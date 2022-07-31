@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/data">
+        <file alias="country">res/country_vi.csv</file>
+        <file alias="vn_vi">res/vn_vi.csv</file>
+        <file alias="us_vi">res/us_en.csv</file>
+        <file alias="saints_vi">res/saints_vi.csv</file>
+    </qresource>
+</RCC>
