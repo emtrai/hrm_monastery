@@ -22,6 +22,9 @@
 #include "dbsqlitepersoneventtbl.h"
 #include "dbsqlitetablebuilder.h"
 
+#include "defs.h"
+#include "logger.h"
+
 static const uint32_t TBL_VERSION_CODE = VERSION_CODE(0,0,1);
 static const char* TBL_NAME = "PersonEvent";
 

@@ -27,16 +27,14 @@
 
 #include "defs.h"
 #include "errcode.h"
+#include "dbmodel.h"
 
-class Saint: public QObject
+class Saint: public QObject, public DbModel
 {
     Q_OBJECT
         public:
             Saint();
 
-            QString nameid() const;
-            const QString &name() const;
-            void setName(const QString &newName);
 
             qint64 feastDay() const;
             void setFeastDay(qint64 newFeastDay);
@@ -44,27 +42,27 @@ class Saint: public QObject
             Gender gender() const;
             void setGender(Gender newGender);
 
-
-            const QString &history() const;
-            void setHistory(const QString &newHistory);
-
             const QString &country() const;
             void setCountry(const QString &newCountry);
 
             const QString &fullName() const;
             void setFullName(const QString &newFullName);
 
-            bool isValid();
-            void dump();
-            QString toString();
+//            bool isValid();
+//            void dump();
+//            QString toString();
 
-            ErrCode save();
+//            ErrCode save();
+
+        public:
+            static DbModel *builder();
+        protected:
+            virtual DbModelHandler *getDbModelHandler();
+
         private:
-            QString mName;
             QString mFullName;
             Gender mGender;
             qint64 mFeastDay; // ngay bon mang
-            QString mHistory;
             QString mCountry;
 
 };

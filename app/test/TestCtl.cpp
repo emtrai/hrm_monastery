@@ -21,7 +21,8 @@
  */
 
 #include "testctl.h"
-#include "std.h"
+#include "logger.h"
+#include "errcode.h"
 
 #include <QRandomGenerator>
 #include <QDateTime>

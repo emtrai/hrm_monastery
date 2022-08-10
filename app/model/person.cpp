@@ -20,10 +20,21 @@
  * Brief:
  */
 #include "person.h"
-#include "std.h"
+#include "logger.h"
+#include "errcode.h"
 #include "dbctl.h"
+#include "utils.h"
 
-Person::Person()
+
+
+// TODO: make those key names configurable????
+static const char* KCsvItemName = "TEN";
+static const char* KCsvItemPersonCode = "MA";
+static const char* KCsvItemChristenDate = "NGAY RUA TOI";
+
+
+Person::Person():
+    mChristenDate(0)
 {
 
 }
@@ -62,24 +73,24 @@ void Person::addHollyName(const QString &newHollyName)
     mHollyName.append(newHollyName);
 }
 
-ErrCode_t Person::save()
-{
-    return DbCtl::getDb()->addPerson(this);
-}
+//ErrCode_t Person::save()
+//{
+//    return DbCtl::getDb()->addPerson(this);
+//}
 
 
 
 
-void Person::dump()
-{
-    traced;
-    QString log = QStringLiteral(
-                      "first name '%1'\n"
-                      "last name '%2'"
-                      )
-                      .arg(firstName(), lastName());
-    logd("%s", log.toStdString().c_str());
-}
+//void Person::dump()
+//{
+//    traced;
+//    QString log = QStringLiteral(
+//                      "first name '%1'\n"
+//                      "last name '%2'\n"
+//                      )
+//                      .arg(firstName(), lastName());
+//    logd("%s", log.toStdString().c_str());
+//}
 
 PersonBasic *Person::dad() const
 {
@@ -109,4 +120,61 @@ const QString &Person::family() const
 void Person::setFamily(const QString &newFamily)
 {
     mFamily = newFamily;
+}
+
+ErrCode Person::fromCSVFile(const QString &fname)
+{
+    traced;
+    QHash<QString, QString> item;
+    logd("parse csv file %s", fname.toStdString().c_str());
+    ErrCode ret = Utils::parseDataFromCSVFile(fname, &item);
+    if (ret == ErrNone){
+        logd("Parsed %d key", item.count());
+        if (item.contains(KCsvItemName)){
+            logd("Set name");
+            setName(item.value(KCsvItemName));
+        }
+        if (item.contains(KCsvItemPersonCode)){
+            logd("Set code");
+            setPersonCode(item.value(KCsvItemPersonCode));
+        }
+        if (item.contains(KCsvItemChristenDate)){
+            logd("Set christenDate");
+            setChristenDate(item.value(KCsvItemChristenDate));
+        }
+    }
+
+    tracedr(ret);
+    return ret;
+
+}
+
+const QString &Person::personCode() const
+{
+    return mPersonCode;
+}
+
+void Person::setPersonCode(const QString &newPersonCode)
+{
+    mPersonCode = newPersonCode;
+}
+
+qint64 Person::christenDate() const
+{
+    return mChristenDate;
+}
+
+void Person::setChristenDate(qint64 newChristenDate)
+{
+    mChristenDate = newChristenDate;
+}
+
+void Person::setChristenDate(const QString &newChristenDate)
+{
+    mChristenDate = Utils::dateFromString(newChristenDate);
+}
+
+DbModelHandler *Person::getDbModelHandler()
+{
+    return DbCtl::getDb()->getSaintModelHandler();
 }

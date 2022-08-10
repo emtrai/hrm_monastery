@@ -23,7 +23,8 @@
 #define FILECTL_H
 
 #include "controller.h"
-
+#include <QFile>
+#include "errcode.h"
 class FileCtl:public Controller
 {
 public:
@@ -35,7 +36,16 @@ public:
 
     static QString getOrCreatePrebuiltDataDir();
     static QString getPrebuiltDataFile(const QString& fname);
+    static QString getPrebuiltDataFilePath(const QString& fname);
+    static QString getPrebuiltDataFileHashPath(const QString& fname);
+
+    // Check if prebuilt data file match with hash file
+    static bool checkPrebuiltDataFileHash(const QString& fname);
+    static ErrCode readPrebuiltDataFileHash(const QString& fname, QString* hashOut);
+    static ErrCode updatePrebuiltDataFileHash(const QString& fname);
     static QString getFullFilePath(const QString &fileName);
+
+    static ErrCode writeStringToFile(const QString& content, const QString&fpath);
 
 private:
     FileCtl();

@@ -23,8 +23,12 @@
 #include <QStandardPaths>
 #include <QDir>
 #include <QCoreApplication>
-#include "std.h"
+#include "logger.h"
+#include "errcode.h"
 #include "defs.h"
+#include "utils.h"
+#include "crypto.h"
+
 FileCtl* FileCtl::gInstance = nullptr;
 
 FileCtl *FileCtl::getInstance()
@@ -90,12 +94,32 @@ QString FileCtl::getFullFilePath(const QString &fileName)
     return QDir(getAppDataDir()).filePath(fileName);
 }
 
+ErrCode FileCtl::writeStringToFile(const QString &content, const QString &fpath)
+{
+    traced;
+    ErrCode ret = ErrNone;
+    QFile file(fpath);
+    logd("Open file %s", fpath.toStdString().c_str());
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)){
+        logd("Write content '%s'", content.toStdString().c_str());
+        QTextStream stream(&file); // TODO: catch exception????
+        stream << content;
+        file.close();
+        ret = ErrNone;
+    }
+    else {
+        ret = ErrFileOpen;
+        loge("Failed to open file %s", fpath.toStdString().c_str());
+    }
+    return ret;
+}
+
 
 QString FileCtl::getPrebuiltDataFile(const QString& fname)
 {
     QFile file(QString(":/data/%1").arg(fname));
     QString prebuiltDir = getOrCreatePrebuiltDataDir();
-    QFile saintFile = QFile(QDir(prebuiltDir).filePath(fname));
+    QFile saintFile(QDir(prebuiltDir).filePath(fname));
     QString path;
     logd("Resource prebuilt file %s", file.fileName().toStdString().c_str());
     if (file.exists())
@@ -117,6 +141,90 @@ QString FileCtl::getPrebuiltDataFile(const QString& fname)
     }
     return path;
 }
+
+QString FileCtl::getPrebuiltDataFilePath(const QString &fname)
+{
+    return QString(":/data/%1").arg(fname);
+}
+
+QString FileCtl::getPrebuiltDataFileHashPath(const QString &fname)
+{
+    QString hashFname = QString("%1.sha256").arg(fname);
+    QString prebuiltDir = getOrCreatePrebuiltDataDir();
+    QString hashFile = QDir(prebuiltDir).filePath(hashFname);
+    logd("Hash file path %s", hashFile.toStdString().c_str());
+    return hashFile;
+}
+
+bool FileCtl::checkPrebuiltDataFileHash(const QString &fname)
+{
+    traced;
+    ErrCode ret = ErrNone;
+    QString fileHash;
+    bool match = false;
+    ret = readPrebuiltDataFileHash(fname, &fileHash);
+    if (ret == ErrNone){
+        QString hash = Crypto::hashFile(getPrebuiltDataFilePath(fname));
+        if (fileHash.compare(hash, Qt::CaseInsensitive) == 0){
+            logi("Hash file match");
+            match = true;
+        }
+        else{
+            logi("Hash file not match");
+        }
+    }
+    else {
+        loge("Something stupid error here %d", ret);
+    }
+
+    logd("Match %d", match);
+    return match;
+}
+
+ErrCode FileCtl::readPrebuiltDataFileHash(const QString &fname, QString* hashOut)
+{
+    traced;
+    ErrCode ret = ErrNone;
+    QString hashFname = getPrebuiltDataFileHashPath(fname);
+    QFile hashFile(hashFname);
+    QString path;
+    logd("hashFile file %s", hashFile.fileName().toStdString().c_str());
+    if (hashFile.exists())
+    {
+        if (hashFile.open(QIODevice::ReadOnly | QIODevice::Text)){
+            QTextStream stream(&hashFile);
+            QString hashValue = stream.readAll();
+            if (!hashValue.isEmpty()){
+                logd("hashValue %s", hashValue.toStdString().c_str());
+                if (hashOut != nullptr){
+                    *hashOut = hashValue.simplified().toLower();
+                }
+            }
+            ret = ErrNone; // TODO: should validate content?
+            hashFile.close();
+        }
+        else{
+            ret = ErrFileRead;
+            loge("Read file '%s' failed", hashFile.fileName().toStdString().c_str());
+        }
+    }
+    else{
+        loge("Hash of %s file not exisst", fname.toStdString().c_str());
+        ret = ErrNotExist;
+    }
+    return ret;
+}
+
+ErrCode FileCtl::updatePrebuiltDataFileHash(const QString &fname)
+{
+    traced;
+
+    QString fpath = getPrebuiltDataFilePath(fname);
+    QString fHashpath = getPrebuiltDataFileHashPath(fname);
+    QString hash = Crypto::hashFile(fpath);
+    return writeStringToFile(hash, fHashpath);
+}
+
 
 FileCtl::FileCtl()
 {

@@ -25,6 +25,7 @@
 //#include "person.h"
 #include "dbinfo.h"
 #include "errcode.h"
+#include "dbmodelhandler.h"
 
 class Person;
 class Community;
@@ -44,7 +45,7 @@ public:
     * Add person to datablase
     *
     */
-    virtual ErrCode_t addPerson(const Person* person) = 0;
+//    virtual ErrCode_t addPerson(const Person* person) = 0;
 
     /**
     * Load database
@@ -52,7 +53,11 @@ public:
     virtual ErrCode_t loadDb(const DbInfo* dbInfo) = 0;
 
 
-//    virtual ErrCode_t addCommunity(const Community* comm) = 0;
+
+    virtual DbModelHandler* getEduModelHandler() = 0;
+    virtual DbModelHandler* getSaintModelHandler() = 0;
+    virtual DbModelHandler* getSpecialistModelHandler() = 0;
+    virtual DbModelHandler* getCommunityModelHandler() = 0;
 };
 
 #endif // IDATABASE_H

@@ -23,49 +23,54 @@
 #define DBSQLITEDEFS_H
 
 #include <QString>
-typedef enum {
+typedef enum TableFieldDatatype {
     TEXT = 0,
     INT32,
     INT64
 }TableFieldDatatype_t;
 
-static const char* KFieldNameId = "nameid";
-static const char* KFieldName = "name";
-static const char* KFieldFirstName = "first_name";
-static const char* KFieldLastName = "last_name";
-static const char* KFieldPersonCode = "person_code";
-static const char* KFieldId = "id";
-static const char* KFieldPersonId = "person_id";
-static const char* KFieldEventId = "event_id";
-static const char* KFieldDate = "date";
-static const char* KFieldTitle = "title";
-static const char* KFieldRemark = "remark";
-static const char* KFieldBirthDay = "birthday";
-static const char* KFieldLevel = "level";
-static const char* KFieldUid = "uid";
-static const char* KFieldParentUid = "parent_uid";
-static const char* KFieldCreateDate = "create_date";
-static const char* KFieldDateFormat = "date_format";
-static const char* KFieldStatus = "status";
-static const char* KFieldCEOUid = "ceo_uid";
-static const char* KFieldChurchUid = "church_uid";
-static const char* KFieldMissionUid = "mission_uid";
-static const char* KFieldAreaUid = "area_uid";
-static const char* KFieldPreset = "preset";
-static const char* KFieldGender = "gender";
-static const char* KFieldFeastDay = "feast_day";
-static const char* KFieldCountry = "country";
-static const char* KFieldHistory = "history";
+const char* const KFieldUuid = "uuid";
+const char* const KFieldNameId = "nameid";
+const char* const KFieldName = "name";
+const char* const KFieldRecordStatus = "record_status";
+const char* const KFieldFirstName = "first_name";
+const char* const KFieldLastName = "last_name";
+const char* const KFieldFullName = "full_name";
+const char* const KFieldPersonCode = "person_code";
+const char* const KFieldId = "id";
+const char* const KFieldPersonId = "person_id";
+const char* const KFieldEventId = "event_id";
+const char* const KFieldDate = "date";
+const char* const KFieldTitle = "title";
+const char* const KFieldRemark = "remark";
+const char* const KFieldBirthDay = "birthday";
+const char* const KFieldLevel = "level";
+const char* const KFieldUid = "uid";
+const char* const KFieldParentUid = "parent_uid";
+const char* const KFieldCreateDate = "create_date";
+const char* const KFieldDateFormat = "date_format";
+const char* const KFieldStatus = "status";
+const char* const KFieldCEOUid = "ceo_uid";
+const char* const KFieldChurchUid = "church_uid";
+const char* const KFieldMissionUid = "mission_uid";
+const char* const KFieldAreaUid = "area_uid";
+const char* const KFieldPreset = "preset";
+const char* const KFieldGender = "gender";
+const char* const KFieldFeastDay = "feast_day";
+const char* const KFieldCountry = "country";
+const char* const KFieldHistory = "history";
 
 // TABLES NAME
-static const char* KTablePerson = "person";
-static const char* KTableCommunity = "community";
-static const char* KTableEvent = "event";
-static const char* KTableSaint = "saint";
-static const char* KTableEdu = "edu";
-static const char* KTableWork = "work";
-static const char* KTableChurch = "church";
-static const char* KTableMission = "mission";
+const char* const KTablePerson = "person"; // Person
+const char* const KTableCommunity = "community"; // cong doan
+const char* const KTableDepartment = "department"; // BQL
+const char* const KTableEvent = "event";
+const char* const KTableSaint = "saint"; // thanh
+const char* const KTableEdu = "edu"; // Education like primary school, high school, etc.
+const char* const KTableSpecialist = "specialist"; // chuyen mon
+const char* const KTableWork = "work"; // cong viec
+const char* const KTableChurch = "church";
+const char* const KTableMission = "mission"; // su vu cua cong doan
 
 // TODO: move to class???
 QString getDateTypeString(TableFieldDatatype_t dataType);

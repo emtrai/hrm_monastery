@@ -20,7 +20,8 @@
  * Brief:
  */
 #include "dbsqlitetablebuilder.h"
-#include "std.h"
+#include "logger.h"
+#include "errcode.h"
 #include <QStringLiteral>
 
 
@@ -84,7 +85,7 @@ QString DbSqliteTableBuilder::buildSqlStatement()
      */
     return QStringLiteral(
                 "CREATE TABLE IF NOT EXISTS %1 "
-                "(id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT, record_status INTEGER"
-                "%2)")
-        .arg(mName, fields);
+                "(%2 INTEGER PRIMARY KEY AUTOINCREMENT"
+                "%3)")
+        .arg(mName, KFieldId, fields);
 }

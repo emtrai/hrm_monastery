@@ -24,7 +24,8 @@
 
 #include "dbsqlitetbl.h"
 #include "errcode.h"
-#include "std.h"
+#include "logger.h"
+
 
 class DbSqlite;
 

@@ -21,7 +21,26 @@
  */
 #include "education.h"
 
+#include "crypto.h"
+
+#include "idbedu.h"
+#include "dbctl.h"
+#include "logger.h"
+#include "idbedu.h"
+
 Education::Education()
 {
 
 }
+
+DbModel *Education::builder()
+{
+    return new Education();
+}
+
+DbModelHandler *Education::getDbModelHandler()
+{
+    return DbCtl::getInstance()->getDb()->getEduModelHandler();
+}
+
+

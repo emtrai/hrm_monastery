@@ -20,7 +20,8 @@
  * Brief:
  */
 #include "saintctl.h"
-#include "std.h"
+#include "logger.h"
+#include "errcode.h"
 #include "config.h"
 #include "saint.h"
 #include "utils.h"
@@ -29,11 +30,33 @@
 #include "defs.h"
 #include "filectl.h"
 #include "dbctl.h"
-#include "idbsaint.h"
 
 SaintCtl *SaintCtl::gInstance = nullptr;
 
 #define MAX_SPLIT_ITEMS (6)
+
+#define SPLIT ','
+
+
+QList<Saint*> SaintCtl::getListSaints()
+{
+    traced;
+    QList<Saint*> list;
+    DbModelHandler* dbSaint = DbCtl::getDb()->getSaintModelHandler();
+    if (dbSaint != nullptr){
+        QList<DbModel*> lstModel = dbSaint->getAll(&Saint::builder);
+        if (!lstModel.empty()) {
+            foreach (DbModel* item, lstModel){
+                list.append((Saint*)item);
+            }
+        }
+
+    }
+    else{
+        loge("DbSaint not ready");
+    }
+    return list;
+}
 
 SaintCtl::SaintCtl()
 {
@@ -43,12 +66,26 @@ SaintCtl::SaintCtl()
 void SaintCtl::onLoad()
 {
     traced;
-
-    check2UpdateDbFromFile(FileCtl::getPrebuiltDataFile(
-                            Utils::getPrebuiltFile(KPrebuiltSaintCSVFileName)));
+    ErrCode ret = ErrNone;
+    QString fname = Utils::getPrebuiltFileByLang(KPrebuiltSaintCSVFileName);
+    if (!FileCtl::checkPrebuiltDataFileHash(fname)){
+        logi("Hash file not match, seem need to update");
+        ret = check2UpdateDbFromFile(FileCtl::getPrebuiltDataFilePath(fname));
+        if (ret == ErrNone){
+            FileCtl::updatePrebuiltDataFileHash(fname);
+        }
+        else{
+            logi("Check to update db from file failed %d", ret);
+        }
+    }
+    else {
+        logi("Prebuilt saint file up-to-date");
+//        getListSaints();//TODO: for test only;
+    }
+//    check2UpdateDbFromFile(FileCtl::getPrebuiltDataFile(
+//                            Utils::getPrebuiltFileByLang(KPrebuiltSaintCSVFileName)));
 }
 
-#define SPLIT ','
 ErrCode SaintCtl::check2UpdateDbFromFile(const QString &filePath)
 {
     traced;

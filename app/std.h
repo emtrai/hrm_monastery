@@ -22,11 +22,11 @@
 #ifndef STD_H
 #define STD_H
 
-#include "logger.h"
-#include "errcode.h"
+//#include "logger.h"
+//#include "errcode.h"
 
-#define UNUSED(name) (void)name;
+//#define UNUSED(name) (void)name;
 
-#define VERSION_CODE(major,minor,patch) (major * 1000000 + minor * 1000 + patch)
+//#define VERSION_CODE(major,minor,patch) (major * 1000000 + minor * 1000 + patch)
 
 #endif // STD_H

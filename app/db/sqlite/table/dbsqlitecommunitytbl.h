@@ -25,16 +25,22 @@
 #include "dbsqlitetbl.h"
 
 class DbSqlite;
-class Community;
+class DbModel;
+class DbSqliteTableBuilder;
+class DbSqliteInsertBuilder;
+class QSqlQuery;
 
 class DbSqliteCommunityTbl : public DbSqliteTbl
 {
 public:
     DbSqliteCommunityTbl(DbSqlite* db);
-    ErrCode_t add(const Community* item);
 
 protected:
-    virtual QString getSqlCmdCreateTable();
+//    virtual QString getSqlCmdCreateTable();
+//    virtual ErrCode_t add(const DbModel* item);
+    virtual void addTableField(DbSqliteTableBuilder* builder);
+    virtual void insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
+    virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
 
 private:
     static const qint32 KVersionCode;

@@ -24,15 +24,18 @@
 
 
 #include "dbsqlitedefs.h"
-#include "std.h"
+#include "errcode.h"
+#include <QSqlQuery>
+#include <QSqlRecord>
+#include <QHash>
+#include "defs.h"
+#include "logger.h"
 
 const qint32 DbSqliteEduTbl::KVersionCode = VERSION_CODE(0,0,1);
 
 DbSqliteEduTbl::DbSqliteEduTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableEdu, KTableEdu, KVersionCode)
-{}
-
-QString DbSqliteEduTbl::getSqlCmdCreateTable()
 {
-
+    traced;
 }
+

@@ -33,7 +33,9 @@ class PersonCtl: public Controller
 {
 public:
     virtual ~PersonCtl();
-    ErrCode_t addPerson(const Person* person);
+    ErrCode addPerson(Person* person);
+    ErrCode addPerson (const QString& fname);
+    ErrCode AddListPersons(const QString& fname);
 private:
     PersonCtl();
 

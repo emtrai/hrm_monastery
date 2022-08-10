@@ -7,6 +7,7 @@ CONFIG += c++17
 CONFIG += console
 QT += sql
 QT += widgets
+QT += gui
 
 DEFINES += FEATURE_system_sqlite=OFF
 
@@ -25,6 +26,7 @@ INCLUDEPATH += $$PWD/config
 INCLUDEPATH += $$PWD/file
 INCLUDEPATH += $$PWD/saint
 INCLUDEPATH += $$PWD/crypto
+INCLUDEPATH += $$PWD/location
 #QT_NO_DEBUG_OUTPUT
 
 # You can make your code fail to compile if it uses deprecated APIs.
@@ -40,12 +42,17 @@ SOURCES += \
     crypto/crypto.cpp \
     db/dbctl.cpp \
     db/dbinfo.cpp \
+    db/dbmodel.cpp \
+    db/dbmodelhandler.cpp \
     db/idatabase.cpp \
     db/sqlite/dbsqlite.cpp \
     db/sqlite/dbsqlitecommunity.cpp \
     db/sqlite/dbsqlitedefs.cpp \
+    db/sqlite/dbsqliteedu.cpp \
     db/sqlite/dbsqliteinsertbuilder.cpp \
+    db/sqlite/dbsqlitemodelhandler.cpp \
     db/sqlite/dbsqlitesaint.cpp \
+    db/sqlite/dbsqlitespecialist.cpp \
     db/sqlite/table/dbsqlitecommunitytbl.cpp \
     db/sqlite/table/dbsqlitedeparttbl.cpp \
     db/sqlite/table/dbsqliteedutbl.cpp \
@@ -53,32 +60,45 @@ SOURCES += \
     db/sqlite/table/dbsqlitepersontbl.cpp \
     db/sqlite/dbsqlitetablebuilder.cpp \
     db/sqlite/table/dbsqlitesainttbl.cpp \
+    db/sqlite/table/dbsqlitespecialisttbl.cpp \
     db/sqlite/table/dbsqlitetbl.cpp \
     db/sqlite/table/dbsqliteworktbl.cpp \
+    edu/eductl.cpp \
     file/filectl.cpp \
     loader/loaderctl.cpp \
+    location/location.cpp \
     logger.cpp \
     main.cpp \
     mainwindow.cpp \
     model/church.cpp \
     model/community.cpp \
+    model/country.cpp \
     model/department.cpp \
     model/education.cpp \
     model/person.cpp \
     model/personbasic.cpp \
     model/personevent.cpp \
+    model/province.cpp \
     model/saint.cpp \
+    model/specialist.cpp \
     model/work.cpp \
     monastery/monasteryctl.cpp \
     person/personctl.cpp \
     report/reportctl.cpp \
     saint/saintctl.cpp \
     search/searchctl.cpp \
+    specialist/specialistctl.cpp \
     statistic/statistic.cpp \
     test/testctl.cpp \
     utils.cpp \
     view/dialog/dlgcommunity.cpp \
-    view/dialog/dlgperson.cpp
+    view/dialog/dlgperson.cpp \
+    view/widget/uicommunityview.cpp \
+    view/widget/uiitembutton.cpp \
+    view/widget/uimulticomboxview.cpp \
+    view/widget/uinunsview.cpp \
+    view/widget/uisaintsview.cpp \
+    view/widget/uisummarizeview.cpp
 
 HEADERS += \
     address.h \
@@ -89,14 +109,21 @@ HEADERS += \
     crypto/crypto.h \
     db/dbctl.h \
     db/dbinfo.h \
+    db/dbmodel.h \
+    db/dbmodelhandler.h \
     db/idatabase.h \
     db/idbcommunity.h \
+    db/idbedu.h \
     db/idbsaint.h \
+    db/idbspecialist.h \
     db/sqlite/dbsqlite.h \
     db/sqlite/dbsqlitecommunity.h \
     db/sqlite/dbsqlitedefs.h \
+    db/sqlite/dbsqliteedu.h \
     db/sqlite/dbsqliteinsertbuilder.h \
+    db/sqlite/dbsqlitemodelhandler.h \
     db/sqlite/dbsqlitesaint.h \
+    db/sqlite/dbsqlitespecialist.h \
     db/sqlite/table/dbsqlitecommunitytbl.h \
     db/sqlite/table/dbsqlitedeparttbl.h \
     db/sqlite/table/dbsqliteedutbl.h \
@@ -104,39 +131,57 @@ HEADERS += \
     db/sqlite/table/dbsqlitepersontbl.h \
     db/sqlite/dbsqlitetablebuilder.h \
     db/sqlite/table/dbsqlitesainttbl.h \
+    db/sqlite/table/dbsqlitespecialisttbl.h \
     db/sqlite/table/dbsqlitetbl.h \
     db/sqlite/table/dbsqliteworktbl.h \
     defs.h \
+    edu/eductl.h \
     errcode.h \
     file/filectl.h \
     loader/loaderctl.h \
+    location/location.h \
     logger.h \
     mainwindow.h \
     model/church.h \
     model/community.h \
+    model/country.h \
     model/department.h \
     model/education.h \
     model/person.h \
     model/personbasic.h \
     model/personevent.h \
+    model/province.h \
     model/saint.h \
+    model/specialist.h \
     model/work.h \
     monastery/monasteryctl.h \
     person/personctl.h \
     report/reportctl.h \
     saint/saintctl.h \
     search/searchctl.h \
+    specialist/specialistctl.h \
     statistic/statistic.h \
     std.h \
     test/testctl.h \
     utils.h \
     view/dialog/dlgcommunity.h \
-    view/dialog/dlgperson.h
+    view/dialog/dlgperson.h \
+    view/widget/uicommunityview.h \
+    view/widget/uiitembutton.h \
+    view/widget/uimulticomboxview.h \
+    view/widget/uinunsview.h \
+    view/widget/uisaintsview.h \
+    view/widget/uisummarizeview.h
 
 FORMS += \
     mainwindow.ui \
     view/dialog/dlgcommunity.ui \
-    view/dialog/dlgperson.ui
+    view/dialog/dlgperson.ui \
+    view/widget/uicommunityview.ui \
+    view/widget/uimulticomboxview.ui \
+    view/widget/uinunsview.ui \
+    view/widget/uisaintsview.ui \
+    view/widget/uisummarizeview.ui
 
 TRANSLATIONS += \
     hrm_monastery_vi_VN.ts
@@ -155,7 +200,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 DISTFILES += \
     license.template \
-    res/Saints.csv
+    res/Saints.csv \
+    res/edu_vi.csv
 
 RESOURCES += \
     resource.qrc

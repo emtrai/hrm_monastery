@@ -26,6 +26,11 @@
 #include "person.h"
 #include "dbsqlite.h"
 
+#include "defs.h"
+#include "logger.h"
+
+#include <QSqlQuery>
+
 const qint32 DbSqlitePersonTbl::KVersionCode = VERSION_CODE(0,0,1);
 
 
@@ -33,33 +38,67 @@ DbSqlitePersonTbl::DbSqlitePersonTbl(DbSqlite* db):
     DbSqliteTbl(db, KTablePerson, KTablePerson, KVersionCode)
 {}
 
-ErrCode_t DbSqlitePersonTbl::addPerson(const Person *person)
+void DbSqlitePersonTbl::addTableField(DbSqliteTableBuilder *builder)
+{
+
+    traced;
+    DbSqliteTbl::addTableField(builder);
+    builder->addField(KFieldLastName, TEXT);
+    builder->addField(KFieldFirstName, TEXT);
+    builder->addField(KFieldPersonCode, TEXT);
+    builder->addField(KFieldBirthDay, INT64);
+}
+
+void DbSqlitePersonTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
+{
+
+    DbSqliteTbl::insertTableField(builder, item);
+    Person* per = (Person*) item;
+    builder->addValue(KFieldLastName, per->lastName());
+    builder->addValue(KFieldFirstName, per->firstName());
+    builder->addValue(KFieldPersonCode, per->personCode());
+    builder->addValue(KFieldBirthDay, per->birthday());
+}
+
+void DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     traced;
-    ErrCode_t err = ErrNone;
-    QString sql = DbSqliteInsertBuilder::build(name())
-                      ->addValue(KFieldLastName, person->lastName())
-                      ->addValue(KFieldFirstName, person->firstName())
-                      ->addValue(KFieldBirthDay, person->birthday())
+    DbSqliteTbl::updateModelFromQuery(item, qry);
+    Person* cmm = (Person*) item;
+    cmm->setLastName(qry.value(KFieldLastName).toString());
+    cmm->setFirstName(qry.value(KFieldFirstName).toString());
+    cmm->setPersonCode(qry.value(KFieldPersonCode).toString());
+    cmm->setBirthday(qry.value(KFieldBirthDay).toInt());
 
-                      ->buildSqlStatement();
-    logi("insert sql statement %s", sql.toStdString().c_str());
-    err = db()->execQuery(sql);
-
-    return err;
 }
 
+//ErrCode_t DbSqlitePersonTbl::addPerson(const Person *person)
+//{
+//    traced;
+//    ErrCode_t err = ErrNone;
+//    QString sql = DbSqliteInsertBuilder::build(name())
+//                      ->addValue(KFieldLastName, person->lastName())
+//                      ->addValue(KFieldFirstName, person->firstName())
+//                      ->addValue(KFieldBirthDay, person->birthday())
 
-QString DbSqlitePersonTbl::getSqlCmdCreateTable() {
-    traced;
-    QString sql = DbSqliteTableBuilder::build(name())
-                      ->addField(KFieldLastName, TEXT)
-                      ->addField(KFieldFirstName, TEXT)
-                      ->addField(KFieldPersonCode, TEXT)
-                      ->addField(KFieldBirthDay, INT64)
+//                      ->buildSqlStatement();
+//    logi("insert sql statement %s", sql.toStdString().c_str());
+//    err = db()->execQuery(sql);
 
-                      ->buildSqlStatement();
-    logi("Create statement %s", sql.toStdString().c_str());
+//    return err;
+//}
 
-    return sql;
-}
+
+//QString DbSqlitePersonTbl::getSqlCmdCreateTable() {
+//    traced;
+//    QString sql = DbSqliteTableBuilder::build(name())
+//                      ->addField(KFieldLastName, TEXT)
+//                      ->addField(KFieldFirstName, TEXT)
+//                      ->addField(KFieldPersonCode, TEXT)
+//                      ->addField(KFieldBirthDay, INT64)
+
+//                      ->buildSqlStatement();
+//    logi("Create statement %s", sql.toStdString().c_str());
+
+//    return sql;
+//}

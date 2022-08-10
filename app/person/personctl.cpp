@@ -21,18 +21,43 @@
  */
 #include "personctl.h"
 #include "dbctl.h"
-#include "std.h"
+#include "logger.h"
+#include "errcode.h"
+#include "logger.h"
+#include "utils.h"
+#include "person.h"
 
 PersonCtl* PersonCtl::gInstance = nullptr;
 
-ErrCode_t PersonCtl::addPerson(const Person *person)
+ErrCode PersonCtl::addPerson(Person *person)
 {
     traced;
     ErrCode_t err = ErrNone;
     // TODO: check null
-    err = DbCtl::getDb()->addPerson(person);
+    err = person->save();
 
     return err;
+}
+
+ErrCode PersonCtl::addPerson(const QString &fname)
+{
+    traced;
+    Person *person = new Person();
+    ErrCode ret = person->fromCSVFile(fname);
+
+    if (ret == ErrNone){
+        ret = person->save();
+    }
+
+    delete person;
+    tracedr(ret);
+    return ret;
+}
+
+ErrCode PersonCtl::AddListPersons(const QString &fname)
+{
+    traced;
+
 }
 
 PersonCtl::PersonCtl()

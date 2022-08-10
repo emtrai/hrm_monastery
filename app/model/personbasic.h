@@ -23,12 +23,12 @@
 #define PERSONBASIC_H
 
 #include <QString>
-
+#include <QObject>
 #include "errcode.h"
 
 class Address;
 
-class PersonBasic
+class PersonBasic: public QObject
 {
 public:
     PersonBasic();
@@ -51,7 +51,7 @@ public:
     void setLastName(const QString &newLastName);
 
 
-    ErrCode_t setName(const QString& name);
+    ErrCode setNameFromFullName(const QString& name);
 
     QString getFullName();
 private:

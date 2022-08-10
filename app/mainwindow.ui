@@ -14,7 +14,11 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout"/>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QWidget" name="widget" native="true"/>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -54,10 +58,16 @@
     <addaction name="actionNew_2"/>
     <addaction name="actionImportComm"/>
    </widget>
+   <widget class="QMenu" name="menuOthers">
+    <property name="title">
+     <string>Others</string>
+    </property>
+   </widget>
    <addaction name="menu_Edit"/>
    <addaction name="menuHelp"/>
    <addaction name="menuPerson"/>
    <addaction name="menuCommunity"/>
+   <addaction name="menuOthers"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -70,8 +80,11 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionSummarize"/>
+   <addaction name="actionNuns"/>
+   <addaction name="actionCommunity"/>
+   <addaction name="actionSaints_2"/>
    <addaction name="action_New"/>
-   <addaction name="actionNew_Community"/>
   </widget>
   <action name="action_New">
    <property name="text">
@@ -121,6 +134,43 @@
   <action name="actionImportComm">
    <property name="text">
     <string>Import</string>
+   </property>
+  </action>
+  <action name="actionAdd">
+   <property name="text">
+    <string>Add Saint</string>
+   </property>
+  </action>
+  <action name="actionCommunity">
+   <property name="text">
+    <string>Community</string>
+   </property>
+   <property name="toolTip">
+    <string>List community</string>
+   </property>
+  </action>
+  <action name="actionSummarize">
+   <property name="text">
+    <string>Thống Kê</string>
+   </property>
+   <property name="toolTip">
+    <string>Summarize</string>
+   </property>
+  </action>
+  <action name="actionSaints_2">
+   <property name="text">
+    <string>Saints</string>
+   </property>
+   <property name="toolTip">
+    <string>Show Saints</string>
+   </property>
+  </action>
+  <action name="actionNuns">
+   <property name="text">
+    <string>Nuns</string>
+   </property>
+   <property name="toolTip">
+    <string>Nuns</string>
    </property>
   </action>
  </widget>

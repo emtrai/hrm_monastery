@@ -26,19 +26,19 @@
 
 
 class DbSqlite;
-class Saint;
+class DbSqliteTableBuilder;
+class DbSqliteInsertBuilder;
+class DbModel;
+class QSqlQuery;
 
 class DbSqliteSaintTbl : public DbSqliteTbl
 {
 public:
     DbSqliteSaintTbl(DbSqlite* db);
-    ErrCode_t add(const Saint* item);
 
-    bool isExist(const Saint* item);
-
-protected:
-    virtual QString getSqlCmdCreateTable();
-
+    virtual void addTableField(DbSqliteTableBuilder* builder);
+    virtual void insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
+    virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
 
 private:
     static const qint32 KVersionCode;

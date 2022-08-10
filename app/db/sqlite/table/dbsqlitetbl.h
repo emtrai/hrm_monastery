@@ -26,9 +26,12 @@
 #include "errcode.h"
 
 #include "dbsqlitedefs.h"
-
+#include "dbmodel.h"
+#include <QHash>
 class DbSqlite;
-
+class DbSqliteTableBuilder;
+class DbSqliteInsertBuilder;
+class QSqlQuery;
 
 class DbSqliteTbl
 {
@@ -37,23 +40,32 @@ public:
     DbSqliteTbl(DbSqlite* db, const QString& baseName, const QString& name, qint32 versionCode);
     virtual ~DbSqliteTbl();
 
-    const QString &baseName() const;
-    void setBaseName(const QString &newBaseName);
+    virtual const QString &baseName() const;
+    virtual void setBaseName(const QString &newBaseName);
 
-    const QString &name() const;
-    void setName(const QString &newName);
+    virtual const QString &name() const;
+    virtual void setName(const QString &newName);
 
-    uint32_t versionCode() const;
-    void setVersionCode(uint32_t newVersionCode);
+    virtual uint32_t versionCode() const;
+    virtual void setVersionCode(uint32_t newVersionCode);
+
+    virtual ErrCode add(const DbModel* item);
+
+    virtual bool isExist(const DbModel* item);
+    virtual QList<DbModel*> getAll(DbModelBuilder builder);
 
 
-    virtual ErrCode_t checkOrCreateTable();
+    virtual ErrCode checkOrCreateTable();
+    virtual ErrCode onDbMigration(int oldVer, int newVer);
+    virtual ErrCode onTblMigration(int oldVer, int newVer);
 protected:
-    virtual QString getSqlCmdCreateTable() = 0;
-
+    virtual QString getSqlCmdCreateTable();
+    virtual void addTableField(DbSqliteTableBuilder* builder);
+    virtual void insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
+    virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
 public:
 
-    DbSqlite *db() const;
+    virtual DbSqlite *db() const;
 
 protected: // allow derived class can get info
     QString mBaseName;

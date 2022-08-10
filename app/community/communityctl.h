@@ -23,7 +23,8 @@
 #define COMMUNITYCTL_H
 
 #include <QString>
-#include "std.h"
+#include "logger.h"
+#include "errcode.h"
 #include "controller.h"
 
 

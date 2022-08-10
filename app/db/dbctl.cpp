@@ -20,12 +20,15 @@
  * Brief:
  */
 #include "dbctl.h"
-#include "std.h"
+#include "logger.h"
+#include "errcode.h"
 #include "sqlite/dbsqlite.h"
 #include <QStandardPaths>
 #include <QDir>
 #include "dbsqlitesaint.h"
 #include "dbsqlitecommunity.h"
+#include "dbsqliteedu.h"
+#include "dbsqlitespecialist.h"
 
 DbCtl* DbCtl::gInstance = nullptr;
 
@@ -49,8 +52,10 @@ DbCtl::DbCtl():Controller("DbCtl")
     logd("dbPath %s", dbPath.toStdString().c_str());
     dbInfo->setUri(dbPath);
 
-    mDbSaint = new DbSqliteSaint();
-    mDbCommunity = new DbSqliteCommunity();
+//    mDbSaint = new DbSqliteSaint();
+//    mDbCommunity = new DbSqliteCommunity();
+//    mDbEdu = new DbSqliteEdu();
+//    mDbSpecialist = new DbSqliteSpecialist();
 }
 
 IDatabase *DbCtl::database() const
@@ -58,22 +63,39 @@ IDatabase *DbCtl::database() const
     return mDatabase;
 }
 
-IDbSaint *DbCtl::dbSaint()
-{
-    traced;
-    if (mDbSaint == nullptr){
-        mDbSaint = new DbSqliteSaint();
-    }
-    return mDbSaint;
-}
+//IDbSaint *DbCtl::dbSaint()
+//{
+//    traced;
+//    if (mDbSaint == nullptr){
+//        mDbSaint = new DbSqliteSaint();
+//    }
+//    return mDbSaint;
+//}
 
-IDbCommunity *DbCtl::dbCommunity()
-{
-    if (mDbCommunity == nullptr){
-        mDbCommunity = new DbSqliteCommunity();
-    }
-    return mDbCommunity;
-}
+//IDbCommunity *DbCtl::dbCommunity()
+//{
+//    if (mDbCommunity == nullptr){
+//        mDbCommunity = new DbSqliteCommunity();
+//    }
+//    return mDbCommunity;
+//}
+
+////IDbEdu *DbCtl::dbEdu()
+////{
+////    if (mDbEdu == nullptr){
+////        mDbEdu = new DbSqliteEdu();
+////    }
+////    return mDbEdu;
+
+////}
+
+//IDbSpecialist *DbCtl::dbSpecialist()
+//{
+//    if (mDbSpecialist == nullptr)
+//        mDbSpecialist = new DbSqliteSpecialist;
+
+//    return mDbSpecialist;
+//}
 
 DbCtl* DbCtl::getInstance(){
     traced;

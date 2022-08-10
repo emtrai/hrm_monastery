@@ -22,6 +22,11 @@
 #ifndef DEFS_H
 #define DEFS_H
 
+
+#define UNUSED(name) (void)name;
+
+#define VERSION_CODE(major,minor,patch) (major * 1000000 + minor * 1000 + patch)
+
 enum Gender{
     FEMALE = 0,
     MALE,
@@ -29,9 +34,12 @@ enum Gender{
     GENDER_UNKNOWN
 };
 
-static const char* KLanguage = "vi";
+const char* const KLanguage = "vi";
 
-static const char* KPrebuiltDirName = "prebuilt";
-static const char* KPrebuiltSaintCSVFileName = "saints";
+const char* const KPrebuiltDirName = "prebuilt";
+const char* const KPrebuiltSaintCSVFileName = "saints";
+const char* const KPrebuiltCountryCSVFileName = "country";
+const char* const KPrebuiltEduCSVFileName = "edu";
+const char* const KPrebuiltSpecialistCSVFileName = "specialist";
 
 #endif // DEFS_H

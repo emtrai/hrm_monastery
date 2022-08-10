@@ -24,6 +24,11 @@
 
 #include <QMainWindow>
 
+#include "view/widget/uisummarizeview.h"
+#include "view/widget/uicommunityview.h"
+#include "view/widget/uisaintsview.h"
+#include "view/widget/uinunsview.h"
+
 QT_BEGIN_NAMESPACE
     namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -39,8 +44,14 @@ QT_END_NAMESPACE
      void showEvent(QShowEvent *ev);
      static void onFinishLoading(int ret, void* data);
  private:
+     void switchView(QWidget* nextView);
+ private:
     Ui::MainWindow *ui;
-
+    UISummarizeView* mSummarizeView;
+    UICommunityView* mCommunityView;
+    UISaintsView* mSaintsView;
+    UINunsView* mNunsView;
+    QWidget* mCurrentView;
  signals:
     void load();
 
@@ -48,5 +59,9 @@ QT_END_NAMESPACE
      void on_action_New_triggered();
      void on_actionNew_Community_triggered();
      void on_actionImportComm_triggered();
+     void on_actionCommunity_triggered();
+     void on_actionSummarize_triggered();
+     void on_actionSaints_2_triggered();
+     void on_actionNuns_triggered();
 };
 #endif // MAINWINDOW_H

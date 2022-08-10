@@ -24,7 +24,8 @@
 
 #include <QObject>
 #include <QString>
-#include "std.h"
+#include "dbmodel.h"
+#include "errcode.h"
 
 // BE WARE, ANY CHANGE TO THIS STATUS WILL IMPACT TO DB
 // THIS VALUE IS WRITTEN DIRECTLY TO DB
@@ -33,9 +34,12 @@ enum CommunityStatus {
     INACTIVE = 0, // inactive, not operating
     ACTIVE, // active, operating
     BUILDING, // building phase, not ready
+
+
+    MAX
 };
 
-class Community: public QObject
+class Community: public QObject, public DbModel
 {
     Q_OBJECT
 public:
@@ -58,14 +62,14 @@ public:
     CommunityStatus getStatus() const;
     void setStatus(CommunityStatus newStatus);
 
-
-
-    ErrCode_t save();
-    void dump();
+//    ErrCode save();
+//    void dump();
 
     qint64 closeDate() const;
     void setCloseDate(qint64 newCloseDate);
 
+protected:
+    virtual DbModelHandler* getDbModelHandler();
 private:
     QString mName;
     qint32 mLevel; // level 0: root, Level 1, Level 2 (belong to level 1), etc...

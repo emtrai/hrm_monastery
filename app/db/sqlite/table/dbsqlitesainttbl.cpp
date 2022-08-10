@@ -23,11 +23,14 @@
 #include "dbsqlite.h"
 
 #include "dbsqlitedefs.h"
-#include "std.h"
+#include "defs.h"
+#include "logger.h"
 #include "dbsqlitetablebuilder.h"
 #include "saint.h"
 #include "dbsqliteinsertbuilder.h"
 #include <QSqlQuery>
+#include <QSqlRecord>
+#include <QHash>
 
 const qint32 DbSqliteSaintTbl::KVersionCode = VERSION_CODE(0,0,1);
 
@@ -37,73 +40,103 @@ DbSqliteSaintTbl::DbSqliteSaintTbl(DbSqlite* db)
 
 }
 
-
-ErrCode_t DbSqliteSaintTbl::add(const Saint *item)
+void DbSqliteSaintTbl::addTableField(DbSqliteTableBuilder *builder)
 {
     traced;
-    ErrCode_t err = ErrNone;
-    QString sql = DbSqliteInsertBuilder::build(name())
-                      ->addValue(KFieldNameId, item->nameid())
-                      ->addValue(KFieldName, item->name())
-                      ->addValue(KFieldGender, item->gender())
-                      ->addValue(KFieldFeastDay, item->feastDay())
-                      ->addValue(KFieldCountry, item->country())
-                      ->addValue(KFieldHistory, item->history())
-
-                      ->buildSqlStatement();
-    logi("insert sql statement %s", sql.toStdString().c_str());
-    err = db()->execQuery(sql);
-
-    return err;
-
+    DbSqliteTbl::addTableField(builder);
+    builder->addField(KFieldFullName, TEXT);
+    builder->addField(KFieldGender, INT32);
+    builder->addField(KFieldFeastDay, INT64);
+    builder->addField(KFieldCountry, TEXT);
 }
 
-bool DbSqliteSaintTbl::isExist(const Saint *item)
-{
-    QSqlQuery qry;
-    bool exist = false;
-    traced;
-    QString queryString = QString("SELECT COUNT(*) FROM %1 WHERE %2 = :nameid").arg(name(), KFieldNameId);
-    qry.prepare(queryString);
-    logd("Query String '%s'", queryString.toStdString().c_str());
-
-    // TODO: check sql injection issue
-    qry.bindValue( ":nameid", item->nameid() );
-    if( qry.exec() )
-    {
-        int rows= 0;
-        if (qry.next()) {
-            rows = qry.value(0).toInt();
-            exist = rows > 0;
-        }
-        else {
-            logd("Not found any items");
-            exist = false;
-        }
-    }
-    else {
-        loge( "Failed to execute %s", queryString.toStdString().c_str() );
-        exist = false;
-    }
-
-    logd("Exist %d", exist);
-    return exist;
-}
-
-QString DbSqliteSaintTbl::getSqlCmdCreateTable()
+void DbSqliteSaintTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
 {
     traced;
-    // TODO; support multi language
-    QString sql = DbSqliteTableBuilder::build(name())
-                      ->addField(KFieldNameId, TEXT)
-                      ->addField(KFieldName, TEXT)
-                      ->addField(KFieldGender, TEXT)
-                      ->addField(KFieldFeastDay, INT64)
-                      ->addField(KFieldCountry, TEXT)
-                      ->addField(KFieldHistory, TEXT)
-
-                      ->buildSqlStatement();
-    logi("Create statement %s", sql.toStdString().c_str());
-
-    return sql;
+    DbSqliteTbl::insertTableField(builder, item);
+    Saint* saint = (Saint*) item;
+    builder->addValue(KFieldFullName, saint->fullName());
+    builder->addValue(KFieldGender, saint->gender());
+    builder->addValue(KFieldFeastDay, saint->feastDay());
+    builder->addValue(KFieldCountry, saint->country());
 }
+
+void DbSqliteSaintTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+{
+    traced;
+    DbSqliteTbl::updateModelFromQuery(item, qry);
+    Saint* saint = (Saint*) item;
+    saint->setFullName(qry.value(KFieldFullName).toString());
+    saint->setGender((Gender)qry.value(KFieldGender).toInt());
+    saint->setFeastDay(qry.value(KFieldFeastDay).toInt());
+    saint->setCountry(qry.value(KFieldCountry).toString());
+}
+
+
+//ErrCode_t DbSqliteSaintTbl::add(const Saint *item)
+//{
+//    traced;
+//    ErrCode_t err = ErrNone;
+//    QString sql = DbSqliteInsertBuilder::build(name())
+//                      ->addValue(KFieldNameId, item->nameid())
+//                      ->addValue(KFieldName, item->name())
+//                      ->addValue(KFieldGender, item->gender())
+//                      ->addValue(KFieldFeastDay, item->feastDay())
+//                      ->addValue(KFieldCountry, item->country())
+//                      ->addValue(KFieldHistory, item->history())
+
+//                      ->buildSqlStatement();
+//    logi("insert sql statement %s", sql.toStdString().c_str());
+//    err = db()->execQuery(sql);
+
+//    return err;
+
+//}
+
+//QHash<QString, Saint*> DbSqliteSaintTbl::getListSaint()
+//{
+//    QSqlQuery qry;
+
+//    traced;
+//    QString queryString = QString("SELECT * FROM %1").arg(name());
+//    qry.prepare(queryString);
+//    logd("Query String '%s'", queryString.toStdString().c_str());
+//    QHash<QString, Saint*> list;
+
+//    if( qry.exec() )
+//    {
+//        while (qry.next()) {
+//            Saint* saint = new Saint();
+//            // TODO: validate value before, i.e. toInt return ok
+//            saint->setName(qry.value(KFieldName).toString());
+//            saint->setDbId(qry.value(KFieldId).toInt());
+//            saint->setGender((Gender)qry.value(KFieldId).toInt());
+//            saint->setFeastDay(qry.value(KFieldFeastDay).toInt());
+//            list.insert(saint->name(), saint);
+//        }
+//    }
+//    else {
+//        loge( "Failed to execute %s", queryString.toStdString().c_str() );
+//    }
+
+//    logd("Found %d", list.size());
+//    return list;
+//}
+
+//QString DbSqliteSaintTbl::getSqlCmdCreateTable()
+//{
+//    traced;
+//    // TODO; support multi language
+//    QString sql = DbSqliteTableBuilder::build(name())
+//                      ->addField(KFieldNameId, TEXT)
+//                      ->addField(KFieldName, TEXT)
+//                      ->addField(KFieldGender, TEXT)
+//                      ->addField(KFieldFeastDay, INT64)
+//                      ->addField(KFieldCountry, TEXT)
+//                      ->addField(KFieldHistory, TEXT)
+
+//                      ->buildSqlStatement();
+//    logi("Create statement %s", sql.toStdString().c_str());
+
+//    return sql;
+//}

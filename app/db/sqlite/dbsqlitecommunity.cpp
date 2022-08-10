@@ -20,43 +20,28 @@
  * Brief:
  */
 #include "dbsqlitecommunity.h"
-#include "std.h"
 #include "dbsqlitedefs.h"
 #include "table/dbsqlitecommunitytbl.h"
 #include "dbsqlite.h"
+#include "logger.h"
 
-DbSqliteCommunity::DbSqliteCommunity()
-{
+DbSqliteCommunity* DbSqliteCommunity::gInstance = nullptr;
 
-}
-
-ErrCode DbSqliteCommunity::add(const Community *comm)
+DbSqliteCommunity::DbSqliteCommunity():DbSqliteModelHandler()
 {
     traced;
-    ErrCode ret = ErrNone;
-    if (!exist(comm)){
-        ret = communityTbl()->add(comm);
-    }
-    else{
-        ret = ErrExisted;
-        loge("Community already exist");
-    }
-
-    logd("ret %d", ret);
-    return ret;
 }
 
-bool DbSqliteCommunity::exist(const Community *comm)
+DbSqliteTbl *DbSqliteCommunity::getMainTbl()
 {
-    // TODO: implement it
-    return false;
+    return (DbSqliteCommunityTbl*)DbSqlite::getInstance()->getTable(KTableCommunity);
 }
 
-DbSqliteCommunityTbl *DbSqliteCommunity::communityTbl()
+DbSqliteCommunity *DbSqliteCommunity::getInstance()
 {
-    if (mCommunityTbl == nullptr){
-        mCommunityTbl =
-            (DbSqliteCommunityTbl*)DbSqlite::getInstance()->getTable(KTableCommunity);
+    if (gInstance == nullptr){
+        gInstance = new DbSqliteCommunity();
     }
-    return mCommunityTbl;
+
+    return gInstance;
 }

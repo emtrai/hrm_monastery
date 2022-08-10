@@ -23,22 +23,23 @@
 #define DBSQLITECOMMUNITY_H
 
 #include <idbcommunity.h>
+#include "dbsqlitemodelhandler.h"
 
 class DbSqliteCommunityTbl;
 
-class DbSqliteCommunity : public IDbCommunity
+class DbSqliteCommunity : public DbSqliteModelHandler
 {
 public:
+    static DbSqliteCommunity* getInstance();
+
+protected:
+    virtual DbSqliteTbl* getMainTbl();
+private:
     DbSqliteCommunity();
 
-
-    virtual ErrCode add(const Community* comm);
-    virtual bool exist(const Community* comm);
 private:
-    DbSqliteCommunityTbl *communityTbl();
+    static DbSqliteCommunity* gInstance;
 
-private:
-    DbSqliteCommunityTbl* mCommunityTbl;
 
 };
 

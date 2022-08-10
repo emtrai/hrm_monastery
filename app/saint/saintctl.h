@@ -25,9 +25,13 @@
 #include <controller.h>
 #include "errcode.h"
 #include <QStringList>
+#include <QHash>
+#include "saint.h"
 
 class SaintCtl : public Controller
 {
+public:
+    QList<Saint*> getListSaints();
 private:
     SaintCtl();
 
@@ -37,6 +41,8 @@ private:
     static ErrCode oneCSVItemCallback(const QStringList& items, void* param);
 public:
     static SaintCtl *getInstance();
+
+///////// MEMBER //////////
 private:
     static SaintCtl* gInstance;
 

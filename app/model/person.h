@@ -29,83 +29,96 @@
 #include "errcode.h"
 #include "personbasic.h"
 #include <QList>
+#include "dbmodel.h"
 
 class Church;
 class Education;
 class Work;
 
-class Person: public QObject, public PersonBasic
+class Person: public PersonBasic, public DbModel
 {
     Q_OBJECT
-public:
-    static Person* build();
+        public:
+            static Person* build();
 
-public:
-    Person();
-    virtual ~Person();
+        public:
+            Person();
+            virtual ~Person();
 
-    const QStringList &hollyName() const;
-    QString hollyNameString() const;
-    void addHollyName(const QString &newHollyName);
+            const QStringList &hollyName() const;
+            QString hollyNameString() const;
+            void addHollyName(const QString &newHollyName);
 
-    ErrCode_t save();
-    void dump();
+//            ErrCode_t save();
+//            void dump();
 
-    PersonBasic *dad() const;
-    void setDad(PersonBasic *newDad);
+            PersonBasic *dad() const;
+            void setDad(PersonBasic *newDad);
 
-    qint64 enlistmentDate() const;
-    void setEnlistmentDate(qint64 newEnlistmentDate);
+            qint64 enlistmentDate() const;
+            void setEnlistmentDate(qint64 newEnlistmentDate);
 
-    const QString &family() const;
-    void setFamily(const QString &newFamily);
+            const QString &family() const;
+            void setFamily(const QString &newFamily);
 
-protected:
-    QStringList mHollyName;
+            ErrCode fromCSVFile(const QString& fname);
 
-    Address* mFamilyAddr;
-    Church* mChurch;
+            const QString &personCode() const;
+            void setPersonCode(const QString &newPersonCode);
 
-    // family info, includes: name of dad, mom, address, the number of brothers/sisters, etc.
-    QString mFamily;
+            qint64 christenDate() const;
+            void setChristenDate(qint64 newChristenDate);
+            void setChristenDate(const QString& newChristenDate);
 
-    // TODO: may dad/mom?????
-    PersonBasic* mDad;
-    PersonBasic* mMom;
+        protected:
+            virtual DbModelHandler *getDbModelHandler();
+        protected:
+            QString mPersonCode;
+            QStringList mHollyName;
 
-    // Rua toi
-    qint64 mChristenDate;
-    Church* mChristenPlace;
+            Address* mFamilyAddr;
+            Church* mChurch;
 
-    // Them suc
-    qint64 mConfirmationDate;
-    Address* mConfirmationPlace;
+            // family info, includes: name of dad, mom, address, the number of brothers/sisters, etc.
+            QString mFamily;
 
-    QStringList mPersonalTel;
-    QStringList mFamilyTel;
+            // TODO: may dad/mom?????
+            PersonBasic* mDad;
+            PersonBasic* mMom;
 
-    QStringList mEmail;
+            // Rua toi
+            qint64 mChristenDate;
+            Church* mChristenPlace;
 
-    QString mCitizenId;
+            // Them suc
+            qint64 mConfirmationDate;
+            Address* mConfirmationPlace;
 
-    QList<Education*> mEducationList;
-    QList<Work*> mWorkList;
+            QStringList mPersonalTel;
+            QStringList mFamilyTel;
 
-    qint64 mEnlistmentDate; // ngay nhap tu
+            QStringList mEmail;
 
-    qint64 mPreTrainJoinDate; // ngay gia nhap Tap Vien
-    Person* mPreTrainPIC; // nguoi dac trac
+            QString mCitizenId;
 
-    qint64 mVowsDate; // ngay tien khan
-    Person* mVowsCEO; // chi tong phu trach
+            QList<Education*> mEducationList;
+            QList<Work*> mWorkList;
+
+            qint64 mEnlistmentDate; // ngay nhap tu
+
+            qint64 mPreTrainJoinDate; // ngay gia nhap Tap Vien
+            Person* mPreTrainPIC; // nguoi dac trac
+
+            qint64 mVowsDate; // ngay tien khan
+            Person* mVowsCEO; // chi tong phu trach
 
 
-    qint64 mEternalVowsDate; // ngay vinh khan
-    Person* mEternalVowsCEO; // chi tong phu trach
+            qint64 mEternalVowsDate; // ngay vinh khan
+            Person* mEternalVowsCEO; // chi tong phu trach
 
-    qint64 mBankDate; // ngan khanh
-    qint64 mGoldenDate; // kim khanh
-    qint64 mEternalDate; // vinh khanh
+            qint64 mBankDate; // ngan khanh
+            qint64 mGoldenDate; // kim khanh
+            qint64 mEternalDate; // vinh khanh
 
 
 };

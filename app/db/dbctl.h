@@ -26,9 +26,13 @@
 #include "controller.h"
 #include "idatabase.h"
 #include "dbinfo.h"
+#include "idbedu.h"
+#include "idbspecialist.h"
 
-class IDbSaint;
-class IDbCommunity;
+//class IDbSaint;
+//class IDbCommunity;
+//class IDbEdu;
+//class IDbSpecialist;
 
 class DbCtl: public Controller
 {
@@ -39,8 +43,10 @@ public:
     IDatabase *database() const;
 
 
-    IDbSaint* dbSaint();
-    IDbCommunity* dbCommunity();
+//    IDbSaint* dbSaint();
+//    IDbCommunity* dbCommunity();
+//    IDbEdu* dbEdu();
+//    IDbSpecialist* dbSpecialist();
 
 private:
     DbCtl();
@@ -48,9 +54,11 @@ private:
     static DbCtl* gInstance;
 
     IDatabase* mDatabase;
-    IDbSaint* mDbSaint;
-    IDbCommunity* mDbCommunity;
+ /*   IDbSaint* mDbSaint;
+    IDbCommunity* mDbCommunity;*/
+//    IDbEdu* mDbEdu;
     DbInfo* dbInfo;
+//    IDbSpecialist* mDbSpecialist;
 
     // event
 public slots:

@@ -23,12 +23,19 @@
 #define EDUCATION_H
 
 #include <QObject>
+#include "dbmodel.h"
 
-class Education: public QObject
+class Education: public QObject, public DbModel
 {
     Q_OBJECT
         public:
-                 Education();
+            Education();
+        public:
+            static DbModel *builder();
+        protected:
+            virtual DbModelHandler *getDbModelHandler();
+        private:
+
 };
 
 #endif // EDUCATION_H

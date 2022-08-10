@@ -21,7 +21,8 @@
  */
 #include "crypto.h"
 #include <QCryptographicHash>
-#include "std.h"
+#include "logger.h"
+#include "errcode.h"
 #include <QFile>
 #include <QByteArray>
 

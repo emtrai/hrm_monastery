@@ -20,7 +20,7 @@
  * Brief:
  */
 #include "communityctl.h"
-#include "std.h"
+#include "logger.h"
 
 CommunityCtl* CommunityCtl::gInstance = nullptr;
 
@@ -52,5 +52,5 @@ ErrCode CommunityCtl::loadFromFile(const QString &path)
 ErrCode CommunityCtl::loadFromDb()
 {
     traced;
-
+    return ErrNone;
 }

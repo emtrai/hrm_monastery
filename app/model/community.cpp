@@ -22,7 +22,7 @@
 #include "community.h"
 
 #include "dbctl.h"
-#include "idbcommunity.h"
+#include "logger.h"
 
 Community::Community()
 {
@@ -85,20 +85,20 @@ void Community::setStatus(CommunityStatus newStatus)
     status = newStatus;
 }
 
-ErrCode_t Community::save()
-{
-    return DbCtl::getInstance()->dbCommunity()->add(this);
-}
+//ErrCode_t Community::save()
+//{
+//    return DbCtl::getInstance()->dbCommunity()->add(this);
+//}
 
-void Community::dump()
-{
-    traced;
-    QString log = QStringLiteral(
-                      "name '%1'\n"
-                      )
-                      .arg(name());
-    logd("%s", log.toStdString().c_str());
-}
+//void Community::dump()
+//{
+//    traced;
+//    QString log = QStringLiteral(
+//                      "name '%1'\n"
+//                      )
+//                      .arg(name());
+//    logd("%s", log.toStdString().c_str());
+//}
 
 qint64 Community::closeDate() const
 {
@@ -108,4 +108,9 @@ qint64 Community::closeDate() const
 void Community::setCloseDate(qint64 newCloseDate)
 {
     mCloseDate = newCloseDate;
+}
+
+DbModelHandler *Community::getDbModelHandler()
+{
+    return DbCtl::getDb()->getCommunityModelHandler();
 }

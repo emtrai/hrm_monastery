@@ -20,7 +20,8 @@
  * Brief:
  */
 #include "personbasic.h"
-#include "std.h"
+#include "logger.h"
+#include "errcode.h"
 #include "address.h"
 
 PersonBasic::PersonBasic()
@@ -90,7 +91,7 @@ void PersonBasic::setLastName(const QString &newLastName)
 }
 
 
-ErrCode_t PersonBasic::setName(const QString &name)
+ErrCode PersonBasic::setNameFromFullName(const QString &name)
 {
     QStringList items = name.trimmed().split(" ", Qt::SkipEmptyParts);
     //    QStringList parts;

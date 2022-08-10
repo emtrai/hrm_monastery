@@ -23,10 +23,12 @@
 
 #include "dbsqlite.h"
 #include "dbsqlitedefs.h"
-#include "std.h"
+#include "defs.h"
 #include "dbsqlitetablebuilder.h"
 #include "community.h"
 #include "dbsqliteinsertbuilder.h"
+#include <QSqlQuery>
+#include "logger.h"
 
 const qint32 DbSqliteCommunityTbl::KVersionCode = VERSION_CODE(0,0,1);
 
@@ -34,42 +36,78 @@ DbSqliteCommunityTbl::DbSqliteCommunityTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableCommunity, KTableCommunity, KVersionCode)
 {}
 
-ErrCode_t DbSqliteCommunityTbl::add(const Community *item)
+//ErrCode_t DbSqliteCommunityTbl::add(const DbModel *param)
+//{
+//    traced;
+//    ErrCode_t err = ErrNone;
+//    Community* item = (Community*)param;
+//    QString sql = DbSqliteInsertBuilder::build(name())
+//                      ->addValue(KFieldName, item->name())
+//                      ->addValue(KFieldCreateDate, item->createDate())
+//                      ->addValue(KFieldParentUid, item->parentUid())
+//                      ->addValue(KFieldStatus, (qint32) item->getStatus())
+
+//                      ->buildSqlStatement();
+//    logi("insert sql statement %s", sql.toStdString().c_str());
+//    err = db()->execQuery(sql);
+
+//    return err;
+
+//}
+
+void DbSqliteCommunityTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
 {
     traced;
-    ErrCode_t err = ErrNone;
-    QString sql = DbSqliteInsertBuilder::build(name())
-                      ->addValue(KFieldName, item->name())
-                      ->addValue(KFieldCreateDate, item->createDate())
-                      ->addValue(KFieldParentUid, item->parentUid())
-                      ->addValue(KFieldStatus, (qint32) item->getStatus())
-
-                      ->buildSqlStatement();
-    logi("insert sql statement %s", sql.toStdString().c_str());
-    err = db()->execQuery(sql);
-
-    return err;
-
+    DbSqliteTbl::insertTableField(builder, item);
+    Community* cmm = (Community*) item;
+    builder->addValue(KFieldCreateDate, cmm->createDate());
+    builder->addValue(KFieldParentUid, cmm->parentUid());
+    builder->addValue(KFieldStatus, (qint32) cmm->getStatus());
 }
 
-QString DbSqliteCommunityTbl::getSqlCmdCreateTable()
+void DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     traced;
-    // TODO; support multi language
-    QString sql = DbSqliteTableBuilder::build(name())
-                      ->addField(KFieldName, TEXT)
-                      ->addField(KFieldCEOUid, TEXT)
-                      ->addField(KFieldChurchUid, TEXT)
-                      ->addField(KFieldAreaUid, TEXT)
-                      ->addField(KFieldLevel, INT32)
-                      ->addField(KFieldParentUid, TEXT)
-                      ->addField(KFieldCreateDate, INT64)
-                      ->addField(KFieldDateFormat, TEXT)
-                      ->addField(KFieldStatus, INT32) // stop, alive, etc.
-                      ->addField(KFieldPreset, INT32) // 0: custom, 1: preset (from json)
+    DbSqliteTbl::updateModelFromQuery(item, qry);
+    Community* cmm = (Community*) item;
+    cmm->setCreateDate(qry.value(KFieldCreateDate).toInt());
+    cmm->setParentUid(qry.value(KFieldParentUid).toString());
+    cmm->setStatus((CommunityStatus)qry.value(KFieldStatus).toInt());
+}
 
-                      ->buildSqlStatement();
-    logi("Create statement %s", sql.toStdString().c_str());
+//QString DbSqliteCommunityTbl::getSqlCmdCreateTable()
+//{
+//    traced;
+//    // TODO; support multi language
+//    QString sql = DbSqliteTableBuilder::build(name())
+//                      ->addField(KFieldName, TEXT)
+//                      ->addField(KFieldCEOUid, TEXT)
+//                      ->addField(KFieldChurchUid, TEXT)
+//                      ->addField(KFieldAreaUid, TEXT)
+//                      ->addField(KFieldLevel, INT32)
+//                      ->addField(KFieldParentUid, TEXT)
+//                      ->addField(KFieldCreateDate, INT64)
+//                      ->addField(KFieldDateFormat, TEXT)
+//                      ->addField(KFieldStatus, INT32) // stop, alive, etc.
+//                      ->addField(KFieldPreset, INT32) // 0: custom, 1: preset (from json)
 
-    return sql;
+//                      ->buildSqlStatement();
+//    logi("Create statement %s", sql.toStdString().c_str());
+
+//    return sql;
+//}
+
+void DbSqliteCommunityTbl::addTableField(DbSqliteTableBuilder *builder)
+{
+    traced;
+    DbSqliteTbl::addTableField(builder);
+    builder->addField(KFieldCEOUid, TEXT);
+    builder->addField(KFieldChurchUid, TEXT);
+    builder->addField(KFieldAreaUid, TEXT);
+    builder->addField(KFieldLevel, INT32);
+    builder->addField(KFieldParentUid, TEXT);
+    builder->addField(KFieldCreateDate, INT64);
+    builder->addField(KFieldDateFormat, TEXT);
+    builder->addField(KFieldStatus, INT32); // stop, alive, etc.
+    builder->addField(KFieldPreset, INT32); // 0: custom, 1: preset (from json)
 }

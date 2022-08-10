@@ -31,10 +31,6 @@ class DbSqliteDepartTbl : public DbSqliteTbl
 {
 public:
     DbSqliteDepartTbl(DbSqlite* db);
-    ErrCode_t add(const Department* item);
-
-protected:
-    virtual QString getSqlCmdCreateTable();
 
 private:
     static const qint32 KVersionCode;

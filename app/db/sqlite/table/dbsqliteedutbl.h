@@ -24,16 +24,13 @@
 
 #include "dbsqlitetbl.h"
 
+#include <QList>
 class DbSqlite;
 
 class DbSqliteEduTbl : public DbSqliteTbl
 {
 public:
     DbSqliteEduTbl(DbSqlite *db);
-
-protected:
-    virtual QString getSqlCmdCreateTable();
-
 
 private:
     static const qint32 KVersionCode;

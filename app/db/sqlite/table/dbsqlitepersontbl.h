@@ -23,20 +23,26 @@
 #define DBSQLITEPersonTBL_H
 
 #include "dbsqlitetbl.h"
-#include "errcode.h"
-#include "std.h"
 
 class Person;
+
+class DbSqliteTableBuilder;
+class DbSqliteInsertBuilder;
+class DbModel;
+class QSqlQuery;
 
 class DbSqlitePersonTbl : public DbSqliteTbl
 {
 public:
     DbSqlitePersonTbl(DbSqlite* db);
 
-    ErrCode_t addPerson(const Person* person);
+    virtual void addTableField(DbSqliteTableBuilder* builder);
+    virtual void insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
+    virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
+//    ErrCode_t addPerson(const Person* person);
 
-protected:
-    virtual QString getSqlCmdCreateTable();
+//protected:
+//    virtual QString getSqlCmdCreateTable();
 
 public:
     static const qint32 KVersionCode;

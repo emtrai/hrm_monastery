@@ -36,7 +36,7 @@ class DbSqlite : public IDatabase
 {
 public:
 
-    virtual ErrCode_t addPerson(const Person* person);
+//    virtual ErrCode_t addPerson(const Person* person);
     /**
     * Load database
     */
@@ -47,6 +47,10 @@ public:
 
 //    virtual ErrCode_t addCommunity(const Community* comm);
     virtual DbSqliteTbl* getTable(const QString& tblName);
+    virtual DbModelHandler *getEduModelHandler();
+    virtual DbModelHandler *getSaintModelHandler();
+    virtual DbModelHandler* getSpecialistModelHandler();
+    virtual DbModelHandler* getCommunityModelHandler();
 private:
 
     DbSqlite();

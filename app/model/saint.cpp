@@ -20,7 +20,8 @@
  * Brief:
  */
 #include "saint.h"
-#include "std.h"
+#include "logger.h"
+#include "errcode.h"
 #include <QString>
 #include <QStringLiteral>
 #include "utils.h"
@@ -28,26 +29,12 @@
 #include "idbsaint.h"
 #include "dbctl.h"
 
-Saint::Saint()
-{
+Saint::Saint(): DbModel()
 
+{
+    mFeastDay = 0;
 }
 
-QString Saint::nameid() const
-{
-    QString hash = Crypto::hashString(name());
-    return hash;
-}
-
-const QString &Saint::name() const
-{
-    return mName;
-}
-
-void Saint::setName(const QString &newName)
-{
-    mName = newName;
-}
 
 qint64 Saint::feastDay() const
 {
@@ -67,16 +54,6 @@ Gender Saint::gender() const
 void Saint::setGender(Gender newGender)
 {
     mGender = newGender;
-}
-
-const QString &Saint::history() const
-{
-    return mHistory;
-}
-
-void Saint::setHistory(const QString &newHistory)
-{
-    mHistory = newHistory;
 }
 
 const QString &Saint::country() const
@@ -99,48 +76,59 @@ void Saint::setFullName(const QString &newFullName)
     mFullName = newFullName;
 }
 
-bool Saint::isValid()
+DbModel *Saint::builder()
 {
-    // TODO: add more checking for valid info
-    return !name().isEmpty();
+    return new Saint();
 }
 
-void Saint::dump()
+DbModelHandler *Saint::getDbModelHandler()
 {
-    // TODO: dump to stdout, sdderr or file???
-#ifdef DEBUG_TRACE
-
-    logd("DUMP SAINT:");
-    logd("- NameId %s", nameid().toStdString().c_str());
-    logd("- Name %s", name().toStdString().c_str());
-    logd("- FullName %s", fullName().toStdString().c_str());
-    logd("- gender %d", gender());
-    logd("- feastDay %lld (%s)", feastDay(),
-         Utils::date2String(feastDay(), QString()).toStdString().c_str());
-#endif //DEBUG_TRACE
-
+    return DbCtl::getInstance()->getDb()->getSaintModelHandler();
 }
 
-QString Saint::toString()
-{
-    return QString("%1,%2").arg(nameid(), name());
-}
+//bool Saint::isValid()
+//{
+//    // TODO: add more checking for valid info
+//    return !name().isEmpty();
+//}
 
-ErrCode Saint::save()
-{
-    traced;
-    ErrCode ret = ErrNone;
-    IDbSaint* dbSaint = DbCtl::getInstance()->dbSaint();
-    if (dbSaint != nullptr){
-        ret = dbSaint->addSaint(this);
-        if (ret == ErrExisted){ // alrady exist, judge as ok
-            ret = ErrNone;
-            logi("%s already exist", toString().toStdString().c_str());
-        }
-    }
-    else{
-        ret = ErrDbNotReady;
-        loge("DbSaint not ready");
-    }
-    return ret;
-}
+//void Saint::dump()
+//{
+//    // TODO: dump to stdout, sdderr or file???
+//#ifdef DEBUG_TRACE
+
+//    logd("DUMP SAINT:");
+//    logd("- NameId %s", nameid().toStdString().c_str());
+//    logd("- Name %s", name().toStdString().c_str());
+//    logd("- FullName %s", fullName().toStdString().c_str());
+//    logd("- gender %d", gender());
+//    logd("- feastDay %lld (%s)", feastDay(),
+//         Utils::date2String(feastDay(), QString()).toStdString().c_str());
+//#endif //DEBUG_TRACE
+
+//}
+
+//QString Saint::toString()
+//{
+//    return QString("%1,%2").arg(nameid(), name());
+//}
+
+//ErrCode Saint::save()
+//{
+//    traced;
+//    ErrCode ret = ErrNone;
+//    IDbSaint* dbSaint = DbCtl::getInstance()->dbSaint();
+//    if (dbSaint != nullptr){
+//        ret = dbSaint->addSaint(this);
+//        if (ret == ErrExisted){ // alrady exist, judge as ok
+//            ret = ErrNone;
+//            logi("%s already exist", toString().toStdString().c_str());
+//        }
+//    }
+//    else{
+//        ret = ErrDbNotReady;
+//        loge("DbSaint not ready");
+//    }
+//    return ret;
+//}
+

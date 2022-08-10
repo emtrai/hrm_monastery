@@ -23,7 +23,7 @@
 #define IDBSAINT_H
 
 #include "errcode.h"
-
+#include <QHash>
 class Saint;
 
 class IDbSaint
@@ -32,6 +32,7 @@ public:
 
     virtual ErrCode addSaint(const Saint* saint) = 0;
     virtual bool exist(const Saint* saint) = 0;
+    virtual QHash<QString, Saint*> getListSaint() = 0;
 };
 
 #endif // IDBSAINT_H

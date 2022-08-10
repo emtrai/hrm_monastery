@@ -36,7 +36,7 @@
     while(0)
 
 #define traced logd("")
-#define tracedr(ret) logd("ret %d", ret)
+#define tracedr(ret) logd("Return %d", ret)
 
 // TODO: push log to file, make separate thread to writing log, to avoid impact
 // to performance of application

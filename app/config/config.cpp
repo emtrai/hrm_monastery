@@ -20,14 +20,13 @@
  * Brief:
  */
 #include "config.h"
-#include "std.h"
+#include "logger.h"
+#include "errcode.h"
 #include <QCoreApplication>
 
 #include <QStandardPaths>
 #include <QRandomGenerator>
 #include <QDir>
-#include "filectl.h"
-#include "defs.h"
 
 Config* Config::gInstance = nullptr;
 

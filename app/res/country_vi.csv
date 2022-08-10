@@ -1,2 +1,4 @@
-#id, Name, Continent
-vi,Viet Nam, Asia
+#id, Name, Region, Continent
+#WARNING: any change in id must be updated on db
+vn,Việt Nam, Asian, Asia
+us,Hoa Kỳ (Mỹ), America, America

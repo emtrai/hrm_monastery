@@ -1,2 +1,2 @@
-#id, Name, Continent
-vi,Viet Nam, Asia
+#id, Name, Parent province id if any
+cali,California,

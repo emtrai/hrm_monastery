@@ -25,20 +25,29 @@
 #include "logger.h"
 
 #include "loader/loaderctl.h"
-#include "test/testctl.h"
-#include "community.h"
 #include "dlgcommunity.h"
 #include "config.h"
 #include "communityctl.h"
 #include "dlgperson.h"
 #include "filectl.h"
 
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , mSummarizeView(nullptr)
+    , mCommunityView(nullptr)
+    , mNunsView(nullptr)
+    , mCurrentView(nullptr)
 {
     ui->setupUi(this);
+
+    mSummarizeView = new UISummarizeView();
+    mCommunityView = new UICommunityView();
+    mSaintsView = new UISaintsView();
+    mNunsView = new UINunsView();
+    switchView(mSummarizeView);
+//    summarize->setWindowState(Qt::WindowState::WindowMaximized);
+//    summarize->show();
 
     logd("init config");
     Config::init();
@@ -48,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent)
     loader->setOnFinishLoadListener(MainWindow::onFinishLoading, this);
     QObject::connect(this, SIGNAL(load()), loader, SLOT(onLoad()));
 }
+
 
 void MainWindow::showEvent(QShowEvent *ev)
 {
@@ -66,6 +76,19 @@ MainWindow::~MainWindow()
 void MainWindow::onFinishLoading(int ret, void* data){
     traced;
 
+}
+
+void MainWindow::switchView(QWidget *nextView)
+{
+    if (mCurrentView != nullptr) {
+        mCurrentView->hide();
+        ui->centralwidget->layout()->replaceWidget(mCurrentView, nextView);
+    }
+    else{
+        ui->centralwidget->layout()->addWidget(nextView);
+    }
+    mCurrentView = nextView;
+    mCurrentView->show();
 }
 
 
@@ -100,5 +123,30 @@ void MainWindow::on_actionImportComm_triggered()
 {
     CommunityCtl::getInstance()->loadFromFile(FileCtl::getFullFilePath("config"));
 
+}
+
+
+void MainWindow::on_actionCommunity_triggered()
+{
+    switchView(mCommunityView);
+}
+
+
+void MainWindow::on_actionSummarize_triggered()
+{
+    switchView(mSummarizeView);
+}
+
+
+void MainWindow::on_actionSaints_2_triggered()
+{
+    switchView(mSaintsView);
+
+}
+
+
+void MainWindow::on_actionNuns_triggered()
+{
+    switchView(mNunsView);
 }
 

@@ -24,11 +24,13 @@
 
 #include <QString>
 #include "defs.h"
-#include "std.h"
+#include "logger.h"
+#include "errcode.h"
 #include <QHash>
 #include <QChar>
 
 typedef ErrCode (*func_one_csv_item_t)(const QStringList& items, void* param);
+
 
 class Utils
 {
@@ -39,8 +41,9 @@ public:
     * Y/M/D
     * M/D
     */
-    static qint64 dateFromString(const QString& date, const QString& format);
-    static QString date2String(qint64 date, const QString& format);
+    // TODO: default for const QString is ok or not??? can set it ???
+    static qint64 dateFromString(const QString& date, const QString& format = "YYYY/MM/DD");
+    static QString date2String(qint64 date, const QString& format = "YYYY/MM/DD");
     static void date2ymd(qint64 date, int* day = nullptr,
                             int* month = nullptr, int* year = nullptr);
 
@@ -49,7 +52,12 @@ public:
                             void* paramCb = nullptr,
                             QChar splitBy = ','
                             );
-    static QString getPrebuiltFile(const QString& prebuiltName);
+
+    static ErrCode parseDataFromCSVFile(const QString& filePath,
+                                QHash<QString, QString>* items,
+                                QChar splitBy = ':'
+                                );
+    static QString getPrebuiltFileByLang(const QString& prebuiltName);
 
 };
 

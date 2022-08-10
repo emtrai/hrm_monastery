@@ -22,6 +22,8 @@
 #ifndef ERRCODE_H
 #define ERRCODE_H
 
+#include <QString>
+
 #define ERR_NONE        (0)
 #define ERR_FAILED      (-1)
 #define ERR_INVALID     (-2)
@@ -43,10 +45,51 @@ typedef enum ErrCode{
     ErrNotAvail,
     ErrFailSqlQuery,
     ErrNotExist,
+    ErrFileOpen,
+    ErrFileWrite,
     ErrFileRead,
     ErrExisted,
     ErrDbNotReady,
+    ErrUnknown,
 
     ErrMax
     } ErrCode_t;
+
+class ErrMsg {
+public:
+    ErrMsg(ErrCode code, const QString& msg) {
+        mCode = code;
+        mMsg = msg;
+    }
+
+    ErrMsg(ErrCode code) {
+        mCode = code;
+    }
+
+    inline ErrCode code() const {
+        return mCode;
+    }
+    inline void setCode(ErrCode newCode)
+    {
+        mCode = newCode;
+    }
+
+    inline const QString &msg() const
+    {
+        return mMsg;
+    }
+
+    inline void setMsg(const QString &newMsg)
+    {
+        mMsg = newMsg;
+    }
+
+
+private:
+    ErrCode mCode;
+    QString mMsg;
+};
+
+
+
 #endif // ERRCODE_H

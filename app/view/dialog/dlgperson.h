@@ -23,7 +23,7 @@
 #define DLGPERSON_H
 
 #include <QDialog>
-
+#include <QAbstractButton>
 namespace Ui {
 class DlgPerson;
 }
@@ -36,8 +36,19 @@ class DlgPerson : public QDialog
                  explicit DlgPerson(QWidget *parent = nullptr);
     ~DlgPerson();
 
-private:
+             private slots:
+                 void on_btnImport_clicked();
+
+             private:
     Ui::DlgPerson *ui;
+
+             private:
+    void setupUI();
+
+//protected:
+//    virtual void accept();
+private slots:
+    void on_buttonBox_clicked( QAbstractButton * button );
 };
 
 #endif // DLGPERSON_H

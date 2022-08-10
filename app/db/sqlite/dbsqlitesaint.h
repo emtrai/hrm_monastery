@@ -23,21 +23,34 @@
 #define DBSQLITESAINT_H
 
 #include <idbsaint.h>
+#include <QHash>
+#include "dbsqlitemodelhandler.h"
 
 class DbSqliteSaintTbl;
 
-class DbSqliteSaint : public IDbSaint
+class DbSqliteSaint : public DbSqliteModelHandler
 {
 public:
+    static DbSqliteSaint* getInstance();
+
+protected:
+    virtual DbSqliteTbl* getMainTbl();
+private:
     DbSqliteSaint();
-    virtual ErrCode addSaint(const Saint* saint);
-    virtual bool exist(const Saint* saint);
 
 private:
-     DbSqliteSaintTbl *saintTbl();
+    static DbSqliteSaint* gInstance;
+//public:
+//    DbSqliteSaint();
+//    virtual ErrCode addSaint(const Saint* saint);
+//    virtual bool exist(const Saint* saint);
+//    virtual QHash<QString, Saint*> getListSaint();
 
-private:
-    DbSqliteSaintTbl* mSaintTbl;
+//private:
+//     DbSqliteSaintTbl *saintTbl();
+
+//private:
+//    DbSqliteSaintTbl* mSaintTbl;
 };
 
 #endif // DBSQLITESAINT_H

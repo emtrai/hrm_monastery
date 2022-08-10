@@ -22,7 +22,8 @@
 #include "utils.h"
 #include <QHash>
 #include <QString>
-#include "std.h"
+#include "logger.h"
+#include "errcode.h"
 #include <QFile>
 // yymd
 #define YMD_TO_INT(y,m,d) (((y) << 16) | ((m) << 8) | (d))
@@ -85,7 +86,7 @@ qint64 Utils::dateFromString(const QString &date, const QString &f)
         && (listDate.length() > 1)
         && (listDate.length() == listFormat.length())){
 
-        qint64 year = 0, month = 0, day = 0;
+        qint32 year = 0, month = 0, day = 0;
         bool ok = false;
         int idx = 0;
         logd("parse each item in date");
@@ -121,6 +122,7 @@ qint64 Utils::dateFromString(const QString &date, const QString &f)
     else{
         loge("Invalid data/format: note match date and format");
     }
+    logd("result date 0x%x", (quint32) ret);
     return ret;
 }
 
@@ -128,14 +130,16 @@ QString Utils::date2String(qint64 date, const QString& format)
 {
     traced;
     int year = 0, month = 0, day = 0;
-    year = (date >> 16) & 0xFF;
+    year = (date >> 16) & 0xFFFF;
     month = (date >> 8) & 0xFF;
     day = date & 0xFF;
     QString dateString;
+    logd("Date 0x%x", (quint32)date);
     // TODO: use format
     if (year > 0) dateString += QString::number(year) + "/";
     if (month > 0) dateString += QString::number(month) + "/";
     if (day > 0) dateString += QString::number(day);
+    logd("DateString %s", dateString.toStdString().c_str());
     return dateString;
 }
 
@@ -156,7 +160,8 @@ void Utils::date2ymd(qint64 date, int *pday, int *pmonth, int *pyear)
 }
 
 #define COMMENT '#'
-ErrCode Utils::parseCSVFile(const QString &filePath, func_one_csv_item_t cb, void *paramCb, QChar splitBy)
+ErrCode Utils::parseCSVFile(const QString &filePath,
+                            func_one_csv_item_t cb, void *paramCb, QChar splitBy)
 {
     traced;
     ErrCode ret = ErrNone;
@@ -169,6 +174,7 @@ ErrCode Utils::parseCSVFile(const QString &filePath, func_one_csv_item_t cb, voi
             if (file.open(QIODevice::ReadOnly | QIODevice::Text)){
                 QTextStream stream(&file );
                 qint32 cnt = 0;
+                // TODO: catch exception????
                 while(!stream.atEnd()) {
                     QString line = stream.readLine();
                     logd("> Line '%s'", line.toStdString().c_str());
@@ -218,7 +224,68 @@ ErrCode Utils::parseCSVFile(const QString &filePath, func_one_csv_item_t cb, voi
     return ret;
 }
 
-QString Utils::getPrebuiltFile(const QString &prebuiltName)
+ErrCode Utils::parseDataFromCSVFile(const QString &filePath,
+                                    QHash<QString, QString>* items,
+                                    QChar splitBy)
+{
+    traced;
+    ErrCode ret = ErrNone;
+    if (!filePath.isEmpty() && (items != nullptr))
+    {
+        QFile file(filePath);
+        if (file.exists()){
+            logi("Read file '%s' then parse", file.fileName().toStdString().c_str());
+            if (file.open(QIODevice::ReadOnly | QIODevice::Text)){
+                QTextStream stream(&file );
+                qint32 cnt = 0;
+                // TODO: catch exception????
+                while(!stream.atEnd()) {
+                    QString line = stream.readLine();
+                    logd("> Line '%s'", line.toStdString().c_str());
+                    line = line.simplified();
+                    if (!line.isEmpty() && !line.startsWith(COMMENT))
+                    {
+                        int idx = line.indexOf(splitBy);
+                        QString key;
+                        QString value;
+                        logd("idx %d", idx);
+                        if (idx >= 0){
+                            key = line.mid(0, idx).simplified().toUpper();
+                            value = line.mid(idx+1).trimmed();
+                            logd("key %s", key.toStdString().c_str());
+                            logd("value %s", value.toStdString().c_str());
+                            items->insert(key, value);
+                        }
+                        // TODO: if not found delimiter, what next???
+                        // TODO: handle wrap line?
+
+                    } // ignore line start with # or empty
+                    else {
+                        logi("Skip line %d", cnt);
+                    }
+                    cnt ++;
+                }
+                file.close();
+            }
+            else{
+                ret = ErrFileRead;
+                loge("Read file '%s' failed", filePath.toStdString().c_str());
+            }
+        }
+        else{
+            ret = ErrNotExist;
+            loge("File %s not exist", filePath.toStdString().c_str());
+        }
+    }
+    else{
+        ret = ErrInvalidArg;
+        loge("Invalid fielPath");
+    }
+    logd("ret %d", ret);
+    return ret;
+}
+
+QString Utils::getPrebuiltFileByLang(const QString &prebuiltName)
 {
     // TODO: this is stupid/dump implementation, let's improve it, please
     return QString("%1_%2").arg(prebuiltName, KLanguage);

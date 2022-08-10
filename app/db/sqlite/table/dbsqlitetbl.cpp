@@ -24,6 +24,14 @@
 #include <QSqlQuery>
 #include "dbsqlite.h"
 
+#include "dbsqlitedefs.h"
+#include "logger.h"
+#include "errcode.h"
+#include "dbsqlitetablebuilder.h"
+#include "dbsqliteinsertbuilder.h"
+#include <QSqlQuery>
+#include <QSqlRecord>
+#include <QHash>
 
 DbSqliteTbl::~DbSqliteTbl(){
     traced;
@@ -71,10 +79,95 @@ void DbSqliteTbl::setVersionCode(uint32_t newVersionCode)
     mVersionCode = newVersionCode;
 }
 
-ErrCode_t DbSqliteTbl::checkOrCreateTable()
+ErrCode_t DbSqliteTbl::add(const DbModel *item)
 {
     traced;
     ErrCode_t err = ErrNone;
+    DbSqliteInsertBuilder* builder = DbSqliteInsertBuilder::build(name());
+    insertTableField(builder, item);
+    QString sql = builder->buildSqlStatement();
+    logi("insert sql statement %s", sql.toStdString().c_str());
+    err = db()->execQuery(sql);
+
+    return err;
+
+}
+
+bool DbSqliteTbl::isExist(const DbModel *item)
+{
+    QSqlQuery qry;
+    bool exist = false;
+    traced;
+    QString queryString = QString("SELECT COUNT(*) "
+                                  "FROM %1 WHERE %2 = :uuid").arg(name(), KFieldUuid);
+    qry.prepare(queryString);
+    logd("Query String '%s'", queryString.toStdString().c_str());
+
+    // TODO: check sql injection issue
+    qry.bindValue( ":uuid", item->nameid() );
+    if( qry.exec() )
+    {
+        int rows= 0;
+        if (qry.next()) {
+            rows = qry.value(0).toInt();
+            exist = rows > 0;
+        }
+        else {
+            logd("Not found any items");
+            exist = false;
+        }
+    }
+    else {
+        loge( "Failed to execute %s", queryString.toStdString().c_str() );
+        exist = false;
+    }
+
+    logd("Exist %d", exist);
+    return exist;
+}
+
+void DbSqliteTbl::updateModelFromQuery(DbModel* item, const QSqlQuery& qry)
+{
+    traced;
+    item->setName(qry.value(KFieldName).toString());
+    item->setUuid(qry.value(KFieldUuid).toString());
+    item->setHistory(qry.value(KFieldHistory).toString());
+}
+
+QList<DbModel *> DbSqliteTbl::getAll(DbModelBuilder builder)
+{
+    QSqlQuery qry;
+
+    traced;
+    // TODO: check record status????
+    QString queryString = QString("SELECT * FROM %1").arg(name());
+    qry.prepare(queryString);
+    logd("Query String '%s'", queryString.toStdString().c_str());
+    QList<DbModel*>list;
+
+    if( qry.exec() )
+    {
+        while (qry.next()) {
+            DbModel* item = builder();
+            item->setDbId(qry.value(KFieldId).toInt());
+            item->setDbStatus(qry.value(KFieldRecordStatus).toInt());
+            // TODO: validate value before, i.e. toInt return ok
+            updateModelFromQuery(item, qry);
+            list.append(item); // TODO: when it cleaned up?????
+        }
+    }
+    else {
+        loge( "Failed to execute %s", queryString.toStdString().c_str() );
+    }
+
+    logd("Found %d", (int)list.size());
+    return list;
+}
+
+ErrCode DbSqliteTbl::checkOrCreateTable()
+{
+    traced;
+    ErrCode err = ErrNone;
     // TODO: should checktable before creating???
     // TODO: insert to management table
     QString sql = getSqlCmdCreateTable();
@@ -99,6 +192,57 @@ ErrCode_t DbSqliteTbl::checkOrCreateTable()
     tracedr(err);
     return err;
 }
+
+ErrCode DbSqliteTbl::onDbMigration(int oldVer, int newVer)
+{
+    traced;
+    return ErrNone;
+}
+
+ErrCode DbSqliteTbl::onTblMigration(int oldVer, int newVer)
+{
+    traced;
+    return ErrNone;
+
+}
+
+QString DbSqliteTbl::getSqlCmdCreateTable()
+{
+    traced;
+    // TODO; support multi language
+    // Common table, with name and history field, together with default one is id, uuid, status, history
+    DbSqliteTableBuilder* builder = DbSqliteTableBuilder::build(name());
+    // common field
+    builder->addField(KFieldRecordStatus, INT32);
+    // specific field
+    addTableField(builder);
+    QString sql = builder->buildSqlStatement();
+    logi("Create statement %s", sql.toStdString().c_str());
+
+    return sql;
+}
+
+void DbSqliteTbl::addTableField(DbSqliteTableBuilder *builder)
+{
+    traced;
+    // TODO: consider to make Uuid as common field???
+    // i.e. uuid can be hash of name, hash of 2 id in different table, etc.
+    builder->addField(KFieldUuid, TEXT);
+    builder->addField(KFieldName, TEXT);
+    builder->addField(KFieldHistory, TEXT);
+}
+
+void DbSqliteTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
+{
+    traced;
+    if (!item->nameid().isEmpty())
+        builder->addValue(KFieldUuid, item->nameid());
+    if (!item->name().isEmpty())
+        builder->addValue(KFieldName, item->name());
+    if (!item->history().isEmpty())
+        builder->addValue(KFieldHistory, item->history());
+}
+
 
 DbSqlite *DbSqliteTbl::db() const
 {

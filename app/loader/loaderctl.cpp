@@ -21,11 +21,14 @@
  */
 #include "loaderctl.h"
 #include "dbctl.h"
-#include "std.h"
+#include "logger.h"
+#include "errcode.h"
 #include "personctl.h"
 #include "communityctl.h"
 #include "saintctl.h"
-
+#include "location.h"
+#include "edu/eductl.h"
+#include "specialist/specialistctl.h"
 LoaderCtl* LoaderCtl::gInstance = nullptr;
 
 LoaderCtl::LoaderCtl()
@@ -54,9 +57,12 @@ void LoaderCtl::registerAll()
 {
     traced;
     add2Loader(DbCtl::getInstance());
+    add2Loader(Location::getInstance());
     add2Loader(PersonCtl::getInstance());
     add2Loader(CommunityCtl::getInstance());
     add2Loader(SaintCtl::getInstance());
+    add2Loader(EduCtl::getInstance());
+    add2Loader(SpecialistCtl::getInstance());
 }
 
 void LoaderCtl::onLoad()

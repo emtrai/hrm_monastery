@@ -23,7 +23,8 @@
 #include "dbsqlite.h"
 
 #include "dbsqlitedefs.h"
-#include "std.h"
+#include "defs.h"
+#include "logger.h"
 
 const qint32 DbSqliteWorkTbl::KVersionCode = VERSION_CODE(0,0,1);
 

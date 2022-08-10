@@ -20,7 +20,8 @@
  * Brief:
  */
 #include "dbsqliteinsertbuilder.h"
-#include "std.h"
+#include "logger.h"
+#include "errcode.h"
 
 class TableInsertItem {
 public:
@@ -101,8 +102,13 @@ DbSqliteInsertBuilder *DbSqliteInsertBuilder::addValue(
     const QString &name, const QString &value)
 {
     traced;
-    logd("addValue %s: %s", name.toStdString().c_str(), value.toStdString().c_str());
-    mFields.append(new TableInsertItem(name, value));
+    if (!value.isEmpty()) {
+        logd("addValue %s: %s", name.toStdString().c_str(), value.toStdString().c_str());
+        mFields.append(new TableInsertItem(name, value));
+    } else {
+        logd("Value is empty, do nothing");
+    }
+
 
     return this;
 }
