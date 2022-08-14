@@ -24,7 +24,7 @@
 #include "dbsqlitespecialist.h"
 #include "dbsqlite.h"
 #include "table/dbsqlitespecialisttbl.h"
-
+#include "defs.h"
 
 DbSqliteSpecialist* DbSqliteSpecialist::gInstance = nullptr;
 
@@ -41,6 +41,11 @@ DbSqliteSpecialist *DbSqliteSpecialist::getInstance()
     }
 
     return gInstance;
+}
+
+const QString DbSqliteSpecialist::getName()
+{
+    return KModelHdlSpecialist;
 }
 
 DbSqliteTbl *DbSqliteSpecialist::getMainTbl()

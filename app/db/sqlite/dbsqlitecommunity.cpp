@@ -24,6 +24,7 @@
 #include "table/dbsqlitecommunitytbl.h"
 #include "dbsqlite.h"
 #include "logger.h"
+#include "defs.h"
 
 DbSqliteCommunity* DbSqliteCommunity::gInstance = nullptr;
 
@@ -44,4 +45,9 @@ DbSqliteCommunity *DbSqliteCommunity::getInstance()
     }
 
     return gInstance;
+}
+
+const QString DbSqliteCommunity::getName()
+{
+    return KModelHdlCommunity;
 }

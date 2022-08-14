@@ -52,7 +52,7 @@ ErrCode Location::loadCountryFromFiles()
 QString path = FileCtl::getPrebuiltDataFilePath(Utils::getPrebuiltFileByLang(KPrebuiltCountryCSVFileName));
     logd("Country file path %s", path.toStdString().c_str());
 
-    ErrCode ret = Utils::parseCSVFile(path, &Location::oneCSVItemCallback);
+    ErrCode ret = Utils::parseCSVFile(path, &Location::oneCSVItemCallback, this);
     logd("ret %d", ret);
 
     return ret;
@@ -74,8 +74,8 @@ ErrCode Location::doOneCSVItemCallback(const QStringList &items, void *param)
 
         qint32 idx = 0;
         //id
-        if (ret == ErrNone)
-            country->setId(items[idx++].simplified());
+//        if (ret == ErrNone)
+//            country->setId(items[idx++].simplified());
 
         // full name
         if (ret == ErrNone)
@@ -83,17 +83,17 @@ ErrCode Location::doOneCSVItemCallback(const QStringList &items, void *param)
 
         // TODO: Continent??
 
-        if (ret == ErrNone)
-        {
-            if (country->isValid()){
-                country->dump();
-                mListCountry.insert(country->id(), country);
-            }
-            else{
-                ret = ErrInvalidData;
-                loge("Country data is invalid");
-            }
-        }
+//        if (ret == ErrNone)
+//        {
+//            if (country->isValid()){
+//                country->dump();
+//                mListCountry.insert(country->id(), country);
+//            }
+//            else{
+//                ret = ErrInvalidData;
+//                loge("Country data is invalid");
+//            }
+//        }
 
     }
     else {
@@ -105,7 +105,7 @@ ErrCode Location::doOneCSVItemCallback(const QStringList &items, void *param)
     return ret;
 }
 
-ErrCode Location::oneCSVItemCallback(const QStringList &items, void *param)
+ErrCode Location::oneCSVItemCallback(const QStringList &items, void* caller, void *param)
 {
 
     traced;

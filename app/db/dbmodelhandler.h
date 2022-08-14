@@ -36,6 +36,7 @@ public:
     virtual ErrCode add(const DbModel* model) = 0;
     virtual bool exist(const DbModel* edu) = 0;
     virtual QList<DbModel*> getAll(DbModelBuilder builder) = 0;
+    virtual const QString getName() = 0;
 
 };
 

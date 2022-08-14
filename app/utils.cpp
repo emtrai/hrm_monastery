@@ -25,12 +25,14 @@
 #include "logger.h"
 #include "errcode.h"
 #include <QFile>
+#include "crypto.h"
+
 // yymd
 #define YMD_TO_INT(y,m,d) (((y) << 16) | ((m) << 8) | (d))
 
 qint64 Utils::getCurrentTimeMs()
 {
-
+    return 0;
 }
 
 Gender Utils::genderFromString(const QString &gender)
@@ -161,7 +163,8 @@ void Utils::date2ymd(qint64 date, int *pday, int *pmonth, int *pyear)
 
 #define COMMENT '#'
 ErrCode Utils::parseCSVFile(const QString &filePath,
-                            func_one_csv_item_t cb, void *paramCb, QChar splitBy)
+                            func_one_csv_item_t cb, void *caller,
+                            void *paramCb, QChar splitBy)
 {
     traced;
     ErrCode ret = ErrNone;
@@ -186,7 +189,7 @@ ErrCode Utils::parseCSVFile(const QString &filePath,
                         if (!items.empty())
                         {
                             if (cb != nullptr){
-                                ret = cb(items, paramCb);
+                                ret = cb(items, caller, paramCb);
                             }
                             if (ret != ErrNone){
                                 loge("Line %d is invali", cnt);
@@ -289,4 +292,13 @@ QString Utils::getPrebuiltFileByLang(const QString &prebuiltName)
 {
     // TODO: this is stupid/dump implementation, let's improve it, please
     return QString("%1_%2").arg(prebuiltName, KLanguage);
+}
+
+QString Utils::UidFromName(const QString &name)
+{
+    traced;
+    QString hash = Crypto::hashString(name.simplified().toLower());
+    logd("Name %s -> uid %s", name.toStdString().c_str(),
+         hash.toStdString().c_str());
+    return hash;
 }

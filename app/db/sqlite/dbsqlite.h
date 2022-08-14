@@ -25,6 +25,7 @@
 #include <idatabase.h>
 #include "errcode.h"
 #include "person.h"
+#include <QSqlQuery>
 #include <QMap>
 
 class DbSqliteTbl;
@@ -44,6 +45,7 @@ public:
     virtual ErrCode_t loadDb(const DbInfo* dbInfo);
 
     virtual ErrCode_t execQuery(const QString& sql);
+    virtual ErrCode_t execQuery(QSqlQuery* qry);
 
 //    virtual ErrCode_t addCommunity(const Community* comm);
     virtual DbSqliteTbl* getTable(const QString& tblName);
@@ -51,6 +53,7 @@ public:
     virtual DbModelHandler *getSaintModelHandler();
     virtual DbModelHandler* getSpecialistModelHandler();
     virtual DbModelHandler* getCommunityModelHandler();
+    virtual DbModelHandler* getModelHandler(const QString& name);
 private:
 
     DbSqlite();
@@ -60,15 +63,20 @@ private:
     * Append table to List
     */
     void appendTable(DbSqliteTbl* tbl);
+    void setupTables();
 
     /**
     * Check & create all tables if not exist
     */
     ErrCode_t checkOrCreateAllTables();
 
+    void appendModelHandler(DbModelHandler* tbl);
+    void setupModelHandler();
+
 private:
     static DbSqlite* gInstance;
     QMap<QString, DbSqliteTbl*> mListTbl;
+    QMap<QString, DbModelHandler*> mModelHdlList;
 public:
     static DbSqlite* getInstance();
 

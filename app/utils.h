@@ -29,7 +29,7 @@
 #include <QHash>
 #include <QChar>
 
-typedef ErrCode (*func_one_csv_item_t)(const QStringList& items, void* param);
+typedef ErrCode (*func_one_csv_item_t)(const QStringList& items, void* caller, void* param);
 
 
 class Utils
@@ -49,6 +49,7 @@ public:
 
     static ErrCode parseCSVFile(const QString& filePath,
                             func_one_csv_item_t cb = nullptr,
+                            void* caller = nullptr,
                             void* paramCb = nullptr,
                             QChar splitBy = ','
                             );
@@ -58,6 +59,7 @@ public:
                                 QChar splitBy = ':'
                                 );
     static QString getPrebuiltFileByLang(const QString& prebuiltName);
+    static QString UidFromName(const QString& name);
 
 };
 

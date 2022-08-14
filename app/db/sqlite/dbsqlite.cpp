@@ -33,11 +33,18 @@
 #include "table/dbsqlitesainttbl.h"
 #include "table/dbsqliteedutbl.h"
 #include "table/dbsqlitespecialisttbl.h"
+#include "table/dbsqlitecountrytbl.h"
+#include "table/dbsqliteprovincetbl.h"
+#include "table/dbsqliteethnictbl.h"
 #include "dbsqlitedefs.h"
 #include "dbsqliteedu.h"
 #include "dbsqlitesaint.h"
 #include "dbsqlitecommunity.h"
 #include "dbsqlitespecialist.h"
+#include "dbsqlitecountry.h"
+#include "dbsqliteethnic.h"
+#include "dbsqliteprovince.h"
+#include "defs.h"
 
 static const QString DRIVER("QSQLITE");
 
@@ -46,7 +53,13 @@ DbSqlite* DbSqlite::gInstance = nullptr;
 DbSqlite::DbSqlite()
 {
     traced;
+    setupTables();
+    setupModelHandler();
+}
 
+void DbSqlite::setupTables()
+{
+    traced;
     // Append all tables need for db
     // TODO: append more table
     appendTable(new DbSqlitePersonTbl(this));
@@ -54,10 +67,27 @@ DbSqlite::DbSqlite()
     appendTable(new DbSqliteSaintTbl(this));
     appendTable(new DbSqliteEduTbl(this));
     appendTable(new DbSqliteSpecialistTbl(this));
+    appendTable(new DbSqliteCountryTbl(this));
+    appendTable(new DbSqliteProvinceTbl(this));
+    appendTable(new DbSqliteEthnicTbl(this));
+}
+
+void DbSqlite::setupModelHandler()
+{
+    traced;
+    appendModelHandler(new DbSqliteSpecialist());
+    appendModelHandler(new DbSqliteEdu());
+    appendModelHandler(new DbSqliteSaint());
+    appendModelHandler(new DbSqliteCommunity());
+    appendModelHandler(new DbSqliteSpecialist());
+    appendModelHandler(new DbSqliteCountry());
+    appendModelHandler(new DbSqliteEthnic());
+    appendModelHandler(new DbSqliteProvince());
 }
 
 void DbSqlite::appendTable(DbSqliteTbl *tbl)
 {
+    traced;
     if (nullptr != tbl)
     {
         mListTbl[tbl->name()] = tbl;
@@ -85,6 +115,21 @@ ErrCode_t DbSqlite::checkOrCreateAllTables()
     return err;
 }
 
+void DbSqlite::appendModelHandler(DbModelHandler *hdl)
+{
+    traced;
+    if (nullptr != hdl)
+    {
+        mModelHdlList[hdl->getName()] = hdl;
+    }
+    else
+    {
+        // TODO: throw exception?????
+    }
+}
+
+
+
 DbSqliteTbl *DbSqlite::getTable(const QString &tblName)
 {
     traced;
@@ -104,22 +149,38 @@ DbSqliteTbl *DbSqlite::getTable(const QString &tblName)
 
 DbModelHandler *DbSqlite::getEduModelHandler()
 {
-    return DbSqliteEdu::getInstance();
+    return getModelHandler(KModelHdlEdu);
 }
 
 DbModelHandler *DbSqlite::getSaintModelHandler()
 {
-    return DbSqliteSaint::getInstance();
+    return getModelHandler(KModelHdlSaint);
 }
 
 DbModelHandler *DbSqlite::getSpecialistModelHandler()
 {
-    return DbSqliteSpecialist::getInstance();
+    return getModelHandler(KModelHdlSpecialist);
 }
 
 DbModelHandler *DbSqlite::getCommunityModelHandler()
 {
-    return DbSqliteCommunity::getInstance();
+    return getModelHandler(KModelHdlCommunity);
+}
+
+DbModelHandler *DbSqlite::getModelHandler(const QString &name)
+{
+    DbModelHandler* hdl = nullptr;
+    traced;
+    if (mModelHdlList.contains(name)){
+        hdl = mModelHdlList[name];
+    }
+    else{
+        hdl = nullptr;
+        loge("Not found model %s", name.toStdString().c_str());
+        // TODO: reload system? or what should we do?
+    }
+
+    return hdl;
 }
 
 
@@ -205,6 +266,21 @@ ErrCode_t DbSqlite::execQuery(const QString &sql)
         qFatal( "Failed to execute %s", sql.toStdString().c_str() );
         err = ErrFailSqlQuery;
     }
+    tracedr(err);
+    return err;
+}
+
+ErrCode_t DbSqlite::execQuery(QSqlQuery *qry)
+{
+
+    ErrCode_t err = ErrNone;
+    traced;
+
+    if( !qry->exec() ) {
+        qFatal( "Failed to execute");
+        err = ErrFailSqlQuery;
+    }
+    tracedr(err);
     return err;
 }
 

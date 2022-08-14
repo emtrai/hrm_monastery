@@ -22,7 +22,7 @@
 #ifndef DBSQLITECOMMUNITY_H
 #define DBSQLITECOMMUNITY_H
 
-#include <idbcommunity.h>
+
 #include "dbsqlitemodelhandler.h"
 
 class DbSqliteCommunityTbl;
@@ -30,12 +30,12 @@ class DbSqliteCommunityTbl;
 class DbSqliteCommunity : public DbSqliteModelHandler
 {
 public:
+    DbSqliteCommunity();
     static DbSqliteCommunity* getInstance();
-
+    virtual const QString getName();
 protected:
     virtual DbSqliteTbl* getMainTbl();
 private:
-    DbSqliteCommunity();
 
 private:
     static DbSqliteCommunity* gInstance;

@@ -49,6 +49,8 @@ class DlgPerson : public QDialog
 //    virtual void accept();
 private slots:
     void on_buttonBox_clicked( QAbstractButton * button );
+    void on_btnEditNation_clicked();
+    void on_cbCountry_currentIndexChanged(int index);
 };
 
 #endif // DLGPERSON_H

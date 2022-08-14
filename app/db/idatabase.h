@@ -30,7 +30,6 @@
 class Person;
 class Community;
 class Saint;
-class IDbSaint;
 
 // THIS IS ONE INTERFACE FOR ALL OPERATION RELATING TO DB
 // TODO: should separate person, community, saint, etc. into separate class????
@@ -58,6 +57,8 @@ public:
     virtual DbModelHandler* getSaintModelHandler() = 0;
     virtual DbModelHandler* getSpecialistModelHandler() = 0;
     virtual DbModelHandler* getCommunityModelHandler() = 0;
+
+    virtual DbModelHandler* getModelHandler(const QString& name) = 0;
 };
 
 #endif // IDATABASE_H

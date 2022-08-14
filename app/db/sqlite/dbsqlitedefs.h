@@ -59,6 +59,16 @@ const char* const KFieldGender = "gender";
 const char* const KFieldFeastDay = "feast_day";
 const char* const KFieldCountry = "country";
 const char* const KFieldHistory = "history";
+const char* const KFieldRegion= "region";
+const char* const KFieldContinent = "continent";
+const char* const KFieldShortName = "short_name";
+const char* const KFieldCountryDbId = "country_dbid";
+const char* const KFieldCountryShortName = "country_short_name";
+const char* const KFieldEthnic = "ethnic"; // dan toc
+const char* const KFieldState = "state"; // tinh/thanh/bang
+const char* const KFieldProvince = "province"; // tinh/thanh/bang
+const char* const KFieldParentDbId = "parent_dbid"; // tinh/thanh/bang
+
 
 // TABLES NAME
 const char* const KTablePerson = "person"; // Person
@@ -71,6 +81,9 @@ const char* const KTableSpecialist = "specialist"; // chuyen mon
 const char* const KTableWork = "work"; // cong viec
 const char* const KTableChurch = "church";
 const char* const KTableMission = "mission"; // su vu cua cong doan
+const char* const KTableCountry = "country"; //
+const char* const KTableProvince = "province"; //
+const char* const KTableEthnic = "ethnic"; //Dan toc
 
 // TODO: move to class???
 QString getDateTypeString(TableFieldDatatype_t dataType);

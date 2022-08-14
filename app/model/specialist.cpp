@@ -23,7 +23,7 @@
 #include "crypto.h"
 #include "errcode.h"
 #include "logger.h"
-#include "idbspecialist.h"
+
 #include "dbctl.h"
 
 Specialist::Specialist(QObject *parent)

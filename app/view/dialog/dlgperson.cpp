@@ -37,8 +37,11 @@
 #include <QRegularExpressionMatch>
 #include "view/widget/uimulticomboxview.h"
 
-#include "edu/eductl.h"
-#include "specialist/specialistctl.h"
+#include "eductl.h"
+#include "specialistctl.h"
+#include "countryctl.h"
+#include "provincectl.h"
+#include "ethnicctl.h"
 
 DlgPerson::DlgPerson(QWidget *parent) :
     QDialog(parent),
@@ -98,6 +101,8 @@ void DlgPerson::setupUI()
     ui->txtCode->setText(Config::getNextPersonalCode());
 
     // Education
+
+    logd("Load Education");
     QList<Education*> list = EduCtl::getInstance()->getListEdu();
     foreach(Education* edu, list){
 
@@ -105,6 +110,8 @@ void DlgPerson::setupUI()
     }
 
     // Saints
+
+    logd("Load Saint");
     UIMultiComboxView *cbSaints = new UIMultiComboxView();
     QList<Saint*> saints = SaintCtl::getInstance()->getListSaints();
     foreach (Saint* saint, saints) {
@@ -114,6 +121,9 @@ void DlgPerson::setupUI()
 
     ui->wgSaint->layout()->addWidget(cbSaints);
 
+    // specialist
+
+    logd("Load specialist");
     UIMultiComboxView *cbSpecialist = new UIMultiComboxView();
     QList<Specialist*> specialists = SpecialistCtl::getInstance()->getAll();
     foreach (Specialist* specialist, specialists) {
@@ -122,6 +132,34 @@ void DlgPerson::setupUI()
     }
     ui->wgSpecialist->layout()->addWidget(cbSpecialist);
 
+
+    // Country
+    logd("Load country");
+    QList<Country*> listCountry = CountryCtl::getInstance()->getCountryList();
+    foreach(Country* item, listCountry){
+
+        ui->cbNationality->addItem(item->name(), item->shortName());
+        ui->cbCountry->addItem(item->name(), item->shortName());
+    }
+
+    logd("Load ethic");
+    // Someone may have US nationality, but Ethic is Kinh, as their original is VN
+    const QHash<QString, QList<Ethnic*>*> listEthnics = ETHNIC->getEthnicList();
+    foreach(QString country, listEthnics.keys()){
+        foreach(Ethnic * ethnic, *(listEthnics.value(country)))
+            ui->cbEthic->addItem(QString("%1,%2").arg(
+                                     ethnic->countryShortName(), ethnic->name()),
+                             ethnic->uuid());
+    }
+
+    // State/Province
+    logd("Load state/province");
+    const QList<Province*>* listProvince = PROVINCE->getProvinceList(ui->cbCountry->currentText());
+    if (listProvince != nullptr){
+        foreach(Province* item, *listProvince){
+            ui->cbProvince->addItem(item->name(), item->uuid());
+        }
+    }
     // Call connect here may cause call is called twice, it's because
     // Qt check func name, if it's in format on_buttonBox_clicked --> auto register slot
     //    connect(ui->buttonBox, SIGNAL(clicked(QAbstractButton*)),
@@ -157,5 +195,30 @@ void DlgPerson::on_buttonBox_clicked( QAbstractButton * button )
         }
 
     }
+}
+
+
+void DlgPerson::on_btnEditNation_clicked()
+{
+    traced;
+}
+
+
+void DlgPerson::on_cbCountry_currentIndexChanged(int index)
+{
+    traced;
+    logd("Reload provine of %s", ui->cbCountry->currentText().toStdString().c_str());
+    logd("index %d", index);
+    if (index >= 0){
+        QString shortName = ui->cbCountry->itemData(index).toString();
+        const QList<Province*>* listProvince = PROVINCE->getProvinceList(shortName);
+        ui->cbProvince->clear();
+        if (listProvince != nullptr){
+            foreach(Province* item, *listProvince){
+                ui->cbProvince->addItem(item->name(), item->nameid());
+            }
+        }
+    }
+
 }
 

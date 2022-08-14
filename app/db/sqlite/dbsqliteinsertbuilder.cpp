@@ -102,6 +102,7 @@ DbSqliteInsertBuilder *DbSqliteInsertBuilder::addValue(
     const QString &name, const QString &value)
 {
     traced;
+    logd("tble %s", mName.toStdString().c_str());
     if (!value.isEmpty()) {
         logd("addValue %s: %s", name.toStdString().c_str(), value.toStdString().c_str());
         mFields.append(new TableInsertItem(name, value));
@@ -171,6 +172,59 @@ QString DbSqliteInsertBuilder::buildSqlStatement(const QString* cond)
 //    qry.bindValue( ":tag", tag );
 
 }
+
+QSqlQuery* DbSqliteInsertBuilder::buildSqlQuery(const QString *cond)
+{
+    QString fields;
+    QString values;
+    traced;
+    foreach( TableInsertItem* item, mFields )
+    {
+        fields += item->name() + ",";
+        values += ":" + item->name() + ",";
+    }
+    if (!fields.isEmpty()){ // remove last ","
+        fields.remove(fields.length() - 1, 1);
+    }
+    if (!values.isEmpty()){ // remove last ","
+        values.remove(values.length() - 1, 1);
+    }
+
+    (void)cond;
+    // TODO: condition?
+    QString queryString = QStringLiteral(
+               "INSERT INTO %1(%2) VALUES(%3)")
+        .arg(mName, fields, values);
+    QSqlQuery* qry = new QSqlQuery();
+    qry->prepare(queryString);
+    logd("Query String '%s'", queryString.toStdString().c_str());
+    foreach( TableInsertItem* item, mFields )
+    {
+        logd("Bind insert command %s, type %d",
+             item->name().toStdString().c_str(), item->datatype());
+        switch (item->datatype()){
+        case TEXT:
+            logd("Bind value %s", item->stringValue().toStdString().c_str());
+            qry->bindValue(":" + item->name(), item->stringValue());
+            break;
+        case INT32:
+            logd("Bind value %d", item->int32Value());
+            qry->bindValue(":" + item->name(), item->int32Value());
+            break;
+        case INT64:
+            logd("Bind value %d", item->int32Value());
+            qry->bindValue(":" + item->name(), item->int64Value());
+            break;
+        default:
+            // TODO handler error
+            loge("UNSUPORT data type");
+            break;
+        }
+
+    }
+    return qry;
+}
+
 
 DbSqliteInsertBuilder::DbSqliteInsertBuilder(const QString& name): mName(name)
 {}

@@ -24,6 +24,11 @@
 #include "dbctl.h"
 #include "logger.h"
 
+DbModel *Community::builder()
+{
+    return new Community();
+}
+
 Community::Community()
 {
 

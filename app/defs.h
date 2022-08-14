@@ -27,6 +27,9 @@
 
 #define VERSION_CODE(major,minor,patch) (major * 1000000 + minor * 1000 + patch)
 
+#define CSV_ITEM_SPLIT ','
+#define CSV_SUBITEM_SPLIT ';'
+
 enum Gender{
     FEMALE = 0,
     MALE,
@@ -41,5 +44,26 @@ const char* const KPrebuiltSaintCSVFileName = "saints";
 const char* const KPrebuiltCountryCSVFileName = "country";
 const char* const KPrebuiltEduCSVFileName = "edu";
 const char* const KPrebuiltSpecialistCSVFileName = "specialist";
+const char* const KPrebuiltProvinceCSVFileName = "province";
+const char* const KPrebuiltEthnicCSVFileName = "ethnic";
+
+const char* const KModelHdlCountry = "country";
+const char* const KModelHdlEdu = "education";
+const char* const KModelHdlCommunity = "community";
+const char* const KModelHdlPerson = "person";
+const char* const KModelHdlSaint = "saint";
+const char* const KModelHdlSpecialist = "specialist";
+const char* const KModelHdlProvince = "province";
+const char* const KModelHdlEthnic = "ethnic";
+
+const char* const KDataFormatList = "QList";
+const char* const KDataFormatStringList = "QStringList";
+const char* const KDataFormatJson = "QJson";
+
+const char* const KFileTypeCSV = "csv";
+const char* const KFileTypeExcelX = "xlsx";
+
+
+
 
 #endif // DEFS_H

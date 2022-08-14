@@ -22,7 +22,6 @@
 #ifndef DBSQLITEEDU_H
 #define DBSQLITEEDU_H
 
-#include <idbedu.h>
 #include <QList>
 #include "education.h"
 #include "dbmodelhandler.h"
@@ -34,12 +33,12 @@ class DbSqliteEduTbl;
 class DbSqliteEdu : public DbSqliteModelHandler
 {
 public:
+    DbSqliteEdu();
     static DbSqliteEdu* getInstance();
-
+    virtual const QString getName();
 protected:
     virtual DbSqliteTbl* getMainTbl();
 private:
-    DbSqliteEdu();
 
 private:
     static DbSqliteEdu* gInstance;

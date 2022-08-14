@@ -23,10 +23,10 @@
 
 #include "crypto.h"
 
-#include "idbedu.h"
+
 #include "dbctl.h"
 #include "logger.h"
-#include "idbedu.h"
+
 
 Education::Education()
 {

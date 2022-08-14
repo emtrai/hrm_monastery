@@ -32,6 +32,13 @@ DbModel::DbModel():
 
 }
 
+DbModel::DbModel(const DbModel &model)
+{
+    setDbId(model.dbId());
+    setName(model.name());
+    setUuid(model.uuid());
+}
+
 DbModel::~DbModel()
 {
     traced;
@@ -89,6 +96,7 @@ ErrCode DbModel::save()
         ret = ErrDbNotReady;
         loge("DbSaint not ready");
     }
+    tracedr(ret);
     return ret;
 }
 

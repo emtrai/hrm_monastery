@@ -63,40 +63,6 @@ IDatabase *DbCtl::database() const
     return mDatabase;
 }
 
-//IDbSaint *DbCtl::dbSaint()
-//{
-//    traced;
-//    if (mDbSaint == nullptr){
-//        mDbSaint = new DbSqliteSaint();
-//    }
-//    return mDbSaint;
-//}
-
-//IDbCommunity *DbCtl::dbCommunity()
-//{
-//    if (mDbCommunity == nullptr){
-//        mDbCommunity = new DbSqliteCommunity();
-//    }
-//    return mDbCommunity;
-//}
-
-////IDbEdu *DbCtl::dbEdu()
-////{
-////    if (mDbEdu == nullptr){
-////        mDbEdu = new DbSqliteEdu();
-////    }
-////    return mDbEdu;
-
-////}
-
-//IDbSpecialist *DbCtl::dbSpecialist()
-//{
-//    if (mDbSpecialist == nullptr)
-//        mDbSpecialist = new DbSqliteSpecialist;
-
-//    return mDbSpecialist;
-//}
-
 DbCtl* DbCtl::getInstance(){
     traced;
     if (gInstance == nullptr){

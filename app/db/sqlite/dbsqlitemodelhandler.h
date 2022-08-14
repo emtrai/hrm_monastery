@@ -37,7 +37,7 @@ public:
     virtual ErrCode add(const DbModel* model);
     virtual bool exist(const DbModel* edu);
     virtual QList<DbModel*> getAll(DbModelBuilder builder);
-
+    virtual const QString getName();
 protected:
     virtual DbSqliteTbl* getMainTbl() = 0;
 };

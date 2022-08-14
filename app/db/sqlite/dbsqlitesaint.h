@@ -22,7 +22,6 @@
 #ifndef DBSQLITESAINT_H
 #define DBSQLITESAINT_H
 
-#include <idbsaint.h>
 #include <QHash>
 #include "dbsqlitemodelhandler.h"
 
@@ -31,12 +30,12 @@ class DbSqliteSaintTbl;
 class DbSqliteSaint : public DbSqliteModelHandler
 {
 public:
+    DbSqliteSaint();
     static DbSqliteSaint* getInstance();
-
+    virtual const QString getName();
 protected:
     virtual DbSqliteTbl* getMainTbl();
 private:
-    DbSqliteSaint();
 
 private:
     static DbSqliteSaint* gInstance;

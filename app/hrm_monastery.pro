@@ -18,13 +18,11 @@ DEFINES = DEBUG_TRACE
 INCLUDEPATH += $$PWD/db
 INCLUDEPATH += $$PWD/db/sqlite
 INCLUDEPATH += $$PWD/model
-INCLUDEPATH += $$PWD/person
-INCLUDEPATH += $$PWD/community
 INCLUDEPATH += $$PWD/view
 INCLUDEPATH += $$PWD/view/dialog
 INCLUDEPATH += $$PWD/config
 INCLUDEPATH += $$PWD/file
-INCLUDEPATH += $$PWD/saint
+INCLUDEPATH += $$PWD/controller
 INCLUDEPATH += $$PWD/crypto
 INCLUDEPATH += $$PWD/location
 #QT_NO_DEBUG_OUTPUT
@@ -36,9 +34,12 @@ INCLUDEPATH += $$PWD/location
 SOURCES += \
     address.cpp \
     cache/cachectl.cpp \
-    community/communityctl.cpp \
+    controller/communityctl.cpp \
     config/config.cpp \
-    controller.cpp \
+    controller/controller.cpp \
+    controller/countryctl.cpp \
+    controller/ethnicctl.cpp \
+    controller/provincectl.cpp \
     crypto/crypto.cpp \
     db/dbctl.cpp \
     db/dbinfo.cpp \
@@ -47,23 +48,29 @@ SOURCES += \
     db/idatabase.cpp \
     db/sqlite/dbsqlite.cpp \
     db/sqlite/dbsqlitecommunity.cpp \
+    db/sqlite/dbsqlitecountry.cpp \
     db/sqlite/dbsqlitedefs.cpp \
     db/sqlite/dbsqliteedu.cpp \
+    db/sqlite/dbsqliteethnic.cpp \
     db/sqlite/dbsqliteinsertbuilder.cpp \
     db/sqlite/dbsqlitemodelhandler.cpp \
+    db/sqlite/dbsqliteprovince.cpp \
     db/sqlite/dbsqlitesaint.cpp \
     db/sqlite/dbsqlitespecialist.cpp \
     db/sqlite/table/dbsqlitecommunitytbl.cpp \
+    db/sqlite/table/dbsqlitecountrytbl.cpp \
     db/sqlite/table/dbsqlitedeparttbl.cpp \
     db/sqlite/table/dbsqliteedutbl.cpp \
+    db/sqlite/table/dbsqliteethnictbl.cpp \
     db/sqlite/table/dbsqlitepersoneventtbl.cpp \
     db/sqlite/table/dbsqlitepersontbl.cpp \
     db/sqlite/dbsqlitetablebuilder.cpp \
+    db/sqlite/table/dbsqliteprovincetbl.cpp \
     db/sqlite/table/dbsqlitesainttbl.cpp \
     db/sqlite/table/dbsqlitespecialisttbl.cpp \
     db/sqlite/table/dbsqlitetbl.cpp \
     db/sqlite/table/dbsqliteworktbl.cpp \
-    edu/eductl.cpp \
+    controller/eductl.cpp \
     file/filectl.cpp \
     loader/loaderctl.cpp \
     location/location.cpp \
@@ -75,6 +82,8 @@ SOURCES += \
     model/country.cpp \
     model/department.cpp \
     model/education.cpp \
+    model/ethnic.cpp \
+    model/mission.cpp \
     model/person.cpp \
     model/personbasic.cpp \
     model/personevent.cpp \
@@ -82,60 +91,68 @@ SOURCES += \
     model/saint.cpp \
     model/specialist.cpp \
     model/work.cpp \
-    monastery/monasteryctl.cpp \
-    person/personctl.cpp \
+    controller/monasteryctl.cpp \
+    controller/personctl.cpp \
     report/reportctl.cpp \
-    saint/saintctl.cpp \
+    controller/saintctl.cpp \
     search/searchctl.cpp \
-    specialist/specialistctl.cpp \
+    controller/specialistctl.cpp \
     statistic/statistic.cpp \
     test/testctl.cpp \
     utils.cpp \
     view/dialog/dlgcommunity.cpp \
     view/dialog/dlgperson.cpp \
-    view/widget/uicommunityview.cpp \
+    view/widget/uicommonlistview.cpp \
+    view/widget/uicommunitylistview.cpp \
     view/widget/uiitembutton.cpp \
     view/widget/uimulticomboxview.cpp \
-    view/widget/uinunsview.cpp \
-    view/widget/uisaintsview.cpp \
-    view/widget/uisummarizeview.cpp
+    view/widget/uipersonlistview.cpp \
+    view/widget/uisaintlistview.cpp \
+    view/widget/uisummarizeview.cpp \
+    view/widget/uitableview.cpp \
+    view/widget/uitableviewfactory.cpp
 
 HEADERS += \
     address.h \
     cache/cachectl.h \
-    community/communityctl.h \
+    controller/communityctl.h \
     config/config.h \
-    controller.h \
+    controller/controller.h \
+    controller/countryctl.h \
+    controller/ethnicctl.h \
+    controller/provincectl.h \
     crypto/crypto.h \
     db/dbctl.h \
     db/dbinfo.h \
     db/dbmodel.h \
     db/dbmodelhandler.h \
     db/idatabase.h \
-    db/idbcommunity.h \
-    db/idbedu.h \
-    db/idbsaint.h \
-    db/idbspecialist.h \
     db/sqlite/dbsqlite.h \
     db/sqlite/dbsqlitecommunity.h \
+    db/sqlite/dbsqlitecountry.h \
     db/sqlite/dbsqlitedefs.h \
     db/sqlite/dbsqliteedu.h \
+    db/sqlite/dbsqliteethnic.h \
     db/sqlite/dbsqliteinsertbuilder.h \
     db/sqlite/dbsqlitemodelhandler.h \
+    db/sqlite/dbsqliteprovince.h \
     db/sqlite/dbsqlitesaint.h \
     db/sqlite/dbsqlitespecialist.h \
     db/sqlite/table/dbsqlitecommunitytbl.h \
+    db/sqlite/table/dbsqlitecountrytbl.h \
     db/sqlite/table/dbsqlitedeparttbl.h \
     db/sqlite/table/dbsqliteedutbl.h \
+    db/sqlite/table/dbsqliteethnictbl.h \
     db/sqlite/table/dbsqlitepersoneventtbl.h \
     db/sqlite/table/dbsqlitepersontbl.h \
     db/sqlite/dbsqlitetablebuilder.h \
+    db/sqlite/table/dbsqliteprovincetbl.h \
     db/sqlite/table/dbsqlitesainttbl.h \
     db/sqlite/table/dbsqlitespecialisttbl.h \
     db/sqlite/table/dbsqlitetbl.h \
     db/sqlite/table/dbsqliteworktbl.h \
     defs.h \
-    edu/eductl.h \
+    controller/eductl.h \
     errcode.h \
     file/filectl.h \
     loader/loaderctl.h \
@@ -147,6 +164,8 @@ HEADERS += \
     model/country.h \
     model/department.h \
     model/education.h \
+    model/ethnic.h \
+    model/mission.h \
     model/person.h \
     model/personbasic.h \
     model/personevent.h \
@@ -154,34 +173,35 @@ HEADERS += \
     model/saint.h \
     model/specialist.h \
     model/work.h \
-    monastery/monasteryctl.h \
-    person/personctl.h \
+    controller/monasteryctl.h \
+    controller/personctl.h \
     report/reportctl.h \
-    saint/saintctl.h \
+    controller/saintctl.h \
     search/searchctl.h \
-    specialist/specialistctl.h \
+    controller/specialistctl.h \
     statistic/statistic.h \
     std.h \
     test/testctl.h \
     utils.h \
     view/dialog/dlgcommunity.h \
     view/dialog/dlgperson.h \
-    view/widget/uicommunityview.h \
+    view/widget/uicommonlistview.h \
+    view/widget/uicommunitylistview.h \
     view/widget/uiitembutton.h \
     view/widget/uimulticomboxview.h \
-    view/widget/uinunsview.h \
-    view/widget/uisaintsview.h \
-    view/widget/uisummarizeview.h
+    view/widget/uipersonlistview.h \
+    view/widget/uisaintlistview.h \
+    view/widget/uisummarizeview.h \
+    view/widget/uitableview.h \
+    view/widget/uitableviewfactory.h
 
 FORMS += \
     mainwindow.ui \
     view/dialog/dlgcommunity.ui \
     view/dialog/dlgperson.ui \
-    view/widget/uicommunityview.ui \
     view/widget/uimulticomboxview.ui \
-    view/widget/uinunsview.ui \
-    view/widget/uisaintsview.ui \
-    view/widget/uisummarizeview.ui
+    view/widget/uisummarizeview.ui \
+    view/widget/uitableview.ui
 
 TRANSLATIONS += \
     hrm_monastery_vi_VN.ts

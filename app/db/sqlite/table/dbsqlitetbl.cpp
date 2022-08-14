@@ -85,10 +85,12 @@ ErrCode_t DbSqliteTbl::add(const DbModel *item)
     ErrCode_t err = ErrNone;
     DbSqliteInsertBuilder* builder = DbSqliteInsertBuilder::build(name());
     insertTableField(builder, item);
-    QString sql = builder->buildSqlStatement();
-    logi("insert sql statement %s", sql.toStdString().c_str());
-    err = db()->execQuery(sql);
-
+//    QString sql = builder->buildSqlStatement();
+//    logi("insert sql statement %s", sql.toStdString().c_str());
+    QSqlQuery* qry = builder->buildSqlQuery();
+    err = db()->execQuery(qry);
+    delete qry;
+    tracedr(err);
     return err;
 
 }
@@ -132,6 +134,7 @@ void DbSqliteTbl::updateModelFromQuery(DbModel* item, const QSqlQuery& qry)
     item->setName(qry.value(KFieldName).toString());
     item->setUuid(qry.value(KFieldUuid).toString());
     item->setHistory(qry.value(KFieldHistory).toString());
+    tracede;
 }
 
 QList<DbModel *> DbSqliteTbl::getAll(DbModelBuilder builder)
@@ -161,6 +164,7 @@ QList<DbModel *> DbSqliteTbl::getAll(DbModelBuilder builder)
     }
 
     logd("Found %d", (int)list.size());
+    tracede;
     return list;
 }
 

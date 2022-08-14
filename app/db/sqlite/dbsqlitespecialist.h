@@ -22,7 +22,6 @@
 #ifndef DBSQLITESPECIALIST_H
 #define DBSQLITESPECIALIST_H
 
-#include <idbspecialist.h>
 #include "dbsqlitemodelhandler.h"
 
 //class Specialist;
@@ -31,12 +30,12 @@ class DbSqliteSpecialistTbl;
 class DbSqliteSpecialist : public DbSqliteModelHandler
 {
 public:
+    DbSqliteSpecialist();
     static DbSqliteSpecialist* getInstance();
-
+    virtual const QString getName();
 protected:
     virtual DbSqliteTbl* getMainTbl();
 private:
-    DbSqliteSpecialist();
 
 private:
     static DbSqliteSpecialist* gInstance;

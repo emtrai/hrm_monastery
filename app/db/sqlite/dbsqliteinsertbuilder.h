@@ -25,7 +25,7 @@
 #include <QString>
 #include <QObject>
 #include <QList>
-
+#include <QSqlQuery>
 #include "dbsqlitedefs.h"
 
 class TableInsertItem;
@@ -37,6 +37,7 @@ public:
     DbSqliteInsertBuilder* addValue(const QString& name, const QString& value);
     DbSqliteInsertBuilder* addValue(const QString& name, qint32 value);
     QString buildSqlStatement(const QString* cond = nullptr);
+    QSqlQuery* buildSqlQuery(const QString* cond = nullptr);
 private:
 
     DbSqliteInsertBuilder(const QString& name);

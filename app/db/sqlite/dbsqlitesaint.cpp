@@ -24,7 +24,7 @@
 #include "dbsqlitedefs.h"
 #include "table/dbsqlitesainttbl.h"
 #include "logger.h"
-
+#include "defs.h"
 DbSqliteSaint* DbSqliteSaint::gInstance = nullptr;
 
 
@@ -41,6 +41,11 @@ DbSqliteSaint *DbSqliteSaint::getInstance()
     }
 
     return gInstance;
+}
+
+const QString DbSqliteSaint::getName()
+{
+    return KModelHdlSaint;
 }
 
 DbSqliteTbl *DbSqliteSaint::getMainTbl()

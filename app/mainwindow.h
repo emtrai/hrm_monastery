@@ -25,9 +25,7 @@
 #include <QMainWindow>
 
 #include "view/widget/uisummarizeview.h"
-#include "view/widget/uicommunityview.h"
-#include "view/widget/uisaintsview.h"
-#include "view/widget/uinunsview.h"
+#include "view/widget/uitableview.h"
 
 QT_BEGIN_NAMESPACE
     namespace Ui { class MainWindow; }
@@ -48,9 +46,9 @@ QT_END_NAMESPACE
  private:
     Ui::MainWindow *ui;
     UISummarizeView* mSummarizeView;
-    UICommunityView* mCommunityView;
-    UISaintsView* mSaintsView;
-    UINunsView* mNunsView;
+    UITableView* mCommunityView;
+    UITableView* mSaintsView;
+    UITableView* mPersonView;
     QWidget* mCurrentView;
  signals:
     void load();

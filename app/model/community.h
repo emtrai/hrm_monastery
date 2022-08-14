@@ -43,6 +43,8 @@ class Community: public QObject, public DbModel
 {
     Q_OBJECT
 public:
+    static DbModel *builder();
+public:
     Community();
     ~Community();
 

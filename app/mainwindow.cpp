@@ -30,21 +30,24 @@
 #include "communityctl.h"
 #include "dlgperson.h"
 #include "filectl.h"
+#include "view/widget/uitableviewfactory.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , mSummarizeView(nullptr)
     , mCommunityView(nullptr)
-    , mNunsView(nullptr)
+    , mPersonView(nullptr)
     , mCurrentView(nullptr)
 {
     ui->setupUi(this);
 
     mSummarizeView = new UISummarizeView();
-    mCommunityView = new UICommunityView();
-    mSaintsView = new UISaintsView();
-    mNunsView = new UINunsView();
+
+    mCommunityView = UITableViewFactory::getView(ViewType::COMMUNITY);
+    mSaintsView = UITableViewFactory::getView(ViewType::SAINT);
+    mPersonView = UITableViewFactory::getView(ViewType::PERSON);
+
     switchView(mSummarizeView);
 //    summarize->setWindowState(Qt::WindowState::WindowMaximized);
 //    summarize->show();
@@ -147,6 +150,6 @@ void MainWindow::on_actionSaints_2_triggered()
 
 void MainWindow::on_actionNuns_triggered()
 {
-    switchView(mNunsView);
+    switchView(mPersonView);
 }
 

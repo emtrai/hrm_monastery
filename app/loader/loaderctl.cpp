@@ -27,8 +27,12 @@
 #include "communityctl.h"
 #include "saintctl.h"
 #include "location.h"
-#include "edu/eductl.h"
-#include "specialist/specialistctl.h"
+#include "eductl.h"
+#include "specialistctl.h"
+#include "countryctl.h"
+#include "provincectl.h"
+#include "ethnicctl.h"
+
 LoaderCtl* LoaderCtl::gInstance = nullptr;
 
 LoaderCtl::LoaderCtl()
@@ -58,11 +62,14 @@ void LoaderCtl::registerAll()
     traced;
     add2Loader(DbCtl::getInstance());
     add2Loader(Location::getInstance());
-    add2Loader(PersonCtl::getInstance());
-    add2Loader(CommunityCtl::getInstance());
     add2Loader(SaintCtl::getInstance());
     add2Loader(EduCtl::getInstance());
     add2Loader(SpecialistCtl::getInstance());
+    add2Loader(CountryCtl::getInstance());
+    add2Loader(ProvinceCtl::getInstance());
+    add2Loader(EthnicCtl::getInstance());
+    add2Loader(PersonCtl::getInstance());
+    add2Loader(CommunityCtl::getInstance());
 }
 
 void LoaderCtl::onLoad()

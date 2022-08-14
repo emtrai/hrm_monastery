@@ -66,3 +66,8 @@ QList<DbModel *> DbSqliteModelHandler::getAll(DbModelBuilder builder)
     traced;
     return getMainTbl()->getAll(builder);
 }
+
+const QString DbSqliteModelHandler::getName()
+{
+    return "sqlite";
+}

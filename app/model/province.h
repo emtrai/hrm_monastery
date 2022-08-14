@@ -25,6 +25,7 @@
 #include <QString>
 #include <QList>
 #include <QObject>
+#include "dbmodel.h"
 
 enum ProvinceType{
     PROVINCE = 0,
@@ -32,23 +33,40 @@ enum ProvinceType{
     STATE
 };
 
-class Province: public QObject
+class Province: public QObject, public DbModel
 {
 public:
     Province();
-    const QString &id() const;
-    void setId(const QString &newId);
+    static DbModel *builder();
+    virtual QString nameid() const;
 
-    const QString &name() const;
-    void setName(const QString &newName);
+    qint64 parentDbId() const;
+    void setParentDbId(qint64 newParentDbId);
 
-    bool isValid();
-    void dump();
 
+
+    qint64 countryDbId() const;
+    void setCountryDbId(qint64 newCountryDbId);
+
+    const QString &remark() const;
+    void setRemark(const QString &newRemark);
+    const QString &countryShortName() const;
+    void setCountryShortName(const QString &newCountryShortName);
+
+
+
+    const QString &parentUid() const;
+    void setParentUid(const QString &newParentUid);
+
+protected:
+    virtual DbModelHandler *getDbModelHandler();
 private:
-    QString mId;
-    QString mName; // TODO: support multi language
     Province* parent;
+    qint64 mParentDbId;
+    qint64 mCountryDbId;
+    QString mCountryShortName;
+    QString mParentUid;
+    QString mRemark;
     QList<Province> mChildProvince; // City belongs to Province, Province belongs to state
 };
 

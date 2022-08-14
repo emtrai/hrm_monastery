@@ -22,10 +22,10 @@
 #include "dbsqliteedu.h"
 #include "logger.h"
 #include "dbsqliteedu.h"
-#include "dbsqlite.h";
+#include "dbsqlite.h"
 #include "dbsqlitedefs.h"
 #include "table/dbsqliteedutbl.h"
-
+#include "defs.h"
 DbSqliteEdu* DbSqliteEdu::gInstance = nullptr;
 
 DbSqliteEdu::DbSqliteEdu()
@@ -40,6 +40,11 @@ DbSqliteEdu *DbSqliteEdu::getInstance()
     }
 
     return gInstance;
+}
+
+const QString DbSqliteEdu::getName()
+{
+    return KModelHdlEdu;
 }
 
 DbSqliteTbl *DbSqliteEdu::getMainTbl()

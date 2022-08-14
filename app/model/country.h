@@ -26,36 +26,38 @@
 #include <QHash>
 #include "errcode.h"
 #include <QObject>
+#include "dbmodel.h"
+#include <QStringList>
 class Province;
 
-class Country: public QObject
+class Country: public QObject, public DbModel
 {
 public:
     Country();
     Country(const Country& country);
 
+    const QList<Province*>* getListProvince();
 
-    const QString &id() const;
-    void setId(const QString &newId);
+    const QString &region() const;
+    void setRegion(const QString &newRegion);
 
-    const QString &name() const;
-    void setName(const QString &newName);
+    const QString &continent() const;
+    void setContinent(const QString &newContinent);
 
-    bool isValid();
-    void dump();
+public:
+    static DbModel *builder();
 
-    QList<Province*> getListProvince();
-    ErrCode loadProvinceFromFiles();
+    const QString &shortName() const;
+    void setShortName(const QString &newShortName);
 
-    ErrCode doOneCSVItemCallback(const QStringList& items, void* param);
+
+protected:
+    virtual DbModelHandler* getDbModelHandler();
+
 private:
-    static ErrCode oneCSVItemCallback(const QStringList& items, void* param);
-
-private:
-    QHash<QString, Province*> mListProvince;
-    QString mId;
-    QString mName; // TODO: support multi language
-    bool mProvinceLoaded;
+    QString mShortName;
+    QString mRegion;
+    QString mContinent;
 };
 
 #endif // COUNTRY_H

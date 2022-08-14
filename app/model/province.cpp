@@ -22,47 +22,88 @@
 #include "province.h"
 #include "logger.h"
 #include "errcode.h"
+#include "province.h"
+#include "filectl.h"
+#include "utils.h"
+#include "dbctl.h"
+#include "defs.h"
+#include "dbmodel.h"
 
 Province::Province()
 {
-
+    traced;
 }
 
-const QString &Province::id() const
+DbModel *Province::builder()
 {
-    return mId;
+    return new Province();
 }
 
-void Province::setId(const QString &newId)
+QString Province::nameid() const
 {
-    mId = newId;
+    QString hash;
+    if (parentUid().isEmpty())
+        hash = Utils::UidFromName(name()+countryShortName());
+    else
+        hash = Utils::UidFromName(name()+countryShortName()+parentUid());
+    logd("province uuid %s", hash.toStdString().c_str());
+    return hash;
 }
 
-const QString &Province::name() const
+qint64 Province::parentDbId() const
 {
-    return mName;
+    return mParentDbId;
 }
 
-void Province::setName(const QString &newName)
+void Province::setParentDbId(qint64 newParentDbId)
 {
-    mName = newName;
+    mParentDbId = newParentDbId;
+}
+
+qint64 Province::countryDbId() const
+{
+    return mCountryDbId;
+}
+
+void Province::setCountryDbId(qint64 newCountryDbId)
+{
+    mCountryDbId = newCountryDbId;
+}
+
+const QString &Province::remark() const
+{
+    return mRemark;
+}
+
+void Province::setRemark(const QString &newRemark)
+{
+    mRemark = newRemark;
 }
 
 
-bool Province::isValid()
+DbModelHandler *Province::getDbModelHandler()
 {
-    return !(name().isEmpty() || id().isEmpty());
+    return DB->getModelHandler(KModelHdlProvince);
 }
 
-void Province::dump()
+const QString &Province::parentUid() const
 {
-    // TODO: dump to stdout, sdderr or file???
-#ifdef DEBUG_TRACE
+    return mParentUid;
+}
 
-    logd("DUMP Province:");
-    logd("- id %s", id().toStdString().c_str());
-    logd("- Name %s", name().toStdString().c_str());
-    // TODO: province???
-#endif //DEBUG_TRACE
+void Province::setParentUid(const QString &newParentUid)
+{
+    mParentUid = newParentUid;
+}
+
+
+const QString &Province::countryShortName() const
+{
+    return mCountryShortName;
+}
+
+void Province::setCountryShortName(const QString &newCountryShortName)
+{
+    mCountryShortName = newCountryShortName;
 }
 

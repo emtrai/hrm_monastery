@@ -32,6 +32,7 @@ class DbModel
 {
 public:
     DbModel();
+    DbModel(const DbModel& model);
     virtual ~DbModel();
 
     virtual QString nameid() const;

@@ -31,25 +31,26 @@
 // TODO: add process id???
 #define logd(fmt,...) \
     do{ \
-        qDebug("DEBUG %s %s[%d] " fmt, THIS_FILE, __func__, __LINE__,##__VA_ARGS__); \
+        qDebug("D %s %s[%d] " fmt, THIS_FILE, __func__, __LINE__,##__VA_ARGS__); \
     }\
     while(0)
 
 #define traced logd("")
 #define tracedr(ret) logd("Return %d", ret)
+#define tracede logd("end")
 
 // TODO: push log to file, make separate thread to writing log, to avoid impact
 // to performance of application
 // TODO: Show crash/critical error on dialog
 #define loge(fmt, ...) \
     do{ \
-            qDebug("ERROR %s %s[%d] " fmt, THIS_FILE, __func__, __LINE__,##__VA_ARGS__); \
+            qDebug("E %s %s[%d] " fmt, THIS_FILE, __func__, __LINE__,##__VA_ARGS__); \
     }\
     while(0)
 
 #define logi(fmt, ...) \
 do{ \
-        qDebug("INFO %s %s[%d] " fmt, THIS_FILE, __func__, __LINE__,##__VA_ARGS__); \
+        qDebug("I %s %s[%d] " fmt, THIS_FILE, __func__, __LINE__,##__VA_ARGS__); \
 }\
     while(0)
 
