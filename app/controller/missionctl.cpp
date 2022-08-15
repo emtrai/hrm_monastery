@@ -14,66 +14,67 @@
  * limitations under the License.
  *
  *
- * Filename: countryctl.cpp
+ * Filename: missionctl.cpp
  * Author: Anh, Ngo Huy
- * Created date:8/13/2022
+ * Created date:8/15/2022
  * Brief:
  */
-#include "countryctl.h"
+#include "missionctl.h"
 #include "logger.h"
-#include "country.h"
+#include "mission.h"
 #include "defs.h"
 #include "dbctl.h"
-CountryCtl* CountryCtl::gInstance = nullptr;
 
-CountryCtl::CountryCtl()
+
+MissionCtl* MissionCtl::gInstance = nullptr;
+
+
+MissionCtl::MissionCtl()
 {
     traced;
 }
+
 // Format: vn, Vietname,Asian, Asia,
-DbModel *CountryCtl::buildModel(void *items, const QString &fmt)
+DbModel *MissionCtl::buildModel(void *items, const QString &fmt)
 {
     traced;
-    Country* item = new Country();
+    Mission* item = new Mission();
     QStringList* itemList = (QStringList*) items;
     qint32 idx = 0;
     qint32 sz = itemList->length();
     logd("sz %d", sz);
-    item->setShortName(itemList->at(idx++));
-    item->setNameId(item->shortName());
+    item->setNameId(itemList->at(idx++));
     item->setName(itemList->at(idx++));
-    item->setRegion(itemList->at(idx++));
-    item->setContinent(itemList->at(idx++));
-
+    tracede;
     return item;
 }
 
-QList<Country *> CountryCtl::getCountryList()
+QList<Mission *> MissionCtl::getCountryList()
 {
     traced;
     // TODO: check if file update then reload??
-    return mCountryList.values();
+    return mMissionList;
 }
 
 
-CountryCtl *CountryCtl::getInstance()
+MissionCtl *MissionCtl::getInstance()
 {
     if (gInstance == nullptr){
-        gInstance = new CountryCtl();
+        gInstance = new MissionCtl();
     }
     return gInstance;
 }
 
-void CountryCtl::onLoad()
+void MissionCtl::onLoad()
 {
 
     traced;
     ErrCode ret = ErrNone;
-    ret = check2UpdateDbFromPrebuiltFile(KPrebuiltCountryCSVFileName, KFileTypeCSV);
+    ret = check2UpdateDbFromPrebuiltFile(KPrebuiltMissionCSVFileName, KFileTypeCSV);
 
-    QList items = DB->getModelHandler(KModelHdlCountry)->getAll(&Country::builder);
+    QList items = DB->getModelHandler(KModelHdlMission)->getAll(&Mission::builder);
     //    mItemList.append();
     foreach (DbModel* model, items){
-        mCountryList.insert(((Country*)model)->shortName(), (Country*)model);
+        mMissionList.append((Mission*)model);
     }
 }

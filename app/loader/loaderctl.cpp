@@ -32,6 +32,7 @@
 #include "countryctl.h"
 #include "provincectl.h"
 #include "ethnicctl.h"
+#include "missionctl.h"
 
 LoaderCtl* LoaderCtl::gInstance = nullptr;
 
@@ -68,6 +69,7 @@ void LoaderCtl::registerAll()
     add2Loader(CountryCtl::getInstance());
     add2Loader(ProvinceCtl::getInstance());
     add2Loader(EthnicCtl::getInstance());
+    add2Loader(MissionCtl::getInstance());
     add2Loader(PersonCtl::getInstance());
     add2Loader(CommunityCtl::getInstance());
 }

@@ -1,18 +1,34 @@
-{
+{ "communities":
     [
         {
         "id":"MTGNG",
+        "parentid":"",
         "name":"CĐ. THÁNH GIA",
         "church":"GX. THÁNH GIA",
         "addr":"Số 10 Đông Phước, P. Phước Long, Bình Tân, NT",
         "province":"",
         "country":"",
-        "tel":"0258 3881 736;0799 725 895",
-        "feastday":"",
+        "tel":"02583881736;0799725895",
+        "feastday":"01.09",
         "establishday":"",
-        "status:"active",
+        "status":"active",
         "mission":"Education",
         "email":"terkimsac@yahoo.com"
+        },
+        {
+        "id":"BONAVENTURA",
+        "parentid":"",
+        "name":"CĐ. BONAVENTURA",
+        "church":"GX. PHƯỚC HÒA",
+        "addr":"Lô  5 + 7 + 9, Đường A6, Khu tái Định Cư VCN",
+        "province":"",
+        "country":"",
+        "tel":"02583870267",
+        "feastday":"15.07",
+        "establishday":"",
+        "status":"active",
+        "mission":"Health",
+        "email":"mnttanhdao@yahoo.com.vn"
         }
     ]
 }

@@ -14,35 +14,36 @@
  * limitations under the License.
  *
  *
- * Filename: mission.cpp
+ * Filename: missionctl.h
  * Author: Anh, Ngo Huy
- * Created date:8/14/2022
+ * Created date:8/15/2022
  * Brief:
  */
-#include "mission.h"
-#include "logger.h"
-#include "errcode.h"
-#include "province.h"
-#include "filectl.h"
-#include "utils.h"
-#include "dbctl.h"
-#include "defs.h"
+#ifndef MISSIONCTL_H
+#define MISSIONCTL_H
+
+#include "controller.h"
+
 #include "dbmodel.h"
+#include "mission.h"
 
 
-Mission::Mission()
+class MissionCtl : public Controller
 {
+public:
+    MissionCtl();
+protected:
+    DbModel *buildModel(void *items, const QString &fmt);
+public:
+    QList<Mission*> getCountryList();
+    static MissionCtl* getInstance();
 
-}
+public slots:
+    virtual void onLoad();
+private:
+    static MissionCtl* gInstance;
+    bool mLoaded;
+    QList<Mission*> mMissionList;
+};
 
-
-DbModel *Mission::builder()
-{
-    traced;
-    return new Mission();
-}
-
-DbModelHandler *Mission::getDbModelHandler()
-{
-    return DB->getModelHandler(KModelHdlMission);
-}
+#endif // MISSIONCTL_H

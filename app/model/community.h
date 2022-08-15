@@ -26,6 +26,7 @@
 #include <QString>
 #include "dbmodel.h"
 #include "errcode.h"
+#include "address.h"
 
 // BE WARE, ANY CHANGE TO THIS STATUS WILL IMPACT TO DB
 // THIS VALUE IS WRITTEN DIRECTLY TO DB
@@ -57,6 +58,7 @@ public:
 
     qint64 createDate() const;
     void setCreateDate(qint64 newCreateDate);
+    void setCreateDateFromString(const QString& date, const QString& format="D.M.Y");
 
     const QString &parentUid() const;
     void setParentUid(const QString &newParentUid);
@@ -70,16 +72,48 @@ public:
     qint64 closeDate() const;
     void setCloseDate(qint64 newCloseDate);
 
+    const QString &church() const;
+    void setChurch(const QString &newChurch);
+
+    const QString &addr() const;
+    void setAddr(const QString &newAddr);
+
+    const QString &province() const;
+    void setProvince(const QString &newProvince);
+
+    const QString &country() const;
+    void setCountry(const QString &newCountry);
+
+    const QString &tel() const;
+    void setTel(const QString &newTel);
+
+    const QString &email() const;
+    void setEmail(const QString &newEmail);
+
+    qint64 feastDate() const;
+    void setFeastDate(qint64 newFeastDate);
+    void setFeastDateFromString(const QString& date, const QString& format="D.M");
+
+    virtual bool isValid();
+    virtual void dump();
 protected:
     virtual DbModelHandler* getDbModelHandler();
 private:
+    QString mId;
     QString mName;
+    QString mAddr;
+    QString mProvince;
+    QString mCountry;
+    QString mChurch;
+    QString mTel;
+    QString mEmail;
     qint32 mLevel; // level 0: root, Level 1, Level 2 (belong to level 1), etc...
     Community* mParent;
     QString mParentUid;
 
     qint64 mCreateDate;
     qint64 mCloseDate;
+    qint64 mFeastDate;
     CommunityStatus status;
 
     QString mBrief;

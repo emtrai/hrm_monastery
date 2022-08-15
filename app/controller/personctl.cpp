@@ -57,7 +57,7 @@ ErrCode PersonCtl::addPerson(const QString &fname)
 ErrCode PersonCtl::AddListPersons(const QString &fname)
 {
     traced;
-
+    return ErrNone;
 }
 
 PersonCtl::PersonCtl()

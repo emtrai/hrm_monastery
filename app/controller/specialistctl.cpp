@@ -42,8 +42,11 @@ DbModel *SpecialistCtl::buildModel(void *items, const QString &fmt)
     Specialist* specialist = new Specialist();
     QStringList* itemList = (QStringList*) items;
     QString item = itemList->join(SPLIT);
+    qint32 idx = 0;
     logd("Add item %s to list", item.toStdString().c_str());
-    specialist->setName(item);
+    specialist->setNameId(itemList->at(idx++));
+    specialist->setName(itemList->at(idx++));
+    tracede;
     return specialist;
 }
 

@@ -29,7 +29,7 @@ typedef enum TableFieldDatatype {
     INT64
 }TableFieldDatatype_t;
 
-const char* const KFieldUuid = "uuid";
+const char* const KFieldUid = "uid";
 const char* const KFieldNameId = "nameid";
 const char* const KFieldName = "name";
 const char* const KFieldRecordStatus = "record_status";
@@ -45,7 +45,6 @@ const char* const KFieldTitle = "title";
 const char* const KFieldRemark = "remark";
 const char* const KFieldBirthDay = "birthday";
 const char* const KFieldLevel = "level";
-const char* const KFieldUid = "uid";
 const char* const KFieldParentUid = "parent_uid";
 const char* const KFieldCreateDate = "create_date";
 const char* const KFieldDateFormat = "date_format";
@@ -67,7 +66,10 @@ const char* const KFieldCountryShortName = "country_short_name";
 const char* const KFieldEthnic = "ethnic"; // dan toc
 const char* const KFieldState = "state"; // tinh/thanh/bang
 const char* const KFieldProvince = "province"; // tinh/thanh/bang
-const char* const KFieldParentDbId = "parent_dbid"; // tinh/thanh/bang
+const char* const KFieldParentDbId = "parent_dbid";
+const char* const KFieldAddr = "addr";
+const char* const KFieldTel = "tel";
+const char* const KFieldEmail = "email";
 
 
 // TABLES NAME

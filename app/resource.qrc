@@ -7,5 +7,6 @@
         <file alias="edu_vi">res/edu_vi.csv</file>
         <file alias="specialist_vi">res/specialist_vi.csv</file>
         <file alias="community_vi">res/community_vi.json</file>
+        <file alias="mission.csv">res/mission_vi.csv</file>
     </qresource>
 </RCC>

@@ -41,9 +41,11 @@ DbModel *EduCtl::buildModel(void *items, const QString &fmt)
     traced;
     Education* edu = new Education();
     QStringList* itemList = (QStringList*) items;
-    QString item = itemList->join(SPLIT);
-    logd("Add item %s to list", item.toStdString().c_str());
-    edu->setName(item);
+    qint32 idx = 0;
+    qint32 sz = itemList->length();
+    logd("sz %d", sz);
+    edu->setNameId(itemList->at(idx++));
+    edu->setName(itemList->at(idx++));
     return edu;
 }
 //ErrCode EduCtl::doOneCSVItemCallback(const QStringList &items, void *param)

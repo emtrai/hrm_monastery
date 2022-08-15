@@ -27,6 +27,8 @@
 #include "errcode.h"
 #include "controller.h"
 
+#define COMMUNITYCTL (CommunityCtl::getInstance())
+
 class Community;
 
 class CommunityCtl: public Controller
@@ -38,16 +40,21 @@ public:
 
     ErrCode loadFromDb();
 
-    QList<Community*> getAll();
+    QList<Community*> getCommunityList();
 
 private:
     CommunityCtl();
 
 public:
     static CommunityCtl* getInstance();
+protected:
+    virtual ErrCode parsePrebuiltFile(const QString &fpath, const QString &ftype);
+    virtual Community* parseOneItem(const QJsonObject& jobj);
 
 private:
     static CommunityCtl* gInstance;
+
+    QList<Community*> mListCommunity;
 
 public slots:
     virtual void onLoad();

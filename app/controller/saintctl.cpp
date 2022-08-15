@@ -71,6 +71,7 @@ DbModel *SaintCtl::buildModel(void *params, const QString &fmt)
     Saint* saint = new Saint();
     QStringList* items = (QStringList*)params;
     UNUSED(fmt);
+    saint->setNameId(items->at(idx++));
     //name
     if (ret == ErrNone)
         saint->setName(items->at(idx++).simplified());

@@ -23,6 +23,21 @@ DbModel *Controller::buildModel(void *items, const QString &fmt)
     return nullptr;
 }
 
+
+
+ErrCode Controller::parsePrebuiltFile(const QString &fpath, const QString &ftype)
+{
+    ErrCode ret = ErrNone;
+    traced;
+    if (ftype == KFileTypeCSV) {
+        ret = Utils::parseCSVFile(fpath,
+                                  &Controller::oneCSVItemCallback,
+                                  this);
+    } else {
+        ret = ErrNotSupport;
+    }
+    return ret;
+}
 ErrCode Controller::check2UpdateDbFromPrebuiltFile(const QString &name, const QString &ftype)
 {
     traced;
@@ -31,13 +46,14 @@ ErrCode Controller::check2UpdateDbFromPrebuiltFile(const QString &name, const QS
     // TODO: file should be from installed dir, rather than embedded inside bin??
     QString fname = Utils::getPrebuiltFileByLang(name);
     if (!FileCtl::checkPrebuiltDataFileHash(fname)){
-        if (ftype == KFileTypeCSV) {
-            ret = Utils::parseCSVFile(FileCtl::getPrebuiltDataFilePath(fname),
-                                      &Controller::oneCSVItemCallback,
-                                      this);
-        } else {
-            ret = ErrNotSupport;
-        }
+        ret = parsePrebuiltFile(FileCtl::getPrebuiltDataFilePath(fname), ftype);
+//        if (ftype == KFileTypeCSV) {
+//            ret = Utils::parseCSVFile(FileCtl::getPrebuiltDataFilePath(fname),
+//                                      &Controller::oneCSVItemCallback,
+//                                      this);
+//        } else {
+//            ret = ErrNotSupport;
+//        }
 
         if (ret == ErrNone){
             FileCtl::updatePrebuiltDataFileHash(fname);

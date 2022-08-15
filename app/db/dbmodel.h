@@ -35,7 +35,6 @@ public:
     DbModel(const DbModel& model);
     virtual ~DbModel();
 
-    virtual QString nameid() const;
 
     virtual const QString &name() const;
     virtual void setName(const QString &newName);
@@ -43,8 +42,8 @@ public:
     virtual qint64 dbId() const;
     virtual void setDbId(qint64 newDbId);
 
-    virtual const QString &uuid() const;
-    virtual void setUuid(const QString &newUuid);
+    virtual const QString &uid() const;
+    virtual void setUid(const QString &newUid);
 
     virtual ErrCode save();
 
@@ -59,13 +58,16 @@ public:
     virtual QString toString();
 
 
+    void setNameId(const QString &newNameId);
+
 protected:
     virtual DbModelHandler* getDbModelHandler() = 0;
 
 private:
     qint64 mDbId;
     QString mName;// TODO: support multi languate???
-    QString mUuid;
+    QString mUid;
+    QString mNameId;
     QString mHistory;
     qint32 mDbStatus;
 };

@@ -37,11 +37,14 @@
 #include <QRegularExpressionMatch>
 #include "view/widget/uimulticomboxview.h"
 
+#include "community.h"
+
 #include "eductl.h"
 #include "specialistctl.h"
 #include "countryctl.h"
 #include "provincectl.h"
 #include "ethnicctl.h"
+#include "communityctl.h"
 
 DlgPerson::DlgPerson(QWidget *parent) :
     QDialog(parent),
@@ -149,7 +152,7 @@ void DlgPerson::setupUI()
         foreach(Ethnic * ethnic, *(listEthnics.value(country)))
             ui->cbEthic->addItem(QString("%1,%2").arg(
                                      ethnic->countryShortName(), ethnic->name()),
-                             ethnic->uuid());
+                             ethnic->uid());
     }
 
     // State/Province
@@ -157,8 +160,15 @@ void DlgPerson::setupUI()
     const QList<Province*>* listProvince = PROVINCE->getProvinceList(ui->cbCountry->currentText());
     if (listProvince != nullptr){
         foreach(Province* item, *listProvince){
-            ui->cbProvince->addItem(item->name(), item->uuid());
+            ui->cbProvince->addItem(item->name(), item->uid());
         }
+    }
+
+    // Community
+    logd("Load community");
+    QList<Community*> listCommunity = COMMUNITYCTL->getCommunityList();
+    foreach(Community* item, listCommunity){
+        ui->cbCommunity->addItem(item->name(), item->uid());
     }
     // Call connect here may cause call is called twice, it's because
     // Qt check func name, if it's in format on_buttonBox_clicked --> auto register slot
@@ -215,7 +225,7 @@ void DlgPerson::on_cbCountry_currentIndexChanged(int index)
         ui->cbProvince->clear();
         if (listProvince != nullptr){
             foreach(Province* item, *listProvince){
-                ui->cbProvince->addItem(item->name(), item->nameid());
+                ui->cbProvince->addItem(item->name(), item->uid());
             }
         }
     }

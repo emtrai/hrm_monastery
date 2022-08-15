@@ -37,8 +37,8 @@
      <widget class="QWidget" name="scrollAreaWidgetContents">
       <property name="geometry">
        <rect>
-        <x>-59</x>
-        <y>-1662</y>
+        <x>0</x>
+        <y>-739</y>
         <width>619</width>
         <height>2009</height>
        </rect>
@@ -639,7 +639,7 @@
           <widget class="QLineEdit" name="txtIDCard"/>
          </item>
          <item row="22" column="1">
-          <widget class="QComboBox" name="comboBox_8"/>
+          <widget class="QComboBox" name="cbCommunity"/>
          </item>
          <item row="29" column="1">
           <widget class="QLineEdit" name="lineEdit_12"/>

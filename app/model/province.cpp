@@ -39,16 +39,16 @@ DbModel *Province::builder()
     return new Province();
 }
 
-QString Province::nameid() const
-{
-    QString hash;
-    if (parentUid().isEmpty())
-        hash = Utils::UidFromName(name()+countryShortName());
-    else
-        hash = Utils::UidFromName(name()+countryShortName()+parentUid());
-    logd("province uuid %s", hash.toStdString().c_str());
-    return hash;
-}
+//QString Province::nameid() const
+//{
+//    QString hash;
+//    if (parentUid().isEmpty())
+//        hash = Utils::UidFromName(name()+countryShortName());
+//    else
+//        hash = Utils::UidFromName(name()+countryShortName()+parentUid());
+//    logd("province uuid %s", hash.toStdString().c_str());
+//    return hash;
+//}
 
 qint64 Province::parentDbId() const
 {

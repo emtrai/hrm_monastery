@@ -42,7 +42,7 @@ UICommunityListView::~UICommunityListView()
 
 ErrCode UICommunityListView::onLoad()
 {
-    QList<Community*> items = CommunityCtl::getInstance()->getAll();
+    QList<Community*> items = COMMUNITYCTL->getCommunityList();
     traced;
     mItemList.clear(); // TODO: clean up item data
     // TODO: loop to much, redundant, do something better?

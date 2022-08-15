@@ -1,5 +1,5 @@
 #country shortname, name[, name of parent province][,remark]
-vn,Ha Noi
-vn,Ho Chi Minh,yyy
-vn,Ha Tinh
-us,Cali
+vn,hn,Ha Noi
+vn,hcm,Ho Chi Minh,yyy
+vn,ht,Ha Tinh
+us,cali,Cali

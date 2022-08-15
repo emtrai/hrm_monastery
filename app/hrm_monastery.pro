@@ -39,6 +39,7 @@ SOURCES += \
     controller/controller.cpp \
     controller/countryctl.cpp \
     controller/ethnicctl.cpp \
+    controller/missionctl.cpp \
     controller/provincectl.cpp \
     crypto/crypto.cpp \
     db/dbctl.cpp \
@@ -53,6 +54,7 @@ SOURCES += \
     db/sqlite/dbsqliteedu.cpp \
     db/sqlite/dbsqliteethnic.cpp \
     db/sqlite/dbsqliteinsertbuilder.cpp \
+    db/sqlite/dbsqlitemission.cpp \
     db/sqlite/dbsqlitemodelhandler.cpp \
     db/sqlite/dbsqliteprovince.cpp \
     db/sqlite/dbsqlitesaint.cpp \
@@ -62,6 +64,7 @@ SOURCES += \
     db/sqlite/table/dbsqlitedeparttbl.cpp \
     db/sqlite/table/dbsqliteedutbl.cpp \
     db/sqlite/table/dbsqliteethnictbl.cpp \
+    db/sqlite/table/dbsqlitemissiontbl.cpp \
     db/sqlite/table/dbsqlitepersoneventtbl.cpp \
     db/sqlite/table/dbsqlitepersontbl.cpp \
     db/sqlite/dbsqlitetablebuilder.cpp \
@@ -120,6 +123,7 @@ HEADERS += \
     controller/controller.h \
     controller/countryctl.h \
     controller/ethnicctl.h \
+    controller/missionctl.h \
     controller/provincectl.h \
     crypto/crypto.h \
     db/dbctl.h \
@@ -134,6 +138,7 @@ HEADERS += \
     db/sqlite/dbsqliteedu.h \
     db/sqlite/dbsqliteethnic.h \
     db/sqlite/dbsqliteinsertbuilder.h \
+    db/sqlite/dbsqlitemission.h \
     db/sqlite/dbsqlitemodelhandler.h \
     db/sqlite/dbsqliteprovince.h \
     db/sqlite/dbsqlitesaint.h \
@@ -143,6 +148,7 @@ HEADERS += \
     db/sqlite/table/dbsqlitedeparttbl.h \
     db/sqlite/table/dbsqliteedutbl.h \
     db/sqlite/table/dbsqliteethnictbl.h \
+    db/sqlite/table/dbsqlitemissiontbl.h \
     db/sqlite/table/dbsqlitepersoneventtbl.h \
     db/sqlite/table/dbsqlitepersontbl.h \
     db/sqlite/dbsqlitetablebuilder.h \

@@ -41,14 +41,14 @@ DbModel *Ethnic::builder()
     return new Ethnic();
 }
 
-QString Ethnic::nameid() const
-{
-    QString hash;
-    traced;
-    hash = Utils::UidFromName(name()+countryShortName());
-    logd("ethnic uuid %s", hash.toStdString().c_str());
-    return hash;
-}
+//QString Ethnic::nameid() const
+//{
+//    QString hash;
+//    traced;
+//    hash = Utils::UidFromName(name()+countryShortName());
+//    logd("ethnic uuid %s", hash.toStdString().c_str());
+//    return hash;
+//}
 
 const QString &Ethnic::remark() const
 {

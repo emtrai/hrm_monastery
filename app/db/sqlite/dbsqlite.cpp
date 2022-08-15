@@ -36,6 +36,7 @@
 #include "table/dbsqlitecountrytbl.h"
 #include "table/dbsqliteprovincetbl.h"
 #include "table/dbsqliteethnictbl.h"
+#include "table/dbsqlitemissiontbl.h"
 #include "dbsqlitedefs.h"
 #include "dbsqliteedu.h"
 #include "dbsqlitesaint.h"
@@ -44,6 +45,7 @@
 #include "dbsqlitecountry.h"
 #include "dbsqliteethnic.h"
 #include "dbsqliteprovince.h"
+#include "dbsqlitemission.h"
 #include "defs.h"
 
 static const QString DRIVER("QSQLITE");
@@ -63,13 +65,14 @@ void DbSqlite::setupTables()
     // Append all tables need for db
     // TODO: append more table
     appendTable(new DbSqlitePersonTbl(this));
-    appendTable(new DbSqliteCommunityTbl(this));
     appendTable(new DbSqliteSaintTbl(this));
     appendTable(new DbSqliteEduTbl(this));
     appendTable(new DbSqliteSpecialistTbl(this));
     appendTable(new DbSqliteCountryTbl(this));
     appendTable(new DbSqliteProvinceTbl(this));
     appendTable(new DbSqliteEthnicTbl(this));
+    appendTable(new DbSqliteMissionTbl(this));
+    appendTable(new DbSqliteCommunityTbl(this));
 }
 
 void DbSqlite::setupModelHandler()
@@ -78,11 +81,12 @@ void DbSqlite::setupModelHandler()
     appendModelHandler(new DbSqliteSpecialist());
     appendModelHandler(new DbSqliteEdu());
     appendModelHandler(new DbSqliteSaint());
-    appendModelHandler(new DbSqliteCommunity());
     appendModelHandler(new DbSqliteSpecialist());
     appendModelHandler(new DbSqliteCountry());
     appendModelHandler(new DbSqliteEthnic());
     appendModelHandler(new DbSqliteProvince());
+    appendModelHandler(new DbSqliteMission());
+    appendModelHandler(new DbSqliteCommunity());
 }
 
 void DbSqlite::appendTable(DbSqliteTbl *tbl)

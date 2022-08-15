@@ -28,6 +28,8 @@
 #include <QSqlQuery>
 #include <QMap>
 
+#define SQLITE (DbSqlite::getInstance())
+
 class DbSqliteTbl;
 
 // THIS IS ONE INTERFACE FOR ALL OPERATION RELATING TO DB

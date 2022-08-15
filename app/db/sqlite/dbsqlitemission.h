@@ -14,35 +14,24 @@
  * limitations under the License.
  *
  *
- * Filename: mission.cpp
+ * Filename: dbsqlitemission.h
  * Author: Anh, Ngo Huy
  * Created date:8/14/2022
  * Brief:
  */
-#include "mission.h"
-#include "logger.h"
-#include "errcode.h"
-#include "province.h"
-#include "filectl.h"
-#include "utils.h"
-#include "dbctl.h"
-#include "defs.h"
-#include "dbmodel.h"
+#ifndef DBSQLITEMISSION_H
+#define DBSQLITEMISSION_H
 
+#include "dbsqlitemodelhandler.h"
 
-Mission::Mission()
+class DbSqliteMission : public DbSqliteModelHandler
 {
+public:
+    DbSqliteMission();
+    virtual const QString getName();
+protected:
+    virtual DbSqliteTbl *getMainTbl();
+private:
+};
 
-}
-
-
-DbModel *Mission::builder()
-{
-    traced;
-    return new Mission();
-}
-
-DbModelHandler *Mission::getDbModelHandler()
-{
-    return DB->getModelHandler(KModelHdlMission);
-}
+#endif // DBSQLITEMISSION_H

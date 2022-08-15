@@ -32,7 +32,7 @@ class Ethnic : public DbModel
 public:
     Ethnic();
     static DbModel *builder();
-    virtual QString nameid() const;
+//    virtual QString nameid() const;
     const QString &remark() const;
     void setRemark(const QString &newRemark);
 

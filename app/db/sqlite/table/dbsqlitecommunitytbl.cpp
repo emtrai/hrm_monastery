@@ -60,7 +60,11 @@ void DbSqliteCommunityTbl::insertTableField(DbSqliteInsertBuilder *builder, cons
     traced;
     DbSqliteTbl::insertTableField(builder, item);
     Community* cmm = (Community*) item;
+    builder->addValue(KFieldAddr, cmm->addr());
+    builder->addValue(KFieldTel, cmm->tel());
+    builder->addValue(KFieldEmail, cmm->email());
     builder->addValue(KFieldCreateDate, cmm->createDate());
+    builder->addValue(KFieldFeastDay, cmm->feastDate());
     builder->addValue(KFieldParentUid, cmm->parentUid());
     builder->addValue(KFieldStatus, (qint32) cmm->getStatus());
 }
@@ -72,6 +76,11 @@ void DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
     Community* cmm = (Community*) item;
     cmm->setCreateDate(qry.value(KFieldCreateDate).toInt());
     cmm->setParentUid(qry.value(KFieldParentUid).toString());
+    cmm->setAddr(qry.value(KFieldAddr).toString());
+    cmm->setTel(qry.value(KFieldTel).toString());
+    cmm->setEmail(qry.value(KFieldEmail).toString());
+    cmm->setFeastDate(qry.value(KFieldFeastDay).toInt());
+    cmm->setCreateDate(qry.value(KFieldCreateDate).toInt());
     cmm->setStatus((CommunityStatus)qry.value(KFieldStatus).toInt());
 }
 
@@ -101,12 +110,16 @@ void DbSqliteCommunityTbl::addTableField(DbSqliteTableBuilder *builder)
 {
     traced;
     DbSqliteTbl::addTableField(builder);
+    builder->addField(KFieldAddr, TEXT);
+    builder->addField(KFieldTel, TEXT);
+    builder->addField(KFieldEmail, TEXT);
     builder->addField(KFieldCEOUid, TEXT);
     builder->addField(KFieldChurchUid, TEXT);
     builder->addField(KFieldAreaUid, TEXT);
     builder->addField(KFieldLevel, INT32);
     builder->addField(KFieldParentUid, TEXT);
     builder->addField(KFieldCreateDate, INT64);
+    builder->addField(KFieldFeastDay, INT64);
     builder->addField(KFieldDateFormat, TEXT);
     builder->addField(KFieldStatus, INT32); // stop, alive, etc.
     builder->addField(KFieldPreset, INT32); // 0: custom, 1: preset (from json)

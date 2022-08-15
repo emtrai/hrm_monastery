@@ -43,6 +43,8 @@ DbModel *ProvinceCtl::buildModel(void *items, const QString &fmt)
     qint32 sz = itemList->length();
     logd("sz %d", sz);
     item->setCountryShortName(itemList->at(idx++));
+    QString nameid = itemList->at(idx++);
+    item->setNameId(nameid + item->countryShortName());
     item->setName(itemList->at(idx++));
     if (sz > idx) {
         QString parent = itemList->at(idx++);

@@ -14,35 +14,35 @@
  * limitations under the License.
  *
  *
- * Filename: mission.cpp
+ * Filename: dbsqlitemissiontbl.h
  * Author: Anh, Ngo Huy
  * Created date:8/14/2022
  * Brief:
  */
-#include "mission.h"
-#include "logger.h"
-#include "errcode.h"
-#include "province.h"
-#include "filectl.h"
-#include "utils.h"
-#include "dbctl.h"
-#include "defs.h"
-#include "dbmodel.h"
+#ifndef DBSQLITEMISSIONTBL_H
+#define DBSQLITEMISSIONTBL_H
+
+#include "dbsqlitetbl.h"
 
 
-Mission::Mission()
+class DbSqlite;
+class DbSqliteTableBuilder;
+class DbSqliteInsertBuilder;
+class DbModel;
+class QSqlQuery;
+
+
+class DbSqliteMissionTbl : public DbSqliteTbl
 {
+public:
+    DbSqliteMissionTbl();
+    DbSqliteMissionTbl(DbSqlite *db);
+    virtual void addTableField(DbSqliteTableBuilder* builder);
+    virtual void insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
+    virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
 
-}
+private:
+    static const qint32 KVersionCode;
+};
 
-
-DbModel *Mission::builder()
-{
-    traced;
-    return new Mission();
-}
-
-DbModelHandler *Mission::getDbModelHandler()
-{
-    return DB->getModelHandler(KModelHdlMission);
-}
+#endif // DBSQLITEMISSIONTBL_H

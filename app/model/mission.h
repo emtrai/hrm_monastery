@@ -34,22 +34,11 @@ class Mission : public DbModel
 public:
     Mission();
     static DbModel *builder();
-    virtual QString nameid() const;
-    const QString &remark() const;
-    void setRemark(const QString &newRemark);
-
-    qint64 countryDbId() const;
-    void setCountryDbId(qint64 newCountryDbId);
-
-    const QString &countryShortName() const;
-    void setCountryShortName(const QString &newCountryShortName);
 
 protected:
     virtual DbModelHandler *getDbModelHandler();
 private:
-    qint64 mNameid;
-    QString mCountryShortName;
-    QString mRemark;
+
 };
 
 #endif // MISSION_H

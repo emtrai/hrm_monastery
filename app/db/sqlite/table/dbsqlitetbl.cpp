@@ -101,12 +101,12 @@ bool DbSqliteTbl::isExist(const DbModel *item)
     bool exist = false;
     traced;
     QString queryString = QString("SELECT COUNT(*) "
-                                  "FROM %1 WHERE %2 = :uuid").arg(name(), KFieldUuid);
+                                  "FROM %1 WHERE %2 = :uid").arg(name(), KFieldUid);
     qry.prepare(queryString);
     logd("Query String '%s'", queryString.toStdString().c_str());
 
     // TODO: check sql injection issue
-    qry.bindValue( ":uuid", item->nameid() );
+    qry.bindValue( ":uid", item->uid() );
     if( qry.exec() )
     {
         int rows= 0;
@@ -132,7 +132,7 @@ void DbSqliteTbl::updateModelFromQuery(DbModel* item, const QSqlQuery& qry)
 {
     traced;
     item->setName(qry.value(KFieldName).toString());
-    item->setUuid(qry.value(KFieldUuid).toString());
+    item->setUid(qry.value(KFieldUid).toString());
     item->setHistory(qry.value(KFieldHistory).toString());
     tracede;
 }
@@ -214,7 +214,7 @@ QString DbSqliteTbl::getSqlCmdCreateTable()
 {
     traced;
     // TODO; support multi language
-    // Common table, with name and history field, together with default one is id, uuid, status, history
+    // Common table, with name and history field, together with default one is id, uid, status, history
     DbSqliteTableBuilder* builder = DbSqliteTableBuilder::build(name());
     // common field
     builder->addField(KFieldRecordStatus, INT32);
@@ -229,9 +229,9 @@ QString DbSqliteTbl::getSqlCmdCreateTable()
 void DbSqliteTbl::addTableField(DbSqliteTableBuilder *builder)
 {
     traced;
-    // TODO: consider to make Uuid as common field???
-    // i.e. uuid can be hash of name, hash of 2 id in different table, etc.
-    builder->addField(KFieldUuid, TEXT);
+    // TODO: consider to make Uid as common field???
+    // i.e. uid can be hash of name, hash of 2 id in different table, etc.
+    builder->addField(KFieldUid, TEXT);
     builder->addField(KFieldName, TEXT);
     builder->addField(KFieldHistory, TEXT);
 }
@@ -239,12 +239,13 @@ void DbSqliteTbl::addTableField(DbSqliteTableBuilder *builder)
 void DbSqliteTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
 {
     traced;
-    if (!item->nameid().isEmpty())
-        builder->addValue(KFieldUuid, item->nameid());
+    if (!item->uid().isEmpty())
+        builder->addValue(KFieldUid, item->uid());
     if (!item->name().isEmpty())
         builder->addValue(KFieldName, item->name());
     if (!item->history().isEmpty())
         builder->addValue(KFieldHistory, item->history());
+    tracede;
 }
 
 

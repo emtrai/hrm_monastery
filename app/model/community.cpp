@@ -23,6 +23,7 @@
 
 #include "dbctl.h"
 #include "logger.h"
+#include "utils.h"
 
 DbModel *Community::builder()
 {
@@ -68,6 +69,14 @@ qint64 Community::createDate() const
 void Community::setCreateDate(qint64 newCreateDate)
 {
     mCreateDate = newCreateDate;
+}
+
+void Community::setCreateDateFromString(const QString &date, const QString &format)
+{
+    traced;
+    logd("create date string '%s'", date.toStdString().c_str());
+    mCreateDate = Utils::dateFromString(date, format);
+    logd("mCreateDate %ll", mCreateDate);
 }
 
 const QString &Community::parentUid() const
@@ -118,4 +127,102 @@ void Community::setCloseDate(qint64 newCloseDate)
 DbModelHandler *Community::getDbModelHandler()
 {
     return DbCtl::getDb()->getCommunityModelHandler();
+}
+
+qint64 Community::feastDate() const
+{
+    return mFeastDate;
+}
+
+void Community::setFeastDate(qint64 newFeastDate)
+{
+    mFeastDate = newFeastDate;
+}
+
+void Community::setFeastDateFromString(const QString &date, const QString &format)
+{
+    traced;
+    logd("mFeastDate date string '%s'", date.toStdString().c_str());
+    mFeastDate = Utils::dateFromString(date, format);
+    logd("mFeastDate %ll", mFeastDate);
+
+}
+
+bool Community::isValid()
+{
+    // TODO: check more and more;
+    return !name().isEmpty() && !uid().isEmpty();
+}
+
+void Community::dump()
+{
+    traced;
+#ifdef DEBUG_TRACE
+
+    logd("DUMP:");
+    logd("- Uid %s", uid().toStdString().c_str());
+    logd("- Name %s", name().toStdString().c_str());
+    logd("- Addr %s", addr().toStdString().c_str());
+    logd("- Feastday %s", Utils::date2String(mFeastDate).toStdString().c_str());
+#endif //DEBUG_TRACE
+}
+
+const QString &Community::email() const
+{
+    return mEmail;
+}
+
+void Community::setEmail(const QString &newEmail)
+{
+    mEmail = newEmail;
+}
+
+const QString &Community::tel() const
+{
+    return mTel;
+}
+
+void Community::setTel(const QString &newTel)
+{
+    mTel = newTel;
+}
+
+const QString &Community::country() const
+{
+    return mCountry;
+}
+
+void Community::setCountry(const QString &newCountry)
+{
+    mCountry = newCountry;
+}
+
+const QString &Community::province() const
+{
+    return mProvince;
+}
+
+void Community::setProvince(const QString &newProvince)
+{
+    mProvince = newProvince;
+}
+
+const QString &Community::addr() const
+{
+    return mAddr;
+}
+
+void Community::setAddr(const QString &newAddr)
+{
+    mAddr = newAddr;
+}
+
+const QString &Community::church() const
+{
+    return mChurch;
+}
+
+void Community::setChurch(const QString &newChurch)
+{
+    mChurch = newChurch;
 }

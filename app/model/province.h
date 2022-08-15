@@ -38,7 +38,7 @@ class Province: public QObject, public DbModel
 public:
     Province();
     static DbModel *builder();
-    virtual QString nameid() const;
+//    virtual QString nameid() const;
 
     qint64 parentDbId() const;
     void setParentDbId(qint64 newParentDbId);

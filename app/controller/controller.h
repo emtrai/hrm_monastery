@@ -20,6 +20,8 @@ protected:
     virtual ErrCode check2UpdateDbFromPrebuiltFile(const QString& fname,
                                                    const QString& ftype);
     virtual ErrCode doOneCSVItemCallback(const QStringList& items, void* param);
+
+    virtual ErrCode parsePrebuiltFile(const QString &fpath, const QString &ftype);
 private:
     static ErrCode oneCSVItemCallback(const QStringList& items, void* caller, void* param);
 

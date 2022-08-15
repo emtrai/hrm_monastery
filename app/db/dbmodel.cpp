@@ -23,6 +23,7 @@
 #include "logger.h"
 #include "crypto.h"
 #include "dbmodelhandler.h"
+#include "utils.h"
 
 DbModel::DbModel():
     mDbId(0),
@@ -36,7 +37,7 @@ DbModel::DbModel(const DbModel &model)
 {
     setDbId(model.dbId());
     setName(model.name());
-    setUuid(model.uuid());
+    setUid(model.uid());
 }
 
 DbModel::~DbModel()
@@ -44,11 +45,6 @@ DbModel::~DbModel()
     traced;
 }
 
-QString DbModel::nameid() const
-{
-    QString hash = Crypto::hashString(name().simplified().toLower());
-    return hash;
-}
 
 const QString &DbModel::name() const
 {
@@ -70,14 +66,14 @@ void DbModel::setDbId(qint64 newDbId)
     mDbId = newDbId;
 }
 
-const QString &DbModel::uuid() const
+const QString &DbModel::uid() const
 {
-    return mUuid;
+    return mUid;
 }
 
-void DbModel::setUuid(const QString &newUuid)
+void DbModel::setUid(const QString &newUid)
 {
-    mUuid = newUuid;
+    mUid= newUid;
 }
 
 ErrCode DbModel::save()
@@ -132,12 +128,19 @@ void DbModel::dump()
 #ifdef DEBUG_TRACE
 
     logd("DUMP:");
-    logd("- Uuid %s", nameid().toStdString().c_str());
+    logd("- Uid %s", uid().toStdString().c_str());
     logd("- Name %s", name().toStdString().c_str());
 #endif //DEBUG_TRACE
 }
 
 QString DbModel::toString()
 {
-    return QString("%1,%2").arg(uuid(), name());
+    return QString("%1,%2").arg(uid(), name());
+}
+
+void DbModel::setNameId(const QString &newNameId)
+{
+    traced;
+    logd("Set name id %s", newNameId.toStdString().c_str());
+    mUid = Utils::UidFromName(newNameId);
 }
