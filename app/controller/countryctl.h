@@ -26,12 +26,13 @@
 #include "dbmodel.h"
 #include "country.h"
 
-
+#define COUNTRYCTL (CountryCtl::getInstance())
 
 class CountryCtl : public Controller
 {
 public:
     CountryCtl();
+    virtual DbModelHandler* getModelHandler();
 protected:
     DbModel *buildModel(void *items, const QString &fmt);
 public:

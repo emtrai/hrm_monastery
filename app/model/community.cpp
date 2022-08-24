@@ -35,20 +35,14 @@ Community::Community()
 
 }
 
+Community::Community(const Community &obj):DbModel(obj)
+{
+    setAddr(obj.addr());
+}
+
 Community::~Community()
 {
     traced;
-}
-
-
-const QString &Community::name() const
-{
-    return mName;
-}
-
-void Community::setName(const QString &newName)
-{
-    mName = newName;
 }
 
 qint32 Community::level() const
@@ -127,6 +121,16 @@ void Community::setCloseDate(qint64 newCloseDate)
 DbModelHandler *Community::getDbModelHandler()
 {
     return DbCtl::getDb()->getCommunityModelHandler();
+}
+
+const QString &Community::imgPath() const
+{
+    return mImgPath;
+}
+
+void Community::setImgPath(const QString &newImgPath)
+{
+    mImgPath = newImgPath;
 }
 
 qint64 Community::feastDate() const

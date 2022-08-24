@@ -67,6 +67,7 @@ void DbSqliteCommunityTbl::insertTableField(DbSqliteInsertBuilder *builder, cons
     builder->addValue(KFieldFeastDay, cmm->feastDate());
     builder->addValue(KFieldParentUid, cmm->parentUid());
     builder->addValue(KFieldStatus, (qint32) cmm->getStatus());
+    builder->addValue(KFieldImgPath, cmm->imgPath());
 }
 
 void DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
@@ -75,6 +76,7 @@ void DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
     DbSqliteTbl::updateModelFromQuery(item, qry);
     Community* cmm = (Community*) item;
     cmm->setCreateDate(qry.value(KFieldCreateDate).toInt());
+    cmm->setImgPath(qry.value(KFieldImgPath).toString());
     cmm->setParentUid(qry.value(KFieldParentUid).toString());
     cmm->setAddr(qry.value(KFieldAddr).toString());
     cmm->setTel(qry.value(KFieldTel).toString());
@@ -110,6 +112,7 @@ void DbSqliteCommunityTbl::addTableField(DbSqliteTableBuilder *builder)
 {
     traced;
     DbSqliteTbl::addTableField(builder);
+    builder->addField(KFieldImgPath, TEXT);
     builder->addField(KFieldAddr, TEXT);
     builder->addField(KFieldTel, TEXT);
     builder->addField(KFieldEmail, TEXT);

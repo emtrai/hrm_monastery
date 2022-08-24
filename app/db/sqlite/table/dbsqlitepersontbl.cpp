@@ -43,6 +43,7 @@ void DbSqlitePersonTbl::addTableField(DbSqliteTableBuilder *builder)
 
     traced;
     DbSqliteTbl::addTableField(builder);
+    builder->addField(KFieldImgPath, TEXT);
     builder->addField(KFieldLastName, TEXT);
     builder->addField(KFieldFirstName, TEXT);
     builder->addField(KFieldPersonCode, TEXT);
@@ -54,6 +55,7 @@ void DbSqlitePersonTbl::insertTableField(DbSqliteInsertBuilder *builder, const D
 
     DbSqliteTbl::insertTableField(builder, item);
     Person* per = (Person*) item;
+    builder->addValue(KFieldImgPath, per->imgPath());
     builder->addValue(KFieldLastName, per->lastName());
     builder->addValue(KFieldFirstName, per->firstName());
     builder->addValue(KFieldPersonCode, per->personCode());
@@ -65,6 +67,7 @@ void DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry
     traced;
     DbSqliteTbl::updateModelFromQuery(item, qry);
     Person* cmm = (Person*) item;
+    cmm->setImgPath(qry.value(KFieldImgPath).toString());
     cmm->setLastName(qry.value(KFieldLastName).toString());
     cmm->setFirstName(qry.value(KFieldFirstName).toString());
     cmm->setPersonCode(qry.value(KFieldPersonCode).toString());

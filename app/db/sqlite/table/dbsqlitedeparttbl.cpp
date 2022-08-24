@@ -22,10 +22,15 @@
 #include "dbsqlitedeparttbl.h"
 #include "department.h"
 
-#include "dbsqlite.h"
 #include "dbsqlitedefs.h"
+#include "errcode.h"
+#include <QSqlQuery>
+#include <QSqlRecord>
+#include <QHash>
 #include "defs.h"
 #include "logger.h"
+#include "dbsqlitetablebuilder.h"
+#include "dbsqliteinsertbuilder.h"
 
 
 const qint32 DbSqliteDepartTbl::KVersionCode = VERSION_CODE(0,0,1);
@@ -36,3 +41,52 @@ DbSqliteDepartTbl::DbSqliteDepartTbl(DbSqlite* db)
     traced;
 }
 
+
+void DbSqliteDepartTbl::addTableField(DbSqliteTableBuilder *builder)
+{
+    traced;
+    DbSqliteTbl::addTableField(builder);
+    builder->addField(KFieldParentDbId, INT64);
+    builder->addField(KFieldParentUid, TEXT);
+    builder->addField(KFieldCommunityDbId, INT64);
+    builder->addField(KFieldCommunityUid, TEXT);
+    builder->addField(KFieldPersonId, INT64); // DB ID
+    builder->addField(KFieldCreateDate, INT64);
+    builder->addField(KFieldBrief, TEXT);
+    builder->addField(KFieldRemark, TEXT);
+    builder->addField(KFieldTel, TEXT);
+    builder->addField(KFieldEmail, TEXT);
+    builder->addField(KFieldAddr, TEXT);
+    builder->addField(KFieldStatus, INT32);//status of dept (active, closed, etc.)
+    tracede;
+}
+
+void DbSqliteDepartTbl::insertTableField(DbSqliteInsertBuilder *builder,
+                                       const DbModel *item)
+{
+    traced;
+    DbSqliteTbl::insertTableField(builder, item);
+
+    Department* model = (Department*) item;
+    builder->addValue(KFieldShortName, model->shortName());
+    builder->addValue(KFieldBrief, model->brief());
+    builder->addValue(KFieldAddr, model->addr());
+    builder->addValue(KFieldEmail, model->email());
+    builder->addValue(KFieldTel, model->tel());
+    builder->addValue(KFieldPersonId, model->hoDPersonId());
+    builder->addValue(KFieldRemark, model->remark());
+    builder->addValue(KFieldCommunityUid, model->communityDbId());
+    tracede;
+}
+
+void DbSqliteDepartTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+{
+    traced;
+    DbSqliteTbl::updateModelFromQuery(item, qry);
+    Department* model = (Department*) item;
+    model->setBrief(qry.value(KFieldBrief).toString());//TODO: load country obj
+    model->setCommunityDbId(qry.value(KFieldCommunityUid).toInt());//TODO: load country obj
+    model->setHoDPersonId(qry.value(KFieldPersonId).toInt());
+    model->setRemark(qry.value(KFieldRemark).toString());
+    tracede;
+}

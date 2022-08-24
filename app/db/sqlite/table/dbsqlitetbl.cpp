@@ -137,7 +137,7 @@ void DbSqliteTbl::updateModelFromQuery(DbModel* item, const QSqlQuery& qry)
     tracede;
 }
 
-QList<DbModel *> DbSqliteTbl::getAll(DbModelBuilder builder)
+QList<DbModel *> DbSqliteTbl::getAll(const DbModelBuilder& builder)
 {
     QSqlQuery qry;
 
@@ -154,6 +154,8 @@ QList<DbModel *> DbSqliteTbl::getAll(DbModelBuilder builder)
             DbModel* item = builder();
             item->setDbId(qry.value(KFieldId).toInt());
             item->setDbStatus(qry.value(KFieldRecordStatus).toInt());
+            item->setName(qry.value(KFieldName).toString());
+            item->setUid(qry.value(KFieldUid).toString());
             // TODO: validate value before, i.e. toInt return ok
             updateModelFromQuery(item, qry);
             list.append(item); // TODO: when it cleaned up?????
@@ -166,6 +168,41 @@ QList<DbModel *> DbSqliteTbl::getAll(DbModelBuilder builder)
     logd("Found %d", (int)list.size());
     tracede;
     return list;
+}
+
+DbModel *DbSqliteTbl::getModel(qint64 dbId, const DbModelBuilder& builder)
+{
+    QSqlQuery qry;
+    ErrCode err = ErrNone;
+    DbModel* item = nullptr;
+    traced;
+    // TODO: check record status????
+    QString queryString = QString("SELECT * FROM %1 where id=:id").arg(name());
+    qry.prepare(queryString);
+    logd("Query String '%s'", queryString.toStdString().c_str());
+
+    qry.bindValue(":id", dbId);
+    if(!qry.exec() ){
+        err = ErrFailed;
+        loge("faile to query sql");
+    }
+    if (err == ErrNone && !qry.next()) {
+        err = ErrFailed;
+        loge("no data");
+    }
+
+    if (err == ErrNone){
+        item = builder();
+        item->setDbId(qry.value(KFieldId).toInt());
+        item->setDbStatus(qry.value(KFieldRecordStatus).toInt());
+        item->setName(qry.value(KFieldName).toString());
+        item->setUid(qry.value(KFieldUid).toString());
+        updateModelFromQuery(item, qry);
+    }
+
+
+    tracede;
+    return item;
 }
 
 ErrCode DbSqliteTbl::checkOrCreateTable()
@@ -245,6 +282,7 @@ void DbSqliteTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel
         builder->addValue(KFieldName, item->name());
     if (!item->history().isEmpty())
         builder->addValue(KFieldHistory, item->history());
+    builder->addValue(KFieldRecordStatus, item->dbStatus());
     tracede;
 }
 

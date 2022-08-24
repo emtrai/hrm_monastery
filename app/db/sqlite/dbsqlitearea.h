@@ -14,14 +14,30 @@
  * limitations under the License.
  *
  *
- * Filename: monastery.cpp
+ * Filename: dbsqlitearea.h
  * Author: Anh, Ngo Huy
- * Created date:7/16/2022
+ * Created date:8/18/2022
  * Brief:
  */
-#include "monasteryctl.h"
+#ifndef DBSQLITEAREA_H
+#define DBSQLITEAREA_H
 
-MonasteryCtl::MonasteryCtl()
+#include "dbsqlitemodelhandler.h"
+
+class DbSqliteTbl;
+
+class DbSqliteArea : public DbSqliteModelHandler
 {
+public:
+    DbSqliteArea();
+    static DbSqliteArea* getInstance();
+    virtual const QString getName();
+protected:
+    virtual DbSqliteTbl* getMainTbl();
+private:
 
-}
+private:
+    static DbSqliteArea* gInstance;
+};
+
+#endif // DBSQLITEAREA_H

@@ -38,6 +38,8 @@ DbModel::DbModel(const DbModel &model)
     setDbId(model.dbId());
     setName(model.name());
     setUid(model.uid());
+    setDbStatus(model.dbStatus());
+    setHistory(model.history());
 }
 
 DbModel::~DbModel()
@@ -96,6 +98,17 @@ ErrCode DbModel::save()
     return ret;
 }
 
+ErrCode DbModel::exportTo(const QString &fpath, ExportType type)
+{
+    traced;
+    ErrCode ret = ErrNone;
+
+    UNUSED(fpath);
+    UNUSED(type);
+    loge("Not support export here");
+    return ErrNotSupport;
+}
+
 qint32 DbModel::dbStatus() const
 {
     return mDbStatus;
@@ -142,5 +155,7 @@ void DbModel::setNameId(const QString &newNameId)
 {
     traced;
     logd("Set name id %s", newNameId.toStdString().c_str());
-    mUid = Utils::UidFromName(newNameId);
+//    mUid = Utils::UidFromName(newNameId);
+    // TODO: should hash or use original value???
+    mUid = newNameId;
 }

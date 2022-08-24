@@ -14,19 +14,23 @@
  * limitations under the License.
  *
  *
- * Filename: monastery.h
+ * Filename: exporter.cpp
  * Author: Anh, Ngo Huy
- * Created date:7/16/2022
+ * Created date:8/20/2022
  * Brief:
  */
-#ifndef MONASTERYCTL_H
-#define MONASTERYCTL_H
+#include "exporter.h"
+#include "logger.h"
+#include "iexporter.h"
 
-
-class MonasteryCtl
+Exporter::Exporter()
 {
-public:
-    MonasteryCtl();
-};
+    traced;
+}
 
-#endif // MONASTERYCTL_H
+ErrCode Exporter::saveTo(const IExporter* exporter, const QString &fpath)
+{
+    traced;
+    loge("Not support export here");
+    return ErrNotSupport;
+}

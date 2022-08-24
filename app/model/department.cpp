@@ -21,17 +21,144 @@
  */
 #include "department.h"
 
+#include "utils.h"
+#include "dbctl.h"
+#include "defs.h"
+#include "dbmodel.h"
+
+
 Department::Department()
 {
 
 }
 
-const QString &Department::name() const
+DbModel *Department::builder()
 {
-    return mName;
+    return new Department();
 }
 
-void Department::setName(const QString &newName)
+qint64 Department::parentDbId() const
 {
-    mName = newName;
+    return mParentDbId;
+}
+
+void Department::setParentDbId(qint64 newParentDbId)
+{
+    mParentDbId = newParentDbId;
+}
+
+const QString &Department::parentUid() const
+{
+    return mParentUid;
+}
+
+void Department::setParentUid(const QString &newParentUid)
+{
+    mParentUid = newParentUid;
+}
+
+qint64 Department::communityDbId() const
+{
+    return mCommunityDbId;
+}
+
+void Department::setCommunityDbId(qint64 newCommunityDbId)
+{
+    mCommunityDbId = newCommunityDbId;
+}
+
+const QString &Department::remark() const
+{
+    return mRemark;
+}
+
+void Department::setRemark(const QString &newRemark)
+{
+    mRemark = newRemark;
+}
+
+qint64 Department::hoDPersonId() const
+{
+    return mHoDPersonId;
+}
+
+void Department::setHoDPersonId(qint64 newHoDPersonId)
+{
+    mHoDPersonId = newHoDPersonId;
+}
+
+qint64 Department::establishDate() const
+{
+    return mEstablishDate;
+}
+
+void Department::setEstablishDate(qint64 newEstablishDate)
+{
+    mEstablishDate = newEstablishDate;
+}
+
+const QString &Department::email() const
+{
+    return mEmail;
+}
+
+void Department::setEmail(const QString &newEmail)
+{
+    mEmail = newEmail;
+}
+
+const QString &Department::addr() const
+{
+    return mAddr;
+}
+
+void Department::setAddr(const QString &newAddr)
+{
+    mAddr = newAddr;
+}
+
+const QString &Department::tel() const
+{
+    return mTel;
+}
+
+void Department::setTel(const QString &newTel)
+{
+    mTel = newTel;
+}
+
+const QString &Department::brief() const
+{
+    return mBrief;
+}
+
+void Department::setBrief(const QString &newBrief)
+{
+    mBrief = newBrief;
+}
+
+qint64 Department::status() const
+{
+    return mStatus;
+}
+
+void Department::setStatus(qint64 newStatus)
+{
+    mStatus = newStatus;
+}
+
+DbModelHandler *Department::getDbModelHandler()
+{
+
+    return DB->getModelHandler(KModelHdlDept);
+}
+
+const QString &Department::shortName() const
+{
+    return mShortName;
+}
+
+void Department::setShortName(const QString &newShortName)
+{
+    mShortName = newShortName;
 }

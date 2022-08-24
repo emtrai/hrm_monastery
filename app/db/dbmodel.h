@@ -24,8 +24,11 @@
 
 #include <QString>
 #include "errcode.h"
+#include "exportfactory.h"
+
 class DbModel;
 class DbModelHandler;
+
 typedef DbModel*(*DbModelBuilder)(void);
 
 class DbModel
@@ -46,6 +49,7 @@ public:
     virtual void setUid(const QString &newUid);
 
     virtual ErrCode save();
+    virtual ErrCode exportTo(const QString &fpath, ExportType type);
 
     virtual qint32 dbStatus() const;
     virtual void setDbStatus(qint32 newDbStatus);
@@ -67,7 +71,6 @@ private:
     qint64 mDbId;
     QString mName;// TODO: support multi languate???
     QString mUid;
-    QString mNameId;
     QString mHistory;
     qint32 mDbStatus;
 };

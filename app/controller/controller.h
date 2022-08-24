@@ -6,6 +6,7 @@
 #include "errcode.h"
 
 class DbModel;
+class DbModelHandler;
 
 class Controller: public QObject
 {
@@ -14,6 +15,9 @@ class Controller: public QObject
 public:
     Controller();
     Controller(const QString& name);
+
+    virtual DbModelHandler* getModelHandler();
+    virtual ErrCode addNew(DbModel* model);
 
 protected:
     virtual DbModel *buildModel(void* items, const QString& fmt);

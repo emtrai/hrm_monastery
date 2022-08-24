@@ -8,5 +8,11 @@
         <file alias="specialist_vi">res/specialist_vi.csv</file>
         <file alias="community_vi">res/community_vi.json</file>
         <file alias="mission.csv">res/mission_vi.csv</file>
+        <file alias="home">res/home.html</file>
+        <file alias="logo.png">res/logo.png</file>
+        <file alias="area_vi">res/area_vi.csv</file>
+        <file alias="department_vi">res/department_vi.json</file>
+        <file alias="person_info_template">res/person_info_template.html</file>
     </qresource>
+    <qresource prefix="/template"/>
 </RCC>

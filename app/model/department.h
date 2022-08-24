@@ -24,18 +24,68 @@
 
 #include <QObject>
 #include <QString>
+#include "dbmodel.h"
 
-class Department:public QObject
+class Department:public QObject, public DbModel
 {
     Q_OBJECT
         public:
                  Department();
 
-            const QString &name() const;
-            void setName(const QString &newName);
+            static DbModel *builder();
 
-        private:
-                 QString mName;
+                 qint64 parentDbId() const;
+                 void setParentDbId(qint64 newParentDbId);
+
+                 const QString &parentUid() const;
+                 void setParentUid(const QString &newParentUid);
+
+                 qint64 communityDbId() const;
+                 void setCommunityDbId(qint64 newCommunityDbId);
+
+                 const QString &remark() const;
+                 void setRemark(const QString &newRemark);
+
+                 qint64 hoDPersonId() const;
+                 void setHoDPersonId(qint64 newHoDPersonId);
+
+                 qint64 establishDate() const;
+                 void setEstablishDate(qint64 newEstablishDate);
+
+                 const QString &email() const;
+                 void setEmail(const QString &newEmail);
+
+                 const QString &addr() const;
+                 void setAddr(const QString &newAddr);
+
+                 const QString &tel() const;
+                 void setTel(const QString &newTel);
+
+                 const QString &brief() const;
+                 void setBrief(const QString &newBrief);
+
+                 qint64 status() const;
+                 void setStatus(qint64 newStatus);
+
+                 const QString &shortName() const;
+                 void setShortName(const QString &newShortName);
+
+             protected:
+                 virtual DbModelHandler* getDbModelHandler();
+             private:
+
+                 QString mShortName;
+            qint64 mParentDbId;
+            QString mParentUid;
+            qint64 mCommunityDbId;
+            QString mRemark;
+            qint64 mHoDPersonId;
+            qint64 mEstablishDate;
+            QString mEmail;
+            QString mAddr;
+            QString mTel;
+            QString mBrief;
+            qint64 mStatus;
 };
 
 #endif // DEPARTMENT_H

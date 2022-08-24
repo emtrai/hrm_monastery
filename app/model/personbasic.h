@@ -53,7 +53,7 @@ public:
 
     ErrCode setNameFromFullName(const QString& name);
 
-    QString getFullName();
+    QString getFullName() const;
 private:
 
         QString mFirstName;

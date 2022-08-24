@@ -62,12 +62,13 @@ Gender Utils::genderFromString(const QString &gender)
     return ret;
 }
 
-qint64 Utils::dateFromString(const QString &date, const QString &f)
+qint64 Utils::dateFromString(const QString &date, const QString &f, bool* isOk)
 {
     QStringList listFormat;
     QStringList listDate;
     qint64 ret = 0;
     QString format = f.toUpper().simplified();
+    bool ok = false;
     traced;
     static QChar supportedSpli[] = {'/', '-', '.'}; // TODO: make it global????
     logd("Convert date '%s' to int, format '%s'",
@@ -76,23 +77,37 @@ qint64 Utils::dateFromString(const QString &date, const QString &f)
          );
     int len = sizeof(supportedSpli)/sizeof(supportedSpli[0]);
 
+//    for (int i = 0; i < len; i++){
+//        if (format.contains(supportedSpli[i]) && date.contains(supportedSpli[i])){
+//            listFormat = format.split(supportedSpli[i]);
+//            listDate = date.split(supportedSpli[i]);
+//            break;
+//        }
+//    }
     for (int i = 0; i < len; i++){
-        if (format.contains(supportedSpli[i]) && date.contains(supportedSpli[i])){
+        if (format.contains(supportedSpli[i])){
             listFormat = format.split(supportedSpli[i]);
+        }
+        if (date.contains(supportedSpli[i])){
             listDate = date.split(supportedSpli[i]);
-            break;
         }
     }
-
+    if (listDate.empty())
+        listDate.append(date);
+    logd("listFormat length %d", listFormat.length());
+    logd("listDate length %d", listDate.length());
     if (!listDate.empty() && !listFormat.empty()
-        && (listDate.length() > 1)
-        && (listDate.length() == listFormat.length())){
+        && (listDate.length() >= 1)){
+//        && (listDate.length() > 1)
+//        && (listDate.length() == listFormat.length())){
 
         qint32 year = 0, month = 0, day = 0;
-        bool ok = false;
+
         int idx = 0;
         logd("parse each item in date");
         foreach (QString item, listFormat){
+            if (idx >= listDate.length())
+                break;
             ok = false;
             logd("item %s", item.toStdString().c_str());
             logd("listDate %s", listDate[idx].toStdString().c_str());
@@ -111,6 +126,7 @@ qint64 Utils::dateFromString(const QString &date, const QString &f)
                 break;
             }
             idx ++;
+
         }
         logd("year %d moth %d date %d", year, month, day);
         if (ok){
@@ -119,12 +135,13 @@ qint64 Utils::dateFromString(const QString &date, const QString &f)
         else{
             ret = 0;
             loge("Invalid data/format: parse faile");
+
         }
+    } else{
+        loge("Invalid data/format: not match date and format");
     }
-    else{
-        loge("Invalid data/format: note match date and format");
-    }
-    logd("result date 0x%x", (quint32) ret);
+    if (isOk) *isOk = ok;
+    logd("result date 0x%x, ok %d", (quint32) ret, ok);
     return ret;
 }
 
@@ -138,9 +155,17 @@ QString Utils::date2String(qint64 date, const QString& format)
     QString dateString;
     logd("Date 0x%x", (quint32)date);
     // TODO: use format
-    if (year > 0) dateString += QString::number(year) + "/";
-    if (month > 0) dateString += QString::number(month) + "/";
-    if (day > 0) dateString += QString::number(day);
+    if (year > 0) dateString += QString::number(year);
+
+    if (month > 0){
+        if (!dateString.isEmpty()) dateString += "/";
+        dateString += QString::number(month);
+    }
+
+    if (day > 0) {
+        if (!dateString.isEmpty()) dateString += "/";
+        dateString += QString::number(day);
+    }
     logd("DateString %s", dateString.toStdString().c_str());
     return dateString;
 }
@@ -288,10 +313,14 @@ ErrCode Utils::parseDataFromCSVFile(const QString &filePath,
     return ret;
 }
 
-QString Utils::getPrebuiltFileByLang(const QString &prebuiltName)
+QString Utils::getPrebuiltFileByLang(const QString &prebuiltName, bool lang)
 {
     // TODO: this is stupid/dump implementation, let's improve it, please
-    return QString("%1_%2").arg(prebuiltName, KLanguage);
+    // TODO: KLanguate can be updatable to update language at runtime???
+    if (lang)
+        return QString("%1_%2").arg(prebuiltName, KLanguage);
+    else
+        return prebuiltName;
 }
 
 QString Utils::UidFromName(const QString &name)
@@ -302,3 +331,14 @@ QString Utils::UidFromName(const QString &name)
          hash.toStdString().c_str());
     return hash;
 }
+
+QString Utils::readAll(const QString &fpath)
+{
+    QFile file(fpath);
+    // TODO: handle error
+    file.open(QIODevice::ReadOnly);
+    QTextStream in(&file);
+    return in.readAll();
+}
+
+

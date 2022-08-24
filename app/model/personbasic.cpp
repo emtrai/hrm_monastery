@@ -113,7 +113,7 @@ ErrCode PersonBasic::setNameFromFullName(const QString &name)
 
 
 
-QString PersonBasic::getFullName(){
+QString PersonBasic::getFullName() const{
     //TODO:check localization
     return mLastName + " " + mFirstName;
 }

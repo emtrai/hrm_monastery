@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "filectl.h"
 #include "dbmodel.h"
+#include "dbmodelhandler.h"
 
 Controller::Controller()
 {
@@ -13,6 +14,38 @@ Controller::Controller()
 Controller::Controller(const QString& name):mName(name)
 {
     traced;
+}
+
+DbModelHandler *Controller::getModelHandler()
+{
+    traced;
+    return nullptr;
+}
+
+ErrCode Controller::addNew(DbModel *model)
+{
+    ErrCode ret = ErrNone;
+    traced;
+    DbModelHandler* hdl = getModelHandler();
+    if (hdl != nullptr){
+        if (!hdl->exist(model)) {
+            logd("all well to save");
+            ret = model->save();
+            if (ret == ErrNone) {
+                logi("Save ok, let's reload");
+                onLoad();
+                // TODO: should emit???? if emit load, loader will catch and reload all
+//                emit load();
+            }
+        } else {
+            ret = ErrExisted;
+            loge("Alerady exist");
+        }
+    } else {
+        ret = ErrNotExist;
+        loge("not found suitable model handler");
+    }
+    return ret;
 }
 
 DbModel *Controller::buildModel(void *items, const QString &fmt)

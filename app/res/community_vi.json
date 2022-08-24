@@ -1,8 +1,24 @@
 { "communities":
     [
+    {
+        "id":"MAIN",
+        "parentid":"",
+        "name":"Hội dòng",
+        "church":"",
+        "addr":"",
+        "province":"",
+        "country":"",
+        "tel":"02583881736;0799725895",
+        "feastday":"01.09",
+        "establishday":"",
+        "status":"active",
+        "mission":"Education",
+        "email":"terkimsac@yahoo.com",
+        "level":0
+        },
         {
         "id":"MTGNG",
-        "parentid":"",
+        "parentid":"MAIN",
         "name":"CĐ. THÁNH GIA",
         "church":"GX. THÁNH GIA",
         "addr":"Số 10 Đông Phước, P. Phước Long, Bình Tân, NT",
@@ -13,11 +29,12 @@
         "establishday":"",
         "status":"active",
         "mission":"Education",
-        "email":"terkimsac@yahoo.com"
+        "email":"terkimsac@yahoo.com",
+        "level":1
         },
         {
         "id":"BONAVENTURA",
-        "parentid":"",
+        "parentid":"MAIN",
         "name":"CĐ. BONAVENTURA",
         "church":"GX. PHƯỚC HÒA",
         "addr":"Lô  5 + 7 + 9, Đường A6, Khu tái Định Cư VCN",
@@ -28,7 +45,8 @@
         "establishday":"",
         "status":"active",
         "mission":"Health",
-        "email":"mnttanhdao@yahoo.com.vn"
+        "email":"mnttanhdao@yahoo.com.vn",
+        "level":1
         }
     ]
 }

@@ -28,7 +28,9 @@
 class FileCtl:public Controller
 {
 public:
+    virtual ~FileCtl();
     static FileCtl* getInstance();
+    static void init();
 
     static QString getAppDataDir(const QString& subDir);
     static QString getAppDataDir(const char* subDir = nullptr);
@@ -46,12 +48,17 @@ public:
     static QString getFullFilePath(const QString &fileName);
 
     static ErrCode writeStringToFile(const QString& content, const QString&fpath);
+    static ErrCode checkAndUpdatePrebuiltFile(const QString& fname, bool backup);
+    static QString getUpdatePrebuiltDataFilePath(const QString name, bool lang = true);
+
+    const QString &tmpDirPath() const;
 
 private:
     FileCtl();
 
 private:
     static FileCtl* gInstance;
+    QString mTmpDirPath;
 };
 
 #endif // FILECTL_H

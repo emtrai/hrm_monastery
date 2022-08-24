@@ -29,6 +29,23 @@
 #include <QHash>
 #include <QChar>
 
+#define GET_INSTALCE_DECL(className) \
+    public:\
+        static className* getInstance(); \
+    private: \
+        static className* gInstance;
+
+#define GET_INSTANCE_IMPL(gInstance, className) \
+        className* className::gInstance = nullptr;\
+        className* className::getInstance() { \
+            if (gInstance == nullptr){ \
+                gInstance = new className(); \
+            } \
+            return gInstance; \
+        }
+
+#define INSTANCE(className) className::getInstance()
+
 typedef ErrCode (*func_one_csv_item_t)(const QStringList& items, void* caller, void* param);
 
 
@@ -42,7 +59,7 @@ public:
     * M/D
     */
     // TODO: default for const QString is ok or not??? can set it ???
-    static qint64 dateFromString(const QString& date, const QString& format = "YYYY/MM/DD");
+    static qint64 dateFromString(const QString& date, const QString& format = "YYYY/MM/DD", bool *isOk = nullptr);
     static QString date2String(qint64 date, const QString& format = "YYYY/MM/DD");
     static void date2ymd(qint64 date, int* day = nullptr,
                             int* month = nullptr, int* year = nullptr);
@@ -58,8 +75,9 @@ public:
                                 QHash<QString, QString>* items,
                                 QChar splitBy = ':'
                                 );
-    static QString getPrebuiltFileByLang(const QString& prebuiltName);
+    static QString getPrebuiltFileByLang(const QString& prebuiltName, bool lang = true);
     static QString UidFromName(const QString& name);
+    static QString readAll(const QString& fpath);
 
 };
 

@@ -15,6 +15,18 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
+    <property name="leftMargin">
+     <number>2</number>
+    </property>
+    <property name="topMargin">
+     <number>2</number>
+    </property>
+    <property name="rightMargin">
+     <number>2</number>
+    </property>
+    <property name="bottomMargin">
+     <number>2</number>
+    </property>
     <item row="0" column="0">
      <widget class="QWidget" name="widget" native="true"/>
     </item>
@@ -29,38 +41,24 @@
      <height>24</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menu_Edit">
+   <widget class="QMenu" name="menuTools">
     <property name="title">
-     <string>&amp;Edit</string>
+     <string>Công cụ</string>
     </property>
-    <addaction name="action_New"/>
     <addaction name="action_Export"/>
-    <addaction name="action_Import"/>
+    <addaction name="actionImportPerson"/>
     <addaction name="action_Backup"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>Help</string>
+     <string>Thông tin</string>
     </property>
     <addaction name="action_Help"/>
     <addaction name="action_About"/>
    </widget>
-   <widget class="QMenu" name="menuPerson">
-    <property name="title">
-     <string>Person</string>
-    </property>
-    <addaction name="actionNew"/>
-   </widget>
-   <widget class="QMenu" name="menuCommunity">
-    <property name="title">
-     <string>Community</string>
-    </property>
-    <addaction name="actionNew_2"/>
-    <addaction name="actionImportComm"/>
-   </widget>
    <widget class="QMenu" name="menuOthers">
     <property name="title">
-     <string>Others</string>
+     <string>Khác</string>
     </property>
     <widget class="QMenu" name="menuCountry">
      <property name="title">
@@ -70,17 +68,28 @@
      <addaction name="actionAdd_2"/>
     </widget>
     <addaction name="menuCountry"/>
+    <addaction name="actionProvince"/>
+    <addaction name="actionArea"/>
+    <addaction name="actionEducation"/>
+    <addaction name="actionMission"/>
+    <addaction name="actionWork"/>
+    <addaction name="actionEthnic"/>
+    <addaction name="actionSpecialist"/>
    </widget>
-   <addaction name="menu_Edit"/>
-   <addaction name="menuHelp"/>
-   <addaction name="menuPerson"/>
-   <addaction name="menuCommunity"/>
    <addaction name="menuOthers"/>
+   <addaction name="menuTools"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
     <string>toolBar</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
@@ -88,15 +97,24 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionHome"/>
+   <addaction name="actionOrgInfo"/>
    <addaction name="actionSummarize"/>
-   <addaction name="actionNuns"/>
+   <addaction name="actionPerson"/>
    <addaction name="actionCommunity"/>
    <addaction name="actionSaints_2"/>
+   <addaction name="separator"/>
    <addaction name="action_New"/>
+   <addaction name="separator"/>
   </widget>
   <action name="action_New">
+   <property name="icon">
+    <iconset>
+     <normalon>:/icon/icon/icons8-join-96.png</normalon>
+    </iconset>
+   </property>
    <property name="text">
-    <string>&amp;New</string>
+    <string>Thêm thành viên</string>
    </property>
   </action>
   <action name="action_Export">
@@ -104,7 +122,7 @@
     <string>&amp;Export</string>
    </property>
   </action>
-  <action name="action_Import">
+  <action name="actionImportPerson">
    <property name="text">
     <string>&amp;Import</string>
    </property>
@@ -116,7 +134,10 @@
   </action>
   <action name="action_Help">
    <property name="text">
-    <string>&amp;Help</string>
+    <string>Trợ giúp</string>
+   </property>
+   <property name="iconText">
+    <string>Trợ giúp</string>
    </property>
   </action>
   <action name="action_About">
@@ -150,32 +171,55 @@
    </property>
   </action>
   <action name="actionCommunity">
+   <property name="icon">
+    <iconset>
+     <normalon>:/icon/icon/icons8-community-64 (1).png</normalon>
+    </iconset>
+   </property>
    <property name="text">
-    <string>Community</string>
+    <string>Cộng đoàn</string>
    </property>
    <property name="toolTip">
     <string>List community</string>
    </property>
   </action>
   <action name="actionSummarize">
+   <property name="icon">
+    <iconset>
+     <normalon>:/icon/icon/icons8-chart-64.png</normalon>
+    </iconset>
+   </property>
    <property name="text">
     <string>Thống Kê</string>
    </property>
    <property name="toolTip">
     <string>Summarize</string>
    </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="actionSaints_2">
+   <property name="icon">
+    <iconset>
+     <normalon>:/icon/icon/icons8-saint-64.png</normalon>
+    </iconset>
+   </property>
    <property name="text">
-    <string>Saints</string>
+    <string>Thánh</string>
    </property>
    <property name="toolTip">
     <string>Show Saints</string>
    </property>
   </action>
-  <action name="actionNuns">
+  <action name="actionPerson">
+   <property name="icon">
+    <iconset>
+     <normalon>:/icon/icon/icons8-nun-64.png</normalon>
+    </iconset>
+   </property>
    <property name="text">
-    <string>Nuns</string>
+    <string>Thành Viên</string>
    </property>
    <property name="toolTip">
     <string>Nuns</string>
@@ -189,6 +233,64 @@
   <action name="actionAdd_2">
    <property name="text">
     <string>Add</string>
+   </property>
+  </action>
+  <action name="actionHome">
+   <property name="icon">
+    <iconset>
+     <normalon>:/icon/icon/icons8-home-128.png</normalon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Trang chủ</string>
+   </property>
+  </action>
+  <action name="actionProvince">
+   <property name="text">
+    <string>Province</string>
+   </property>
+  </action>
+  <action name="actionArea">
+   <property name="text">
+    <string>Area</string>
+   </property>
+  </action>
+  <action name="actionEducation">
+   <property name="text">
+    <string>Education</string>
+   </property>
+  </action>
+  <action name="actionMission">
+   <property name="text">
+    <string>Mission</string>
+   </property>
+  </action>
+  <action name="actionWork">
+   <property name="text">
+    <string>Work</string>
+   </property>
+  </action>
+  <action name="actionEthnic">
+   <property name="text">
+    <string>Ethnic</string>
+   </property>
+  </action>
+  <action name="actionSpecialist">
+   <property name="text">
+    <string>Specialist</string>
+   </property>
+  </action>
+  <action name="actionOrgInfo">
+   <property name="icon">
+    <iconset>
+     <normalon>:/icon/icon/icons8-church-64.png</normalon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Hội Dòng</string>
+   </property>
+   <property name="toolTip">
+    <string>Thông tin Hội Dòng</string>
    </property>
   </action>
  </widget>

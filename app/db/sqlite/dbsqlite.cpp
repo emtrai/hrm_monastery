@@ -37,6 +37,8 @@
 #include "table/dbsqliteprovincetbl.h"
 #include "table/dbsqliteethnictbl.h"
 #include "table/dbsqlitemissiontbl.h"
+#include "table/dbsqliteareatbl.h"
+#include "table/dbsqlitedeparttbl.h"
 #include "dbsqlitedefs.h"
 #include "dbsqliteedu.h"
 #include "dbsqlitesaint.h"
@@ -46,6 +48,8 @@
 #include "dbsqliteethnic.h"
 #include "dbsqliteprovince.h"
 #include "dbsqlitemission.h"
+#include "dbsqlitearea.h"
+#include "dbsqlitedept.h"
 #include "defs.h"
 
 static const QString DRIVER("QSQLITE");
@@ -73,6 +77,8 @@ void DbSqlite::setupTables()
     appendTable(new DbSqliteEthnicTbl(this));
     appendTable(new DbSqliteMissionTbl(this));
     appendTable(new DbSqliteCommunityTbl(this));
+    appendTable(new DbSqliteAreaTbl(this));
+    appendTable(new DbSqliteDepartTbl(this));
 }
 
 void DbSqlite::setupModelHandler()
@@ -87,6 +93,8 @@ void DbSqlite::setupModelHandler()
     appendModelHandler(new DbSqliteProvince());
     appendModelHandler(new DbSqliteMission());
     appendModelHandler(new DbSqliteCommunity());
+    appendModelHandler(new DbSqliteArea());
+    appendModelHandler(new DbSqliteDept());
 }
 
 void DbSqlite::appendTable(DbSqliteTbl *tbl)

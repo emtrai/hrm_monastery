@@ -24,7 +24,10 @@
 #include "errcode.h"
 #include "dbctl.h"
 #include "utils.h"
-
+#include "filectl.h"
+#include "iexporter.h"
+#include "exportfactory.h"
+#include "defs.h"
 
 
 // TODO: make those key names configurable????
@@ -174,7 +177,57 @@ void Person::setChristenDate(const QString &newChristenDate)
     mChristenDate = Utils::dateFromString(newChristenDate);
 }
 
+ErrCode Person::exportTo(const QString &fpath, ExportType type)
+{
+    traced;
+    ErrCode ret = ErrNone;
+    // TODO: implement something here
+    logi("Export Person to %s", fpath.toStdString().c_str());
+    ret = ExportFactory::exportTo(this, fpath, type);
+    tracedr(ret);
+    return ret;
+
+}
+
 DbModelHandler *Person::getDbModelHandler()
 {
     return DbCtl::getDb()->getSaintModelHandler();
+}
+
+const QString Person::exportTemplatePath() const
+{
+    return FileCtl::getPrebuiltDataFilePath(KPrebuiltPersonInfoTemplateFileName);
+}
+
+const QStringList Person::getListKeyWord() const
+{
+    traced;
+    QStringList fields;
+    fields.append(KExportFieldFullName);
+    fields.append(KExportFieldBirthday);
+    return fields;
+}
+
+ErrCode Person::getDataString(const QString &keyword, QString *data, bool *isFile) const
+{
+    ErrCode ret = ErrNone;
+    traced;
+    logd("keyword %s", keyword.toStdString().c_str());
+    if (keyword == KExportFieldFullName){
+        *data = getFullName();
+    } else if (keyword == KExportFieldBirthday) {
+        *data = Utils::date2String(birthday());
+    }
+
+    return ret;
+}
+
+const QString &Person::imgPath() const
+{
+    return mImgPath;
+}
+
+void Person::setImgPath(const QString &newImgPath)
+{
+    mImgPath = newImgPath;
 }

@@ -49,6 +49,7 @@ const char* const KFieldParentUid = "parent_uid";
 const char* const KFieldCreateDate = "create_date";
 const char* const KFieldDateFormat = "date_format";
 const char* const KFieldStatus = "status";
+const char* const KFieldDbStatus = "dbstatus";
 const char* const KFieldCEOUid = "ceo_uid";
 const char* const KFieldChurchUid = "church_uid";
 const char* const KFieldMissionUid = "mission_uid";
@@ -67,9 +68,13 @@ const char* const KFieldEthnic = "ethnic"; // dan toc
 const char* const KFieldState = "state"; // tinh/thanh/bang
 const char* const KFieldProvince = "province"; // tinh/thanh/bang
 const char* const KFieldParentDbId = "parent_dbid";
+const char* const KFieldCommunityDbId = "community_dbid";
+const char* const KFieldCommunityUid = "community_uid";
 const char* const KFieldAddr = "addr";
 const char* const KFieldTel = "tel";
 const char* const KFieldEmail = "email";
+const char* const KFieldBrief = "brief";
+const char* const KFieldImgPath = "imgpath";
 
 
 // TABLES NAME
@@ -86,6 +91,7 @@ const char* const KTableMission = "mission"; // su vu cua cong doan
 const char* const KTableCountry = "country"; //
 const char* const KTableProvince = "province"; //
 const char* const KTableEthnic = "ethnic"; //Dan toc
+const char* const KTableArea = "area"; //Dan toc
 
 // TODO: move to class???
 QString getDateTypeString(TableFieldDatatype_t dataType);

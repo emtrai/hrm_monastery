@@ -47,7 +47,12 @@ const char* const KPrebuiltSpecialistCSVFileName = "specialist";
 const char* const KPrebuiltProvinceCSVFileName = "province";
 const char* const KPrebuiltEthnicCSVFileName = "ethnic";
 const char* const KPrebuiltMissionCSVFileName = "mission";
+const char* const KPrebuiltAreaCSVFileName = "area";
+const char* const KPrebuiltDeptJsonFileName = "dept";
 const char* const KPrebuiltCommunityJsonFileName = "community";
+const char* const KPrebuiltHomeHtmlFileName = "home";
+const char* const KPrebuiltLogoFileName = "logo.png"; // special case, need file extenstion
+const char* const KPrebuiltPersonInfoTemplateFileName = "person_info_template";
 
 const char* const KModelHdlCountry = "country";
 const char* const KModelHdlEdu = "education";
@@ -58,6 +63,8 @@ const char* const KModelHdlSpecialist = "specialist";
 const char* const KModelHdlProvince = "province";
 const char* const KModelHdlEthnic = "ethnic";
 const char* const KModelHdlMission = "mission";
+const char* const KModelHdlArea = "area";
+const char* const KModelHdlDept = "department";
 
 const char* const KDataFormatList = "QList";
 const char* const KDataFormatStringList = "QStringList";
@@ -66,6 +73,10 @@ const char* const KDataFormatJson = "QJson";
 const char* const KFileTypeCSV = "csv";
 const char* const KFileTypeJson = "json";
 const char* const KFileTypeExcelX = "xlsx";
+
+const char* const KExportFieldName = "name";
+const char* const KExportFieldFullName = "fullname";
+const char* const KExportFieldBirthday = "birthday";
 
 
 

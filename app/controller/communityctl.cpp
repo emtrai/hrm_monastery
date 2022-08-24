@@ -192,7 +192,7 @@ ErrCode CommunityCtl::loadFromDb()
     return ErrNone;
 }
 
-QList<Community *> CommunityCtl::getCommunityList()
+const QList<Community *> CommunityCtl::getCommunityList()
 {
 //    QList<Community*> list;
 //    traced;

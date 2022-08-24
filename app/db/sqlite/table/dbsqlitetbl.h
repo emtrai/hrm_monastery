@@ -52,7 +52,8 @@ public:
     virtual ErrCode add(const DbModel* item);
 
     virtual bool isExist(const DbModel* item);
-    virtual QList<DbModel*> getAll(DbModelBuilder builder);
+    virtual QList<DbModel*> getAll(const DbModelBuilder& builder);
+    virtual DbModel* getModel(qint64 dbId, const DbModelBuilder& builder);
 
 
     virtual ErrCode checkOrCreateTable();

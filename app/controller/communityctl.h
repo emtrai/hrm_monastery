@@ -40,7 +40,7 @@ public:
 
     ErrCode loadFromDb();
 
-    QList<Community*> getCommunityList();
+    const QList<Community*> getCommunityList();
 
 private:
     CommunityCtl();

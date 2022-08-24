@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/icon">
+        <file>icon/icons8-home-128.png</file>
+        <file>icon/icons8-chart-64.png</file>
+        <file>icon/icons8-church-100_2.png</file>
+        <file>icon/icons8-church-64.png</file>
+        <file>icon/icons8-nun-60.png</file>
+        <file>icon/icons8-nun-64.png</file>
+        <file>icon/icons8-community-64 (1).png</file>
+        <file>icon/icons8-saint-64.png</file>
+        <file>icon/icons8-join-96.png</file>
+    </qresource>
+</RCC>

@@ -23,6 +23,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QTextBrowser>
 
 #include "view/widget/uisummarizeview.h"
 #include "view/widget/uitableview.h"
@@ -43,12 +44,14 @@ QT_END_NAMESPACE
      static void onFinishLoading(int ret, void* data);
  private:
      void switchView(QWidget* nextView);
+     void loadHomePageFile();
  private:
     Ui::MainWindow *ui;
     UISummarizeView* mSummarizeView;
     UITableView* mCommunityView;
     UITableView* mSaintsView;
     UITableView* mPersonView;
+    QTextBrowser* mHomeView;
     QWidget* mCurrentView;
  signals:
     void load();
@@ -60,6 +63,7 @@ QT_END_NAMESPACE
      void on_actionCommunity_triggered();
      void on_actionSummarize_triggered();
      void on_actionSaints_2_triggered();
-     void on_actionNuns_triggered();
+     void on_actionHome_triggered();
+     void on_actionPerson_triggered();
 };
 #endif // MAINWINDOW_H

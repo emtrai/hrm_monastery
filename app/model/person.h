@@ -30,12 +30,14 @@
 #include "personbasic.h"
 #include <QList>
 #include "dbmodel.h"
+#include "iexporter.h"
+
 
 class Church;
 class Education;
 class Work;
 
-class Person: public PersonBasic, public DbModel
+class Person: public PersonBasic, public DbModel, public IExporter
 {
     Q_OBJECT
         public:
@@ -70,11 +72,21 @@ class Person: public PersonBasic, public DbModel
             void setChristenDate(qint64 newChristenDate);
             void setChristenDate(const QString& newChristenDate);
 
+            virtual ErrCode exportTo(const QString &fpath, ExportType type);
+
+            const QString &imgPath() const;
+            void setImgPath(const QString &newImgPath);
+
         protected:
             virtual DbModelHandler *getDbModelHandler();
+            virtual const QString exportTemplatePath() const;
+
+            virtual const QStringList getListKeyWord() const;
+            virtual ErrCode getDataString(const QString& keyword, QString* data, bool* isFile) const;
         protected:
             QString mPersonCode;
             QStringList mHollyName;
+            QString mImgPath;
 
             Address* mFamilyAddr;
             Church* mChurch;

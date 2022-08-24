@@ -31,6 +31,11 @@
 
 FileCtl* FileCtl::gInstance = nullptr;
 
+FileCtl::~FileCtl()
+{
+    traced;
+}
+
 FileCtl *FileCtl::getInstance()
 {
     if (gInstance == nullptr){
@@ -38,6 +43,11 @@ FileCtl *FileCtl::getInstance()
     }
     return gInstance;
 
+}
+
+void FileCtl::init()
+{
+    traced;
 }
 
 QString FileCtl::getAppDataDir(const QString& subDir)
@@ -111,6 +121,46 @@ ErrCode FileCtl::writeStringToFile(const QString &content, const QString &fpath)
         ret = ErrFileOpen;
         loge("Failed to open file %s", fpath.toStdString().c_str());
     }
+    return ret;
+}
+QString FileCtl::getUpdatePrebuiltDataFilePath(const QString name, bool lang)
+{
+    traced;
+    QString fname = Utils::getPrebuiltFileByLang(name, lang);
+    QString prebuiltDir = getOrCreatePrebuiltDataDir();
+    QString newFpath = QDir(prebuiltDir).filePath(fname);
+    return newFpath;
+}
+ErrCode FileCtl::checkAndUpdatePrebuiltFile(const QString &name, bool backup)
+{
+    ErrCode ret = ErrNone;
+    UNUSED(backup);
+    traced;
+    // TODO: file should be from installed dir, rather than embedded inside bin??
+    QString fname = Utils::getPrebuiltFileByLang(name, false);
+    QString fpath = getPrebuiltDataFilePath(fname);
+    if (!QFile::exists(fpath)){
+        ret = ErrNotExist;
+        loge("File %s not exist", fname.toStdString().c_str());
+    }
+    if ((ret == ErrNone) && !FileCtl::checkPrebuiltDataFileHash(fname)){
+        // TODO: do backup
+        QString prebuiltDir = getOrCreatePrebuiltDataDir();
+        QString newFpath = QDir(prebuiltDir).filePath(fname);
+        logd("newFpath %s", newFpath.toStdString().c_str());
+        if (!QFile::copy(fpath, newFpath)){
+            ret = ErrFileWrite;
+            loge("copy file %s failed", fname.toStdString().c_str());
+        }
+    }
+
+    if (ret == ErrNone){
+        logi("Updaet file hash %s", fname.toStdString().c_str());
+        ret = FileCtl::updatePrebuiltDataFileHash(fname);
+    }
+
+    logi("Check to update prebuilt file %s: %d", name.toStdString().c_str(), ret);
+
     return ret;
 }
 
@@ -229,4 +279,9 @@ ErrCode FileCtl::updatePrebuiltDataFileHash(const QString &fname)
 FileCtl::FileCtl()
 {
 
+}
+
+const QString &FileCtl::tmpDirPath() const
+{
+    return mTmpDirPath;
 }

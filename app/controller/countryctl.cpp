@@ -30,6 +30,11 @@ CountryCtl::CountryCtl()
 {
     traced;
 }
+
+DbModelHandler *CountryCtl::getModelHandler()
+{
+    return DB->getModelHandler(KModelHdlCountry);
+}
 // Format: vn, Vietname,Asian, Asia,
 DbModel *CountryCtl::buildModel(void *items, const QString &fmt)
 {
@@ -71,8 +76,9 @@ void CountryCtl::onLoad()
     ErrCode ret = ErrNone;
     ret = check2UpdateDbFromPrebuiltFile(KPrebuiltCountryCSVFileName, KFileTypeCSV);
 
-    QList items = DB->getModelHandler(KModelHdlCountry)->getAll(&Country::builder);
+    QList items = getModelHandler()->getAll(&Country::builder);
     //    mItemList.append();
+    mCountryList.clear();
     foreach (DbModel* model, items){
         mCountryList.insert(((Country*)model)->shortName(), (Country*)model);
     }

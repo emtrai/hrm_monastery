@@ -27,7 +27,9 @@
 #include "dbmodel.h"
 #include "errcode.h"
 #include "address.h"
+#include "person.h"
 
+class Area;
 // BE WARE, ANY CHANGE TO THIS STATUS WILL IMPACT TO DB
 // THIS VALUE IS WRITTEN DIRECTLY TO DB
 // TODO: to do what to improve this???
@@ -37,7 +39,7 @@ enum CommunityStatus {
     BUILDING, // building phase, not ready
 
 
-    MAX
+    COMMUNITY_STATUS_MAX
 };
 
 class Community: public QObject, public DbModel
@@ -47,10 +49,9 @@ public:
     static DbModel *builder();
 public:
     Community();
+    Community(const Community& obj);
     ~Community();
 
-    const QString &name() const;
-    void setName(const QString &newName);
 
     qint32 level() const;
 
@@ -96,11 +97,13 @@ public:
 
     virtual bool isValid();
     virtual void dump();
+    const QString &imgPath() const;
+    void setImgPath(const QString &newImgPath);
+
 protected:
     virtual DbModelHandler* getDbModelHandler();
 private:
-    QString mId;
-    QString mName;
+    QString mImgPath;
     QString mAddr;
     QString mProvince;
     QString mCountry;
@@ -119,6 +122,10 @@ private:
     QString mBrief;
     QString mFullInfo;
     QString mHistory;
+    Person* mPIC;
+    QHash<qint32, QList<Person*>> mManagement; // role, list of person
+    Area* mArea;
+    // Board of management?
 };
 
 #endif // COMMUNITY_H

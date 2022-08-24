@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>407</width>
     <height>300</height>
    </rect>
   </property>
@@ -19,6 +19,13 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QToolButton" name="toolButton_2">
+       <property name="text">
+        <string>&lt;</string>
+       </property>
+      </widget>
+     </item>
      <item>
       <widget class="QSpinBox" name="spinBox"/>
      </item>

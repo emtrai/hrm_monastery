@@ -31,6 +31,7 @@
 #include "dlgperson.h"
 #include "filectl.h"
 #include "view/widget/uitableviewfactory.h"
+#include "utils.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -47,8 +48,19 @@ MainWindow::MainWindow(QWidget *parent)
     mCommunityView = UITableViewFactory::getView(ViewType::COMMUNITY);
     mSaintsView = UITableViewFactory::getView(ViewType::SAINT);
     mPersonView = UITableViewFactory::getView(ViewType::PERSON);
+    mHomeView = new QTextBrowser(this);
+    mHomeView->clearHistory();
+    mHomeView->clear();
+//    mHomeView->setSource(QUrl(":/data/home"), QTextDocument::ResourceType::HtmlResource);
+//    mHomeView->setHtml("<h1>Hello</h1>");
+//    mHomeView->setHtml(Utils::readAll(":/data/home"));
+    loadHomePageFile();
+    // TODO: load all memory, consume much memory and performance
+    mHomeView->setSearchPaths(QStringList(FileCtl::getOrCreatePrebuiltDataDir()));
+    mHomeView->setHtml(Utils::readAll(
+        FileCtl::getUpdatePrebuiltDataFilePath(KPrebuiltHomeHtmlFileName, false)));
 
-    switchView(mSummarizeView);
+    switchView(mHomeView);
 //    summarize->setWindowState(Qt::WindowState::WindowMaximized);
 //    summarize->show();
 
@@ -96,6 +108,20 @@ void MainWindow::switchView(QWidget *nextView)
 
 
 
+void MainWindow::loadHomePageFile()
+{
+    traced;
+    ErrCode ret = ErrNone;
+    ret = FileCtl::checkAndUpdatePrebuiltFile(KPrebuiltHomeHtmlFileName, true);
+    if (ret == ErrNone)
+        ret = FileCtl::checkAndUpdatePrebuiltFile(KPrebuiltLogoFileName, true);
+
+    logd("Load home page file ret %d", ret);
+    // TODO: should log to file???
+}
+
+
+
 void MainWindow::on_action_New_triggered()
 {
     traced;
@@ -124,6 +150,7 @@ void MainWindow::on_actionNew_Community_triggered()
 
 void MainWindow::on_actionImportComm_triggered()
 {
+    traced;
     CommunityCtl::getInstance()->loadFromFile(FileCtl::getFullFilePath("config"));
 
 }
@@ -131,25 +158,36 @@ void MainWindow::on_actionImportComm_triggered()
 
 void MainWindow::on_actionCommunity_triggered()
 {
+    traced;
     switchView(mCommunityView);
 }
 
 
 void MainWindow::on_actionSummarize_triggered()
 {
+    traced;
     switchView(mSummarizeView);
 }
 
 
 void MainWindow::on_actionSaints_2_triggered()
 {
+    traced;
     switchView(mSaintsView);
 
 }
 
 
-void MainWindow::on_actionNuns_triggered()
+void MainWindow::on_actionHome_triggered()
 {
+    traced;
+    switchView(mHomeView);
+}
+
+
+void MainWindow::on_actionPerson_triggered()
+{
+    traced;
     switchView(mPersonView);
 }
 

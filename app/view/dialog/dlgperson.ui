@@ -38,9 +38,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-739</y>
-        <width>619</width>
-        <height>2009</height>
+        <y>0</y>
+        <width>565</width>
+        <height>2008</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -126,7 +126,7 @@
            <item>
             <widget class="QPushButton" name="pushButton_4">
              <property name="text">
-              <string>add</string>
+              <string>+</string>
              </property>
             </widget>
            </item>
@@ -249,21 +249,21 @@
          <item row="23" column="1">
           <layout class="QVBoxLayout" name="verticalLayout_7">
            <item>
-            <widget class="QTableView" name="tableView"/>
+            <widget class="QTableWidget" name="tblCommunityList"/>
            </item>
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_8">
              <item>
-              <widget class="QPushButton" name="pushButton_8">
+              <widget class="QPushButton" name="btnAddCommunityHistory">
                <property name="text">
-                <string>PushButton</string>
+                <string>Add</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton_2">
+              <widget class="QPushButton" name="tblClearCommunity">
                <property name="text">
-                <string>PushButton</string>
+                <string>Clear All</string>
                </property>
               </widget>
              </item>
@@ -283,7 +283,7 @@
            <item>
             <widget class="QPushButton" name="pushButton_6">
              <property name="text">
-              <string>add</string>
+              <string>+</string>
              </property>
             </widget>
            </item>
@@ -358,7 +358,7 @@
            <item>
             <widget class="QPushButton" name="pushButton_3">
              <property name="text">
-              <string>add</string>
+              <string>+</string>
              </property>
             </widget>
            </item>
@@ -638,9 +638,6 @@
          <item row="8" column="1">
           <widget class="QLineEdit" name="txtIDCard"/>
          </item>
-         <item row="22" column="1">
-          <widget class="QComboBox" name="cbCommunity"/>
-         </item>
          <item row="29" column="1">
           <widget class="QLineEdit" name="lineEdit_12"/>
          </item>
@@ -720,7 +717,7 @@
            <item>
             <widget class="QPushButton" name="btnEditNation">
              <property name="text">
-              <string>add</string>
+              <string>+</string>
              </property>
             </widget>
            </item>
@@ -748,9 +745,6 @@
          </item>
          <item row="17" column="1">
           <widget class="QPlainTextEdit" name="txtChurch"/>
-         </item>
-         <item row="0" column="1">
-          <widget class="QGraphicsView" name="graphicsView"/>
          </item>
          <item row="26" column="0">
           <widget class="QLabel" name="label_10">
@@ -787,6 +781,58 @@
            </property>
           </widget>
          </item>
+         <item row="22" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="3,1">
+           <item>
+            <widget class="QComboBox" name="cbCommunity"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButton_9">
+             <property name="text">
+              <string>+</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="0" column="1">
+          <layout class="QVBoxLayout" name="verticalLayout_8">
+           <item>
+            <widget class="QLabel" name="lblImg">
+             <property name="text">
+              <string>Picture</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_10">
+             <item>
+              <spacer name="horizontalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnImg">
+               <property name="text">
+                <string>Change</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
         </layout>
        </item>
       </layout>
@@ -819,6 +865,13 @@
       <widget class="QPushButton" name="pushButton">
        <property name="text">
         <string>Save and New</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnPreview">
+       <property name="text">
+        <string>Preview</string>
        </property>
       </widget>
      </item>

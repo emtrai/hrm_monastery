@@ -24,6 +24,9 @@
 
 #include <QDialog>
 #include <QAbstractButton>
+
+class Person;
+
 namespace Ui {
 class DlgPerson;
 }
@@ -35,6 +38,8 @@ class DlgPerson : public QDialog
         public:
                  explicit DlgPerson(QWidget *parent = nullptr);
     ~DlgPerson();
+
+                 Person *person();
 
              private slots:
                  void on_btnImport_clicked();
@@ -51,6 +56,13 @@ private slots:
     void on_buttonBox_clicked( QAbstractButton * button );
     void on_btnEditNation_clicked();
     void on_cbCountry_currentIndexChanged(int index);
+    void on_btnAddCommunityHistory_clicked();
+    void on_tblClearCommunity_clicked();
+    void on_btnPreview_clicked();
+    void on_btnImg_clicked();
+
+private:
+    Person* mPerson;
 };
 
 #endif // DLGPERSON_H
