@@ -48,6 +48,15 @@ void DbSqlitePersonTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldFirstName, TEXT);
     builder->addField(KFieldPersonCode, TEXT);
     builder->addField(KFieldBirthDay, INT64);
+    builder->addField(KFieldBirthPlace, TEXT);
+    builder->addField(KFieldIDCard, TEXT);
+    builder->addField(KFieldIDCardIssueDate, INT64);
+    // just caching, official check mapping table holly vs person
+    builder->addField(KFieldIHollyName, TEXT);
+    builder->addField(KFieldINationalityName, TEXT);
+    builder->addField(KFieldIEthnicName, TEXT);
+    builder->addField(KFieldIDCardIssuePlace, TEXT);
+    builder->addField(KFieldIEduName, TEXT);
 }
 
 void DbSqlitePersonTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
@@ -60,6 +69,14 @@ void DbSqlitePersonTbl::insertTableField(DbSqliteInsertBuilder *builder, const D
     builder->addValue(KFieldFirstName, per->firstName());
     builder->addValue(KFieldPersonCode, per->personCode());
     builder->addValue(KFieldBirthDay, per->birthday());
+    builder->addValue(KFieldBirthPlace, per->birthPlace());
+    builder->addValue(KFieldIDCard, per->idCard());
+    builder->addValue(KFieldIHollyName, per->hollyName());
+    builder->addValue(KFieldINationalityName, per->nationalityName());
+    builder->addValue(KFieldIEthnicName, per->ethnicName());
+    builder->addValue(KFieldIDCardIssueDate, per->idCardIssueDate());
+    builder->addValue(KFieldIDCardIssuePlace, per->idCardIssuePlace());
+    builder->addValue(KFieldIEduName, per->eduName());
 }
 
 void DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
@@ -72,36 +89,14 @@ void DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry
     cmm->setFirstName(qry.value(KFieldFirstName).toString());
     cmm->setPersonCode(qry.value(KFieldPersonCode).toString());
     cmm->setBirthday(qry.value(KFieldBirthDay).toInt());
+    cmm->setBirthPlace(qry.value(KFieldBirthPlace).toString());
+    cmm->setIdCard(qry.value(KFieldIDCard).toString());
+    cmm->setHollyName(qry.value(KFieldIHollyName).toString());
+    cmm->setNationalityName(qry.value(KFieldINationalityName).toString());
+    cmm->setEthnicName(qry.value(KFieldIEthnicName).toString());
+    cmm->setIdCardIssueDate(qry.value(KFieldIDCardIssueDate).toInt());
+    cmm->setIdCardIssuePlace(qry.value(KFieldIDCardIssuePlace).toString());
+    cmm->setEduName(qry.value(KFieldIEduName).toString());
 
 }
 
-//ErrCode_t DbSqlitePersonTbl::addPerson(const Person *person)
-//{
-//    traced;
-//    ErrCode_t err = ErrNone;
-//    QString sql = DbSqliteInsertBuilder::build(name())
-//                      ->addValue(KFieldLastName, person->lastName())
-//                      ->addValue(KFieldFirstName, person->firstName())
-//                      ->addValue(KFieldBirthDay, person->birthday())
-
-//                      ->buildSqlStatement();
-//    logi("insert sql statement %s", sql.toStdString().c_str());
-//    err = db()->execQuery(sql);
-
-//    return err;
-//}
-
-
-//QString DbSqlitePersonTbl::getSqlCmdCreateTable() {
-//    traced;
-//    QString sql = DbSqliteTableBuilder::build(name())
-//                      ->addField(KFieldLastName, TEXT)
-//                      ->addField(KFieldFirstName, TEXT)
-//                      ->addField(KFieldPersonCode, TEXT)
-//                      ->addField(KFieldBirthDay, INT64)
-
-//                      ->buildSqlStatement();
-//    logi("Create statement %s", sql.toStdString().c_str());
-
-//    return sql;
-//}

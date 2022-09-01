@@ -26,7 +26,10 @@
 #include "errcode.h"
 #include <QFile>
 #include "crypto.h"
-
+#include <QMessageBox>
+#include <QScreen>
+#include <QGuiApplication>
+#include <QRect>
 // yymd
 #define YMD_TO_INT(y,m,d) (((y) << 16) | ((m) << 8) | (d))
 
@@ -254,7 +257,10 @@ ErrCode Utils::parseCSVFile(const QString &filePath,
 
 ErrCode Utils::parseDataFromCSVFile(const QString &filePath,
                                     QHash<QString, QString>* items,
-                                    QChar splitBy)
+                                    QChar splitBy,
+                                    func_one_csv_field_t cb,
+                                    void* caller,
+                                    void* paramCb)
 {
     traced;
     ErrCode ret = ErrNone;
@@ -282,7 +288,17 @@ ErrCode Utils::parseDataFromCSVFile(const QString &filePath,
                             value = line.mid(idx+1).trimmed();
                             logd("key %s", key.toStdString().c_str());
                             logd("value %s", value.toStdString().c_str());
-                            items->insert(key, value);
+                            if (items != nullptr) {
+                                items->insert(key, value);
+                            }
+                            if (cb != nullptr){
+                                logd("Parse one CSV field, call callback");
+                                ret = cb(key, value, caller, paramCb);
+                                if (ret != ErrNone){
+                                    loge("Callback return error %d", ret);
+                                    break;
+                                }
+                            }
                         }
                         // TODO: if not found delimiter, what next???
                         // TODO: handle wrap line?
@@ -323,13 +339,21 @@ QString Utils::getPrebuiltFileByLang(const QString &prebuiltName, bool lang)
         return prebuiltName;
 }
 
-QString Utils::UidFromName(const QString &name)
+QString Utils::UidFromName(const QString &name, bool hash)
 {
     traced;
-    QString hash = Crypto::hashString(name.simplified().toLower());
+    QString normalize = name.simplified().toLower();
+    QString uid;
+    if (hash) {
+        logd("Calc uid from name with hash");
+        uid = Crypto::hashString(normalize);
+
+    } else {
+        uid = normalize;
+    }
     logd("Name %s -> uid %s", name.toStdString().c_str(),
-         hash.toStdString().c_str());
-    return hash;
+         uid.toStdString().c_str());
+    return uid;
 }
 
 QString Utils::readAll(const QString &fpath)
@@ -341,4 +365,38 @@ QString Utils::readAll(const QString &fpath)
     return in.readAll();
 }
 
+QString Utils::showErrorBox(const QString &msg)
+{
+    QMessageBox msgBox;
+    traced;
+    logd("Error box %s", msg.toStdString().c_str());
+    msgBox.setText(msg);
+    msgBox.setStandardButtons(QMessageBox::Cancel);
+    msgBox.addButton(QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Cancel);
+    msgBox.exec();
+}
+
+ErrCode Utils::screenSize(int *w, int *h)
+{
+    traced;
+    QScreen *screen = QGuiApplication::primaryScreen();
+    QRect  screenGeometry = screen->geometry();
+    int height = screenGeometry.height();
+    int width = screenGeometry.width();
+    if (w) *w = width;
+    if (h) *h = height;
+    logd("w %d h %d", height, width);
+    // TODO: screen is screen showing app??? should check to know exact screen in multiscreen
+    return ErrNone; // TODO; check if valid data is returned
+
+}
+
+int Utils::screenHeight()
+{
+    traced;
+    int h = 0;
+    screenSize(nullptr, &h);
+    return h;
+}
 

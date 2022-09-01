@@ -27,7 +27,7 @@
 #include <QRegularExpressionMatchIterator>
 #include "filectl.h"
 
-GET_INSTANCE_IMPL(gInstance, ExportHtml)
+GET_INSTANCE_IMPL(ExportHtml)
 
 ExportHtml::ExportHtml()
 {
@@ -39,7 +39,7 @@ ErrCode ExportHtml::saveTo(const IExporter *item, const QString &fpath)
     traced;
     ErrCode ret = ErrNone;
     const QString templatePath = item->exportTemplatePath();
-    QStringList keywords = item->getListKeyWord();
+    QStringList keywords = item->getListExportKeyWord();
     QString templateData;
 
 
@@ -49,10 +49,11 @@ ErrCode ExportHtml::saveTo(const IExporter *item, const QString &fpath)
         templateData = Utils::readAll(templatePath);
     }
 
-    logd("number of keyword: %d", keywords.length());
-    logd("templateData len %d", templateData.length());
+    logd("number of keyword: %d", (int)keywords.length());
+    logd("templateData len %d", (int)templateData.length());
 
-    QRegularExpression re("{{(.*)}}");
+//    QRegularExpression re("{{(.*)}}");
+    QRegularExpression re("\\{\\{([^\\}\\}\\{\\{]*)\\}\\}");
     QRegularExpressionMatchIterator i = re.globalMatch(templateData);
     QHash<QString, bool> keywordStatus;
 

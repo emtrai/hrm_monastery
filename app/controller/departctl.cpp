@@ -27,7 +27,7 @@
 #include "dbctl.h"
 #include "utils.h"
 
-GET_INSTANCE_IMPL(gInstance,DepartCtl)
+GET_INSTANCE_IMPL(DepartCtl)
 
 DepartCtl::DepartCtl()
 {

@@ -48,6 +48,12 @@ ErrCode Controller::addNew(DbModel *model)
     return ret;
 }
 
+ErrCode Controller::reloadDb()
+{
+    traced; // TODO: implement observer to call all reload db when any changes in model
+    return ErrNone;
+}
+
 DbModel *Controller::buildModel(void *items, const QString &fmt)
 {
     traced;

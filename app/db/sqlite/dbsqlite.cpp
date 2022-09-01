@@ -39,6 +39,7 @@
 #include "table/dbsqlitemissiontbl.h"
 #include "table/dbsqliteareatbl.h"
 #include "table/dbsqlitedeparttbl.h"
+#include "table/dbsqlitecoursetbl.h"
 #include "dbsqlitedefs.h"
 #include "dbsqliteedu.h"
 #include "dbsqlitesaint.h"
@@ -50,6 +51,7 @@
 #include "dbsqlitemission.h"
 #include "dbsqlitearea.h"
 #include "dbsqlitedept.h"
+#include "dbsqlitecourse.h"
 #include "defs.h"
 
 static const QString DRIVER("QSQLITE");
@@ -79,6 +81,7 @@ void DbSqlite::setupTables()
     appendTable(new DbSqliteCommunityTbl(this));
     appendTable(new DbSqliteAreaTbl(this));
     appendTable(new DbSqliteDepartTbl(this));
+    appendTable(new DbSqliteCourseTbl(this));
 }
 
 void DbSqlite::setupModelHandler()
@@ -95,6 +98,7 @@ void DbSqlite::setupModelHandler()
     appendModelHandler(new DbSqliteCommunity());
     appendModelHandler(new DbSqliteArea());
     appendModelHandler(new DbSqliteDept());
+    appendModelHandler(new DbSqliteCourse());
 }
 
 void DbSqlite::appendTable(DbSqliteTbl *tbl)
@@ -275,7 +279,9 @@ ErrCode_t DbSqlite::execQuery(const QString &sql)
     logd("Execute query %s", sql.toStdString().c_str());
     qry.prepare(sql);
     if( !qry.exec() ) {
-        qFatal( "Failed to execute %s", sql.toStdString().c_str() );
+
+        loge( "Failed to execute %s", qry.executedQuery().toStdString().c_str() );
+        loge( "Last error %s", qry.lastError().text().toStdString().c_str() );
         err = ErrFailSqlQuery;
     }
     tracedr(err);
@@ -289,7 +295,9 @@ ErrCode_t DbSqlite::execQuery(QSqlQuery *qry)
     traced;
 
     if( !qry->exec() ) {
-        qFatal( "Failed to execute");
+        loge( "Failed to execQuery %s", qry->executedQuery().toStdString().c_str());
+        loge( "Last error %s", qry->lastError().text().toStdString().c_str() );
+        err = ErrFailSqlQuery;
         err = ErrFailSqlQuery;
     }
     tracedr(err);

@@ -44,6 +44,7 @@ public:
     const QString &continent() const;
     void setContinent(const QString &newContinent);
 
+    virtual void dump();
 public:
     static DbModel *builder();
 

@@ -9,5 +9,7 @@
         <file>icon/icons8-community-64 (1).png</file>
         <file>icon/icons8-saint-64.png</file>
         <file>icon/icons8-join-96.png</file>
+        <file>icon/icons8-delete-64.png</file>
+        <file>icon/icons8-search-64.png</file>
     </qresource>
 </RCC>

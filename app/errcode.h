@@ -35,6 +35,7 @@
 typedef enum ErrCode{
     ErrNone = 0,
     ErrFailed,
+    ErrNoMemory,
     ErrInvalidArg,
     ErrInvalidData,
     ErrInvalidState,
@@ -51,6 +52,8 @@ typedef enum ErrCode{
     ErrExisted,
     ErrDbNotReady,
     ErrUnknown,
+    ErrSkip,
+    ErrCancelled,
 
     ErrMax
     } ErrCode_t;

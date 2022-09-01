@@ -41,6 +41,10 @@
 #include "view/widget/uimulticomboxview.h"
 #include "view/dialog/dlgaddcommunityhistory.h"
 #include "view/dialog/dlghtmlviewer.h"
+#include "view/dialog/dlgsaint.h"
+#include "view/dialog/dlgcountry.h"
+#include "view/dialog/dlgethnic.h"
+#include "view/dialog/dlgcourse.h"
 
 #include "community.h"
 
@@ -51,11 +55,58 @@
 #include "ethnicctl.h"
 #include "communityctl.h"
 #include "exportfactory.h"
+#include "importfactory.h"
+#include "education.h"
+#include "course.h"
+#include "coursectl.h"
+
+
+#define SET_VAL_FROM_WIDGET(widget,func) \
+                do { \
+                    QString val = widget->text().trimmed();\
+                    func(val);\
+                } while (0)
+
+
+#define SET_DATE_VAL_FROM_WIDGET(widget,func) \
+do { \
+    QString val = widget->text().trimmed();\
+    func(0);\
+    if (!val.isEmpty()){ \
+        bool isOk = false;\
+        qint64 date = Utils::dateFromString(val, DATE_FORMAT_YMD, &isOk);\
+        if (isOk && date > 0){\
+            func(date);\
+        }\
+    } \
+} while (0)
+
+#define SET_VAL_FROM_CBOX(widget,func, functxt) \
+do { \
+        QString currtxt = widget->currentText().trimmed();\
+        if (!currtxt.isEmpty()){ \
+            int index = widget->findText(currtxt);\
+            logd("item %s, index %d", currtxt.toStdString().c_str(), index);\
+            if (index >= 0){ \
+                QVariant value = widget->itemData(index);\
+                if (!value.isNull()) {\
+                    func(value.toString());\
+                    functxt(currtxt);\
+                }\
+            }\
+        }\
+} while (0)
+
+
+const char* const KUiMultiComboxNameSaint = "saint";
+const char* const KUiMultiComboxNameSpecialist = "specialist";
 
 DlgPerson::DlgPerson(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DlgPerson),
-    mPerson(nullptr)
+    mPerson(nullptr),
+    cbSaints(nullptr),
+    cbSpecialist(nullptr)
 {
     setupUI();
 
@@ -66,12 +117,18 @@ DlgPerson::~DlgPerson()
 {
     if (mPerson)
         delete mPerson;
+    if (cbSaints)
+        delete cbSaints;
+    if (cbSpecialist)
+        delete cbSpecialist;
     delete ui;
 }
 
 void DlgPerson::on_btnImport_clicked()
 {
     traced;
+    ErrCode ret = ErrNone;
+    Person* per = nullptr;
     QString fname = QFileDialog::getOpenFileName(
                                 this,
                                 tr("Open file"),
@@ -79,36 +136,47 @@ void DlgPerson::on_btnImport_clicked()
                                 tr("CSV Files (*.csv);;Excel (*.xlsx)"));
     if (!fname.isEmpty()){
         logd("File %s is selected", fname.toStdString().c_str());
-        Person* person = new Person();
-        ErrCode ret = person->fromCSVFile(fname);
-        if (ret == ErrNone){
-            logd("Parse ok, fill dialog");
-            person->dump();
-            if (!person->personCode().isEmpty())
-                ui->txtCode->setText(person->personCode());
+        per = person(true);
+        ret = ImportFactory::importFrom(per, fname, IMPORT_CSV);
+//        Person* person = new Person();
+//        ErrCode ret = person->fromCSVFile(fname);
+//        if (ret == ErrNone){
+//            logd("Parse ok, fill dialog");
+//            person->dump();
+//            if (!person->personCode().isEmpty())
+//                ui->txtCode->setText(person->personCode());
 
-            if (!person->getFullName().isEmpty())
-                ui->txtName->setText(person->getFullName());
+//            if (!person->getFullName().isEmpty())
+//                ui->txtName->setText(person->getFullName());
 
-            if (person->christenDate() > 0){
-                QString date = Utils::date2String(person->christenDate());
-                if (!date.isEmpty()){
-                    ui->txtChristenDate->setText(date);
-                }
-            }
-        }
-        delete person;
-    }
-    else {
+//            if (person->christenDate() > 0){
+//                QString date = Utils::date2String(person->christenDate());
+//                if (!date.isEmpty()){
+//                    ui->txtChristenDate->setText(date);
+//                }
+//            }
+//        }
+//        delete person;
+    } else {
         logd("Nothing be selected");
+        ret = ErrCancelled;
     }
+    if (ret == ErrNone){
+        fromPerson(per);
+    } // TODO: if error, should popup message or just print error log???
 }
 
 void DlgPerson::setupUI()
 {
     traced;
     ui->setupUi(this);
-    this->setWindowState(Qt::WindowState::WindowMaximized);
+//    this->setWindowState(Qt::WindowState::WindowMaximized);
+//    int h = Utils::screenHeight();
+//    if (h > 0) {
+//        this->setFixedHeight(h); // this may be overlap by bottom area
+//    } else {
+//        loge("Invalid screen size");
+//    }
 
     ui->txtCode->setText(Config::getNextPersonalCode());
 
@@ -124,11 +192,12 @@ void DlgPerson::setupUI()
     // Saints
 
     logd("Load Saint");
-    UIMultiComboxView *cbSaints = new UIMultiComboxView();
+    cbSaints = new UIMultiComboxView(KUiMultiComboxNameSaint, ui->wgSaint);
     QList<Saint*> saints = SaintCtl::getInstance()->getListSaints();
+    cbSaints->setListener(this);
     foreach (Saint* saint, saints) {
         logd(">> Saint %s", saint->name().toStdString().c_str());
-         cbSaints->addItem(saint->name(), saint->dbId());
+        cbSaints->addItem(saint->name(), saint->uid());
     }
 
     ui->wgSaint->layout()->addWidget(cbSaints);
@@ -136,33 +205,21 @@ void DlgPerson::setupUI()
     // specialist
 
     logd("Load specialist");
-    UIMultiComboxView *cbSpecialist = new UIMultiComboxView();
+    cbSpecialist = new UIMultiComboxView(KUiMultiComboxNameSpecialist, ui->wgSaint);
+    cbSpecialist->setListener(this);
     QList<Specialist*> specialists = SpecialistCtl::getInstance()->getAll();
     foreach (Specialist* specialist, specialists) {
 //        logd(">> specialist %s", name.toStdString().c_str());
-        cbSpecialist->addItem(specialist->name(), specialist->dbId());
+        cbSpecialist->addItem(specialist->name(), specialist->uid());
     }
     ui->wgSpecialist->layout()->addWidget(cbSpecialist);
 
 
     // Country
-    logd("Load country");
-    QList<Country*> listCountry = CountryCtl::getInstance()->getCountryList();
-    foreach(Country* item, listCountry){
-
-        ui->cbNationality->addItem(item->name(), item->shortName());
-        ui->cbCountry->addItem(item->name(), item->shortName());
-    }
+    loadCountry();
 
     logd("Load ethic");
-    // Someone may have US nationality, but Ethic is Kinh, as their original is VN
-    const QHash<QString, QList<Ethnic*>*> listEthnics = ETHNIC->getEthnicList();
-    foreach(QString country, listEthnics.keys()){
-        foreach(Ethnic * ethnic, *(listEthnics.value(country)))
-            ui->cbEthic->addItem(QString("%1,%2").arg(
-                                     ethnic->countryShortName(), ethnic->name()),
-                             ethnic->uid());
-    }
+    loadEthnic();
 
     // State/Province
     logd("Load state/province");
@@ -179,6 +236,9 @@ void DlgPerson::setupUI()
     foreach(Community* item, listCommunity){
         ui->cbCommunity->addItem(item->name(), item->uid());
     }
+
+    // Course
+    loadCourse();
 
     QStringList communityListHdr;
     communityListHdr.append("Id");
@@ -199,6 +259,212 @@ void DlgPerson::setupUI()
     // Qt check func name, if it's in format on_buttonBox_clicked --> auto register slot
     //    connect(ui->buttonBox, SIGNAL(clicked(QAbstractButton*)),
     //            this, SLOT(on_buttonBox_clicked(QAbstractButton*)));
+}
+
+Person *DlgPerson::buildPerson()
+{
+    traced;
+    Person* per = person();
+    // Image
+    per->setImgPath(ui->lblImgPath->text().trimmed());
+    // person code
+    per->setPersonCode(ui->txtCode->text().trimmed());
+
+    // holly uid
+    QList<QVariant> saints = cbSaints->valueItems();
+    per->clearSaintUid();
+    foreach (QVariant id, saints){
+        per->addSaintUid(id.toString());
+    }
+
+    // holly name
+    per->setHollyName(ui->txtSaint->text().trimmed());
+
+    // set name from full name
+    per->setNameFromFullName(ui->txtName->text().trimmed());
+
+    // birthday
+    SET_DATE_VAL_FROM_WIDGET(ui->txtBirthday, per->setBirthday);
+
+    // birthplace
+    per->setBirthPlace(ui->txtBirthplace->text().trimmed());
+
+    // nationality
+    SET_VAL_FROM_CBOX(ui->cbCountry, per->setNationalityUid, per->setNationalityName);
+
+    // ethnic name
+    SET_VAL_FROM_CBOX(ui->cbEthic, per->setEthnicUid, per->setEthnicName);
+
+    // id card
+    per->setIdCard(ui->txtIDCard->text().trimmed());
+
+    // id card issue date
+    SET_DATE_VAL_FROM_WIDGET(ui->txtIdCardDate, per->setIdCardIssueDate);
+
+
+    // edu name
+    SET_VAL_FROM_CBOX(ui->cbEdu, per->setEduUid, per->setEduName);
+
+    //specialist
+    QList<QVariant> specialist = cbSpecialist->valueItems();
+    per->clearSpecialistUid();
+    foreach (QVariant id, specialist){
+        per->addSpecialistUid(id.toString());
+    }
+
+    SET_VAL_FROM_CBOX(ui->cbCourse, per->setCourseUid, per->setCourse);
+
+    per->dump();
+    return per;
+
+}
+
+ErrCode DlgPerson::fromPerson(const Person *person)
+{
+    traced;
+    ErrCode ret = ErrNone;
+    if (person == nullptr){
+        ret = ErrInvalidArg; // TODO: should raise assert instead???
+    }
+    if (ret == ErrNone){
+        ui->txtName->setText(person->getFullName());
+    }
+    tracedr(ret);
+    return ret;
+}
+
+ErrCode DlgPerson::onNewItem(UIMultiComboxView *ui, const QString &value, bool silent)
+{
+    traced;
+    ErrCode ret = ErrNone;
+    logd("do silent %d", silent);
+    logd("name %s", ui->name().toStdString().c_str());
+
+
+    // TODO: separate processing to multi functions????
+    if (ui->name() == KUiMultiComboxNameSaint) {
+        if (silent) {
+            // TODO: implement it
+            ret = ErrNotSupport;
+        } else {
+            DlgSaint *dlg = new DlgSaint(this);
+            dlg->setName(value.trimmed());
+            dlg->setModal(true);
+            if (dlg->exec() == QDialog::Accepted){
+                Saint* saint = dlg->saint();
+                if (saint != nullptr) {
+                    ui->addItem(saint->name(), saint->uid());
+                    ret = ErrNone;
+                } else {
+                    ret = ErrFailed;
+                }
+            } else {
+                ret = ErrSkip;
+            }
+            delete dlg;
+        }
+    } else if (ui->name() == KUiMultiComboxNameSpecialist) {
+        bool ok = false;
+        QMessageBox msgBox;
+
+        QString specialistName = QInputDialog::getText(this, tr("New Specialist"),
+                                                tr("Specialist name"), QLineEdit::Normal,
+                                                "", &ok);
+        if (!specialistName.isEmpty()){
+            Specialist* item = new Specialist();
+            item->setUid(Utils::UidFromName(specialistName));
+            item->setName(specialistName);
+            logd("Save new specilist item %s", specialistName.toStdString().c_str());
+            ret = item->save();
+            logd("save ret=%d", ret);
+            if (ret == ErrNone){
+                ui->addItem(item->name(), item->uid());
+            }
+            delete item;
+        } else {
+            ret = ErrInvalidData;
+            loge("invalid specialist name");
+        }
+
+    }
+
+    return ret;
+}
+
+void DlgPerson::onItemAdded(UIMultiComboxView *cb, const QString &name, const QVariant &value)
+{
+    traced;
+    logd("name %s", cb->name().toStdString().c_str());
+
+
+    // TODO: separate processing to multi functions????
+    if (cb->name() == KUiMultiComboxNameSaint) {
+        QHash<QString, QVariant> items = cb->items();
+        QString str;
+        foreach (QString value, items.keys()) {
+            if (!str.isEmpty()) str.append(" ");
+            str.append(value);
+        }
+        ui->txtSaint->setText(str);
+    }
+
+
+}
+
+void DlgPerson::onItemDeleted(UIMultiComboxView *cb, const QString &name, const QVariant &value)
+{
+    traced;
+    logd("name %s", cb->name().toStdString().c_str());
+
+
+    // TODO: separate processing to multi functions????
+    if (cb->name() == KUiMultiComboxNameSaint) {
+        QHash<QString, QVariant> items = cb->items();
+        QString str;
+        foreach (QString value, items.keys()) {
+            if (!str.isEmpty()) str.append(" ");
+            str.append(value);
+        }
+        ui->txtSaint->setText(str);
+    }
+}
+
+void DlgPerson::loadEthnic()
+{
+    traced;
+
+    // Someone may have US nationality, but Ethic is Kinh, as their original is VN
+    logd("Reload course");
+    ui->cbCourse->clear();
+    QList<Course*> listCourse = INSTANCE(CourseCtl)->getCourseList();
+    foreach(Course* item, listCourse){
+        ui->cbCourse->addItem(item->name(), item->uid());
+    }
+}
+
+
+void DlgPerson::loadCountry()
+{
+    traced;
+
+    logd("Load country");
+    QList<Country*> listCountry = CountryCtl::getInstance()->getCountryList();
+    foreach(Country* item, listCountry){
+
+        ui->cbNationality->addItem(item->name(), item->uid());
+        ui->cbCountry->addItem(item->name(), item->uid());
+    }
+}
+
+void DlgPerson::loadCourse()
+{
+    traced;
+    ui->cbCourse->clear();
+    QList<Course*> listCourse = INSTANCE(CourseCtl)->getCourseList();
+    foreach(Course* item, listCourse){
+        ui->cbCourse->addItem(item->name(), item->uid());
+    }
+
 }
 
 //void DlgPerson::accept()
@@ -236,42 +502,19 @@ void DlgPerson::on_buttonBox_clicked( QAbstractButton * button )
 void DlgPerson::on_btnEditNation_clicked()
 {
     traced;
-    bool ok;
-    QString countryName = QInputDialog::getText(this, tr("New country"),
-                                         tr("Country name"), QLineEdit::Normal,
-                                        "", &ok);
-    if (ok && !countryName.isEmpty()){
-        Country* country = new Country();
-        // TODO: dialog with short name and full name
-        country->setShortName(countryName);
-        country->setNameId(country->shortName());
-        country->setName(countryName);
-        ErrCode ret = COUNTRYCTL->addNew(country);
-        delete country;
 
-        QMessageBox msgBox;
-
-        msgBox.setStandardButtons(QMessageBox::Cancel);
-        msgBox.setDefaultButton(QMessageBox::Cancel);
-
-        if (ret == ErrNone){
-            msgBox.setText(QString("Country '%1' was saved SUCCESSFUL.").arg(countryName));
-            logd("Load country");
-            QList<Country*> listCountry = CountryCtl::getInstance()->getCountryList();
-            ui->cbCountry->clear();
-            ui->cbNationality->clear();
-            foreach(Country* item, listCountry){
-
-                ui->cbNationality->addItem(item->name(), item->shortName());
-                ui->cbCountry->addItem(item->name(), item->shortName());
-            }
-
-        } else {
-            msgBox.setText(QString("FAILED to save country '%1', err %2")
-                               .arg(countryName).arg(ret));
-        }
-        msgBox.exec();
+    DlgCountry* dlg = new DlgCountry();
+    if (dlg == nullptr) {
+        loge("Open dlg country fail, No memory");
+        return;
     }
+
+
+    if (dlg->exec() == QDialog::Accepted){
+        loadCountry()
+
+    }
+    delete dlg;
 }
 
 
@@ -337,10 +580,11 @@ void DlgPerson::on_tblClearCommunity_clicked()
 void DlgPerson::on_btnPreview_clicked()
 {
     traced;
-    person()->setNameFromFullName(ui->txtName->text());
-    person()->setBirthday(Utils::dateFromString(ui->txtBirthday->text()));
-    QString fpath = FileCtl::getAppDataDir("person.html");
-    ExportFactory::exportTo(person(), fpath, ExportType::EXPORT_HTML);
+    Person* per = buildPerson();
+    per->setNameFromFullName(ui->txtName->text());
+    per->setBirthday(Utils::dateFromString(ui->txtBirthday->text()));
+    QString fpath = FileCtl::getTmpDataDir("person.html");
+    ExportFactory::exportTo(per, fpath, ExportType::EXPORT_HTML);
     if (QFile::exists(fpath)){
         dlgHtmlViewer* viewer = new dlgHtmlViewer();
         viewer->setHtmlPath(fpath);
@@ -350,10 +594,15 @@ void DlgPerson::on_btnPreview_clicked()
 
 }
 
-Person *DlgPerson::person()
+Person *DlgPerson::person(bool newone)
 {
-    if (mPerson == nullptr)
+    if (mPerson == nullptr) {
         mPerson = new Person();
+    } else if (newone) {
+        delete mPerson;
+        mPerson = new Person();
+    }
+
     return mPerson;
 }
 
@@ -365,10 +614,126 @@ void DlgPerson::on_btnImg_clicked()
         this,
         tr("Open file"),
         FileCtl::getAppDataDir(),
-        tr("PNG Files (*.png);;JPEG (*.jpg)"));
+        tr("PNG Files (*.png);;JPEG (*.jpg *.jpeg)"));
+
     if (!fname.isEmpty()){
         logd("File %s is selected", fname.toStdString().c_str());
-        ui->lblImg->setPixmap(QPixmap(fname));
+        QPixmap p(fname);
+        ui->lblImg->setPixmap(p.scaledToHeight( ui->lblImg->height()));
+        ui->lblImgPath->setText(fname);
     }
+}
+
+
+void DlgPerson::on_btnClearImage_clicked()
+{
+    traced;
+    ui->lblImg->clear();
+    ui->lblImgPath->clear();
+    ui->lblImg->setText("<Picture>");
+}
+
+
+void DlgPerson::on_btnAddCountry_clicked()
+{
+    traced;
+    DlgCountry * dlg = new DlgCountry();
+    if (dlg == nullptr) {
+        loge("Open dlg country fail, No memory");
+        return;
+    }
+
+    if (dlg->exec() == QDialog::Accepted){
+        loadCountry();
+    }
+    delete dlg;
+}
+
+
+void DlgPerson::on_btnAddEthnic_clicked()
+{
+    traced;
+
+    DlgEthnic * dlg = new DlgEthnic();
+    if (dlg == nullptr) {
+        loge("Open dlg ethnic fail, No memory");
+        return;
+    }
+
+
+    if (dlg->exec() == QDialog::Accepted){
+        loadEthnic();
+    }
+    delete dlg;
+}
+
+
+void DlgPerson::on_btnAddEdu_clicked()
+{
+    traced;
+    ErrCode ret = ErrNone;
+    bool ok = false;
+    QMessageBox msgBox;
+
+    QString eduName = QInputDialog::getText(this, tr("New Education"),
+                                         tr("Education name"), QLineEdit::Normal,
+                                        "", &ok);
+    if (!eduName.isEmpty()){
+        Education* edu = new Education();
+        edu->setUid(Utils::UidFromName(eduName));
+        edu->setName(eduName);
+        ret = edu->save();
+        delete edu;
+    }
+
+    msgBox.setStandardButtons(QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Cancel);
+    if (ret == ErrNone){
+        msgBox.setText(QString("Education '%1' was saved SUCCESSFUL.").arg(eduName));
+        logd("Load Education");
+        QList<Education*> listEdu = INSTANCE(EduCtl)->getListEdu();
+        ui->cbEdu->clear();
+        foreach(Education* item, listEdu){
+
+            ui->cbEdu->addItem(item->name(), item->uid());
+        }
+
+    } else {
+        msgBox.setText(QString("FAILED to save edu '%1', err %2")
+                           .arg(eduName).arg(ret));
+    }
+    logd("ret=%d", ret);
+    msgBox.exec();
+
+}
+
+
+void DlgPerson::on_btnAddProvince_clicked()
+{
+    traced;
+}
+
+
+void DlgPerson::on_btnAddCommunity_clicked()
+{
+    traced;
+}
+
+
+void DlgPerson::on_btnAddCourse_clicked()
+{
+    traced;
+
+    DlgCourse * dlg = new DlgCourse();
+    if (dlg == nullptr) {
+        loge("Open dlg course fail, No memory");
+        return;
+    }
+
+    if (dlg->exec() == QDialog::Accepted){
+        loadCourse();
+
+    }
+    delete dlg;
 }
 

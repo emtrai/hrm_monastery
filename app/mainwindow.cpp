@@ -191,3 +191,9 @@ void MainWindow::on_actionPerson_triggered()
     switchView(mPersonView);
 }
 
+
+void MainWindow::on_actionSearch_triggered()
+{
+    traced;
+}
+

@@ -29,13 +29,18 @@
 #include <QHash>
 #include <QChar>
 
+#define DATE_FORMAT_DM "D/M"
+#define DATE_FORMAT_YMD "Y/M/D"
+#define DEFAULT_CSV_FIELD_SPLIT ':'
+#define DEFAULT_CSV_ITEM_SPLIT ','
+
 #define GET_INSTALCE_DECL(className) \
     public:\
         static className* getInstance(); \
     private: \
         static className* gInstance;
 
-#define GET_INSTANCE_IMPL(gInstance, className) \
+#define GET_INSTANCE_IMPL(className) \
         className* className::gInstance = nullptr;\
         className* className::getInstance() { \
             if (gInstance == nullptr){ \
@@ -47,6 +52,7 @@
 #define INSTANCE(className) className::getInstance()
 
 typedef ErrCode (*func_one_csv_item_t)(const QStringList& items, void* caller, void* param);
+typedef ErrCode (*func_one_csv_field_t)(const QString& key, const QString& value, void* caller, void* param);
 
 
 class Utils
@@ -68,17 +74,23 @@ public:
                             func_one_csv_item_t cb = nullptr,
                             void* caller = nullptr,
                             void* paramCb = nullptr,
-                            QChar splitBy = ','
+                            QChar splitBy = DEFAULT_CSV_ITEM_SPLIT
                             );
 
     static ErrCode parseDataFromCSVFile(const QString& filePath,
-                                QHash<QString, QString>* items,
-                                QChar splitBy = ':'
+                                QHash<QString, QString>* items = nullptr,
+                                QChar splitBy = DEFAULT_CSV_FIELD_SPLIT,
+                                func_one_csv_field_t cb = nullptr,
+                                void* caller = nullptr,
+                                void* paramCb = nullptr
                                 );
     static QString getPrebuiltFileByLang(const QString& prebuiltName, bool lang = true);
-    static QString UidFromName(const QString& name);
+    static QString UidFromName(const QString& name, bool hash = false);
     static QString readAll(const QString& fpath);
 
+    static QString showErrorBox(const QString& msg);
+    static ErrCode screenSize(int* w=nullptr, int* h=nullptr);
+    static int screenHeight();
 };
 
 #endif // UTILS_H

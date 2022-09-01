@@ -1,4 +1,3 @@
-#country shortname, name[, remark]
+#Format: country short name, id,name[, remark]
 vn,kinh,Kinh
-vn,hmlong,H'mong,yyy
-us,us,US
+vn,tay,Tay,dan toc tay

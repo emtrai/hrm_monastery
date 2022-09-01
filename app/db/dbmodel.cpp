@@ -137,10 +137,10 @@ bool DbModel::isValid()
 
 void DbModel::dump()
 {
+    traced;
     // TODO: dump to stdout, sdderr or file???
 #ifdef DEBUG_TRACE
-
-    logd("DUMP:");
+    logd("- DbId %d", dbId());
     logd("- Uid %s", uid().toStdString().c_str());
     logd("- Name %s", name().toStdString().c_str());
 #endif //DEBUG_TRACE

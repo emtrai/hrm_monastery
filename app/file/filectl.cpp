@@ -78,6 +78,13 @@ QString FileCtl::getAppDataDir(const char *subDir)
     }
 }
 
+QString FileCtl::getTmpDataDir(const char *subDir)
+{
+    traced;
+    // TODO: implement it, this is just termprary processing
+    return getAppDataDir(subDir);
+}
+
 QString FileCtl::getAppInstallDir(const QString& subDir)
 {
     QString dir = QCoreApplication::applicationDirPath();
@@ -284,4 +291,10 @@ FileCtl::FileCtl()
 const QString &FileCtl::tmpDirPath() const
 {
     return mTmpDirPath;
+}
+
+void FileCtl::cleanUpData()
+{
+    traced;
+    // TODO: implement it, clean up all data, i.e data in temp storage
 }

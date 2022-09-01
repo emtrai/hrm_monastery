@@ -46,6 +46,7 @@ public:
 
     qint64 birthday() const;
     void setBirthday(qint64 newBirthday);
+    void setBirthday(const QString& newBirthday);
 
     const QString &lastName() const;
     void setLastName(const QString &newLastName);

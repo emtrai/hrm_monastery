@@ -32,11 +32,14 @@ public:
     virtual ~UIItemButton();
 
 public:
-    QObject* mData;
-    void setData(QObject *newData);
+    QVariant mValue;
+
+
+    const QVariant &value() const;
+    void setValue(const QVariant &newValue);
 
 signals:
-    void clicked(UIItemButton*, QObject*);
+    void clicked(UIItemButton*, QVariant);
 public slots:
     void reEmitClick();
 };

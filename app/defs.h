@@ -53,6 +53,7 @@ const char* const KPrebuiltCommunityJsonFileName = "community";
 const char* const KPrebuiltHomeHtmlFileName = "home";
 const char* const KPrebuiltLogoFileName = "logo.png"; // special case, need file extenstion
 const char* const KPrebuiltPersonInfoTemplateFileName = "person_info_template";
+const char* const KPrebuiltCourseCSVFileName = "course";
 
 const char* const KModelHdlCountry = "country";
 const char* const KModelHdlEdu = "education";
@@ -65,6 +66,7 @@ const char* const KModelHdlEthnic = "ethnic";
 const char* const KModelHdlMission = "mission";
 const char* const KModelHdlArea = "area";
 const char* const KModelHdlDept = "department";
+const char* const KModelHdlCourse = "course";
 
 const char* const KDataFormatList = "QList";
 const char* const KDataFormatStringList = "QStringList";
@@ -75,10 +77,25 @@ const char* const KFileTypeJson = "json";
 const char* const KFileTypeExcelX = "xlsx";
 
 const char* const KExportFieldName = "name";
+const char* const KExportFieldFirstName = "firstname";
+const char* const KExportFieldLastName = "lastname";
 const char* const KExportFieldFullName = "fullname";
 const char* const KExportFieldBirthday = "birthday";
+const char* const KExportFieldBirthplace = "birthplace";
+const char* const KExportFieldHollyUids = "holly_uids";
+const char* const KExportFieldHollyName = "hollyname";
+const char* const KExportFieldNationality = "nationality";
+const char* const KExportFieldNationalityUid = "nationality_uid";
 
-
+// TODO: make those key names configurable????
+// ALL must me upper here, but key in file may lower or any, as it'll be converted to upper
+// when parsing
+static const char* KCsvItemName = "TEN";
+static const char* KCsvItemPersonCode = "MA";
+static const char* KCsvItemChristenDate = "NGAY_RUA_TOI";
+static const char* KCsvItemBirthDay = "NGAY_SINH";
+static const char* KCsvItemBirthPlace = "NOI_SINH";
+static const char* KCsvItemHollyName = "TEN_THANH";
 
 
 #endif // DEFS_H

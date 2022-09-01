@@ -34,6 +34,7 @@ public:
 
     static QString getAppDataDir(const QString& subDir);
     static QString getAppDataDir(const char* subDir = nullptr);
+    static QString getTmpDataDir(const char* subDir = nullptr);
     static QString getAppInstallDir(const QString& subDir);
 
     static QString getOrCreatePrebuiltDataDir();
@@ -52,6 +53,8 @@ public:
     static QString getUpdatePrebuiltDataFilePath(const QString name, bool lang = true);
 
     const QString &tmpDirPath() const;
+
+    static void cleanUpData();
 
 private:
     FileCtl();

@@ -29,6 +29,8 @@
 #include "errcode.h"
 #include "dbmodel.h"
 
+
+
 class Saint: public QObject, public DbModel
 {
     Q_OBJECT
@@ -53,9 +55,13 @@ class Saint: public QObject, public DbModel
 //            QString toString();
 
 //            ErrCode save();
+            virtual void dump();
 
         public:
             static DbModel *builder();
+            const QString &countryUid() const;
+            void setCountryUid(const QString &newCountryUid);
+
         protected:
             virtual DbModelHandler *getDbModelHandler();
 
@@ -64,7 +70,9 @@ class Saint: public QObject, public DbModel
             Gender mGender;
             qint64 mFeastDay; // ngay bon mang
             QString mCountry;
+            QString mCountryUid;
 
 };
+
 
 #endif // SAINT_H

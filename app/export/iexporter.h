@@ -31,7 +31,7 @@ public:
 
     virtual const QString exportTemplatePath() const;
 
-    virtual const QStringList getListKeyWord() const;
+    virtual const QStringList getListExportKeyWord() const;
     virtual ErrCode getDataString(const QString& keyword, QString* data, bool* isFile) const;
 };
 

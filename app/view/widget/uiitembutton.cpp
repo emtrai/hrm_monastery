@@ -23,22 +23,29 @@
 #include "logger.h"
 
 UIItemButton::UIItemButton(QWidget *parent)
-    : QPushButton{parent}, mData(nullptr)
+    : QPushButton{parent}
 {
     connect(this, SIGNAL(clicked()), this, SLOT(reEmitClick()));
+    this->setStyleSheet("qproperty-icon: url(:/icon/icon/icons8-delete-64.png);");
 }
 UIItemButton::~UIItemButton()
 {
     traced;
 }
 
-void UIItemButton::setData(QObject *newData)
+const QVariant &UIItemButton::value() const
 {
-    mData = newData;
+    return mValue;
 }
+
+void UIItemButton::setValue(const QVariant &newValue)
+{
+    mValue = newValue;
+}
+
 
 void UIItemButton::reEmitClick()
 {
     traced;
-    emit clicked(this, mData);
+    emit clicked(this, mValue);
 }

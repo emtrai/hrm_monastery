@@ -42,11 +42,15 @@ public:
     const QString &countryShortName() const;
     void setCountryShortName(const QString &newCountryShortName);
 
+    const QString &countryUid() const;
+    void setCountryUid(const QString &newCountryUid);
+
 protected:
     virtual DbModelHandler *getDbModelHandler();
 private:
     qint64 mCountryDbId;
     QString mCountryShortName;
+    QString mCountryUid;
     QString mRemark;
 };
 

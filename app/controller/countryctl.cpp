@@ -31,6 +31,19 @@ CountryCtl::CountryCtl()
     traced;
 }
 
+CountryCtl::~CountryCtl()
+{
+    traced;
+
+    // TODO: is it safe??? (delete data before clear queue)
+    foreach (Country* item, mCountryList.values()) {
+        if (item != nullptr) {
+            delete item;
+        }
+    }
+    mCountryList.clear();
+}
+
 DbModelHandler *CountryCtl::getModelHandler()
 {
     return DB->getModelHandler(KModelHdlCountry);
@@ -58,6 +71,26 @@ QList<Country *> CountryCtl::getCountryList()
     traced;
     // TODO: check if file update then reload??
     return mCountryList.values();
+}
+
+QStringList CountryCtl::getRegionList()
+{
+    traced;
+    QStringList list;
+    list.append(tr("Dong Nam A"));
+    // TODO: Read from file
+    return list;
+}
+
+QStringList CountryCtl::getContinentList()
+{
+    traced;
+    QStringList list;
+    list.append(tr("Chau A"));
+    list.append(tr("Chau My"));
+    list.append(tr("Chau Au"));
+    // TODO: Read from file
+    return list;
 }
 
 

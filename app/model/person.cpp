@@ -30,10 +30,7 @@
 #include "defs.h"
 
 
-// TODO: make those key names configurable????
-static const char* KCsvItemName = "TEN";
-static const char* KCsvItemPersonCode = "MA";
-static const char* KCsvItemChristenDate = "NGAY RUA TOI";
+
 
 
 Person::Person():
@@ -52,29 +49,6 @@ Person* Person::build(){
     return new Person();
 }
 
-const QStringList &Person::hollyName() const
-{
-    return mHollyName;
-}
-
-QString Person::hollyNameString() const
-{
-    QString hollyName;
-    foreach (QString name, mHollyName){
-        if (!hollyName.isEmpty())
-            hollyName += " ";
-        hollyName += name;
-    }
-
-    // TODO: safe? this is stack or pointer????
-    return hollyName;
-}
-
-void Person::addHollyName(const QString &newHollyName)
-{
-    logd("Add holy name %s", newHollyName.toStdString().c_str());
-    mHollyName.append(newHollyName);
-}
 
 //ErrCode_t Person::save()
 //{
@@ -175,6 +149,7 @@ void Person::setChristenDate(qint64 newChristenDate)
 void Person::setChristenDate(const QString &newChristenDate)
 {
     mChristenDate = Utils::dateFromString(newChristenDate);
+    logd("mChristenDate %s -> %d", newChristenDate.toStdString().c_str(), (int)mChristenDate);
 }
 
 ErrCode Person::exportTo(const QString &fpath, ExportType type)
@@ -199,12 +174,19 @@ const QString Person::exportTemplatePath() const
     return FileCtl::getPrebuiltDataFilePath(KPrebuiltPersonInfoTemplateFileName);
 }
 
-const QStringList Person::getListKeyWord() const
+const QStringList Person::getListExportKeyWord() const
 {
     traced;
     QStringList fields;
     fields.append(KExportFieldFullName);
+    fields.append(KExportFieldFirstName);
+    fields.append(KExportFieldLastName);
     fields.append(KExportFieldBirthday);
+    fields.append(KExportFieldBirthplace);
+    fields.append(KExportFieldHollyUids);
+    fields.append(KExportFieldHollyName);
+    fields.append(KExportFieldNationality);
+    fields.append(KExportFieldNationalityUid);
     return fields;
 }
 
@@ -215,11 +197,241 @@ ErrCode Person::getDataString(const QString &keyword, QString *data, bool *isFil
     logd("keyword %s", keyword.toStdString().c_str());
     if (keyword == KExportFieldFullName){
         *data = getFullName();
+    } else if (keyword == KExportFieldLastName) {
+        *data = lastName();
+    } else if (keyword == KExportFieldFirstName) {
+        *data = firstName();
     } else if (keyword == KExportFieldBirthday) {
         *data = Utils::date2String(birthday());
+    } else if (keyword == KExportFieldBirthplace) {
+        *data = birthPlace();
+    } else if (keyword == KExportFieldHollyName) {
+        *data = hollyName();
+    } else if (keyword == KExportFieldHollyUids) {
+        QString hollyId;
+        foreach (QString id, mSaintUidList) {
+            if (!hollyId.isEmpty()) {
+                hollyId += ", ";
+            }
+            hollyId += id;
+        }
+        *data = hollyId;
+    } else if (keyword == KExportFieldNationality) {
+        *data = nationalityName();
+    } else if (keyword == KExportFieldNationalityUid) {
+        *data = nationalityUid();
     }
 
+
     return ret;
+}
+
+const QString &Person::nationalityName() const
+{
+    return mNationalityName;
+}
+
+void Person::setNationalityName(const QString &newNationalityName)
+{
+    mNationalityName = newNationalityName;
+}
+
+void Person::dump()
+{
+    traced;
+    DbModel::dump();
+    logd("- FirstName %s", firstName().toStdString().c_str());
+    logd("- LastName %s", lastName().toStdString().c_str());
+}
+
+ErrCode Person::onImportItem(const QString &keyword, const QString &value)
+{
+    traced;
+    ErrCode ret = ErrNone;
+    if (keyword == KCsvItemName) {
+        setNameFromFullName(value);
+    } else if (keyword == KCsvItemPersonCode) {
+        setPersonCode(value);
+    } else if (keyword == KCsvItemBirthDay) {
+        setBirthday(value);
+    } else if (keyword == KCsvItemBirthPlace) {
+        setBirthPlace(value);
+    } else if (keyword == KCsvItemChristenDate) {
+        setChristenDate(value);
+    }
+
+    tracedr(ret);
+    return ret;
+}
+
+const QString &Person::courseUid() const
+{
+    return mCourseUid;
+}
+
+void Person::setCourseUid(const QString &newCourseUid)
+{
+    mCourseUid = newCourseUid;
+}
+
+const QString &Person::course() const
+{
+    return mCourse;
+}
+
+void Person::setCourse(const QString &newCourse)
+{
+    mCourse = newCourse;
+}
+
+const QStringList &Person::specialistUidList() const
+{
+    return mSpecialistUidList;
+}
+
+void Person::setSpecialistUidList(const QStringList &newSpecialistUidList)
+{
+    mSpecialistUidList = newSpecialistUidList;
+}
+
+void Person::clearSpecialistUid()
+{
+    mSpecialistUidList.clear();
+}
+
+void Person::addSpecialistUid(const QString &uid)
+{
+    mSpecialistUidList.append(uid);
+}
+
+const QString &Person::eduName() const
+{
+    return mEduName;
+}
+
+void Person::setEduName(const QString &newEduName)
+{
+    mEduName = newEduName;
+}
+
+const QString &Person::eduUid() const
+{
+    return mEduUid;
+}
+
+void Person::setEduUid(const QString &newEduUid)
+{
+    mEduUid = newEduUid;
+}
+
+const QString &Person::idCardIssuePlace() const
+{
+    return mIdCardIssuePlace;
+}
+
+void Person::setIdCardIssuePlace(const QString &newIdCardIssuePlace)
+{
+    mIdCardIssuePlace = newIdCardIssuePlace;
+}
+
+qint64 Person::idCardIssueDate() const
+{
+    return mIdCardIssueDate;
+}
+
+void Person::setIdCardIssueDate(qint64 newIdCardIssueDate)
+{
+    mIdCardIssueDate = newIdCardIssueDate;
+}
+
+const QString &Person::idCard() const
+{
+    return mIdCard;
+}
+
+void Person::setIdCard(const QString &newIdCard)
+{
+    mIdCard = newIdCard;
+}
+
+const QString &Person::ethnicName() const
+{
+    return mEthnicName;
+}
+
+void Person::setEthnicName(const QString &newEthnicName)
+{
+    mEthnicName = newEthnicName;
+}
+
+const QString &Person::ethnicUid() const
+{
+    return mEthnicUid;
+}
+
+void Person::setEthnicUid(const QString &newEthnicUid)
+{
+    mEthnicUid = newEthnicUid;
+}
+
+const QString &Person::nationalityUid() const
+{
+    return mNationalityUid;
+}
+
+void Person::setNationalityUid(const QString &newNationalityUid)
+{
+    mNationalityUid = newNationalityUid;
+}
+
+const QString &Person::hollyName() const
+{
+    return mHollyName;
+}
+
+void Person::setHollyName(const QString &newHollyName)
+{
+    mHollyName = newHollyName;
+}
+
+const QStringList &Person::saintUidList() const
+{
+    return mSaintUidList;
+}
+
+void Person::setSaintUidList(const QStringList &newSaintUidList)
+{
+    mSaintUidList = newSaintUidList;
+}
+
+void Person::clearSaintUid()
+{
+    mSaintUidList.clear();
+}
+
+void Person::addSaintUid(const QString &saint)
+{
+    mSaintUidList.append(saint);
+}
+
+Person *Person::trainPIC() const
+{
+    return mTrainPIC;
+}
+
+void Person::setTrainPIC(Person *newTrainPIC)
+{
+    mTrainPIC = newTrainPIC;
+}
+
+qint64 Person::trainJoinDate() const
+{
+    return mTrainJoinDate;
+}
+
+void Person::setTrainJoinDate(qint64 newTrainJoinDate)
+{
+    mTrainJoinDate = newTrainJoinDate;
 }
 
 const QString &Person::imgPath() const

@@ -29,12 +29,24 @@
 #include <QVariant>
 #include <QVBoxLayout>
 #include <QPushButton>
-
+#include <QHash>
 #include "view/widget/uiitembutton.h"
+
+class UIMultiComboxView;
+
+//typedef ErrCode (*onNewItem)(UIMultiComboxView* ui, const QString& value);
 
 namespace Ui {
 class UIMultiComboxView;
 }
+
+class UIMultiComboxViewListener {
+public:
+    // slient: add new item silently, don't ask/popup up anything
+    virtual ErrCode onNewItem(UIMultiComboxView* ui, const QString& value, bool silent) = 0;
+    virtual void onItemAdded(UIMultiComboxView* ui, const QString& name, const QVariant& value) = 0;
+    virtual void onItemDeleted(UIMultiComboxView* ui, const QString& name, const QVariant& value) = 0;
+};
 
 class UIMultiComboxView : public QFrame
 {
@@ -42,17 +54,29 @@ class UIMultiComboxView : public QFrame
 
 public:
     explicit UIMultiComboxView(QWidget *parent = nullptr);
+    explicit UIMultiComboxView(const QString& name, QWidget *parent = nullptr);
     ~UIMultiComboxView();
 
-    ErrCode addItem(const QString& name, const QVariant &data = QVariant());
+    ErrCode addItem(const QString& name, const QVariant& value=QVariant());
+
+
+    void setListener(UIMultiComboxViewListener *newListener);
+
+    const QHash<QString, QVariant> &items() const;
+    QList<QVariant> valueItems() const;
+
+    const QString &name() const;
 
 private slots:
     void on_btnAdd_clicked();
-    void on_item_clicked( UIItemButton * button, QObject* data );
+    void on_item_clicked( UIItemButton * button, QVariant value );
 
 private:
     Ui::UIMultiComboxView *ui;
     QVBoxLayout *mContainerLayout;
+    QHash<QString, QVariant> mValueList;
+    UIMultiComboxViewListener* mListener;
+    QString mName;
 };
 
 #endif // UIMULTICOMBOXVIEW_H

@@ -32,11 +32,14 @@ class CountryCtl : public Controller
 {
 public:
     CountryCtl();
+    virtual ~CountryCtl();
     virtual DbModelHandler* getModelHandler();
 protected:
     DbModel *buildModel(void *items, const QString &fmt);
 public:
     QList<Country*> getCountryList();
+    QStringList getRegionList();
+    QStringList getContinentList();
     static CountryCtl* getInstance();
 
 public slots:

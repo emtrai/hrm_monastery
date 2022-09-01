@@ -63,6 +63,7 @@ DbSqliteTableBuilder* DbSqliteTableBuilder::build(const QString& tblName){
 
 DbSqliteTableBuilder* DbSqliteTableBuilder::addField(const QString& name, TableFieldDatatype_t dataType){
     traced;
+    logd("Add field %s", name.toStdString().c_str());
     mFields.append(new TableFieldItem(name, dataType));
     return this;
 }

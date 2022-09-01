@@ -27,7 +27,7 @@
 #include "dbctl.h"
 #include "utils.h"
 
-GET_INSTANCE_IMPL(gInstance,AreaCtl)
+GET_INSTANCE_IMPL(AreaCtl)
 
 AreaCtl::AreaCtl()
 {

@@ -76,6 +76,18 @@ void Saint::setFullName(const QString &newFullName)
     mFullName = newFullName;
 }
 
+void Saint::dump()
+{
+    traced;
+    DbModel::dump();
+#ifdef DEBUG_TRACE
+    logd("- feastday: %d", (int)feastDay());
+    logd("- gender: %d", (int)gender());
+    logd("- Full Name %s", fullName().toStdString().c_str());
+    logd("- Country dbId %s", countryUid().toStdString().c_str());
+#endif //DEBUG_TRACE
+}
+
 DbModel *Saint::builder()
 {
     return new Saint();
@@ -84,6 +96,16 @@ DbModel *Saint::builder()
 DbModelHandler *Saint::getDbModelHandler()
 {
     return DbCtl::getInstance()->getDb()->getSaintModelHandler();
+}
+
+const QString &Saint::countryUid() const
+{
+    return mCountryUid;
+}
+
+void Saint::setCountryUid(const QString &newCountryUid)
+{
+    mCountryUid = newCountryUid;
 }
 
 //bool Saint::isValid()

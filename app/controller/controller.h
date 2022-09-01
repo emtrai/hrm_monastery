@@ -19,6 +19,7 @@ public:
     virtual DbModelHandler* getModelHandler();
     virtual ErrCode addNew(DbModel* model);
 
+    virtual ErrCode reloadDb();
 protected:
     virtual DbModel *buildModel(void* items, const QString& fmt);
     virtual ErrCode check2UpdateDbFromPrebuiltFile(const QString& fname,

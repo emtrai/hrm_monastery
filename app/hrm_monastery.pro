@@ -26,6 +26,7 @@ INCLUDEPATH += $$PWD/controller
 INCLUDEPATH += $$PWD/crypto
 INCLUDEPATH += $$PWD/location
 INCLUDEPATH += $$PWD/export
+INCLUDEPATH += $$PWD/import
 #QT_NO_DEBUG_OUTPUT
 
 # You can make your code fail to compile if it uses deprecated APIs.
@@ -40,6 +41,7 @@ SOURCES += \
     config/config.cpp \
     controller/controller.cpp \
     controller/countryctl.cpp \
+    controller/coursectl.cpp \
     controller/departctl.cpp \
     controller/ethnicctl.cpp \
     controller/missionctl.cpp \
@@ -54,6 +56,7 @@ SOURCES += \
     db/sqlite/dbsqlitearea.cpp \
     db/sqlite/dbsqlitecommunity.cpp \
     db/sqlite/dbsqlitecountry.cpp \
+    db/sqlite/dbsqlitecourse.cpp \
     db/sqlite/dbsqlitedefs.cpp \
     db/sqlite/dbsqlitedept.cpp \
     db/sqlite/dbsqliteedu.cpp \
@@ -67,6 +70,7 @@ SOURCES += \
     db/sqlite/table/dbsqliteareatbl.cpp \
     db/sqlite/table/dbsqlitecommunitytbl.cpp \
     db/sqlite/table/dbsqlitecountrytbl.cpp \
+    db/sqlite/table/dbsqlitecoursetbl.cpp \
     db/sqlite/table/dbsqlitedeparttbl.cpp \
     db/sqlite/table/dbsqliteedutbl.cpp \
     db/sqlite/table/dbsqliteethnictbl.cpp \
@@ -85,6 +89,10 @@ SOURCES += \
     export/exporthtml.cpp \
     export/iexporter.cpp \
     file/filectl.cpp \
+    import/iimporter.cpp \
+    import/importcsv.cpp \
+    import/importer.cpp \
+    import/importfactory.cpp \
     loader/loaderctl.cpp \
     location/location.cpp \
     logger.cpp \
@@ -94,6 +102,7 @@ SOURCES += \
     model/church.cpp \
     model/community.cpp \
     model/country.cpp \
+    model/course.cpp \
     model/department.cpp \
     model/education.cpp \
     model/ethnic.cpp \
@@ -115,9 +124,13 @@ SOURCES += \
     utils.cpp \
     view/dialog/dlgaddcommunityhistory.cpp \
     view/dialog/dlgcommunity.cpp \
+    view/dialog/dlgcountry.cpp \
+    view/dialog/dlgcourse.cpp \
     view/dialog/dlgdepartment.cpp \
+    view/dialog/dlgethnic.cpp \
     view/dialog/dlghtmlviewer.cpp \
     view/dialog/dlgperson.cpp \
+    view/dialog/dlgsaint.cpp \
     view/widget/uicommonlistview.cpp \
     view/widget/uicommunitylistview.cpp \
     view/widget/uiitembutton.cpp \
@@ -136,6 +149,7 @@ HEADERS += \
     config/config.h \
     controller/controller.h \
     controller/countryctl.h \
+    controller/coursectl.h \
     controller/departctl.h \
     controller/ethnicctl.h \
     controller/missionctl.h \
@@ -150,6 +164,7 @@ HEADERS += \
     db/sqlite/dbsqlitearea.h \
     db/sqlite/dbsqlitecommunity.h \
     db/sqlite/dbsqlitecountry.h \
+    db/sqlite/dbsqlitecourse.h \
     db/sqlite/dbsqlitedefs.h \
     db/sqlite/dbsqlitedept.h \
     db/sqlite/dbsqliteedu.h \
@@ -163,6 +178,7 @@ HEADERS += \
     db/sqlite/table/dbsqliteareatbl.h \
     db/sqlite/table/dbsqlitecommunitytbl.h \
     db/sqlite/table/dbsqlitecountrytbl.h \
+    db/sqlite/table/dbsqlitecoursetbl.h \
     db/sqlite/table/dbsqlitedeparttbl.h \
     db/sqlite/table/dbsqliteedutbl.h \
     db/sqlite/table/dbsqliteethnictbl.h \
@@ -183,6 +199,10 @@ HEADERS += \
     export/exporthtml.h \
     export/iexporter.h \
     file/filectl.h \
+    import/iimporter.h \
+    import/importcsv.h \
+    import/importer.h \
+    import/importfactory.h \
     loader/loaderctl.h \
     location/location.h \
     logger.h \
@@ -191,6 +211,7 @@ HEADERS += \
     model/church.h \
     model/community.h \
     model/country.h \
+    model/course.h \
     model/department.h \
     model/education.h \
     model/ethnic.h \
@@ -213,9 +234,13 @@ HEADERS += \
     utils.h \
     view/dialog/dlgaddcommunityhistory.h \
     view/dialog/dlgcommunity.h \
+    view/dialog/dlgcountry.h \
+    view/dialog/dlgcourse.h \
     view/dialog/dlgdepartment.h \
+    view/dialog/dlgethnic.h \
     view/dialog/dlghtmlviewer.h \
     view/dialog/dlgperson.h \
+    view/dialog/dlgsaint.h \
     view/widget/uicommonlistview.h \
     view/widget/uicommunitylistview.h \
     view/widget/uiitembutton.h \
@@ -230,9 +255,13 @@ FORMS += \
     mainwindow.ui \
     view/dialog/dlgaddcommunityhistory.ui \
     view/dialog/dlgcommunity.ui \
+    view/dialog/dlgcountry.ui \
+    view/dialog/dlgcourse.ui \
     view/dialog/dlgdepartment.ui \
+    view/dialog/dlgethnic.ui \
     view/dialog/dlghtmlviewer.ui \
     view/dialog/dlgperson.ui \
+    view/dialog/dlgsaint.ui \
     view/widget/uimulticomboxview.ui \
     view/widget/uisummarizeview.ui \
     view/widget/uitableview.ui
@@ -256,6 +285,7 @@ DISTFILES += \
     license.template \
     res/Saints.csv \
     res/area_vi.csv \
+    res/course_vi.csv \
     res/department_vi.json \
     res/edu_vi.csv \
     res/home.html \

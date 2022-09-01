@@ -85,3 +85,13 @@ DbModelHandler *Ethnic::getDbModelHandler()
 {
     return DB->getModelHandler(KModelHdlEthnic);
 }
+
+const QString &Ethnic::countryUid() const
+{
+    return mCountryUid;
+}
+
+void Ethnic::setCountryUid(const QString &newCountryUid)
+{
+    mCountryUid = newCountryUid;
+}

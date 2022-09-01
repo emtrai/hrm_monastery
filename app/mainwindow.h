@@ -65,5 +65,6 @@ QT_END_NAMESPACE
      void on_actionSaints_2_triggered();
      void on_actionHome_triggered();
      void on_actionPerson_triggered();
+     void on_actionSearch_triggered();
 };
 #endif // MAINWINDOW_H

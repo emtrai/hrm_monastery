@@ -24,34 +24,44 @@
 
 #include <QDialog>
 #include <QAbstractButton>
-
+#include "view/widget/uimulticomboxview.h"
 class Person;
 
 namespace Ui {
 class DlgPerson;
 }
 
-class DlgPerson : public QDialog
+class DlgPerson : public QDialog, public UIMultiComboxViewListener
 {
     Q_OBJECT
 
         public:
                  explicit DlgPerson(QWidget *parent = nullptr);
-    ~DlgPerson();
+                    ~DlgPerson();
 
-                 Person *person();
+                    Person *person(bool newone=false);
 
              private slots:
                  void on_btnImport_clicked();
 
              private:
-    Ui::DlgPerson *ui;
+                Ui::DlgPerson *ui;
 
              private:
-    void setupUI();
+                void setupUI();
+                Person *buildPerson();
+                ErrCode fromPerson(const Person* person);
 
+             public:
+                virtual ErrCode onNewItem(UIMultiComboxView* ui, const QString& value, bool silent);
+                virtual void onItemAdded(UIMultiComboxView* ui, const QString& name, const QVariant& value);
+                virtual void onItemDeleted(UIMultiComboxView* ui, const QString& name, const QVariant& value);
 //protected:
 //    virtual void accept();
+            private:
+                void loadEthnic();
+                void loadCourse();
+                void loadCountry();
 private slots:
     void on_buttonBox_clicked( QAbstractButton * button );
     void on_btnEditNation_clicked();
@@ -61,8 +71,24 @@ private slots:
     void on_btnPreview_clicked();
     void on_btnImg_clicked();
 
+    void on_btnClearImage_clicked();
+
+    void on_btnAddCountry_clicked();
+
+    void on_btnAddEthnic_clicked();
+
+    void on_btnAddEdu_clicked();
+
+    void on_btnAddProvince_clicked();
+
+    void on_btnAddCommunity_clicked();
+
+    void on_btnAddCourse_clicked();
+
 private:
     Person* mPerson;
+    UIMultiComboxView *cbSaints;
+    UIMultiComboxView *cbSpecialist;
 };
 
 #endif // DLGPERSON_H

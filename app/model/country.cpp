@@ -145,6 +145,15 @@ void Country::setContinent(const QString &newContinent)
     mContinent = newContinent;
 }
 
+void Country::dump()
+{
+    traced;
+    DbModel::dump();
+#ifdef DEBUG_TRACE
+    logd("- Short name %s", shortName().toStdString().c_str());
+#endif //DEBUG_TRACE
+}
+
 DbModel *Country::builder()
 {
     return new Country();

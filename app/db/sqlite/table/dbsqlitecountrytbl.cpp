@@ -56,6 +56,7 @@ void DbSqliteCountryTbl::insertTableField(DbSqliteInsertBuilder *builder, const 
     DbSqliteTbl::insertTableField(builder, item);
 
     Country* model = (Country*) item;
+    // TODO: check if shortname exist???
     builder->addValue(KFieldRegion, model->region());
     builder->addValue(KFieldShortName, model->shortName());
     builder->addValue(KFieldContinent, model->continent());

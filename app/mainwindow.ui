@@ -76,8 +76,8 @@
     <addaction name="actionEthnic"/>
     <addaction name="actionSpecialist"/>
    </widget>
-   <addaction name="menuOthers"/>
    <addaction name="menuTools"/>
+   <addaction name="menuOthers"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -106,6 +106,7 @@
    <addaction name="separator"/>
    <addaction name="action_New"/>
    <addaction name="separator"/>
+   <addaction name="actionSearch"/>
   </widget>
   <action name="action_New">
    <property name="icon">
@@ -291,6 +292,19 @@
    </property>
    <property name="toolTip">
     <string>Thông tin Hội Dòng</string>
+   </property>
+  </action>
+  <action name="actionSearch">
+   <property name="icon">
+    <iconset>
+     <normalon>:/icon/icon/icons8-search-64.png</normalon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Tìm kiếm</string>
+   </property>
+   <property name="toolTip">
+    <string>Tìm kiếm</string>
    </property>
   </action>
  </widget>

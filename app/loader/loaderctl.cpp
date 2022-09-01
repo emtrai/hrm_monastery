@@ -35,6 +35,8 @@
 #include "missionctl.h"
 #include "areactl.h"
 #include "departctl.h"
+#include "coursectl.h"
+#include "utils.h"
 
 LoaderCtl* LoaderCtl::gInstance = nullptr;
 
@@ -73,6 +75,7 @@ void LoaderCtl::registerAll()
     add2Loader(EthnicCtl::getInstance());
     add2Loader(MissionCtl::getInstance());
     add2Loader(PersonCtl::getInstance());
+    add2Loader(INSTANCE(CourseCtl));
 //    add2Loader(CommunityCtl::getInstance());
 //    add2Loader(AreaCtl::getInstance());
 //    add2Loader(DepartCtl::getInstance());

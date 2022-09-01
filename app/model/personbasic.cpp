@@ -23,6 +23,8 @@
 #include "logger.h"
 #include "errcode.h"
 #include "address.h"
+#include "utils.h"
+
 
 PersonBasic::PersonBasic()
     :mBirthday(0)
@@ -80,6 +82,19 @@ void PersonBasic::setBirthday(qint64 newBirthday)
     mBirthday = newBirthday;
 }
 
+void PersonBasic::setBirthday(const QString &newBirthday)
+{
+    traced;
+    bool isOk = false;
+    qint64 date = Utils::dateFromString(newBirthday, DATE_FORMAT_YMD, &isOk);
+    logd("conver '%s', isOk=%d, value %d", newBirthday.toStdString().c_str(),
+                                        isOk, (int)date);
+    if (isOk && date > 0)
+        setBirthday(date);
+    else
+        setBirthday(0); // TODO: should set 0 or return error????
+}
+
 const QString &PersonBasic::lastName() const
 {
     return mLastName;
@@ -107,6 +122,8 @@ ErrCode PersonBasic::setNameFromFullName(const QString &name)
         items.removeLast();
     }
     mLastName = items.join(" ");
+    logd("first name %s", mFirstName.toStdString().c_str());
+    logd("last name %s", mLastName.toStdString().c_str());
 
     return ErrNone;
 }

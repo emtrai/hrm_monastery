@@ -38,7 +38,7 @@ const QString IExporter::exportTemplatePath() const
     return QString();
 }
 
-const QStringList IExporter::getListKeyWord() const
+const QStringList IExporter::getListExportKeyWord() const
 {
     traced;
     return QStringList();

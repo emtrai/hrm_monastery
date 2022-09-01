@@ -31,13 +31,14 @@
 #include <QList>
 #include "dbmodel.h"
 #include "iexporter.h"
+#include "iimporter.h"
 
 
 class Church;
 class Education;
 class Work;
 
-class Person: public PersonBasic, public DbModel, public IExporter
+class Person: public PersonBasic, public DbModel, public IExporter, public IImporter
 {
     Q_OBJECT
         public:
@@ -46,13 +47,6 @@ class Person: public PersonBasic, public DbModel, public IExporter
         public:
             Person();
             virtual ~Person();
-
-            const QStringList &hollyName() const;
-            QString hollyNameString() const;
-            void addHollyName(const QString &newHollyName);
-
-//            ErrCode_t save();
-//            void dump();
 
             PersonBasic *dad() const;
             void setDad(PersonBasic *newDad);
@@ -77,16 +71,97 @@ class Person: public PersonBasic, public DbModel, public IExporter
             const QString &imgPath() const;
             void setImgPath(const QString &newImgPath);
 
+            qint64 trainJoinDate() const;
+            void setTrainJoinDate(qint64 newTrainJoinDate);
+
+            Person *trainPIC() const;
+            void setTrainPIC(Person *newTrainPIC);
+
+            const QStringList &saintUidList() const;
+            void setSaintUidList(const QStringList &newSaintUidList);
+            void clearSaintUid();
+            void addSaintUid(const QString& saint);
+
+            const QString &hollyName() const;
+            void setHollyName(const QString &newHollyName);
+
+            const QString &nationalityUid() const;
+            void setNationalityUid(const QString &newNationalityUid);
+
+            const QString &nationalityName() const;
+            void setNationalityName(const QString &newNationalityName);
+
+
+            virtual void dump();
+
+            const QString &ethnicUid() const;
+            void setEthnicUid(const QString &newEthnicUid);
+
+            const QString &ethnicName() const;
+            void setEthnicName(const QString &newEthnicName);
+
+            const QString &idCard() const;
+            void setIdCard(const QString &newIdCard);
+
+            qint64 idCardIssueDate() const;
+            void setIdCardIssueDate(qint64 newIdCardIssueDate);
+
+            const QString &idCardIssuePlace() const;
+            void setIdCardIssuePlace(const QString &newIdCardIssuePlace);
+
+            const QString &eduUid() const;
+            void setEduUid(const QString &newEduUid);
+
+            const QString &eduName() const;
+            void setEduName(const QString &newEduName);
+
+            const QStringList &specialistUidList() const;
+            void setSpecialistUidList(const QStringList &newSpecialistUidList);
+            void clearSpecialistUid();
+            void addSpecialistUid(const QString& uid);
+
+
+            const QString &course() const;
+            void setCourse(const QString &newCourse);
+
+            const QString &courseUid() const;
+            void setCourseUid(const QString &newCourseUid);
+
         protected:
             virtual DbModelHandler *getDbModelHandler();
             virtual const QString exportTemplatePath() const;
 
-            virtual const QStringList getListKeyWord() const;
+            virtual const QStringList getListExportKeyWord() const;
             virtual ErrCode getDataString(const QString& keyword, QString* data, bool* isFile) const;
+            virtual ErrCode onImportItem(const QString& keyword, const QString& value);
         protected:
             QString mPersonCode;
-            QStringList mHollyName;
+            QString mHollyName;
+            QStringList mSaintUidList;
             QString mImgPath;
+
+            // nationality
+            QString mNationalityUid;
+            QString mNationalityName;
+
+
+            QString mEthnicUid;
+            QString mEthnicName;
+
+            // ID card
+            QString mIdCard;
+            QString mIdCardIssuePlace;
+            qint64 mIdCardIssueDate;
+
+            // education
+            QString mEduUid;
+            QString mEduName;
+
+
+            QStringList mSpecialistUidList;
+
+            QString mCourseUid;
+            QString mCourse;
 
             Address* mFamilyAddr;
             Church* mChurch;
@@ -118,8 +193,12 @@ class Person: public PersonBasic, public DbModel, public IExporter
 
             qint64 mEnlistmentDate; // ngay nhap tu
 
-            qint64 mPreTrainJoinDate; // ngay gia nhap Tap Vien
+            qint64 mPreTrainJoinDate; // ngay gia nhap Tien Tap Vien
             Person* mPreTrainPIC; // nguoi dac trac
+
+
+            qint64 mTrainJoinDate; // ngay gia nhap Tap Vien
+            Person* mTrainPIC; // nguoi dac trac
 
             qint64 mVowsDate; // ngay tien khan
             Person* mVowsCEO; // chi tong phu trach
