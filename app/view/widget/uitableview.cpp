@@ -109,7 +109,9 @@ void UITableView::onUpdatePage(qint32 page)
             tbl->insertRow(idx);
             QStringList values = item->valueList();
             for (int i = 0; i < values.count(); ++i) {
-                tbl->setItem(idx, i, new QTableWidgetItem(values.value(i)));
+                QTableWidgetItem* wgitem = new QTableWidgetItem(values.value(i));
+                wgitem->setData(Qt::UserRole, idx);
+                tbl->setItem(idx, i, wgitem);
             }
 
             idx ++;
@@ -137,6 +139,12 @@ ErrCode UITableView::onLoad()
 void UITableView::importRequested(const QString& fpath)
 {
     traced;
+}
+
+void UITableView::onViewItem(qint32 idx)
+{
+    traced;
+    logd("parent class, nothing to do");
 }
 
 qint32 UITableView::itemPerPage() const
@@ -229,5 +237,21 @@ quint32 UITableView::currentPage() const
 void UITableView::setCurrentPage(quint32 newCurrentPage)
 {
     mCurrentPage = newCurrentPage;
+}
+
+
+void UITableView::on_tblList_itemDoubleClicked(QTableWidgetItem *item)
+{
+    traced;
+    qint32 idx = 0;
+    bool ok = false;
+    // TODO: handle view only and edit mode
+    idx = item->data(Qt::UserRole).toInt(&ok);
+    if (ok){
+        logd("view item %d", idx);
+        onViewItem(idx);
+    } else {
+        loge("Cannot get data from widget item");
+    }
 }
 

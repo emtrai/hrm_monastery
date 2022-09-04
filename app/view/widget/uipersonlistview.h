@@ -36,6 +36,7 @@ protected:
     virtual void initHeader();
 protected:
     virtual void importRequested(const QString& fpath);
+    virtual void onViewItem(qint32 idx);
 private:
     void cleanUpItem();
 //public:

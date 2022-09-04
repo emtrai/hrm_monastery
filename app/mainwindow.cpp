@@ -93,6 +93,7 @@ MainWindow::MainWindow(QWidget *parent)
     mHomeView = new QTextBrowser(this);
     mHomeView->clearHistory();
     mHomeView->clear();
+
 //    mHomeView->setSource(QUrl(":/data/home"), QTextDocument::ResourceType::HtmlResource);
 //    mHomeView->setHtml("<h1>Hello</h1>");
 //    mHomeView->setHtml(Utils::readAll(":/data/home"));

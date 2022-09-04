@@ -58,7 +58,7 @@ ErrCode Controller::exportToFile(DbModel *model, ExportType type, QString *fpath
 {
     traced;
     ErrCode ret = ErrNone;
-    QString fname = QString("%1.html").arg(model->name());
+    QString fname = QString("%1.html").arg(model->uid());
     *fpath = FileCtl::getTmpDataDir(fname);
     ret = ExportFactory::exportTo(model->getExporter(),
                                   *fpath, type);

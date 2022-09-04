@@ -24,7 +24,7 @@
 
 #include <QFrame>
 #include <QStringList>
-
+#include <QTableWidgetItem>
 #include "errcode.h"
 
 class UITableItem;
@@ -87,10 +87,13 @@ protected:
     virtual qint32 getTotalItems();
     virtual ErrCode onLoad();
     virtual void importRequested(const QString& fpath);
+    virtual void onViewItem(qint32 idx);
 protected:
     QStringList mHeader;
 private slots:
     void on_btnImport_clicked();
+
+    void on_tblList_itemDoubleClicked(QTableWidgetItem *item);
 
 private:
     Ui::UITableView *ui;

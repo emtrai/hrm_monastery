@@ -28,6 +28,8 @@
 #include "person.h"
 #include "utils.h"
 #include "view/dialog/dlgimportpersonlistresult.h"
+#include "view/dialog/dlghtmlviewer.h"
+#include <QFile>
 UIPersonListView::UIPersonListView(QWidget *parent):
     UICommonListView(parent)
 {
@@ -83,6 +85,12 @@ void UIPersonListView::initHeader()
     mHeader.append(tr("Email"));
     mHeader.append(tr("Căn cước công dân"));
     mHeader.append(tr("Nơi cấp CCCD"));
+    mHeader.append(tr("Khoá"));
+    mHeader.append(tr("Chuyên môn"));
+    mHeader.append(tr("Công tác xã hội"));
+    mHeader.append(tr("Ngày Nhập Tu"));
+    mHeader.append(tr("Ngày Tiên Khấn"));
+    mHeader.append(tr("Ngày Vĩnh Khấn"));
 }
 
 
@@ -99,6 +107,26 @@ void UIPersonListView::importRequested(const QString &fpath)
     dlg->setup(list);
     dlg->exec();
     delete dlg;
+}
+
+void UIPersonListView::onViewItem(qint32 idx)
+{
+    traced;
+    logd("idx=%d",idx);
+    if (idx < mItemList.length()){
+        Person* per = (Person*)mItemList.value(idx);
+        QString fpath;
+        INSTANCE(PersonCtl)->exportToFile(per, ExportType::EXPORT_HTML, &fpath);
+        if (QFile::exists(fpath)){
+            dlgHtmlViewer* viewer = new dlgHtmlViewer();
+            viewer->setHtmlPath(fpath);
+            viewer->setSubject("Person");
+            viewer->exec();
+        }
+    } else {
+        loge("Invalid idx");
+        // TODO: popup message???
+    }
 }
 
 void UIPersonListView::cleanUpItem()
