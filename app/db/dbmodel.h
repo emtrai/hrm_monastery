@@ -28,6 +28,7 @@
 
 class DbModel;
 class DbModelHandler;
+class IExporter;
 
 typedef DbModel*(*DbModelBuilder)(void);
 
@@ -47,6 +48,7 @@ public:
 
     virtual const QString &uid() const;
     virtual void setUid(const QString &newUid);
+    virtual void buildUidIfNotSet();
 
     virtual ErrCode save();
     virtual ErrCode exportTo(const QString &fpath, ExportType type);
@@ -63,6 +65,7 @@ public:
 
 
     void setNameId(const QString &newNameId);
+    virtual IExporter* getExporter();
 
 protected:
     virtual DbModelHandler* getDbModelHandler() = 0;

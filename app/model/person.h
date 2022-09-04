@@ -27,38 +27,61 @@
 #include <QSet>
 #include "address.h"
 #include "errcode.h"
-#include "personbasic.h"
+
 #include <QList>
+#include <QHash>
+#include <QMap>
 #include "dbmodel.h"
 #include "iexporter.h"
 #include "iimporter.h"
 
+#include <functional>
+#include <iostream>
 
 class Church;
 class Education;
 class Work;
+class Person;
 
-class Person: public PersonBasic, public DbModel, public IExporter, public IImporter
+//typedef QString (Person::*GET_DATA_FUNC());
+//typedef QString (Person::*GET_DATA_FUNC() const);
+typedef QString *GET_DATA_FUNC();
+
+class Person: public DbModel, public IExporter, public IImporter
 {
-    Q_OBJECT
+//    Q_OBJECT
         public:
-            static Person* build();
+            static DbModel* build();
+//            void bindEvent(const QString event, std::function<GET_DATA_FUNC> handler);
+            void init();
+            void initExportFields();
+            void initImportFields();
 
         public:
             Person();
             virtual ~Person();
+            virtual void clone(const Person& per);
+            virtual void buildUidIfNotSet();
 
-            PersonBasic *dad() const;
-            void setDad(PersonBasic *newDad);
+            const QString &firstName() const;
+            void setFirstName(const QString &newFirstName);
+            const QString &lastName() const;
+            void setLastName(const QString &newLastName);
 
-            qint64 enlistmentDate() const;
-            void setEnlistmentDate(qint64 newEnlistmentDate);
 
-            const QString &family() const;
-            void setFamily(const QString &newFamily);
+            const QString &birthPlace() const;
+            void setBirthPlace(const QString &newBirthPlace);
 
+            qint64 birthday() const;
+            void setBirthday(qint64 newBirthday);
+            void setBirthday(const QString& newBirthday);
+
+            ErrCode setNameFromFullName(const QString& name);
+
+            QString getFullName() const;
             ErrCode fromCSVFile(const QString& fname);
 
+            virtual IExporter* getExporter();
             const QString &personCode() const;
             void setPersonCode(const QString &newPersonCode);
 
@@ -105,6 +128,7 @@ class Person: public PersonBasic, public DbModel, public IExporter, public IImpo
 
             qint64 idCardIssueDate() const;
             void setIdCardIssueDate(qint64 newIdCardIssueDate);
+            void setIdCardIssueDate(const QString& newIdCardIssueDate);
 
             const QString &idCardIssuePlace() const;
             void setIdCardIssuePlace(const QString &newIdCardIssuePlace);
@@ -127,17 +151,208 @@ class Person: public PersonBasic, public DbModel, public IExporter, public IImpo
             const QString &courseUid() const;
             void setCourseUid(const QString &newCourseUid);
 
+            const QString &countryUid() const;
+            void setCountryUid(const QString &newCountryUid);
+
+            const QString &countryName() const;
+            void setCountryName(const QString &newCountryName);
+
+            const QString &provinceUid() const;
+            void setProvinceUid(const QString &newProvinceUid);
+
+            const QString &provinceName() const;
+            void setProvinceName(const QString &newProvinceName);
+
+            const QString &addr() const;
+            void setAddr(const QString &newAddr);
+
+            const QString &churchAddr() const;
+            void setChurchAddr(const QString &newChurchAddr);
+
+            const QStringList &email() const;
+            void setEmail(const QStringList &newEmail);
+            void setEmail(const QString &newEmail);
+
+            const QStringList &tel() const;
+            void setTel(const QStringList &newTel);
+            void setTel(const QString &newTel);
+
+            const QString &dadName() const;
+            void setDadName(const QString &newDadName);
+
+            qint64 dadBirthday() const;
+            void setDadBirthday(qint64 newDadBirthday);
+
+            const QString &dadAddr() const;
+            void setDadAddr(const QString &newDadAddr);
+
+            const QString &momName() const;
+            void setMomName(const QString &newMomName);
+
+            qint64 momBirthday() const;
+            void setMomBirthday(qint64 newMomBirthday);
+
+            const QString &momAddr() const;
+            void setMomAddr(const QString &newMomAddr);
+
+
+            const QString &familyHistory() const;
+            void setFamilyHistory(const QString &newFamilyHistory);
+
+            const QString &christenPlace() const;
+            void setChristenPlace(const QString &newChristenPlace);
+
+            const QString &hollyPlace() const;
+            void setHollyPlace(const QString &newHollyPlace);
+
+            qint64 hollyDate() const;
+            void setHollyDate(qint64 newHollyDate);
+
+            const QString &familyContact() const;
+            void setFamilyContact(const QString &newFamilyContact);
+
+            qint64 joinDate() const;
+            void setJoinDate(qint64 newJoinDate);
+
+            const QString &joinPICUid() const;
+            void setJoinPICUid(const QString &newJoinPICUid);
+
+            const QString &joinPICName() const;
+            void setJoinPICName(const QString &newJoinPICName);
+
+            qint64 preTrainJoinDate() const;
+            void setPreTrainJoinDate(qint64 newPreTrainJoinDate);
+
+            const QString &preTrainPICUid() const;
+            void setPreTrainPICUid(const QString &newPreTrainPICUid);
+
+            const QString &preTrainPICName() const;
+            void setPreTrainPICName(const QString &newPreTrainPICName);
+
+            const QString &trainPICUid() const;
+            void setTrainPICUid(const QString &newTrainPICUid);
+
+            const QString &trainPICName() const;
+            void setTrainPICName(const QString &newTrainPICName);
+
+            const QString &vowsCEOUid() const;
+            void setVowsCEOUid(const QString &newVowsCEOUid);
+
+            const QString &vowsCEOName() const;
+            void setVowsCEOName(const QString &newVowsCEOName);
+
+            qint64 vowsDate() const;
+            void setVowsDate(qint64 newVowsDate);
+
+            qint64 eternalVowsDate() const;
+            void setEternalVowsDate(qint64 newEternalVowsDate);
+
+            const QString &eternalVowsCEOUid() const;
+            void setEternalVowsCEOUid(const QString &newEternalVowsCEOUid);
+
+            const QString &eternalVowsCEOName() const;
+            void setEternalVowsCEOName(const QString &newEternalVowsCEOName);
+
+            const QString &eternalVowsPICUid() const;
+            void setEternalVowsPICUid(const QString &newEternalVowsPICUid);
+
+            const QString &eternalVowsPICName() const;
+            void setEternalVowsPICName(const QString &newEternalVowsName);
+
+            qint64 bankDate() const;
+            void setBankDate(qint64 newBankDate);
+
+            const QString &bankPlace() const;
+            void setBankPlace(const QString &newBankPlace);
+
+            qint64 goldenDate() const;
+            void setGoldenDate(qint64 newGoldenDate);
+
+            const QString &goldenPlace() const;
+            void setGoldenPlace(const QString &newGoldenPlace);
+
+            qint64 eternalDate() const;
+            void setEternalDate(qint64 newEternalDate);
+
+            const QString &eternalPlace() const;
+            void setEternalPlace(const QString &newEternalPlace);
+
+            const QString &statusUid() const;
+            void setStatusUid(const QString &newStatusUid);
+
+            const QString &statusName() const;
+            void setStatusName(const QString &newStatusName);
+
+            qint64 retireDate() const;
+            void setRetireDate(qint64 newRetireDate);
+
+            const QString &retirePlace() const;
+            void setRetirePlace(const QString &newRetirePlace);
+
+            qint64 deadDate() const;
+            void setDeadDate(qint64 newDeadDate);
+
+            const QString &deadPlace() const;
+            void setDeadPlace(const QString &newDeadPlace);
+
+            const QString &imgId() const;
+            void setImgId(const QString &newImgId);
+
+            const QStringList &eventUidList() const;
+            void setEventUidList(const QStringList &newEventUidList);
+
+            const QList<Education *> &educationList() const;
+            void setEducationList(const QList<Education *> &newEducationList);
+
+            const QList<Work *> &workList() const;
+            void setWorkList(const QList<Work *> &newWorkList);
+
+
+            const QHash<QString, QString> &educationUidList() const;
+            void setEducationUidList(const QHash<QString, QString> &newEducationUidList);
+
+            const QHash<QString, QString> &workUidList() const;
+            void setWorkUidList(const QHash<QString, QString> &newWorkUidList);
+
+            const QString &otherContact() const;
+            void setOtherContact(const QString &newOtherContact);
+
+
+            qint64 eucharistDate() const;
+            void setEucharistDate(qint64 newEucharistDate);
+
+            const QString &eucharistPlace() const;
+            void setEucharistPlace(const QString &newEucharistPlace);
+
+            qint64 feastDay() const;
+            void setFeastDay(qint64 newFeastDay);
+            void setFeastDay(const QString& newFeastDay);
+
+            virtual ErrCode onImportItem(int importFileType, const QString& keyword, const QString& value, quint32 idx = 0, void* tag = nullptr);
+
         protected:
             virtual DbModelHandler *getDbModelHandler();
             virtual const QString exportTemplatePath() const;
 
             virtual const QStringList getListExportKeyWord() const;
-            virtual ErrCode getDataString(const QString& keyword, QString* data, bool* isFile) const;
-            virtual ErrCode onImportItem(const QString& keyword, const QString& value);
+            virtual ErrCode getExportDataString(const QString& keyword, QString* data) const;
         protected:
+            QHash<QString, std::function<QString(void)>> mExportFields;
+            QHash<QString, std::function<void(const QString&)>> mImportFields;
             QString mPersonCode;
+
+            QString mFirstName;
+            QString mLastName;
+
+            qint64 mBirthday;
+            QString mBirthPlace;
+
             QString mHollyName;
             QStringList mSaintUidList;
+
+            qint64 mFeastDay;
+
+            QString mImgId;
             QString mImgPath;
 
             // nationality
@@ -160,58 +375,102 @@ class Person: public PersonBasic, public DbModel, public IExporter, public IImpo
 
             QStringList mSpecialistUidList;
 
+            //course
             QString mCourseUid;
             QString mCourse;
 
-            Address* mFamilyAddr;
-            Church* mChurch;
+            // country
+            QString mCountryUid;
+            QString mCountryName;
+
+            // province
+            QString mProvinceUid;
+            QString mProvinceName;
+
+            // address
+            QString mAddr;
+
+            // church
+            QString mChurchAddr;
+
+            // contact
+            QStringList mEmail;
+            QStringList mTel;
+            QString mOtherContact;
+
+
+            // dad
+            QString mDadName;
+            qint64 mDadBirthday;
+            QString mDadAddr;
+
+            // mom
+            QString mMomName;
+            qint64 mMomBirthday;
+            QString mMomAddr;
 
             // family info, includes: name of dad, mom, address, the number of brothers/sisters, etc.
-            QString mFamily;
+            QString mFamilyHistory;
 
-            // TODO: may dad/mom?????
-            PersonBasic* mDad;
-            PersonBasic* mMom;
+            QString mFamilyContact;
 
             // Rua toi
             qint64 mChristenDate;
-            Church* mChristenPlace;
+            QString mChristenPlace;
+
+            // Thanh the
+            qint64 mEucharistDate;
+            QString mEucharistPlace;
 
             // Them suc
-            qint64 mConfirmationDate;
-            Address* mConfirmationPlace;
+            qint64 mHollyDate;
+            QString mHollyPlace;
 
-            QStringList mPersonalTel;
-            QStringList mFamilyTel;
 
-            QStringList mEmail;
-
-            QString mCitizenId;
+            QHash<QString,QString> mEducationUidList;
+            QHash<QString,QString> mWorkUidList;
 
             QList<Education*> mEducationList;
             QList<Work*> mWorkList;
 
-            qint64 mEnlistmentDate; // ngay nhap tu
+            qint64 mJoinDate; // ngay nhap tu
+            QString mJoinPICUid;
+            QString mJoinPICName;
 
             qint64 mPreTrainJoinDate; // ngay gia nhap Tien Tap Vien
-            Person* mPreTrainPIC; // nguoi dac trac
-
+            QString mPreTrainPICUid; // nguoi dac trac
+            QString mPreTrainPICName; // nguoi dac trac
 
             qint64 mTrainJoinDate; // ngay gia nhap Tap Vien
-            Person* mTrainPIC; // nguoi dac trac
+            QString mTrainPICUid; // nguoi dac trac
+            QString mTrainPICName; // nguoi dac trac
 
             qint64 mVowsDate; // ngay tien khan
-            Person* mVowsCEO; // chi tong phu trach
+            QString mVowsCEOUid; // chi tong phu trach
+            QString mVowsCEOName; // chi tong phu trach
 
 
             qint64 mEternalVowsDate; // ngay vinh khan
-            Person* mEternalVowsCEO; // chi tong phu trach
+            QString mEternalVowsCEOUid; // chi tong phu trach
+            QString mEternalVowsCEOName;
+            QString mEternalVowsPICUid; // nguoi dac trac
+            QString mEternalVowsPICName; // nguoi dac trac
 
             qint64 mBankDate; // ngan khanh
+            QString mBankPlace;
             qint64 mGoldenDate; // kim khanh
+            QString mGoldenPlace;
             qint64 mEternalDate; // vinh khanh
+            QString mEternalPlace;
 
+            QString mStatusUid;
+            QString mStatusName;
+            qint64 mRetireDate;
+            QString mRetirePlace;
+            qint64 mDeadDate;
+            QString mDeadPlace; // noi chon cat
 
+            QStringList mEventUidList;
 };
 
 #endif // PEOPLE_H

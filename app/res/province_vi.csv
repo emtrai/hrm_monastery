@@ -1,4 +1,6 @@
-#country shortname, name[, name of parent province][,remark]
+#country uid,uid, name[, uid of parent[,remark]
+#note: final uid shall be combination between country uid and id
+# parent id, not include country uid, will be added later in processing
 vn,hn,Ha Noi
 vn,hcm,Ho Chi Minh,yyy
 vn,ht,Ha Tinh

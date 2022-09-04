@@ -47,7 +47,7 @@ void DbSqliteProvinceTbl::addTableField(DbSqliteTableBuilder *builder)
 {
     traced;
     DbSqliteTbl::addTableField(builder);
-    builder->addField(KFieldCountryShortName, TEXT);
+    builder->addField(KFieldCountryUid, TEXT);
     builder->addField(KFieldCountryDbId, INT64); // DB ID
     builder->addField(KFieldParentDbId, INT64); // DB ID
     builder->addField(KFieldParentUid, TEXT); // DB ID
@@ -62,7 +62,7 @@ void DbSqliteProvinceTbl::insertTableField(DbSqliteInsertBuilder *builder,
     DbSqliteTbl::insertTableField(builder, item);
 
     Province* model = (Province*) item;
-    builder->addValue(KFieldCountryShortName, model->countryShortName());
+    builder->addValue(KFieldCountryUid, model->countryUid());
     builder->addValue(KFieldCountryDbId, model->countryDbId());
     builder->addValue(KFieldParentDbId, model->parentDbId());
     builder->addValue(KFieldParentUid, model->parentUid());
@@ -75,7 +75,7 @@ void DbSqliteProvinceTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &q
     traced;
     DbSqliteTbl::updateModelFromQuery(item, qry);
     Province* model = (Province*) item;
-    model->setCountryShortName(qry.value(KFieldCountryShortName).toString());
+    model->setCountryUid(qry.value(KFieldCountryUid).toString());
     model->setCountryDbId(qry.value(KFieldCountryDbId).toInt());
     model->setParentDbId(qry.value(KFieldParentDbId).toInt());
     model->setParentUid(qry.value(KFieldParentUid).toString());

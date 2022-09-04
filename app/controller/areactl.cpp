@@ -34,7 +34,7 @@ AreaCtl::AreaCtl()
     traced;
 }
 
-// Format: Country short name, Province name[, <parent province if any>]
+// Format: Country ID, ID, Name, remark
 DbModel *AreaCtl::buildModel(void *items, const QString &fmt)
 {
     traced;
@@ -43,9 +43,9 @@ DbModel *AreaCtl::buildModel(void *items, const QString &fmt)
     qint32 idx = 0;
     qint32 sz = itemList->length();
     logd("sz %d", sz);
-    item->setShortCountryName(itemList->at(idx++));
+    item->setCountryUid(itemList->at(idx++));
     QString nameid = itemList->at(idx++);
-    item->setNameId(nameid + item->shortCountryName());
+    item->setNameId(item->countryUid() + "_" + nameid);
     item->setName(itemList->at(idx++));
     if (sz > idx) {
         QString remark = itemList->at(idx++);

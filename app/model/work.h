@@ -22,13 +22,23 @@
 #ifndef WORK_H
 #define WORK_H
 
-#include <QObject>
+#include "dbmodel.h"
 
-class Work: public QObject
+/*Cong viec xa hoi, vd: khiem thi, khiem thinh, etc.*/
+class Work: public DbModel
 {
-    Q_OBJECT
-        public:
-                 Work();
+public:
+    Work();
+    virtual ~Work();
+    static DbModel *builder();
+    const QString &remark() const;
+    void setRemark(const QString &newRemark);
+
+protected:
+    virtual DbModelHandler* getDbModelHandler();
+private:
+
+    QString mRemark;
 };
 
 #endif // WORK_H

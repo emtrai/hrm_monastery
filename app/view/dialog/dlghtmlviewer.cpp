@@ -29,7 +29,9 @@ dlgHtmlViewer::dlgHtmlViewer(QWidget *parent) :
     ui(new Ui::dlgHtmlViewer)
 {
     ui->setupUi(this);
-    this->setWindowState(Qt::WindowState::WindowMaximized);
+//    this->setWindowState(Qt::WindowState::WindowMaximized);
+    DIALOG_SIZE_SHOW(this);
+
 }
 
 dlgHtmlViewer::~dlgHtmlViewer()

@@ -35,7 +35,7 @@ public:
     ImportCSV();
 
 
-    virtual ErrCode importFrom(IImporter* importer, const QString& fpath);
+    virtual ErrCode importFrom(int importFileType, IImporter* importer, const QString& fpath, void* tag = nullptr);
 };
 
 #endif // IMPORTCSV_H

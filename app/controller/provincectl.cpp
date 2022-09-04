@@ -42,14 +42,20 @@ DbModel *ProvinceCtl::buildModel(void *items, const QString &fmt)
     qint32 idx = 0;
     qint32 sz = itemList->length();
     logd("sz %d", sz);
-    item->setCountryShortName(itemList->at(idx++));
-    QString nameid = itemList->at(idx++);
-    item->setNameId(nameid + item->countryShortName());
-    item->setName(itemList->at(idx++));
+    QString countryId = itemList->at(idx++).trimmed();
+    item->setCountryUid(countryId); // TODO: check if country id is valid or not
+    QString nameid = itemList->at(idx++).trimmed();
+    QString name = itemList->at(idx++).trimmed();
+    if (nameid.isEmpty()){
+        nameid = Utils::UidFromName(name, UidNameConvertType::NO_VN_MARK_UPPER);
+    }
+    // TODO: check/validate if name/nameid is valid
+    item->setNameId(NAMEID(item->countryUid(), nameid));
+    item->setName(name);
     if (sz > idx) {
-        QString parent = itemList->at(idx++);
-        if (!parent.isEmpty())
-            item->setParentUid(Utils::UidFromName(parent));
+        QString parentid = itemList->at(idx++).trimmed();
+        if (!parentid.isEmpty())
+            item->setParentUid(NAMEID(item->countryUid(), parentid));
     }
     if (sz > idx) {
         QString remark = itemList->at(idx++);
@@ -86,9 +92,9 @@ void ProvinceCtl::onLoad()
     //    mItemList.append();
     foreach (DbModel* model, items){
         Province* province = (Province*)model;
-        if (!mProvinceList.contains(province->countryShortName()))
-            mProvinceList[province->countryShortName()] = new QList<Province*>();
-        mProvinceList[province->countryShortName()]->append(province);
+        if (!mProvinceList.contains(province->countryUid()))
+            mProvinceList[province->countryUid()] = new QList<Province*>();
+        mProvinceList[province->countryUid()]->append(province);
     }
     tracede;
 }

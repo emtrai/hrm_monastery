@@ -74,9 +74,9 @@ ErrCode ExportHtml::saveTo(const IExporter *item, const QString &fpath)
     QString finadata = templateData;
     foreach(QString word, keywordStatus.keys()){
         QString data;
-        bool isFile = false;
+
         if (keywordStatus.value(word)){
-            ret = item->getDataString(word, &data, &isFile);
+            ret = item->getExportDataString(word, &data);
         } else {
             data = "";
         }

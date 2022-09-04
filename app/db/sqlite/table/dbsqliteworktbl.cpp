@@ -26,10 +26,41 @@
 #include "defs.h"
 #include "logger.h"
 
+#include "dbsqlitetablebuilder.h"
+#include "work.h"
+#include "dbsqliteinsertbuilder.h"
+#include <QSqlQuery>
+#include <QSqlRecord>
+#include <QHash>
+
 const qint32 DbSqliteWorkTbl::KVersionCode = VERSION_CODE(0,0,1);
 
 DbSqliteWorkTbl::DbSqliteWorkTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableWork, KTableWork, KVersionCode)
 {
 
+}
+
+void DbSqliteWorkTbl::addTableField(DbSqliteTableBuilder *builder)
+{
+    traced;
+    DbSqliteTbl::addTableField(builder);
+    builder->addField(KFieldRemark, TEXT);
+}
+
+void DbSqliteWorkTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
+{
+    traced;
+    DbSqliteTbl::insertTableField(builder, item);
+
+    Work* model = (Work*) item;
+    builder->addValue(KFieldRemark, model->remark());
+}
+
+void DbSqliteWorkTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+{
+    traced;
+    DbSqliteTbl::updateModelFromQuery(item, qry);
+    Work* model = (Work*) item;
+    model->setRemark(qry.value(KFieldRemark).toString());
 }

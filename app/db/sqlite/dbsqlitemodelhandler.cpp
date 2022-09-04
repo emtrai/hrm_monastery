@@ -34,6 +34,9 @@ ErrCode DbSqliteModelHandler::add(const DbModel *model)
     traced;
     ErrCode_t err = ErrNone;
 
+    // TODO: should check if some sub-item not exist???
+    // i.e.import person, but country, holly name, etc. not exist, need to check and add it
+
     if (model != nullptr){
         DbSqliteTbl* tbl = getMainTbl();
         if (!tbl->isExist(model)){

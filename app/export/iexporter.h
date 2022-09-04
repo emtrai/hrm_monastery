@@ -32,7 +32,7 @@ public:
     virtual const QString exportTemplatePath() const;
 
     virtual const QStringList getListExportKeyWord() const;
-    virtual ErrCode getDataString(const QString& keyword, QString* data, bool* isFile) const;
+    virtual ErrCode getExportDataString(const QString& keyword, QString* data) const;
 };
 
 #endif // IEXPORTER_H

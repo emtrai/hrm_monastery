@@ -55,7 +55,7 @@ void UISaintListView::updateItem(DbModel *item, UITableItem *tblItem)
 {
     UICommonListView::updateItem(item, tblItem);
     traced;
-    tblItem->addValue(Utils::date2String(static_cast<Saint*>(item)->feastDay(), "M/D"));
+    tblItem->addValue(Utils::date2String(static_cast<Saint*>(item)->feastDay(), DATE_FORMAT_MD));
 
 }
 

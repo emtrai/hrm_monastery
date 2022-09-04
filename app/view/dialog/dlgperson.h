@@ -26,6 +26,7 @@
 #include <QAbstractButton>
 #include "view/widget/uimulticomboxview.h"
 class Person;
+class QComboBox;
 
 namespace Ui {
 class DlgPerson;
@@ -59,9 +60,14 @@ class DlgPerson : public QDialog, public UIMultiComboxViewListener
 //protected:
 //    virtual void accept();
             private:
+                void loadEdu();
                 void loadEthnic();
                 void loadCourse();
                 void loadCountry();
+                void loadProvince();
+                void loadWork();
+                void loadEvent();
+
 private slots:
     void on_buttonBox_clicked( QAbstractButton * button );
     void on_btnEditNation_clicked();
@@ -84,6 +90,8 @@ private slots:
     void on_btnAddCommunity_clicked();
 
     void on_btnAddCourse_clicked();
+
+    void on_btnAddWork_clicked();
 
 private:
     Person* mPerson;

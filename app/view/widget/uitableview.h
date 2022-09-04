@@ -72,6 +72,13 @@ public:
 
     virtual void initHeader();
     virtual void setupUI();
+    virtual void reload();
+    quint32 currentPage() const;
+    void setCurrentPage(quint32 newCurrentPage);
+
+    quint32 totalPages() const;
+    void setTotalPages(quint32 newTotalPages);
+
 protected:
     virtual QStringList getHeader();
     virtual void showEvent(QShowEvent *ev);
@@ -79,13 +86,19 @@ protected:
     virtual QList<UITableItem*> getListItem(qint32 page, qint32 perPage, qint32 totalPages);
     virtual qint32 getTotalItems();
     virtual ErrCode onLoad();
+    virtual void importRequested(const QString& fpath);
 protected:
     QStringList mHeader;
+private slots:
+    void on_btnImport_clicked();
+
 private:
     Ui::UITableView *ui;
     onRequestData mFpDataReq;
     onRequestTotalData mFpTotalDataReq;
     qint32 mItemPerPage;
+    quint32 mCurrentPage;
+    quint32 mTotalPages;
 };
 
 #endif // UITABLEVIEW_H

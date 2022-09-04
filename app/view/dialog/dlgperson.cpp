@@ -25,6 +25,7 @@
 #include "logger.h"
 #include <QFileDialog>
 #include "filectl.h"
+#include "personctl.h"
 #include "person.h"
 #include "utils.h"
 #include "saintctl.h"
@@ -45,6 +46,7 @@
 #include "view/dialog/dlgcountry.h"
 #include "view/dialog/dlgethnic.h"
 #include "view/dialog/dlgcourse.h"
+#include "view/dialog/dlgprovince.h"
 
 #include "community.h"
 
@@ -59,7 +61,10 @@
 #include "education.h"
 #include "course.h"
 #include "coursectl.h"
+#include "work.h"
+#include "workctl.h"
 
+#define SPLIT_EMAIL_PHONE ";"
 
 #define SET_VAL_FROM_WIDGET(widget,func) \
                 do { \
@@ -80,6 +85,7 @@ do { \
         }\
     } \
 } while (0)
+
 
 #define SET_VAL_FROM_CBOX(widget,func, functxt) \
 do { \
@@ -170,24 +176,13 @@ void DlgPerson::setupUI()
 {
     traced;
     ui->setupUi(this);
-//    this->setWindowState(Qt::WindowState::WindowMaximized);
-//    int h = Utils::screenHeight();
-//    if (h > 0) {
-//        this->setFixedHeight(h); // this may be overlap by bottom area
-//    } else {
-//        loge("Invalid screen size");
-//    }
+
+    DIALOG_SIZE_SHOW(this);
 
     ui->txtCode->setText(Config::getNextPersonalCode());
 
     // Education
-
-    logd("Load Education");
-    QList<Education*> list = EduCtl::getInstance()->getListEdu();
-    foreach(Education* edu, list){
-
-        ui->cbEdu->addItem(edu->name());
-    }
+    loadEdu();
 
     // Saints
 
@@ -223,12 +218,7 @@ void DlgPerson::setupUI()
 
     // State/Province
     logd("Load state/province");
-    const QList<Province*>* listProvince = PROVINCE->getProvinceList(ui->cbCountry->currentText());
-    if (listProvince != nullptr){
-        foreach(Province* item, *listProvince){
-            ui->cbProvince->addItem(item->name(), item->uid());
-        }
-    }
+    loadProvince();
 
     // Community
     logd("Load community");
@@ -239,6 +229,9 @@ void DlgPerson::setupUI()
 
     // Course
     loadCourse();
+
+    // work
+    loadWork();
 
     QStringList communityListHdr;
     communityListHdr.append("Id");
@@ -264,6 +257,7 @@ void DlgPerson::setupUI()
 Person *DlgPerson::buildPerson()
 {
     traced;
+    // TODO: backup data to restore later??
     Person* per = person();
     // Image
     per->setImgPath(ui->lblImgPath->text().trimmed());
@@ -279,6 +273,7 @@ Person *DlgPerson::buildPerson()
 
     // holly name
     per->setHollyName(ui->txtSaint->text().trimmed());
+    SET_DATE_VAL_FROM_WIDGET(ui->txtFeastDay, per->setFeastDay);
 
     // set name from full name
     per->setNameFromFullName(ui->txtName->text().trimmed());
@@ -313,22 +308,177 @@ Person *DlgPerson::buildPerson()
     }
 
     SET_VAL_FROM_CBOX(ui->cbCourse, per->setCourseUid, per->setCourse);
+    SET_VAL_FROM_CBOX(ui->cbCountry, per->setCountryUid, per->setCountryName);
+
+    SET_VAL_FROM_CBOX(ui->cbProvince, per->setProvinceUid, per->setProvinceName);
+    per->setAddr(ui->txtAddr->toPlainText().trimmed());
+    per->setChurchAddr(ui->txtChurch->toPlainText().trimmed());
+    per->setEmail(ui->txtEmail->text().split(SPLIT_EMAIL_PHONE));
+    per->setTel(ui->txtPhone->text().split(SPLIT_EMAIL_PHONE));
+    per->setOtherContact(ui->txtOtherContact->toPlainText().trimmed());
+
+    per->setDadName(ui->txtDad->text().trimmed());
+    SET_DATE_VAL_FROM_WIDGET(ui->txtDadBirth, per->setDadBirthday);
+    per->setDadAddr(ui->txtDadAddr->text().trimmed());
+
+    per->setMomName(ui->txtMom->text().trimmed());
+    SET_DATE_VAL_FROM_WIDGET(ui->txtMonBirth, per->setMomBirthday);
+    per->setDadAddr(ui->txtMonAddr->text().trimmed());
+
+    per->setFamilyHistory(ui->txtFamilyHistory->toPlainText().trimmed());
+    per->setFamilyContact(ui->txtFamilyContact->toPlainText().trimmed() );
+
+    SET_DATE_VAL_FROM_WIDGET(ui->txtChristenDate, per->setChristenDate);
+    per->setChristenPlace(ui->txtChristenPlace->text().trimmed());
+
+
+    SET_DATE_VAL_FROM_WIDGET(ui->txtEucharisDate, per->setEucharistDate);
+    per->setEucharistPlace(ui->txtEucharistPlace->text().trimmed());
+
+    SET_DATE_VAL_FROM_WIDGET(ui->txtHollyDate, per->setHollyDate);
+    per->setHollyPlace(ui->txtHollyPlace->text().trimmed());
+
+    SET_DATE_VAL_FROM_WIDGET(ui->txtJoinDate, per->setJoinDate);
+    SET_VAL_FROM_CBOX(ui->cbJoinPIC, per->setJoinPICUid, per->setJoinPICName);
+
+
+    SET_DATE_VAL_FROM_WIDGET(ui->txtPreTrainJoinDate, per->setPreTrainJoinDate);
+    SET_VAL_FROM_CBOX(ui->cbPreTrainJoinPIC, per->setPreTrainPICUid, per->setPreTrainPICName);
+
+    SET_DATE_VAL_FROM_WIDGET(ui->txtTrainJoinDate, per->setTrainJoinDate);
+    SET_VAL_FROM_CBOX(ui->cbTrainPIC, per->setTrainPICUid, per->setTrainPICName);
+
+
+    SET_DATE_VAL_FROM_WIDGET(ui->txtVowsDate, per->setVowsDate);
+    SET_VAL_FROM_CBOX(ui->cbVowsCEO, per->setVowsCEOUid, per->setVowsCEOName);
+
+    SET_DATE_VAL_FROM_WIDGET(ui->txtEternalVowsDate, per->setEternalVowsDate);
+    SET_VAL_FROM_CBOX(ui->cbEternalVowsPIC, per->setEternalVowsPICUid, per->setEternalVowsPICName);
+    SET_VAL_FROM_CBOX(ui->cbEternalVowsCEO, per->setEternalVowsCEOUid, per->setEternalVowsCEOName);
+
+    SET_DATE_VAL_FROM_WIDGET(ui->txtBankDate, per->setBankDate);
+    per->setBankPlace(ui->txtBankPlace->text().trimmed());
+
+    SET_DATE_VAL_FROM_WIDGET(ui->txtGoldenDate, per->setGoldenDate);
+    per->setGoldenPlace(ui->txtGoldenPlace->text().trimmed());
+
+    SET_DATE_VAL_FROM_WIDGET(ui->txtEternalDate, per->setEternalDate);
+    per->setEternalPlace(ui->txtEternalPlace->text().trimmed());
+
+    SET_VAL_FROM_CBOX(ui->cbStatus, per->setStatusUid, per->setStatusName);
+
+    SET_DATE_VAL_FROM_WIDGET(ui->txtRetireDate, per->setRetireDate);
+    per->setRetirePlace(ui->txtRetirePlace->text().trimmed());
+
+    SET_DATE_VAL_FROM_WIDGET(ui->txtDeadDate, per->setDeadDate);
+    per->setDeadPlace(ui->txtDeadPlace->text().trimmed());
+
+    //event
+//    QList<QVariant> specialist = ui->tblEvents->item
+//    per->clearSpecialistUid();
+//    foreach (QVariant id, specialist){
+//        per->addSpecialistUid(id.toString());
+//    }
 
     per->dump();
     return per;
 
 }
 
-ErrCode DlgPerson::fromPerson(const Person *person)
+ErrCode DlgPerson::fromPerson(const Person *per)
 {
     traced;
     ErrCode ret = ErrNone;
-    if (person == nullptr){
+    if (per == nullptr){
         ret = ErrInvalidArg; // TODO: should raise assert instead???
     }
-    if (ret == ErrNone){
-        ui->txtName->setText(person->getFullName());
+    // TODO: check and valid data??
+    if (!per->imgPath().isEmpty()) {
+        // TODO: validate image path
+        QPixmap p(per->imgPath());
+        ui->lblImg->setPixmap(p.scaledToHeight( ui->lblImg->height()));
+        ui->lblImgPath->setText(per->imgPath());
     }
+
+    ui->txtCode->setText(per->personCode());
+    ui->txtName->setText(per->getFullName());
+    ui->txtBirthday->setText(Utils::date2String(per->birthday()));
+
+    // TODO: set saint list
+    // cbSaints
+
+    ui->txtSaint->setText(per->hollyName());
+    ui->txtFeastDay->setText(Utils::date2String(per->feastDay(), DATE_FORMAT_MD));
+    ui->txtBirthplace->setText(per->birthPlace());
+    // TODO: country, ethinic, nationality, etc.
+    // cbCountry
+    // cbEthic
+    ui->txtIDCard->setText(per->idCard());
+
+    ui->txtIdCardDate->setText(Utils::date2String(per->idCardIssueDate()));
+    ui->txtIdCardPlace->setText(per->idCardIssuePlace());
+    // cbEdu
+    // cbSpecialist
+    // cbCourse
+    // cbCountry
+    // cbProvince
+    //
+    ui->txtAddr->setPlainText(per->addr());
+    ui->txtChurch->setPlainText(per->churchAddr());
+    ui->txtEmail->setText(per->email().join(SPLIT_EMAIL_PHONE));
+    ui->txtPhone->setText(per->tel().join(SPLIT_EMAIL_PHONE));
+    ui->txtOtherContact->setPlainText(per->otherContact());
+
+    ui->txtDad->setText(per->dadName());
+    ui->txtDadBirth->setText(Utils::date2String(per->dadBirthday()));
+    ui->txtDadAddr->setText(per->dadAddr());
+
+    ui->txtMom->setText(per->momName());
+    ui->txtMonBirth->setText(Utils::date2String(per->momBirthday()));
+    ui->txtMonAddr->setText(per->momAddr());
+
+    ui->txtFamilyHistory->setPlainText(per->familyHistory());
+    ui->txtFamilyContact->setPlainText(per->familyContact());
+
+    ui->txtChristenDate->setText(Utils::date2String(per->christenDate()));
+    ui->txtChristenPlace->setText(per->christenPlace());
+
+
+    ui->txtEucharisDate->setText(Utils::date2String(per->eucharistDate()));
+    ui->txtEucharistPlace->setText(per->eucharistPlace());
+
+    ui->txtHollyDate->setText(Utils::date2String(per->hollyDate()));
+    ui->txtHollyPlace->setText(per->hollyPlace());
+
+    ui->txtJoinDate->setText(Utils::date2String(per->joinDate()));
+    //cbJoinPIC
+    ui->txtPreTrainJoinDate->setText(Utils::date2String(per->preTrainJoinDate()));
+    //cbPreTrainJoinPIC
+    ui->txtTrainJoinDate->setText(Utils::date2String(per->trainJoinDate()));
+    //cbTrainPIC
+    ui->txtVowsDate->setText(Utils::date2String(per->vowsDate()));
+    //cbVowsCEO
+    ui->txtEternalVowsDate->setText(Utils::date2String(per->eternalVowsDate()));
+    //cbEternalVowsPIC
+    //cbEternalVowsCEO
+
+    ui->txtBankDate->setText(Utils::date2String(per->bankDate()));
+    ui->txtBankPlace->setText(per->bankPlace());
+
+    ui->txtGoldenDate->setText(Utils::date2String(per->goldenDate()));
+    ui->txtGoldenPlace->setText(per->goldenPlace());
+
+    ui->txtEternalDate->setText(Utils::date2String(per->eternalDate()));
+    ui->txtEternalPlace->setText(per->eternalPlace());
+
+    // cbStatus
+
+    ui->txtRetireDate->setText(Utils::date2String(per->retireDate()));
+    ui->txtRetirePlace->setText(per->retirePlace());
+
+    ui->txtDeadDate->setText(Utils::date2String(per->deadDate()));
+    ui->txtDeadPlace->setText(per->deadPlace());
+
     tracedr(ret);
     return ret;
 }
@@ -429,6 +579,19 @@ void DlgPerson::onItemDeleted(UIMultiComboxView *cb, const QString &name, const 
     }
 }
 
+void DlgPerson::loadEdu()
+{
+    traced;
+    logd("Load Education");
+    QList<Education*> list = EduCtl::getInstance()->getListEdu();
+    ui->cbEdu->clear();
+    foreach(Education* edu, list){
+
+        ui->cbEdu->addItem(edu->name());
+    }
+}
+
+
 void DlgPerson::loadEthnic()
 {
     traced;
@@ -449,11 +612,44 @@ void DlgPerson::loadCountry()
 
     logd("Load country");
     QList<Country*> listCountry = CountryCtl::getInstance()->getCountryList();
+    ui->cbNationality->clear();
+    ui->cbCountry->clear();
     foreach(Country* item, listCountry){
 
         ui->cbNationality->addItem(item->name(), item->uid());
         ui->cbCountry->addItem(item->name(), item->uid());
     }
+}
+
+void DlgPerson::loadProvince()
+{
+    traced;
+    QString countryUid = Utils::getCurrentComboxDataString(ui->cbCountry);
+    ui->cbProvince->clear();
+    if (!countryUid.isEmpty()){
+        const QList<Province*>* listProvince = PROVINCE->getProvinceList(countryUid);
+        if (listProvince != nullptr){
+            foreach(Province* item, *listProvince){
+                ui->cbProvince->addItem(item->name(), item->uid());
+            }
+        }
+    }
+}
+
+void DlgPerson::loadWork()
+{
+    traced;
+    ui->cbWork->clear();
+    QList<Work*> list = INSTANCE(WorkCtl)->getWorkList();
+    foreach(Work* item, list){
+        ui->cbWork->addItem(item->name(), item->uid());
+    }
+
+}
+
+void DlgPerson::loadEvent()
+{
+
 }
 
 void DlgPerson::loadCourse()
@@ -511,7 +707,7 @@ void DlgPerson::on_btnEditNation_clicked()
 
 
     if (dlg->exec() == QDialog::Accepted){
-        loadCountry()
+        loadCountry();
 
     }
     delete dlg;
@@ -523,16 +719,18 @@ void DlgPerson::on_cbCountry_currentIndexChanged(int index)
     traced;
     logd("Reload provine of %s", ui->cbCountry->currentText().toStdString().c_str());
     logd("index %d", index);
-    if (index >= 0){
-        QString shortName = ui->cbCountry->itemData(index).toString();
-        const QList<Province*>* listProvince = PROVINCE->getProvinceList(shortName);
-        ui->cbProvince->clear();
-        if (listProvince != nullptr){
-            foreach(Province* item, *listProvince){
-                ui->cbProvince->addItem(item->name(), item->uid());
-            }
-        }
-    }
+
+    loadProvince();
+//    if (index >= 0){
+//        QString shortName = ui->cbCountry->itemData(index).toString();
+//        const QList<Province*>* listProvince = PROVINCE->getProvinceList(shortName);
+//        ui->cbProvince->clear();
+//        if (listProvince != nullptr){
+//            foreach(Province* item, *listProvince){
+//                ui->cbProvince->addItem(item->name(), item->uid());
+//            }
+//        }
+//    }
 
 }
 
@@ -581,17 +779,14 @@ void DlgPerson::on_btnPreview_clicked()
 {
     traced;
     Person* per = buildPerson();
-    per->setNameFromFullName(ui->txtName->text());
-    per->setBirthday(Utils::dateFromString(ui->txtBirthday->text()));
-    QString fpath = FileCtl::getTmpDataDir("person.html");
-    ExportFactory::exportTo(per, fpath, ExportType::EXPORT_HTML);
+    QString fpath;
+    INSTANCE(PersonCtl)->exportToFile(per, ExportType::EXPORT_HTML, &fpath);
     if (QFile::exists(fpath)){
         dlgHtmlViewer* viewer = new dlgHtmlViewer();
         viewer->setHtmlPath(fpath);
         viewer->setSubject("Person");
         viewer->exec();
     }
-
 }
 
 Person *DlgPerson::person(bool newone)
@@ -660,7 +855,6 @@ void DlgPerson::on_btnAddEthnic_clicked()
         return;
     }
 
-
     if (dlg->exec() == QDialog::Accepted){
         loadEthnic();
     }
@@ -690,13 +884,7 @@ void DlgPerson::on_btnAddEdu_clicked()
     msgBox.setDefaultButton(QMessageBox::Cancel);
     if (ret == ErrNone){
         msgBox.setText(QString("Education '%1' was saved SUCCESSFUL.").arg(eduName));
-        logd("Load Education");
-        QList<Education*> listEdu = INSTANCE(EduCtl)->getListEdu();
-        ui->cbEdu->clear();
-        foreach(Education* item, listEdu){
-
-            ui->cbEdu->addItem(item->name(), item->uid());
-        }
+        loadEdu();
 
     } else {
         msgBox.setText(QString("FAILED to save edu '%1', err %2")
@@ -711,6 +899,17 @@ void DlgPerson::on_btnAddEdu_clicked()
 void DlgPerson::on_btnAddProvince_clicked()
 {
     traced;
+    DlgProvince * dlg = new DlgProvince();
+    if (dlg == nullptr) {
+        loge("Open dlg province fail, No memory");
+        return;
+    }
+
+    if (dlg->exec() == QDialog::Accepted){
+        loadProvince();
+
+    }
+    delete dlg;
 }
 
 
@@ -735,5 +934,39 @@ void DlgPerson::on_btnAddCourse_clicked()
 
     }
     delete dlg;
+}
+
+
+
+void DlgPerson::on_btnAddWork_clicked()
+{
+    traced;
+    ErrCode ret = ErrNone;
+    bool ok = false;
+    QMessageBox msgBox;
+
+    QString workName = QInputDialog::getText(this, tr("New Work"),
+                                             tr("Work name"), QLineEdit::Normal,
+                                             "", &ok);
+    if (!workName.isEmpty()){
+        Work* work = new Work();
+        work->setUid(Utils::UidFromName(workName, UidNameConvertType::NO_VN_MARK_UPPER));
+        work->setName(workName);
+        ret = work->save();
+        delete work;
+    }
+
+    msgBox.setStandardButtons(QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Cancel);
+    if (ret == ErrNone){
+        msgBox.setText(QString("Work '%1' was saved SUCCESSFUL.").arg(workName));
+        loadWork();
+
+    } else {
+        msgBox.setText(QString("FAILED to save edu '%1', err %2")
+                           .arg(workName).arg(ret));
+    }
+    logd("ret=%d", ret);
+    msgBox.exec();
 }
 

@@ -26,7 +26,7 @@
 #include "logger.h"
 #include "utils.h"
 #include "person.h"
-
+#include "filectl.h"
 PersonCtl* PersonCtl::gInstance = nullptr;
 
 ErrCode PersonCtl::addPerson(Person *person)
@@ -60,9 +60,44 @@ ErrCode PersonCtl::AddListPersons(const QString &fname)
     return ErrNone;
 }
 
+QList<DbModel *> PersonCtl::getAllPerson()
+{
+    traced;
+    return DB->getModelHandler(KModelHdlPerson)->getAll(&Person::build);
+}
+
+DbModel *PersonCtl::doImportOneItem(int importFileType, const QStringList &items, quint32 idx)
+{
+    ErrCode ret = ErrNone;
+    Person* person = nullptr;
+    int i = 0;
+    logd("idx = %d", idx);
+    logd("no items %d", items.count());
+    if (idx == 0) {
+        logd("HEADER, save it");
+        foreach (QString item, items) {
+            mImportFields.append(item.trimmed());
+        }
+    } else {
+
+        person = (Person*)Person::build();
+        foreach (QString item, items) {
+            ret = person->onImportItem(importFileType, mImportFields[i++], item, idx);
+        }
+    }
+
+    tracedr(ret);
+    return person;
+}
+
+
 PersonCtl::PersonCtl()
 {
-
+//    mImportFields.append(KExportFieldHollyName);
+//    mImportFields.append(KExportFieldFullName);
+//    mImportFields.append(KExportFieldBirthday);
+//    mImportFields.append(KExportFieldBirthplace);
+//    mImportFields.append(KExportFieldFeastDay);
 }
 
 
@@ -79,6 +114,11 @@ PersonCtl *PersonCtl::getInstance()
     }
 
     return gInstance;
+}
+
+const QList<QString> &PersonCtl::importFields() const
+{
+    return mImportFields;
 }
 
 void PersonCtl::onLoad()

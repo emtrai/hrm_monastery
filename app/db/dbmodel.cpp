@@ -24,6 +24,7 @@
 #include "crypto.h"
 #include "dbmodelhandler.h"
 #include "utils.h"
+#include "iexporter.h"
 
 DbModel::DbModel():
     mDbId(0),
@@ -78,12 +79,21 @@ void DbModel::setUid(const QString &newUid)
     mUid= newUid;
 }
 
+void DbModel::buildUidIfNotSet()
+{
+    traced;
+    if (uid().isEmpty()){
+        setUid(Utils::UidFromName(name(), UidNameConvertType::NO_VN_MARK_UPPER));
+    }
+}
+
 ErrCode DbModel::save()
 {
     traced;
     ErrCode ret = ErrNone;
     DbModelHandler* dbModelHdl = getDbModelHandler();
     if (dbModelHdl != nullptr){
+        buildUidIfNotSet();
         ret = dbModelHdl->add(this);
         if (ret == ErrExisted){ // alrady exist, judge as ok
             ret = ErrNone;
@@ -92,7 +102,7 @@ ErrCode DbModel::save()
     }
     else{
         ret = ErrDbNotReady;
-        loge("DbSaint not ready");
+        loge("db not ready");
     }
     tracedr(ret);
     return ret;
@@ -158,4 +168,9 @@ void DbModel::setNameId(const QString &newNameId)
 //    mUid = Utils::UidFromName(newNameId);
     // TODO: should hash or use original value???
     mUid = newNameId;
+}
+
+IExporter *DbModel::getExporter()
+{
+    return nullptr;
 }

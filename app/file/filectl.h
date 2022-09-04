@@ -33,8 +33,9 @@ public:
     static void init();
 
     static QString getAppDataDir(const QString& subDir);
-    static QString getAppDataDir(const char* subDir = nullptr);
-    static QString getTmpDataDir(const char* subDir = nullptr);
+    static QString getAppDataDir();
+    static QString getTmpDataDir(const QString& subDir);
+    static QString getTmpDataDir();
     static QString getAppInstallDir(const QString& subDir);
 
     static QString getOrCreatePrebuiltDataDir();

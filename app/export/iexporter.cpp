@@ -44,7 +44,7 @@ const QStringList IExporter::getListExportKeyWord() const
     return QStringList();
 }
 
-ErrCode IExporter::getDataString(const QString &keyword, QString* data, bool* isFile) const
+ErrCode IExporter::getExportDataString(const QString &keyword, QString* data) const
 {
     traced;
     loge("Not support here");

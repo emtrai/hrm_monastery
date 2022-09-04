@@ -14,6 +14,7 @@
         <file alias="department_vi">res/department_vi.json</file>
         <file alias="person_info_template">res/person_info_template.html</file>
         <file alias="course_vi">res/course_vi.csv</file>
+        <file alias="status_vi">res/status_vi.csv</file>
     </qresource>
     <qresource prefix="/template"/>
 </RCC>

@@ -50,13 +50,16 @@ public:
 
     const QString &remark() const;
     void setRemark(const QString &newRemark);
-    const QString &countryShortName() const;
-    void setCountryShortName(const QString &newCountryShortName);
+
+
 
 
 
     const QString &parentUid() const;
     void setParentUid(const QString &newParentUid);
+
+    const QString &countryUid() const;
+    void setCountryUid(const QString &newCountryUid);
 
 protected:
     virtual DbModelHandler *getDbModelHandler();
@@ -64,7 +67,7 @@ private:
     Province* parent;
     qint64 mParentDbId;
     qint64 mCountryDbId;
-    QString mCountryShortName;
+    QString mCountryUid;
     QString mParentUid;
     QString mRemark;
     QList<Province> mChildProvince; // City belongs to Province, Province belongs to state

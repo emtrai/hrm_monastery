@@ -27,6 +27,7 @@
 
 #include "view/widget/uisummarizeview.h"
 #include "view/widget/uitableview.h"
+#include <QAction>
 
 QT_BEGIN_NAMESPACE
     namespace Ui { class MainWindow; }
@@ -53,10 +54,14 @@ QT_END_NAMESPACE
     UITableView* mPersonView;
     QTextBrowser* mHomeView;
     QWidget* mCurrentView;
+    QAction* mActionImportPersonList;
+    QAction* mActionImportPerson;
+    QAction* mActionImportCommunityList;
  signals:
     void load();
 
  private slots:
+     void on_action_ImportPersonList_triggered();
      void on_action_New_triggered();
      void on_actionNew_Community_triggered();
      void on_actionImportComm_triggered();

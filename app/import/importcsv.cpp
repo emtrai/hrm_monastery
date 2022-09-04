@@ -35,7 +35,7 @@ ImportCSV::ImportCSV()
     traced;
 }
 
-ErrCode ImportCSV::importFrom(IImporter *importer, const QString &fpath)
+ErrCode ImportCSV::importFrom(int importFileType, IImporter *importer, const QString &fpath, void* tag)
 {
     traced;
     QHash<QString, QString> item;
@@ -57,11 +57,12 @@ ErrCode ImportCSV::importFrom(IImporter *importer, const QString &fpath)
     if (ret == ErrNone){
         int cnt = item.count();
         logd("Parsed %d key", cnt);
+        int idx = 0;
         if (cnt > 0) {
             foreach (QString key, item.keys()) {
                 logd("key %s", key.toStdString().c_str());
                 logd("val %s", item.value(key).toStdString().c_str());
-                importer->onImportItem(key, item.value(key));
+                importer->onImportItem(importFileType, key, item.value(key), idx++, tag);
             }
         }
     }

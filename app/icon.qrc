@@ -11,5 +11,14 @@
         <file>icon/icons8-join-96.png</file>
         <file>icon/icons8-delete-64.png</file>
         <file>icon/icons8-search-64.png</file>
+        <file>icon/icons8-add-new-100.png</file>
+        <file>icon/icons8-create-64.png</file>
+        <file>icon/icons8-create-100.png</file>
+        <file>icon/icons8-create-64 (1).png</file>
+        <file>icon/icons8-add-64.png</file>
+        <file>icon/icons8-delete-64 (1).png</file>
+        <file>icon/icons8-delete-100.png</file>
+        <file>icon/icons8-change-64.png</file>
+        <file>icon/icons8-import-64.png</file>
     </qresource>
 </RCC>

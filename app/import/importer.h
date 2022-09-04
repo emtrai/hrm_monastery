@@ -32,7 +32,7 @@ class Importer
 public:
     Importer();
 
-    virtual ErrCode importFrom (IImporter* importer, const QString& fpath);
+    virtual ErrCode importFrom (int importFileType, IImporter* importer, const QString& fpath, void* tag = nullptr);
 };
 
 #endif // IMPORTER_H

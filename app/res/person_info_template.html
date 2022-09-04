@@ -7,40 +7,301 @@
     margin-left: auto;
     margin-right: auto;
     text-align: center;
-    width: 50%;
     }
 .right {
     text-align: right;
     }
+.header {
+    background-color:rgb(208, 244, 246);
+    padding: 5px;
+    width: 30%;
+}
+.value {
+    padding: 5px;
+    width: 80%;
+}
+.header2 {
+    padding: 5px;
+    font-weight: bold;
+    text-align: left;
+    font-size: large;
+    width: 100%;
+
+}
 </style>
 </head>
 <body>
-<table>
+<div style="padding: 5%">
+<div style="text-align: center">
+    <img src="{{img_path}}" style="margin: auto;display: block;position:absolute"/></div>
+<table style="border: none;border-collapse: collapse;" width="100%">
+    <colgroup>
+    <col width="30%"/>
+    <col width="80%"/>
+    </colgroup>
     <tr>
-        <td>Tên Thánh</td>
-        <td>{{hollyname}} ({{holly_uids}})</td>
+        <td class="header2" colspan="2">Thông tin cá nhân</td>
     </tr>
     <tr>
-        <td>Tên</td>
-        <td>{{fullname}} ({{lastname}},{{firstname}})</td>
+        <td class="header" width="30%">Mã số</td>
+        <td class="value">{{MA_NU_TU}}</td>
     </tr>
     <tr>
-        <td>Ngày sinh</td>
-        <td>{{birthday}}</td>
+        <td class="header" width="30%">Tên Thánh</td>
+        <td class="value">{{TEN_THANH}}</td>
     </tr>
     <tr>
-        <td>Nơi sinh</td>
-        <td>{{birthplace}}</td>
+        <td class="header" width="30%">Tên</td>
+        <td class="value">{{TEN_DAY_DU}}</td>
     </tr>
     <tr>
-        <td>Quốc tịch</td>
-        <td>{{nationality}} ({{nationality_uid}}</td>
+        <td class="header">Ngày sinh</td>
+        <td class="value">{{NGAY_SINH}}</td>
     </tr>
     <tr>
-        <td>Address</td>
-        <td>{{address}}</td>
+        <td class="header">Nơi sinh</td>
+        <td class="value">{{NOI_SINH}}</td>
+    </tr>
+    <tr>
+        <td class="header">Quốc tịch</td>
+        <td class="value">{{QUOC_TICH}}</td>
+    </tr>
+    <tr>
+        <td class="header">Dân tộc</td>
+        <td class="value">{{DAN_TOC}}</td>
+    </tr>
+    <tr>
+        <td class="header">Căn cước công dân</td>
+        <td class="value">{{CAN_CUOC_CONG_DAN}}</td>
+    </tr>
+    <tr>
+        <td class="header">Ngày cấp</td>
+        <td class="value">{{NGAY_CAP_CCCD}}</td>
+    </tr>
+    <tr>
+        <td class="header">Nơi cấp</td>
+        <td class="value">{{NOI_CAP_CCCD}}</td>
+    </tr>
+    <tr>
+        <td class="header">Tình trạng</td>
+        <td>{{TINH_TRANG}}</td>
+    </tr>
+    <tr>
+        <td class="header">Ngày nghỉ hưu</td>
+        <td>{{NGAY_NGHI_HUU}}</td>
+    </tr>
+    <tr>
+        <td class="header">Nơi nghỉ hưu</td>
+        <td>{{NOI_NGHI_HUU}}</td>
+    </tr>
+    <tr>
+        <td class="header">Ngày mất</td>
+        <td>{{NGAY_MAT}}</td>
+    </tr>
+    <tr>
+        <td class="header">Nơi chôn cất</td>
+        <td>{{NOI_CHON_CAT}}</td>
+    </tr>
+    <tr>
+        <td class="header2" colspan="2">Thông tin liên lạc</td>
+    </tr>
+    <tr>
+        <td class="header">Quốc gia</td>
+        <td>{{QUOC_GIA}}</td>
+    </tr>
+    <tr>
+        <td class="header">Tỉnh/Thành phố</td>
+        <td>{{TINH_TP}}</td>
+    </tr>
+    <tr>
+        <td class="header">Địa chỉ</td>
+        <td>{{DIA_CHI}}</td>
+    </tr>
+    <tr>
+        <td class="header">Giáo xứ</td>
+        <td>{{GIAO_XU}}</td>
+    </tr>
+    <tr>
+        <td class="header">Số điện thoại</td>
+        <td>{{DIEN_THOAI}}</td>
+    </tr>
+    <tr>
+        <td class="header">Email</td>
+        <td>{{EMAIL}}</td>
+    </tr>
+    <tr>
+        <td class="header">Kênh liên lạc khác</td>
+        <td>{{LIEN_LAC_KHAC}}</td>
+    </tr>
+    <tr>
+        <td class="header2" colspan="2">Công tác</td>
+    </tr>
+    <tr>
+        <td class="header">Trình độ học vấn</td>
+        <td>{{HOC_VAN}}</td>
+    </tr>
+    <tr>
+        <td class="header">Chuyên môn</td>
+        <td>{{CHUYEN_MON}}</td>
+    </tr>
+    <tr>
+        <td class="header">Công việc hiện tại</td>
+        <td>{{CONG_VIEC}}</td>
+    </tr>
+    <tr>
+        <td class="header">Lịch sử công tác</td>
+        <td>{{LICH_SU_CONG_TAC}}</td>
+    </tr>
+    <tr>
+        <td class="header">Cộng đoàn phục vụ</td>
+        <td>{{CONG_DOAN}}</td>
+    </tr>
+    <tr>
+        <td class="header">Lịch sử cộng đoàn</td>
+        <td>{{LICH_SU_CONG_DOAN}}</td>
+    </tr>
+    <tr>
+        <td  class="header2" colspan="2">Thông tin gia đình</td>
+    </tr>
+    <tr>
+        <td class="header">Họ tên cha</td>
+        <td>{{TEN_CHA}}</td>
+    </tr>
+    <tr>
+        <td class="header">Ngày sinh</td>
+        <td>{{NGAY_SINH_CHA}}</td>
+    </tr>
+    <tr>
+        <td class="header">Địa chỉ</td>
+        <td>{{DIA_CHI_CHA}}</td>
+    </tr>
+    <tr>
+        <td class="header">Họ tên mẹ</td>
+        <td>{{TEN_ME}}</td>
+    </tr>
+    <tr>
+        <td class="header">Ngày sinh</td>
+        <td>{{NGAY_SINH_ME}}</td>
+    </tr>
+    <tr>
+        <td class="header">Địa chỉ</td>
+        <td>{{DIA_CHI_ME}}</td>
+    </tr>
+    <tr>
+        <td class="header">Thông tin gia đình</td>
+        <td>{{THONG_TIN_GIA_DINH}}</td>
+    </tr>
+    <tr>
+        <td class="header">Thông tin liên lạc</td>
+        <td>{{LIEN_HE_GIA_DINH}}</td>
+    </tr>
+    <tr>
+        <td class="header2" colspan="2">Bí tích</td>
+    </tr>
+    <tr>
+        <td class="header">Rửa tội</td>
+        <td>{{NGAY_RUA_TOI}}</td>
+    </tr>
+    <tr>
+        <td class="header">Tại</td>
+        <td>{{NOI_RUA_TOI}}</td>
+    </tr>
+    <tr>
+        <td class="header">Bí tích thánh thể</td>
+        <td>{{NGAY_THANH_THE}}</td>
+    </tr>
+    <tr>
+        <td class="header">Tại</td>
+        <td>{{NOI_THANH_THE}}</td>
+    </tr>
+    <tr>
+        <td class="header">Bí tích thêm sức</td>
+        <td>{{NGAY_THEM_SU}}</td>
+    </tr>
+    <tr>
+        <td class="header">Tại</td>
+        <td>{{NOI_THEM_SUC}}</td>
+    </tr>
+    <tr>
+        <td class="header2" colspan="2">Thông tin khấn</td>
+    </tr>
+    <tr>
+        <td class="header">Lớp khấn</td>
+        <td>{{KHOA}}</td>
+    </tr>
+    <tr>
+        <td class="header">Ngày nhập tu</td>
+        <td>{{NGAY_GIA_NHAP}}</td>
+    </tr>
+    <tr>
+        <td class="header">Người đặc trách</td>
+        <td>{{PHU_TRACH_GIA_NHAP}}</td>
+    </tr>
+    <tr>
+        <td class="header">Ngày gia nhập Tiền Tập Viện</td>
+        <td>{{NGAY_TIEN_TAP_VIEN}}</td>
+    </tr>
+    <tr>
+        <td class="header">Người đặc trách</td>
+        <td>{{PHU_TRACH_TIEN_TAP_VIEN}}</td>
+    </tr>
+    <tr>
+        <td class="header">Ngày gia nhập Tập Viện</td>
+        <td>{{NGAY_TAP_VIEN}}</td>
+    </tr>
+    <tr>
+        <td class="header">Giám sư Tập Viện</td>
+        <td>{{PHU_TRACH_TAP_VIEN}}</td>
+    </tr>
+    <tr>
+        <td class="header">Ngày Tiên Khấn</td>
+        <td>{{NGAY_TIEN_KHAN}}</td>
+    </tr>
+    <tr>
+        <td class="header">Tổng phụ trách</td>
+        <td>{{TONG_PHU_TRACH_TIEN_KHAN}}</td>
+    </tr>
+    <tr>
+        <td class="header">Ngày Vĩnh Khấn</td>
+        <td>{{NGAY_VINH_KHAN}}</td>
+    </tr>
+    <tr>
+        <td class="header">Tổng phụ trách</td>
+        <td>{{TONG_PHU_TRACH_VINH_KHAN}}</td>
+    </tr>
+    <tr>
+        <td class="header">Giám sư</td>
+        <td>{{PHU_TRACH_VINH_KHAN}}</td>
+    </tr>
+    <tr>
+        <td class="header2" colspan="2">Ngày kỉ niệm</td>
+    </tr>
+    <tr>
+        <td class="header">Ngân Khánh</td>
+        <td>{{NGAY_NGAN_KHANH}}</td>
+    </tr>
+    <tr>
+        <td class="header">Tại</td>
+        <td>{{NOI_NGAN_KHANH}}</td>
+    </tr>
+    <tr>
+        <td class="header">Kim Khánh</td>
+        <td>{{NGAY_KIM_KHANH}}</td>
+    </tr>
+    <tr>
+        <td class="header">Tại</td>
+        <td>{{NOI_KIM_KHANH}}</td>
+    </tr>
+    <tr>
+        <td class="header">Vĩnh Khánh</td>
+        <td>{{NGAY_VINH_KHANH}}</td>
+    </tr>
+    <tr>
+        <td class="header">Tại</td>
+        <td>{{NOI_VINH_KHANH}}</td>
     </tr>
 </table>
+</div>
 </body>
 
 </html>

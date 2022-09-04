@@ -18,7 +18,7 @@
     <widget class="QTableWidget" name="tblList"/>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,3,1,3,3,1">
+    <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1,3,1,3,0">
      <property name="leftMargin">
       <number>0</number>
      </property>
@@ -26,12 +26,25 @@
       <number>0</number>
      </property>
      <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
       <widget class="QLabel" name="label_2">
        <property name="layoutDirection">
         <enum>Qt::LeftToRight</enum>
        </property>
        <property name="text">
-        <string>Loại</string>
+        <string>Mục</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -44,7 +57,7 @@
      <item>
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>Mục</string>
+        <string>Nội dung</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -55,20 +68,17 @@
       <widget class="QComboBox" name="comboBox_2"/>
      </item>
      <item>
-      <widget class="QLineEdit" name="txtSearch"/>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btnSearch">
+      <widget class="QToolButton" name="btnSearch">
        <property name="text">
-        <string/>
+        <string>Lọc</string>
        </property>
        <property name="icon">
         <iconset>
          <normalon>:/icon/icon/icons8-search-64.png</normalon>
         </iconset>
        </property>
-       <property name="flat">
-        <bool>true</bool>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
        </property>
       </widget>
      </item>
@@ -77,26 +87,12 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QToolButton" name="toolButton_2">
-       <property name="text">
-        <string>&lt;</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QSpinBox" name="spinBox"/>
      </item>
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
         <string>page</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="toolButton">
-       <property name="text">
-        <string>&gt;</string>
        </property>
       </widget>
      </item>

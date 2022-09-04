@@ -25,10 +25,12 @@
 #include <QString>
 #include "errcode.h"
 
+
 class IImporter
 {
 public:
-    virtual ErrCode onImportItem(const QString& keyword, const QString& value) = 0;
+    virtual ErrCode onImportItem(int importFileType, const QString& keyword, const QString& value, quint32 idx = 0, void* tag = nullptr);
+    virtual ErrCode onImportItem(int importFileType, const QStringList& items, quint32 idx = 0, void* tag = nullptr);
 };
 
 #endif // IIMPORTER_H

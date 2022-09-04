@@ -68,21 +68,24 @@ QString FileCtl::getAppDataDir(const QString& subDir)
     }
 }
 
-QString FileCtl::getAppDataDir(const char *subDir)
+
+QString FileCtl::getAppDataDir()
 {
-    if (subDir == nullptr){
-        return getAppDataDir(QString());
-    }
-    else{
-        return getAppDataDir(QString(subDir));
-    }
+    return getAppDataDir(QString());
 }
 
-QString FileCtl::getTmpDataDir(const char *subDir)
+QString FileCtl::getTmpDataDir(const QString& subDir)
 {
     traced;
     // TODO: implement it, this is just termprary processing
     return getAppDataDir(subDir);
+}
+
+QString FileCtl::getTmpDataDir()
+{
+    traced;
+    // TODO: implement it, this is just termprary processing
+    return getAppDataDir();
 }
 
 QString FileCtl::getAppInstallDir(const QString& subDir)

@@ -22,13 +22,35 @@
 #ifndef UIPERSONLISTVIEW_H
 #define UIPERSONLISTVIEW_H
 
-#include "uitableview.h"
+#include "uicommonlistview.h"
+#include "person.h"
 
-class UIPersonListView : public UITableView
+class UIPersonListView : public UICommonListView
 {
 public:
     explicit UIPersonListView(QWidget *parent = nullptr);
     virtual ~UIPersonListView();
+protected:
+    virtual ErrCode onLoad();
+    virtual void updateItem(DbModel* item, UITableItem* tblItem);
+    virtual void initHeader();
+protected:
+    virtual void importRequested(const QString& fpath);
+private:
+    void cleanUpItem();
+//public:
+//    explicit UIPersonListView(QWidget *parent = nullptr);
+//    virtual ~UIPersonListView();
+//    quint32 currentPage() const;
+//    void setCurrentPage(quint32 newCurrentPage);
+
+//protected:
+//    virtual void importRequested(const QString& fpath);
+//private:
+//    void cleanUpItem();
+//private:
+//    quint32 mCurrentPage;
+//    quint32 mTotalPages;
 };
 
 #endif // UIPERSONLISTVIEW_H

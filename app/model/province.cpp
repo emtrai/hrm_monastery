@@ -86,6 +86,16 @@ DbModelHandler *Province::getDbModelHandler()
     return DB->getModelHandler(KModelHdlProvince);
 }
 
+const QString &Province::countryUid() const
+{
+    return mCountryUid;
+}
+
+void Province::setCountryUid(const QString &newCountryUid)
+{
+    mCountryUid = newCountryUid;
+}
+
 const QString &Province::parentUid() const
 {
     return mParentUid;
@@ -96,14 +106,4 @@ void Province::setParentUid(const QString &newParentUid)
     mParentUid = newParentUid;
 }
 
-
-const QString &Province::countryShortName() const
-{
-    return mCountryShortName;
-}
-
-void Province::setCountryShortName(const QString &newCountryShortName)
-{
-    mCountryShortName = newCountryShortName;
-}
 

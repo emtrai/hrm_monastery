@@ -20,8 +20,41 @@
  * Brief:
  */
 #include "work.h"
+#include "logger.h"
+#include "errcode.h"
+#include "filectl.h"
+#include "utils.h"
+#include "dbctl.h"
+#include "defs.h"
+#include "dbmodel.h"
 
 Work::Work()
 {
+    traced;
+}
 
+Work::~Work()
+{
+    traced;
+}
+
+DbModel *Work::builder()
+{
+    traced;
+    return new Work();
+}
+
+DbModelHandler *Work::getDbModelHandler()
+{
+    return DB->getModelHandler(KModelHdlWork);
+}
+
+const QString &Work::remark() const
+{
+    return mRemark;
+}
+
+void Work::setRemark(const QString &newRemark)
+{
+    mRemark = newRemark;
 }

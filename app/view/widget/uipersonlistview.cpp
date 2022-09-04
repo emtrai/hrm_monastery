@@ -20,15 +20,94 @@
  * Brief:
  */
 #include "uipersonlistview.h"
-
+#include "personctl.h"
+#include "utils.h"
+#include "logger.h"
+#include <QList>
+#include "dbmodel.h"
+#include "person.h"
+#include "utils.h"
+#include "view/dialog/dlgimportpersonlistresult.h"
 UIPersonListView::UIPersonListView(QWidget *parent):
-    UITableView(parent)
+    UICommonListView(parent)
 {
-    mHeader.append("ID");
-    mHeader.append("Name");
+
+
 }
 
 UIPersonListView::~UIPersonListView()
 {
+    traced;
+}
 
+ErrCode UIPersonListView::onLoad()
+{
+    QList<DbModel*> items = PersonCtl::getInstance()->getAllPerson();
+    traced;
+    mItemList.clear(); // TODO: clean up item data
+    // TODO: loop to much, redundant, do something better?
+    foreach (DbModel* item, items) {
+        mItemList.append(item);
+    }
+    return ErrNone;
+}
+
+void UIPersonListView::updateItem(DbModel *item, UITableItem *tblItem)
+{
+    traced;
+    Person* per = (Person*) item;
+    tblItem->addValue(per->uid());
+    tblItem->addValue(per->hollyName());
+    tblItem->addValue(per->getFullName());
+    tblItem->addValue(Utils::date2String(per->birthday()));
+    tblItem->addValue(per->birthPlace());
+    tblItem->addValue(Utils::date2String(per->feastDay(), DATE_FORMAT_MD)); // seem feastday convert repeate many time, make it common????
+
+    tblItem->addValue(per->tel().join(";"));
+    tblItem->addValue(per->email().join(";"));
+    tblItem->addValue(per->idCard());
+    tblItem->addValue(per->idCardIssuePlace());
+
+}
+
+void UIPersonListView::initHeader()
+{
+    traced;
+    mHeader.append(tr("ID"));
+    mHeader.append(tr("Tên Thánh"));
+    mHeader.append(tr("Họ tên"));
+    mHeader.append(tr("Năm sinh"));
+    mHeader.append(tr("Nơi sinh"));
+    mHeader.append(tr("Ngày bổn mạng"));
+    mHeader.append(tr("Điện thoại"));
+    mHeader.append(tr("Email"));
+    mHeader.append(tr("Căn cước công dân"));
+    mHeader.append(tr("Nơi cấp CCCD"));
+}
+
+
+
+void UIPersonListView::importRequested(const QString &fpath)
+{
+    traced;
+    QList<DbModel*> list;
+    logd("Import from file %s", fpath.toStdString().c_str());
+    ErrCode ret = INSTANCE(PersonCtl)->importFromFile(nullptr, ImportType::IMPORT_CSV_LIST, fpath, &list);
+    logd("Import result %d", ret);
+    logd("No of import item %d", list.count());
+    DlgImportPersonListResult* dlg = new DlgImportPersonListResult();
+    dlg->setup(list);
+    dlg->exec();
+    delete dlg;
+}
+
+void UIPersonListView::cleanUpItem()
+{
+    traced;
+//    logd("Clean up %d items", mPersonList.count());
+//    foreach (Person* per, mPersonList){
+//        logd("Delet per %s", per->getFullName().toStdString().c_str());
+//        delete per;
+//    }
+//    mPersonList.clear();
 }

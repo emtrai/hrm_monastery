@@ -30,6 +30,8 @@
 #include <QScreen>
 #include <QGuiApplication>
 #include <QRect>
+#include <QComboBox>
+
 // yymd
 #define YMD_TO_INT(y,m,d) (((y) << 16) | ((m) << 8) | (d))
 
@@ -191,11 +193,14 @@ void Utils::date2ymd(qint64 date, int *pday, int *pmonth, int *pyear)
 
 #define COMMENT '#'
 ErrCode Utils::parseCSVFile(const QString &filePath,
-                            func_one_csv_item_t cb, void *caller,
-                            void *paramCb, QChar splitBy)
+    std::function<ErrCode(const QStringList& items, void* caller, void* param, quint32 idx)> cb,
+    void *caller,
+    void *paramCb, QChar splitBy,
+    qint32* cnt)
 {
     traced;
     ErrCode ret = ErrNone;
+    qint32 count = 0;
     if (!filePath.isEmpty())
     {
 
@@ -217,9 +222,12 @@ ErrCode Utils::parseCSVFile(const QString &filePath,
                         if (!items.empty())
                         {
                             if (cb != nullptr){
-                                ret = cb(items, caller, paramCb);
+                                ret = cb(items, caller, paramCb, count);
                             }
-                            if (ret != ErrNone){
+                            if (ret == ErrNone){
+                                count ++;
+                            } else {
+                                // TODO: check this case again, should continue or break/stop??
                                 loge("Line %d is invali", cnt);
                                 break;
                             }
@@ -251,6 +259,7 @@ ErrCode Utils::parseCSVFile(const QString &filePath,
         ret = ErrInvalidArg;
         loge("Invalid fielPath");
     }
+    if (cnt != nullptr) *cnt = count;
     logd("ret %d", ret);
     return ret;
 }
@@ -339,21 +348,83 @@ QString Utils::getPrebuiltFileByLang(const QString &prebuiltName, bool lang)
         return prebuiltName;
 }
 
-QString Utils::UidFromName(const QString &name, bool hash)
+
+QString Utils::UidFromName(const QString &name, UidNameConvertType type, bool* isOk)
 {
     traced;
-    QString normalize = name.simplified().toLower();
+    QString normalize = name.simplified();
     QString uid;
-    if (hash) {
+    logd("conver type %d", type);
+    switch (type){
+    case HASH_NAME:
         logd("Calc uid from name with hash");
-        uid = Crypto::hashString(normalize);
+        uid = Crypto::hashString(normalize.toLower());
+        break;
+    case SIMPLIFY_UPPER:
+        uid = normalize.toUpper();
+        break;
+    case NO_VN_MARK_UPPER:
+        uid = removeVietnameseSign(normalize.replace(' ', '_').toUpper());
+        break;
+    default:
+        loge("Not support type %d", type);
 
-    } else {
-        uid = normalize;
+        break;
     }
+    if (isOk) *isOk = !uid.isEmpty();
+
     logd("Name %s -> uid %s", name.toStdString().c_str(),
          uid.toStdString().c_str());
     return uid;
+}
+
+// FIXME: if those char is ok if putting on code???
+static const QString VNSigns[] =
+{
+
+    "aAeEoOuUiIdDyY",
+
+    "áàạảãâấầậẩẫăắằặẳẵ",
+
+    "ÁÀẠẢÃÂẤẦẬẨẪĂẮẰẶẲẴ",
+
+    "éèẹẻẽêếềệểễ",
+
+    "ÉÈẸẺẼÊẾỀỆỂỄ",
+
+    "óòọỏõôốồộổỗơớờợởỡ",
+
+    "ÓÒỌỎÕÔỐỒỘỔỖƠỚỜỢỞỠ",
+
+    "úùụủũưứừựửữ",
+
+    "ÚÙỤỦŨƯỨỪỰỬỮ",
+
+    "íìịỉĩ",
+
+    "ÍÌỊỈĨ",
+
+    "đ",
+
+    "Đ",
+
+    "ýỳỵỷỹ",
+
+    "ÝỲỴỶỸ"
+};
+
+QString Utils::removeVietnameseSign(const QString &vietnameseString)
+{
+    traced;
+    QString finalString = vietnameseString;
+    int numEle = sizeof(VNSigns)/sizeof(QString);
+    logd("numEle '%d'", numEle);
+    for (int i = 1; i < numEle; i++)
+        for (int j = 0; j < VNSigns[i].length(); j++)
+            finalString = finalString.replace(VNSigns[i][j], VNSigns[0][i - 1]);
+
+    logd("finalString '%s'", finalString.toStdString().c_str());
+    return finalString;
 }
 
 QString Utils::readAll(const QString &fpath)
@@ -365,7 +436,7 @@ QString Utils::readAll(const QString &fpath)
     return in.readAll();
 }
 
-QString Utils::showErrorBox(const QString &msg)
+void Utils::showErrorBox(const QString &msg)
 {
     QMessageBox msgBox;
     traced;
@@ -400,3 +471,30 @@ int Utils::screenHeight()
     return h;
 }
 
+
+int Utils::getCurrentComboxIndex(const QComboBox *cb)
+{
+    traced;
+    QString currtxt = cb->currentText().trimmed();
+    int index = cb->findText(currtxt);
+    logd("Current text %s", currtxt.toStdString().c_str());
+    logd("Index %d", index);
+    return index;
+}
+
+QString Utils::getCurrentComboxDataString(const QComboBox *cb, bool *isOk)
+{
+    traced;
+    int idx = getCurrentComboxIndex(cb);
+    logd("current idx %d", idx);
+    QString ret;
+    if (idx >= 0){
+        if (isOk) *isOk = true;
+        ret = cb->itemData(idx).toString();
+        if (ret.isEmpty())
+            if (isOk) *isOk = false;
+    } else {
+        if (isOk) *isOk = false;
+    }
+    return ret;
+}

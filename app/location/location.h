@@ -43,7 +43,7 @@ private:
 
     ErrCode doOneCSVItemCallback(const QStringList& items, void* param);
 private:
-    static ErrCode oneCSVItemCallback(const QStringList& items, void* caller, void* param);
+    static ErrCode oneCSVItemCallback(const QStringList& items, void* caller, void* param, quint32 idx);
 private:
     static Location* gInstance;
     QHash<QString, Country*> mListCountry;

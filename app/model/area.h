@@ -45,8 +45,9 @@ public:
     const QString &remark() const;
     void setRemark(const QString &newRemark);
 
-    const QString &shortCountryName() const;
-    void setShortCountryName(const QString &newShortCountryName);
+
+    const QString &countryUid() const;
+    void setCountryUid(const QString &newCountryUid);
 
 protected:
     virtual DbModelHandler* getDbModelHandler();
@@ -57,7 +58,7 @@ private:
     qint64 mCountryDbId;
     qint64 mPersonDbId;
     QString mRemark;
-    QString mShortCountryName;
+    QString mCountryUid;
 
 };
 

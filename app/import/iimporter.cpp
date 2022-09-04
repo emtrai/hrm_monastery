@@ -20,4 +20,16 @@
  * Brief:
  */
 #include "iimporter.h"
+#include "logger.h"
+#include "errcode.h"
 
+ErrCode IImporter::onImportItem(int importFileType, const QString &keyword, const QString &value, quint32 idx, void* tag)
+{
+    traced;
+    return ErrNotSupport;
+}
+
+ErrCode IImporter::onImportItem(int importFileType, const QStringList &items, quint32 idx, void* tag) {
+    traced;
+    return ErrNotSupport;
+}

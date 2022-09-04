@@ -24,13 +24,14 @@
 #include "errcode.h"
 #include "utils.h"
 #include "importcsv.h"
+#include "importcsvlist.h"
 
 ImportFactory::ImportFactory()
 {
     traced;
 }
 
-Importer *ImportFactory::getImporter(IMPORT_TYPE type)
+Importer *ImportFactory::getImporter(ImportType type)
 {
     Importer* ret = nullptr;
     traced;
@@ -38,6 +39,9 @@ Importer *ImportFactory::getImporter(IMPORT_TYPE type)
     switch (type) {
     case IMPORT_CSV:
         ret = INSTANCE(ImportCSV);
+        break;
+    case IMPORT_CSV_LIST:
+        ret = INSTANCE(ImportCSVList);
         break;
     default:
         loge("Import type %d not support", type);
@@ -47,14 +51,14 @@ Importer *ImportFactory::getImporter(IMPORT_TYPE type)
     return ret;
 }
 
-ErrCode ImportFactory::importFrom(IImporter *item, const QString &fpath, IMPORT_TYPE type)
+ErrCode ImportFactory::importFrom(IImporter *item, const QString &fpath, ImportType type, void* tag)
 {
     traced;
     ErrCode ret = ErrNone;
     logi("Import from %d", type);
     Importer* importer = getImporter(type);
     if (importer != nullptr)
-        ret = importer->importFrom(item, fpath);
+        ret = importer->importFrom((int) type, item, fpath, tag);
     else {
         ret = ErrNotSupport;
         loge("Importer %d not support", type);

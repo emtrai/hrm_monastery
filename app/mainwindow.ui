@@ -48,6 +48,7 @@
     <addaction name="action_Export"/>
     <addaction name="actionImportPerson"/>
     <addaction name="action_Backup"/>
+    <addaction name="actionRestore"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -106,7 +107,10 @@
    <addaction name="separator"/>
    <addaction name="action_New"/>
    <addaction name="separator"/>
+   <addaction name="actionWorkChange"/>
+   <addaction name="separator"/>
    <addaction name="actionSearch"/>
+   <addaction name="separator"/>
   </widget>
   <action name="action_New">
    <property name="icon">
@@ -130,7 +134,7 @@
   </action>
   <action name="action_Backup">
    <property name="text">
-    <string>&amp;Backup</string>
+    <string>&amp;Sao lưu</string>
    </property>
   </action>
   <action name="action_Help">
@@ -305,6 +309,21 @@
    </property>
    <property name="toolTip">
     <string>Tìm kiếm</string>
+   </property>
+  </action>
+  <action name="actionRestore">
+   <property name="text">
+    <string>&amp;Phục hồi</string>
+   </property>
+  </action>
+  <action name="actionWorkChange">
+   <property name="icon">
+    <iconset>
+     <normalon>:/icon/icon/icons8-change-64.png</normalon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Chuyển công tác</string>
    </property>
   </action>
  </widget>

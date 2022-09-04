@@ -5,7 +5,7 @@
 #include "filectl.h"
 #include "dbmodel.h"
 #include "dbmodelhandler.h"
-
+#include "iimporter.h"
 Controller::Controller()
 {
     traced;
@@ -53,6 +53,58 @@ ErrCode Controller::reloadDb()
     traced; // TODO: implement observer to call all reload db when any changes in model
     return ErrNone;
 }
+
+ErrCode Controller::exportToFile(DbModel *model, ExportType type, QString *fpath)
+{
+    traced;
+    ErrCode ret = ErrNone;
+    QString fname = QString("%1.html").arg(model->name());
+    *fpath = FileCtl::getTmpDataDir(fname);
+    ret = ExportFactory::exportTo(model->getExporter(),
+                                  *fpath, type);
+    return ret;
+}
+
+ErrCode Controller::importFromFile(IImporter *importer, ImportType type, const QString& fpath, QList<DbModel*>*outList)
+{
+    traced;
+    ErrCode ret = ErrNone;
+
+    ret = ImportFactory::importFrom((importer != nullptr)?importer:this,fpath,type, outList);
+    tracedr(ret);
+    return ret;
+}
+
+ErrCode Controller::onImportItem(int importFileType, const QStringList &items, quint32 idx, void *tag)
+{
+    traced;
+    ErrCode ret = ErrNone;
+    DbModel* model = doImportOneItem(importFileType, items, idx);
+    QList<DbModel*> *list = (QList<DbModel*>*)tag;
+    if (model != nullptr) {
+        if (list != nullptr) {
+            list->append(model);
+        } else {
+            delete model;
+        }
+    } else {
+        // do nothing
+        // TODO: handle error case
+        // be ware the case that fist item is header!!
+    }
+    // TODO: handle error case
+    tracedr(ret);
+    return ret;
+
+
+}
+
+DbModel* Controller::doImportOneItem(int importFileType, const QStringList &items, quint32 idx)
+{
+    traced;
+    return nullptr;
+}
+
 
 DbModel *Controller::buildModel(void *items, const QString &fmt)
 {
@@ -134,7 +186,7 @@ ErrCode Controller::doOneCSVItemCallback(const QStringList &items, void *param)
     return ret;
 }
 
-ErrCode Controller::oneCSVItemCallback(const QStringList &items, void* caller, void *param)
+ErrCode Controller::oneCSVItemCallback(const QStringList &items, void* caller, void *param, quint32 idx)
 {
     traced;
     ErrCode ret = ErrFailed;

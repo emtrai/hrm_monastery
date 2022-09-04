@@ -59,7 +59,7 @@ void DbInfo::setPassword(const QString &newPassword)
 
 int DbInfo::fromJson(const QString& jsonString){
     // TODO:
-    return ERR_NONE;
+    return ErrNone;
 }
 QString DbInfo::toJsonString(){
     //TODO:

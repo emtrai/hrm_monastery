@@ -5,10 +5,14 @@
 #include <QString>
 #include "errcode.h"
 
+#include "exportfactory.h"
+#include "importfactory.h"
+#include "iimporter.h"
+
 class DbModel;
 class DbModelHandler;
 
-class Controller: public QObject
+class Controller: public QObject, public IImporter
 {
     Q_OBJECT
 
@@ -20,6 +24,10 @@ public:
     virtual ErrCode addNew(DbModel* model);
 
     virtual ErrCode reloadDb();
+    virtual ErrCode exportToFile(DbModel* model, ExportType type, QString* fpath);
+    virtual ErrCode importFromFile(IImporter *importer, ImportType type, const QString& fpath, QList<DbModel*>*outList = nullptr);
+    virtual ErrCode onImportItem(int importFileType, const QStringList& items, quint32 idx = 0, void* tag = nullptr);
+    virtual DbModel* doImportOneItem(int importFileType, const QStringList& items, quint32 idx);
 protected:
     virtual DbModel *buildModel(void* items, const QString& fmt);
     virtual ErrCode check2UpdateDbFromPrebuiltFile(const QString& fname,
@@ -28,7 +36,7 @@ protected:
 
     virtual ErrCode parsePrebuiltFile(const QString &fpath, const QString &ftype);
 private:
-    static ErrCode oneCSVItemCallback(const QStringList& items, void* caller, void* param);
+    static ErrCode oneCSVItemCallback(const QStringList& items, void* caller, void* param, quint32 idx);
 
 protected:
     QString mName;

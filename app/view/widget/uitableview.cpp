@@ -23,13 +23,15 @@
 #include "ui_uitableview.h"
 #include "logger.h"
 #include <QStringList>
-
-
+#include <QFileDialog>
+#include "filectl.h"
 
 UITableView::UITableView(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::UITableView),
-    mItemPerPage(0)
+    mItemPerPage(0),
+    mFpTotalDataReq(nullptr),
+    mFpDataReq(nullptr)
 {
     ui->setupUi(this);
 
@@ -64,6 +66,12 @@ void UITableView::setupUI()
     ui->tblList->setHorizontalHeaderLabels(getHeader());
 }
 
+void UITableView::reload()
+{
+    traced;
+    onUpdatePage(1);
+}
+
 void UITableView::showEvent(QShowEvent *ev)
 {
     QFrame::showEvent(ev);
@@ -86,25 +94,28 @@ void UITableView::onUpdatePage(qint32 page)
     tbl->model()->removeRows(0, tbl->rowCount());
     // TODO: clear saints???
 
-    if (mFpTotalDataReq == nullptr || mFpDataReq == nullptr)
-        return;
+//    if (mFpTotalDataReq == nullptr || mFpDataReq == nullptr)
+//        return;
 
     qint32 total = getTotalItems();
-    qint32 perPage = ((mItemPerPage != 0) && (mItemPerPage < total))?mItemPerPage:total;
-    qint32 totalPages = total/perPage;
-    logd("total %d perpage %d totaPage %d", total, perPage, totalPages);
+    if (total > 0){
+        qint32 perPage = ((mItemPerPage != 0) && (mItemPerPage < total))?mItemPerPage:total;
+        qint32 totalPages = total/perPage;
+        logd("total %d perpage %d totaPage %d", total, perPage, totalPages);
 
-    QList<UITableItem*> items = getListItem(page, perPage, totalPages);
-    int idx = tbl->rowCount();
-    foreach (UITableItem* item, items){
-        tbl->insertRow(idx);
-        QStringList values = item->valueList();
-        for (int i = 0; i < values.count(); ++i) {
-            tbl->setItem(idx, i, new QTableWidgetItem(values.value(i)));
+        QList<UITableItem*> items = getListItem(page, perPage, totalPages);
+        int idx = tbl->rowCount();
+        foreach (UITableItem* item, items){
+            tbl->insertRow(idx);
+            QStringList values = item->valueList();
+            for (int i = 0; i < values.count(); ++i) {
+                tbl->setItem(idx, i, new QTableWidgetItem(values.value(i)));
+            }
+
+            idx ++;
         }
-
-        idx ++;
     }
+
 }
 
 QList<UITableItem *> UITableView::getListItem(qint32 page, qint32 perPage, qint32 totalPages)
@@ -121,6 +132,11 @@ ErrCode UITableView::onLoad()
 {
     traced;
     return ErrNone;
+}
+
+void UITableView::importRequested(const QString& fpath)
+{
+    traced;
 }
 
 qint32 UITableView::itemPerPage() const
@@ -179,3 +195,39 @@ void UITableItem::setValueList(const QStringList &newValueList)
 {
     mValueList = newValueList;
 }
+
+void UITableView::on_btnImport_clicked()
+{
+    // TODO: show dialog to select which type of file to be imported???
+    QString fname = QFileDialog::getOpenFileName(
+        this,
+        tr("Open file"),
+        FileCtl::getAppDataDir(),
+        tr("CSV Files (*.csv);;Excel (*.xls *.xlsx)"));
+
+    if (!fname.isEmpty()){
+        logd("File %s is selected", fname.toStdString().c_str());
+        importRequested(fname);
+    }
+}
+
+quint32 UITableView::totalPages() const
+{
+    return mTotalPages;
+}
+
+void UITableView::setTotalPages(quint32 newTotalPages)
+{
+    mTotalPages = newTotalPages;
+}
+
+quint32 UITableView::currentPage() const
+{
+    return mCurrentPage;
+}
+
+void UITableView::setCurrentPage(quint32 newCurrentPage)
+{
+    mCurrentPage = newCurrentPage;
+}
+

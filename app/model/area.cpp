@@ -77,18 +77,19 @@ void Area::setRemark(const QString &newRemark)
     mRemark = newRemark;
 }
 
-const QString &Area::shortCountryName() const
-{
-    return mShortCountryName;
-}
-
-void Area::setShortCountryName(const QString &newShortCountryName)
-{
-    mShortCountryName = newShortCountryName;
-}
 
 DbModelHandler *Area::getDbModelHandler()
 {
 
     return DB->getModelHandler(KModelHdlProvince);
+}
+
+const QString &Area::countryUid() const
+{
+    return mCountryUid;
+}
+
+void Area::setCountryUid(const QString &newCountryUid)
+{
+    mCountryUid = newCountryUid;
 }

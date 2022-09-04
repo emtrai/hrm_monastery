@@ -40,6 +40,7 @@
 #include "table/dbsqliteareatbl.h"
 #include "table/dbsqlitedeparttbl.h"
 #include "table/dbsqlitecoursetbl.h"
+#include "table/dbsqliteworktbl.h"
 #include "dbsqlitedefs.h"
 #include "dbsqliteedu.h"
 #include "dbsqlitesaint.h"
@@ -52,6 +53,8 @@
 #include "dbsqlitearea.h"
 #include "dbsqlitedept.h"
 #include "dbsqlitecourse.h"
+#include "dbsqlitework.h"
+#include "dbsqliteperson.h"
 #include "defs.h"
 
 static const QString DRIVER("QSQLITE");
@@ -82,6 +85,7 @@ void DbSqlite::setupTables()
     appendTable(new DbSqliteAreaTbl(this));
     appendTable(new DbSqliteDepartTbl(this));
     appendTable(new DbSqliteCourseTbl(this));
+    appendTable(new DbSqliteWorkTbl(this));
 }
 
 void DbSqlite::setupModelHandler()
@@ -99,6 +103,8 @@ void DbSqlite::setupModelHandler()
     appendModelHandler(new DbSqliteArea());
     appendModelHandler(new DbSqliteDept());
     appendModelHandler(new DbSqliteCourse());
+    appendModelHandler(new DbSqliteWork());
+    appendModelHandler(new DbSqlitePerson());
 }
 
 void DbSqlite::appendTable(DbSqliteTbl *tbl)

@@ -24,14 +24,6 @@
 
 #include <QString>
 
-#define ERR_NONE        (0)
-#define ERR_FAILED      (-1)
-#define ERR_INVALID     (-2)
-#define ERR_NOT_SUPPORT (-3)
-#define ERR_NOT_FOUND   (-4)
-#define ERR_NOT_READY   (-5)
-#define ERR_NOT_AVAIL   (-6)
-
 typedef enum ErrCode{
     ErrNone = 0,
     ErrFailed,

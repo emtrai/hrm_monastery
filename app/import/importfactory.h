@@ -24,9 +24,11 @@
 
 #include "importer.h"
 
-enum IMPORT_TYPE {
+
+enum ImportType {
     IMPORT_NONE = 0,
     IMPORT_CSV,
+    IMPORT_CSV_LIST,
     IMPORT_DOCX,
     IMPORT_XLSX,
     IMPORT_MAX
@@ -37,9 +39,9 @@ class ImportFactory
 {
 public:
     ImportFactory();
-    static Importer* getImporter(IMPORT_TYPE type);
+    static Importer* getImporter(ImportType type);
 
-    static ErrCode importFrom(IImporter* item, const QString& fpath, IMPORT_TYPE type);
+    static ErrCode importFrom(IImporter* item, const QString& fpath, ImportType type, void* tag = nullptr);
 
 };
 

@@ -36,6 +36,7 @@
 #include "areactl.h"
 #include "departctl.h"
 #include "coursectl.h"
+#include "workctl.h"
 #include "utils.h"
 
 LoaderCtl* LoaderCtl::gInstance = nullptr;
@@ -76,6 +77,7 @@ void LoaderCtl::registerAll()
     add2Loader(MissionCtl::getInstance());
     add2Loader(PersonCtl::getInstance());
     add2Loader(INSTANCE(CourseCtl));
+    add2Loader(INSTANCE(WorkCtl));
 //    add2Loader(CommunityCtl::getInstance());
 //    add2Loader(AreaCtl::getInstance());
 //    add2Loader(DepartCtl::getInstance());
@@ -89,7 +91,7 @@ void LoaderCtl::onLoad()
     // TODO: call on separate thread?
     // TODO: timeout???
     if (mListener != nullptr){
-        mListener(ERR_NONE, mListenerData);
+        mListener(ErrNone, mListenerData);
     }
 }
 

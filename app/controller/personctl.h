@@ -25,6 +25,7 @@
 #include <QObject>
 #include "errcode.h"
 #include "controller.h"
+#include <QHash>
 class Person;
 
 
@@ -36,15 +37,22 @@ public:
     ErrCode addPerson(Person* person);
     ErrCode addPerson (const QString& fname);
     ErrCode AddListPersons(const QString& fname);
+    QList<DbModel*> getAllPerson();
+
+    virtual DbModel* doImportOneItem(int importFileType, const QStringList& items, quint32 idx);
 private:
     PersonCtl();
+
 
 public:
     static PersonCtl* getInstance();
 
+    const QList<QString> &importFields() const;
+
 private:
     static PersonCtl* gInstance;
-
+    QList<QString> mImportFields;
+//    QHash<QString, std::function<QString (Person::*())>> mExportFields;
 public slots:
     virtual void onLoad();
 };

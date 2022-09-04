@@ -105,7 +105,7 @@ ErrCode Location::doOneCSVItemCallback(const QStringList &items, void *param)
     return ret;
 }
 
-ErrCode Location::oneCSVItemCallback(const QStringList &items, void* caller, void *param)
+ErrCode Location::oneCSVItemCallback(const QStringList &items, void* caller, void *param, quint32 idx)
 {
 
     traced;

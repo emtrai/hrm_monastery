@@ -32,6 +32,11 @@
 #include "filectl.h"
 #include "view/widget/uitableviewfactory.h"
 #include "utils.h"
+#include <QToolButton>
+#include <QFileDialog>
+
+#include "view/dialog/dlgimportpersonlistresult.h"
+#include "personctl.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -42,6 +47,43 @@ MainWindow::MainWindow(QWidget *parent)
     , mCurrentView(nullptr)
 {
     ui->setupUi(this);
+    QToolButton *importButton = new QToolButton(this);
+    importButton->setText(tr("&Nhập"));
+    importButton->setPopupMode(QToolButton::InstantPopup);
+    importButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    QIcon icon;
+    icon.addFile(QString::fromUtf8(":/icon/icon/icons8-import-64"), QSize(), QIcon::Normal, QIcon::On);
+    importButton->setIcon(icon);
+
+    QMenu *importMenu = new QMenu(importButton);
+
+    mActionImportPersonList = new QAction(this);
+    mActionImportPersonList->setObjectName(QString::fromUtf8("action_ImportPersonList"));
+    mActionImportPersonList->setText(tr("Danh sách Nữ tu"));
+    QIcon mImportPersonListIcon;
+    mImportPersonListIcon.addFile(QString::fromUtf8(":/icon/icon/icons8-nun-64.png"), QSize(), QIcon::Normal, QIcon::On);
+    mActionImportPersonList->setIcon(mImportPersonListIcon);
+    QObject::connect(mActionImportPersonList, SIGNAL(triggered()), this, SLOT(on_action_ImportPersonList_triggered()));
+    importMenu->addAction(mActionImportPersonList);
+
+    mActionImportPerson = new QAction(this);
+    mActionImportPerson->setObjectName(QString::fromUtf8("action_ImportPerson"));
+    mActionImportPerson->setText(tr("Nữ tu"));
+    mActionImportPerson->setIcon(mImportPersonListIcon);
+//    QObject::connect(mActionImportPerson, SIGNAL(triggered()), this, SLOT(on_action_ImportPersonList_triggered()));
+    importMenu->addAction(mActionImportPerson);
+
+    mActionImportCommunityList = new QAction(this);
+    mActionImportCommunityList->setObjectName(QString::fromUtf8("action_ImportCommunityList"));
+    mActionImportCommunityList->setText(tr("Danh sách Cộng đoàn"));
+    QIcon mImportCommunityIcon;
+    mImportCommunityIcon.addFile(QString::fromUtf8(":/icon/icon/icons8-community-64 (1).png"), QSize(), QIcon::Normal, QIcon::On);
+    mActionImportCommunityList->setIcon(mImportCommunityIcon);
+
+
+    importMenu->addAction(mActionImportCommunityList);
+    importButton->setMenu(importMenu);
+    ui->toolBar->addWidget(importButton);
 
     mSummarizeView = new UISummarizeView();
 
@@ -118,6 +160,31 @@ void MainWindow::loadHomePageFile()
 
     logd("Load home page file ret %d", ret);
     // TODO: should log to file???
+}
+
+void MainWindow::on_action_ImportPersonList_triggered()
+{
+    traced;
+    // TODO: show dialog to select which type of file to be imported???
+    QString fname = QFileDialog::getOpenFileName(
+        this,
+        tr("Open file"),
+        FileCtl::getAppDataDir(),
+        tr("CSV Files (*.csv);;Excel (*.xls *.xlsx)"));
+    // TODO: this is duplicate code, make it common please
+    if (!fname.isEmpty()){
+        logd("File %s is selected", fname.toStdString().c_str());
+        QList<DbModel*> list;
+        logd("Import from file %s", fname.toStdString().c_str());
+        ErrCode ret = INSTANCE(PersonCtl)->importFromFile(nullptr, ImportType::IMPORT_CSV_LIST, fname, &list);
+        logd("Import result %d", ret);
+        logd("No of import item %d", list.count());
+        DlgImportPersonListResult* dlg = new DlgImportPersonListResult();
+        dlg->setup(list);
+        dlg->exec();
+        delete dlg;
+    }
+
 }
 
 

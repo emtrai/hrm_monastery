@@ -46,6 +46,7 @@ SOURCES += \
     controller/ethnicctl.cpp \
     controller/missionctl.cpp \
     controller/provincectl.cpp \
+    controller/workctl.cpp \
     crypto/crypto.cpp \
     db/dbctl.cpp \
     db/dbinfo.cpp \
@@ -64,9 +65,11 @@ SOURCES += \
     db/sqlite/dbsqliteinsertbuilder.cpp \
     db/sqlite/dbsqlitemission.cpp \
     db/sqlite/dbsqlitemodelhandler.cpp \
+    db/sqlite/dbsqliteperson.cpp \
     db/sqlite/dbsqliteprovince.cpp \
     db/sqlite/dbsqlitesaint.cpp \
     db/sqlite/dbsqlitespecialist.cpp \
+    db/sqlite/dbsqlitework.cpp \
     db/sqlite/table/dbsqliteareatbl.cpp \
     db/sqlite/table/dbsqlitecommunitytbl.cpp \
     db/sqlite/table/dbsqlitecountrytbl.cpp \
@@ -91,6 +94,7 @@ SOURCES += \
     file/filectl.cpp \
     import/iimporter.cpp \
     import/importcsv.cpp \
+    import/importcsvlist.cpp \
     import/importer.cpp \
     import/importfactory.cpp \
     loader/loaderctl.cpp \
@@ -108,7 +112,6 @@ SOURCES += \
     model/ethnic.cpp \
     model/mission.cpp \
     model/person.cpp \
-    model/personbasic.cpp \
     model/personevent.cpp \
     model/province.cpp \
     model/saint.cpp \
@@ -129,7 +132,10 @@ SOURCES += \
     view/dialog/dlgdepartment.cpp \
     view/dialog/dlgethnic.cpp \
     view/dialog/dlghtmlviewer.cpp \
+    view/dialog/dlgimportlistresult.cpp \
+    view/dialog/dlgimportpersonlistresult.cpp \
     view/dialog/dlgperson.cpp \
+    view/dialog/dlgprovince.cpp \
     view/dialog/dlgsaint.cpp \
     view/widget/uicommonlistview.cpp \
     view/widget/uicommunitylistview.cpp \
@@ -154,6 +160,7 @@ HEADERS += \
     controller/ethnicctl.h \
     controller/missionctl.h \
     controller/provincectl.h \
+    controller/workctl.h \
     crypto/crypto.h \
     db/dbctl.h \
     db/dbinfo.h \
@@ -172,9 +179,11 @@ HEADERS += \
     db/sqlite/dbsqliteinsertbuilder.h \
     db/sqlite/dbsqlitemission.h \
     db/sqlite/dbsqlitemodelhandler.h \
+    db/sqlite/dbsqliteperson.h \
     db/sqlite/dbsqliteprovince.h \
     db/sqlite/dbsqlitesaint.h \
     db/sqlite/dbsqlitespecialist.h \
+    db/sqlite/dbsqlitework.h \
     db/sqlite/table/dbsqliteareatbl.h \
     db/sqlite/table/dbsqlitecommunitytbl.h \
     db/sqlite/table/dbsqlitecountrytbl.h \
@@ -201,6 +210,7 @@ HEADERS += \
     file/filectl.h \
     import/iimporter.h \
     import/importcsv.h \
+    import/importcsvlist.h \
     import/importer.h \
     import/importfactory.h \
     loader/loaderctl.h \
@@ -217,7 +227,6 @@ HEADERS += \
     model/ethnic.h \
     model/mission.h \
     model/person.h \
-    model/personbasic.h \
     model/personevent.h \
     model/province.h \
     model/saint.h \
@@ -239,7 +248,10 @@ HEADERS += \
     view/dialog/dlgdepartment.h \
     view/dialog/dlgethnic.h \
     view/dialog/dlghtmlviewer.h \
+    view/dialog/dlgimportlistresult.h \
+    view/dialog/dlgimportpersonlistresult.h \
     view/dialog/dlgperson.h \
+    view/dialog/dlgprovince.h \
     view/dialog/dlgsaint.h \
     view/widget/uicommonlistview.h \
     view/widget/uicommunitylistview.h \
@@ -260,7 +272,9 @@ FORMS += \
     view/dialog/dlgdepartment.ui \
     view/dialog/dlgethnic.ui \
     view/dialog/dlghtmlviewer.ui \
+    view/dialog/dlgimportlistresult.ui \
     view/dialog/dlgperson.ui \
+    view/dialog/dlgprovince.ui \
     view/dialog/dlgsaint.ui \
     view/widget/uimulticomboxview.ui \
     view/widget/uisummarizeview.ui \
@@ -290,7 +304,9 @@ DISTFILES += \
     res/edu_vi.csv \
     res/home.html \
     res/person_info_template.html \
-    res/role_vi.csv
+    res/role_vi.csv \
+    res/status_vi.csv \
+    res/work_vi.csv
 
 RESOURCES += \
     icon.qrc \
