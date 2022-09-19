@@ -14,30 +14,33 @@
  * limitations under the License.
  *
  *
- * Filename: dbmodelhandler.h
+ * Filename: dbsqlitemodelhandler.h
  * Author: Anh, Ngo Huy
  * Created date:8/9/2022
  * Brief:
  */
-#ifndef DBMODELHANDLER_H
-#define DBMODELHANDLER_H
+#ifndef DBSQLITEMODELHANDLER_H
+#define DBSQLITEMODELHANDLER_H
 
+#include <dbmodelhandler.h>
+#include "table/dbsqlitetbl.h"
 #include "errcode.h"
-#include <QList>
-#include "dbmodel.h"
 
-class DbModel;
-
-class DbModelHandler
+class DbSqliteModelHandler : public virtual DbModelHandler
 {
 public:
-    DbModelHandler();
+    DbSqliteModelHandler();
 
-    virtual ErrCode add(const DbModel* model) = 0;
-    virtual bool exist(const DbModel* edu) = 0;
-    virtual QList<DbModel*> getAll(DbModelBuilder builder, const char* modelName = nullptr) = 0;
-    virtual const QString getName() = 0;
+    /* Those are very generic functions */
 
+
+    virtual ErrCode add(const DbModel* model);
+    virtual bool exist(const DbModel* edu);
+    virtual QList<DbModel*> getAll(DbModelBuilder builder, const char* modelName = nullptr);
+    virtual DbModel* getModel(qint64 dbId);
+    virtual const QString getName();
+protected:
+    virtual DbSqliteTbl* getMainTbl() = 0;
 };
 
-#endif // DBMODELHANDLER_H
+#endif // DBSQLITEMODELHANDLER_H

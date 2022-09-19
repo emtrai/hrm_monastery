@@ -27,7 +27,7 @@
 #include "controller.h"
 #include <QHash>
 class Person;
-
+class Event;
 
 // TODO: observer Person change?
 class PersonCtl: public Controller
@@ -38,6 +38,7 @@ public:
     ErrCode addPerson (const QString& fname);
     ErrCode AddListPersons(const QString& fname);
     QList<DbModel*> getAllPerson();
+    QList<DbModel*> getListEvent(const Person* person); // TODO: should move to separate event controller?
 
     virtual DbModel* doImportOneItem(int importFileType, const QStringList& items, quint32 idx);
 private:

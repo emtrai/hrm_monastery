@@ -14,30 +14,37 @@
  * limitations under the License.
  *
  *
- * Filename: dbmodelhandler.h
+ * Filename: statusctl.h
  * Author: Anh, Ngo Huy
- * Created date:8/9/2022
+ * Created date:9/6/2022
  * Brief:
  */
-#ifndef DBMODELHANDLER_H
-#define DBMODELHANDLER_H
+#ifndef STATUSCTL_H
+#define STATUSCTL_H
 
-#include "errcode.h"
+#include "controller.h"
+#include "utils.h"
 #include <QList>
-#include "dbmodel.h"
 
-class DbModel;
+class Status;
 
-class DbModelHandler
+class StatusCtl : public Controller
 {
+    GET_INSTALCE_DECL(StatusCtl);
 public:
-    DbModelHandler();
+    StatusCtl();
+protected:
+    DbModel *buildModel(void *items, const QString &fmt);
+public:
+    const QList<Status*> getStatusList();
 
-    virtual ErrCode add(const DbModel* model) = 0;
-    virtual bool exist(const DbModel* edu) = 0;
-    virtual QList<DbModel*> getAll(DbModelBuilder builder, const char* modelName = nullptr) = 0;
-    virtual const QString getName() = 0;
+public:
+    virtual ErrCode reloadDb();
 
+public slots:
+    virtual void onLoad();
+private:
+    QList<Status*> mStatusList;
 };
 
-#endif // DBMODELHANDLER_H
+#endif // STATUSCTL_H

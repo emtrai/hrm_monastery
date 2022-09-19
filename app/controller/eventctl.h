@@ -14,33 +14,39 @@
  * limitations under the License.
  *
  *
- * Filename: dbsqlitemodelhandler.h
+ * Filename: eventctl.h
  * Author: Anh, Ngo Huy
- * Created date:8/9/2022
+ * Created date:9/19/2022
  * Brief:
  */
-#ifndef DBSQLITEMODELHANDLER_H
-#define DBSQLITEMODELHANDLER_H
+#ifndef EVENTCTL_H
+#define EVENTCTL_H
 
-#include <dbmodelhandler.h>
-#include "table/dbsqlitetbl.h"
-#include "errcode.h"
+#include "controller.h"
+#include "utils.h"
+#include <QList>
 
-class DbSqliteModelHandler : public DbModelHandler
+
+class Event;
+
+class EventCtl : public Controller
 {
+    GET_INSTALCE_DECL(EventCtl);
 public:
-    DbSqliteModelHandler();
-
-    /* Those are very generic functions */
-
-
-    virtual ErrCode add(const DbModel* model);
-    virtual bool exist(const DbModel* edu);
-    virtual QList<DbModel*> getAll(DbModelBuilder builder);
-    virtual DbModel* getModel(qint64 dbId);
-    virtual const QString getName();
+    EventCtl();
+    virtual ~EventCtl();
 protected:
-    virtual DbSqliteTbl* getMainTbl() = 0;
+    DbModel *buildModel(void *items, const QString &fmt);
+public:
+    const QList<Event*> getEventList();
+
+public:
+    virtual ErrCode reloadDb();
+
+public slots:
+    virtual void onLoad();
+private:
+    QList<Event*> mList;
 };
 
-#endif // DBSQLITEMODELHANDLER_H
+#endif // EVENTCTL_H

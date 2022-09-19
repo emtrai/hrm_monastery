@@ -14,30 +14,40 @@
  * limitations under the License.
  *
  *
- * Filename: dbmodelhandler.h
+ * Filename: status.cpp
  * Author: Anh, Ngo Huy
- * Created date:8/9/2022
+ * Created date:9/5/2022
  * Brief:
  */
-#ifndef DBMODELHANDLER_H
-#define DBMODELHANDLER_H
-
+#include "status.h"
+#include "logger.h"
 #include "errcode.h"
-#include <QList>
+#include "filectl.h"
+#include "utils.h"
+#include "dbctl.h"
+#include "defs.h"
 #include "dbmodel.h"
 
-class DbModel;
-
-class DbModelHandler
+Status::Status()
 {
-public:
-    DbModelHandler();
+    traced;
+}
+DbModel *Status::builder()
+{
+    traced;
+    return new Status();
+}
+const QString &Status::remark() const
+{
+    return mRemark;
+}
 
-    virtual ErrCode add(const DbModel* model) = 0;
-    virtual bool exist(const DbModel* edu) = 0;
-    virtual QList<DbModel*> getAll(DbModelBuilder builder, const char* modelName = nullptr) = 0;
-    virtual const QString getName() = 0;
+void Status::setRemark(const QString &newRemark)
+{
+    mRemark = newRemark;
+}
 
-};
-
-#endif // DBMODELHANDLER_H
+DbModelHandler *Status::getDbModelHandler()
+{
+    return DB->getModelHandler(KModelHdlStatus);
+}

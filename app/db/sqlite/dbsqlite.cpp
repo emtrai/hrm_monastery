@@ -41,6 +41,10 @@
 #include "table/dbsqlitedeparttbl.h"
 #include "table/dbsqlitecoursetbl.h"
 #include "table/dbsqliteworktbl.h"
+#include "table/dbsqlitestatustbl.h"
+#include "table/dbsqlitepersoneventtbl.h"
+#include "table/dbsqliteeventtbl.h"
+
 #include "dbsqlitedefs.h"
 #include "dbsqliteedu.h"
 #include "dbsqlitesaint.h"
@@ -55,6 +59,10 @@
 #include "dbsqlitecourse.h"
 #include "dbsqlitework.h"
 #include "dbsqliteperson.h"
+#include "dbsqlitestatus.h"
+#include "dbsqlitepersonevent.h"
+#include "dbsqliteevent.h"
+
 #include "defs.h"
 
 static const QString DRIVER("QSQLITE");
@@ -86,6 +94,9 @@ void DbSqlite::setupTables()
     appendTable(new DbSqliteDepartTbl(this));
     appendTable(new DbSqliteCourseTbl(this));
     appendTable(new DbSqliteWorkTbl(this));
+    appendTable(new DbSqliteStatusTbl(this));
+    appendTable(new DbSqlitePersonEventTbl(this));
+    appendTable(new DbSqliteEventTbl(this));
 }
 
 void DbSqlite::setupModelHandler()
@@ -104,7 +115,10 @@ void DbSqlite::setupModelHandler()
     appendModelHandler(new DbSqliteDept());
     appendModelHandler(new DbSqliteCourse());
     appendModelHandler(new DbSqliteWork());
+    appendModelHandler(new DbSqliteStatus());
     appendModelHandler(new DbSqlitePerson());
+    appendModelHandler(new DbSqliteEvent());
+    appendModelHandler(new DbSqlitePersonEvent());
 }
 
 void DbSqlite::appendTable(DbSqliteTbl *tbl)
@@ -205,6 +219,11 @@ DbModelHandler *DbSqlite::getModelHandler(const QString &name)
     return hdl;
 }
 
+DbSqliteTbl *DbSqlite::table(const QString &tblName)
+{
+    return DbSqlite::getInstance()->getTable(tblName);
+}
+
 
 DbSqlite* DbSqlite::getInstance(){
     if (gInstance == nullptr){
@@ -213,23 +232,6 @@ DbSqlite* DbSqlite::getInstance(){
     return gInstance;
 }
 
-
-//ErrCode_t DbSqlite::addPerson(const Person* person)
-//{
-//    traced;
-//    ErrCode_t err = ErrNone;
-
-//    if (mListTbl.contains(KTablePerson)){
-//        err = ((DbSqlitePersonTbl*)mListTbl[KTablePerson])->addPerson(person);
-//    }
-//    else{
-//        err = ErrNotFound;
-//        loge("Not found table %s", KTablePerson);
-//        // TODO: reload system? or what should we do?
-//    }
-
-//    return err;
-//}
 
 ErrCode_t DbSqlite::loadDb(const DbInfo* dbInfo){
     traced;

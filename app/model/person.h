@@ -62,6 +62,7 @@ class Person: public DbModel, public IExporter, public IImporter
             virtual ~Person();
             virtual void clone(const Person& per);
             virtual void buildUidIfNotSet();
+            virtual QString modelName() const;
 
             const QString &firstName() const;
             void setFirstName(const QString &newFirstName);

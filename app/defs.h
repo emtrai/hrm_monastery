@@ -55,6 +55,8 @@ const char* const KPrebuiltLogoFileName = "logo.png"; // special case, need file
 const char* const KPrebuiltPersonInfoTemplateFileName = "person_info_template";
 const char* const KPrebuiltCourseCSVFileName = "course";
 const char* const KPrebuiltWorkCSVFileName = "work";
+const char* const KPrebuiltStatusCSVFileName = "status";
+const char* const KPrebuiltEventCSVFileName = "event";
 
 const char* const KModelHdlCountry = "country";
 const char* const KModelHdlEdu = "education";
@@ -69,6 +71,12 @@ const char* const KModelHdlArea = "area";
 const char* const KModelHdlDept = "department";
 const char* const KModelHdlCourse = "course";
 const char* const KModelHdlWork = "work";
+const char* const KModelHdlStatus = "status";
+const char* const KModelHdlPersonEvent = "person_event";
+const char* const KModelHdlEvent = "event";
+
+const char* const KModelNamePerson = "person";
+const char* const KModelNamePersonEvent = "person_event";
 
 const char* const KDataFormatList = "QList";
 const char* const KDataFormatStringList = "QStringList";

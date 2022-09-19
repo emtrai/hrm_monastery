@@ -131,13 +131,15 @@ const char* const KFieldRetireDate = "retire_date";
 const char* const KFieldRetirePlace = "retire_place";
 const char* const KFieldDeadDate = "dead_date";
 const char* const KFieldDeadPlace = "dead_place"; // noi chon cat
+const char* const KFieldCategoryUid = "catetory_uid";
+const char* const KFieldEventUid = "event_uid";
 
 
 // TABLES NAME
 const char* const KTablePerson = "person"; // Person
 const char* const KTableCommunity = "community"; // cong doan
 const char* const KTableDepartment = "department"; // BQL
-const char* const KTableEvent = "event";
+const char* const KTablePersonEvent = "person_event";
 const char* const KTableSaint = "saint"; // thanh
 const char* const KTableEdu = "edu"; // Education like primary school, high school, etc.
 const char* const KTableSpecialist = "specialist"; // chuyen mon
@@ -149,6 +151,8 @@ const char* const KTableProvince = "province"; //
 const char* const KTableEthnic = "ethnic"; //Dan toc
 const char* const KTableArea = "area"; //Dan toc
 const char* const KTableCourse = "course"; //Dan toc
+const char* const KTableStatus = "status"; //Tinh trang
+const char* const KTableEvent = "event"; //Tinh trang
 
 // TODO: move to class???
 QString getDateTypeString(TableFieldDatatype_t dataType);

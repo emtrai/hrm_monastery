@@ -64,7 +64,7 @@ bool DbSqliteModelHandler::exist(const DbModel *edu)
     return getMainTbl()->isExist(edu);;
 }
 
-QList<DbModel *> DbSqliteModelHandler::getAll(DbModelBuilder builder)
+QList<DbModel *> DbSqliteModelHandler::getAll(DbModelBuilder builder, const char* modelName)
 {
     traced;
     return getMainTbl()->getAll(builder);

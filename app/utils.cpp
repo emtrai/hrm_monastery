@@ -373,7 +373,7 @@ QString Utils::UidFromName(const QString &name, UidNameConvertType type, bool* i
     }
     if (isOk) *isOk = !uid.isEmpty();
 
-    logd("Name %s -> uid %s", name.toStdString().c_str(),
+    logd("Name '%s' -> uid '%s'", name.toStdString().c_str(),
          uid.toStdString().c_str());
     return uid;
 }
@@ -442,10 +442,20 @@ void Utils::showErrorBox(const QString &msg)
     traced;
     logd("Error box %s", msg.toStdString().c_str());
     msgBox.setText(msg);
-    msgBox.setStandardButtons(QMessageBox::Cancel);
-    msgBox.addButton(QMessageBox::Cancel);
-    msgBox.setDefaultButton(QMessageBox::Cancel);
+    msgBox.setStandardButtons(QMessageBox::Close);
     msgBox.exec();
+}
+
+void Utils::showErrorBox(int ret, const QString *msg)
+{
+    traced;
+    QString errMsg;
+    if (msg != nullptr) {
+        errMsg.append(*msg);
+        errMsg.append("\n");
+    }
+    errMsg.append(QString("Lỗi ! Mã lỗi %1").arg(ret)); // TODO: translation
+    showErrorBox(errMsg);
 }
 
 ErrCode Utils::screenSize(int *w, int *h)
@@ -496,5 +506,32 @@ QString Utils::getCurrentComboxDataString(const QComboBox *cb, bool *isOk)
     } else {
         if (isOk) *isOk = false;
     }
+    return ret;
+}
+
+ErrCode Utils::getCurrentComboxDataString(const QComboBox *cb, QString *data, QString *name)
+{
+    traced;
+    int idx = getCurrentComboxIndex(cb);
+    logd("current idx %d", idx);
+    ErrCode ret = ErrNone;
+    if (idx >= 0){
+
+        QString currTxt = cb->itemText(idx);
+        QString value = cb->itemData(idx).toString();
+        if (name != nullptr)
+            *name = currTxt;
+
+        if (!value.isEmpty()) {
+            if (data != nullptr)
+                *data = value;
+        } else {
+            ret = ErrNoData;
+        }
+
+    } else {
+        ret = ErrInvalidData;
+    }
+    tracedr(ret);
     return ret;
 }

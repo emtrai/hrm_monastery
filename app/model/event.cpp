@@ -14,30 +14,40 @@
  * limitations under the License.
  *
  *
- * Filename: dbmodelhandler.h
+ * Filename: event.cpp
  * Author: Anh, Ngo Huy
- * Created date:8/9/2022
+ * Created date:9/10/2022
  * Brief:
  */
-#ifndef DBMODELHANDLER_H
-#define DBMODELHANDLER_H
+#include "event.h"
 
-#include "errcode.h"
-#include <QList>
+#include "utils.h"
+#include "dbctl.h"
+#include "defs.h"
 #include "dbmodel.h"
-
-class DbModel;
-
-class DbModelHandler
+Event::Event()
 {
-public:
-    DbModelHandler();
+    traced;
+}
 
-    virtual ErrCode add(const DbModel* model) = 0;
-    virtual bool exist(const DbModel* edu) = 0;
-    virtual QList<DbModel*> getAll(DbModelBuilder builder, const char* modelName = nullptr) = 0;
-    virtual const QString getName() = 0;
+DbModel *Event::build()
+{
+    return new Event();
 
-};
+}
 
-#endif // DBMODELHANDLER_H
+const QString &Event::remark() const
+{
+    return mRemark;
+}
+
+void Event::setRemark(const QString &newRemark)
+{
+    mRemark = newRemark;
+}
+
+DbModelHandler *Event::getDbModelHandler()
+{
+
+    return DB->getModelHandler(KModelHdlEvent);
+}

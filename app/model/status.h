@@ -14,30 +14,29 @@
  * limitations under the License.
  *
  *
- * Filename: dbmodelhandler.h
+ * Filename: status.h
  * Author: Anh, Ngo Huy
- * Created date:8/9/2022
+ * Created date:9/5/2022
  * Brief:
  */
-#ifndef DBMODELHANDLER_H
-#define DBMODELHANDLER_H
+#ifndef STATUS_H
+#define STATUS_H
 
-#include "errcode.h"
-#include <QList>
-#include "dbmodel.h"
+#include <dbmodel.h>
 
-class DbModel;
-
-class DbModelHandler
+class Status : public DbModel
 {
 public:
-    DbModelHandler();
+    Status();
+    static DbModel *builder();
 
-    virtual ErrCode add(const DbModel* model) = 0;
-    virtual bool exist(const DbModel* edu) = 0;
-    virtual QList<DbModel*> getAll(DbModelBuilder builder, const char* modelName = nullptr) = 0;
-    virtual const QString getName() = 0;
+    const QString &remark() const;
+    void setRemark(const QString &newRemark);
 
+protected:
+    virtual DbModelHandler *getDbModelHandler();
+private:
+    QString mRemark;
 };
 
-#endif // DBMODELHANDLER_H
+#endif // STATUS_H

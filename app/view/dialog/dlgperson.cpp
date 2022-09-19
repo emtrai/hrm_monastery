@@ -29,6 +29,7 @@
 #include "person.h"
 #include "utils.h"
 #include "saintctl.h"
+#include "statusctl.h"
 
 #include <QRegularExpression>
 #include <QValidator>
@@ -47,6 +48,7 @@
 #include "view/dialog/dlgethnic.h"
 #include "view/dialog/dlgcourse.h"
 #include "view/dialog/dlgprovince.h"
+#include "view/dialog/dlgaddpersonevent.h"
 
 #include "community.h"
 
@@ -63,6 +65,9 @@
 #include "coursectl.h"
 #include "work.h"
 #include "workctl.h"
+#include "status.h"
+#include "statusctl.h"
+#include "personevent.h"
 
 #define SPLIT_EMAIL_PHONE ";"
 
@@ -112,11 +117,11 @@ DlgPerson::DlgPerson(QWidget *parent) :
     ui(new Ui::DlgPerson),
     mPerson(nullptr),
     cbSaints(nullptr),
-    cbSpecialist(nullptr)
+    cbSpecialist(nullptr),
+    mEditMode(Mode::NEW)
 {
+    traced;
     setupUI();
-
-
 }
 
 DlgPerson::~DlgPerson()
@@ -127,6 +132,7 @@ DlgPerson::~DlgPerson()
         delete cbSaints;
     if (cbSpecialist)
         delete cbSpecialist;
+
     delete ui;
 }
 
@@ -144,25 +150,6 @@ void DlgPerson::on_btnImport_clicked()
         logd("File %s is selected", fname.toStdString().c_str());
         per = person(true);
         ret = ImportFactory::importFrom(per, fname, IMPORT_CSV);
-//        Person* person = new Person();
-//        ErrCode ret = person->fromCSVFile(fname);
-//        if (ret == ErrNone){
-//            logd("Parse ok, fill dialog");
-//            person->dump();
-//            if (!person->personCode().isEmpty())
-//                ui->txtCode->setText(person->personCode());
-
-//            if (!person->getFullName().isEmpty())
-//                ui->txtName->setText(person->getFullName());
-
-//            if (person->christenDate() > 0){
-//                QString date = Utils::date2String(person->christenDate());
-//                if (!date.isEmpty()){
-//                    ui->txtChristenDate->setText(date);
-//                }
-//            }
-//        }
-//        delete person;
     } else {
         logd("Nothing be selected");
         ret = ErrCancelled;
@@ -175,40 +162,53 @@ void DlgPerson::on_btnImport_clicked()
 void DlgPerson::setupUI()
 {
     traced;
+    /*
+     * SET UP UI
+     */
     ui->setupUi(this);
 
     DIALOG_SIZE_SHOW(this);
 
     ui->txtCode->setText(Config::getNextPersonalCode());
 
+
+    QStringList communityListHdr;
+    // TODO: translation
+    communityListHdr.append("Id");
+    communityListHdr.append("Date");
+    communityListHdr.append("End Date");
+    communityListHdr.append("Event");
+    communityListHdr.append("Title");
+    communityListHdr.append("Remark");
+    ui->tblEvents->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tblEvents->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
+
+    ui->tblEvents->setShowGrid(true);
+    ui->tblEvents->setColumnCount(communityListHdr.count());
+//    ui->tblCommunityList->setMinimumWidth(500);
+    ui->tblEvents->setMinimumHeight(200);
+
+    ui->tblEvents->setHorizontalHeaderLabels(communityListHdr);
+
+    // Call connect here may cause call is called twice, it's because
+    // Qt check func name, if it's in format on_buttonBox_clicked --> auto register slot
+    //    connect(ui->buttonBox, SIGNAL(clicked(QAbstractButton*)),
+    //            this, SLOT(on_buttonBox_clicked(QAbstractButton*)));
+
+    /*
+     * LOAD DATA
+     */
+
+    loadStatus();
+
     // Education
     loadEdu();
 
     // Saints
-
-    logd("Load Saint");
-    cbSaints = new UIMultiComboxView(KUiMultiComboxNameSaint, ui->wgSaint);
-    QList<Saint*> saints = SaintCtl::getInstance()->getListSaints();
-    cbSaints->setListener(this);
-    foreach (Saint* saint, saints) {
-        logd(">> Saint %s", saint->name().toStdString().c_str());
-        cbSaints->addItem(saint->name(), saint->uid());
-    }
-
-    ui->wgSaint->layout()->addWidget(cbSaints);
+    loadSaints();
 
     // specialist
-
-    logd("Load specialist");
-    cbSpecialist = new UIMultiComboxView(KUiMultiComboxNameSpecialist, ui->wgSaint);
-    cbSpecialist->setListener(this);
-    QList<Specialist*> specialists = SpecialistCtl::getInstance()->getAll();
-    foreach (Specialist* specialist, specialists) {
-//        logd(">> specialist %s", name.toStdString().c_str());
-        cbSpecialist->addItem(specialist->name(), specialist->uid());
-    }
-    ui->wgSpecialist->layout()->addWidget(cbSpecialist);
-
+    loadSpecialist();
 
     // Country
     loadCountry();
@@ -221,11 +221,7 @@ void DlgPerson::setupUI()
     loadProvince();
 
     // Community
-    logd("Load community");
-    QList<Community*> listCommunity = COMMUNITYCTL->getCommunityList();
-    foreach(Community* item, listCommunity){
-        ui->cbCommunity->addItem(item->name(), item->uid());
-    }
+    loadCommunity();
 
     // Course
     loadCourse();
@@ -233,25 +229,9 @@ void DlgPerson::setupUI()
     // work
     loadWork();
 
-    QStringList communityListHdr;
-    communityListHdr.append("Id");
-    communityListHdr.append("Date");
-    communityListHdr.append("Community");
-    communityListHdr.append("Remark");
-    ui->tblCommunityList->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui->tblCommunityList->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
+    // load Event
+    loadEvent(true);
 
-    ui->tblCommunityList->setShowGrid(true);
-    ui->tblCommunityList->setColumnCount(communityListHdr.count());
-//    ui->tblCommunityList->setMinimumWidth(500);
-//    ui->tblCommunityList->setMinimumHeight(500);
-
-    ui->tblCommunityList->setHorizontalHeaderLabels(communityListHdr);
-
-    // Call connect here may cause call is called twice, it's because
-    // Qt check func name, if it's in format on_buttonBox_clicked --> auto register slot
-    //    connect(ui->buttonBox, SIGNAL(clicked(QAbstractButton*)),
-    //            this, SLOT(on_buttonBox_clicked(QAbstractButton*)));
 }
 
 Person *DlgPerson::buildPerson()
@@ -579,6 +559,11 @@ void DlgPerson::onItemDeleted(UIMultiComboxView *cb, const QString &name, const 
     }
 }
 
+void DlgPerson::onClearAll()
+{
+    traced;
+}
+
 void DlgPerson::loadEdu()
 {
     traced;
@@ -589,6 +574,45 @@ void DlgPerson::loadEdu()
 
         ui->cbEdu->addItem(edu->name());
     }
+}
+
+void DlgPerson::loadSaints()
+{
+    traced;
+    logd("Load Saint");
+    if (cbSaints == nullptr) {
+
+        cbSaints = new UIMultiComboxView(KUiMultiComboxNameSaint, ui->wgSaint);
+        cbSaints->setListener(this);
+
+        ui->wgSaint->layout()->addWidget(cbSaints);
+    }
+    cbSaints->clearAll();
+    QList<Saint*> saints = SaintCtl::getInstance()->getListSaints();
+
+    foreach (Saint* saint, saints) {
+        logd(">> Saint %s", saint->name().toStdString().c_str());
+        cbSaints->addItem(saint->name(), saint->uid());
+    }
+
+}
+
+void DlgPerson::loadSpecialist()
+{
+    traced;
+    logd("Load specialist");
+    if (cbSpecialist == nullptr){
+        cbSpecialist = new UIMultiComboxView(KUiMultiComboxNameSpecialist, ui->wgSaint);
+        cbSpecialist->setListener(this);
+        ui->wgSpecialist->layout()->addWidget(cbSpecialist);
+    }
+    cbSpecialist->clearAll();
+    QList<Specialist*> specialists = SpecialistCtl::getInstance()->getAll();
+    foreach (Specialist* specialist, specialists) {
+        //        logd(">> specialist %s", name.toStdString().c_str());
+        cbSpecialist->addItem(specialist->name(), specialist->uid());
+    }
+
 }
 
 
@@ -647,8 +671,74 @@ void DlgPerson::loadWork()
 
 }
 
-void DlgPerson::loadEvent()
+void DlgPerson::loadEvent(bool reloadAll)
 {
+    traced;
+    QTableWidget* tbl = ui->tblEvents;
+    tbl->clearContents();
+    tbl->model()->removeRows(0, tbl->rowCount());
+    logd("reloadAll %d", reloadAll);
+    if (reloadAll) {
+        cleanEvent();
+        Person* per = person();
+        if (per != nullptr) {
+            QList<DbModel*> list = INSTANCE(PersonCtl)->getListEvent(per);
+            foreach(DbModel* item, list){
+                mListPersonEvent.append(new PersonEvent((PersonEvent*)item));
+            }
+        }
+    }
+
+    qint32 col = 0;
+    qint32 idx = tbl->rowCount();
+    logd("idx=%d", idx);
+    logd("mListPersonEvent cnt=%d", mListPersonEvent.count());
+    foreach (PersonEvent* event, mListPersonEvent) {
+        col = 0;
+        logd("idx=%d", idx);
+        tbl->insertRow(idx);
+        tbl->setItem(idx, col++, new QTableWidgetItem(event->uid()));
+        tbl->setItem(idx, col++, new QTableWidgetItem(Utils::date2String(event->date())));
+        tbl->setItem(idx, col++, new QTableWidgetItem(Utils::date2String(event->endDate())));
+        tbl->setItem(idx, col++, new QTableWidgetItem(event->eventName()));
+        tbl->setItem(idx, col++, new QTableWidgetItem(event->name()));
+        tbl->setItem(idx, col++, new QTableWidgetItem(event->remark()));
+        idx++;
+    }
+
+}
+
+void DlgPerson::cleanEvent()
+{
+    traced;
+    if (!mListPersonEvent.empty()) {
+        foreach(PersonEvent* item, mListPersonEvent) {
+            delete item; // TODO: is it safe????, should check if iterator is supported
+        }
+        mListPersonEvent.clear();
+    }
+}
+
+void DlgPerson::loadCommunity()
+{
+    traced;
+    logd("Load community");
+    QList<Community*> listCommunity = COMMUNITYCTL->getCommunityList();
+    ui->cbCommunity->clear();
+    foreach(Community* item, listCommunity){
+        ui->cbCommunity->addItem(item->name(), item->uid());
+    }
+
+}
+
+void DlgPerson::loadStatus()
+{
+    traced;
+    ui->cbStatus->clear();
+    QList<Status*> listItems = INSTANCE(StatusCtl)->getStatusList();
+    foreach(Status* item, listItems){
+        ui->cbStatus->addItem(item->name(), item->uid());
+    }
 
 }
 
@@ -737,41 +827,41 @@ void DlgPerson::on_cbCountry_currentIndexChanged(int index)
 
 void DlgPerson::on_btnAddCommunityHistory_clicked()
 {
-    DlgAddCommunityHistory w;
-    //    w.setWindowState(Qt::WindowState::WindowMaximized);
-    w.setModal(true);
-    if (w.exec() == QDialog::Accepted){
-        QTableWidget* tbl = ui->tblCommunityList;
-        qint64 date = w.getDate();
-        int idx = tbl->rowCount();
-        QString name;
-        const Community* comm = w.getCommunity();
-        if (comm != nullptr){
-            name = comm->name();
-        }
-        logd("idx %d", idx);
-        if (date > 0 && !name.isEmpty()){
+//    DlgAddCommunityHistory w;
+//    //    w.setWindowState(Qt::WindowState::WindowMaximized);
+//    w.setModal(true);
+//    if (w.exec() == QDialog::Accepted){
+//        QTableWidget* tbl = ui->tblCommunityList;
+//        qint64 date = w.getDate();
+//        int idx = tbl->rowCount();
+//        QString name;
+//        const Community* comm = w.getCommunity();
+//        if (comm != nullptr){
+//            name = comm->name();
+//        }
+//        logd("idx %d", idx);
+//        if (date > 0 && !name.isEmpty()){
 
-            logd("Date %d", date);
-            logd("Name %s", name.toStdString().c_str());
-            tbl->insertRow(idx);
-            qint32 col = 0;
-            tbl->setItem(idx, col++, new QTableWidgetItem(QString("%1").arg(comm->dbId())));
-            tbl->setItem(idx, col++, new QTableWidgetItem(Utils::date2String(date)));
-            tbl->setItem(idx, col++, new QTableWidgetItem(name));
-            tbl->setItem(idx, col++, new QTableWidgetItem(w.getRemark()));
+//            logd("Date %d", date);
+//            logd("Name %s", name.toStdString().c_str());
+//            tbl->insertRow(idx);
+//            qint32 col = 0;
+//            tbl->setItem(idx, col++, new QTableWidgetItem(QString("%1").arg(comm->dbId())));
+//            tbl->setItem(idx, col++, new QTableWidgetItem(Utils::date2String(date)));
+//            tbl->setItem(idx, col++, new QTableWidgetItem(name));
+//            tbl->setItem(idx, col++, new QTableWidgetItem(w.getRemark()));
 
-            //        logd("Date %d", w.getDate());
-        }
-    }
+//            //        logd("Date %d", w.getDate());
+//        }
+//    }
 }
 
 
 void DlgPerson::on_tblClearCommunity_clicked()
 {
     traced;
-    ui->tblCommunityList->clearContents();
-    ui->tblCommunityList->model()->removeRows(0, ui->tblCommunityList->rowCount());
+//    ui->tblCommunityList->clearContents();
+//    ui->tblCommunityList->model()->removeRows(0, ui->tblCommunityList->rowCount());
 }
 
 
@@ -968,5 +1058,35 @@ void DlgPerson::on_btnAddWork_clicked()
     }
     logd("ret=%d", ret);
     msgBox.exec();
+}
+
+DlgPerson::Mode DlgPerson::editMode() const
+{
+    return mEditMode;
+}
+
+void DlgPerson::setEditMode(DlgPerson::Mode newEditMode)
+{
+    mEditMode = newEditMode;
+}
+
+
+void DlgPerson::on_btnAddEvent_clicked()
+{
+    traced;
+    DlgAddPersonEvent * dlg = new DlgAddPersonEvent();
+    if (dlg == nullptr) {
+        loge("Open dlg DlgAddPersonEvent fail, No memory");
+        return;
+    }
+
+    if (dlg->exec() == QDialog::Accepted){
+        PersonEvent* event = dlg->personEvent();
+        if (event != nullptr) {
+            mListPersonEvent.append(new PersonEvent(event));
+        }
+        loadEvent();
+    }
+    delete dlg;
 }
 

@@ -17,6 +17,7 @@ DEFINES = DEBUG_TRACE
 
 INCLUDEPATH += $$PWD/db
 INCLUDEPATH += $$PWD/db/sqlite
+INCLUDEPATH += $$PWD/db/sqlite/handler
 INCLUDEPATH += $$PWD/model
 INCLUDEPATH += $$PWD/view
 INCLUDEPATH += $$PWD/view/dialog
@@ -44,32 +45,38 @@ SOURCES += \
     controller/coursectl.cpp \
     controller/departctl.cpp \
     controller/ethnicctl.cpp \
+    controller/eventctl.cpp \
     controller/missionctl.cpp \
     controller/provincectl.cpp \
+    controller/statusctl.cpp \
     controller/workctl.cpp \
     crypto/crypto.cpp \
     db/dbctl.cpp \
     db/dbinfo.cpp \
     db/dbmodel.cpp \
     db/dbmodelhandler.cpp \
+    db/dbpersonmodelhandler.cpp \
     db/idatabase.cpp \
     db/sqlite/dbsqlite.cpp \
-    db/sqlite/dbsqlitearea.cpp \
-    db/sqlite/dbsqlitecommunity.cpp \
-    db/sqlite/dbsqlitecountry.cpp \
-    db/sqlite/dbsqlitecourse.cpp \
     db/sqlite/dbsqlitedefs.cpp \
-    db/sqlite/dbsqlitedept.cpp \
-    db/sqlite/dbsqliteedu.cpp \
-    db/sqlite/dbsqliteethnic.cpp \
     db/sqlite/dbsqliteinsertbuilder.cpp \
-    db/sqlite/dbsqlitemission.cpp \
-    db/sqlite/dbsqlitemodelhandler.cpp \
-    db/sqlite/dbsqliteperson.cpp \
-    db/sqlite/dbsqliteprovince.cpp \
-    db/sqlite/dbsqlitesaint.cpp \
-    db/sqlite/dbsqlitespecialist.cpp \
-    db/sqlite/dbsqlitework.cpp \
+    db/sqlite/handler/dbsqlitemission.cpp \
+    db/sqlite/handler/dbsqlitemodelhandler.cpp \
+    db/sqlite/handler/dbsqliteperson.cpp \
+    db/sqlite/handler/dbsqlitepersonevent.cpp \
+    db/sqlite/handler/dbsqliteprovince.cpp \
+    db/sqlite/handler/dbsqlitesaint.cpp \
+    db/sqlite/handler/dbsqlitespecialist.cpp \
+    db/sqlite/handler/dbsqlitestatus.cpp \
+    db/sqlite/handler/dbsqlitework.cpp \
+    db/sqlite/handler/dbsqlitearea.cpp \
+    db/sqlite/handler/dbsqlitecommunity.cpp \
+    db/sqlite/handler/dbsqlitecountry.cpp \
+    db/sqlite/handler/dbsqlitecourse.cpp \
+    db/sqlite/handler/dbsqlitedept.cpp \
+    db/sqlite/handler/dbsqliteedu.cpp \
+    db/sqlite/handler/dbsqliteethnic.cpp \
+    db/sqlite/handler/dbsqliteevent.cpp \
     db/sqlite/table/dbsqliteareatbl.cpp \
     db/sqlite/table/dbsqlitecommunitytbl.cpp \
     db/sqlite/table/dbsqlitecountrytbl.cpp \
@@ -77,6 +84,7 @@ SOURCES += \
     db/sqlite/table/dbsqlitedeparttbl.cpp \
     db/sqlite/table/dbsqliteedutbl.cpp \
     db/sqlite/table/dbsqliteethnictbl.cpp \
+    db/sqlite/table/dbsqliteeventtbl.cpp \
     db/sqlite/table/dbsqlitemissiontbl.cpp \
     db/sqlite/table/dbsqlitepersoneventtbl.cpp \
     db/sqlite/table/dbsqlitepersontbl.cpp \
@@ -84,6 +92,7 @@ SOURCES += \
     db/sqlite/table/dbsqliteprovincetbl.cpp \
     db/sqlite/table/dbsqlitesainttbl.cpp \
     db/sqlite/table/dbsqlitespecialisttbl.cpp \
+    db/sqlite/table/dbsqlitestatustbl.cpp \
     db/sqlite/table/dbsqlitetbl.cpp \
     db/sqlite/table/dbsqliteworktbl.cpp \
     controller/eductl.cpp \
@@ -110,12 +119,14 @@ SOURCES += \
     model/department.cpp \
     model/education.cpp \
     model/ethnic.cpp \
+    model/event.cpp \
     model/mission.cpp \
     model/person.cpp \
     model/personevent.cpp \
     model/province.cpp \
     model/saint.cpp \
     model/specialist.cpp \
+    model/status.cpp \
     model/work.cpp \
     controller/personctl.cpp \
     report/reportctl.cpp \
@@ -126,6 +137,8 @@ SOURCES += \
     test/testctl.cpp \
     utils.cpp \
     view/dialog/dlgaddcommunityhistory.cpp \
+    view/dialog/dlgaddevent.cpp \
+    view/dialog/dlgaddpersonevent.cpp \
     view/dialog/dlgcommunity.cpp \
     view/dialog/dlgcountry.cpp \
     view/dialog/dlgcourse.cpp \
@@ -158,32 +171,38 @@ HEADERS += \
     controller/coursectl.h \
     controller/departctl.h \
     controller/ethnicctl.h \
+    controller/eventctl.h \
     controller/missionctl.h \
     controller/provincectl.h \
+    controller/statusctl.h \
     controller/workctl.h \
     crypto/crypto.h \
     db/dbctl.h \
     db/dbinfo.h \
     db/dbmodel.h \
     db/dbmodelhandler.h \
+    db/dbpersonmodelhandler.h \
     db/idatabase.h \
     db/sqlite/dbsqlite.h \
-    db/sqlite/dbsqlitearea.h \
-    db/sqlite/dbsqlitecommunity.h \
-    db/sqlite/dbsqlitecountry.h \
-    db/sqlite/dbsqlitecourse.h \
     db/sqlite/dbsqlitedefs.h \
-    db/sqlite/dbsqlitedept.h \
-    db/sqlite/dbsqliteedu.h \
-    db/sqlite/dbsqliteethnic.h \
     db/sqlite/dbsqliteinsertbuilder.h \
-    db/sqlite/dbsqlitemission.h \
-    db/sqlite/dbsqlitemodelhandler.h \
-    db/sqlite/dbsqliteperson.h \
-    db/sqlite/dbsqliteprovince.h \
-    db/sqlite/dbsqlitesaint.h \
-    db/sqlite/dbsqlitespecialist.h \
-    db/sqlite/dbsqlitework.h \
+    db/sqlite/handler/dbsqlitearea.h \
+    db/sqlite/handler/dbsqlitecommunity.h \
+    db/sqlite/handler/dbsqlitecountry.h \
+    db/sqlite/handler/dbsqlitecourse.h \
+    db/sqlite/handler/dbsqlitedept.h \
+    db/sqlite/handler/dbsqliteedu.h \
+    db/sqlite/handler/dbsqliteethnic.h \
+    db/sqlite/handler/dbsqliteevent.h \
+    db/sqlite/handler/dbsqlitemission.h \
+    db/sqlite/handler/dbsqlitemodelhandler.h \
+    db/sqlite/handler/dbsqliteperson.h \
+    db/sqlite/handler/dbsqlitepersonevent.h \
+    db/sqlite/handler/dbsqliteprovince.h \
+    db/sqlite/handler/dbsqlitesaint.h \
+    db/sqlite/handler/dbsqlitespecialist.h \
+    db/sqlite/handler/dbsqlitestatus.h \
+    db/sqlite/handler/dbsqlitework.h \
     db/sqlite/table/dbsqliteareatbl.h \
     db/sqlite/table/dbsqlitecommunitytbl.h \
     db/sqlite/table/dbsqlitecountrytbl.h \
@@ -191,6 +210,7 @@ HEADERS += \
     db/sqlite/table/dbsqlitedeparttbl.h \
     db/sqlite/table/dbsqliteedutbl.h \
     db/sqlite/table/dbsqliteethnictbl.h \
+    db/sqlite/table/dbsqliteeventtbl.h \
     db/sqlite/table/dbsqlitemissiontbl.h \
     db/sqlite/table/dbsqlitepersoneventtbl.h \
     db/sqlite/table/dbsqlitepersontbl.h \
@@ -198,6 +218,7 @@ HEADERS += \
     db/sqlite/table/dbsqliteprovincetbl.h \
     db/sqlite/table/dbsqlitesainttbl.h \
     db/sqlite/table/dbsqlitespecialisttbl.h \
+    db/sqlite/table/dbsqlitestatustbl.h \
     db/sqlite/table/dbsqlitetbl.h \
     db/sqlite/table/dbsqliteworktbl.h \
     defs.h \
@@ -225,12 +246,14 @@ HEADERS += \
     model/department.h \
     model/education.h \
     model/ethnic.h \
+    model/event.h \
     model/mission.h \
     model/person.h \
     model/personevent.h \
     model/province.h \
     model/saint.h \
     model/specialist.h \
+    model/status.h \
     model/work.h \
     controller/personctl.h \
     report/reportctl.h \
@@ -242,6 +265,8 @@ HEADERS += \
     test/testctl.h \
     utils.h \
     view/dialog/dlgaddcommunityhistory.h \
+    view/dialog/dlgaddevent.h \
+    view/dialog/dlgaddpersonevent.h \
     view/dialog/dlgcommunity.h \
     view/dialog/dlgcountry.h \
     view/dialog/dlgcourse.h \
@@ -266,6 +291,8 @@ HEADERS += \
 FORMS += \
     mainwindow.ui \
     view/dialog/dlgaddcommunityhistory.ui \
+    view/dialog/dlgaddevent.ui \
+    view/dialog/dlgaddpersonevent.ui \
     view/dialog/dlgcommunity.ui \
     view/dialog/dlgcountry.ui \
     view/dialog/dlgcourse.ui \
@@ -302,6 +329,7 @@ DISTFILES += \
     res/course_vi.csv \
     res/department_vi.json \
     res/edu_vi.csv \
+    res/event_category_vi.csv \
     res/home.html \
     res/person_info_template.html \
     res/role_vi.csv \

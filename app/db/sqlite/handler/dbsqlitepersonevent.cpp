@@ -14,30 +14,33 @@
  * limitations under the License.
  *
  *
- * Filename: dbmodelhandler.h
+ * Filename: dbsqlitepersonevent.cpp
  * Author: Anh, Ngo Huy
- * Created date:8/9/2022
+ * Created date:9/8/2022
  * Brief:
  */
-#ifndef DBMODELHANDLER_H
-#define DBMODELHANDLER_H
+#include "dbsqlitepersonevent.h"
+#include "logger.h"
+#include "defs.h"
 
-#include "errcode.h"
-#include <QList>
-#include "dbmodel.h"
+#include "dbsqlitedefs.h"
+#include "dbsqlite.h"
 
-class DbModel;
+GET_INSTANCE_IMPL(DbSqlitePersonEvent)
 
-class DbModelHandler
+DbSqlitePersonEvent::DbSqlitePersonEvent()
 {
-public:
-    DbModelHandler();
+    traced;
+}
 
-    virtual ErrCode add(const DbModel* model) = 0;
-    virtual bool exist(const DbModel* edu) = 0;
-    virtual QList<DbModel*> getAll(DbModelBuilder builder, const char* modelName = nullptr) = 0;
-    virtual const QString getName() = 0;
 
-};
 
-#endif // DBMODELHANDLER_H
+const QString DbSqlitePersonEvent::getName()
+{
+    return KModelHdlPersonEvent;
+}
+
+DbSqliteTbl *DbSqlitePersonEvent::getMainTbl()
+{
+    return (DbSqliteTbl*)DbSqlite::getInstance()->getTable(KTablePersonEvent);
+}

@@ -14,31 +14,30 @@
  * limitations under the License.
  *
  *
- * Filename: dbsqliteperson.cpp
+ * Filename: event.h
  * Author: Anh, Ngo Huy
- * Created date:9/4/2022
+ * Created date:9/10/2022
  * Brief:
  */
-#include "dbsqliteperson.h"
-#include "logger.h"
-#include "defs.h"
+#ifndef EVENT_H
+#define EVENT_H
 
-#include "dbsqlitedefs.h"
-#include "dbsqlite.h"
+#include <dbmodel.h>
 
-GET_INSTANCE_IMPL(DbSqlitePerson)
-
-DbSqlitePerson::DbSqlitePerson()
+class Event : public DbModel
 {
-    traced;
-}
+public:
+    Event();
+    static DbModel *build();
 
-const QString DbSqlitePerson::getName()
-{
-    return KModelHdlPerson;
-}
 
-DbSqliteTbl *DbSqlitePerson::getMainTbl()
-{
-    return (DbSqliteTbl*)DbSqlite::getInstance()->getTable(KTablePerson);
-}
+    const QString &remark() const;
+    void setRemark(const QString &newRemark);
+
+protected:
+    virtual DbModelHandler *getDbModelHandler();
+private:
+    QString mRemark;
+};
+
+#endif // EVENT_H

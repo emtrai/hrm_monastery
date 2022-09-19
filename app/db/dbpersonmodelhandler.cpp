@@ -14,30 +14,18 @@
  * limitations under the License.
  *
  *
- * Filename: dbmodelhandler.h
+ * Filename: dbpersonmodelhandler.cpp
  * Author: Anh, Ngo Huy
- * Created date:8/9/2022
+ * Created date:9/10/2022
  * Brief:
  */
-#ifndef DBMODELHANDLER_H
-#define DBMODELHANDLER_H
-
+#include "dbpersonmodelhandler.h"
+#include "logger.h"
 #include "errcode.h"
-#include <QList>
-#include "dbmodel.h"
 
-class DbModel;
-
-class DbModelHandler
+DbPersonModelHandler::DbPersonModelHandler()
 {
-public:
-    DbModelHandler();
+    traced;
+}
 
-    virtual ErrCode add(const DbModel* model) = 0;
-    virtual bool exist(const DbModel* edu) = 0;
-    virtual QList<DbModel*> getAll(DbModelBuilder builder, const char* modelName = nullptr) = 0;
-    virtual const QString getName() = 0;
 
-};
-
-#endif // DBMODELHANDLER_H

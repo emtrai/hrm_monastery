@@ -25,16 +25,25 @@
 #include <QDialog>
 #include <QAbstractButton>
 #include "view/widget/uimulticomboxview.h"
+
 class Person;
 class QComboBox;
-
+class DbModel;
+class PersonEvent;
 namespace Ui {
 class DlgPerson;
 }
 
+
 class DlgPerson : public QDialog, public UIMultiComboxViewListener
 {
     Q_OBJECT
+
+    enum Mode {
+        NEW = 0,
+        EDIT,
+        MAX
+    };
 
         public:
                  explicit DlgPerson(QWidget *parent = nullptr);
@@ -57,16 +66,28 @@ class DlgPerson : public QDialog, public UIMultiComboxViewListener
                 virtual ErrCode onNewItem(UIMultiComboxView* ui, const QString& value, bool silent);
                 virtual void onItemAdded(UIMultiComboxView* ui, const QString& name, const QVariant& value);
                 virtual void onItemDeleted(UIMultiComboxView* ui, const QString& name, const QVariant& value);
+                virtual void onClearAll();
+
 //protected:
-//    virtual void accept();
+                //    virtual void accept();
+                DlgPerson::Mode editMode() const;
+                void setEditMode(DlgPerson::Mode newEditMode);
+
             private:
                 void loadEdu();
+                void loadSaints();
+                void loadSpecialist();
                 void loadEthnic();
                 void loadCourse();
                 void loadCountry();
                 void loadProvince();
                 void loadWork();
-                void loadEvent();
+                void loadCommunity();
+                void loadStatus();
+
+
+                void loadEvent(bool reloadAll = false);
+                void cleanEvent();
 
 private slots:
     void on_buttonBox_clicked( QAbstractButton * button );
@@ -93,10 +114,15 @@ private slots:
 
     void on_btnAddWork_clicked();
 
+    void on_btnAddEvent_clicked();
+
 private:
     Person* mPerson;
     UIMultiComboxView *cbSaints;
     UIMultiComboxView *cbSpecialist;
+    DlgPerson::Mode mEditMode;
+
+    QList<PersonEvent*> mListPersonEvent;
 };
 
 #endif // DLGPERSON_H

@@ -120,6 +120,9 @@ ErrCode Controller::parsePrebuiltFile(const QString &fpath, const QString &ftype
 {
     ErrCode ret = ErrNone;
     traced;
+    // TODO: should we add meta field in beginning of file to know status of information???
+    // i.e.: version, last update time.
+    // This can be used to check/compare witl one stored in db
     if (ftype == KFileTypeCSV) {
         ret = Utils::parseCSVFile(fpath,
                                   &Controller::oneCSVItemCallback,

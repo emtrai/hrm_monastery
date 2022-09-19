@@ -36,6 +36,7 @@ DbModel::DbModel():
 
 DbModel::DbModel(const DbModel &model)
 {
+    traced;
     setDbId(model.dbId());
     setName(model.name());
     setUid(model.uid());
@@ -43,9 +44,20 @@ DbModel::DbModel(const DbModel &model)
     setHistory(model.history());
 }
 
+DbModel::DbModel(const DbModel *model):DbModel(*model)
+{
+    traced;
+}
+
 DbModel::~DbModel()
 {
     traced;
+}
+
+
+QString DbModel::modelName() const
+{
+    return "DbModel";
 }
 
 

@@ -226,6 +226,11 @@ void Person::buildUidIfNotSet()
     setUid(Utils::UidFromName(uidName, UidNameConvertType::NO_VN_MARK_UPPER)); // TODO: handle error
 }
 
+QString Person::modelName() const
+{
+    return KModelNamePerson;
+}
+
 DbModel* Person::build(){
     return new Person();
 }
@@ -244,7 +249,7 @@ void Person::initExportFields()
     traced;
     // TODO: took to much memory for this, should put in in PersonCtl????
     mExportFields.insert(KExportFieldImgPath, [this](){
-        QString imgPath =this->imgPath();
+        QString imgPath = this->imgPath();
         if (imgPath.isEmpty()){
             imgPath = ":/icon/icon/unknown.png";
         }
@@ -264,11 +269,21 @@ void Person::initExportFields()
     });
     mExportFields.insert(KExportFieldBirthday, [this](){
         return Utils::date2String(this->birthday());});
-    mExportFields.insert(KExportFieldBirthplace, [this](){return this->birthPlace();});
-    mExportFields.insert(KExportFieldHollyName, [this](){return this->hollyName();});
-    mExportFields.insert(KExportFieldFeastDay, [this](){return Utils::date2String(this->feastDay(), DATE_FORMAT_MD);});
-    mExportFields.insert(KExportFieldNationality, [this](){return this->nationalityName();});
-    mExportFields.insert(KExportFieldEthnic, [this](){return this->ethnicName();});
+    mExportFields.insert(KExportFieldBirthplace, [this](){
+        return this->birthPlace();
+    });
+    mExportFields.insert(KExportFieldHollyName, [this](){
+        return this->hollyName();
+    });
+    mExportFields.insert(KExportFieldFeastDay, [this](){
+        return Utils::date2String(this->feastDay(), DATE_FORMAT_MD);
+    });
+    mExportFields.insert(KExportFieldNationality, [this](){
+        return this->nationalityName();
+    });
+    mExportFields.insert(KExportFieldEthnic, [this](){
+        return this->ethnicName();
+    });
     mExportFields.insert(KExportFieldIDcard, [this](){
         return this->idCard();
     });
@@ -547,6 +562,7 @@ ErrCode Person::setNameFromFullName(const QString &name)
         mFirstName = items.last();
         items.removeLast();
     }
+    // TODO: this is vietnamese style only, how about name in Englist style???
     mLastName = items.join(" ");
     logd("first name %s", mFirstName.toStdString().c_str());
     logd("last name %s", mLastName.toStdString().c_str());

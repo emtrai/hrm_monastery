@@ -65,7 +65,7 @@ ErrCode ImportCSVList::importFrom(int importFileType, IImporter *importer, const
                 tracedr(ret2);
                 return ret2;
                 },
-            this, tag, CSV_ITEM_SPLIT, &cnt);
+            this, tag, CSV_LIST_ITEM_SPLIT, &cnt);
     }
     logi("Parsed %d item", cnt);
     logd("Parse result %d", ret);

@@ -20,6 +20,7 @@
  * Brief:
  */
 #include "loaderctl.h"
+#include "utils.h"
 #include "dbctl.h"
 #include "logger.h"
 #include "errcode.h"
@@ -37,7 +38,8 @@
 #include "departctl.h"
 #include "coursectl.h"
 #include "workctl.h"
-#include "utils.h"
+#include "statusctl.h"
+#include "eventctl.h"
 
 LoaderCtl* LoaderCtl::gInstance = nullptr;
 
@@ -78,6 +80,9 @@ void LoaderCtl::registerAll()
     add2Loader(PersonCtl::getInstance());
     add2Loader(INSTANCE(CourseCtl));
     add2Loader(INSTANCE(WorkCtl));
+    add2Loader(INSTANCE(StatusCtl));
+    add2Loader(INSTANCE(StatusCtl));
+    add2Loader(INSTANCE(EventCtl));
 //    add2Loader(CommunityCtl::getInstance());
 //    add2Loader(AreaCtl::getInstance());
 //    add2Loader(DepartCtl::getInstance());

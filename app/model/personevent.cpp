@@ -20,8 +20,120 @@
  * Brief:
  */
 #include "personevent.h"
+#include "logger.h"
+#include "errcode.h"
+#include "filectl.h"
+#include "utils.h"
+#include "dbctl.h"
+#include "defs.h"
+#include "dbmodel.h"
 
-PersonEvent::PersonEvent()
+PersonEvent::PersonEvent():
+    mDate(0),
+    mEndDate(0)
 {
-
+    traced;
 }
+
+PersonEvent::PersonEvent(const PersonEvent *model):
+    DbModel((const DbModel *)model)
+{
+    traced;
+    setRemark(model->remark());
+    setDate(model->date());
+    setEndDate(model->endDate());
+    setPersonUid(model->personUid());
+    setEventUid(model->eventUid());
+    setEventName(model->eventName());
+}
+
+DbModel *PersonEvent::build()
+{
+    traced;
+    return new PersonEvent();
+}
+
+QString PersonEvent::modelName() const
+{
+    return KModelNamePersonEvent;
+}
+const QString &PersonEvent::remark() const
+{
+    return mRemark;
+}
+
+void PersonEvent::setRemark(const QString &newRemark)
+{
+    mRemark = newRemark;
+}
+
+void PersonEvent::buildUidIfNotSet()
+{
+    traced;
+    if (uid().isEmpty()){
+        bool isOk = false;
+        QString uid = Utils::UidFromName(
+            QString("%1%2%3%4").arg(personUid()).arg(eventUid()).arg(date()).arg(name().simplified().toLower()),
+            UidNameConvertType::HASH_NAME, &isOk);
+        // TODO: check isOk
+        logd("Uuid %s", uid.toStdString().c_str());
+        setUid(uid);
+    }
+}
+
+DbModelHandler *PersonEvent::getDbModelHandler()
+{
+//    return DB->getModelHandler(KModelHdlPersonEvent);
+    return DB->getModelHandler(KModelHdlPerson);
+}
+
+qint64 PersonEvent::endDate() const
+{
+    return mEndDate;
+}
+
+void PersonEvent::setEndDate(qint64 newEndDate)
+{
+    mEndDate = newEndDate;
+}
+
+const QString &PersonEvent::eventName() const
+{
+    return mEventName;
+}
+
+void PersonEvent::setEventName(const QString &newEventName)
+{
+    mEventName = newEventName;
+}
+
+const QString &PersonEvent::eventUid() const
+{
+    return mEventUid;
+}
+
+void PersonEvent::setEventUid(const QString &newEventUid)
+{
+    mEventUid = newEventUid;
+}
+
+const QString &PersonEvent::personUid() const
+{
+    return mPersonUid;
+}
+
+void PersonEvent::setPersonUid(const QString &newPersonUid)
+{
+    mPersonUid = newPersonUid;
+}
+
+qint64 PersonEvent::date() const
+{
+    return mDate;
+}
+
+void PersonEvent::setDate(qint64 newDate)
+{
+    mDate = newDate;
+}
+

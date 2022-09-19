@@ -46,6 +46,7 @@ public:
     virtual ErrCode onNewItem(UIMultiComboxView* ui, const QString& value, bool silent) = 0;
     virtual void onItemAdded(UIMultiComboxView* ui, const QString& name, const QVariant& value) = 0;
     virtual void onItemDeleted(UIMultiComboxView* ui, const QString& name, const QVariant& value) = 0;
+    virtual void onClearAll() = 0;
 };
 
 class UIMultiComboxView : public QFrame
@@ -66,6 +67,7 @@ public:
     QList<QVariant> valueItems() const;
 
     const QString &name() const;
+    void clearAll();
 
 private slots:
     void on_btnAdd_clicked();
@@ -77,6 +79,7 @@ private:
     QHash<QString, QVariant> mValueList;
     UIMultiComboxViewListener* mListener;
     QString mName;
+    QList<UIItemButton*> mButtonList;
 };
 
 #endif // UIMULTICOMBOXVIEW_H

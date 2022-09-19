@@ -46,6 +46,7 @@ typedef enum ErrCode{
     ErrUnknown,
     ErrSkip,
     ErrCancelled,
+    ErrNoData,
 
     ErrMax
     } ErrCode_t;

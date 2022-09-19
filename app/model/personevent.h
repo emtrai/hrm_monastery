@@ -23,12 +23,46 @@
 #define PERSONEVENT_H
 
 #include <QObject>
+#include <dbmodel.h>
 
-class PersonEvent: public QObject
+class PersonEvent : public DbModel
 {
-    Q_OBJECT
-        public:
-                 PersonEvent();
+
+public:
+    PersonEvent();
+    PersonEvent(const PersonEvent* model);
+    static DbModel *build();
+    virtual QString modelName() const;
+
+    const QString &remark() const;
+    void setRemark(const QString &newRemark);
+
+    virtual void buildUidIfNotSet();
+
+    qint64 date() const;
+    void setDate(qint64 newDate);
+
+    const QString &personUid() const;
+    void setPersonUid(const QString &newPersonUid);
+
+    const QString &eventUid() const;
+    void setEventUid(const QString &newEventUid);
+
+    const QString &eventName() const;
+    void setEventName(const QString &newEventName);
+
+    qint64 endDate() const;
+    void setEndDate(qint64 newEndDate);
+
+protected:
+    virtual DbModelHandler *getDbModelHandler();
+private:
+    qint64 mDate;
+    qint64 mEndDate;
+    QString mEventUid;
+    QString mEventName;
+    QString mPersonUid;
+    QString mRemark;
 };
 
 #endif // PERSONEVENT_H

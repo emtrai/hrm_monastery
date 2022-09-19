@@ -56,6 +56,8 @@ public:
     virtual DbModelHandler* getSpecialistModelHandler();
     virtual DbModelHandler* getCommunityModelHandler();
     virtual DbModelHandler* getModelHandler(const QString& name);
+
+    static DbSqliteTbl* table(const QString& tblName);
 private:
 
     DbSqlite();

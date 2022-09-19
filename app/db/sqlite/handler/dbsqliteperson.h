@@ -23,16 +23,30 @@
 #define DBSQLITEPERSON_H
 
 #include "dbsqlitemodelhandler.h"
+#include "dbpersonmodelhandler.h"
 #include <QHash>
 #include "utils.h"
+#include "table/dbsqlitetbl.h"
+#include "errcode.h"
 
 class DbSqlitePersonTbl;
-class DbSqlitePerson : public DbSqliteModelHandler
+class DbSqlitePerson : public DbPersonModelHandler
 {
     GET_INSTALCE_DECL(DbSqlitePerson);
 public:
     DbSqlitePerson();
     virtual const QString getName();
+    virtual ErrCode add(const DbModel* model);
+    virtual bool exist(const DbModel* edu);
+    virtual QList<DbModel*> getAll(DbModelBuilder builder, const char* modelName = nullptr);
+    virtual DbModel* getModel(qint64 dbId);
+
+    virtual ErrCode addEvent(const QString& personUid, const QString& eventUid,
+                             qint64 date, const QString& title, const QString& remark);
+    virtual QList<PersonEvent*>* getListEvents(const QString& personUid,
+                                               const QString* eventUid = nullptr,
+                                               qint64 date = 0);
+
 protected:
     virtual DbSqliteTbl* getMainTbl();
 private:

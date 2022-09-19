@@ -215,16 +215,6 @@ ErrCode DbSqliteTbl::checkOrCreateTable()
 
     if (!sql.isNull()){
         err = db()->execQuery(sql);
-//        QSqlQuery qry;
-//        qry.prepare( sql );
-//        if( qry.exec() ) {
-//            logd("Created table %s", name().toStdString().c_str());
-//        }
-//        else
-//        {
-//            qFatal( "Failed to create table images" );
-//            err = ErrFailed;
-//        }
     }
     else{
         loge("Invalid sql command");

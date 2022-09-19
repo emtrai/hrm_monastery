@@ -37,8 +37,11 @@ class DbModel
 public:
     DbModel();
     DbModel(const DbModel& model);
+    DbModel(const DbModel* model);
     virtual ~DbModel();
 
+
+    virtual QString modelName() const;
 
     virtual const QString &name() const;
     virtual void setName(const QString &newName);

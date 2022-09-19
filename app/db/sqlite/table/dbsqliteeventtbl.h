@@ -14,49 +14,28 @@
  * limitations under the License.
  *
  *
- * Filename: dbsqlitepersoneventtbl.h
+ * Filename: dbsqliteeventtbl.h
  * Author: Anh, Ngo Huy
- * Created date:7/21/2022
+ * Created date:9/10/2022
  * Brief:
  */
-#ifndef DBSQLITEPersonEVENTTBL_H
-#define DBSQLITEPersonEVENTTBL_H
+#ifndef DBSQLITEEVENTTBL_H
+#define DBSQLITEEVENTTBL_H
 
 #include "dbsqlitetbl.h"
-#include "errcode.h"
-#include "logger.h"
 
-
-class DbSqlite;
-class DbSqliteTableBuilder;
-class DbSqliteInsertBuilder;
-class DbModel;
-class QSqlQuery;
-class PersonEvent;
-
-/**
-* Table for events of a person
-*/
-class DbSqlitePersonEventTbl : public DbSqliteTbl
+class DbSqliteEventTbl : public DbSqliteTbl
 {
 public:
-    DbSqlitePersonEventTbl();
-    DbSqlitePersonEventTbl(DbSqlite* db);
-    virtual ~DbSqlitePersonEventTbl();
-
-
+    DbSqliteEventTbl();
+public:
+    DbSqliteEventTbl(DbSqlite *db);
     virtual void addTableField(DbSqliteTableBuilder* builder);
     virtual void insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
     virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
-    //    ErrCode_t addPerson(const Person* person);
 
-    //protected:
-    //    virtual QString getSqlCmdCreateTable();
-    virtual QList<PersonEvent*>* getListEvents(const QString& personUid,
-                                                const QString* eventUid = nullptr,
-                                                qint64 date = 0); // TODO; should support enddate???
-public:
+private:
     static const qint32 KVersionCode;
 };
 
-#endif // DBSQLITEPersonEVENTTBL_H
+#endif // DBSQLITEEVENTTBL_H

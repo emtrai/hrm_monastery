@@ -14,30 +14,30 @@
  * limitations under the License.
  *
  *
- * Filename: dbmodelhandler.h
+ * Filename: dlgaddevent.h
  * Author: Anh, Ngo Huy
- * Created date:8/9/2022
+ * Created date:9/7/2022
  * Brief:
  */
-#ifndef DBMODELHANDLER_H
-#define DBMODELHANDLER_H
+#ifndef DLGADDEVENT_H
+#define DLGADDEVENT_H
 
-#include "errcode.h"
-#include <QList>
-#include "dbmodel.h"
+#include <QDialog>
 
-class DbModel;
+namespace Ui {
+class DlgAddEvent;
+}
 
-class DbModelHandler
+class DlgAddEvent : public QDialog
 {
+    Q_OBJECT
+
 public:
-    DbModelHandler();
+    explicit DlgAddEvent(QWidget *parent = nullptr);
+    ~DlgAddEvent();
 
-    virtual ErrCode add(const DbModel* model) = 0;
-    virtual bool exist(const DbModel* edu) = 0;
-    virtual QList<DbModel*> getAll(DbModelBuilder builder, const char* modelName = nullptr) = 0;
-    virtual const QString getName() = 0;
-
+private:
+    Ui::DlgAddEvent *ui;
 };
 
-#endif // DBMODELHANDLER_H
+#endif // DLGADDEVENT_H

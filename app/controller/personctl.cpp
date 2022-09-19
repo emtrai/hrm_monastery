@@ -26,7 +26,9 @@
 #include "logger.h"
 #include "utils.h"
 #include "person.h"
+#include "personevent.h"
 #include "filectl.h"
+#include "event.h"
 PersonCtl* PersonCtl::gInstance = nullptr;
 
 ErrCode PersonCtl::addPerson(Person *person)
@@ -66,6 +68,12 @@ QList<DbModel *> PersonCtl::getAllPerson()
     return DB->getModelHandler(KModelHdlPerson)->getAll(&Person::build);
 }
 
+QList<DbModel *> PersonCtl::getListEvent(const Person* person)
+{
+    traced;
+    return DB->getModelHandler(KModelHdlPerson)->getAll(&PersonEvent::build, KModelNamePersonEvent);
+}
+
 DbModel *PersonCtl::doImportOneItem(int importFileType, const QStringList &items, quint32 idx)
 {
     ErrCode ret = ErrNone;
@@ -93,11 +101,6 @@ DbModel *PersonCtl::doImportOneItem(int importFileType, const QStringList &items
 
 PersonCtl::PersonCtl()
 {
-//    mImportFields.append(KExportFieldHollyName);
-//    mImportFields.append(KExportFieldFullName);
-//    mImportFields.append(KExportFieldBirthday);
-//    mImportFields.append(KExportFieldBirthplace);
-//    mImportFields.append(KExportFieldFeastDay);
 }
 
 

@@ -107,6 +107,7 @@ void UIMultiComboxView::on_btnAdd_clicked()
         if (mListener != nullptr) {
             mListener->onItemAdded(this, currtxt, value);
         }
+        mButtonList.append(lbl);
     }
 }
 
@@ -119,12 +120,33 @@ void UIMultiComboxView::on_item_clicked( UIItemButton * button, QVariant value){
     if (mListener != nullptr) {
         mListener->onItemDeleted(this, button->text(), value);
     }
-    delete button;
+    if (mButtonList.removeOne(button)){
+        logd("Removed button %s", button->text().toStdString().c_str());
+    }
+    delete button; // TODO: is it safe to delete here????
 }
 
 const QString &UIMultiComboxView::name() const
 {
     return mName;
+}
+
+void UIMultiComboxView::clearAll()
+{
+    traced;
+    ui->cbItems->clear();
+
+    mValueList.clear();
+    foreach (UIItemButton* btn, mButtonList) {
+        ui->formLayout->removeWidget(btn);
+        delete btn;
+    }
+    mButtonList.clear();
+    if (mListener != nullptr) {
+        logd("call callback");
+        mListener->onClearAll();
+    }
+
 }
 
 const QHash<QString, QVariant> &UIMultiComboxView::items() const
@@ -145,6 +167,5 @@ void UIMultiComboxView::setListener(UIMultiComboxViewListener *newListener)
 {
     mListener = newListener;
 }
-
 
 

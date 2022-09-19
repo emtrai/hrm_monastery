@@ -38,6 +38,8 @@ int main(int argc, char *argv[])
             break;
         }
     }
+    // TODO: check to make sure that only one instance of app is running
+    // this is to avoid confliction when updating data
     MainWindow w;
     w.setWindowState(Qt::WindowState::WindowMaximized);
     w.show();

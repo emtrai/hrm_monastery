@@ -1,11 +1,14 @@
-#name
-th,Tiểu học
-thcs,Trung học cơ sở
-thpt,Trung học phổ thông
-dh,Đại học
-ths,Thạc sĩ
-ncs,Nghiên cứu sinh
-ts,Tiến sĩ
+#id, name[, remark if any]
+KHONG_RO,Không rõ
+TIEU_HOC,Tiểu học
+THCS,Trung học cơ sở
+THPT,Trung học phổ thông
+DAI_HOC,Đại học
+THAC_SI,Thạc sĩ
+NGHIEN_CUU_SINH,Nghiên cứu sinh
+TIEN_SI,Tiến sĩ
+PGS,Phó Giáo Sư
+GS,Giáo Sư
 
 
 
