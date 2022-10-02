@@ -28,6 +28,8 @@
 #include "errcode.h"
 
 class UITableItem;
+class QMenu;
+class QAction;
 
 typedef QList<UITableItem*> (*onRequestData)(qint32 page, qint32 perPage, qint32 totalPages);
 typedef qint32 (*onRequestTotalData)();
@@ -36,6 +38,11 @@ namespace Ui {
 class UITableView;
 }
 
+enum MenuAction {
+    ACTION_NEW,
+    ACTION_DELETE,
+    ACTION_MAX
+};
 
 class UITableItem
 {
@@ -88,12 +95,21 @@ protected:
     virtual ErrCode onLoad();
     virtual void importRequested(const QString& fpath);
     virtual void onViewItem(qint32 idx);
+    virtual QMenu* buildPopupMenu();
+    virtual QList<QAction*> getMenuActions();
+    virtual ErrCode onMenuActionTrigger(QMenu* menu, QAction*);
+    virtual ErrCode onMenuAddAction(QMenu* menu, QAction* act);
+    virtual ErrCode onMenuDeleteAction(QMenu* menu, QAction* act);
+
+    virtual void onFilter(const QString& catetory, qint64 opFlags, const QString& keywords);
 protected:
     QStringList mHeader;
 private slots:
     void on_btnImport_clicked();
 
     void on_tblList_itemDoubleClicked(QTableWidgetItem *item);
+    void customMenuRequested(QPoint pos);
+    void on_btnFilter_clicked();
 
 private:
     Ui::UITableView *ui;
@@ -102,6 +118,7 @@ private:
     qint32 mItemPerPage;
     quint32 mCurrentPage;
     quint32 mTotalPages;
+    QMenu* mMenu;
 };
 
 #endif // UITABLEVIEW_H

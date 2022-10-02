@@ -29,6 +29,8 @@ enum ViewType {
     PERSON,
     SAINT,
     COMMUNITY,
+    AREA,
+    VIEW_MAX,
 };
 
 class UITableView;

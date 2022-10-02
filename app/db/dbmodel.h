@@ -70,6 +70,13 @@ public:
     void setNameId(const QString &newNameId);
     virtual IExporter* getExporter();
 
+    /**
+     * @brief validate if data is all valid
+     * @param result of validate for each field Field:ErrCode
+     * @return true if all valid, false otherwise
+     */
+    virtual bool validate(QHash<QString, ErrCode>* result = nullptr);
+
 protected:
     virtual DbModelHandler* getDbModelHandler() = 0;
 

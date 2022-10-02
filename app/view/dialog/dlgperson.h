@@ -84,6 +84,8 @@ class DlgPerson : public QDialog, public UIMultiComboxViewListener
                 void loadWork();
                 void loadCommunity();
                 void loadStatus();
+                void loadArea();
+                void loadDepartment();
 
 
                 void loadEvent(bool reloadAll = false);
@@ -115,6 +117,12 @@ private slots:
     void on_btnAddWork_clicked();
 
     void on_btnAddEvent_clicked();
+
+    void on_btnDelEvent_clicked();
+
+    void on_btnAddDepart_clicked();
+
+    void on_btnAddArea_clicked();
 
 private:
     Person* mPerson;

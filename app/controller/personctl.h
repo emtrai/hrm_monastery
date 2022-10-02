@@ -50,6 +50,8 @@ public:
 
     const QList<QString> &importFields() const;
 
+    QList<Person*> searchPersonByName(const QString& name);
+
 private:
     static PersonCtl* gInstance;
     QList<QString> mImportFields;

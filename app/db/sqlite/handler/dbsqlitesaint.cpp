@@ -25,6 +25,7 @@
 #include "table/dbsqlitesainttbl.h"
 #include "logger.h"
 #include "defs.h"
+#include "saint.h"
 DbSqliteSaint* DbSqliteSaint::gInstance = nullptr;
 
 
@@ -48,55 +49,14 @@ const QString DbSqliteSaint::getName()
     return KModelHdlSaint;
 }
 
+DbModel *DbSqliteSaint::getByName(const QString &name)
+{
+    traced;
+    return DbSqliteModelHandler::getByName(name, &Saint::build);
+}
+
 DbSqliteTbl *DbSqliteSaint::getMainTbl()
 {
     return (DbSqliteSaintTbl*)DbSqlite::getInstance()->getTable(KTableSaint);
 }
 
-
-
-//ErrCode DbSqliteSaint::addSaint(const Saint *saint)
-//{
-//    traced;
-//    ErrCode_t err = ErrNone;
-
-//    if (saint != nullptr){
-//        if (!saintTbl()->isExist(saint)){
-//            err = saintTbl()->add(saint);
-//        }
-//        else{
-//            err = ErrExisted;
-//            loge("Saint %s already exist", saint->name().toStdString().c_str());
-//        }
-//    }
-//    else{
-//        err = ErrInvalidArg;
-//        loge("invalid argument");
-//    }
-
-
-
-//    return err;
-//}
-
-//bool DbSqliteSaint::exist(const Saint *saint)
-//{
-//    traced;
-
-//    return saintTbl()->isExist(saint);;
-//}
-
-//QHash<QString, Saint*>  DbSqliteSaint::getListSaint()
-//{
-//    traced;
-//    return saintTbl()->getListSaint();
-//}
-
-//DbSqliteSaintTbl *DbSqliteSaint::saintTbl()
-//{
-//    traced;
-//    if (mSaintTbl == nullptr){
-//        mSaintTbl = (DbSqliteSaintTbl*)DbSqlite::getInstance()->getTable(KTableSaint);
-//    }
-//    return mSaintTbl;
-//}

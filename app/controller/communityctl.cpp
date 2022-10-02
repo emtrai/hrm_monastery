@@ -49,15 +49,6 @@ CommunityCtl *CommunityCtl::getInstance()
     return gInstance;
 }
 
-const char* const JSON_COMMUNITYLIST = "communities";
-const char* const JSON_ID = "id";
-const char* const JSON_NAME = "name";
-const char* const JSON_CHURCH = "church";
-const char* const JSON_ADDR = "addr";
-const char* const JSON_TEL = "tel";
-const char* const JSON_EMAIL = "email";
-const char* const JSON_FEASTDAY = "feastday";
-const char* const JSON_ESTABLISH = "establishday";
 Community* CommunityCtl::parseOneItem(const QJsonObject& jobj)
 {
     Community* ret = new Community();
@@ -99,7 +90,6 @@ Community* CommunityCtl::parseOneItem(const QJsonObject& jobj)
             ret->setEmail(tmp);
 
     }
-
 
     if (jobj.contains(JSON_FEASTDAY)){
         QString tmp = jobj[JSON_FEASTDAY].toString().trimmed();

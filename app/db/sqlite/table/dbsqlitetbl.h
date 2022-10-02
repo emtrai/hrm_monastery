@@ -59,11 +59,42 @@ public:
     virtual ErrCode checkOrCreateTable();
     virtual ErrCode onDbMigration(int oldVer, int newVer);
     virtual ErrCode onTblMigration(int oldVer, int newVer);
+
+    virtual QList<QString> getNameFields();
+    virtual DbModel *getByName(const QString& keyword, const DbModelBuilder& builder);
+
+    /**
+     * @brief Search item by keywords
+     * @param keyword
+     * @param outList
+     * @return the number of found items
+     */
+    virtual int search(const QString& keyword, QList<DbModel*>* outList = nullptr);
+
+    virtual QHash<QString, int> getSearchFields();
+    virtual int search(const QString& keyword, const DbModelBuilder& builder, QList<DbModel*>* outList = nullptr);
+
+
+    /**
+     * @brief Search
+     * @param keyword keyword
+     * @param inFields fields to search (OR condition)
+     * @param outList
+     * @return the number of found items
+     */
+    virtual int search(const QString& keyword, const QHash<QString, int>& inFields,
+                       const DbModelBuilder& builder,
+                       QList<DbModel*>* outList = nullptr,
+                       bool isExact = false);
+
 protected:
     virtual QString getSqlCmdCreateTable();
     virtual void addTableField(DbSqliteTableBuilder* builder);
     virtual void insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
     virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
+    virtual int runQuery(QSqlQuery& qry, const DbModelBuilder& builder,
+                      QList<DbModel *> *outList = nullptr);
+
 public:
 
     virtual DbSqlite *db() const;

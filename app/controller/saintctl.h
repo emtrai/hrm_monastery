@@ -32,21 +32,22 @@ class SaintCtl : public Controller
 {
 public:
     QList<Saint*> getListSaints();
+    virtual DbModel* doImportOneItem(int importFileType, const QStringList& items, quint32 idx);
+    virtual DbModelHandler* getModelHandler();
 private:
     SaintCtl();
 
-//    ErrCode check2UpdateDbFromFile(const QString& filePath);
-//    ErrCode doOneCSVItemCallback(const QStringList& items, void* param);
-//private:
-//    static ErrCode oneCSVItemCallback(const QStringList& items, void* caller, void* param);
 protected:
     DbModel *buildModel(void *items, const QString &fmt);
+    virtual ErrCode parsePrebuiltFile(const QString &fpath, const QString &ftype);
+
 public:
     static SaintCtl *getInstance();
 
 ///////// MEMBER //////////
 private:
     static SaintCtl* gInstance;
+    QList<QString> mImportFields;
 
 public slots:
     virtual void onLoad();

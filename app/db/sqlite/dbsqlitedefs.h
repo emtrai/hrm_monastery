@@ -27,6 +27,7 @@ typedef enum TableFieldDatatype {
     TEXT = 0,
     INT32,
     INT64
+    // WARNING: if any change on this, check impact to all, as some assumed only text/int
 }TableFieldDatatype_t;
 
 const char* const KFieldUid = "uid";
@@ -36,6 +37,7 @@ const char* const KFieldRecordStatus = "record_status";
 const char* const KFieldFirstName = "first_name";
 const char* const KFieldLastName = "lastname";
 const char* const KFieldFullName = "fullname";
+const char* const KFieldOriginName = "originName";
 const char* const KFieldPersonCode = "personcode";
 const char* const KFieldId = "id";
 const char* const KFieldPersonId = "personid";
@@ -53,8 +55,9 @@ const char* const KFieldStatus = "status";
 const char* const KFieldDbStatus = "dbstatus";
 const char* const KFieldCEOUid = "ceouid";
 const char* const KFieldChurchUid = "church_uid";
-const char* const KFieldMissionUid = "missionuid";
-const char* const KFieldAreaUid = "areauid";
+const char* const KFieldMissionUid = "mission_uid";
+const char* const KFieldAreaUid = "area_uid";
+const char* const KFieldDepartmentUid = "depart_uid";
 const char* const KFieldPreset = "preset";
 const char* const KFieldGender = "gender";
 const char* const KFieldFeastDay = "feastday";

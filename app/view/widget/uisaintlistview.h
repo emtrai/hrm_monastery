@@ -35,6 +35,8 @@ protected:
     virtual void updateItem(DbModel* item, UITableItem* tblItem);
     virtual void initHeader();
 
+    virtual void onFilter(const QString& catetory, qint64 opFlags, const QString& keywords);
+
 };
 
 #endif // UISAINTLISTVIEW_H

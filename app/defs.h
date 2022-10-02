@@ -48,7 +48,7 @@ const char* const KPrebuiltProvinceCSVFileName = "province";
 const char* const KPrebuiltEthnicCSVFileName = "ethnic";
 const char* const KPrebuiltMissionCSVFileName = "mission";
 const char* const KPrebuiltAreaCSVFileName = "area";
-const char* const KPrebuiltDeptJsonFileName = "dept";
+const char* const KPrebuiltDeptJsonFileName = "department";
 const char* const KPrebuiltCommunityJsonFileName = "community";
 const char* const KPrebuiltHomeHtmlFileName = "home";
 const char* const KPrebuiltLogoFileName = "logo.png"; // special case, need file extenstion
@@ -87,11 +87,14 @@ const char* const KFileTypeJson = "json";
 const char* const KFileTypeExcelX = "xlsx";
 
 const char* const KExportFieldImgPath = "img_path";
+const char* const KExportFieldUid = "MA_DINH_DANH";
+const char* const KExportFieldGender = "GIOI_TINH";
 const char* const KExportFieldPersonCode = "MA_NU_TU";
 const char* const KExportFieldName = "TEN";
 const char* const KExportFieldFirstName = "TEN_DAU";
 const char* const KExportFieldLastName = "HO";
 const char* const KExportFieldFullName = "TEN_DAY_DU";
+const char* const KExportFieldOriginName = "TEN_GOC";
 const char* const KExportFieldBirthday = "NGAY_SINH";
 const char* const KExportFieldBirthplace = "NOI_SINH";
 const char* const KExportFieldHollyUids = "holly_uids";
@@ -153,16 +156,31 @@ const char* const KExportFieldGoldenDate = "NGAY_KIM_KHANH";
 const char* const KExportFieldGoldenPlace = "NOI_KIM_KHANH";
 const char* const KExportFieldEternalDate = "NGAY_VINH_KHANH";
 const char* const KExportFieldEternalPlace = "NOI_VINH_KHANH";
+const char* const KExportFieldRemark = "GHI_CHU";
 
 // TODO: make those key names configurable????
 // ALL must me upper here, but key in file may lower or any, as it'll be converted to upper
 // when parsing
-static const char* KCsvItemName = "TEN";
-static const char* KCsvItemPersonCode = "MA";
-static const char* KCsvItemChristenDate = "NGAY_RUA_TOI";
-static const char* KCsvItemBirthDay = "NGAY_SINH";
-static const char* KCsvItemBirthPlace = "NOI_SINH";
-static const char* KCsvItemHollyName = "TEN_THANH";
+const char* const KCsvItemName = "TEN";
+const char* const KCsvItemPersonCode = "MA";
+const char* const KCsvItemChristenDate = "NGAY_RUA_TOI";
+const char* const KCsvItemBirthDay = "NGAY_SINH";
+const char* const KCsvItemBirthPlace = "NOI_SINH";
+const char* const KCsvItemHollyName = "TEN_THANH";
 
+const char* const JSON_COMMUNITYLIST = "communities";
+const char* const JSON_DEPARTMENTS = "departments";
+const char* const JSON_ID = "id";
+const char* const JSON_NAME = "name";
+const char* const JSON_CHURCH = "church";
+const char* const JSON_ADDR = "addr";
+const char* const JSON_TEL = "tel";
+const char* const JSON_EMAIL = "email";
+const char* const JSON_BRIEF = "brief";
+const char* const JSON_REMARK = "remark";
+const char* const JSON_STATUS = "status";
+const char* const JSON_FEASTDAY = "feastday";
+const char* const JSON_ESTABLISH = "establishday";
+const char* const JSON_COMMUNITY_UID = "communityid";
 
 #endif // DEFS_H

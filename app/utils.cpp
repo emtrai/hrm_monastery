@@ -51,7 +51,9 @@ Gender Utils::genderFromString(const QString &gender)
         logd("Init map gender with string");
         // TODO: should do init somewhere????
         map["MALE"] = Gender::MALE;
+        map["NAM"] = Gender::MALE;
         map["FEMALE"] = Gender::FEMALE;
+        map["NU"] = Gender::FEMALE;
         mapInit = true;
     }
     QString key = gender.simplified().toUpper();

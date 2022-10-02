@@ -81,7 +81,17 @@ void Area::setRemark(const QString &newRemark)
 DbModelHandler *Area::getDbModelHandler()
 {
 
-    return DB->getModelHandler(KModelHdlProvince);
+    return DB->getModelHandler(KModelHdlArea);
+}
+
+qint64 Area::countryName() const
+{
+    return mCountryName;
+}
+
+void Area::setCountryName(qint64 newCountryName)
+{
+    mCountryName = newCountryName;
 }
 
 const QString &Area::countryUid() const
@@ -92,4 +102,11 @@ const QString &Area::countryUid() const
 void Area::setCountryUid(const QString &newCountryUid)
 {
     mCountryUid = newCountryUid;
+}
+
+// <country name>,<area name>
+QString Area::getFullName()
+{
+    // TODO: no country name???
+    return QString("%s,%s").arg(countryName()).arg(name());
 }

@@ -186,3 +186,10 @@ IExporter *DbModel::getExporter()
 {
     return nullptr;
 }
+
+bool DbModel::validate(QHash<QString, ErrCode> *result)
+{
+    traced;
+    logi("Should be implemented by derived class");
+    return true;
+}

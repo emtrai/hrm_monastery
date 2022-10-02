@@ -11,7 +11,7 @@
         "status":"active",
         "email":"",
         "brief":"",
-        "remark":"",
+        "remark":""
         },
         {
         "id":"BTG",
@@ -24,7 +24,7 @@
         "status":"active",
         "email":"",
         "brief":"",
-        "remark":"",
+        "remark":""
         },
         {
         "id":"BXD",
@@ -37,7 +37,7 @@
         "status":"active",
         "email":"",
         "brief":"",
-        "remark":"",
+        "remark":""
         },
         {
         "id":"BOG",
@@ -50,7 +50,7 @@
         "status":"active",
         "email":"",
         "brief":"",
-        "remark":"",
+        "remark":""
         }
     ]
 }

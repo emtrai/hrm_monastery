@@ -24,23 +24,32 @@
 #include "logger.h"
 #include <QStringList>
 #include <QFileDialog>
+#include <QMenu>
 #include "filectl.h"
 
 UITableView::UITableView(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::UITableView),
-    mItemPerPage(0),
+    mFpDataReq(nullptr),
     mFpTotalDataReq(nullptr),
-    mFpDataReq(nullptr)
+    mItemPerPage(0),
+    mMenu(nullptr)
 {
     ui->setupUi(this);
-
-
+    ui->tblList->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->tblList, SIGNAL(customContextMenuRequested(QPoint)),
+            SLOT(customMenuRequested(QPoint)));
 }
 
 UITableView::~UITableView()
 {
     traced;
+    if (mMenu != nullptr){
+        // TODO: action may be allocated, need to check again if action is really clear???
+        // see: https://doc.qt.io/qt-6/qmenu.html#clear
+        mMenu->clear();
+        delete mMenu;
+    }
     delete ui;
 }
 
@@ -64,6 +73,7 @@ void UITableView::setupUI()
     ui->tblList->setMinimumHeight(500);
 
     ui->tblList->setHorizontalHeaderLabels(getHeader());
+
 }
 
 void UITableView::reload()
@@ -145,6 +155,93 @@ void UITableView::onViewItem(qint32 idx)
 {
     traced;
     logd("parent class, nothing to do");
+}
+
+QMenu* UITableView::buildPopupMenu()
+{
+    traced;
+    if (mMenu == nullptr) {
+        logd("build menu actions");
+        mMenu = new QMenu(this);
+        QList<QAction*> actions = getMenuActions();
+        foreach (QAction* act, actions) {
+            connect(act, &QAction::triggered, [this, act](){
+                        logd("lambda trigger call");
+                        onMenuActionTrigger(this->mMenu, act);
+                        // TODO: handle return???
+                    });
+            mMenu->addAction(act);
+        }
+    }
+    return mMenu;
+}
+
+QList<QAction *> UITableView::getMenuActions()
+{
+    traced;
+    QList<QAction*> actionList;
+    QAction* action = new QAction("New", this);
+    action->setData(MenuAction::ACTION_NEW);
+    actionList.append(action);
+
+    action = new QAction("Delete", this);
+    action->setData(MenuAction::ACTION_DELETE);
+    actionList.append(action);
+
+    return actionList;
+}
+
+ErrCode UITableView::onMenuActionTrigger(QMenu* menu, QAction *action)
+{
+    traced;
+    if (action == nullptr)
+        return ErrInvalidArg;
+    bool isOk = false;
+    ErrCode err = ErrNone;
+    logd("action %s", action->text().toStdString().c_str());
+    MenuAction act = static_cast<MenuAction>(action->data().toInt(&isOk));
+    if (isOk) {
+        logd("action id %d", act);
+        // TODO: what should we do now??
+        switch (act) {
+        case MenuAction::ACTION_NEW:
+            err = onMenuAddAction(menu, action);
+            break;
+        case MenuAction::ACTION_DELETE:
+            err = onMenuDeleteAction(menu, action);
+            break;
+        default:
+            loge("Unknow action id %d", act);
+            err = ErrNotSupport;
+            break;
+        }
+    } else {
+        err = ErrUnknown;
+        logd("not defined menu action, what should we do now???");
+        // TODO: what should we do now??
+    }
+    tracedr(err);
+    return err;
+}
+
+ErrCode UITableView::onMenuAddAction(QMenu *menu, QAction *act)
+{
+    traced;
+    // TODO: handle it
+    return ErrNone;
+}
+
+ErrCode UITableView::onMenuDeleteAction(QMenu *menu, QAction *act)
+{
+    traced;
+    // TODO: handle it
+    return ErrNone;
+}
+
+void UITableView::onFilter(const QString &catetory, qint64 opFlags, const QString &keywords)
+{
+    traced;
+    logi("DEFAULT filter, should not caller here, DERIVED CLASS implement this");
 }
 
 qint32 UITableView::itemPerPage() const
@@ -253,5 +350,22 @@ void UITableView::on_tblList_itemDoubleClicked(QTableWidgetItem *item)
     } else {
         loge("Cannot get data from widget item");
     }
+}
+
+
+
+void UITableView::customMenuRequested(QPoint pos)
+{
+    QModelIndex index=ui->tblList->indexAt(pos);
+    // TODO: hande it
+    QMenu* menu = buildPopupMenu();
+    menu->popup(ui->tblList->viewport()->mapToGlobal(pos));
+}
+
+
+void UITableView::on_btnFilter_clicked()
+{
+    traced;
+    onFilter(ui->cbCategory->currentText(), 0, ui->cbKeyword->currentText());
 }
 

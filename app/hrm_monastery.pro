@@ -150,6 +150,7 @@ SOURCES += \
     view/dialog/dlgperson.cpp \
     view/dialog/dlgprovince.cpp \
     view/dialog/dlgsaint.cpp \
+    view/dialog/dlgsearchperson.cpp \
     view/widget/uicommonlistview.cpp \
     view/widget/uicommunitylistview.cpp \
     view/widget/uiitembutton.cpp \
@@ -178,6 +179,7 @@ HEADERS += \
     controller/workctl.h \
     crypto/crypto.h \
     db/dbctl.h \
+    db/dbdefs.h \
     db/dbinfo.h \
     db/dbmodel.h \
     db/dbmodelhandler.h \
@@ -278,6 +280,7 @@ HEADERS += \
     view/dialog/dlgperson.h \
     view/dialog/dlgprovince.h \
     view/dialog/dlgsaint.h \
+    view/dialog/dlgsearchperson.h \
     view/widget/uicommonlistview.h \
     view/widget/uicommunitylistview.h \
     view/widget/uiitembutton.h \
@@ -303,6 +306,7 @@ FORMS += \
     view/dialog/dlgperson.ui \
     view/dialog/dlgprovince.ui \
     view/dialog/dlgsaint.ui \
+    view/dialog/dlgsearchperson.ui \
     view/widget/uimulticomboxview.ui \
     view/widget/uisummarizeview.ui \
     view/widget/uitableview.ui

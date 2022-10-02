@@ -25,53 +25,69 @@
 #include <QObject>
 #include <QString>
 
+#include <QList>
+#include <QHash>
+#include <QMap>
+#include <functional>
+#include <iostream>
+
 #include "defs.h"
 #include "errcode.h"
 #include "dbmodel.h"
+#include "iexporter.h"
+#include "iimporter.h"
 
 
 
-class Saint: public QObject, public DbModel
+class Saint: public DbModel, public IExporter, public IImporter
 {
-    Q_OBJECT
-        public:
-            Saint();
+    public:
+        static DbModel* build();
+        void init();
+        void initImportFields();
+        Saint();
+        virtual ErrCode onImportItem(int importFileType, const QString& keyword, const QString& value, quint32 idx = 0, void* tag = nullptr);
 
 
-            qint64 feastDay() const;
-            void setFeastDay(qint64 newFeastDay);
+        qint64 feastDay() const;
+        void setFeastDay(qint64 newFeastDay);
+        void setFeastDay(const QString& newFeastDay, const QString& f = "D-M");
 
-            Gender gender() const;
-            void setGender(Gender newGender);
+        Gender gender() const;
+        void setGender(Gender newGender);
+        void setGender(const QString& gender);
 
-            const QString &country() const;
-            void setCountry(const QString &newCountry);
+        const QString &country() const;
+        void setCountry(const QString &newCountry);
 
-            const QString &fullName() const;
-            void setFullName(const QString &newFullName);
+        const QString &fullName() const;
+        void setFullName(const QString &newFullName);
 
-//            bool isValid();
-//            void dump();
-//            QString toString();
+        virtual void dump();
 
-//            ErrCode save();
-            virtual void dump();
+    public:
+        static DbModel *builder();
+        const QString &countryUid() const;
+        void setCountryUid(const QString &newCountryUid);
 
-        public:
-            static DbModel *builder();
-            const QString &countryUid() const;
-            void setCountryUid(const QString &newCountryUid);
+        const QString &originName() const;
+        void setOriginName(const QString &newOriginName);
 
-        protected:
-            virtual DbModelHandler *getDbModelHandler();
+        const QString &remark() const;
+        void setRemark(const QString &newRemark);
 
-        private:
-            QString mFullName;
-            Gender mGender;
-            qint64 mFeastDay; // ngay bon mang
-            QString mCountry;
-            QString mCountryUid;
+    protected:
+        virtual DbModelHandler *getDbModelHandler();
 
+    private:
+        QHash<QString, std::function<void(const QString&)>> mImportFields;
+        QString mFullName;
+        QString mOriginName;
+        Gender mGender;
+        qint64 mFeastDay; // ngay bon mang
+        QString mCountry;
+        QString mCountryUid;
+        QString mRemark;
 };
 
 

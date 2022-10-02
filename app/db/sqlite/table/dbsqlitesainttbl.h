@@ -39,6 +39,17 @@ public:
     virtual void addTableField(DbSqliteTableBuilder* builder);
     virtual void insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
     virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
+    virtual QHash<QString, int> getSearchFields();
+    virtual QList<QString> getNameFields();
+
+    /**
+     * @brief Search item by keywords
+     * @param keyword
+     * @param outList
+     * @return the number of found items
+     */
+    virtual int search(const QString& keyword, QList<DbModel*>* outList = nullptr);
+
 
 private:
     static const qint32 KVersionCode;

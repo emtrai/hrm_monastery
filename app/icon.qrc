@@ -22,5 +22,7 @@
         <file>icon/icons8-import-64.png</file>
         <file>icon/background.jpeg</file>
         <file>icon/unknown.png</file>
+        <file>icon/icons8-diversity-64.png</file>
+        <file>icon/icons8-earth-planet-80.png</file>
     </qresource>
 </RCC>

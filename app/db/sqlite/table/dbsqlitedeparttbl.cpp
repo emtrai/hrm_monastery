@@ -46,6 +46,7 @@ void DbSqliteDepartTbl::addTableField(DbSqliteTableBuilder *builder)
 {
     traced;
     DbSqliteTbl::addTableField(builder);
+    // TODO: check again if it maps with json
     builder->addField(KFieldParentDbId, INT64);
     builder->addField(KFieldParentUid, TEXT);
     builder->addField(KFieldCommunityDbId, INT64);

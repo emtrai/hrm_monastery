@@ -40,6 +40,9 @@ UITableView *UITableViewFactory::getView(ViewType type, QWidget *parent )
     case COMMUNITY:
         view = new UICommunityListView(parent);
         break;
+    case AREA:
+        view = new UICommonListView(parent);
+        break;
     default:
         break;
     }

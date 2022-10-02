@@ -28,6 +28,8 @@ public:
     virtual ErrCode importFromFile(IImporter *importer, ImportType type, const QString& fpath, QList<DbModel*>*outList = nullptr);
     virtual ErrCode onImportItem(int importFileType, const QStringList& items, quint32 idx = 0, void* tag = nullptr);
     virtual DbModel* doImportOneItem(int importFileType, const QStringList& items, quint32 idx);
+
+    virtual int search(const QString& keyword, QList<DbModel*>* outList = nullptr);
 protected:
     virtual DbModel *buildModel(void* items, const QString& fmt);
     virtual ErrCode check2UpdateDbFromPrebuiltFile(const QString& fname,

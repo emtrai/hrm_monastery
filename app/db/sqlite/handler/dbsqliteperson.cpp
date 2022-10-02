@@ -144,6 +144,20 @@ QList<PersonEvent *> *DbSqlitePerson::getListEvents(const QString& personUid,
     return tbl->getListEvents(personUid, eventUid, date);
 }
 
+DbModel *DbSqlitePerson::getByName(const QString &name, const DbModelBuilder &builder)
+{
+    traced;
+    // TODO: implement it
+    logd("NOT IMPLEMENT YET");
+    return nullptr;
+}
+
+DbModel *DbSqlitePerson::getByName(const QString &name)
+{
+    traced;
+    return getByName(name, &Person::build);
+}
+
 
 const QString DbSqlitePerson::getName()
 {

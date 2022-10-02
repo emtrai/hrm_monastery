@@ -74,6 +74,10 @@ void DbSqlitePersonTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldProvinceUid, TEXT);
     builder->addField(KFieldAddr, TEXT);
 
+    builder->addField(KFieldCommunityUid, TEXT);
+    builder->addField(KFieldAreaUid, TEXT);
+    builder->addField(KFieldDepartmentUid, TEXT);
+
     builder->addField(KFieldChurchAddr, TEXT);
 
     builder->addField(KFieldEmail, TEXT);
@@ -174,6 +178,10 @@ void DbSqlitePersonTbl::insertTableField(DbSqliteInsertBuilder *builder, const D
 
     builder->addValue(KFieldContact, per->otherContact());
 
+    builder->addValue(KFieldCommunityUid, per->communityUid());
+    builder->addValue(KFieldAreaUid, per->areaUid());
+    builder->addValue(KFieldDepartmentUid, per->departUid());
+
     builder->addValue(KFieldDadName, per->dadName());
     builder->addValue(KFieldDadAddr, per->dadAddr());
     builder->addValue(KFieldDadBirthDay, per->dadBirthday());
@@ -268,6 +276,11 @@ void DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry
     cmm->setEmail(qry.value(KFieldEmail).toString());
     cmm->setTel(qry.value(KFieldTel).toString());
     cmm->setOtherContact(qry.value(KFieldContact).toString());
+
+    cmm->setCommunityUid(qry.value(KFieldCommunityUid).toString());
+    cmm->setDepartUid(qry.value(KFieldDepartmentUid).toString());
+    cmm->setAreaUid(qry.value(KFieldAreaUid).toString());
+    // TODO: search and set name
 
     cmm->setDadName(qry.value(KFieldDadName).toString());
     cmm->setDadAddr(qry.value(KFieldDadAddr).toString());

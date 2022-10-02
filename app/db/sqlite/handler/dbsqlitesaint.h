@@ -33,23 +33,14 @@ public:
     DbSqliteSaint();
     static DbSqliteSaint* getInstance();
     virtual const QString getName();
+    virtual DbModel *getByName(const QString& name);
+
 protected:
     virtual DbSqliteTbl* getMainTbl();
 private:
 
 private:
     static DbSqliteSaint* gInstance;
-//public:
-//    DbSqliteSaint();
-//    virtual ErrCode addSaint(const Saint* saint);
-//    virtual bool exist(const Saint* saint);
-//    virtual QHash<QString, Saint*> getListSaint();
-
-//private:
-//     DbSqliteSaintTbl *saintTbl();
-
-//private:
-//    DbSqliteSaintTbl* mSaintTbl;
 };
 
 #endif // DBSQLITESAINT_H

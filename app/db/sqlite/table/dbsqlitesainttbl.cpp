@@ -45,9 +45,11 @@ void DbSqliteSaintTbl::addTableField(DbSqliteTableBuilder *builder)
     traced;
     DbSqliteTbl::addTableField(builder);
     builder->addField(KFieldFullName, TEXT);
+    builder->addField(KFieldOriginName, TEXT);
     builder->addField(KFieldGender, INT32);
     builder->addField(KFieldFeastDay, INT64);
     builder->addField(KFieldCountry, TEXT);
+    builder->addField(KFieldRemark, TEXT);
 }
 
 void DbSqliteSaintTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
@@ -56,9 +58,11 @@ void DbSqliteSaintTbl::insertTableField(DbSqliteInsertBuilder *builder, const Db
     DbSqliteTbl::insertTableField(builder, item);
     Saint* saint = (Saint*) item;
     builder->addValue(KFieldFullName, saint->fullName());
+    builder->addValue(KFieldOriginName, saint->originName());
     builder->addValue(KFieldGender, saint->gender());
     builder->addValue(KFieldFeastDay, saint->feastDay());
     builder->addValue(KFieldCountry, saint->country());
+    builder->addValue(KFieldRemark, saint->remark());
 }
 
 void DbSqliteSaintTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
@@ -67,76 +71,79 @@ void DbSqliteSaintTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
     DbSqliteTbl::updateModelFromQuery(item, qry);
     Saint* saint = (Saint*) item;
     saint->setFullName(qry.value(KFieldFullName).toString());
+    saint->setOriginName(qry.value(KFieldOriginName).toString());
     saint->setGender((Gender)qry.value(KFieldGender).toInt());
     saint->setFeastDay(qry.value(KFieldFeastDay).toInt());
     saint->setCountry(qry.value(KFieldCountry).toString());
+    saint->setRemark(qry.value(KFieldRemark).toString());
 }
 
+QHash<QString, int> DbSqliteSaintTbl::getSearchFields()
+{
+    QHash<QString, int> inFields;// TODO: make as class member?
+    inFields[KFieldName] = TEXT;
+    inFields[KFieldFullName] = TEXT;
+    inFields[KFieldOriginName] = TEXT;
+    return inFields;
+}
 
-//ErrCode_t DbSqliteSaintTbl::add(const Saint *item)
-//{
+QList<QString> DbSqliteSaintTbl::getNameFields()
+{
+    traced;
+    QList<QString> list;// TODO: make as class member?
+    list.append(KFieldName);
+    list.append(KFieldFullName);
+    list.append(KFieldOriginName);
+    return list;
+}
+
+int DbSqliteSaintTbl::search(const QString &keyword, QList<DbModel *> *outList)
+{
+    traced;
+    return DbSqliteTbl::search (keyword, &Saint::build, outList);
+//    QHash<QString, int> inFields;
+//    inFields[KFieldName] = TEXT;
+//    inFields[KFieldFullName] = TEXT;
+//    inFields[KFieldOriginName] = TEXT;
+//    logi("Search Saint '%s'", keyword.toStdString().c_str());
+//    qint32 cnt = 0;
+//    cnt = DbSqliteTbl::search (keyword, inFields, &Saint::build, outList);
 //    traced;
-//    ErrCode_t err = ErrNone;
-//    QString sql = DbSqliteInsertBuilder::build(name())
-//                      ->addValue(KFieldNameId, item->nameid())
-//                      ->addValue(KFieldName, item->name())
-//                      ->addValue(KFieldGender, item->gender())
-//                      ->addValue(KFieldFeastDay, item->feastDay())
-//                      ->addValue(KFieldCountry, item->country())
-//                      ->addValue(KFieldHistory, item->history())
-
-//                      ->buildSqlStatement();
-//    logi("insert sql statement %s", sql.toStdString().c_str());
-//    err = db()->execQuery(sql);
-
-//    return err;
-
-//}
-
-//QHash<QString, Saint*> DbSqliteSaintTbl::getListSaint()
-//{
+//    // TODO: implement it
+//    // TODO: exact and not exact match???
 //    QSqlQuery qry;
-
-//    traced;
-//    QString queryString = QString("SELECT * FROM %1").arg(name());
+//    qint32 cnt = 0;
+//    logi("Search Saint '%s'", keyword.toStdString().c_str());
+//    QString queryString = QString("SELECT * "
+//                                  "FROM %1 WHERE lower(%2) like :name OR "
+//                                  "lower(%3) like :name OR "
+//                                  "lower(%4) like :name")
+//                              .arg(name(), KFieldName, KFieldFullName, KFieldOriginName);
 //    qry.prepare(queryString);
 //    logd("Query String '%s'", queryString.toStdString().c_str());
-//    QHash<QString, Saint*> list;
 
-//    if( qry.exec() )
-//    {
-//        while (qry.next()) {
-//            Saint* saint = new Saint();
-//            // TODO: validate value before, i.e. toInt return ok
-//            saint->setName(qry.value(KFieldName).toString());
-//            saint->setDbId(qry.value(KFieldId).toInt());
-//            saint->setGender((Gender)qry.value(KFieldId).toInt());
-//            saint->setFeastDay(qry.value(KFieldFeastDay).toInt());
-//            list.insert(saint->name(), saint);
-//        }
-//    }
-//    else {
-//        loge( "Failed to execute %s", queryString.toStdString().c_str() );
-//    }
+//    // TODO: check sql injection issue
+//    qry.bindValue( ":name", QString("%%1%").arg(keyword.trimmed().toLower()) );
+//    cnt = runQuery(qry, &Saint::build, outList);
+////    if( qry.exec() )
+////    {
+////        while (qry.next()) {
+////            // qry.size may not support, so cannot use here
+////            // TODO: check if any better way to get the number of items;
+////            cnt++;
+////            if (outList != nullptr){
+////                Saint* item = (Saint*)Saint::build();
+////                updateModelFromQuery(item, qry);
+////                outList->append(item); // TODO: when it cleaned up?????
+////            }
+////        }
+////    }
+////    else {
+////        loge( "Failed to execute %s", queryString.toStdString().c_str() );
+////    }
 
-//    logd("Found %d", list.size());
-//    return list;
-//}
+//    logi("Found %d", cnt);
 
-//QString DbSqliteSaintTbl::getSqlCmdCreateTable()
-//{
-//    traced;
-//    // TODO; support multi language
-//    QString sql = DbSqliteTableBuilder::build(name())
-//                      ->addField(KFieldNameId, TEXT)
-//                      ->addField(KFieldName, TEXT)
-//                      ->addField(KFieldGender, TEXT)
-//                      ->addField(KFieldFeastDay, INT64)
-//                      ->addField(KFieldCountry, TEXT)
-//                      ->addField(KFieldHistory, TEXT)
+//    return cnt;
+}
 
-//                      ->buildSqlStatement();
-//    logi("Create statement %s", sql.toStdString().c_str());
-
-//    return sql;
-//}

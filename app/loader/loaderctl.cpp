@@ -83,9 +83,9 @@ void LoaderCtl::registerAll()
     add2Loader(INSTANCE(StatusCtl));
     add2Loader(INSTANCE(StatusCtl));
     add2Loader(INSTANCE(EventCtl));
-//    add2Loader(CommunityCtl::getInstance());
-//    add2Loader(AreaCtl::getInstance());
-//    add2Loader(DepartCtl::getInstance());
+    add2Loader(CommunityCtl::getInstance());
+    add2Loader(AreaCtl::getInstance());
+    add2Loader(DepartCtl::getInstance());
 }
 
 void LoaderCtl::onLoad()

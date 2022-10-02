@@ -76,7 +76,37 @@ DbModel *DbSqliteModelHandler::getModel(qint64 dbId)
     return nullptr;
 }
 
+DbModel *DbSqliteModelHandler::getByName(const QString &name, const DbModelBuilder &builder)
+{
+    traced;
+    DbSqliteTbl* tbl = getMainTbl();
+    // assume main tbl is not null, if not programming error,
+    // and require override search function
+    Q_ASSERT(tbl != nullptr);
+    return tbl->getByName(name, builder);
+
+}
+
+DbModel *DbSqliteModelHandler::getByName(const QString &name)
+{
+    traced;
+    loge("SHOULD NOT BE CALLED, MUST BE IMPLEMENTED BY DERIVED CLASS");
+    // TODO: throw exception???
+    return nullptr;
+}
+
 const QString DbSqliteModelHandler::getName()
 {
     return "sqlite";
+}
+
+int DbSqliteModelHandler::search(const QString& keyword, QList<DbModel*>* outList)
+{
+    traced;
+    DbSqliteTbl* tbl = getMainTbl();
+    // assume main tbl is not null, if not programming error,
+    // and require override search function
+    Q_ASSERT(tbl != nullptr);
+    return tbl->search(keyword, outList);
+
 }

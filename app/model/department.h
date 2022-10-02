@@ -51,6 +51,7 @@ class Department:public QObject, public DbModel
 
                  qint64 establishDate() const;
                  void setEstablishDate(qint64 newEstablishDate);
+                 void setEstablishDateFromString(const QString &date, const QString &format="D.M.Y");
 
                  const QString &email() const;
                  void setEmail(const QString &newEmail);
@@ -70,14 +71,18 @@ class Department:public QObject, public DbModel
                  const QString &shortName() const;
                  void setShortName(const QString &newShortName);
 
+                 const QString &communityUid() const;
+                 void setCommunityUid(const QString &newCommunityUid);
+
              protected:
                  virtual DbModelHandler* getDbModelHandler();
              private:
 
-                 QString mShortName;
+            QString mShortName;
             qint64 mParentDbId;
             QString mParentUid;
             qint64 mCommunityDbId;
+            QString mCommunityUid;
             QString mRemark;
             qint64 mHoDPersonId;
             qint64 mEstablishDate;

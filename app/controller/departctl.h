@@ -38,9 +38,11 @@ protected:
     DbModel *buildModel(void *items, const QString &fmt);
 public:
     static DepartCtl* getInstance();
-    const QList<Department*>* getDeptList();
-
-
+    const QList<Department*> getDeptList();
+protected:
+    virtual ErrCode parsePrebuiltFile(const QString &fpath, const QString &ftype);
+private:
+    Department* parseOneItem(const QJsonObject& jobj);
 public slots:
     virtual void onLoad();
 private:

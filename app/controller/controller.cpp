@@ -105,6 +105,23 @@ DbModel* Controller::doImportOneItem(int importFileType, const QStringList &item
     return nullptr;
 }
 
+int Controller::search(const QString &keyword, QList<DbModel *> *outList)
+{
+    int ret = 0;
+    traced;
+    DbModelHandler *hdl = getModelHandler();
+    if (hdl != nullptr) {
+        ret = hdl->search(keyword, outList);
+    } else {
+        loge("Unknown handler, DERIVED class should implement this");
+        ret = 0;
+        // TODO: should throw exception???
+    }
+
+    tracedr(ret);
+    return ret;
+}
+
 
 DbModel *Controller::buildModel(void *items, const QString &fmt)
 {
@@ -141,14 +158,6 @@ ErrCode Controller::check2UpdateDbFromPrebuiltFile(const QString &name, const QS
     QString fname = Utils::getPrebuiltFileByLang(name);
     if (!FileCtl::checkPrebuiltDataFileHash(fname)){
         ret = parsePrebuiltFile(FileCtl::getPrebuiltDataFilePath(fname), ftype);
-//        if (ftype == KFileTypeCSV) {
-//            ret = Utils::parseCSVFile(FileCtl::getPrebuiltDataFilePath(fname),
-//                                      &Controller::oneCSVItemCallback,
-//                                      this);
-//        } else {
-//            ret = ErrNotSupport;
-//        }
-
         if (ret == ErrNone){
             FileCtl::updatePrebuiltDataFileHash(fname);
         }

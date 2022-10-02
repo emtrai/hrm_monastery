@@ -55,7 +55,10 @@ void UISaintListView::updateItem(DbModel *item, UITableItem *tblItem)
 {
     UICommonListView::updateItem(item, tblItem);
     traced;
+    Saint* saint = (Saint*)item;
+    tblItem->addValue(saint->fullName());
     tblItem->addValue(Utils::date2String(static_cast<Saint*>(item)->feastDay(), DATE_FORMAT_MD));
+    tblItem->addValue(saint->remark());
 
 }
 
@@ -63,5 +66,26 @@ void UISaintListView::initHeader()
 {
     UICommonListView::initHeader();
     traced;
-    mHeader.append("Memory Day");
+    mHeader.append(tr("Tên đầy đủ"));
+    mHeader.append(tr("Ngày bổn mạng"));
+    mHeader.append(tr("Ghi chú"));
+}
+
+void UISaintListView::onFilter(const QString &catetory, qint64 opFlags, const QString &keywords)
+{
+    traced;
+    QList<DbModel*> list;
+    logd("Search %s", keywords.toStdString().c_str());
+    int cnt = SaintCtl::getInstance()->search(keywords, &list);
+    logd("Search ret %d", cnt);
+    mItemList.clear(); // TODO: clean up item data
+    // TODO: loop to much, redundant, do something better?
+    if (cnt > 0) {
+        foreach (DbModel* item, list) {
+            mItemList.append(static_cast<DbModel*>(item));
+        }
+    } else {
+        logi("Nothing to add");
+    }
+    reload();
 }

@@ -49,6 +49,7 @@ void UICommonListView::updateItem(DbModel *item, UITableItem *tblItem)
 {
     traced;
     tblItem->addValue(QString("%1").arg(item->dbId()));
+    tblItem->addValue(item->uid());
     tblItem->addValue(item->name());
 }
 
@@ -67,6 +68,7 @@ ErrCode UICommonListView::onLoad()
 void UICommonListView::initHeader()
 {
     traced;
-    mHeader.append("ID");
-    mHeader.append("Name");
+    mHeader.append(tr("ID"));
+    mHeader.append(tr("Mã định danh"));
+    mHeader.append(tr("Tên"));
 }

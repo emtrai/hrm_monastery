@@ -45,7 +45,7 @@ DbModel *AreaCtl::buildModel(void *items, const QString &fmt)
     logd("sz %d", sz);
     item->setCountryUid(itemList->at(idx++));
     QString nameid = itemList->at(idx++);
-    item->setNameId(item->countryUid() + "_" + nameid);
+    item->setNameId(nameid);
     item->setName(itemList->at(idx++));
     if (sz > idx) {
         QString remark = itemList->at(idx++);
@@ -58,12 +58,21 @@ DbModel *AreaCtl::buildModel(void *items, const QString &fmt)
 
 
 
-const QList<Area *> *AreaCtl::getAreaList(const QString &country)
+const QList<Area *> AreaCtl::getAreaList(const QString &country)
 {
     traced;
 
-    return &mAreaList;
+    return mAreaList; // TODO: copy constructor???
 }
+
+
+const QList<Area *> AreaCtl::getAreaList()
+{
+    traced;
+
+    return mAreaList; // TODO: copy constructor???
+}
+
 
 void AreaCtl::onLoad()
 {
@@ -73,6 +82,7 @@ void AreaCtl::onLoad()
     // TODO: should do lazy load??? load all consume much memory
     QList items = DB->getModelHandler(KModelHdlArea)->getAll(&Area::builder);
     //    mItemList.append();
+    logd("Load %d item", (int)items.count());
     foreach (DbModel* model, items){
         Area* item = (Area*)model;
         mAreaList.append(item);

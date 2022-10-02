@@ -97,6 +97,14 @@ void Department::setEstablishDate(qint64 newEstablishDate)
     mEstablishDate = newEstablishDate;
 }
 
+void Department::setEstablishDateFromString(const QString &date, const QString &format)
+{
+    traced;
+    logd("create date string '%s'", date.toStdString().c_str());
+    mEstablishDate = Utils::dateFromString(date, format);
+    logd("mEstablishDate %ll", mEstablishDate);
+}
+
 const QString &Department::email() const
 {
     return mEmail;
@@ -151,6 +159,16 @@ DbModelHandler *Department::getDbModelHandler()
 {
 
     return DB->getModelHandler(KModelHdlDept);
+}
+
+const QString &Department::communityUid() const
+{
+    return mCommunityUid;
+}
+
+void Department::setCommunityUid(const QString &newCommunityUid)
+{
+    mCommunityUid = newCommunityUid;
 }
 
 const QString &Department::shortName() const

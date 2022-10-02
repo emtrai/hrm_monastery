@@ -103,11 +103,9 @@
    <addaction name="actionSummarize"/>
    <addaction name="actionPerson"/>
    <addaction name="actionCommunity"/>
-   <addaction name="actionSaints_2"/>
+   <addaction name="actionDummy"/>
    <addaction name="separator"/>
    <addaction name="action_New"/>
-   <addaction name="separator"/>
-   <addaction name="actionWorkChange"/>
    <addaction name="separator"/>
    <addaction name="actionSearch"/>
    <addaction name="separator"/>
@@ -204,19 +202,6 @@
     <bool>true</bool>
    </property>
   </action>
-  <action name="actionSaints_2">
-   <property name="icon">
-    <iconset>
-     <normalon>:/icon/icon/icons8-saint-64.png</normalon>
-    </iconset>
-   </property>
-   <property name="text">
-    <string>Thánh</string>
-   </property>
-   <property name="toolTip">
-    <string>Show Saints</string>
-   </property>
-  </action>
   <action name="actionPerson">
    <property name="icon">
     <iconset>
@@ -224,7 +209,7 @@
     </iconset>
    </property>
    <property name="text">
-    <string>Thành Viên</string>
+    <string>Nữ tu</string>
    </property>
    <property name="toolTip">
     <string>Nuns</string>
@@ -257,7 +242,7 @@
   </action>
   <action name="actionArea">
    <property name="text">
-    <string>Area</string>
+    <string>Khu vực</string>
    </property>
   </action>
   <action name="actionEducation">
@@ -316,14 +301,15 @@
     <string>&amp;Phục hồi</string>
    </property>
   </action>
-  <action name="actionWorkChange">
-   <property name="icon">
-    <iconset>
-     <normalon>:/icon/icon/icons8-change-64.png</normalon>
-    </iconset>
+  <action name="actionDummy">
+   <property name="enabled">
+    <bool>false</bool>
    </property>
    <property name="text">
-    <string>Chuyển công tác</string>
+    <string>Khác</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
  </widget>

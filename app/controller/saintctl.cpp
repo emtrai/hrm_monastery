@@ -58,6 +58,30 @@ QList<Saint*> SaintCtl::getListSaints()
     return list;
 }
 
+DbModel *SaintCtl::doImportOneItem(int importFileType, const QStringList &items, quint32 idx)
+{
+    ErrCode ret = ErrNone;
+    Saint* saint = nullptr;
+    int i = 0;
+    logd("idx = %d", idx);
+    logd("no items %d", items.count());
+    if (idx == 0) {
+        logd("HEADER, save it");
+        foreach (QString item, items) {
+            mImportFields.append(item.trimmed());
+        }
+    } else {
+
+        saint = (Saint*)Saint::build();
+        foreach (QString item, items) {
+            ret = saint->onImportItem(importFileType, mImportFields[i++], item, idx);
+        }
+    }
+
+    tracedr(ret);
+    return saint;
+}
+
 SaintCtl::SaintCtl()
 {
 
@@ -128,129 +152,50 @@ DbModel *SaintCtl::buildModel(void *params, const QString &fmt)
     return saint;
 }
 
+ErrCode SaintCtl::parsePrebuiltFile(const QString &fpath, const QString &ftype)
+{
+    ErrCode ret = ErrNone;
+    traced;
+    // TODO: should we add meta field in beginning of file to know status of information???
+    // i.e.: version, last update time.
+    // This can be used to check/compare witl one stored in db
+    if (ftype == KFileTypeCSV) {
+
+        QList<DbModel*> list;
+        logd("Import saint file %s", fpath.toStdString().c_str());
+        ret = importFromFile(nullptr, ImportType::IMPORT_CSV_LIST, fpath, &list);
+        logd("Import result %d", ret);
+        logd("No of import item %d", list.count());
+        if (ret == ErrNone) {
+            if (list.count() > 0) {
+                foreach (DbModel* item, list) {
+                    logd("Save item");
+                    item->dump();
+                    item->save();
+                }
+            } else {
+                logi("Nothing to import saint");
+            }
+        }
+    } else {
+        ret = ErrNotSupport;
+    }
+    return ret;
+}
+
+DbModelHandler *SaintCtl::getModelHandler()
+{
+    traced;
+    return DB->getModelHandler(KModelHdlSaint);
+}
+
 void SaintCtl::onLoad()
 {
     traced;
     ErrCode ret = ErrNone;
     ret = check2UpdateDbFromPrebuiltFile(KPrebuiltSaintCSVFileName, KFileTypeCSV);
-//    QString fname = Utils::getPrebuiltFileByLang(KPrebuiltSaintCSVFileName);
-//    if (!FileCtl::checkPrebuiltDataFileHash(fname)){
-//        logi("Hash file not match, seem need to update");
-//        ret = check2UpdateDbFromFile(FileCtl::getPrebuiltDataFilePath(fname));
-//        if (ret == ErrNone){
-//            FileCtl::updatePrebuiltDataFileHash(fname);
-//        }
-//        else{
-//            logi("Check to update db from file failed %d", ret);
-//        }
-//    }
-//    else {
-//        logi("Prebuilt saint file up-to-date");
-////        getListSaints();//TODO: for test only;
-//    }
-//    check2UpdateDbFromFile(FileCtl::getPrebuiltDataFile(
-//                            Utils::getPrebuiltFileByLang(KPrebuiltSaintCSVFileName)));
+
 }
-
-//ErrCode SaintCtl::check2UpdateDbFromFile(const QString &filePath)
-//{
-//    traced;
-//    // TODO: add more checking????
-//    ErrCode ret = Utils::parseCSVFile(filePath, &SaintCtl::oneCSVItemCallback,
-//                                      this, nullptr, SPLIT);
-//    logd("ret %d", ret);
-//    return ret;
-//}
-
-//ErrCode SaintCtl::oneCSVItemCallback(const QStringList& items, void* caller, void*param)
-//{
-//    return getInstance()->doOneCSVItemCallback(items, param);
-//}
-
-//ErrCode SaintCtl::doOneCSVItemCallback(const QStringList& items, void*param)
-//{
-//    traced;
-//    ErrCode ret = ErrNone;
-//    (void) param;
-//    if (!items.empty() && items.length() >= MAX_SPLIT_ITEMS) {
-//        Saint saint;
-
-//        qint32 idx = 0;
-//        //name
-//        if (ret == ErrNone)
-//            saint.setName(items[idx++].simplified());
-
-//        // full name
-//        if (ret == ErrNone)
-//            saint.setFullName(items[idx++].simplified());
-
-//        // gender
-//        if (ret == ErrNone)
-//        {
-//            Gender gender = Utils::genderFromString(items[idx++]);
-//            if (gender != Gender::GENDER_UNKNOWN){
-//                saint.setGender(gender);
-//            }
-//            else{
-//                loge("Invalid gender");
-//                ret = ErrInvalidData;
-//            }
-
-//        }
-
-//        // memory date
-//        if (ret == ErrNone)
-//        {
-//            qint64 date = Utils::dateFromString(items[idx++].simplified(),"M/D");
-//            if (date > 0){
-//                saint.setFeastDay(date);
-//            }
-//            else{
-//                loge("Invalid date");
-//                ret = ErrInvalidData;
-//                // TODO: should break or continue???
-
-//            }
-//        }
-
-//        // country
-//        // TODO: check if country exist in db, then insert it????
-//        if (ret == ErrNone)
-//            saint.setCountry(items[idx++].simplified());
-
-//        // brief info
-//        if (ret == ErrNone)
-//        {
-//            QString brief;
-//            for (;idx < items.length(); idx++){
-//                if (!brief.isEmpty())
-//                    brief += SPLIT;
-//                brief += items[idx];
-//            }
-//        }
-
-//        if (ret == ErrNone)
-//        {
-//            if (saint.isValid()){
-//                saint.dump();
-//                logi("Save saint '%s'", saint.toString().toStdString().c_str());
-//                ret = saint.save();
-//            }
-//            else{
-//                ret = ErrInvalidData;
-//                loge("Saint data is invalid");
-//            }
-//        }
-
-//    }
-//    else {
-//        loge("Invalid data");
-//        // TODO: should break or continue???
-//        ret = ErrInvalidData;
-//    }
-//    logd("ret %d", ret);
-//    return ret;
-//}
 
 SaintCtl *SaintCtl::getInstance()
 {

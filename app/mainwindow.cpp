@@ -44,59 +44,24 @@ MainWindow::MainWindow(QWidget *parent)
     , mSummarizeView(nullptr)
     , mCommunityView(nullptr)
     , mPersonView(nullptr)
+    , mAreaView(nullptr)
     , mCurrentView(nullptr)
 {
     ui->setupUi(this);
-    QToolButton *importButton = new QToolButton(this);
-    importButton->setText(tr("&Nhập"));
-    importButton->setPopupMode(QToolButton::InstantPopup);
-    importButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-    QIcon icon;
-    icon.addFile(QString::fromUtf8(":/icon/icon/icons8-import-64"), QSize(), QIcon::Normal, QIcon::On);
-    importButton->setIcon(icon);
 
-    QMenu *importMenu = new QMenu(importButton);
-
-    mActionImportPersonList = new QAction(this);
-    mActionImportPersonList->setObjectName(QString::fromUtf8("action_ImportPersonList"));
-    mActionImportPersonList->setText(tr("Danh sách Nữ tu"));
-    QIcon mImportPersonListIcon;
-    mImportPersonListIcon.addFile(QString::fromUtf8(":/icon/icon/icons8-nun-64.png"), QSize(), QIcon::Normal, QIcon::On);
-    mActionImportPersonList->setIcon(mImportPersonListIcon);
-    QObject::connect(mActionImportPersonList, SIGNAL(triggered()), this, SLOT(on_action_ImportPersonList_triggered()));
-    importMenu->addAction(mActionImportPersonList);
-
-    mActionImportPerson = new QAction(this);
-    mActionImportPerson->setObjectName(QString::fromUtf8("action_ImportPerson"));
-    mActionImportPerson->setText(tr("Nữ tu"));
-    mActionImportPerson->setIcon(mImportPersonListIcon);
-//    QObject::connect(mActionImportPerson, SIGNAL(triggered()), this, SLOT(on_action_ImportPersonList_triggered()));
-    importMenu->addAction(mActionImportPerson);
-
-    mActionImportCommunityList = new QAction(this);
-    mActionImportCommunityList->setObjectName(QString::fromUtf8("action_ImportCommunityList"));
-    mActionImportCommunityList->setText(tr("Danh sách Cộng đoàn"));
-    QIcon mImportCommunityIcon;
-    mImportCommunityIcon.addFile(QString::fromUtf8(":/icon/icon/icons8-community-64 (1).png"), QSize(), QIcon::Normal, QIcon::On);
-    mActionImportCommunityList->setIcon(mImportCommunityIcon);
-
-
-    importMenu->addAction(mActionImportCommunityList);
-    importButton->setMenu(importMenu);
-    ui->toolBar->addWidget(importButton);
+    loadImportMenu();
+    loadOtherMenu();
 
     mSummarizeView = new UISummarizeView();
 
     mCommunityView = UITableViewFactory::getView(ViewType::COMMUNITY);
     mSaintsView = UITableViewFactory::getView(ViewType::SAINT);
     mPersonView = UITableViewFactory::getView(ViewType::PERSON);
+    mAreaView = UITableViewFactory::getView(ViewType::AREA);
     mHomeView = new QTextBrowser(this);
     mHomeView->clearHistory();
     mHomeView->clear();
 
-//    mHomeView->setSource(QUrl(":/data/home"), QTextDocument::ResourceType::HtmlResource);
-//    mHomeView->setHtml("<h1>Hello</h1>");
-//    mHomeView->setHtml(Utils::readAll(":/data/home"));
     loadHomePageFile();
     // TODO: load all memory, consume much memory and performance
     mHomeView->setSearchPaths(QStringList(FileCtl::getOrCreatePrebuiltDataDir()));
@@ -104,8 +69,6 @@ MainWindow::MainWindow(QWidget *parent)
         FileCtl::getUpdatePrebuiltDataFilePath(KPrebuiltHomeHtmlFileName, false)));
 
     switchView(mHomeView);
-//    summarize->setWindowState(Qt::WindowState::WindowMaximized);
-//    summarize->show();
 
     logd("init config");
     Config::init();
@@ -161,6 +124,82 @@ void MainWindow::loadHomePageFile()
 
     logd("Load home page file ret %d", ret);
     // TODO: should log to file???
+}
+
+
+void MainWindow::loadOtherMenu()
+{
+    traced;
+
+    QToolButton *otherButton = new QToolButton(this);
+    // TODO: when other button be clear? check it
+    otherButton->setText(tr("&Khác"));
+    otherButton->setPopupMode(QToolButton::InstantPopup);
+    otherButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    QIcon icon;
+    icon.addFile(QString::fromUtf8(":/icon/icon/icons8-diversity-64"), QSize(), QIcon::Normal, QIcon::On);
+    otherButton->setIcon(icon);
+
+    QMenu *otherMenu = new QMenu(otherButton);
+    // TODO: when other menu clear? check it
+    QAction* act = otherMenu->addAction(QIcon(QString::fromUtf8(":/icon/icon/icons8-saint-64")),
+                                        tr("Thánh"));
+    QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionSaints_2_triggered()));
+
+    act = otherMenu->addAction(QIcon(QString::fromUtf8(":/icon/icon/icon/icons8-earth-planet-80")),
+                               tr("Khu vực"));
+    QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionArea_triggered()));
+
+
+
+    otherButton->setMenu(otherMenu);
+    // actionDummy? stupid? but it works
+    ui->toolBar->insertWidget(ui->actionDummy, otherButton);
+}
+
+void MainWindow::loadImportMenu()
+{
+    traced;
+
+    QToolButton *importButton = new QToolButton(this);
+    // TODO: when import button be clear? check it
+    importButton->setText(tr("&Nhập"));
+    importButton->setPopupMode(QToolButton::InstantPopup);
+    importButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    QIcon icon;
+    icon.addFile(QString::fromUtf8(":/icon/icon/icons8-import-64"), QSize(), QIcon::Normal, QIcon::On);
+    importButton->setIcon(icon);
+
+    QMenu *importMenu = new QMenu(importButton);
+
+    mActionImportPersonList = new QAction(this);
+    mActionImportPersonList->setObjectName(QString::fromUtf8("action_ImportPersonList"));
+    mActionImportPersonList->setText(tr("Danh sách Nữ tu"));
+    QIcon mImportPersonListIcon;
+    mImportPersonListIcon.addFile(QString::fromUtf8(":/icon/icon/icons8-nun-64.png"), QSize(), QIcon::Normal, QIcon::On);
+    mActionImportPersonList->setIcon(mImportPersonListIcon);
+    QObject::connect(mActionImportPersonList, SIGNAL(triggered()), this, SLOT(on_action_ImportPersonList_triggered()));
+    importMenu->addAction(mActionImportPersonList);
+
+    mActionImportPerson = new QAction(this);
+    mActionImportPerson->setObjectName(QString::fromUtf8("action_ImportPerson"));
+    mActionImportPerson->setText(tr("Nữ tu"));
+    mActionImportPerson->setIcon(mImportPersonListIcon);
+//    QObject::connect(mActionImportPerson, SIGNAL(triggered()), this, SLOT(on_action_ImportPersonList_triggered()));
+    importMenu->addAction(mActionImportPerson);
+
+    mActionImportCommunityList = new QAction(this);
+    mActionImportCommunityList->setObjectName(QString::fromUtf8("action_ImportCommunityList"));
+    mActionImportCommunityList->setText(tr("Danh sách Cộng đoàn"));
+    QIcon mImportCommunityIcon;
+    mImportCommunityIcon.addFile(QString::fromUtf8(":/icon/icon/icons8-community-64 (1).png"), QSize(), QIcon::Normal, QIcon::On);
+    mActionImportCommunityList->setIcon(mImportCommunityIcon);
+
+
+    importMenu->addAction(mActionImportCommunityList);
+     // TODO: when menu is clear???? check it careffully
+    importButton->setMenu(importMenu);
+    ui->toolBar->insertWidget(ui->action_New, importButton);
 }
 
 void MainWindow::on_action_ImportPersonList_triggered()
@@ -263,5 +302,11 @@ void MainWindow::on_actionPerson_triggered()
 void MainWindow::on_actionSearch_triggered()
 {
     traced;
+}
+
+void MainWindow::on_actionArea_triggered()
+{
+    traced;
+    switchView(mAreaView);
 }
 

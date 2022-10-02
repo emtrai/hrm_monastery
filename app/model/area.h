@@ -49,12 +49,18 @@ public:
     const QString &countryUid() const;
     void setCountryUid(const QString &newCountryUid);
 
+    QString getFullName();
+
+    qint64 countryName() const;
+    void setCountryName(qint64 newCountryName);
+
 protected:
     virtual DbModelHandler* getDbModelHandler();
 private:
     Person* mManager;
     QHash<qint32, QList<Person*>> mMember; // role, list of member
     Country* country;
+    qint64 mCountryName;
     qint64 mCountryDbId;
     qint64 mPersonDbId;
     QString mRemark;

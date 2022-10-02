@@ -124,6 +124,13 @@ const QList<QString> &PersonCtl::importFields() const
     return mImportFields;
 }
 
+QList<Person *> PersonCtl::searchPersonByName(const QString &name)
+{
+    traced;
+    logd("search persone by name %s", name.toStdString().c_str());
+    // TODO:
+}
+
 void PersonCtl::onLoad()
 {
     traced;

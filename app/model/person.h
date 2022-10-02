@@ -56,6 +56,12 @@ class Person: public DbModel, public IExporter, public IImporter
             void init();
             void initExportFields();
             void initImportFields();
+            /**
+             * @brief validate if data is all valid
+             * @param result of validate for each field Field:ErrCode
+             * @return true if all valid, false otherwise
+             */
+            virtual bool validate(QHash<QString, ErrCode>* result = nullptr);
 
         public:
             Person();
@@ -331,6 +337,24 @@ class Person: public DbModel, public IExporter, public IImporter
 
             virtual ErrCode onImportItem(int importFileType, const QString& keyword, const QString& value, quint32 idx = 0, void* tag = nullptr);
 
+            const QString &areaUid() const;
+            void setAreaUid(const QString &newAreaUid);
+
+            const QString &areaName() const;
+            void setAreaName(const QString &newAreaName);
+
+            const QString &departUid() const;
+            void setDepartUid(const QString &newDepartUid);
+
+            const QString &departName() const;
+            void setDepartName(const QString &newDepartName);
+
+            const QString &communityUid() const;
+            void setCommunityUid(const QString &newCommunityUid);
+
+            const QString &communityName() const;
+            void setCommunityName(const QString &newCommunityName);
+
         protected:
             virtual DbModelHandler *getDbModelHandler();
             virtual const QString exportTemplatePath() const;
@@ -399,6 +423,18 @@ class Person: public DbModel, public IExporter, public IImporter
             QStringList mTel;
             QString mOtherContact;
 
+            //area
+            QString mAreaUid;
+            QString mAreaName;
+
+            //department
+            QString mDepartUid;
+            QString mDepartName;
+
+
+            //community
+            QString mCommunityUid;
+            QString mCommunityName;
 
             // dad
             QString mDadName;

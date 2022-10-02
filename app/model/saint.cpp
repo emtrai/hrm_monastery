@@ -29,10 +29,73 @@
 
 #include "dbctl.h"
 
+#include "defs.h"
+
+
+DbModel *Saint::build()
+{
+    return new Saint();
+}
+
+void Saint::init()
+{
+    traced;
+    initImportFields();
+}
+
+
+void Saint::initImportFields()
+{
+    traced;
+    // TODO: check fields like holly name, country, etc. and mark invalid field???
+
+    mImportFields.insert(KExportFieldUid, [this](const QString& value){
+        this->setUid(value);
+    });
+
+    mImportFields.insert(KExportFieldName, [this](const QString& value){
+        this->setName(value);
+    });
+
+    mImportFields.insert(KExportFieldFullName, [this](const QString& value){
+        this->setFullName(value);
+    });
+    mImportFields.insert(KExportFieldOriginName, [this](const QString& value){
+        this->setOriginName(value);
+    });
+    mImportFields.insert(KExportFieldGender, [this](const QString& value){
+        this->setGender(value);
+    });
+    mImportFields.insert(KExportFieldFeastDay, [this](const QString& value){
+        this->setFeastDay(value);
+    });
+    mImportFields.insert(KExportFieldRemark, [this](const QString& value){
+        this->setRemark(value);
+    });
+}
+
 Saint::Saint(): DbModel()
 
 {
     mFeastDay = 0;
+    init();
+}
+
+ErrCode Saint::onImportItem(int importFileType, const QString &keyword, const QString &value, quint32 idx, void *tag)
+{
+    traced;
+    ErrCode ret = ErrNone;
+    logd("importFileType %d", importFileType);
+
+    // TODO: raise exception when error occur???
+    logd("keyword %s", keyword.toStdString().c_str());
+    if (mImportFields.contains(keyword)){
+        std::function<void(const QString& value)> func = mImportFields.value(keyword);
+        if (func != nullptr) func(value);
+    }
+
+    tracedr(ret);
+    return ret;
 }
 
 
@@ -46,6 +109,11 @@ void Saint::setFeastDay(qint64 newFeastDay)
     mFeastDay = newFeastDay;
 }
 
+void Saint::setFeastDay(const QString &newFeastDay, const QString& f)
+{
+    setFeastDay(Utils::dateFromString(newFeastDay, f));
+}
+
 Gender Saint::gender() const
 {
     return mGender;
@@ -54,6 +122,11 @@ Gender Saint::gender() const
 void Saint::setGender(Gender newGender)
 {
     mGender = newGender;
+}
+
+void Saint::setGender(const QString &gender)
+{
+    mGender = Utils::genderFromString(gender);
 }
 
 const QString &Saint::country() const
@@ -96,6 +169,26 @@ DbModel *Saint::builder()
 DbModelHandler *Saint::getDbModelHandler()
 {
     return DbCtl::getInstance()->getDb()->getSaintModelHandler();
+}
+
+const QString &Saint::remark() const
+{
+    return mRemark;
+}
+
+void Saint::setRemark(const QString &newRemark)
+{
+    mRemark = newRemark;
+}
+
+const QString &Saint::originName() const
+{
+    return mOriginName;
+}
+
+void Saint::setOriginName(const QString &newOriginName)
+{
+    mOriginName = newOriginName;
 }
 
 const QString &Saint::countryUid() const

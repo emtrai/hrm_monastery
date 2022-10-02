@@ -16,6 +16,7 @@
         <file alias="course_vi">res/course_vi.csv</file>
         <file alias="status_vi">res/status_vi.csv</file>
         <file alias="event_vi">res/event_vi.csv</file>
+        <file alias="work_vi">res/work_vi.csv</file>
     </qresource>
     <qresource prefix="/template"/>
 </RCC>

@@ -68,6 +68,10 @@
 #include "status.h"
 #include "statusctl.h"
 #include "personevent.h"
+#include "areactl.h"
+#include "area.h"
+#include "departctl.h"
+#include "department.h"
 
 #define SPLIT_EMAIL_PHONE ";"
 
@@ -111,6 +115,7 @@ do { \
 
 const char* const KUiMultiComboxNameSaint = "saint";
 const char* const KUiMultiComboxNameSpecialist = "specialist";
+const char* const KUidNone = "";
 
 DlgPerson::DlgPerson(QWidget *parent) :
     QDialog(parent),
@@ -183,6 +188,8 @@ void DlgPerson::setupUI()
     ui->tblEvents->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tblEvents->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
 
+    ui->tblEvents->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
+
     ui->tblEvents->setShowGrid(true);
     ui->tblEvents->setColumnCount(communityListHdr.count());
 //    ui->tblCommunityList->setMinimumWidth(500);
@@ -231,6 +238,9 @@ void DlgPerson::setupUI()
 
     // load Event
     loadEvent(true);
+
+    loadArea();
+    loadDepartment();
 
 }
 
@@ -296,6 +306,11 @@ Person *DlgPerson::buildPerson()
     per->setEmail(ui->txtEmail->text().split(SPLIT_EMAIL_PHONE));
     per->setTel(ui->txtPhone->text().split(SPLIT_EMAIL_PHONE));
     per->setOtherContact(ui->txtOtherContact->toPlainText().trimmed());
+
+    SET_VAL_FROM_CBOX(ui->cbArea, per->setAreaUid, per->setAreaName);
+    SET_VAL_FROM_CBOX(ui->cbDepart, per->setDepartUid, per->setDepartName);
+    SET_VAL_FROM_CBOX(ui->cbCommunity, per->setCommunityUid, per->setCommunityName);
+
 
     per->setDadName(ui->txtDad->text().trimmed());
     SET_DATE_VAL_FROM_WIDGET(ui->txtDadBirth, per->setDadBirthday);
@@ -665,6 +680,7 @@ void DlgPerson::loadWork()
     traced;
     ui->cbWork->clear();
     QList<Work*> list = INSTANCE(WorkCtl)->getWorkList();
+    ui->cbWork->addItem(tr("Không xác đinh"), KUidNone);
     foreach(Work* item, list){
         ui->cbWork->addItem(item->name(), item->uid());
     }
@@ -725,6 +741,7 @@ void DlgPerson::loadCommunity()
     logd("Load community");
     QList<Community*> listCommunity = COMMUNITYCTL->getCommunityList();
     ui->cbCommunity->clear();
+    ui->cbCommunity->addItem(tr("Không xác đinh"), KUidNone);
     foreach(Community* item, listCommunity){
         ui->cbCommunity->addItem(item->name(), item->uid());
     }
@@ -740,6 +757,28 @@ void DlgPerson::loadStatus()
         ui->cbStatus->addItem(item->name(), item->uid());
     }
 
+}
+
+void DlgPerson::loadArea()
+{
+    traced;
+    ui->cbArea->clear();
+    QList<Area*> listItems = INSTANCE(AreaCtl)->getAreaList();
+    ui->cbArea->addItem(tr("Không xác đinh"), KUidNone);
+    foreach(Area* item, listItems){
+        ui->cbArea->addItem(item->name(), item->uid());
+    }
+}
+
+void DlgPerson::loadDepartment()
+{
+    traced;
+    ui->cbDepart->clear();
+    QList<Department*> listItems = INSTANCE(DepartCtl)->getDeptList();
+    ui->cbDepart->addItem(tr("Không xác đinh"), KUidNone);
+    foreach(Department* item, listItems){
+        ui->cbDepart->addItem(item->name(), item->uid());
+    }
 }
 
 void DlgPerson::loadCourse()
@@ -1088,5 +1127,37 @@ void DlgPerson::on_btnAddEvent_clicked()
         loadEvent();
     }
     delete dlg;
+}
+
+
+void DlgPerson::on_btnDelEvent_clicked()
+{
+    traced;
+    // TODO: validate data
+    QTableWidget* tbl = ui->tblEvents;
+    QItemSelectionModel* selectionModel = tbl->selectionModel();
+    QModelIndexList selection = selectionModel->selectedRows();
+    // Multiple rows can be selected
+    for(int i=0; i< selection.count(); i++)
+    {
+        QModelIndex index = selection.at(i);
+        mListPersonEvent.removeAt(index.row());
+    }
+    loadEvent();
+}
+
+
+void DlgPerson::on_btnAddDepart_clicked()
+{
+    traced;
+    // TODO: implement add department
+}
+
+
+void DlgPerson::on_btnAddArea_clicked()
+{
+    traced;
+    // TODO: implement add area
+
 }
 

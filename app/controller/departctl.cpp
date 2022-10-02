@@ -26,6 +26,12 @@
 #include "defs.h"
 #include "dbctl.h"
 #include "utils.h"
+#include <QFile>
+
+#include <QByteArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 GET_INSTANCE_IMPL(DepartCtl)
 
@@ -57,11 +63,127 @@ DbModel *DepartCtl::buildModel(void *items, const QString &fmt)
 }
 
 
-const QList<Department *> *DepartCtl::getDeptList()
+const QList<Department *> DepartCtl::getDeptList()
 {
     traced;
 
-    return &mDeptList;
+    return mDeptList;
+}
+
+Department* DepartCtl::parseOneItem(const QJsonObject& jobj)
+{
+    Department* ret = new Department();
+    traced;
+    if (jobj.contains(JSON_ID)){
+        QString tmp = jobj[JSON_ID].toString().trimmed();
+        if (!tmp.isEmpty())
+            ret->setUid(tmp);
+    }
+
+    if (jobj.contains(JSON_NAME)){
+        QString tmp = jobj[JSON_NAME].toString().trimmed();
+        if (!tmp.isEmpty())
+            ret->setName(tmp);
+
+    }
+
+    if (jobj.contains(JSON_COMMUNITY_UID)){
+        QString tmp = jobj[JSON_COMMUNITY_UID].toString().trimmed();
+        if (!tmp.isEmpty())
+            ret->setCommunityUid(tmp);
+    }
+
+    if (jobj.contains(JSON_ADDR)){
+        QString tmp = jobj[JSON_ADDR].toString().trimmed();
+        if (!tmp.isEmpty())
+            ret->setAddr(tmp);
+    }
+
+    if (jobj.contains(JSON_TEL)){
+        QString tmp = jobj[JSON_TEL].toString().trimmed();
+        if (!tmp.isEmpty())
+            ret->setTel(tmp);
+    }
+
+    if (jobj.contains(JSON_EMAIL)){
+        QString tmp = jobj[JSON_EMAIL].toString().trimmed();
+        if (!tmp.isEmpty())
+            ret->setEmail(tmp);
+
+    }
+
+    if (jobj.contains(JSON_EMAIL)){
+        QString tmp = jobj[JSON_EMAIL].toString().trimmed();
+        if (!tmp.isEmpty())
+            ret->setBrief(tmp);
+
+    }
+
+    if (jobj.contains(JSON_REMARK)){
+        QString tmp = jobj[JSON_REMARK].toString().trimmed();
+        if (!tmp.isEmpty())
+            ret->setRemark(tmp);
+    }
+    // TODO: set status
+
+    if (jobj.contains(JSON_ESTABLISH)){
+        QString tmp = jobj[JSON_ESTABLISH].toString().trimmed();
+        if (!tmp.isEmpty())
+            ret->setEstablishDateFromString(tmp);
+    }
+
+    return ret;
+
+}
+
+ErrCode DepartCtl::parsePrebuiltFile(const QString &fpath, const QString &ftype)
+{
+    ErrCode ret = ErrNone;
+    traced;
+    if (ftype == KFileTypeJson) {
+
+        logd("Load file %s", fpath.toStdString().c_str());
+        QFile loadFile(fpath);
+
+        if (!loadFile.open(QIODevice::ReadOnly)) {
+            loge("Couldn't open file %s", fpath.toStdString().c_str());
+            ret = ErrFileRead;
+        }
+
+        if (ret == ErrNone){
+            logd("Parse json");
+            QByteArray saveData = loadFile.readAll();
+            logd("saveData length %d", (int)saveData.length());
+
+            QJsonDocument loadDoc = QJsonDocument::fromJson(saveData);
+
+            logd("loadDoc isEmpty %d", loadDoc.isEmpty());
+            QJsonObject jRootObj = loadDoc.object();
+            qWarning() << jRootObj;
+            if (jRootObj.contains(JSON_DEPARTMENTS) && jRootObj[JSON_DEPARTMENTS].isArray()) {
+                QJsonArray jlist = jRootObj[JSON_DEPARTMENTS].toArray();
+                for (int levelIndex = 0; levelIndex < jlist.size(); ++levelIndex) {
+                    QJsonObject jObj = jlist[levelIndex].toObject();
+                    Department* depart = parseOneItem(jObj);
+                    if (depart->isValid()) {
+                        logd("Save %s", depart->name().toStdString().c_str());
+                        depart->save();
+                    }
+
+                    delete depart;
+
+                }
+            } else {
+                loge("Invalid data, not found %s", JSON_DEPARTMENTS);
+                ret = ErrInvalidData;
+            }
+        }
+
+    } else {
+        ret = ErrNotSupport;
+    }
+    tracedr(ret);
+    return ret;
 }
 
 void DepartCtl::onLoad()

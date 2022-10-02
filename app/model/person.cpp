@@ -30,72 +30,6 @@
 #include "defs.h"
 #include <QMap>
 
-
-//QHash<QString, std::function<QString (Person::*())>> Person::gExportFields; = {
-//    {KExportFieldImgPath, nullptr},
-//    {KExportFieldFullName, &Person::getFullName},
-//    {KExportFieldBirthday, nullptr},
-//    {KExportFieldBirthplace, &Person::birthPlace},
-//    {KExportFieldHollyName, nullptr},
-//    {KExportFieldNationality, nullptr},
-//    {KExportFieldEthnic, nullptr},
-//    {KExportFieldIDcard, nullptr},
-//    {KExportFieldIDcardIssueDate, nullptr},
-//    {KExportFieldIDcardIssuer, nullptr},
-//    {KExportFieldStatus, nullptr},
-//    {KExportFieldRetireDate, nullptr},
-//    {KExportFieldRetirePlace, nullptr}, //"retire_place";
-//    {KExportFieldDeadDate, nullptr}, //"dead_date";
-//    {KExportFieldDeadPlace, nullptr}, //"dead_place";
-//    {KExportFieldCountry, nullptr}, //"country";
-//    {KExportFieldProvince, nullptr}, //"province";
-//    {KExportFieldAddress, nullptr}, //"address";
-//    {KExportFieldChurchAddress, nullptr}, //"church_addr";
-//    {KExportFieldTel, nullptr}, //"telephone";
-//    {KExportFieldEmail, nullptr}, //"email";
-//    {KExportFieldOtherContant, nullptr}, //"othercontact";
-//    {KExportFieldEdu, nullptr}, //"education";
-//    {KExportFieldSpeciaist, nullptr}, //"specialist";
-//    {KExportFieldWork, nullptr}, //"work";
-//    {KExportFieldWorkHistory, nullptr}, //"work_history";
-//    {KExportFieldCommunity, nullptr}, //"community";
-//    {KExportFieldCommunityHistory, nullptr}, //"community_history";
-//    {KExportFieldDad, nullptr}, //"dad";
-//    {KExportFieldDadBirthday, nullptr}, //"dad_birthday";
-//    {KExportFieldDadAddr, nullptr}, //"dad_addr";
-//    {KExportFieldMom, nullptr}, //"mom";
-//    {KExportFieldMomBirthday, nullptr}, //"mom_birthday";
-//    {KExportFieldMomAddr, nullptr}, //"mom_addr";
-//    {KExportFieldFamilyHistory, nullptr}, //"family_history";
-//    {KExportFieldFamilyContact, nullptr}, //"family_contact";
-//    {KExportFieldChristenDate, nullptr}, //"christen_date";
-//    {KExportFieldChristenPlace, nullptr}, //"christen_place";
-//    {KExportFieldEucharistDate, nullptr}, //"eucharist_date";
-//    {KExportFieldEucharistPlace, nullptr}, //"eucharist_place";
-//    {KExportFieldHollyDate, nullptr}, //"holly_date";
-//    {KExportFieldHollyPlace, nullptr}, //"holly_place";
-//    {KExportFieldCourse, nullptr}, //"course";
-//    {KExportFieldJoinDate, nullptr}, //"join_date";
-//    {KExportFieldJoinPIC, nullptr}, //"join_pic";
-//    {KExportFieldPreTrainDate, nullptr}, //"pre_train_date";
-//    {KExportFieldPreTrainPIC, nullptr}, //"pre_train_pic";
-//    {KExportFieldTrainDate, nullptr}, //"train_date";
-//    {KExportFieldTrainPIC, nullptr}, //"train_pic";
-//    {KExportFieldVowsDate, nullptr}, //"vows_date";
-//    {KExportFieldVowsCEO, nullptr}, //"vows_ceo";
-//    {KExportFieldEternalVowsDate, nullptr}, //"eternal_vows_date";
-//    {KExportFieldEternalVowsCEO, nullptr}, //"eternal_vows_ceo";
-//    {KExportFieldEternalVowsPIC, nullptr}, //"eternal_vows_pic";
-//    {KExportFieldBankDate, nullptr}, //"bank_date";
-//    {KExportFieldBankPlace, nullptr}, //"bank_place";
-//    {KExportFieldGoldenDate, nullptr}, //"golden_date";
-//    {KExportFieldGoldenPlace, nullptr}, //"golden_place";
-//    {KExportFieldEternalDate, nullptr}, //"eternal_date";
-//    {KExportFieldEternalPlace, nullptr} //"eternal_place";
-//};
-
-
-
 Person::Person():
     mChristenDate(0),
     mBirthday(0)
@@ -438,6 +372,14 @@ void Person::initImportFields()
     mImportFields.insert(KExportFieldEternalPlace, nullptr); //"eternal_place";
 }
 
+bool Person::validate(QHash<QString, ErrCode> *result)
+{
+    traced;
+    bool res = false;
+
+    return res;
+}
+
 
 //ErrCode_t Person::save()
 //{
@@ -699,6 +641,66 @@ ErrCode Person::getExportDataString(const QString &keyword, QString *data) const
     return ret;
 }
 
+const QString &Person::communityName() const
+{
+    return mCommunityName;
+}
+
+void Person::setCommunityName(const QString &newCommunityName)
+{
+    mCommunityName = newCommunityName;
+}
+
+const QString &Person::communityUid() const
+{
+    return mCommunityUid;
+}
+
+void Person::setCommunityUid(const QString &newCommunityUid)
+{
+    mCommunityUid = newCommunityUid;
+}
+
+const QString &Person::departName() const
+{
+    return mDepartName;
+}
+
+void Person::setDepartName(const QString &newDepartName)
+{
+    mDepartName = newDepartName;
+}
+
+const QString &Person::departUid() const
+{
+    return mDepartUid;
+}
+
+void Person::setDepartUid(const QString &newDepartUid)
+{
+    mDepartUid = newDepartUid;
+}
+
+const QString &Person::areaName() const
+{
+    return mAreaName;
+}
+
+void Person::setAreaName(const QString &newAreaName)
+{
+    mAreaName = newAreaName;
+}
+
+const QString &Person::areaUid() const
+{
+    return mAreaUid;
+}
+
+void Person::setAreaUid(const QString &newAreaUid)
+{
+    mAreaUid = newAreaUid;
+}
+
 const QString &Person::nationalityName() const
 {
     return mNationalityName;
@@ -715,6 +717,7 @@ void Person::dump()
     DbModel::dump();
     logd("- FirstName %s", firstName().toStdString().c_str());
     logd("- LastName %s", lastName().toStdString().c_str());
+    logd("- HollyName %s", hollyName().toStdString().c_str());
 }
 
 ErrCode Person::onImportItem(int importFileType, const QString &keyword, const QString &value, quint32 idx, void* tag)

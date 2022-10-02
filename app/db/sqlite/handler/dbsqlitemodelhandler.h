@@ -34,11 +34,37 @@ public:
     /* Those are very generic functions */
 
 
+    /**
+     * @brief add model to db
+     * @param model
+     * @return ErrNone on success, error code otherwise
+     */
     virtual ErrCode add(const DbModel* model);
+
+    /**
+     * @brief Check if model exist in db
+     * @param edu
+     * @return true if exist, false otherwise
+     */
     virtual bool exist(const DbModel* edu);
     virtual QList<DbModel*> getAll(DbModelBuilder builder, const char* modelName = nullptr);
     virtual DbModel* getModel(qint64 dbId);
+
+    virtual DbModel *getByName(const QString& name, const DbModelBuilder& builder);
+    virtual DbModel *getByName(const QString& name);
+    /**
+     * @brief getName
+     * @return Model Handler name
+     */
     virtual const QString getName();
+
+    /**
+     * @brief Search item by keywords
+     * @param keyword
+     * @param outList
+     * @return the number of found items
+     */
+    virtual int search(const QString& keyword, QList<DbModel*>* outList = nullptr);
 protected:
     virtual DbSqliteTbl* getMainTbl() = 0;
 };

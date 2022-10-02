@@ -14,30 +14,12 @@
  * limitations under the License.
  *
  *
- * Filename: dbmodelhandler.cpp
+ * Filename: dbdefs.h
  * Author: Anh, Ngo Huy
- * Created date:8/9/2022
+ * Created date:10/2/2022
  * Brief:
  */
-#include "dbmodelhandler.h"
-#include "logger.h"
-#include "errcode.h"
-DbModelHandler::DbModelHandler()
-{
+#ifndef DBDEFS_H
+#define DBDEFS_H
 
-}
-
-int DbModelHandler::search(const QString &keyword, QList<DbModel *> *outList)
-{
-    traced;
-    loge("Default search one, do nothing");
-    return 0;
-}
-
-int DbModelHandler::searchAll(const QString &keyword, QList<DbModel *> *outList)
-{
-    traced;
-    loge("Default search one, do nothing");
-    return 0;
-}
-
+#endif // DBDEFS_H

@@ -46,7 +46,8 @@ public:
     virtual QList<PersonEvent*>* getListEvents(const QString& personUid,
                                                const QString* eventUid = nullptr,
                                                qint64 date = 0);
-
+    virtual DbModel *getByName(const QString& name, const DbModelBuilder& builder);
+    virtual DbModel *getByName(const QString& name);
 protected:
     virtual DbSqliteTbl* getMainTbl();
 private:

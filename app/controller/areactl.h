@@ -38,7 +38,8 @@ protected:
     DbModel *buildModel(void *items, const QString &fmt);
 public:
     static AreaCtl* getInstance();
-    const QList<Area*>* getAreaList(const QString& country);
+    const QList<Area*> getAreaList(const QString& country);
+    const QList<Area*> getAreaList();
 
 
 public slots:

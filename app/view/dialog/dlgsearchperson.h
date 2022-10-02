@@ -14,30 +14,41 @@
  * limitations under the License.
  *
  *
- * Filename: dbmodelhandler.cpp
+ * Filename: dlgsearchperson.h
  * Author: Anh, Ngo Huy
- * Created date:8/9/2022
+ * Created date:9/20/2022
  * Brief:
  */
-#include "dbmodelhandler.h"
-#include "logger.h"
-#include "errcode.h"
-DbModelHandler::DbModelHandler()
-{
+#ifndef DLGSEARCHPERSON_H
+#define DLGSEARCHPERSON_H
 
+#include <QDialog>
+
+class Person;
+namespace Ui {
+class DlgSearchPerson;
 }
 
-int DbModelHandler::search(const QString &keyword, QList<DbModel *> *outList)
+class DlgSearchPerson : public QDialog
 {
-    traced;
-    loge("Default search one, do nothing");
-    return 0;
-}
+    Q_OBJECT
 
-int DbModelHandler::searchAll(const QString &keyword, QList<DbModel *> *outList)
-{
-    traced;
-    loge("Default search one, do nothing");
-    return 0;
-}
+public:
+    explicit DlgSearchPerson(QWidget *parent = nullptr);
+    ~DlgSearchPerson();
 
+
+    Person *person() const;
+
+protected:
+    void accept();
+private slots:
+    void on_btnSearch_clicked();
+
+private:
+    Ui::DlgSearchPerson *ui;
+    Person* mPerson;
+    QList<Person*> mListPerson;
+};
+
+#endif // DLGSEARCHPERSON_H

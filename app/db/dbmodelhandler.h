@@ -34,10 +34,37 @@ public:
     DbModelHandler();
 
     virtual ErrCode add(const DbModel* model) = 0;
-    virtual bool exist(const DbModel* edu) = 0;
+
+    /**
+     * @brief Check if model exist in db
+     * @param model
+     * @return true if exists
+     */
+    virtual bool exist(const DbModel* model) = 0;
+
     virtual QList<DbModel*> getAll(DbModelBuilder builder, const char* modelName = nullptr) = 0;
     virtual const QString getName() = 0;
 
+    /**
+     * @brief Search item by keywords
+     * @param keyword
+     * @param outList
+     * @return the number of found items
+     */
+    virtual int search(const QString& keyword, QList<DbModel*>* outList = nullptr);
+
+    /**
+     * @brief search EVERYTHING by keywords
+     * @param keyword
+     * @param outList
+     * @return the number of found items
+     */
+    virtual int searchAll(const QString& keyword, QList<DbModel*>* outList = nullptr);
+
+    // TODO: implement filter with operator (equal, greater, in range, etc.)
+
+    virtual DbModel *getByName(const QString& name, const DbModelBuilder& builder) = 0;
+    virtual DbModel *getByName(const QString& name) = 0;
 };
 
 #endif // DBMODELHANDLER_H

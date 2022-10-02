@@ -46,12 +46,15 @@ QT_END_NAMESPACE
  private:
      void switchView(QWidget* nextView);
      void loadHomePageFile();
+     void loadOtherMenu();
+     void loadImportMenu();
  private:
     Ui::MainWindow *ui;
     UISummarizeView* mSummarizeView;
     UITableView* mCommunityView;
     UITableView* mSaintsView;
     UITableView* mPersonView;
+    UITableView* mAreaView;
     QTextBrowser* mHomeView;
     QWidget* mCurrentView;
     QAction* mActionImportPersonList;
@@ -71,5 +74,6 @@ QT_END_NAMESPACE
      void on_actionHome_triggered();
      void on_actionPerson_triggered();
      void on_actionSearch_triggered();
+     void on_actionArea_triggered();
 };
 #endif // MAINWINDOW_H
