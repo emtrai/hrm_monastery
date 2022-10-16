@@ -34,11 +34,15 @@ class DlgSearchPerson : public QDialog
     Q_OBJECT
 
 public:
-    explicit DlgSearchPerson(QWidget *parent = nullptr);
+    explicit DlgSearchPerson(QWidget *parent = nullptr, bool isMulti = false);
     ~DlgSearchPerson();
 
 
     Person *person() const;
+    QList<Person*> personList();
+
+    bool getIsMultiSelection() const;
+    void setIsMultiSelection(bool newIsMultiSelection);
 
 protected:
     void accept();
@@ -47,8 +51,9 @@ private slots:
 
 private:
     Ui::DlgSearchPerson *ui;
-    Person* mPerson;
+    QList<Person*> mSelectedPersons;
     QList<Person*> mListPerson;
+    bool mIsMultiSelection;
 };
 
 #endif // DLGSEARCHPERSON_H

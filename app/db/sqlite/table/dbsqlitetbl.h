@@ -49,9 +49,11 @@ public:
     virtual uint32_t versionCode() const;
     virtual void setVersionCode(uint32_t newVersionCode);
 
-    virtual ErrCode add(const DbModel* item);
+    virtual ErrCode add(DbModel* item);
+    virtual ErrCode updateUid(const DbModel* item, const QString& uid);
 
     virtual bool isExist(const DbModel* item);
+    virtual QHash<QString, QString> getFieldsCheckExists(const DbModel* item);
     virtual QList<DbModel*> getAll(const DbModelBuilder& builder);
     virtual DbModel* getModel(qint64 dbId, const DbModelBuilder& builder);
 

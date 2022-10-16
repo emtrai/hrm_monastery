@@ -32,6 +32,7 @@
 #define DATE_FORMAT_MD "M/D"
 #define DATE_FORMAT_DM "D/M"
 #define DATE_FORMAT_YMD "Y/M/D"
+#define DATE_FORMAT_DMY "D/M/Y"
 #define DEFAULT_CSV_FIELD_SPLIT ':'
 
 //TODO: change default split to '|'? '|' is not common used like ','

@@ -30,6 +30,7 @@
 #define COMMUNITYCTL (CommunityCtl::getInstance())
 
 class Community;
+class Person;
 
 class CommunityCtl: public Controller
 {
@@ -41,7 +42,13 @@ public:
     ErrCode loadFromDb();
 
     const QList<Community*> getCommunityList();
-
+    const QList<DbModel*> getPersonList(const QString& communityUid);
+    ErrCode addPerson2Community(const Community* comm,
+                      const Person* per,
+                      int status = 0,
+                      qint64 startdate = 0,
+                      qint64 enddate = 0,
+                      const QString& remark = nullptr);
 private:
     CommunityCtl();
 

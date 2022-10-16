@@ -29,6 +29,7 @@
 #include "exportfactory.h"
 #include "defs.h"
 #include <QMap>
+#include "dbpersonmodelhandler.h"
 
 Person::Person():
     mChristenDate(0),
@@ -156,8 +157,22 @@ void Person::clone(const Person &per)
 
 void Person::buildUidIfNotSet()
 {
-    QString uidName = QString("%1_%2_%3").arg(hollyName()).arg(getFullName()).arg(birthday());
-    setUid(Utils::UidFromName(uidName, UidNameConvertType::NO_VN_MARK_UPPER)); // TODO: handle error
+    traced;
+    // do nothing, as uild will be built later
+}
+
+QString Person::buildUid(const QString *seed)
+{
+    traced;
+    QString uid;
+    QString uidName = QString("%1_%2_%3").arg(getFullName()).arg(birthday()).arg(birthPlace());
+    if (seed != nullptr) {
+        uidName += "_" + *seed;
+    }
+    logd("uidName: %s", uidName.toStdString().c_str());
+    uid = Utils::UidFromName(uidName, UidNameConvertType::HASH_NAME);
+    logd("uid: %s", uid.toStdString().c_str());
+    return uid;
 }
 
 QString Person::modelName() const
@@ -316,89 +331,162 @@ void Person::initImportFields()
     mImportFields.insert(KExportFieldIDcardIssuer, [this](const QString& value){
         this->setIdCardIssuePlace(value);
     });
-    mImportFields.insert(KExportFieldStatus, nullptr);
-    mImportFields.insert(KExportFieldRetireDate, nullptr);
-    mImportFields.insert(KExportFieldRetirePlace, nullptr); //"retire_place";
-    mImportFields.insert(KExportFieldDeadDate, nullptr); //"dead_date";
-    mImportFields.insert(KExportFieldDeadPlace, nullptr); //"dead_place";
-    mImportFields.insert(KExportFieldCountry, nullptr); //"country";
-    mImportFields.insert(KExportFieldProvince, nullptr); //"province";
-    mImportFields.insert(KExportFieldAddress, nullptr); //"address";
-    mImportFields.insert(KExportFieldChurchAddress, nullptr); //"church_addr";
+    mImportFields.insert(KExportFieldStatus, nullptr); // TODO: implement this
+    mImportFields.insert(KExportFieldRetireDate,  [this](const QString& value){
+        this->setRetireDate(value);
+    });
+    mImportFields.insert(KExportFieldRetirePlace, [this](const QString& value){
+        this->setRetirePlace(value);
+    }); //"retire_place";
+    mImportFields.insert(KExportFieldDeadDate, [this](const QString& value){
+        this->setDeadDate(value);
+    }); //"dead_date";
+    mImportFields.insert(KExportFieldDeadPlace, [this](const QString& value){
+        this->setDeadPlace(value);
+    }); //"dead_place";
+    mImportFields.insert(KExportFieldCountry, [this](const QString& value){
+        this->setCountryName(value);
+    }); //"country";
+    mImportFields.insert(KExportFieldProvince, [this](const QString& value){
+        this->setProvinceName(value);
+    }); //"province";
+    mImportFields.insert(KExportFieldAddress, [this](const QString& value){
+        this->setAddr(value);
+    }); //"address";
+    mImportFields.insert(KExportFieldChurchAddress, [this](const QString& value){
+        this->setChurchAddr(value);
+    }); //"church_addr";
     mImportFields.insert(KExportFieldTel, [this](const QString& value){
         this->setTel(value);
     }); //"telephone";
     mImportFields.insert(KExportFieldEmail, [this](const QString& value){
         this->setEmail(value);
     }); //"email";
-    mImportFields.insert(KExportFieldOtherContant, nullptr); //"othercontact";
-    mImportFields.insert(KExportFieldEdu, nullptr); //"education";
-    mImportFields.insert(KExportFieldSpeciaist, nullptr); //"specialist";
-    mImportFields.insert(KExportFieldWork, nullptr); //"work";
-    mImportFields.insert(KExportFieldWorkHistory, nullptr); //"work_history";
-    mImportFields.insert(KExportFieldCommunity, nullptr); //"community";
-    mImportFields.insert(KExportFieldCommunityHistory, nullptr); //"community_history";
-    mImportFields.insert(KExportFieldDad, nullptr); //"dad";
-    mImportFields.insert(KExportFieldDadBirthday, nullptr); //"dad_birthday";
-    mImportFields.insert(KExportFieldDadAddr, nullptr); //"dad_addr";
-    mImportFields.insert(KExportFieldMom, nullptr); //"mom";
-    mImportFields.insert(KExportFieldMomBirthday, nullptr); //"mom_birthday";
-    mImportFields.insert(KExportFieldMomAddr, nullptr); //"mom_addr";
-    mImportFields.insert(KExportFieldFamilyHistory, nullptr); //"family_history";
-    mImportFields.insert(KExportFieldFamilyContact, nullptr); //"family_contact";
-    mImportFields.insert(KExportFieldChristenDate, nullptr); //"christen_date";
-    mImportFields.insert(KExportFieldChristenPlace, nullptr); //"christen_place";
-    mImportFields.insert(KExportFieldEucharistDate, nullptr); //"eucharist_date";
-    mImportFields.insert(KExportFieldEucharistPlace, nullptr); //"eucharist_place";
-    mImportFields.insert(KExportFieldHollyDate, nullptr); //"holly_date";
-    mImportFields.insert(KExportFieldHollyPlace, nullptr); //"holly_place";
-    mImportFields.insert(KExportFieldCourse, nullptr); //"course";
-    mImportFields.insert(KExportFieldJoinDate, nullptr); //"join_date";
+    mImportFields.insert(KExportFieldOtherContant, [this](const QString& value){
+        this->setOtherContact(value);
+    }); //"othercontact";
+    mImportFields.insert(KExportFieldEdu, [this](const QString& value){
+        this->setEduName(value);
+    }); //"education";
+    mImportFields.insert(KExportFieldSpeciaist, [this](const QString& value){
+        this->setSpecialistNames(value);
+    }); //"specialist";
+    mImportFields.insert(KExportFieldWork, nullptr); //"work"; // TODO
+    mImportFields.insert(KExportFieldWorkHistory, nullptr); //"work_history"; // TODO
+    mImportFields.insert(KExportFieldCommunity, nullptr); //"community"; // TODO
+    mImportFields.insert(KExportFieldCommunityHistory, nullptr); //"community_history"; // TODO
+    mImportFields.insert(KExportFieldDad, [this](const QString& value){
+        this->setDadName(value);
+    }); //"dad";
+    mImportFields.insert(KExportFieldDadBirthday, [this](const QString& value){
+        this->setDadBirthday(value);
+    }); //"dad_birthday";
+    mImportFields.insert(KExportFieldDadAddr,  [this](const QString& value){
+        this->setDadAddr(value);
+    }); //"dad_addr";
+    mImportFields.insert(KExportFieldMom,  [this](const QString& value){
+        this->setMomName(value);
+    }); //"mom";
+    mImportFields.insert(KExportFieldMomBirthday,  [this](const QString& value){
+        this->setMomBirthday(value);
+    }); //"mom_birthday";
+    mImportFields.insert(KExportFieldMomAddr, [this](const QString& value){
+        this->setMomAddr(value);
+    }); //"mom_addr";
+    mImportFields.insert(KExportFieldFamilyHistory, [this](const QString& value){
+        this->setFamilyHistory(value);
+    }); //"family_history";
+    mImportFields.insert(KExportFieldFamilyContact, [this](const QString& value){
+        this->setFamilyContact(value);
+    }); //"family_contact";
+    mImportFields.insert(KExportFieldChristenDate, [this](const QString& value){
+        this->setChristenDate(value);
+    }); //"christen_date";
+    mImportFields.insert(KExportFieldChristenPlace, [this](const QString& value){
+        this->setChristenPlace(value);
+    }); //"christen_place";
+    mImportFields.insert(KExportFieldEucharistDate, [this](const QString& value){
+        this->setEucharistDate(value);
+    }); //"eucharist_date";
+    mImportFields.insert(KExportFieldEucharistPlace, [this](const QString& value){
+        this->setEucharistPlace(value);
+    }); //"eucharist_place";
+    mImportFields.insert(KExportFieldHollyDate, [this](const QString& value){
+        this->setHollyDate(value);
+    }); //"holly_date";
+    mImportFields.insert(KExportFieldHollyPlace, [this](const QString& value){
+        this->setHollyPlace(value);
+    }); //"holly_place";
+    mImportFields.insert(KExportFieldCourse, [this](const QString& value){
+        this->setCourse(value);
+    }); //"course";
+    mImportFields.insert(KExportFieldJoinDate, [this](const QString& value){
+        this->setJoinDate(value);
+    }); //"join_date";
     mImportFields.insert(KExportFieldJoinPIC, nullptr); //"join_pic";
-    mImportFields.insert(KExportFieldPreTrainDate, nullptr); //"pre_train_date";
+    mImportFields.insert(KExportFieldPreTrainDate,  [this](const QString& value){
+        this->setPreTrainJoinDate(value);
+    }); //"pre_train_date";
     mImportFields.insert(KExportFieldPreTrainPIC, nullptr); //"pre_train_pic";
-    mImportFields.insert(KExportFieldTrainDate, nullptr); //"train_date";
+    mImportFields.insert(KExportFieldTrainDate, [this](const QString& value){
+        this->setTrainJoinDate(value);
+    }); //"train_date";
     mImportFields.insert(KExportFieldTrainPIC, nullptr); //"train_pic";
-    mImportFields.insert(KExportFieldVowsDate, nullptr); //"vows_date";
+    mImportFields.insert(KExportFieldVowsDate,  [this](const QString& value){
+        this->setVowsDate(value);
+    }); //"vows_date";
     mImportFields.insert(KExportFieldVowsCEO, nullptr); //"vows_ceo";
-    mImportFields.insert(KExportFieldEternalVowsDate, nullptr); //"eternal_vows_date";
+    mImportFields.insert(KExportFieldEternalVowsDate,  [this](const QString& value){
+        this->setEternalVowsDate(value);
+    }); //"eternal_vows_date";
     mImportFields.insert(KExportFieldEternalVowsCEO, nullptr); //"eternal_vows_ceo";
     mImportFields.insert(KExportFieldEternalVowsPIC, nullptr); //"eternal_vows_pic";
-    mImportFields.insert(KExportFieldBankDate, nullptr); //"bank_date";
-    mImportFields.insert(KExportFieldBankPlace, nullptr); //"bank_place";
-    mImportFields.insert(KExportFieldGoldenDate, nullptr); //"golden_date";
-    mImportFields.insert(KExportFieldGoldenPlace, nullptr); //"golden_place";
-    mImportFields.insert(KExportFieldEternalDate, nullptr); //"eternal_date";
-    mImportFields.insert(KExportFieldEternalPlace, nullptr); //"eternal_place";
+    mImportFields.insert(KExportFieldBankDate,  [this](const QString& value){
+        this->setBankDate(value);
+    }); //"bank_date";
+    mImportFields.insert(KExportFieldBankPlace,  [this](const QString& value){
+        this->setBankPlace(value);
+    }); //"bank_place";
+    mImportFields.insert(KExportFieldGoldenDate,  [this](const QString& value){
+        this->setGoldenDate(value);
+    }); //"golden_date";
+    mImportFields.insert(KExportFieldGoldenPlace,  [this](const QString& value){
+        this->setGoldenPlace(value);
+    }); //"golden_place";
+    mImportFields.insert(KExportFieldEternalDate,  [this](const QString& value){
+        this->setEternalDate(value);
+    }); //"eternal_date";
+    mImportFields.insert(KExportFieldEternalPlace,  [this](const QString& value){
+        this->setEternalPlace(value);
+    }); //"eternal_place";
 }
 
-bool Person::validate(QHash<QString, ErrCode> *result)
+ErrCode Person::validate()
 {
     traced;
-    bool res = false;
+    // TODO: cached value???
+    ErrCode ret = ErrNone;
+    DbModelHandler* personHdlr = this->getDbModelHandler();
+    if (personHdlr == nullptr) {
+        loge("Invalid Person handler");
+        ret = ErrFailed;
+    }
+    if (ret == ErrNone && personHdlr->exist(this)) {
+        loge("Person already existed");
+        ret = ErrExisted;
+    }
 
-    return res;
+    if (ret == ErrNone) {
+        ret = checkAndUpdateSaintListFromHollyName();
+        if (ret != ErrNone) {
+            appendValidateResult(KExportFieldHollyName, ErrNotFound);
+            appendValidateMsg(QString("Saint %1 not found").arg(hollyName()));
+            ret = ErrInvalidData;
+        }
+    }
+    tracedr(ret);
+    return ret;
 }
-
-
-//ErrCode_t Person::save()
-//{
-//    return DbCtl::getDb()->addPerson(this);
-//}
-
-
-
-
-//void Person::dump()
-//{
-//    traced;
-//    QString log = QStringLiteral(
-//                      "first name '%1'\n"
-//                      "last name '%2'\n"
-//                      )
-//                      .arg(firstName(), lastName());
-//    logd("%s", log.toStdString().c_str());
-//}
 
 ErrCode Person::fromCSVFile(const QString &fname)
 {
@@ -530,9 +618,10 @@ void Person::setChristenDate(qint64 newChristenDate)
     mChristenDate = newChristenDate;
 }
 
-void Person::setChristenDate(const QString &newChristenDate)
+void Person::setChristenDate(const QString &newChristenDate,
+                             const QString& format)
 {
-    mChristenDate = Utils::dateFromString(newChristenDate);
+    mChristenDate = Utils::dateFromString(newChristenDate,format);
     logd("mChristenDate %s -> %d", newChristenDate.toStdString().c_str(), (int)mChristenDate);
 }
 
@@ -562,68 +651,6 @@ const QStringList Person::getListExportKeyWord() const
 {
     traced;
 
-//    fields.append(KExportFieldImgPath);
-//    fields.append(KExportFieldFullName);
-//    fields.append(KExportFieldBirthday);
-//    fields.append(KExportFieldBirthplace);
-//    fields.append(KExportFieldHollyName);
-//    fields.append(KExportFieldNationality);
-//    fields.append(KExportFieldEthnic);
-//    fields.append(KExportFieldIDcard);
-//    fields.append(KExportFieldIDcardIssueDate);
-//    fields.append(KExportFieldIDcardIssuer);
-//    fields.append(KExportFieldStatus);
-//    fields.append(KExportFieldRetireDate);
-
-//    fields.append(KExportFieldRetirePlace); //"retire_place";
-//    fields.append(KExportFieldDeadDate); //"dead_date";
-//    fields.append(KExportFieldDeadPlace); //"dead_place";
-//    fields.append(KExportFieldCountry); //"country";
-//    fields.append(KExportFieldProvince); //"province";
-//    fields.append(KExportFieldAddress); //"address";
-//    fields.append(KExportFieldChurchAddress); //"church_addr";
-//    fields.append(KExportFieldTel); //"telephone";
-//    fields.append(KExportFieldEmail); //"email";
-//    fields.append(KExportFieldOtherContant); //"othercontact";
-//    fields.append(KExportFieldEdu); //"education";
-//    fields.append(KExportFieldSpeciaist); //"specialist";
-//    fields.append(KExportFieldWork); //"work";
-//    fields.append(KExportFieldWorkHistory); //"work_history";
-//    fields.append(KExportFieldCommunity); //"community";
-//    fields.append(KExportFieldCommunityHistory); //"community_history";
-//    fields.append(KExportFieldDad); //"dad";
-//    fields.append(KExportFieldDadBirthday); //"dad_birthday";
-//    fields.append(KExportFieldDadAddr); //"dad_addr";
-//    fields.append(KExportFieldMom); //"mom";
-//    fields.append(KExportFieldMomBirthday); //"mom_birthday";
-//    fields.append(KExportFieldMomAddr); //"mom_addr";
-//    fields.append(KExportFieldFamilyHistory); //"family_history";
-//    fields.append(KExportFieldFamilyContact); //"family_contact";
-//    fields.append(KExportFieldChristenDate); //"christen_date";
-//    fields.append(KExportFieldChristenPlace); //"christen_place";
-//    fields.append(KExportFieldEucharistDate); //"eucharist_date";
-//    fields.append(KExportFieldEucharistPlace); //"eucharist_place";
-//    fields.append(KExportFieldHollyDate); //"holly_date";
-//    fields.append(KExportFieldHollyPlace); //"holly_place";
-//    fields.append(KExportFieldCourse); //"course";
-//    fields.append(KExportFieldJoinDate); //"join_date";
-//    fields.append(KExportFieldJoinPIC); //"join_pic";
-//    fields.append(KExportFieldPreTrainDate); //"pre_train_date";
-//    fields.append(KExportFieldPreTrainPIC); //"pre_train_pic";
-//    fields.append(KExportFieldTrainDate); //"train_date";
-//    fields.append(KExportFieldTrainPIC); //"train_pic";
-//    fields.append(KExportFieldVowsDate); //"vows_date";
-//    fields.append(KExportFieldVowsCEO); //"vows_ceo";
-//    fields.append(KExportFieldEternalVowsDate); //"eternal_vows_date";
-//    fields.append(KExportFieldEternalVowsCEO); //"eternal_vows_ceo";
-//    fields.append(KExportFieldEternalVowsPIC); //"eternal_vows_pic";
-//    fields.append(KExportFieldBankDate); //"bank_date";
-//    fields.append(KExportFieldBankPlace); //"bank_place";
-//    fields.append(KExportFieldGoldenDate); //"golden_date";
-//    fields.append(KExportFieldGoldenPlace); //"golden_place";
-//    fields.append(KExportFieldEternalDate); //"eternal_date";
-//    fields.append(KExportFieldEternalPlace); //"eternal_place";
-
     return mExportFields.keys();
 }
 
@@ -638,6 +665,18 @@ ErrCode Person::getExportDataString(const QString &keyword, QString *data) const
     }
     // TODO: raise exception when error occur???
 
+    return ret;
+}
+
+ErrCode Person::prepare2Save()
+{
+    traced;
+    DbModelHandler* saintHdlr = nullptr;
+    ErrCode ret = DbModel::prepare2Save();
+    if (ret == ErrNone) {
+        ret = checkAndUpdateSaintListFromHollyName();
+    }
+    tracedr(ret);
     return ret;
 }
 
@@ -747,9 +786,10 @@ void Person::setFeastDay(qint64 newFeastDay)
     mFeastDay = newFeastDay;
 }
 
-void Person::setFeastDay(const QString &newFeastDay)
+void Person::setFeastDay(const QString &newFeastDay,
+                         const QString& format)
 {
-    setFeastDay(Utils::dateFromString(newFeastDay, DATE_FORMAT_MD));
+    setFeastDay(Utils::dateFromString(newFeastDay, format));
 }
 
 const QString &Person::eucharistPlace() const
@@ -770,6 +810,11 @@ qint64 Person::eucharistDate() const
 void Person::setEucharistDate(qint64 newEucharistDate)
 {
     mEucharistDate = newEucharistDate;
+}
+
+void Person::setEucharistDate(const QString &newEucharistDate, const QString &format)
+{
+    setEucharistDate(Utils::dateFromString(newEucharistDate, format));
 }
 
 const QString &Person::otherContact() const
@@ -862,6 +907,11 @@ void Person::setDeadDate(qint64 newDeadDate)
     mDeadDate = newDeadDate;
 }
 
+void Person::setDeadDate(const QString &newDeadDate, const QString &format)
+{
+    setDeadDate(Utils::dateFromString(newDeadDate, format));
+}
+
 const QString &Person::retirePlace() const
 {
     return mRetirePlace;
@@ -880,6 +930,12 @@ qint64 Person::retireDate() const
 void Person::setRetireDate(qint64 newRetireDate)
 {
     mRetireDate = newRetireDate;
+}
+
+void Person::setRetireDate(const QString &newRetireDate, const QString &format)
+{
+    traced;
+    setRetireDate(Utils::dateFromString(newRetireDate, format));
 }
 
 const QString &Person::statusName() const
@@ -922,6 +978,11 @@ void Person::setEternalDate(qint64 newEternalDate)
     mEternalDate = newEternalDate;
 }
 
+void Person::setEternalDate(const QString &newEternalDate, const QString &format)
+{
+    setEternalDate(Utils::dateFromString(newEternalDate, format));
+}
+
 const QString &Person::goldenPlace() const
 {
     return mGoldenPlace;
@@ -942,6 +1003,11 @@ void Person::setGoldenDate(qint64 newGoldenDate)
     mGoldenDate = newGoldenDate;
 }
 
+void Person::setGoldenDate(const QString &newGoldenDate, const QString &format)
+{
+    setGoldenDate(Utils::dateFromString(newGoldenDate, format));
+}
+
 const QString &Person::bankPlace() const
 {
     return mBankPlace;
@@ -960,6 +1026,11 @@ qint64 Person::bankDate() const
 void Person::setBankDate(qint64 newBankDate)
 {
     mBankDate = newBankDate;
+}
+
+void Person::setBankDate(const QString &newBankDate, const QString &format)
+{
+    setBankDate(Utils::dateFromString(newBankDate, format));
 }
 
 const QString &Person::eternalVowsPICName() const
@@ -1012,6 +1083,11 @@ void Person::setEternalVowsDate(qint64 newEternalVowsDate)
     mEternalVowsDate = newEternalVowsDate;
 }
 
+void Person::setEternalVowsDate(const QString &newEternalVowsDate, const QString &format)
+{
+    setEternalVowsDate(Utils::dateFromString(newEternalVowsDate, format));
+}
+
 qint64 Person::vowsDate() const
 {
     return mVowsDate;
@@ -1020,6 +1096,11 @@ qint64 Person::vowsDate() const
 void Person::setVowsDate(qint64 newVowsDate)
 {
     mVowsDate = newVowsDate;
+}
+
+void Person::setVowsDate(const QString &newVowsDate, const QString &format)
+{
+    setVowsDate(Utils::dateFromString(newVowsDate, format));
 }
 
 const QString &Person::vowsCEOName() const
@@ -1092,6 +1173,11 @@ void Person::setPreTrainJoinDate(qint64 newPreTrainJoinDate)
     mPreTrainJoinDate = newPreTrainJoinDate;
 }
 
+void Person::setPreTrainJoinDate(const QString &newPreTrainJoinDate, const QString &format)
+{
+    setPreTrainJoinDate(Utils::dateFromString(newPreTrainJoinDate, format));
+}
+
 const QString &Person::joinPICName() const
 {
     return mJoinPICName;
@@ -1122,6 +1208,11 @@ void Person::setJoinDate(qint64 newJoinDate)
     mJoinDate = newJoinDate;
 }
 
+void Person::setJoinDate(const QString &newJoinDate, const QString &format)
+{
+    setJoinDate(Utils::dateFromString(newJoinDate, format));
+}
+
 const QString &Person::familyContact() const
 {
     return mFamilyContact;
@@ -1140,6 +1231,11 @@ qint64 Person::hollyDate() const
 void Person::setHollyDate(qint64 newHollyDate)
 {
     mHollyDate = newHollyDate;
+}
+
+void Person::setHollyDate(const QString &newHollyDate, const QString &format)
+{
+    setHollyDate(Utils::dateFromString(newHollyDate, format));
 }
 
 const QString &Person::hollyPlace() const
@@ -1192,6 +1288,11 @@ void Person::setMomBirthday(qint64 newMomBirthday)
     mMomBirthday = newMomBirthday;
 }
 
+void Person::setMomBirthday(const QString &newMomBirthday, const QString &format)
+{
+    setMomBirthday(Utils::dateFromString(newMomBirthday, format));
+}
+
 const QString &Person::momName() const
 {
     return mMomName;
@@ -1220,6 +1321,11 @@ qint64 Person::dadBirthday() const
 void Person::setDadBirthday(qint64 newDadBirthday)
 {
     mDadBirthday = newDadBirthday;
+}
+
+void Person::setDadBirthday(const QString &newDadBirthday, const QString &format)
+{
+    setDadBirthday(Utils::dateFromString(newDadBirthday, format));
 }
 
 const QString &Person::dadName() const
@@ -1352,6 +1458,11 @@ void Person::setSpecialistUidList(const QStringList &newSpecialistUidList)
     mSpecialistUidList = newSpecialistUidList;
 }
 
+void Person::setSpecialistNames(const QString &newSpecialists, const QString &split)
+{
+    mSpecialistNameList = newSpecialists.split(split); // TODO: check to remove redudant
+}
+
 void Person::clearSpecialistUid()
 {
     mSpecialistUidList.clear();
@@ -1457,6 +1568,39 @@ void Person::setHollyName(const QString &newHollyName)
     mHollyName = newHollyName;
 }
 
+ErrCode Person::checkAndUpdateSaintListFromHollyName()
+{
+    traced;
+    DbModelHandler* saintHdlr = nullptr;
+    ErrCode ret = ErrNone;
+    saintHdlr = dynamic_cast<DbModelHandler*>(DB->getModelHandler(KModelHdlSaint));
+    if (saintHdlr == nullptr) {
+        loge("Invalid Saint handler");
+        ret = ErrFailed;
+    }
+    if (ret == ErrNone) {
+        if (mSaintUidList.empty() && !mHollyName.isEmpty()) {
+            QStringList names = mHollyName.split(",");
+            DbModel* model = nullptr;
+            QString hollyNotFound;
+            foreach (QString name, names) {
+                logd("Check saint name '%s'", name.toStdString().c_str());
+                model = saintHdlr->getByName(name.trimmed());
+                if (model) {
+                    logd("update saint uid %s", model->uid().toStdString().c_str());
+                    addSaintUid(model->uid());
+                } else {
+                    loge("Saint '%s' not found in db", name.toStdString().c_str());
+                    ret = ErrNotFound;
+                    break;
+                }
+            }
+        }
+    }
+    tracedr(ret);
+    return ret;
+}
+
 const QStringList &Person::saintUidList() const
 {
     return mSaintUidList;
@@ -1474,7 +1618,8 @@ void Person::clearSaintUid()
 
 void Person::addSaintUid(const QString &saint)
 {
-    mSaintUidList.append(saint);
+    if (!mSaintUidList.contains(saint))
+        mSaintUidList.append(saint);
 }
 
 qint64 Person::trainJoinDate() const
@@ -1485,6 +1630,11 @@ qint64 Person::trainJoinDate() const
 void Person::setTrainJoinDate(qint64 newTrainJoinDate)
 {
     mTrainJoinDate = newTrainJoinDate;
+}
+
+void Person::setTrainJoinDate(const QString &newTrainJoinDate, const QString &format)
+{
+    setTrainJoinDate(Utils::dateFromString(newTrainJoinDate, format));
 }
 
 const QString &Person::imgPath() const

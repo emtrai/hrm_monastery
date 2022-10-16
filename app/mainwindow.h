@@ -39,15 +39,19 @@ QT_END_NAMESPACE
 
         public:
                  MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
- protected:
+            ~MainWindow();
+            static MainWindow *getInstance();
+
+        protected:
      void showEvent(QShowEvent *ev);
      static void onFinishLoading(int ret, void* data);
- private:
+ public:
      void switchView(QWidget* nextView);
+ private:
      void loadHomePageFile();
      void loadOtherMenu();
      void loadImportMenu();
+
  private:
     Ui::MainWindow *ui;
     UISummarizeView* mSummarizeView;
@@ -55,6 +59,7 @@ QT_END_NAMESPACE
     UITableView* mSaintsView;
     UITableView* mPersonView;
     UITableView* mAreaView;
+    QList<QWidget*> mMainViews;
     QTextBrowser* mHomeView;
     QWidget* mCurrentView;
     QAction* mActionImportPersonList;
@@ -75,5 +80,7 @@ QT_END_NAMESPACE
      void on_actionPerson_triggered();
      void on_actionSearch_triggered();
      void on_actionArea_triggered();
+ private:
+     static MainWindow* gInstance;
 };
 #endif // MAINWINDOW_H

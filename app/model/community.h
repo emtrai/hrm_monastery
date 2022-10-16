@@ -28,6 +28,7 @@
 #include "errcode.h"
 #include "address.h"
 #include "person.h"
+#include "department.h"
 
 class Area;
 // BE WARE, ANY CHANGE TO THIS STATUS WILL IMPACT TO DB
@@ -126,6 +127,7 @@ private:
     QHash<qint32, QList<Person*>> mManagement; // role, list of person
     Area* mArea;
     // Board of management?
+    QList<Department*> mDepList;
 };
 
 #endif // COMMUNITY_H

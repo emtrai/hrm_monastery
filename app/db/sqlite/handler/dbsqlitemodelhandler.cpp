@@ -28,7 +28,7 @@ DbSqliteModelHandler::DbSqliteModelHandler()
 
 }
 
-ErrCode DbSqliteModelHandler::add(const DbModel *model)
+ErrCode DbSqliteModelHandler::add(DbModel *model)
 {
 
     traced;
@@ -38,7 +38,7 @@ ErrCode DbSqliteModelHandler::add(const DbModel *model)
     // i.e.import person, but country, holly name, etc. not exist, need to check and add it
 
     if (model != nullptr){
-        DbSqliteTbl* tbl = getMainTbl();
+        DbSqliteTbl* tbl = getTable(model->modelName());
         if (!tbl->isExist(model)){
             err = tbl->add(model);
         }
@@ -109,4 +109,9 @@ int DbSqliteModelHandler::search(const QString& keyword, QList<DbModel*>* outLis
     Q_ASSERT(tbl != nullptr);
     return tbl->search(keyword, outList);
 
+}
+
+DbSqliteTbl *DbSqliteModelHandler::getTable(const QString& modelName)
+{
+    return getMainTbl();
 }

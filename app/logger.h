@@ -27,6 +27,7 @@
 #define THIS_FILE __FILE__
 #endif
 
+// TODO: check debug macro
 
 // TODO: add process id???
 #define logd(fmt,...) \
@@ -35,9 +36,9 @@
     }\
     while(0)
 
-#define traced logd("")
-#define tracedr(ret) logd("Return %d", ret)
-#define tracede logd("end")
+#define traced logd("IN>> %s", __func__)
+#define tracedr(ret) logd("<<END %s with ret=%d", __func__, ret)
+#define tracede logd("<<END %s", __func__)
 
 // TODO: push log to file, make separate thread to writing log, to avoid impact
 // to performance of application

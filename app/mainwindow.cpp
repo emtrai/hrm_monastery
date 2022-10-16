@@ -38,6 +38,8 @@
 #include "view/dialog/dlgimportpersonlistresult.h"
 #include "personctl.h"
 
+MainWindow* MainWindow::gInstance = nullptr;
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -47,6 +49,7 @@ MainWindow::MainWindow(QWidget *parent)
     , mAreaView(nullptr)
     , mCurrentView(nullptr)
 {
+    gInstance = this;
     ui->setupUi(this);
 
     loadImportMenu();
@@ -58,6 +61,7 @@ MainWindow::MainWindow(QWidget *parent)
     mSaintsView = UITableViewFactory::getView(ViewType::SAINT);
     mPersonView = UITableViewFactory::getView(ViewType::PERSON);
     mAreaView = UITableViewFactory::getView(ViewType::AREA);
+
     mHomeView = new QTextBrowser(this);
     mHomeView->clearHistory();
     mHomeView->clear();
@@ -67,6 +71,14 @@ MainWindow::MainWindow(QWidget *parent)
     mHomeView->setSearchPaths(QStringList(FileCtl::getOrCreatePrebuiltDataDir()));
     mHomeView->setHtml(Utils::readAll(
         FileCtl::getUpdatePrebuiltDataFilePath(KPrebuiltHomeHtmlFileName, false)));
+
+
+    mMainViews.append((QWidget*)mSummarizeView);
+    mMainViews.append((QWidget*)mSaintsView);
+    mMainViews.append((QWidget*)mPersonView);
+    mMainViews.append((QWidget*)mAreaView);
+    mMainViews.append((QWidget*)mHomeView);
+    mMainViews.append((QWidget*)mCommunityView);
 
     switchView(mHomeView);
 
@@ -101,15 +113,26 @@ void MainWindow::onFinishLoading(int ret, void* data){
 
 void MainWindow::switchView(QWidget *nextView)
 {
+    traced;
     if (mCurrentView != nullptr) {
+        logd("hide currentl widget");
         mCurrentView->hide();
         ui->centralwidget->layout()->replaceWidget(mCurrentView, nextView);
+        if (!mMainViews.contains(mCurrentView)) {
+            logd("Not in cached view, remove");
+            delete mCurrentView;
+            mCurrentView = nullptr;
+        } else {
+            logd("In cache view, keep current, just hide");
+        }
     }
     else{
         ui->centralwidget->layout()->addWidget(nextView);
     }
+    logd("show next");
     mCurrentView = nextView;
     mCurrentView->show();
+    tracede;
 }
 
 
@@ -146,10 +169,9 @@ void MainWindow::loadOtherMenu()
                                         tr("Thánh"));
     QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionSaints_2_triggered()));
 
-    act = otherMenu->addAction(QIcon(QString::fromUtf8(":/icon/icon/icon/icons8-earth-planet-80")),
+    act = otherMenu->addAction(QIcon(QString::fromUtf8(":/icon/icon/icons8-earth-planet-80")),
                                tr("Khu vực"));
     QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionArea_triggered()));
-
 
 
     otherButton->setMenu(otherMenu);
@@ -308,5 +330,10 @@ void MainWindow::on_actionArea_triggered()
 {
     traced;
     switchView(mAreaView);
+}
+
+MainWindow *MainWindow::getInstance()
+{
+    return gInstance;
 }
 

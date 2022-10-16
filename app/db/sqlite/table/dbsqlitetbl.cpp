@@ -29,8 +29,10 @@
 #include "errcode.h"
 #include "dbsqlitetablebuilder.h"
 #include "dbsqliteinsertbuilder.h"
+#include "dbsqliteupdatebuilder.h"
 #include <QSqlQuery>
 #include <QSqlRecord>
+#include <QSqlError>
 #include <QHash>
 
 DbSqliteTbl::~DbSqliteTbl(){
@@ -79,20 +81,63 @@ void DbSqliteTbl::setVersionCode(uint32_t newVersionCode)
     mVersionCode = newVersionCode;
 }
 
-ErrCode_t DbSqliteTbl::add(const DbModel *item)
+ErrCode_t DbSqliteTbl::add(DbModel *item)
 {
     traced;
     ErrCode_t err = ErrNone;
+    DbSqliteUpdateBuilder* updateBuilder = nullptr;
+    QSqlQuery* updateQry = nullptr;
     DbSqliteInsertBuilder* builder = DbSqliteInsertBuilder::build(name());
     insertTableField(builder, item);
 //    QString sql = builder->buildSqlStatement();
 //    logi("insert sql statement %s", sql.toStdString().c_str());
+    logd("Insert ");
     QSqlQuery* qry = builder->buildSqlQuery();
     err = db()->execQuery(qry);
+    if (err == ErrNone) {
+        qint64 lastDbId = qry->lastInsertId().toInt();
+        logd("last insert id %lld", lastDbId);
+        item->setDbId(lastDbId);
+        if (item->uid().isEmpty()) {
+            logd("Uid is empty, create new one and update");
+            QString dbIdStr = QString("%1").arg(lastDbId);
+            QString uid = item->buildUid(&dbIdStr);
+            // TODO: check to make sure that uid does not exist?????
+            updateBuilder = DbSqliteUpdateBuilder::build(name());
+            updateBuilder->addCond(KFieldId, dbIdStr);
+            updateBuilder->addValue(KFieldUid, uid);
+            QSqlQuery* updateQry = updateBuilder->buildSqlQuery();
+            err = db()->execQuery(updateQry);
+            if (err == ErrNone) {
+                item->setUid(uid);
+            }
+        } else {
+            logd("Uid already existed, skip updating");
+        }
+
+    }
+
     delete qry;
+    delete builder;
+    if (updateBuilder) {
+        delete updateBuilder;
+        updateBuilder = nullptr;
+    }
+    if (updateQry) {
+        delete updateQry;
+        updateQry = nullptr;
+    }
     tracedr(err);
     return err;
 
+}
+
+ErrCode DbSqliteTbl::updateUid(const DbModel *item, const QString &uid)
+{
+    traced;
+    ErrCode ret = ErrNone;
+    tracedr(ret);
+    return ret;
 }
 
 bool DbSqliteTbl::isExist(const DbModel *item)
@@ -100,32 +145,65 @@ bool DbSqliteTbl::isExist(const DbModel *item)
     QSqlQuery qry;
     bool exist = false;
     traced;
-    QString queryString = QString("SELECT COUNT(*) "
-                                  "FROM %1 WHERE %2 = :uid").arg(name(), KFieldUid);
-    qry.prepare(queryString);
-    logd("Query String '%s'", queryString.toStdString().c_str());
+    if (!item->uid().isEmpty()) {
+        QString queryString = QString("SELECT COUNT(*) "
+                                      "FROM %1 WHERE %2 = :uid").arg(name(), KFieldUid);
+        qry.prepare(queryString);
+        logd("Query String '%s'", queryString.toStdString().c_str());
 
-    // TODO: check sql injection issue
-    qry.bindValue( ":uid", item->uid() );
-    if( qry.exec() )
-    {
+        // TODO: check sql injection issue
+        qry.bindValue( ":uid", item->uid() );
+    } else {
+        QString cond;
+        QHash<QString, QString> inFields = getFieldsCheckExists(item);
+        foreach (QString field, inFields.keys()) {
+            if (!cond.isEmpty()) {
+                cond += " AND ";
+            }
+            cond += QString("lower(%1) = :%2").arg(field,field);
+        }
+
+        QString queryString = QString("SELECT * FROM %1 WHERE %2")
+                                  .arg(name(), cond);
+
+        qry.prepare(queryString);
+        logd("Query String '%s'", queryString.toStdString().c_str());
+
+        // TODO: check sql injection issue
+        foreach (QString field, inFields.keys()) {
+            // TODO: if value is empty, data may not match
+            // Check if value is empty, for string, it seem '', but for integer,
+            // check again, as this process is string format, stupid
+            qry.bindValue( ":" + field, inFields[field].trimmed().toLower());
+            logd("bind :'%s' to '%s'", field.toStdString().c_str(),
+                 inFields[field].trimmed().toLower().toStdString().c_str());
+        }
+    }
+    if( qry.exec() ) {
         int rows= 0;
         if (qry.next()) {
             rows = qry.value(0).toInt();
             exist = rows > 0;
         }
         else {
-            logd("Not found any items");
+            logd("Not found any items, query '%s'", qry.lastQuery().toStdString().c_str() );
             exist = false;
         }
     }
     else {
-        loge( "Failed to execute %s", queryString.toStdString().c_str() );
+        loge( "Failed to execute %s", qry.lastQuery().toStdString().c_str() );
         exist = false;
     }
 
     logd("Exist %d", exist);
     return exist;
+}
+
+QHash<QString, QString> DbSqliteTbl::getFieldsCheckExists(const DbModel* item)
+{
+    QHash<QString, QString> list;
+    list[KFieldName] = item->name(); // TODO: make as class member?
+    return list;
 }
 
 
@@ -160,6 +238,7 @@ int DbSqliteTbl::runQuery(QSqlQuery &qry, const DbModelBuilder& builder,
     }
     else {
         loge( "Failed to execute %s", qry.executedQuery().toStdString().c_str() );
+        loge( "Last error %s", qry.lastError().text().toStdString().c_str() );
     }
 
     logi("Found %d", cnt);
@@ -239,6 +318,7 @@ ErrCode DbSqliteTbl::checkOrCreateTable()
 {
     traced;
     ErrCode err = ErrNone;
+    logd("Create table '%s'", name().toStdString().c_str());
     // TODO: should checktable before creating???
     // TODO: insert to management table
     QString sql = getSqlCmdCreateTable();

@@ -33,6 +33,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include "dbcommunitymodelhandler.h"
 
 CommunityCtl* CommunityCtl::gInstance = nullptr;
 
@@ -203,3 +204,19 @@ const QList<Community *> CommunityCtl::getCommunityList()
     traced;
     return mListCommunity;
 }
+
+const QList<DbModel *> CommunityCtl::getPersonList(const QString &communityUid)
+{
+    traced;
+    DbCommunityModelHandler* model =  dynamic_cast<DbCommunityModelHandler*>(DB->getModelHandler(KModelHdlCommunity));
+    QList<DbModel *> items = model->getListPerson(communityUid);
+    return items;
+}
+
+ErrCode CommunityCtl::addPerson2Community(const Community *comm, const Person *per, int status, qint64 startdate, qint64 enddate, const QString &remark)
+{
+    traced;
+    DbCommunityModelHandler* model =  dynamic_cast<DbCommunityModelHandler*>(DB->getModelHandler(KModelHdlCommunity));
+    return model->addPerson2Community(comm, per, status, startdate, enddate, remark);
+}
+

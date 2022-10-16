@@ -24,17 +24,27 @@
 
 
 #include "dbsqlitemodelhandler.h"
+#include "dbcommunitymodelhandler.h"
 
 class DbSqliteCommunityTbl;
+class Community;
 
-class DbSqliteCommunity : public DbSqliteModelHandler
+class DbSqliteCommunity : public DbSqliteModelHandler, public DbCommunityModelHandler
 {
 public:
     DbSqliteCommunity();
     static DbSqliteCommunity* getInstance();
     virtual const QString getName();
+    virtual QList<DbModel*> getListPerson(const QString& uid);
+    virtual ErrCode addPerson2Community(const Community *comm,
+                                      const Person* per,
+                                      int status = 0,
+                                      qint64 startdate = 0,
+                                      qint64 enddate = 0,
+                                      const QString& remark = nullptr);
 protected:
     virtual DbSqliteTbl* getMainTbl();
+    virtual DbSqliteTbl* getTable(const QString& modelName);
 private:
 
 private:

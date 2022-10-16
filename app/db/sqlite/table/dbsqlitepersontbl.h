@@ -30,15 +30,20 @@ class DbSqliteTableBuilder;
 class DbSqliteInsertBuilder;
 class DbModel;
 class QSqlQuery;
+class DbSqliteCommunityPersonTbl;
 
 class DbSqlitePersonTbl : public DbSqliteTbl
 {
 public:
     DbSqlitePersonTbl(DbSqlite* db);
 
+protected:
     virtual void addTableField(DbSqliteTableBuilder* builder);
     virtual void insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
     virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
+    virtual QHash<QString, QString> getFieldsCheckExists(const DbModel* item);
+    QHash<QString, int> getSearchFields();
+    QList<QString> getNameFields();
 //    ErrCode_t addPerson(const Person* person);
 
 //protected:
@@ -47,7 +52,9 @@ public:
 public:
     static const qint32 KVersionCode;
 
-
+    // allow this class can call protected/private class
+    // this is not good at OOP, but I want to re-use code, not want to waste my relax time...
+    friend class DbSqliteCommunityPersonTbl;
 };
 
 #endif // DBSQLITEPersonTBL_H

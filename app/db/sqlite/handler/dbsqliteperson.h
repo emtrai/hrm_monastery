@@ -36,7 +36,8 @@ class DbSqlitePerson : public DbPersonModelHandler
 public:
     DbSqlitePerson();
     virtual const QString getName();
-    virtual ErrCode add(const DbModel* model);
+    virtual ErrCode add(DbModel* model);
+    virtual ErrCode add2Table(DbModel* model, DbSqliteTbl* tbl);
     virtual bool exist(const DbModel* edu);
     virtual QList<DbModel*> getAll(DbModelBuilder builder, const char* modelName = nullptr);
     virtual DbModel* getModel(qint64 dbId);
@@ -48,6 +49,13 @@ public:
                                                qint64 date = 0);
     virtual DbModel *getByName(const QString& name, const DbModelBuilder& builder);
     virtual DbModel *getByName(const QString& name);
+    /**
+     * @brief Search item by keywords
+     * @param keyword
+     * @param outList
+     * @return the number of found items
+     */
+    virtual int search(const QString& keyword, QList<DbModel*>* outList = nullptr);
 protected:
     virtual DbSqliteTbl* getMainTbl();
 private:

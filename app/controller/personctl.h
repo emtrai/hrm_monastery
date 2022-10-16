@@ -28,6 +28,7 @@
 #include <QHash>
 class Person;
 class Event;
+class DbPersonModelHandler;
 
 // TODO: observer Person change?
 class PersonCtl: public Controller
@@ -50,11 +51,17 @@ public:
 
     const QList<QString> &importFields() const;
 
-    QList<Person*> searchPersonByName(const QString& name);
+    /**
+     * Search person by keywords, search keywords in any fields possible
+     */
+    QList<Person*> searchPerson(const QString& keyword);
+
+    DbPersonModelHandler *modelHdl();
 
 private:
     static PersonCtl* gInstance;
     QList<QString> mImportFields;
+    DbPersonModelHandler* mModelHdl;
 //    QHash<QString, std::function<QString (Person::*())>> mExportFields;
 public slots:
     virtual void onLoad();

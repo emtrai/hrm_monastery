@@ -29,6 +29,7 @@
 #include "personevent.h"
 #include "filectl.h"
 #include "event.h"
+#include "dbpersonmodelhandler.h"
 PersonCtl* PersonCtl::gInstance = nullptr;
 
 ErrCode PersonCtl::addPerson(Person *person)
@@ -65,13 +66,13 @@ ErrCode PersonCtl::AddListPersons(const QString &fname)
 QList<DbModel *> PersonCtl::getAllPerson()
 {
     traced;
-    return DB->getModelHandler(KModelHdlPerson)->getAll(&Person::build);
+    return modelHdl()->getAll(&Person::build, KModelNamePerson);
 }
 
 QList<DbModel *> PersonCtl::getListEvent(const Person* person)
 {
     traced;
-    return DB->getModelHandler(KModelHdlPerson)->getAll(&PersonEvent::build, KModelNamePersonEvent);
+    return modelHdl()->getAll(&PersonEvent::build, KModelNamePersonEvent);
 }
 
 DbModel *PersonCtl::doImportOneItem(int importFileType, const QStringList &items, quint32 idx)
@@ -80,17 +81,20 @@ DbModel *PersonCtl::doImportOneItem(int importFileType, const QStringList &items
     Person* person = nullptr;
     int i = 0;
     logd("idx = %d", idx);
-    logd("no items %d", items.count());
+    logd("no items %lld", items.count());
     if (idx == 0) {
         logd("HEADER, save it");
         foreach (QString item, items) {
+            logd("Header %s", item.toStdString().c_str());
             mImportFields.append(item.trimmed());
         }
     } else {
 
         person = (Person*)Person::build();
         foreach (QString item, items) {
-            ret = person->onImportItem(importFileType, mImportFields[i++], item, idx);
+            QString field = mImportFields[i++];
+            logd("Import field %s", field.toStdString().c_str());
+            ret = person->onImportItem(importFileType, field, item, idx);
         }
     }
 
@@ -99,7 +103,8 @@ DbModel *PersonCtl::doImportOneItem(int importFileType, const QStringList &items
 }
 
 
-PersonCtl::PersonCtl()
+PersonCtl::PersonCtl():
+    mModelHdl(nullptr)
 {
 }
 
@@ -124,11 +129,30 @@ const QList<QString> &PersonCtl::importFields() const
     return mImportFields;
 }
 
-QList<Person *> PersonCtl::searchPersonByName(const QString &name)
+QList<Person *> PersonCtl::searchPerson(const QString &keyword)
 {
     traced;
-    logd("search persone by name %s", name.toStdString().c_str());
+    logd("search persone by name %s", keyword.toStdString().c_str());
     // TODO:
+    QList<DbModel*> list;
+    QList<Person*> listret;
+    int ret = modelHdl()->search(keyword, &list);
+    logd("Search result %d", ret);
+    logd("no item %d", list.count());
+    if (ret > 0) {
+        foreach(DbModel* item, list) {
+            listret.append(dynamic_cast<Person*>(item));
+        }
+    }
+    return listret;
+}
+
+DbPersonModelHandler *PersonCtl::modelHdl()
+{
+    if (mModelHdl == nullptr) {
+        mModelHdl = dynamic_cast<DbPersonModelHandler*>(DB->getModelHandler(KModelHdlPerson));
+    }
+    return mModelHdl;
 }
 
 void PersonCtl::onLoad()

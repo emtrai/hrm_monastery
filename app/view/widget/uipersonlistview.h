@@ -36,7 +36,8 @@ protected:
     virtual void initHeader();
 protected:
     virtual void importRequested(const QString& fpath);
-    virtual void onViewItem(qint32 idx);
+    virtual void onViewItem(UITableWidgetItem *item);
+    virtual QString getTitle();
 private:
     void cleanUpItem();
 //public:

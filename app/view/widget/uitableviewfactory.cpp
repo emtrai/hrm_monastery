@@ -24,6 +24,7 @@
 #include "view/widget/uipersonlistview.h"
 #include "view/widget/uisaintlistview.h"
 #include "view/widget/uicommunitylistview.h"
+#include "view/widget/uicommunitypersonlistview.h"
 
 UITableView *UITableViewFactory::getView(ViewType type, QWidget *parent )
 {
@@ -43,6 +44,9 @@ UITableView *UITableViewFactory::getView(ViewType type, QWidget *parent )
     case AREA:
         view = new UICommonListView(parent);
         break;
+    case COMMUNITY_PERSON:
+        view = new UICommunityPersonListView(parent);
+        break;
     default:
         break;
     }
@@ -50,5 +54,6 @@ UITableView *UITableViewFactory::getView(ViewType type, QWidget *parent )
     if (nullptr != view)
         view->setupUI();
 
+    tracede;
     return view;
 }

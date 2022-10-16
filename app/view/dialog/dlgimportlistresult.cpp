@@ -42,6 +42,11 @@ UIImportItem::UIImportItem(void* data):
 
 }
 
+void *UIImportItem::data() const
+{
+    return mData;
+}
+
 const QStringList &UIImportItem::valueList() const
 {
     return mValueList;
@@ -111,6 +116,7 @@ QStringList DlgImportListResult::getFinalHeader()
     traced;
     QStringList hdrs;
     hdrs.append(tr("Chọn"));
+//    hdrs.append(tr(""));
     hdrs.append(getHeader());
     return hdrs;
 }
@@ -129,7 +135,6 @@ ErrCode DlgImportListResult::onLoad()
 {
     traced;
     QTableWidget* tbl = ui->tblList;
-    traced;
 
     // TODO: is it really remove all data?
     // Is there any risk of leakage memory here??
@@ -142,17 +147,39 @@ ErrCode DlgImportListResult::onLoad()
     QList<UIImportItem*>* items = getItems();
     if (items && !items->empty()) {
         int idx = tbl->rowCount();
+        QIcon icOk (QString::fromUtf8(":/icon/icon/icons8-ok-48"));
+        QIcon icNok (QString::fromUtf8(":/icon/icon/icons8-error-cloud-96"));
+        QIcon icDup (QString::fromUtf8(":/icon/icon/icons8-copy-64.png"));
+        int itemIdx = 0;
         foreach (UIImportItem* item, *items){
             tbl->insertRow(idx);
             QStringList values = item->valueList();
 
             QTableWidgetItem *widgetItem = new QTableWidgetItem();
-            widgetItem->setCheckState(Qt::CheckState::Unchecked);
+
+//            tbl->setItem(idx, 0, widgetItem);
+
+            DbModel* val = (DbModel* )item->data();
+            if (val != nullptr) {
+                ErrCode valRes = val->validate();
+                if (valRes == ErrNone) {
+                    widgetItem->setCheckState(Qt::CheckState::Unchecked);
+                } else if (valRes == ErrExisted){
+                    widgetItem->setIcon(icDup);
+                } else {
+                    widgetItem->setIcon(icNok);
+                }
+            } else {
+                widgetItem->setIcon(icNok);
+            }
             tbl->setItem(idx, 0, widgetItem);
+            widgetItem->setData(Qt::UserRole, itemIdx);
+
             for (int i = 0; i < values.count(); ++i) {
                 tbl->setItem(idx, i+1, new QTableWidgetItem(values.value(i)));
             }
             idx ++;
+            itemIdx++;
         }
         delete items;
     } else {
@@ -175,7 +202,8 @@ ErrCode DlgImportListResult::saveItems(const QList<DbModel *> &list)
     ErrCode ret = ErrNone;
     // TODO: review this again
     foreach (DbModel* item, list) {
-        logd("Save %d", item->name().toStdString().c_str());
+        logd("Save %s", item->name().toStdString().c_str());
+        item->dump();
         ret = item->save();
         logi("save item result %d", ret);
     }
@@ -188,7 +216,18 @@ void DlgImportListResult::accept()
     ErrCode ret = ErrNone;
 
     if (mList.count() > 0) {
-        ret = saveItems(mList);
+        QTableWidget* tbl = ui->tblList;
+        QList<DbModel *> selectedItem;
+        int cnt = tbl->rowCount();
+        for (int idx = 0; idx < cnt; idx++){
+            QTableWidgetItem *widgetItem = tbl->item(idx, 0);
+            if (widgetItem->checkState() == Qt::CheckState::Checked) {
+                int itemIdx = widgetItem->data(Qt::UserRole).toInt();
+                logd("selected item idx %d", itemIdx);
+                selectedItem.append(mList[itemIdx]);
+            }
+        }
+        ret = saveItems(selectedItem);
     } else {
         logi("Nothing to save");
     }
@@ -198,3 +237,4 @@ void DlgImportListResult::accept()
     else
         Utils::showErrorBox(QString(tr("Lỗi ! Mã lỗi %1").arg(ret)));
 }
+

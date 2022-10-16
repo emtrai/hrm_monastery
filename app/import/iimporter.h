@@ -29,6 +29,15 @@
 class IImporter
 {
 public:
+    /**
+     * @brief Import one field/item
+     * @param importFileType file type, like CSV, CSV_LIST. \ref ImportType
+     * @param keyword Field/item name, i.e.MA_DINH_DANH
+     * @param value Value
+     * @param idx
+     * @param tag
+     * @return ErrNone on success, error code otherwise
+     */
     virtual ErrCode onImportItem(int importFileType, const QString& keyword, const QString& value, quint32 idx = 0, void* tag = nullptr);
     virtual ErrCode onImportItem(int importFileType, const QStringList& items, quint32 idx = 0, void* tag = nullptr);
 };

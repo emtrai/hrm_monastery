@@ -34,7 +34,7 @@
 #include "dbmodel.h"
 #include "iexporter.h"
 #include "iimporter.h"
-
+#include "utils.h"
 #include <functional>
 #include <iostream>
 
@@ -59,15 +59,16 @@ class Person: public DbModel, public IExporter, public IImporter
             /**
              * @brief validate if data is all valid
              * @param result of validate for each field Field:ErrCode
-             * @return true if all valid, false otherwise
+             * @return ErrNone on ok, ErrInvalidData if data is invalid, other error code otherwhise
              */
-            virtual bool validate(QHash<QString, ErrCode>* result = nullptr);
+            virtual ErrCode validate();
 
         public:
             Person();
             virtual ~Person();
             virtual void clone(const Person& per);
             virtual void buildUidIfNotSet();
+            virtual QString buildUid(const QString* seed = nullptr);
             virtual QString modelName() const;
 
             const QString &firstName() const;
@@ -94,7 +95,8 @@ class Person: public DbModel, public IExporter, public IImporter
 
             qint64 christenDate() const;
             void setChristenDate(qint64 newChristenDate);
-            void setChristenDate(const QString& newChristenDate);
+            void setChristenDate(const QString& newChristenDate,
+                                 const QString& format = DATE_FORMAT_DMY);
 
             virtual ErrCode exportTo(const QString &fpath, ExportType type);
 
@@ -103,6 +105,8 @@ class Person: public DbModel, public IExporter, public IImporter
 
             qint64 trainJoinDate() const;
             void setTrainJoinDate(qint64 newTrainJoinDate);
+            void setTrainJoinDate(const QString& newTrainJoinDate,
+                                  const QString& format = DATE_FORMAT_DMY);
 
             Person *trainPIC() const;
             void setTrainPIC(Person *newTrainPIC);
@@ -114,6 +118,7 @@ class Person: public DbModel, public IExporter, public IImporter
 
             const QString &hollyName() const;
             void setHollyName(const QString &newHollyName);
+            ErrCode checkAndUpdateSaintListFromHollyName();
 
             const QString &nationalityUid() const;
             void setNationalityUid(const QString &newNationalityUid);
@@ -148,6 +153,8 @@ class Person: public DbModel, public IExporter, public IImporter
 
             const QStringList &specialistUidList() const;
             void setSpecialistUidList(const QStringList &newSpecialistUidList);
+            void setSpecialistNames(const QString &newSpecialists,
+                                const QString& split=",");
             void clearSpecialistUid();
             void addSpecialistUid(const QString& uid);
 
@@ -189,6 +196,8 @@ class Person: public DbModel, public IExporter, public IImporter
 
             qint64 dadBirthday() const;
             void setDadBirthday(qint64 newDadBirthday);
+            void setDadBirthday(const QString& newDadBirthday,
+                                const QString& format = DATE_FORMAT_DMY);
 
             const QString &dadAddr() const;
             void setDadAddr(const QString &newDadAddr);
@@ -198,6 +207,8 @@ class Person: public DbModel, public IExporter, public IImporter
 
             qint64 momBirthday() const;
             void setMomBirthday(qint64 newMomBirthday);
+            void setMomBirthday(const QString& newMomBirthday,
+                                const QString& format = DATE_FORMAT_DMY);
 
             const QString &momAddr() const;
             void setMomAddr(const QString &newMomAddr);
@@ -214,12 +225,16 @@ class Person: public DbModel, public IExporter, public IImporter
 
             qint64 hollyDate() const;
             void setHollyDate(qint64 newHollyDate);
+            void setHollyDate(const QString& newHollyDate,
+                              const QString& format = DATE_FORMAT_DMY);
 
             const QString &familyContact() const;
             void setFamilyContact(const QString &newFamilyContact);
 
             qint64 joinDate() const;
             void setJoinDate(qint64 newJoinDate);
+            void setJoinDate(const QString& newJoinDate,
+                             const QString& format = DATE_FORMAT_DMY);
 
             const QString &joinPICUid() const;
             void setJoinPICUid(const QString &newJoinPICUid);
@@ -229,6 +244,8 @@ class Person: public DbModel, public IExporter, public IImporter
 
             qint64 preTrainJoinDate() const;
             void setPreTrainJoinDate(qint64 newPreTrainJoinDate);
+            void setPreTrainJoinDate(const QString& newPreTrainJoinDate,
+                                     const QString& format = DATE_FORMAT_DMY);
 
             const QString &preTrainPICUid() const;
             void setPreTrainPICUid(const QString &newPreTrainPICUid);
@@ -250,9 +267,13 @@ class Person: public DbModel, public IExporter, public IImporter
 
             qint64 vowsDate() const;
             void setVowsDate(qint64 newVowsDate);
+            void setVowsDate(const QString& newVowsDate,
+                             const QString& format = DATE_FORMAT_DMY);
 
             qint64 eternalVowsDate() const;
             void setEternalVowsDate(qint64 newEternalVowsDate);
+            void setEternalVowsDate(const QString& newEternalVowsDate,
+                                    const QString& format = DATE_FORMAT_DMY);
 
             const QString &eternalVowsCEOUid() const;
             void setEternalVowsCEOUid(const QString &newEternalVowsCEOUid);
@@ -268,18 +289,24 @@ class Person: public DbModel, public IExporter, public IImporter
 
             qint64 bankDate() const;
             void setBankDate(qint64 newBankDate);
+            void setBankDate(const QString& newBankDate,
+                             const QString& format = DATE_FORMAT_DMY);
 
             const QString &bankPlace() const;
             void setBankPlace(const QString &newBankPlace);
 
             qint64 goldenDate() const;
             void setGoldenDate(qint64 newGoldenDate);
+            void setGoldenDate(const QString& newGoldenDate,
+                               const QString& format = DATE_FORMAT_DMY);
 
             const QString &goldenPlace() const;
             void setGoldenPlace(const QString &newGoldenPlace);
 
             qint64 eternalDate() const;
             void setEternalDate(qint64 newEternalDate);
+            void setEternalDate(const QString& newEternalDate,
+                               const QString& format = DATE_FORMAT_DMY);
 
             const QString &eternalPlace() const;
             void setEternalPlace(const QString &newEternalPlace);
@@ -292,12 +319,16 @@ class Person: public DbModel, public IExporter, public IImporter
 
             qint64 retireDate() const;
             void setRetireDate(qint64 newRetireDate);
+            void setRetireDate(const QString & newRetireDate,
+                               const QString& format = DATE_FORMAT_DMY);
 
             const QString &retirePlace() const;
             void setRetirePlace(const QString &newRetirePlace);
 
             qint64 deadDate() const;
             void setDeadDate(qint64 newDeadDate);
+            void setDeadDate(const QString&  newDeadDate,
+                             const QString& format = DATE_FORMAT_DMY);
 
             const QString &deadPlace() const;
             void setDeadPlace(const QString &newDeadPlace);
@@ -327,15 +358,22 @@ class Person: public DbModel, public IExporter, public IImporter
 
             qint64 eucharistDate() const;
             void setEucharistDate(qint64 newEucharistDate);
+            void setEucharistDate(const QString& newEucharistDate,
+                                  const QString& format = DATE_FORMAT_DMY);
 
             const QString &eucharistPlace() const;
             void setEucharistPlace(const QString &newEucharistPlace);
 
             qint64 feastDay() const;
             void setFeastDay(qint64 newFeastDay);
-            void setFeastDay(const QString& newFeastDay);
+            void setFeastDay(const QString& newFeastDay,
+                             const QString& format = DATE_FORMAT_MD);
 
-            virtual ErrCode onImportItem(int importFileType, const QString& keyword, const QString& value, quint32 idx = 0, void* tag = nullptr);
+            virtual ErrCode onImportItem(int importFileType,
+                                         const QString& keyword,
+                                         const QString& value,
+                                         quint32 idx = 0,
+                                         void* tag = nullptr);
 
             const QString &areaUid() const;
             void setAreaUid(const QString &newAreaUid);
@@ -361,6 +399,8 @@ class Person: public DbModel, public IExporter, public IImporter
 
             virtual const QStringList getListExportKeyWord() const;
             virtual ErrCode getExportDataString(const QString& keyword, QString* data) const;
+            virtual ErrCode prepare2Save();
+
         protected:
             QHash<QString, std::function<QString(void)>> mExportFields;
             QHash<QString, std::function<void(const QString&)>> mImportFields;
@@ -399,6 +439,7 @@ class Person: public DbModel, public IExporter, public IImporter
 
 
             QStringList mSpecialistUidList;
+            QStringList mSpecialistNameList;
 
             //course
             QString mCourseUid;

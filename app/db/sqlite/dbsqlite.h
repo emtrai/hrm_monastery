@@ -27,6 +27,7 @@
 #include "person.h"
 #include <QSqlQuery>
 #include <QMap>
+#include <QSqlDatabase>
 
 #define SQLITE (DbSqlite::getInstance())
 
@@ -48,6 +49,9 @@ public:
 
     virtual ErrCode_t execQuery(const QString& sql);
     virtual ErrCode_t execQuery(QSqlQuery* qry);
+    virtual ErrCode_t execQueryNoTrans(QSqlQuery* qry);
+    virtual ErrCode_t startTransaction();
+    virtual ErrCode_t endTransaction();
 
 //    virtual ErrCode_t addCommunity(const Community* comm);
     virtual DbSqliteTbl* getTable(const QString& tblName);
@@ -81,9 +85,12 @@ private:
     static DbSqlite* gInstance;
     QMap<QString, DbSqliteTbl*> mListTbl;
     QMap<QString, DbModelHandler*> mModelHdlList;
+    QSqlDatabase mDb;
+
 public:
     static DbSqlite* getInstance();
 
+    const QSqlDatabase &db() const;
 };
 
 #endif // DBSQLITE_H

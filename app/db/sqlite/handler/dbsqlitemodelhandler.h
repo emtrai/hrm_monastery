@@ -39,7 +39,7 @@ public:
      * @param model
      * @return ErrNone on success, error code otherwise
      */
-    virtual ErrCode add(const DbModel* model);
+    virtual ErrCode add(DbModel* model);
 
     /**
      * @brief Check if model exist in db
@@ -67,6 +67,7 @@ public:
     virtual int search(const QString& keyword, QList<DbModel*>* outList = nullptr);
 protected:
     virtual DbSqliteTbl* getMainTbl() = 0;
+    virtual DbSqliteTbl* getTable(const QString& modelName);
 };
 
 #endif // DBSQLITEMODELHANDLER_H

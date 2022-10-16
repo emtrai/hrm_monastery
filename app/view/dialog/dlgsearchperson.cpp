@@ -26,10 +26,11 @@
 #include "utils.h"
 #include "person.h"
 
-DlgSearchPerson::DlgSearchPerson(QWidget *parent) :
+DlgSearchPerson::DlgSearchPerson(QWidget *parent, bool isMulti) :
     QDialog(parent),
     ui(new Ui::DlgSearchPerson),
-    mPerson(nullptr)
+//    mPerson(nullptr),
+    mIsMultiSelection(isMulti)
 {
     traced;
     ui->setupUi(this);
@@ -44,7 +45,10 @@ DlgSearchPerson::DlgSearchPerson(QWidget *parent) :
     ui->tblList->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tblList->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
 
-    ui->tblList->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
+    if (mIsMultiSelection)
+        ui->tblList->setSelectionMode(QAbstractItemView::SelectionMode::MultiSelection);
+    else
+        ui->tblList->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
 
     ui->tblList->setShowGrid(true);
     ui->tblList->setColumnCount(header.count());
@@ -68,12 +72,13 @@ void DlgSearchPerson::on_btnSearch_clicked()
     traced;
     QTableWidget* tbl = ui->tblList;
     QString name = ui->txtName->text().trimmed();
-    mPerson = nullptr;
+//    mPerson = nullptr;
+    mSelectedPersons.clear();
     if (!name.isEmpty()) {
         tbl->clearContents();
         tbl->model()->removeRows(0, tbl->rowCount());
         mListPerson.clear();
-        mListPerson = INSTANCE(PersonCtl)->searchPersonByName(name);
+        mListPerson = INSTANCE(PersonCtl)->searchPerson(name);
         logd("Found %d per", mListPerson.count());
         if (mListPerson.count() > 0) {
 
@@ -104,9 +109,28 @@ void DlgSearchPerson::on_btnSearch_clicked()
     }
 }
 
+bool DlgSearchPerson::getIsMultiSelection() const
+{
+    return mIsMultiSelection;
+}
+
+void DlgSearchPerson::setIsMultiSelection(bool newIsMultiSelection)
+{
+    mIsMultiSelection = newIsMultiSelection;
+    if (mIsMultiSelection)
+        ui->tblList->setSelectionMode(QAbstractItemView::SelectionMode::MultiSelection);
+    else
+        ui->tblList->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
+}
+
 Person *DlgSearchPerson::person() const
 {
-    return mPerson;
+    return (mSelectedPersons.count() > 0)?mSelectedPersons.at(0):nullptr;
+}
+
+QList<Person *> DlgSearchPerson::personList()
+{
+    return mSelectedPersons;
 }
 
 void DlgSearchPerson::accept()
@@ -116,19 +140,27 @@ void DlgSearchPerson::accept()
     QTableWidget* tbl = ui->tblList;
     QItemSelectionModel* selectionModel = tbl->selectionModel();
     QModelIndexList selection = selectionModel->selectedRows();
-    logd("Selection count %d", selection.count());
+    logd("Selection count %d", (int)selection.count());
     // only select one
     if (selection.count() > 0) {
-        QModelIndex index = selection.at(0);
-        mPerson = mListPerson.at(index.row());
-        if (mPerson == nullptr) {
-            loge("No person found, what's wrong???");
-            // TODO: handle this error special case
+        for(int i=0; i< selection.count(); i++)
+        {
+            QModelIndex index = selection.at(i);
+            // TODO: validate value
+            Person* per =  mListPerson.at(index.row());
+            mSelectedPersons.append(per);
         }
+//        QModelIndex index = selection.at(0);
+//        mPerson = mListPerson.at(index.row());
+//        if (mPerson == nullptr) {
+//            loge("No person found, what's wrong???");
+//            // TODO: handle this error special case
+//        }
     } else {
         loge("Nothing to select");
         // TODO:show warning dialog???
     }
+    QDialog::accept();
 
 }
 

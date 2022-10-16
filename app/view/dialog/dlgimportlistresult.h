@@ -39,6 +39,8 @@ public:
 
     const QStringList &valueList() const;
     void setValueList(const QStringList &newValueList);
+    void *data() const;
+
 private:
     UIImportItem(void* data);
 private:

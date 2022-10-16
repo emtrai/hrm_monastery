@@ -52,6 +52,8 @@ public:
     virtual const QString &uid() const;
     virtual void setUid(const QString &newUid);
     virtual void buildUidIfNotSet();
+    virtual QString buildUid(const QString* seed = nullptr);
+
 
     virtual ErrCode save();
     virtual ErrCode exportTo(const QString &fpath, ExportType type);
@@ -73,13 +75,24 @@ public:
     /**
      * @brief validate if data is all valid
      * @param result of validate for each field Field:ErrCode
-     * @return true if all valid, false otherwise
+     * @return ErrNone on ok, ErrInvalidData if data is invalid, other error code otherwhise
      */
-    virtual bool validate(QHash<QString, ErrCode>* result = nullptr);
+    virtual ErrCode validate();
+
+    QHash<QString, ErrCode> *validateResult() const;
+
+    const QString &validateMsg() const;
+
+    void appendValidateResult(const QString& item, ErrCode res);
+    void appendValidateMsg(const QString &newValidateMsg);
+    void cleanValidateResult();
 
 protected:
     virtual DbModelHandler* getDbModelHandler() = 0;
-
+    virtual ErrCode prepare2Save();
+protected:
+    QHash<QString, ErrCode>* mValidateResult;
+    QString mValidateMsg;
 private:
     qint64 mDbId;
     QString mName;// TODO: support multi languate???

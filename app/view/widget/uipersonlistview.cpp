@@ -109,9 +109,10 @@ void UIPersonListView::importRequested(const QString &fpath)
     delete dlg;
 }
 
-void UIPersonListView::onViewItem(qint32 idx)
+void UIPersonListView::onViewItem(UITableWidgetItem *item)
 {
     traced;
+    int idx = item->idx();
     logd("idx=%d",idx);
     if (idx < mItemList.length()){
         Person* per = (Person*)mItemList.value(idx);
@@ -127,6 +128,11 @@ void UIPersonListView::onViewItem(qint32 idx)
         loge("Invalid idx");
         // TODO: popup message???
     }
+}
+
+QString UIPersonListView::getTitle()
+{
+    return tr("Danh sách nữ tu");
 }
 
 void UIPersonListView::cleanUpItem()

@@ -30,6 +30,16 @@ public:
     explicit UICommunityListView(QWidget *parent = nullptr);
     virtual ~UICommunityListView();
 protected:
+    virtual QList<UITableMenuAction*> getMenuItemActions(const QMenu* menu,
+                                                          UITableWidgetItem* item);
+    virtual ErrCode onMenuActionListPerson(QMenu* menu, UITableMenuAction* act);
+    virtual ErrCode onMenuActionListDepartment(QMenu* menu, UITableMenuAction* act);
+//    virtual ErrCode onMenuAction(QMenu* menu, UITableMenuAction* act);
+    virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
+    virtual ErrCode onMenuActionDelete(QMenu* menu, UITableMenuAction* act);
+//    virtual ErrCode onMenuActionView(QMenu* menu, UITableMenuAction* act);
+    virtual void onViewItem(UITableWidgetItem *item);
+protected:
     virtual ErrCode onLoad();
 };
 

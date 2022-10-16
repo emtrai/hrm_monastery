@@ -57,7 +57,9 @@ const char* const KFieldCEOUid = "ceouid";
 const char* const KFieldChurchUid = "church_uid";
 const char* const KFieldMissionUid = "mission_uid";
 const char* const KFieldAreaUid = "area_uid";
+const char* const KFieldAreaDbId = "area_dbid";
 const char* const KFieldDepartmentUid = "depart_uid";
+const char* const KFieldDepartmentDbId = "depart_dbid";
 const char* const KFieldPreset = "preset";
 const char* const KFieldGender = "gender";
 const char* const KFieldFeastDay = "feastday";
@@ -136,6 +138,12 @@ const char* const KFieldDeadDate = "dead_date";
 const char* const KFieldDeadPlace = "dead_place"; // noi chon cat
 const char* const KFieldCategoryUid = "catetory_uid";
 const char* const KFieldEventUid = "event_uid";
+const char* const KFieldSaintUid = "saint_uid";
+const char* const KFieldSaintDbId = "saint_dbid";
+const char* const KFieldPersonUid = "person_uid";
+const char* const KFieldPersonDbId = "person_dbid";
+const char* const KFieldRoleUid = "role_uid";
+const char* const KFieldTermUid = "term_uid";
 
 
 // TABLES NAME
@@ -156,6 +164,11 @@ const char* const KTableArea = "area"; //Dan toc
 const char* const KTableCourse = "course"; //Dan toc
 const char* const KTableStatus = "status"; //Tinh trang
 const char* const KTableEvent = "event"; //Tinh trang
+const char* const KTableSaintPerson = "saint_person";
+const char* const KTableCommDept = "comm_dept";
+const char* const KTableDeptMgr = "dept_mgr";
+const char* const KTableCommPerson = "comm_person";
+const char* const KTableAreaPerson = "area_person";
 
 // TODO: move to class???
 QString getDateTypeString(TableFieldDatatype_t dataType);

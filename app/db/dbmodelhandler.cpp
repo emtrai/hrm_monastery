@@ -41,3 +41,17 @@ int DbModelHandler::searchAll(const QString &keyword, QList<DbModel *> *outList)
     return 0;
 }
 
+DbModel *DbModelHandler::getByName(const QString &name, const DbModelBuilder &builder)
+{
+    traced;
+    loge("Default one, do nothing");
+    return nullptr;
+}
+
+DbModel *DbModelHandler::getByName(const QString &name)
+{
+    traced;
+    loge("Default one, do nothing");
+    return nullptr;
+}
+

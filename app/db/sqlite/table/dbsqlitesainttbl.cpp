@@ -37,7 +37,7 @@ const qint32 DbSqliteSaintTbl::KVersionCode = VERSION_CODE(0,0,1);
 DbSqliteSaintTbl::DbSqliteSaintTbl(DbSqlite* db)
     : DbSqliteTbl(db, KTableSaint, KTableSaint, KVersionCode)
 {
-
+    traced;
 }
 
 void DbSqliteSaintTbl::addTableField(DbSqliteTableBuilder *builder)
@@ -101,49 +101,5 @@ int DbSqliteSaintTbl::search(const QString &keyword, QList<DbModel *> *outList)
 {
     traced;
     return DbSqliteTbl::search (keyword, &Saint::build, outList);
-//    QHash<QString, int> inFields;
-//    inFields[KFieldName] = TEXT;
-//    inFields[KFieldFullName] = TEXT;
-//    inFields[KFieldOriginName] = TEXT;
-//    logi("Search Saint '%s'", keyword.toStdString().c_str());
-//    qint32 cnt = 0;
-//    cnt = DbSqliteTbl::search (keyword, inFields, &Saint::build, outList);
-//    traced;
-//    // TODO: implement it
-//    // TODO: exact and not exact match???
-//    QSqlQuery qry;
-//    qint32 cnt = 0;
-//    logi("Search Saint '%s'", keyword.toStdString().c_str());
-//    QString queryString = QString("SELECT * "
-//                                  "FROM %1 WHERE lower(%2) like :name OR "
-//                                  "lower(%3) like :name OR "
-//                                  "lower(%4) like :name")
-//                              .arg(name(), KFieldName, KFieldFullName, KFieldOriginName);
-//    qry.prepare(queryString);
-//    logd("Query String '%s'", queryString.toStdString().c_str());
-
-//    // TODO: check sql injection issue
-//    qry.bindValue( ":name", QString("%%1%").arg(keyword.trimmed().toLower()) );
-//    cnt = runQuery(qry, &Saint::build, outList);
-////    if( qry.exec() )
-////    {
-////        while (qry.next()) {
-////            // qry.size may not support, so cannot use here
-////            // TODO: check if any better way to get the number of items;
-////            cnt++;
-////            if (outList != nullptr){
-////                Saint* item = (Saint*)Saint::build();
-////                updateModelFromQuery(item, qry);
-////                outList->append(item); // TODO: when it cleaned up?????
-////            }
-////        }
-////    }
-////    else {
-////        loge( "Failed to execute %s", queryString.toStdString().c_str() );
-////    }
-
-//    logi("Found %d", cnt);
-
-//    return cnt;
 }
 

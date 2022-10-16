@@ -39,6 +39,7 @@ UITableView::UITableView(QWidget *parent) :
     ui->tblList->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->tblList, SIGNAL(customContextMenuRequested(QPoint)),
             SLOT(customMenuRequested(QPoint)));
+//    QObject::connect(ui->cbKeyword, SIGNAL(returnPressed()), this, SLOT(on_cbKeyword_returnPressed()));
 }
 
 UITableView::~UITableView()
@@ -74,11 +75,14 @@ void UITableView::setupUI()
 
     ui->tblList->setHorizontalHeaderLabels(getHeader());
 
+    setTitle(getTitle());
+    tracede;
 }
 
 void UITableView::reload()
 {
     traced;
+    onLoad();
     onUpdatePage(1);
 }
 
@@ -119,9 +123,11 @@ void UITableView::onUpdatePage(qint32 page)
             tbl->insertRow(idx);
             QStringList values = item->valueList();
             for (int i = 0; i < values.count(); ++i) {
-                QTableWidgetItem* wgitem = new QTableWidgetItem(values.value(i));
-                wgitem->setData(Qt::UserRole, idx);
-                tbl->setItem(idx, i, wgitem);
+//                QTableWidgetItem* wgitem = new QTableWidgetItem(values.value(i));
+//                wgitem->setData(Qt::UserRole, idx);
+//                tbl->setItem(idx, i, wgitem);
+                tbl->setItem(idx, i, UITableWidgetItem::build(values.value(i), i, idx, item));
+
             }
 
             idx ++;
@@ -151,91 +157,115 @@ void UITableView::importRequested(const QString& fpath)
     traced;
 }
 
-void UITableView::onViewItem(qint32 idx)
+void UITableView::onViewItem(UITableWidgetItem *item)
 {
     traced;
     logd("parent class, nothing to do");
 }
 
-QMenu* UITableView::buildPopupMenu()
+QMenu* UITableView::buildPopupMenu(UITableWidgetItem* item)
 {
     traced;
     if (mMenu == nullptr) {
         logd("build menu actions");
         mMenu = new QMenu(this);
-        QList<QAction*> actions = getMenuActions();
-        foreach (QAction* act, actions) {
-            connect(act, &QAction::triggered, [this, act](){
-                        logd("lambda trigger call");
-                        onMenuActionTrigger(this->mMenu, act);
-                        // TODO: handle return???
-                    });
-            mMenu->addAction(act);
+    }
+    mMenu->clear();
+
+    QList<UITableMenuAction*> actions = getMenuCommonActions(mMenu);
+
+
+    if (item != nullptr){
+//        QVariant data = item->data(Qt::UserRole);
+//        bool ok = false;
+//        int idx = data.toInt(&ok);
+//        logd("item data ok %d idx %d", ok, idx);
+//        if (!ok) {
+//            idx = -1;
+//        }
+
+        QList<UITableMenuAction*> itemActions = getMenuItemActions(mMenu, item);
+        if (!itemActions.empty()) {
+            actions.append(itemActions);
         }
     }
+//    mMenu->addSeparator();
+    foreach (UITableMenuAction* act, actions) {
+        connect(act, &QAction::triggered, [this, act](){
+            logd("lambda trigger call");
+            act->callback()(this->menu(), act);
+//                    onMenuActionTrigger(this->mMenu, act);
+//                    act->callback(this, act);
+//                    this->onMenuAddAction(mN)
+                    // TODO: handle return???
+                });
+        mMenu->addAction(act);
+    }
+
     return mMenu;
 }
 
-QList<QAction *> UITableView::getMenuActions()
+QList<UITableMenuAction *> UITableView::getMenuCommonActions(const QMenu* menu)
 {
     traced;
-    QList<QAction*> actionList;
-    QAction* action = new QAction("New", this);
-    action->setData(MenuAction::ACTION_NEW);
-    actionList.append(action);
+    QList<UITableMenuAction*> actionList;
 
-    action = new QAction("Delete", this);
-    action->setData(MenuAction::ACTION_DELETE);
-    actionList.append(action);
+    actionList.append(UITableMenuAction::build(tr("Thêm"), this)
+                        ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                return this->onMenuActionAdd(m, a);
+                          }));
 
     return actionList;
 }
 
-ErrCode UITableView::onMenuActionTrigger(QMenu* menu, QAction *action)
+QList<UITableMenuAction *> UITableView::getMenuItemActions(const QMenu* menu,
+                                                           UITableWidgetItem *item)
 {
     traced;
-    if (action == nullptr)
-        return ErrInvalidArg;
-    bool isOk = false;
-    ErrCode err = ErrNone;
-    logd("action %s", action->text().toStdString().c_str());
-    MenuAction act = static_cast<MenuAction>(action->data().toInt(&isOk));
-    if (isOk) {
-        logd("action id %d", act);
-        // TODO: what should we do now??
-        switch (act) {
-        case MenuAction::ACTION_NEW:
-            err = onMenuAddAction(menu, action);
-            break;
-        case MenuAction::ACTION_DELETE:
-            err = onMenuDeleteAction(menu, action);
-            break;
-        default:
-            loge("Unknow action id %d", act);
-            err = ErrNotSupport;
-            break;
-        }
-    } else {
-        err = ErrUnknown;
-        logd("not defined menu action, what should we do now???");
-        // TODO: what should we do now??
-    }
-    tracedr(err);
-    return err;
+    QList<UITableMenuAction*> actionList;
+    actionList.append(UITableMenuAction::build(tr("Xem"), this, item)
+                                          ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                              return this->onMenuActionView(m, a);
+                                          }));
+    actionList.append(UITableMenuAction::build(tr("Xoá"), this, item)
+                                           ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                               return this->onMenuActionDelete(m, a);
+                                           }));
+    actionList.append(UITableMenuAction::build(tr("Chỉnh sửa"), this, item)
+                                              ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                                  return this->onMenuActionEdit(m, a);
+                                              }));
+    return actionList;
 }
 
-ErrCode UITableView::onMenuAddAction(QMenu *menu, QAction *act)
+
+ErrCode UITableView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act)
 {
     traced;
     // TODO: handle it
     return ErrNone;
 }
 
-ErrCode UITableView::onMenuDeleteAction(QMenu *menu, QAction *act)
+ErrCode UITableView::onMenuActionDelete(QMenu *menu, UITableMenuAction *act)
 {
     traced;
     // TODO: handle it
     return ErrNone;
+}
+
+ErrCode UITableView::onMenuActionEdit(QMenu *menu, UITableMenuAction *act)
+{
+    traced;
+    // TODO: handle it
+    return ErrNone;
+}
+
+ErrCode UITableView::onMenuActionView(QMenu *menu, UITableMenuAction *act)
+{
+    traced;
+    onViewItem((UITableWidgetItem*)act->tblItem());
+    return ErrNone;
+
 }
 
 void UITableView::onFilter(const QString &catetory, qint64 opFlags, const QString &keywords)
@@ -288,6 +318,16 @@ UITableItem *UITableItem::addValue(const QString &val)
 UITableItem::UITableItem(void* data):
     mData(data)
 {
+    traced;
+}
+
+void *UITableItem::data() const
+{
+    return mData;
+}
+
+UITableItem::UITableItem():mData(nullptr)
+{
 
 }
 
@@ -326,6 +366,18 @@ void UITableView::setTotalPages(quint32 newTotalPages)
     mTotalPages = newTotalPages;
 }
 
+void UITableView::setTitle(const QString &title)
+{
+    traced;
+    ui->lblTitle->setText(title);
+    tracede;
+}
+
+QString UITableView::getTitle()
+{
+    return "";
+}
+
 quint32 UITableView::currentPage() const
 {
     return mCurrentPage;
@@ -340,25 +392,22 @@ void UITableView::setCurrentPage(quint32 newCurrentPage)
 void UITableView::on_tblList_itemDoubleClicked(QTableWidgetItem *item)
 {
     traced;
-    qint32 idx = 0;
-    bool ok = false;
-    // TODO: handle view only and edit mode
-    idx = item->data(Qt::UserRole).toInt(&ok);
-    if (ok){
-        logd("view item %d", idx);
-        onViewItem(idx);
-    } else {
-        loge("Cannot get data from widget item");
-    }
+    onViewItem((UITableWidgetItem*)item);
 }
 
 
 
 void UITableView::customMenuRequested(QPoint pos)
 {
-    QModelIndex index=ui->tblList->indexAt(pos);
+    traced;
+//    QModelIndex index = ui->tblList->indexAt(pos);
     // TODO: hande it
-    QMenu* menu = buildPopupMenu();
+    int row = ui->tblList->rowAt(pos.y());
+    int col = ui->tblList->rowAt(pos.x());
+    logd("menu at row=%d col=%d", row, col);
+//    cell = ui->tblList->item(row, col);
+    UITableWidgetItem *item = (UITableWidgetItem*)ui->tblList->itemAt(pos);
+    QMenu* menu = buildPopupMenu(item);
     menu->popup(ui->tblList->viewport()->mapToGlobal(pos));
 }
 
@@ -369,3 +418,124 @@ void UITableView::on_btnFilter_clicked()
     onFilter(ui->cbCategory->currentText(), 0, ui->cbKeyword->currentText());
 }
 
+//void UITableView::on_cbKeyword_returnPressed()
+//{
+//    traced;
+//    on_btnFilter_clicked();
+//}
+
+
+UITableMenuAction::UITableMenuAction(const QString &text, QObject *parent):
+    QAction(text, parent),
+    mTblItem(nullptr)
+{
+    traced;
+}
+
+UITableWidgetItem *UITableMenuAction::tblItem() const
+{
+    return mTblItem;
+}
+
+UITableMenuAction* UITableMenuAction::setTblItem(UITableWidgetItem *newTblItem)
+{
+    mTblItem = newTblItem;
+    return this;
+}
+
+UITableMenuAction *UITableMenuAction::build(const QString &text, QObject *parent,
+                                            UITableWidgetItem *item, qint32 idx)
+{
+    traced;
+    UITableMenuAction* menu = new UITableMenuAction(text, parent);
+    menu->setTblItem(item);
+    return menu;
+}
+
+const std::function<ErrCode (QMenu *, UITableMenuAction *)> &UITableMenuAction::callback() const
+{
+    return mCallback;
+}
+
+UITableMenuAction* UITableMenuAction::setCallback(const std::function<ErrCode (QMenu *, UITableMenuAction *)> &newCallback)
+{
+    mCallback = newCallback;
+    return this;
+}
+
+void *UITableMenuAction::getData()
+{
+    traced;
+    if (mTblItem != nullptr) {
+        UITableItem* item = mTblItem->item();
+        if (item != nullptr) {
+            return item->data();
+        } else {
+            loge("invalid tbl item");
+        }
+    } else {
+        loge("invaid widget item");
+    }
+    logi("invalid data");
+    return nullptr;
+}
+
+void UITableView::on_btnAdd_clicked()
+{
+    traced;
+    logi("Add from parent, do nothing");
+}
+
+QMenu *UITableView::menu() const
+{
+    return mMenu;
+}
+
+
+UITableWidgetItem::UITableWidgetItem(const QString &text):
+    QTableWidgetItem(text),
+    mItem(nullptr),
+    mItemIdx(0),
+    mIdx(0)
+{
+    traced;
+}
+
+UITableWidgetItem *UITableWidgetItem::build(const QString &txt, qint32 itemIdx, qint32 idx, UITableItem *item)
+{
+    UITableWidgetItem* wg = new UITableWidgetItem(txt);
+    wg->setItem(item);
+    wg->setItemIdx(itemIdx);
+    wg->setIdx(idx);
+    return wg; // TODO: when this item is deleted??? check carefuly please
+}
+
+UITableItem *UITableWidgetItem::item() const
+{
+    return mItem;
+}
+
+void UITableWidgetItem::setItem(UITableItem *newItem)
+{
+    mItem = newItem;
+}
+
+qint32 UITableWidgetItem::itemIdx() const
+{
+    return mItemIdx;
+}
+
+void UITableWidgetItem::setItemIdx(qint32 newItemIdx)
+{
+    mItemIdx = newItemIdx;
+}
+
+qint32 UITableWidgetItem::idx() const
+{
+    return mIdx;
+}
+
+void UITableWidgetItem::setIdx(qint32 newIdx)
+{
+    mIdx = newIdx;
+}

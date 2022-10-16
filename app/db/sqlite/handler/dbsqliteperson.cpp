@@ -28,6 +28,7 @@
 #include "dbsqlitepersonevent.h"
 #include "table/dbsqlitepersoneventtbl.h"
 #include "personevent.h"
+#include "model/saintperson.h"
 
 GET_INSTANCE_IMPL(DbSqlitePerson)
 
@@ -36,7 +37,7 @@ DbSqlitePerson::DbSqlitePerson()
     traced;
 }
 
-ErrCode DbSqlitePerson::add(const DbModel *model)
+ErrCode DbSqlitePerson::add(DbModel *model)
 {
 
     traced;
@@ -50,35 +51,58 @@ ErrCode DbSqlitePerson::add(const DbModel *model)
         QString name = model->modelName();
         logd("model name %s", name.toStdString().c_str());
         if (name == KModelNamePerson) {
-//            tbl = getMainTbl();
             tbl = DbSqlite::table(KTablePerson);
         } else if (name == KModelNamePersonEvent){
             tbl = DbSqlite::table(KTablePersonEvent);
+        } else if (name == KModelNameSaintPerson){
+            tbl = DbSqlite::table(KTableSaintPerson);
         } else {
             loge("Unknow model name %s", name.toStdString().c_str());
         }
 
-        if (tbl != nullptr){
-            if (!tbl->isExist(model)){
-                err = tbl->add(model);
+        err = add2Table(model, tbl);
+        if (err == ErrNone && name == KModelNamePerson) {
+            logd("Check to add saint - person ");
+            Person* per = dynamic_cast<Person*>(model);
+            QStringList saintList = per->saintUidList();
+            if (!saintList.empty()) {
+                SaintPerson* saint = (SaintPerson*)SaintPerson::build();
+                saint->setPersonDbId(per->dbId());
+                saint->setPersonUid(per->uid());
+                foreach (QString item, saintList) {
+                    saint->setSaintUid(item);
+                    logd("Save saint/person, saint uid '%s'", item.toStdString().c_str());
+                    err = saint->save();
+                }
+                delete saint;
             }
-            else{
-                err = ErrExisted;
-                loge("Saint %s already exist", model->name().toStdString().c_str());
-            }
-        } else {
-            err = ErrUnknown;
-            loge("Not found corresponding table");
         }
-
     }
     else{
         err = ErrInvalidArg;
         loge("invalid argument");
     }
+    tracedr(err);
+    return err;
+}
 
-
-
+ErrCode DbSqlitePerson::add2Table(DbModel *model, DbSqliteTbl *tbl)
+{
+    traced;
+    ErrCode err = ErrNone;
+    if (tbl != nullptr){
+        if (!tbl->isExist(model)){
+            err = tbl->add(model);
+        }
+        else{
+            err = ErrExisted;
+            loge("Person %s already exist", model->name().toStdString().c_str());
+        }
+    } else {
+        err = ErrUnknown;
+        loge("Not found corresponding table");
+    }
+    tracedr(err);
     return err;
 }
 
@@ -156,6 +180,16 @@ DbModel *DbSqlitePerson::getByName(const QString &name)
 {
     traced;
     return getByName(name, &Person::build);
+}
+
+int DbSqlitePerson::search(const QString &keyword, QList<DbModel *> *outList)
+{
+    traced;
+    DbSqliteTbl* tbl = getMainTbl();
+    // assume main tbl is not null, if not programming error,
+    // and require override search function
+    Q_ASSERT(tbl != nullptr);
+    return tbl->search(keyword, &Person::build, outList);
 }
 
 

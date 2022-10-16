@@ -26,7 +26,9 @@
 #include "dbmodel.h"
 #include "community.h"
 #include "utils.h"
-
+#include "mainwindow.h"
+#include "uicommunitypersonlistview.h"
+#include "uitableviewfactory.h"
 
 UICommunityListView::UICommunityListView(QWidget *parent):
     UICommonListView(parent)
@@ -38,6 +40,112 @@ UICommunityListView::UICommunityListView(QWidget *parent):
 UICommunityListView::~UICommunityListView()
 {
     traced;
+}
+ErrCode UICommunityListView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act)
+{
+    traced;
+    // TODO: handle it
+    return ErrNone;
+}
+
+ErrCode UICommunityListView::onMenuActionDelete(QMenu *menu, UITableMenuAction *act)
+{
+    traced;
+    // TODO: handle it
+    return ErrNone;
+}
+
+//ErrCode UICommunityListView::onMenuActionView(QMenu *menu, UITableMenuAction *act)
+//{
+//    traced;
+//    if (act == nullptr) {
+//        loge("Invalid arg");
+//        return ErrInvalidArg;
+//    }
+
+//    Community* model = (Community*)act->getData();
+//    if (model == nullptr) {
+//        loge("no data");
+//        return ErrInvalidData;
+//    }
+//    model->dump();
+//    QString uid = model->uid();
+//    if (uid.isEmpty()) {
+//        loge("no uid");
+//        return ErrNoData;
+//    }
+//    UICommunityPersonListView* view = (UICommunityPersonListView*)UITableViewFactory::getView(ViewType::COMMUNITY_PERSON);
+
+//    logd("community uid %s", uid.toStdString().c_str());
+//    view->setCommunityUid(uid);
+//    MainWindow::getInstance()->switchView(view);
+//    // TODO: handle it
+//    return ErrNone;
+//}
+void UICommunityListView::onViewItem(UITableWidgetItem *item)
+{
+    traced;
+    int idx = item->idx();
+    logd("idx=%d",idx);
+    if (idx < mItemList.length()){
+        Community* model = (Community*)mItemList.value(idx);
+        if (model == nullptr) {
+            loge("no data");
+            return;
+        }
+        model->dump();
+        QString uid = model->uid();
+        if (uid.isEmpty()) {
+            loge("no uid");
+            return;
+        }
+        UICommunityPersonListView* view = (UICommunityPersonListView*)UITableViewFactory::getView(ViewType::COMMUNITY_PERSON);
+
+        logd("community uid %s", uid.toStdString().c_str());
+//        view->setCommunityUid(uid);
+        view->setCommunity(model);
+        view->setTitle(model->name());
+        MainWindow::getInstance()->switchView(view);
+    } else {
+        loge("Invalid idx");
+        // TODO: popup message???
+    }
+}
+
+
+
+ErrCode UICommunityListView::onMenuActionListPerson(QMenu *menu, UITableMenuAction *act)
+{
+    traced;
+
+    return ErrNone;
+
+}
+
+ErrCode UICommunityListView::onMenuActionListDepartment(QMenu *menu, UITableMenuAction *act)
+{
+    traced;
+    return ErrNone;
+
+}
+
+QList<UITableMenuAction *> UICommunityListView::getMenuItemActions(const QMenu* menu,
+                                            UITableWidgetItem *item)
+{
+    traced;
+//    logd("idx %d", idx);
+    QList<UITableMenuAction*> actionList = UITableView::getMenuItemActions(menu, item);
+
+    actionList.append(UITableMenuAction::build(tr("Danh sách nữ tu"), this, item)
+                                              ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                               return this->onMenuActionListPerson(m, a);
+                                           }));
+    actionList.append(UITableMenuAction::build(tr("Danh sách ban"), this, item)
+                                          ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                              return this->onMenuActionListDepartment(m, a);
+                                          }));
+    return actionList;
+
 }
 
 ErrCode UICommunityListView::onLoad()

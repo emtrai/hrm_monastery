@@ -341,4 +341,40 @@ void DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry
 
     // TODO: add field relate to list, like holly list, community, etc.
 }
+QHash<QString, int> DbSqlitePersonTbl::getSearchFields()
+{
+    QHash<QString, int> inFields;// TODO: make as class member?
+    inFields[KFieldFirstName] = TEXT;
+    inFields[KFieldLastName] = TEXT;
+    inFields[KFieldHollyName] = TEXT;
+    inFields[KFieldEmail] = TEXT;
+    inFields[KFieldTel] = TEXT;
+    inFields[KFieldIDCard] = TEXT;
+    inFields[KFieldAddr] = TEXT;
+    inFields[KFieldContact] = TEXT;
+    return inFields;
+}
+
+QList<QString> DbSqlitePersonTbl::getNameFields()
+{
+    traced;
+    QList<QString> list;// TODO: make as class member?
+    list.append(KFieldFirstName);
+    list.append(KFieldLastName);
+    return list;
+}
+QHash<QString, QString> DbSqlitePersonTbl::getFieldsCheckExists(const DbModel *item)
+{
+    traced;
+    const Person* per = (Person*)item;
+    // TODO: make as class member?
+    QHash<QString, QString> list;// = DbSqliteTbl::getFieldsCheckExists(item);
+    list[KFieldLastName] = per->lastName();
+    list[KFieldFirstName] = per->firstName();
+    list[KFieldBirthDay] = QString("%1").arg(per->birthday());
+    list[KFieldBirthPlace] = per->birthPlace();
+    list[KFieldIDCard] = per->idCard();
+    list[KFieldHollyName] = per->hollyName();
+    return list;
+}
 

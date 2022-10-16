@@ -45,8 +45,6 @@
     <property name="title">
      <string>Công cụ</string>
     </property>
-    <addaction name="action_Export"/>
-    <addaction name="actionImportPerson"/>
     <addaction name="action_Backup"/>
     <addaction name="actionRestore"/>
    </widget>
@@ -61,16 +59,7 @@
     <property name="title">
      <string>Khác</string>
     </property>
-    <widget class="QMenu" name="menuCountry">
-     <property name="title">
-      <string>Country</string>
-     </property>
-     <addaction name="actionView"/>
-     <addaction name="actionAdd_2"/>
-    </widget>
-    <addaction name="menuCountry"/>
     <addaction name="actionProvince"/>
-    <addaction name="actionArea"/>
     <addaction name="actionEducation"/>
     <addaction name="actionMission"/>
     <addaction name="actionWork"/>

@@ -33,7 +33,7 @@ class DbModelHandler
 public:
     DbModelHandler();
 
-    virtual ErrCode add(const DbModel* model) = 0;
+    virtual ErrCode add(DbModel* model) = 0;
 
     /**
      * @brief Check if model exist in db
@@ -63,8 +63,8 @@ public:
 
     // TODO: implement filter with operator (equal, greater, in range, etc.)
 
-    virtual DbModel *getByName(const QString& name, const DbModelBuilder& builder) = 0;
-    virtual DbModel *getByName(const QString& name) = 0;
+    virtual DbModel *getByName(const QString& name, const DbModelBuilder& builder);
+    virtual DbModel *getByName(const QString& name);
 };
 
 #endif // DBMODELHANDLER_H

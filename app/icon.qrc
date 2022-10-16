@@ -24,5 +24,9 @@
         <file>icon/unknown.png</file>
         <file>icon/icons8-diversity-64.png</file>
         <file>icon/icons8-earth-planet-80.png</file>
+        <file>icon/icons8-box-important-100.png</file>
+        <file>icon/icons8-error-cloud-96.png</file>
+        <file>icon/icons8-ok-48.png</file>
+        <file>icon/icons8-copy-64.png</file>
     </qresource>
 </RCC>

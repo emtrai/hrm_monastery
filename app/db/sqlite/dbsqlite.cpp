@@ -44,6 +44,8 @@
 #include "table/dbsqlitestatustbl.h"
 #include "table/dbsqlitepersoneventtbl.h"
 #include "table/dbsqliteeventtbl.h"
+#include "table/dbsqlitesaintpersonmaptbl.h"
+#include "table/dbsqlitecommunitypersontbl.h"
 
 #include "dbsqlitedefs.h"
 #include "dbsqliteedu.h"
@@ -97,6 +99,8 @@ void DbSqlite::setupTables()
     appendTable(new DbSqliteStatusTbl(this));
     appendTable(new DbSqlitePersonEventTbl(this));
     appendTable(new DbSqliteEventTbl(this));
+    appendTable(new DbSqliteSaintPersonMapTbl(this));
+    appendTable(new DbSqliteCommunityPersonTbl(this));
 }
 
 void DbSqlite::setupModelHandler()
@@ -119,6 +123,12 @@ void DbSqlite::setupModelHandler()
     appendModelHandler(new DbSqlitePerson());
     appendModelHandler(new DbSqliteEvent());
     appendModelHandler(new DbSqlitePersonEvent());
+    appendModelHandler(new DbSqlitePersonEvent());
+}
+
+const QSqlDatabase &DbSqlite::db() const
+{
+    return mDb;
 }
 
 void DbSqlite::appendTable(DbSqliteTbl *tbl)
@@ -126,6 +136,7 @@ void DbSqlite::appendTable(DbSqliteTbl *tbl)
     traced;
     if (nullptr != tbl)
     {
+        logd("Add table '%s'", tbl->name().toStdString().c_str());
         mListTbl[tbl->name()] = tbl;
     }
     else
@@ -142,8 +153,9 @@ ErrCode_t DbSqlite::checkOrCreateAllTables()
 
     foreach (QString key, mListTbl.keys())
     {
+        logd("check & create table '%s'", key.toStdString().c_str());
         err = mListTbl[key]->checkOrCreateTable();
-        if (err != ErrNone)
+        if (err != ErrNone) // TODO: should break? return critical error????
             break;
     }
 
@@ -240,7 +252,7 @@ ErrCode_t DbSqlite::loadDb(const DbInfo* dbInfo){
 
         if(QSqlDatabase::isDriverAvailable(DRIVER))
         {
-            QSqlDatabase db = QSqlDatabase::addDatabase(DRIVER);
+            mDb = QSqlDatabase::addDatabase(DRIVER);
             QString uri;
             if (dbInfo->uri().isNull())
                 uri = ":memory:";
@@ -249,10 +261,13 @@ ErrCode_t DbSqlite::loadDb(const DbInfo* dbInfo){
 
             logd("Db connect to uri %s", uri.toStdString().c_str());
 
-            db.setDatabaseName(uri);
+            mDb.setDatabaseName(uri);
+            logd("Feature LastInsertId %d", mDb.driver()->hasFeature(QSqlDriver::LastInsertId));
+            logd("Feature Transactions %d", mDb.driver()->hasFeature(QSqlDriver::Transactions));
+            logd("Feature PreparedQueries %d", mDb.driver()->hasFeature(QSqlDriver::PreparedQueries));
 
-            if(!db.open()){
-                loge("Database connect ERROR %s", db.lastError().text().toStdString().c_str());
+            if(!mDb.open()){
+                loge("Database connect ERROR %s", mDb.lastError().text().toStdString().c_str());
                 err = ErrFailed;
             }
             else{
@@ -285,12 +300,18 @@ ErrCode_t DbSqlite::execQuery(const QString &sql)
     ErrCode_t err = ErrNone;
     traced;
     logd("Execute query %s", sql.toStdString().c_str());
+    mDb.transaction();
+
     qry.prepare(sql);
     if( !qry.exec() ) {
 
         loge( "Failed to execute %s", qry.executedQuery().toStdString().c_str() );
         loge( "Last error %s", qry.lastError().text().toStdString().c_str() );
         err = ErrFailSqlQuery;
+    }
+
+    if (!mDb.commit()){
+        mDb.rollback();
     }
     tracedr(err);
     return err;
@@ -302,13 +323,42 @@ ErrCode_t DbSqlite::execQuery(QSqlQuery *qry)
     ErrCode_t err = ErrNone;
     traced;
 
+    startTransaction();
+    err = execQueryNoTrans(qry);
+    endTransaction();
+    tracedr(err);
+    return err;
+}
+
+ErrCode_t DbSqlite::execQueryNoTrans(QSqlQuery *qry)
+{
+
+    ErrCode_t err = ErrNone;
+    traced;
+
     if( !qry->exec() ) {
         loge( "Failed to execQuery %s", qry->executedQuery().toStdString().c_str());
         loge( "Last error %s", qry->lastError().text().toStdString().c_str() );
         err = ErrFailSqlQuery;
-        err = ErrFailSqlQuery;
+    } else {
+        logd( "Executed execQuery %s", qry->executedQuery().toStdString().c_str());
     }
     tracedr(err);
     return err;
+}
+
+ErrCode_t DbSqlite::startTransaction()
+{
+    traced;
+    mDb.transaction();
+}
+
+ErrCode_t DbSqlite::endTransaction()
+{
+    traced;
+
+    if (!mDb.commit()){
+        mDb.rollback();
+    }
 }
 

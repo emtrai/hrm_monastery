@@ -30,6 +30,7 @@ enum ViewType {
     SAINT,
     COMMUNITY,
     AREA,
+    COMMUNITY_PERSON,
     VIEW_MAX,
 };
 

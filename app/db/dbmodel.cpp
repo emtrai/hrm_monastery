@@ -28,7 +28,8 @@
 
 DbModel::DbModel():
     mDbId(0),
-    mDbStatus(0)
+    mDbStatus(0),
+    mValidateResult(nullptr)
 {
     traced;
 
@@ -42,6 +43,7 @@ DbModel::DbModel(const DbModel &model)
     setUid(model.uid());
     setDbStatus(model.dbStatus());
     setHistory(model.history());
+    // TODO: mValidateResult
 }
 
 DbModel::DbModel(const DbModel *model):DbModel(*model)
@@ -95,8 +97,26 @@ void DbModel::buildUidIfNotSet()
 {
     traced;
     if (uid().isEmpty()){
-        setUid(Utils::UidFromName(name(), UidNameConvertType::NO_VN_MARK_UPPER));
+        setUid(buildUid());
     }
+}
+
+QString DbModel::buildUid(const QString* seed)
+{
+    traced;
+    QString uid = Utils::UidFromName(name(), UidNameConvertType::NO_VN_MARK_UPPER);
+    if (seed != nullptr) {
+        uid += "_" + *seed;
+    }
+    logd("uid: %s", uid.toStdString().c_str());
+    return uid;
+}
+
+ErrCode DbModel::prepare2Save()
+{
+    traced;
+    buildUidIfNotSet();
+    return ErrNone;
 }
 
 ErrCode DbModel::save()
@@ -105,8 +125,10 @@ ErrCode DbModel::save()
     ErrCode ret = ErrNone;
     DbModelHandler* dbModelHdl = getDbModelHandler();
     if (dbModelHdl != nullptr){
-        buildUidIfNotSet();
-        ret = dbModelHdl->add(this);
+        ret = prepare2Save();
+        if (ret == ErrNone) {
+            ret = dbModelHdl->add(this);
+        }
         if (ret == ErrExisted){ // alrady exist, judge as ok
             ret = ErrNone;
             logi("%s already exist", name().toStdString().c_str());
@@ -162,6 +184,7 @@ void DbModel::dump()
     traced;
     // TODO: dump to stdout, sdderr or file???
 #ifdef DEBUG_TRACE
+    logd("- modelName %s", modelName().toStdString().c_str());
     logd("- DbId %d", dbId());
     logd("- Uid %s", uid().toStdString().c_str());
     logd("- Name %s", name().toStdString().c_str());
@@ -187,9 +210,45 @@ IExporter *DbModel::getExporter()
     return nullptr;
 }
 
-bool DbModel::validate(QHash<QString, ErrCode> *result)
+ErrCode DbModel::validate()
 {
     traced;
     logi("Should be implemented by derived class");
-    return true;
+    return ErrNone;
+}
+
+QHash<QString, ErrCode> *DbModel::validateResult() const
+{
+    return mValidateResult;
+}
+
+const QString &DbModel::validateMsg() const
+{
+    return mValidateMsg;
+}
+
+void DbModel::appendValidateResult(const QString& item, ErrCode res)
+{
+    if (mValidateResult == nullptr) {
+        mValidateResult = new QHash<QString, ErrCode>();
+    }
+
+    logd("App validate item '%s':%d", item.toStdString().c_str(), res);
+    (*mValidateResult)[item] = res;
+}
+
+void DbModel::appendValidateMsg(const QString &newValidateMsg)
+{
+    traced;
+    logd("App validate msg '%s'", newValidateMsg.toStdString().c_str());
+    mValidateMsg.append(newValidateMsg + ";");
+}
+
+void DbModel::cleanValidateResult()
+{
+    traced;
+    mValidateMsg.clear();
+    if (mValidateResult){
+        mValidateResult->clear();
+    }
 }

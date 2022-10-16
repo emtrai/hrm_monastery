@@ -77,6 +77,11 @@ const char* const KModelHdlEvent = "event";
 
 const char* const KModelNamePerson = "person";
 const char* const KModelNamePersonEvent = "person_event";
+const char* const KModelNameSaintPerson = "saint_person";
+const char* const KModelNameCommDept = "comm_dept";
+const char* const KModelNameDeptMgr = "dept_mgr";
+const char* const KModelNameCommPerson = "comm_pers";
+const char* const KModelNameMap = "map_model";
 
 const char* const KDataFormatList = "QList";
 const char* const KDataFormatStringList = "QStringList";

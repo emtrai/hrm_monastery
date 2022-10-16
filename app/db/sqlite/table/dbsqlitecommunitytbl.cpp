@@ -36,24 +36,6 @@ DbSqliteCommunityTbl::DbSqliteCommunityTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableCommunity, KTableCommunity, KVersionCode)
 {}
 
-//ErrCode_t DbSqliteCommunityTbl::add(const DbModel *param)
-//{
-//    traced;
-//    ErrCode_t err = ErrNone;
-//    Community* item = (Community*)param;
-//    QString sql = DbSqliteInsertBuilder::build(name())
-//                      ->addValue(KFieldName, item->name())
-//                      ->addValue(KFieldCreateDate, item->createDate())
-//                      ->addValue(KFieldParentUid, item->parentUid())
-//                      ->addValue(KFieldStatus, (qint32) item->getStatus())
-
-//                      ->buildSqlStatement();
-//    logi("insert sql statement %s", sql.toStdString().c_str());
-//    err = db()->execQuery(sql);
-
-//    return err;
-
-//}
 
 void DbSqliteCommunityTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
 {
@@ -86,27 +68,6 @@ void DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
     cmm->setStatus((CommunityStatus)qry.value(KFieldStatus).toInt());
 }
 
-//QString DbSqliteCommunityTbl::getSqlCmdCreateTable()
-//{
-//    traced;
-//    // TODO; support multi language
-//    QString sql = DbSqliteTableBuilder::build(name())
-//                      ->addField(KFieldName, TEXT)
-//                      ->addField(KFieldCEOUid, TEXT)
-//                      ->addField(KFieldChurchUid, TEXT)
-//                      ->addField(KFieldAreaUid, TEXT)
-//                      ->addField(KFieldLevel, INT32)
-//                      ->addField(KFieldParentUid, TEXT)
-//                      ->addField(KFieldCreateDate, INT64)
-//                      ->addField(KFieldDateFormat, TEXT)
-//                      ->addField(KFieldStatus, INT32) // stop, alive, etc.
-//                      ->addField(KFieldPreset, INT32) // 0: custom, 1: preset (from json)
-
-//                      ->buildSqlStatement();
-//    logi("Create statement %s", sql.toStdString().c_str());
-
-//    return sql;
-//}
 
 void DbSqliteCommunityTbl::addTableField(DbSqliteTableBuilder *builder)
 {
