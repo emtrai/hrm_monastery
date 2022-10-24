@@ -53,11 +53,11 @@ void DbSqliteAreaTbl::addTableField(DbSqliteTableBuilder *builder)
     tracede;
 }
 
-void DbSqliteAreaTbl::insertTableField(DbSqliteInsertBuilder *builder,
+ErrCode DbSqliteAreaTbl::insertTableField(DbSqliteInsertBuilder *builder,
                                            const DbModel *item)
 {
     traced;
-    DbSqliteTbl::insertTableField(builder, item);
+    DbSqliteTbl::insertTableField(builder, item); // TODO: handle error code
 
     Area* model = (Area*) item;
     builder->addValue(KFieldCountryUid, model->countryUid());
@@ -65,6 +65,7 @@ void DbSqliteAreaTbl::insertTableField(DbSqliteInsertBuilder *builder,
     builder->addValue(KFieldPersonDbId, model->personDbId());
     builder->addValue(KFieldRemark, model->remark());
     tracede;
+    return ErrNone;
 }
 
 void DbSqliteAreaTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)

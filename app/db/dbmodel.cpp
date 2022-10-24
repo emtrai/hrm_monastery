@@ -25,6 +25,7 @@
 #include "dbmodelhandler.h"
 #include "utils.h"
 #include "iexporter.h"
+#include "dbdefs.h"
 
 DbModel::DbModel():
     mDbId(0),
@@ -60,6 +61,11 @@ DbModel::~DbModel()
 QString DbModel::modelName() const
 {
     return "DbModel";
+}
+
+int DbModel::modelType() const
+{
+    return MODEL_UNKNOWN;
 }
 
 

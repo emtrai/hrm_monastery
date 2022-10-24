@@ -25,6 +25,8 @@
 #include "view/widget/uisaintlistview.h"
 #include "view/widget/uicommunitylistview.h"
 #include "view/widget/uicommunitypersonlistview.h"
+#include "view/widget/uidepartmentlistview.h"
+#include "view/widget/uidepartmentpersonlistview.h"
 
 UITableView *UITableViewFactory::getView(ViewType type, QWidget *parent )
 {
@@ -46,6 +48,12 @@ UITableView *UITableViewFactory::getView(ViewType type, QWidget *parent )
         break;
     case COMMUNITY_PERSON:
         view = new UICommunityPersonListView(parent);
+        break;
+    case DEPARTMENT:
+        view = new UIDepartmentListView(parent);
+        break;
+    case DEPARTMENT_PERSON:
+        view = new UIDepartmentPersonListView(parent);
         break;
     default:
         break;

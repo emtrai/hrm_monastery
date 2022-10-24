@@ -133,7 +133,7 @@ void UITableView::onUpdatePage(qint32 page)
             idx ++;
         }
     }
-
+    tracede;
 }
 
 QList<UITableItem *> UITableView::getListItem(qint32 page, qint32 perPage, qint32 totalPages)
@@ -304,7 +304,7 @@ void UITableView::setHeader(const QStringList &newHeader)
     mHeader = newHeader;
 }
 
-UITableItem *UITableItem::build(void *data)
+UITableItem *UITableItem::build(DbModel *data)
 {
     return new UITableItem(data);
 }
@@ -315,13 +315,13 @@ UITableItem *UITableItem::addValue(const QString &val)
     return this;
 }
 
-UITableItem::UITableItem(void* data):
+UITableItem::UITableItem(DbModel* data):
     mData(data)
 {
     traced;
 }
 
-void *UITableItem::data() const
+DbModel *UITableItem::data() const
 {
     return mData;
 }
@@ -463,7 +463,7 @@ UITableMenuAction* UITableMenuAction::setCallback(const std::function<ErrCode (Q
     return this;
 }
 
-void *UITableMenuAction::getData()
+DbModel *UITableMenuAction::getData()
 {
     traced;
     if (mTblItem != nullptr) {

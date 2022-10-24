@@ -40,6 +40,14 @@ public:
     virtual ErrCode add2Table(DbModel* model, DbSqliteTbl* tbl);
     virtual bool exist(const DbModel* edu);
     virtual QList<DbModel*> getAll(DbModelBuilder builder, const char* modelName = nullptr);
+    /**
+     * @brief Get All, return as dictionary, map b/w uid and model
+     * @param builder
+     * @param modelName
+     * @return
+     */
+    virtual QHash<QString, DbModel*> getAllInDict(DbModelBuilder builder, const char* modelName = nullptr);
+
     virtual DbModel* getModel(qint64 dbId);
 
     virtual ErrCode addEvent(const QString& personUid, const QString& eventUid,

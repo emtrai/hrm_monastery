@@ -43,6 +43,14 @@ public:
     virtual bool exist(const DbModel* model) = 0;
 
     virtual QList<DbModel*> getAll(DbModelBuilder builder, const char* modelName = nullptr) = 0;
+    /**
+     * @brief Get All, return as dictionary, map b/w uid and model
+     * @param builder
+     * @param modelName
+     * @return
+     */
+    virtual QHash<QString, DbModel*> getAllInDict(DbModelBuilder builder, const char* modelName = nullptr) = 0;
+    virtual DbModel* getItem(const QString& uid, DbModelBuilder builder, const char* modelName = nullptr);
     virtual const QString getName() = 0;
 
     /**

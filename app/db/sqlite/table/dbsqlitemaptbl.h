@@ -41,8 +41,9 @@ public:
     DbSqliteMapTbl(DbSqlite* db, const QString& baseName, const QString& name, qint32 versionCode);
 protected:
     virtual void addTableField(DbSqliteTableBuilder* builder);
-    virtual void insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
+    virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
     virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
+    virtual QHash<QString, QString> getFieldsCheckExists(const DbModel* item);
 
     virtual const QString& getFieldNameUid1() const;
     virtual const QString& getFieldNameDbid1() const;

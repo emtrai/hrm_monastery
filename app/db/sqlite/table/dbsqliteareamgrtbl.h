@@ -22,9 +22,9 @@
 #ifndef DBSQLITEAREAMGRTBL_H
 #define DBSQLITEAREAMGRTBL_H
 
-#include "dbsqlitedeptmgrtbl.h"
+#include "dbsqlitedepartmentpersontbl.h"
 
-class DbSqliteAreaMgrTbl : public DbSqliteDeptMgrTbl
+class DbSqliteAreaMgrTbl : public DbSqliteDepartmentPersonTbl
 {
 public:
     DbSqliteAreaMgrTbl(DbSqlite* db);

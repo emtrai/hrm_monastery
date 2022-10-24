@@ -50,16 +50,17 @@ void DbSqliteCountryTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldContinent, TEXT);
 }
 
-void DbSqliteCountryTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
+ErrCode DbSqliteCountryTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
 {
     traced;
-    DbSqliteTbl::insertTableField(builder, item);
+    DbSqliteTbl::insertTableField(builder, item); // TODO: handle error code
 
     Country* model = (Country*) item;
     // TODO: check if shortname exist???
     builder->addValue(KFieldRegion, model->region());
     builder->addValue(KFieldShortName, model->shortName());
     builder->addValue(KFieldContinent, model->continent());
+    return ErrNone;
 }
 
 void DbSqliteCountryTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)

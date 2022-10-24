@@ -57,6 +57,7 @@ const char* const KPrebuiltCourseCSVFileName = "course";
 const char* const KPrebuiltWorkCSVFileName = "work";
 const char* const KPrebuiltStatusCSVFileName = "status";
 const char* const KPrebuiltEventCSVFileName = "event";
+const char* const KPrebuiltRoleCSVFileName = "role";
 
 const char* const KModelHdlCountry = "country";
 const char* const KModelHdlEdu = "education";
@@ -72,6 +73,7 @@ const char* const KModelHdlDept = "department";
 const char* const KModelHdlCourse = "course";
 const char* const KModelHdlWork = "work";
 const char* const KModelHdlStatus = "status";
+const char* const KModelHdlRole = "role";
 const char* const KModelHdlPersonEvent = "person_event";
 const char* const KModelHdlEvent = "event";
 
@@ -79,9 +81,12 @@ const char* const KModelNamePerson = "person";
 const char* const KModelNamePersonEvent = "person_event";
 const char* const KModelNameSaintPerson = "saint_person";
 const char* const KModelNameCommDept = "comm_dept";
-const char* const KModelNameDeptMgr = "dept_mgr";
+const char* const KModelNameMapDeptMgr = "dept_mgr";
 const char* const KModelNameCommPerson = "comm_pers";
 const char* const KModelNameMap = "map_model";
+const char* const KModelNamePersonDept = "person_dept";
+const char* const KModelNameRole = "role";
+const char* const KModelNameDepartment = "department";
 
 const char* const KDataFormatList = "QList";
 const char* const KDataFormatStringList = "QStringList";

@@ -33,6 +33,7 @@ class Department:public QObject, public DbModel
                  Department();
 
             static DbModel *builder();
+                 virtual QString modelName() const;
 
                  qint64 parentDbId() const;
                  void setParentDbId(qint64 newParentDbId);
@@ -74,6 +75,9 @@ class Department:public QObject, public DbModel
                  const QString &communityUid() const;
                  void setCommunityUid(const QString &newCommunityUid);
 
+                 const QString &communityName() const;
+                 void setCommunityName(const QString &newCommunityName);
+
              protected:
                  virtual DbModelHandler* getDbModelHandler();
              private:
@@ -83,6 +87,7 @@ class Department:public QObject, public DbModel
             QString mParentUid;
             qint64 mCommunityDbId;
             QString mCommunityUid;
+            QString mCommunityName;
             QString mRemark;
             qint64 mHoDPersonId;
             qint64 mEstablishDate;

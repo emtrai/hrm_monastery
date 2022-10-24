@@ -47,6 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
     , mCommunityView(nullptr)
     , mPersonView(nullptr)
     , mAreaView(nullptr)
+    , mDepartView(nullptr)
     , mCurrentView(nullptr)
 {
     gInstance = this;
@@ -61,6 +62,7 @@ MainWindow::MainWindow(QWidget *parent)
     mSaintsView = UITableViewFactory::getView(ViewType::SAINT);
     mPersonView = UITableViewFactory::getView(ViewType::PERSON);
     mAreaView = UITableViewFactory::getView(ViewType::AREA);
+    mDepartView = UITableViewFactory::getView(ViewType::DEPARTMENT);
 
     mHomeView = new QTextBrowser(this);
     mHomeView->clearHistory();
@@ -79,6 +81,7 @@ MainWindow::MainWindow(QWidget *parent)
     mMainViews.append((QWidget*)mAreaView);
     mMainViews.append((QWidget*)mHomeView);
     mMainViews.append((QWidget*)mCommunityView);
+    mMainViews.append((QWidget*)mDepartView);
 
     switchView(mHomeView);
 
@@ -111,6 +114,16 @@ void MainWindow::onFinishLoading(int ret, void* data){
 
 }
 
+void MainWindow::switchView(ViewType type)
+{
+    traced;
+    QWidget *nextView = getView(type);
+    if (nextView != nullptr) {
+        switchView(nextView);
+    }
+    tracede;
+}
+
 void MainWindow::switchView(QWidget *nextView)
 {
     traced;
@@ -118,9 +131,15 @@ void MainWindow::switchView(QWidget *nextView)
         logd("hide currentl widget");
         mCurrentView->hide();
         ui->centralwidget->layout()->replaceWidget(mCurrentView, nextView);
+        // TODO: make this as stack????
         if (!mMainViews.contains(mCurrentView)) {
             logd("Not in cached view, remove");
-            delete mCurrentView;
+//            delete mCurrentView;
+            // TODO: delete here cause something terrible, i.e UIDepartmentListView --> uidepartmentpersonlistview.cpp
+            // UIDepartmentListView is deleted, but its function is still called, because
+            // uidepartmentpersonlistview is created in menu UIDepartmentListView::onMenuActionListPerson
+            // cause use-after-free issue
+            // Need to rethink this again!!!!!
             mCurrentView = nullptr;
         } else {
             logd("In cache view, keep current, just hide");
@@ -133,6 +152,23 @@ void MainWindow::switchView(QWidget *nextView)
     mCurrentView = nextView;
     mCurrentView->show();
     tracede;
+}
+
+QWidget *MainWindow::getView(ViewType type)
+{
+    traced;
+    QWidget *nextView = nullptr;
+    logd("type %d", type);
+    switch (type) {
+    case ViewType::DEPARTMENT:
+        nextView = mDepartView;
+        break;
+    default:
+        loge("Unknown type %d", type);
+        break;
+    }
+    tracede;
+    return nextView;
 }
 
 
@@ -173,6 +209,9 @@ void MainWindow::loadOtherMenu()
                                tr("Khu vực"));
     QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionArea_triggered()));
 
+    act = otherMenu->addAction(QIcon(QString::fromUtf8(":/icon/icon/icons8-unit-80.png")),
+                               tr("Các ban"));
+                               QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionDepart_triggered()));
 
     otherButton->setMenu(otherMenu);
     // actionDummy? stupid? but it works
@@ -249,8 +288,6 @@ void MainWindow::on_action_ImportPersonList_triggered()
 
 }
 
-
-
 void MainWindow::on_action_New_triggered()
 {
     traced;
@@ -289,6 +326,7 @@ void MainWindow::on_actionCommunity_triggered()
 {
     traced;
     switchView(mCommunityView);
+    tracede;
 }
 
 
@@ -296,6 +334,7 @@ void MainWindow::on_actionSummarize_triggered()
 {
     traced;
     switchView(mSummarizeView);
+    tracede;
 }
 
 
@@ -303,6 +342,7 @@ void MainWindow::on_actionSaints_2_triggered()
 {
     traced;
     switchView(mSaintsView);
+    tracede;
 
 }
 
@@ -311,6 +351,7 @@ void MainWindow::on_actionHome_triggered()
 {
     traced;
     switchView(mHomeView);
+    tracede;
 }
 
 
@@ -318,6 +359,7 @@ void MainWindow::on_actionPerson_triggered()
 {
     traced;
     switchView(mPersonView);
+    tracede;
 }
 
 
@@ -330,6 +372,14 @@ void MainWindow::on_actionArea_triggered()
 {
     traced;
     switchView(mAreaView);
+    tracede;
+}
+
+void MainWindow::on_actionDepart_triggered()
+{
+    traced;
+    switchView(mDepartView);
+    tracede;
 }
 
 MainWindow *MainWindow::getInstance()

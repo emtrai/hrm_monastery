@@ -29,6 +29,7 @@
 #include "table/dbsqlitepersoneventtbl.h"
 #include "personevent.h"
 #include "model/saintperson.h"
+#include "dbctl.h"
 
 GET_INSTANCE_IMPL(DbSqlitePerson)
 
@@ -135,6 +136,20 @@ QList<DbModel *> DbSqlitePerson::getAll(DbModelBuilder builder, const char* mode
         return QList<DbModel *>();
     }
 
+}
+
+QHash<QString, DbModel *> DbSqlitePerson::getAllInDict(DbModelBuilder builder, const char *modelName)
+{
+    traced;
+    QList<DbModel *> list = getAll(builder, modelName);
+    QHash<QString, DbModel *> map;
+    logd("found %lld item", list.count());
+    foreach (DbModel* item, list) {
+        map.insert(item->uid(), item);
+    }
+    // TODO: cache it??????
+    tracede;
+    return map;
 }
 
 DbModel *DbSqlitePerson::getModel(qint64 dbId)

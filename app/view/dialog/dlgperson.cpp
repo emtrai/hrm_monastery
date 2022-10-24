@@ -75,42 +75,6 @@
 
 #define SPLIT_EMAIL_PHONE ";"
 
-#define SET_VAL_FROM_WIDGET(widget,func) \
-                do { \
-                    QString val = widget->text().trimmed();\
-                    func(val);\
-                } while (0)
-
-
-#define SET_DATE_VAL_FROM_WIDGET(widget,func) \
-do { \
-    QString val = widget->text().trimmed();\
-    func(0);\
-    if (!val.isEmpty()){ \
-        bool isOk = false;\
-        qint64 date = Utils::dateFromString(val, DATE_FORMAT_YMD, &isOk);\
-        if (isOk && date > 0){\
-            func(date);\
-        }\
-    } \
-} while (0)
-
-
-#define SET_VAL_FROM_CBOX(widget,func, functxt) \
-do { \
-        QString currtxt = widget->currentText().trimmed();\
-        if (!currtxt.isEmpty()){ \
-            int index = widget->findText(currtxt);\
-            logd("item %s, index %d", currtxt.toStdString().c_str(), index);\
-            if (index >= 0){ \
-                QVariant value = widget->itemData(index);\
-                if (!value.isNull()) {\
-                    func(value.toString());\
-                    functxt(currtxt);\
-                }\
-            }\
-        }\
-} while (0)
 
 
 const char* const KUiMultiComboxNameSaint = "saint";

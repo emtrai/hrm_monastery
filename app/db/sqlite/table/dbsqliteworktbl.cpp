@@ -48,13 +48,15 @@ void DbSqliteWorkTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldRemark, TEXT);
 }
 
-void DbSqliteWorkTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
+ErrCode DbSqliteWorkTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
 {
     traced;
     DbSqliteTbl::insertTableField(builder, item);
 
     Work* model = (Work*) item;
     builder->addValue(KFieldRemark, model->remark());
+    tracede;
+    return ErrNone;
 }
 
 void DbSqliteWorkTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)

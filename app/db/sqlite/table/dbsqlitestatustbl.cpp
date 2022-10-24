@@ -52,7 +52,7 @@ void DbSqliteStatusTbl::addTableField(DbSqliteTableBuilder *builder)
     tracede;
 }
 
-void DbSqliteStatusTbl::insertTableField(DbSqliteInsertBuilder *builder,
+ErrCode DbSqliteStatusTbl::insertTableField(DbSqliteInsertBuilder *builder,
                                          const DbModel *item)
 {
     traced;
@@ -61,6 +61,7 @@ void DbSqliteStatusTbl::insertTableField(DbSqliteInsertBuilder *builder,
     Status* model = (Status*) item;
     builder->addValue(KFieldRemark, model->remark());
     tracede;
+    return ErrNone;
 }
 
 void DbSqliteStatusTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)

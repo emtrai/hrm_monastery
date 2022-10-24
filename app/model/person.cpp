@@ -754,6 +754,7 @@ void Person::dump()
 {
     traced;
     DbModel::dump();
+    logd("- FullName %s", getFullName().toStdString().c_str());
     logd("- FirstName %s", firstName().toStdString().c_str());
     logd("- LastName %s", lastName().toStdString().c_str());
     logd("- HollyName %s", hollyName().toStdString().c_str());

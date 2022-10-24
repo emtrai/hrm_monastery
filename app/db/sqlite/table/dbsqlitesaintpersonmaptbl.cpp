@@ -50,7 +50,7 @@ void DbSqliteSaintPersonMapTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldPersonDbId, INT64);
 }
 
-void DbSqliteSaintPersonMapTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
+ErrCode DbSqliteSaintPersonMapTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
 {
     traced;
     DbSqliteTbl::insertTableField(builder, item);
@@ -59,6 +59,8 @@ void DbSqliteSaintPersonMapTbl::insertTableField(DbSqliteInsertBuilder *builder,
     builder->addValue(KFieldSaintDbId, saint->saintDbId());
     builder->addValue(KFieldPersonUid, saint->personUid());
     builder->addValue(KFieldPersonDbId, saint->personDbId());
+    tracede;
+    return ErrNone;
 }
 
 void DbSqliteSaintPersonMapTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)

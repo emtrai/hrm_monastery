@@ -142,7 +142,7 @@ void DbSqlitePersonTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldDeadPlace, TEXT);
 }
 
-void DbSqlitePersonTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
+ErrCode DbSqlitePersonTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
 {
 
     DbSqliteTbl::insertTableField(builder, item);
@@ -238,7 +238,7 @@ void DbSqlitePersonTbl::insertTableField(DbSqliteInsertBuilder *builder, const D
     builder->addValue(KFieldDeadPlace, per->deadPlace());
 
     // TODO: add field relate to list, like holly list, community, etc.
-
+    return ErrNone;
 }
 
 void DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)

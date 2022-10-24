@@ -32,6 +32,8 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QHash>
+#include "dbdefs.h"
+
 
 DbSqliteMapTbl::DbSqliteMapTbl(DbSqlite* db):DbSqliteTbl(db)
 {
@@ -65,20 +67,25 @@ void DbSqliteMapTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldParentUid, TEXT);
 }
 
-void DbSqliteMapTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
+ErrCode DbSqliteMapTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
 {
     traced;
-    DbSqliteTbl::insertTableField(builder, item);
-    MapDbModel* model = (MapDbModel*) item;
-    builder->addValue(getFieldNameUid1(), model->uid1());
-    builder->addValue(getFieldNameDbid1(), model->dbId1());
-    builder->addValue(getFieldNameUid2(), model->uid2());
-    builder->addValue(getFieldNameDbid2(), model->dbId2());
-    builder->addValue(KFieldStatus, model->status());
-    builder->addValue(KFieldStartDate, model->startDate());
-    builder->addValue(KFieldEndDate, model->endDate());
-    builder->addValue(KFieldRemark, model->remark());
-    builder->addValue(KFieldParentUid, model->parentUid());
+    ErrCode ret = ErrNone;
+    ret = DbSqliteTbl::insertTableField(builder, item);
+    if (ret == ErrNone) {
+        MapDbModel* model = (MapDbModel*) item;
+        builder->addValue(getFieldNameUid1(), model->uid1());
+        builder->addValue(getFieldNameDbid1(), model->dbId1());
+        builder->addValue(getFieldNameUid2(), model->uid2());
+        builder->addValue(getFieldNameDbid2(), model->dbId2());
+        builder->addValue(KFieldStatus, model->status());
+        builder->addValue(KFieldStartDate, model->startDate());
+        builder->addValue(KFieldEndDate, model->endDate());
+        builder->addValue(KFieldRemark, model->remark());
+        builder->addValue(KFieldParentUid, model->parentUid());
+    }
+    tracedr(ret);
+    return ret;
 }
 
 void DbSqliteMapTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
@@ -102,6 +109,32 @@ void DbSqliteMapTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
     } else {
         loge("Invalid mapp model '%s', do nothing", item->modelName().toStdString().c_str());
     }
+    tracede;
+}
+
+QHash<QString, QString> DbSqliteMapTbl::getFieldsCheckExists(const DbModel *item)
+{
+    traced;
+    QHash<QString, QString> list;
+    QString modelName = item->modelName();
+    int modelType = item->modelType();
+    logd("modelName %s", modelName.toStdString().c_str());
+    logd("modelType %d", modelType);
+    if (modelType == MODEL_MAP) {
+    // TODO: should we check model name?????
+        const MapDbModel* model = (MapDbModel*)item;
+        // TODO: make as class member?
+
+        list[getFieldNameUid1()] = model->uid1();
+        list[getFieldNameUid2()] = model->uid2();
+        list[KFieldStartDate] = QString("%1").arg(model->startDate());
+        list[KFieldEndDate] = QString("%1").arg(model->endDate());
+        list[KFieldStatus] = QString("%1").arg(model->status());
+    } else {
+        logd("Invalid modelName %s", modelName.toStdString().c_str());
+    }
+
+    return list;
 }
 
 const QString& DbSqliteMapTbl::getFieldNameUid1() const

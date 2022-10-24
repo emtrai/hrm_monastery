@@ -25,6 +25,7 @@
 #include "dbsqlite.h"
 #include "table/dbsqlitespecialisttbl.h"
 #include "defs.h"
+#include "dbsqlitedefs.h"
 
 DbSqliteSpecialist* DbSqliteSpecialist::gInstance = nullptr;
 

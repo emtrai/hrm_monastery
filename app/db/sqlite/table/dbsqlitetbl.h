@@ -25,7 +25,6 @@
 #include <QString>
 #include "errcode.h"
 
-#include "dbsqlitedefs.h"
 #include "dbmodel.h"
 #include <QHash>
 class DbSqlite;
@@ -89,14 +88,15 @@ public:
                        QList<DbModel*>* outList = nullptr,
                        bool isExact = false);
 
+    virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
 protected:
     virtual QString getSqlCmdCreateTable();
     virtual void addTableField(DbSqliteTableBuilder* builder);
-    virtual void insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
-    virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
+    virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
     virtual int runQuery(QSqlQuery& qry, const DbModelBuilder& builder,
                       QList<DbModel *> *outList = nullptr);
 
+    virtual QSqlQuery *getAllQuery();
 public:
 
     virtual DbSqlite *db() const;

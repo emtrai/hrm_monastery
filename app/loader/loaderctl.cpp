@@ -40,6 +40,7 @@
 #include "workctl.h"
 #include "statusctl.h"
 #include "eventctl.h"
+#include "rolectl.h"
 
 LoaderCtl* LoaderCtl::gInstance = nullptr;
 
@@ -86,6 +87,7 @@ void LoaderCtl::registerAll()
     add2Loader(CommunityCtl::getInstance());
     add2Loader(AreaCtl::getInstance());
     add2Loader(DepartCtl::getInstance());
+    add2Loader(RoleCtl::getInstance());
 }
 
 void LoaderCtl::onLoad()

@@ -31,6 +31,8 @@ enum ViewType {
     COMMUNITY,
     AREA,
     COMMUNITY_PERSON,
+    DEPARTMENT,
+    DEPARTMENT_PERSON,
     VIEW_MAX,
 };
 

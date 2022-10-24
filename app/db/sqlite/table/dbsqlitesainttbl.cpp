@@ -52,7 +52,7 @@ void DbSqliteSaintTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldRemark, TEXT);
 }
 
-void DbSqliteSaintTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
+ErrCode DbSqliteSaintTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
 {
     traced;
     DbSqliteTbl::insertTableField(builder, item);
@@ -63,6 +63,8 @@ void DbSqliteSaintTbl::insertTableField(DbSqliteInsertBuilder *builder, const Db
     builder->addValue(KFieldFeastDay, saint->feastDay());
     builder->addValue(KFieldCountry, saint->country());
     builder->addValue(KFieldRemark, saint->remark());
+    tracede;
+    return ErrNone;
 }
 
 void DbSqliteSaintTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)

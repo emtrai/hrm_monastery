@@ -30,7 +30,7 @@
 
 class UITableItem;
 class QMenu;
-
+class DbModel;
 typedef QList<UITableItem*> (*onRequestData)(qint32 page, qint32 perPage, qint32 totalPages);
 typedef qint32 (*onRequestTotalData)();
 
@@ -48,20 +48,20 @@ class UITableView;
 class UITableItem
 {
 public:
-    static UITableItem* build(void* data);
+    static UITableItem* build(DbModel* data);
     UITableItem* addValue(const QString& val);
 
     const QStringList &valueList() const;
     void setValueList(const QStringList &newValueList);
 
-    void *data() const;
+    DbModel *data() const;
 
 private:
     UITableItem();
-    UITableItem(void* data);
+    UITableItem(DbModel* data);
 private:
     QStringList mValueList;
-    void* mData;
+    DbModel* mData;
 };
 class UITableWidgetItem: public QTableWidgetItem
 {
@@ -96,7 +96,7 @@ public:
 
     const std::function<ErrCode (QMenu *, UITableMenuAction *)> &callback() const;
     UITableMenuAction* setCallback(const std::function<ErrCode (QMenu *, UITableMenuAction *)> &newCallback);
-    void* getData();
+    DbModel* getData();
 private:
     UITableWidgetItem* mTblItem;
     std::function<ErrCode(QMenu* menu, UITableMenuAction* act)> mCallback;

@@ -50,15 +50,17 @@ void DbSqliteCourseTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldRemark, TEXT);
 }
 
-void DbSqliteCourseTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
+ErrCode DbSqliteCourseTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
 {
     traced;
-    DbSqliteTbl::insertTableField(builder, item);
+    DbSqliteTbl::insertTableField(builder, item); // TODO: handle error code
     Course* course = (Course*) item;
     builder->addValue(KFieldPeriod, course->name());
     builder->addValue(KFieldStartDate, course->startDate());
     builder->addValue(KFieldEndDate, course->endDate());
     builder->addValue(KFieldRemark, course->remark());
+    tracede;
+    return ErrNone;
 }
 
 void DbSqliteCourseTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)

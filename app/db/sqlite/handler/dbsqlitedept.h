@@ -23,17 +23,20 @@
 #define DBSQLITEDEPT_H
 
 #include "dbsqlitemodelhandler.h"
+#include "dbdepartmentmodelhandler.h"
 
 class DbSqliteTbl;
 
-class DbSqliteDept : public DbSqliteModelHandler
+class DbSqliteDept : public DbSqliteModelHandler, public DbDepartmentModelHandler
 {
 public:
     DbSqliteDept();
     static DbSqliteDept* getInstance();
     virtual const QString getName();
+    virtual QList<DbModel*> getListPerson(const QString& deptUid);
 protected:
     virtual DbSqliteTbl* getMainTbl();
+    virtual DbSqliteTbl* getTable(const QString& modelName);
 private:
 
 private:

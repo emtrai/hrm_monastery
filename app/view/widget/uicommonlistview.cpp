@@ -51,6 +51,7 @@ void UICommonListView::updateItem(DbModel *item, UITableItem *tblItem)
     tblItem->addValue(QString("%1").arg(item->dbId()));
     tblItem->addValue(item->uid());
     tblItem->addValue(item->name());
+    tracede;
 }
 
 qint32 UICommonListView::getTotalItems()
@@ -71,4 +72,5 @@ void UICommonListView::initHeader()
     mHeader.append(tr("ID"));
     mHeader.append(tr("Mã định danh"));
     mHeader.append(tr("Tên"));
+    tracede;
 }

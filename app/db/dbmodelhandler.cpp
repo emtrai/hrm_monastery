@@ -27,6 +27,25 @@ DbModelHandler::DbModelHandler()
 
 }
 
+DbModel *DbModelHandler::getItem(const QString &uid, DbModelBuilder builder, const char* modelName)
+{
+    traced;
+    logd("uid %s", uid.toStdString().c_str());
+    QHash<QString, DbModel*> list = getAllInDict(builder, modelName);
+    DbModel* model = nullptr;
+    if (list.count() > 0) {
+        if (list.contains(uid)){
+            model = list.value(uid);
+        } else {
+            loge("Not found uid '%s'", uid.toStdString().c_str());
+        }
+    } else {
+        logi("Not found any item");
+    }
+    tracede;
+    return model;
+}
+
 int DbModelHandler::search(const QString &keyword, QList<DbModel *> *outList)
 {
     traced;

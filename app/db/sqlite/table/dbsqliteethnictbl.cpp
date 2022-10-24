@@ -53,7 +53,7 @@ void DbSqliteEthnicTbl::addTableField(DbSqliteTableBuilder *builder)
     tracede;
 }
 
-void DbSqliteEthnicTbl::insertTableField(DbSqliteInsertBuilder *builder,
+ErrCode DbSqliteEthnicTbl::insertTableField(DbSqliteInsertBuilder *builder,
                                            const DbModel *item)
 {
     traced;
@@ -64,6 +64,7 @@ void DbSqliteEthnicTbl::insertTableField(DbSqliteInsertBuilder *builder,
     builder->addValue(KFieldCountryDbId, model->countryDbId());
     builder->addValue(KFieldRemark, model->remark());
     tracede;
+    return ErrNone;
 }
 
 void DbSqliteEthnicTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)

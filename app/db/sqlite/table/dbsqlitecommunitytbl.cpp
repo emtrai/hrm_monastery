@@ -29,6 +29,7 @@
 #include "dbsqliteinsertbuilder.h"
 #include <QSqlQuery>
 #include "logger.h"
+#include "errcode.h"
 
 const qint32 DbSqliteCommunityTbl::KVersionCode = VERSION_CODE(0,0,1);
 
@@ -37,10 +38,10 @@ DbSqliteCommunityTbl::DbSqliteCommunityTbl(DbSqlite* db)
 {}
 
 
-void DbSqliteCommunityTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
+ErrCode DbSqliteCommunityTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
 {
     traced;
-    DbSqliteTbl::insertTableField(builder, item);
+    DbSqliteTbl::insertTableField(builder, item); // TODO: handle error code
     Community* cmm = (Community*) item;
     builder->addValue(KFieldAddr, cmm->addr());
     builder->addValue(KFieldTel, cmm->tel());
@@ -50,6 +51,7 @@ void DbSqliteCommunityTbl::insertTableField(DbSqliteInsertBuilder *builder, cons
     builder->addValue(KFieldParentUid, cmm->parentUid());
     builder->addValue(KFieldStatus, (qint32) cmm->getStatus());
     builder->addValue(KFieldImgPath, cmm->imgPath());
+    return ErrNone;
 }
 
 void DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)

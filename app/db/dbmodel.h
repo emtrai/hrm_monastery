@@ -42,6 +42,7 @@ public:
 
 
     virtual QString modelName() const;
+    virtual int modelType() const;
 
     virtual const QString &name() const;
     virtual void setName(const QString &newName);

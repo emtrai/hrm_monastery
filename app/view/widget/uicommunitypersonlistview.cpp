@@ -31,7 +31,8 @@
 #include "dialog/dlgsearchperson.h"
 
 UICommunityPersonListView::UICommunityPersonListView(QWidget *parent):
-    UICommonListView(parent)
+    UICommonListView(parent),
+    mCommunity(nullptr)
 {
     traced;
 }

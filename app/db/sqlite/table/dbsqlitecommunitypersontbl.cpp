@@ -78,7 +78,7 @@ QList<DbModel *> DbSqliteCommunityPersonTbl::getListPerson(const QString &commun
 void DbSqliteCommunityPersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     traced;
-    DbSqliteTbl::updateModelFromQuery(item, qry);
+    DbSqliteMapTbl::updateModelFromQuery(item, qry);
     QString modelName = item->modelName();
     logd("update for map model '%s'", modelName.toStdString().c_str());
     if (modelName == KModelNamePerson)

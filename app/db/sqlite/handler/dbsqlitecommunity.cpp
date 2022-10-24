@@ -99,6 +99,8 @@ ErrCode DbSqliteCommunity::addPerson2Community(const Community *comm, const Pers
     logd("Add to db");
     err = model->save();
 
+    delete model;
+    model = nullptr;
     tracedr(err);
     return err;
 }

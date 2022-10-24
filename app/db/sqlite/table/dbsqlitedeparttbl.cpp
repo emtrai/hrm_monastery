@@ -62,11 +62,11 @@ void DbSqliteDepartTbl::addTableField(DbSqliteTableBuilder *builder)
     tracede;
 }
 
-void DbSqliteDepartTbl::insertTableField(DbSqliteInsertBuilder *builder,
+ErrCode DbSqliteDepartTbl::insertTableField(DbSqliteInsertBuilder *builder,
                                        const DbModel *item)
 {
     traced;
-    DbSqliteTbl::insertTableField(builder, item);
+    DbSqliteTbl::insertTableField(builder, item); // TODO: handle error code
 
     Department* model = (Department*) item;
     builder->addValue(KFieldShortName, model->shortName());
@@ -76,8 +76,10 @@ void DbSqliteDepartTbl::insertTableField(DbSqliteInsertBuilder *builder,
     builder->addValue(KFieldTel, model->tel());
     builder->addValue(KFieldPersonId, model->hoDPersonId());
     builder->addValue(KFieldRemark, model->remark());
-    builder->addValue(KFieldCommunityUid, model->communityDbId());
+    builder->addValue(KFieldCommunityDbId, model->communityDbId());
+    builder->addValue(KFieldCommunityUid, model->communityUid());
     tracede;
+    return ErrNone;
 }
 
 void DbSqliteDepartTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
@@ -86,8 +88,26 @@ void DbSqliteDepartTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry
     DbSqliteTbl::updateModelFromQuery(item, qry);
     Department* model = (Department*) item;
     model->setBrief(qry.value(KFieldBrief).toString());//TODO: load country obj
-    model->setCommunityDbId(qry.value(KFieldCommunityUid).toInt());//TODO: load country obj
+    model->setCommunityDbId(qry.value(KFieldCommunityDbId).toInt());//TODO: load country obj
+    model->setCommunityUid(qry.value(KFieldCommunityUid).toString());//TODO: load country obj
+    model->setCommunityName(qry.value(KFieldCommunityName).toString());//TODO: load country obj
     model->setHoDPersonId(qry.value(KFieldPersonId).toInt());
     model->setRemark(qry.value(KFieldRemark).toString());
     tracede;
+}
+
+QSqlQuery *DbSqliteDepartTbl::getAllQuery()
+{
+    traced;
+    QSqlQuery* qry = new QSqlQuery();
+
+    traced;
+    // TODO: check record status????
+    QString queryString = QString("SELECT *, %2.%5 AS %6 FROM %1 JOIN %2 ON %1.%3 = %2.%4")
+                              .arg(name(), KTableCommunity)
+                              .arg(KFieldCommunityUid, KFieldUid)
+                              .arg(KFieldName, KFieldCommunityName);
+    qry->prepare(queryString);
+    logd("Query String '%s'", queryString.toStdString().c_str());
+    return qry;
 }

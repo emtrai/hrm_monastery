@@ -55,7 +55,7 @@ void DbSqliteProvinceTbl::addTableField(DbSqliteTableBuilder *builder)
     tracede;
 }
 
-void DbSqliteProvinceTbl::insertTableField(DbSqliteInsertBuilder *builder,
+ErrCode DbSqliteProvinceTbl::insertTableField(DbSqliteInsertBuilder *builder,
                                            const DbModel *item)
 {
     traced;
@@ -68,6 +68,7 @@ void DbSqliteProvinceTbl::insertTableField(DbSqliteInsertBuilder *builder,
     builder->addValue(KFieldParentUid, model->parentUid());
     builder->addValue(KFieldRemark, model->remark());
     tracede;
+    return ErrNone;
 }
 
 void DbSqliteProvinceTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)

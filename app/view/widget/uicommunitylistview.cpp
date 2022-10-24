@@ -28,13 +28,13 @@
 #include "utils.h"
 #include "mainwindow.h"
 #include "uicommunitypersonlistview.h"
+#include "uidepartmentlistview.h"
 #include "uitableviewfactory.h"
 
 UICommunityListView::UICommunityListView(QWidget *parent):
     UICommonListView(parent)
 {
-
-
+    traced;
 }
 
 UICommunityListView::~UICommunityListView()
@@ -125,8 +125,46 @@ ErrCode UICommunityListView::onMenuActionListPerson(QMenu *menu, UITableMenuActi
 ErrCode UICommunityListView::onMenuActionListDepartment(QMenu *menu, UITableMenuAction *act)
 {
     traced;
-    return ErrNone;
+    ErrCode ret = ErrNone;
+    Community* community = dynamic_cast<Community*>(act->getData());
+    if (community != nullptr) {
+        community->dump();
+        UIDepartmentListView* view = (UIDepartmentListView*)UITableViewFactory::getView(ViewType::DEPARTMENT);
 
+        view->setCommunity(community);
+        MainWindow::getInstance()->switchView(view);
+    } else {
+        loge("no community info");
+        ret = ErrNoData;
+    }
+
+//    int idx = item->idx();
+//    logd("idx=%d",idx);
+//    if (idx < mItemList.length()){
+//        Community* model = (Community*)mItemList.value(idx);
+//        if (model == nullptr) {
+//            loge("no data");
+//            return;
+//        }
+//        model->dump();
+//        QString uid = model->uid();
+//        if (uid.isEmpty()) {
+//            loge("no uid");
+//            return;
+//        }
+//        UICommunityPersonListView* view = (UICommunityPersonListView*)UITableViewFactory::getView(ViewType::COMMUNITY_PERSON);
+
+//        logd("community uid %s", uid.toStdString().c_str());
+//        //        view->setCommunityUid(uid);
+//        view->setCommunity(model);
+//        view->setTitle(model->name());
+//        MainWindow::getInstance()->switchView(view);
+//    } else {
+//        loge("Invalid idx");
+//        // TODO: popup message???
+//    }
+    tracedr(ret);
+    return ret;
 }
 
 QList<UITableMenuAction *> UICommunityListView::getMenuItemActions(const QMenu* menu,
@@ -155,7 +193,7 @@ ErrCode UICommunityListView::onLoad()
     mItemList.clear(); // TODO: clean up item data
     // TODO: loop to much, redundant, do something better?
     foreach (Community* item, items) {
-        mItemList.append(static_cast<DbModel*>(item));
+        mItemList.append(dynamic_cast<DbModel*>(item));
     }
     return ErrNone;
 }

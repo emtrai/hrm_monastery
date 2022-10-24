@@ -49,12 +49,12 @@ void DbSqliteMissionTbl::addTableField(DbSqliteTableBuilder *builder)
     DbSqliteTbl::addTableField(builder);
 }
 
-void DbSqliteMissionTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
+ErrCode DbSqliteMissionTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
 {
     traced;
     DbSqliteTbl::insertTableField(builder, item);
     tracede;
-
+    return ErrNone;
 }
 
 void DbSqliteMissionTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)

@@ -27,6 +27,7 @@
 
 #include "view/widget/uisummarizeview.h"
 #include "view/widget/uitableview.h"
+#include "view/widget/uitableviewfactory.h"
 #include <QAction>
 
 QT_BEGIN_NAMESPACE
@@ -46,7 +47,9 @@ QT_END_NAMESPACE
      void showEvent(QShowEvent *ev);
      static void onFinishLoading(int ret, void* data);
  public:
+     void switchView(ViewType type);
      void switchView(QWidget* nextView);
+     QWidget* getView(ViewType type);
  private:
      void loadHomePageFile();
      void loadOtherMenu();
@@ -59,6 +62,7 @@ QT_END_NAMESPACE
     UITableView* mSaintsView;
     UITableView* mPersonView;
     UITableView* mAreaView;
+    UITableView* mDepartView;
     QList<QWidget*> mMainViews;
     QTextBrowser* mHomeView;
     QWidget* mCurrentView;
@@ -80,6 +84,7 @@ QT_END_NAMESPACE
      void on_actionPerson_triggered();
      void on_actionSearch_triggered();
      void on_actionArea_triggered();
+     void on_actionDepart_triggered();
  private:
      static MainWindow* gInstance;
 };

@@ -14,37 +14,32 @@
  * limitations under the License.
  *
  *
- * Filename: dbsqlitedeptmgrtbl.h
+ * Filename: dbsqlitedepartmentpersontbl.h
  * Author: Anh, Ngo Huy
- * Created date:10/8/2022
+ * Created date:10/17/2022
  * Brief:
  */
-#ifndef DBSQLITEDEPTMGRTBL_H
-#define DBSQLITEDEPTMGRTBL_H
+#ifndef DBSQLITEDEPARTMENTPERSONTBL_H
+#define DBSQLITEDEPARTMENTPERSONTBL_H
 
 #include "dbsqlitemaptbl.h"
 
-class DbSqliteDeptMgrTbl : public DbSqliteMapTbl
+class DbSqliteDepartmentPersonTbl : public DbSqliteMapTbl
 {
 public:
-    DbSqliteDeptMgrTbl(DbSqlite* db);
-    DbSqliteDeptMgrTbl(DbSqlite* db, const QString& baseName, const QString& name, qint32 versionCode);
-
-
-    virtual void addTableField(DbSqliteTableBuilder* builder);
-    virtual void insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
-    virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
-    const QString &roleUid() const;
-    void setRoleUid(const QString &newRoleUid);
-
-    const QString &termUid() const;
-    void setTermUid(const QString &newTermUid);
-
+    DbSqliteDepartmentPersonTbl(DbSqlite* db);
+    DbSqliteDepartmentPersonTbl(DbSqlite* db, const QString& baseName, const QString& name, qint32 versionCode);
+    QList<DbModel*> getListPerson(const QString& communityUid, int status = ITEM_MAP_STATUS_ACTIVE);
 protected:
-    QString mRoleUid;
-    QString mTermUid;
+    virtual void addTableField(DbSqliteTableBuilder* builder);
+    virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
+    virtual QHash<QString, QString> getFieldsCheckExists(const DbModel* item);
+
+
+    virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
+
 private:
     static const qint32 KVersionCode;
 };
 
-#endif // DBSQLITEDEPTMGRTBL_H
+#endif // DBSQLITEDEPARTMENTPERSONTBL_H

@@ -46,6 +46,9 @@
 #include "table/dbsqliteeventtbl.h"
 #include "table/dbsqlitesaintpersonmaptbl.h"
 #include "table/dbsqlitecommunitypersontbl.h"
+#include "table/dbsqlitecommunitydeptmaptbl.h"
+#include "table/dbsqlitedepartmentpersontbl.h"
+#include "table/dbsqliteroletbl.h"
 
 #include "dbsqlitedefs.h"
 #include "dbsqliteedu.h"
@@ -64,6 +67,7 @@
 #include "dbsqlitestatus.h"
 #include "dbsqlitepersonevent.h"
 #include "dbsqliteevent.h"
+#include "dbsqliterole.h"
 
 #include "defs.h"
 
@@ -96,11 +100,14 @@ void DbSqlite::setupTables()
     appendTable(new DbSqliteDepartTbl(this));
     appendTable(new DbSqliteCourseTbl(this));
     appendTable(new DbSqliteWorkTbl(this));
+    appendTable(new DbSqliteRoleTbl(this));
     appendTable(new DbSqliteStatusTbl(this));
     appendTable(new DbSqlitePersonEventTbl(this));
     appendTable(new DbSqliteEventTbl(this));
     appendTable(new DbSqliteSaintPersonMapTbl(this));
     appendTable(new DbSqliteCommunityPersonTbl(this));
+    appendTable(new DbSqliteCommunityDeptMapTbl(this));
+    appendTable(new DbSqliteDepartmentPersonTbl(this));
 }
 
 void DbSqlite::setupModelHandler()
@@ -120,9 +127,9 @@ void DbSqlite::setupModelHandler()
     appendModelHandler(new DbSqliteCourse());
     appendModelHandler(new DbSqliteWork());
     appendModelHandler(new DbSqliteStatus());
+    appendModelHandler(new DbSqliteRole());
     appendModelHandler(new DbSqlitePerson());
     appendModelHandler(new DbSqliteEvent());
-    appendModelHandler(new DbSqlitePersonEvent());
     appendModelHandler(new DbSqlitePersonEvent());
 }
 

@@ -48,11 +48,13 @@ SOURCES += \
     controller/eventctl.cpp \
     controller/missionctl.cpp \
     controller/provincectl.cpp \
+    controller/rolectl.cpp \
     controller/statusctl.cpp \
     controller/workctl.cpp \
     crypto/crypto.cpp \
     db/dbcommunitymodelhandler.cpp \
     db/dbctl.cpp \
+    db/dbdepartmentmodelhandler.cpp \
     db/dbinfo.cpp \
     db/dbmodel.cpp \
     db/dbmodelhandler.cpp \
@@ -67,6 +69,7 @@ SOURCES += \
     db/sqlite/handler/dbsqliteperson.cpp \
     db/sqlite/handler/dbsqlitepersonevent.cpp \
     db/sqlite/handler/dbsqliteprovince.cpp \
+    db/sqlite/handler/dbsqliterole.cpp \
     db/sqlite/handler/dbsqlitesaint.cpp \
     db/sqlite/handler/dbsqlitespecialist.cpp \
     db/sqlite/handler/dbsqlitestatus.cpp \
@@ -90,8 +93,8 @@ SOURCES += \
     db/sqlite/table/dbsqlitecommunitytbl.cpp \
     db/sqlite/table/dbsqlitecountrytbl.cpp \
     db/sqlite/table/dbsqlitecoursetbl.cpp \
+    db/sqlite/table/dbsqlitedepartmentpersontbl.cpp \
     db/sqlite/table/dbsqlitedeparttbl.cpp \
-    db/sqlite/table/dbsqlitedeptmgrtbl.cpp \
     db/sqlite/table/dbsqliteedutbl.cpp \
     db/sqlite/table/dbsqliteethnictbl.cpp \
     db/sqlite/table/dbsqliteeventtbl.cpp \
@@ -101,6 +104,7 @@ SOURCES += \
     db/sqlite/table/dbsqlitepersontbl.cpp \
     db/sqlite/dbsqlitetablebuilder.cpp \
     db/sqlite/table/dbsqliteprovincetbl.cpp \
+    db/sqlite/table/dbsqliteroletbl.cpp \
     db/sqlite/table/dbsqlitesaintpersonmaptbl.cpp \
     db/sqlite/table/dbsqlitesainttbl.cpp \
     db/sqlite/table/dbsqlitespecialisttbl.cpp \
@@ -134,8 +138,10 @@ SOURCES += \
     model/event.cpp \
     model/mission.cpp \
     model/person.cpp \
+    model/persondept.cpp \
     model/personevent.cpp \
     model/province.cpp \
+    model/role.cpp \
     model/saint.cpp \
     db/sqlite/model/saintperson.cpp \
     model/specialist.cpp \
@@ -156,6 +162,7 @@ SOURCES += \
     view/dialog/dlgcountry.cpp \
     view/dialog/dlgcourse.cpp \
     view/dialog/dlgdepartment.cpp \
+    view/dialog/dlgdeptmgr.cpp \
     view/dialog/dlgethnic.cpp \
     view/dialog/dlghtmlviewer.cpp \
     view/dialog/dlgimportlistresult.cpp \
@@ -167,6 +174,8 @@ SOURCES += \
     view/widget/uicommonlistview.cpp \
     view/widget/uicommunitylistview.cpp \
     view/widget/uicommunitypersonlistview.cpp \
+    view/widget/uidepartmentlistview.cpp \
+    view/widget/uidepartmentpersonlistview.cpp \
     view/widget/uiitembutton.cpp \
     view/widget/uimulticomboxview.cpp \
     view/widget/uipersonlistview.cpp \
@@ -189,12 +198,14 @@ HEADERS += \
     controller/eventctl.h \
     controller/missionctl.h \
     controller/provincectl.h \
+    controller/rolectl.h \
     controller/statusctl.h \
     controller/workctl.h \
     crypto/crypto.h \
     db/dbcommunitymodelhandler.h \
     db/dbctl.h \
     db/dbdefs.h \
+    db/dbdepartmentmodelhandler.h \
     db/dbinfo.h \
     db/dbmodel.h \
     db/dbmodelhandler.h \
@@ -217,6 +228,7 @@ HEADERS += \
     db/sqlite/handler/dbsqliteperson.h \
     db/sqlite/handler/dbsqlitepersonevent.h \
     db/sqlite/handler/dbsqliteprovince.h \
+    db/sqlite/handler/dbsqliterole.h \
     db/sqlite/handler/dbsqlitesaint.h \
     db/sqlite/handler/dbsqlitespecialist.h \
     db/sqlite/handler/dbsqlitestatus.h \
@@ -232,8 +244,8 @@ HEADERS += \
     db/sqlite/table/dbsqlitecommunitytbl.h \
     db/sqlite/table/dbsqlitecountrytbl.h \
     db/sqlite/table/dbsqlitecoursetbl.h \
+    db/sqlite/table/dbsqlitedepartmentpersontbl.h \
     db/sqlite/table/dbsqlitedeparttbl.h \
-    db/sqlite/table/dbsqlitedeptmgrtbl.h \
     db/sqlite/table/dbsqliteedutbl.h \
     db/sqlite/table/dbsqliteethnictbl.h \
     db/sqlite/table/dbsqliteeventtbl.h \
@@ -243,6 +255,7 @@ HEADERS += \
     db/sqlite/table/dbsqlitepersontbl.h \
     db/sqlite/dbsqlitetablebuilder.h \
     db/sqlite/table/dbsqliteprovincetbl.h \
+    db/sqlite/table/dbsqliteroletbl.h \
     db/sqlite/table/dbsqlitesaintpersonmaptbl.h \
     db/sqlite/table/dbsqlitesainttbl.h \
     db/sqlite/table/dbsqlitespecialisttbl.h \
@@ -277,8 +290,10 @@ HEADERS += \
     model/event.h \
     model/mission.h \
     model/person.h \
+    model/persondept.h \
     model/personevent.h \
     model/province.h \
+    model/role.h \
     model/saint.h \
     db/sqlite/model/saintperson.h \
     model/specialist.h \
@@ -300,6 +315,7 @@ HEADERS += \
     view/dialog/dlgcountry.h \
     view/dialog/dlgcourse.h \
     view/dialog/dlgdepartment.h \
+    view/dialog/dlgdeptmgr.h \
     view/dialog/dlgethnic.h \
     view/dialog/dlghtmlviewer.h \
     view/dialog/dlgimportlistresult.h \
@@ -311,6 +327,8 @@ HEADERS += \
     view/widget/uicommonlistview.h \
     view/widget/uicommunitylistview.h \
     view/widget/uicommunitypersonlistview.h \
+    view/widget/uidepartmentlistview.h \
+    view/widget/uidepartmentpersonlistview.h \
     view/widget/uiitembutton.h \
     view/widget/uimulticomboxview.h \
     view/widget/uipersonlistview.h \
@@ -328,6 +346,7 @@ FORMS += \
     view/dialog/dlgcountry.ui \
     view/dialog/dlgcourse.ui \
     view/dialog/dlgdepartment.ui \
+    view/dialog/dlgdeptmgr.ui \
     view/dialog/dlgethnic.ui \
     view/dialog/dlghtmlviewer.ui \
     view/dialog/dlgimportlistresult.ui \

@@ -41,7 +41,7 @@ DbModel *DeptMgr::build()
 
 QString DeptMgr::modelName() const
 {
-    return KModelNameDeptMgr;
+    return KModelNameMapDeptMgr;
 }
 
 
@@ -50,14 +50,14 @@ DbModelHandler *DeptMgr::getDbModelHandler()
     return DB->getModelHandler(KModelHdlDept);
 }
 
-const QString &DeptMgr::termUid() const
+const QString &DeptMgr::courseUid() const
 {
-    return mTermUid;
+    return mCourseUid;
 }
 
-void DeptMgr::setTermUid(const QString &newTermUid)
+void DeptMgr::setCourseUid(const QString &newCourseUid)
 {
-    mTermUid = newTermUid;
+    mCourseUid = newCourseUid;
 }
 
 const QString &DeptMgr::roleUid() const

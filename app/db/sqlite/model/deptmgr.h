@@ -24,6 +24,7 @@
 
 #include "mapdbmodel.h"
 
+// Department managers
 class DeptMgr : public MapDbModel
 {
 public:
@@ -33,14 +34,14 @@ public:
     const QString &roleUid() const;
     void setRoleUid(const QString &newRoleUid);
 
-    const QString &termUid() const;
-    void setTermUid(const QString &newTermUid);
+    const QString &courseUid() const;
+    void setCourseUid(const QString &newCourseUid);
 
 protected:
     virtual DbModelHandler *getDbModelHandler();
 protected:
     QString mRoleUid;
-    QString mTermUid;
+    QString mCourseUid; // Term
 };
 
 #endif // DEPTMGR_H

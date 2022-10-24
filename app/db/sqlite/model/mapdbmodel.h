@@ -59,6 +59,7 @@ public:
     void setParentUid(const QString &newParentUid);
 
     virtual QString modelName() const;
+    virtual int modelType() const;
 
 protected:
     QString mUid1;

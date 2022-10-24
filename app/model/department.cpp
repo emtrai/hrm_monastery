@@ -37,6 +37,11 @@ DbModel *Department::builder()
     return new Department();
 }
 
+QString Department::modelName() const
+{
+    return KModelNameDepartment;
+}
+
 qint64 Department::parentDbId() const
 {
     return mParentDbId;
@@ -159,6 +164,16 @@ DbModelHandler *Department::getDbModelHandler()
 {
 
     return DB->getModelHandler(KModelHdlDept);
+}
+
+const QString &Department::communityName() const
+{
+    return mCommunityName;
+}
+
+void Department::setCommunityName(const QString &newCommunityName)
+{
+    mCommunityName = newCommunityName;
 }
 
 const QString &Department::communityUid() const

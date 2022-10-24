@@ -50,7 +50,7 @@ void DbSqliteEventTbl::addTableField(DbSqliteTableBuilder *builder)
     tracede;
 }
 
-void DbSqliteEventTbl::insertTableField(DbSqliteInsertBuilder *builder,
+ErrCode DbSqliteEventTbl::insertTableField(DbSqliteInsertBuilder *builder,
                                          const DbModel *item)
 {
     traced;
@@ -59,6 +59,7 @@ void DbSqliteEventTbl::insertTableField(DbSqliteInsertBuilder *builder,
     Event* model = (Event*) item;
     builder->addValue(KFieldRemark, model->remark());
     tracede;
+    return ErrNone;
 }
 
 void DbSqliteEventTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)

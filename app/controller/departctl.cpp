@@ -23,6 +23,7 @@
 
 #include "logger.h"
 #include "department.h"
+#include "dbdepartmentmodelhandler.h"
 #include "defs.h"
 #include "dbctl.h"
 #include "utils.h"
@@ -63,11 +64,33 @@ DbModel *DepartCtl::buildModel(void *items, const QString &fmt)
 }
 
 
-const QList<Department *> DepartCtl::getDeptList()
+const QList<Department *> DepartCtl::getDeptList(const QString& communityUid)
 {
     traced;
+    if (communityUid.isEmpty()) {
+        logd("empty community uid, return all");
+        return mDeptList;
+    } else {
+        logd("community uid '%s'", communityUid.toStdString().c_str());
+        QList<Department*> dept;
+        foreach(Department* item, mDeptList) {
+            if (item->communityUid() == communityUid) {
+                dept.append(item);
+            }
+        }
+        logd("found %d", dept.count());
+        return dept;
+    }
+}
 
-    return mDeptList;
+const QList<DbModel *> DepartCtl::getPersonList(const QString &deptUid)
+{
+    traced;
+    DbDepartmentModelHandler* model =  dynamic_cast<DbDepartmentModelHandler*>(DB->getModelHandler(KModelHdlDept));
+    QList<DbModel *> items = model->getListPerson(deptUid);
+
+    tracede;
+    return items;
 }
 
 Department* DepartCtl::parseOneItem(const QJsonObject& jobj)

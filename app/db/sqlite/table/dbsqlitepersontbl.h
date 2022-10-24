@@ -37,10 +37,10 @@ class DbSqlitePersonTbl : public DbSqliteTbl
 public:
     DbSqlitePersonTbl(DbSqlite* db);
 
+    virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
 protected:
     virtual void addTableField(DbSqliteTableBuilder* builder);
-    virtual void insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
-    virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
+    virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
     virtual QHash<QString, QString> getFieldsCheckExists(const DbModel* item);
     QHash<QString, int> getSearchFields();
     QList<QString> getNameFields();

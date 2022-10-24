@@ -28,7 +28,7 @@
 #include <QHash>
 #include <QList>
 
-#define AREA (AreaCtl::getInstance())
+#define DEPART (DepartCtl::getInstance())
 
 class DepartCtl : public Controller
 {
@@ -38,7 +38,8 @@ protected:
     DbModel *buildModel(void *items, const QString &fmt);
 public:
     static DepartCtl* getInstance();
-    const QList<Department*> getDeptList();
+    const QList<Department*> getDeptList(const QString& communityUid = nullptr);
+    const QList<DbModel*> getPersonList(const QString& deptUid);
 protected:
     virtual ErrCode parsePrebuiltFile(const QString &fpath, const QString &ftype);
 private:

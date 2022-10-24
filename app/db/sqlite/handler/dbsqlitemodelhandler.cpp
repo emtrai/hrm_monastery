@@ -70,6 +70,20 @@ QList<DbModel *> DbSqliteModelHandler::getAll(DbModelBuilder builder, const char
     return getMainTbl()->getAll(builder);
 }
 
+QHash<QString, DbModel *> DbSqliteModelHandler::getAllInDict(DbModelBuilder builder, const char *modelName)
+{
+    traced;
+    QList<DbModel *> list = getAll(builder, modelName);
+    QHash<QString, DbModel *> map;
+    logd("found %lld item", list.count());
+    foreach (DbModel* item, list) {
+        map.insert(item->uid(), item);
+    }
+    // TODO: cache it??????
+    tracede;
+    return map;
+}
+
 DbModel *DbSqliteModelHandler::getModel(qint64 dbId)
 {
     traced;

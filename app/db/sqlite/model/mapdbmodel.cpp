@@ -25,6 +25,8 @@
 #include "utils.h"
 #include "defs.h"
 
+#include "dbdefs.h"
+
 MapDbModel::MapDbModel()
 {
     traced;
@@ -138,4 +140,9 @@ void MapDbModel::setParentUid(const QString &newParentUid)
 QString MapDbModel::modelName() const
 {
     return KModelNameMap;
+}
+
+int MapDbModel::modelType() const
+{
+    return MODEL_MAP;
 }

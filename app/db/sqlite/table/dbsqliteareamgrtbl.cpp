@@ -26,7 +26,6 @@
 #include "defs.h"
 #include "logger.h"
 #include "dbsqlitetablebuilder.h"
-#include "table/dbsqlitedeptmgrtbl.h"
 #include "dbsqliteinsertbuilder.h"
 #include <QSqlQuery>
 #include <QSqlRecord>
@@ -35,7 +34,7 @@
 const qint32 DbSqliteAreaMgrTbl::KVersionCode = VERSION_CODE(0,0,1);
 
 DbSqliteAreaMgrTbl::DbSqliteAreaMgrTbl(DbSqlite *db):
-    DbSqliteDeptMgrTbl(db, KTableAreaPerson, KTableAreaPerson, KVersionCode)
+    DbSqliteDepartmentPersonTbl(db, KTableAreaPerson, KTableAreaPerson, KVersionCode)
 {
     traced;
 
