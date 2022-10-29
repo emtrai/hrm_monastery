@@ -101,6 +101,16 @@ public:
     const QString &imgPath() const;
     void setImgPath(const QString &newImgPath);
 
+    const QString &areaUid() const;
+    void setAreaUid(const QString &newAreaUid);
+
+
+    qint64 areaDbId() const;
+    void setAreaDbId(qint64 newAreaDbId);
+
+    const QString &areaName() const;
+    void setAreaName(const QString &newAreaName);
+
 protected:
     virtual DbModelHandler* getDbModelHandler();
 private:
@@ -128,6 +138,10 @@ private:
     Area* mArea;
     // Board of management?
     QList<Department*> mDepList;
+
+    QString mAreaUid;
+    qint64 mAreaDbId;
+    QString mAreaName; // just for display, not store in db of community
 };
 
 #endif // COMMUNITY_H

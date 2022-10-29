@@ -14,27 +14,26 @@
  * limitations under the License.
  *
  *
- * Filename: dbsqliteareamgrtbl.h
+ * Filename: areacommunity.h
  * Author: Anh, Ngo Huy
- * Created date:10/8/2022
+ * Created date:10/25/2022
  * Brief:
  */
-#ifndef DBSQLITEAREAMGRTBL_H
-#define DBSQLITEAREAMGRTBL_H
+#ifndef AREACOMMUNITY_H
+#define AREACOMMUNITY_H
 
-#include "dbsqlitedepartmentpersontbl.h"
+#include "mapdbmodel.h"
+#include <dbmodel.h>
+#include "model/mapdbmodel.h"
 
-class DbSqliteAreaMgrTbl : public DbSqliteMapTbl
+class AreaCommunity : public MapDbModel
 {
 public:
-    DbSqliteAreaMgrTbl(DbSqlite* db);
-    QList<DbModel*> getListPerson(const QString& areaUid, int status = ITEM_MAP_STATUS_ACTIVE);
-
+    AreaCommunity();
+    static DbModel* build();
+    virtual QString modelName() const;
 protected:
-    virtual void addTableField(DbSqliteTableBuilder* builder);
-    virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
-private:
-    static const qint32 KVersionCode;
+    virtual DbModelHandler *getDbModelHandler();
 };
 
-#endif // DBSQLITEAREAMGRTBL_H
+#endif // AREACOMMUNITY_H

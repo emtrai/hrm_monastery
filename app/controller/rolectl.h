@@ -25,6 +25,8 @@
 #include "controller.h"
 #include "utils.h"
 
+#define ROLECTL INSTANCE(RoleCtl)
+
 class Role;
 
 class RoleCtl : public Controller

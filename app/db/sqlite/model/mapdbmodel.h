@@ -24,6 +24,24 @@
 
 #include <dbmodel.h>
 
+#define SAVE_MAP_MODEL(MODEL, field1, field2, status, startdate, enddate, remark) \
+do { \
+        MODEL* model = new MODEL(); \
+        model->setDbId1(field1->dbId()); \
+        model->setUid1(field1->uid()); \
+        model->setDbId2(field2->dbId()); \
+        model->setUid2(field2->uid()); \
+        model->setStatus(status); \
+        model->setStartDate(startdate); \
+        model->setEndDate(enddate); \
+        if (!remark.isEmpty()) \
+        model->setRemark(remark); \
+        logd("Add to db"); \
+        err = model->save(); \
+        delete model; \
+        model = nullptr; \
+} while (0)
+
 class MapDbModel : public DbModel
 {
 public:

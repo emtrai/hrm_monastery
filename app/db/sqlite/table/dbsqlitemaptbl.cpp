@@ -52,6 +52,46 @@ DbSqliteMapTbl::DbSqliteMapTbl(DbSqlite *db,
     mFieldNameDbId2 = "DBID2";
 }
 
+/*
+ * SELECT * FROM "mapTblName"
+ *  JOIN "modelTblName"
+ *  ON "mapTblName"."fieldUid2Join" = "modelTblName"."fieldModelUid"
+ *  WHERE "mapTblName"."fieldUid1Cond" = :uid
+ */
+QList<DbModel *> DbSqliteMapTbl::getListItems(const QString &mapTblName,
+                                              const QString &modelTblName,
+                                              const QString &fieldUid2Join,
+                                              const QString &fieldModelUid,
+                                              const QString &fieldUid1Cond,
+                                              const DbModelBuilder &builder,
+                                              const QString &uid, int status)
+{
+    traced;
+    QSqlQuery qry;
+    qint32 cnt = 0;
+    if (uid.isEmpty()){
+        loge("Invalid uid");
+        return QList<DbModel*>();
+    }
+    logi("uid '%s'", uid.toStdString().c_str());
+    QString queryString = QString("SELECT * FROM %1 JOIN %2 ON %1.%3 = %2.%4 WHERE %1.%5 = :uid")
+                              .arg(mapTblName, modelTblName)
+                              .arg(fieldUid2Join, fieldModelUid, fieldUid1Cond);
+
+    qry.prepare(queryString);
+    logd("Query String '%s'", queryString.toStdString().c_str());
+
+    // TODO: check sql injection issue
+    qry.bindValue( ":uid", uid);
+    // TODO: status check???
+    QList<DbModel *> outList;
+    cnt = runQuery(qry, builder, &outList);
+
+    logi("Found %d", cnt);
+    tracede;
+    return outList;
+}
+
 void DbSqliteMapTbl::addTableField(DbSqliteTableBuilder *builder)
 {
     traced;

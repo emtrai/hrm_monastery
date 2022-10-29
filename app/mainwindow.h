@@ -63,6 +63,7 @@ QT_END_NAMESPACE
     UITableView* mPersonView;
     UITableView* mAreaView;
     UITableView* mDepartView;
+    UITableView* mRoleView;
     QList<QWidget*> mMainViews;
     QTextBrowser* mHomeView;
     QWidget* mCurrentView;
@@ -85,6 +86,7 @@ QT_END_NAMESPACE
      void on_actionSearch_triggered();
      void on_actionArea_triggered();
      void on_actionDepart_triggered();
+     void on_actionRole_triggered();
  private:
      static MainWindow* gInstance;
 };

@@ -39,6 +39,15 @@ class DbSqliteMapTbl : public DbSqliteTbl
 public:
     DbSqliteMapTbl(DbSqlite* db);
     DbSqliteMapTbl(DbSqlite* db, const QString& baseName, const QString& name, qint32 versionCode);
+    QList<DbModel*> getListItems(const QString &mapTblName,
+                                  const QString &modelTblName,
+                                  const QString &fieldUid2Join,
+                                  const QString &fieldModelUid,
+                                  const QString &fieldUid1Cond,
+                                  const DbModelBuilder &builder,
+                                  const QString &uid,
+                                  int status = ITEM_MAP_STATUS_ACTIVE);
+
 protected:
     virtual void addTableField(DbSqliteTableBuilder* builder);
     virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);

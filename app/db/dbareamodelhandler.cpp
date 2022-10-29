@@ -14,27 +14,10 @@
  * limitations under the License.
  *
  *
- * Filename: dbsqliteareamgrtbl.h
+ * Filename: dbareamodelhandler.cpp
  * Author: Anh, Ngo Huy
- * Created date:10/8/2022
+ * Created date:10/25/2022
  * Brief:
  */
-#ifndef DBSQLITEAREAMGRTBL_H
-#define DBSQLITEAREAMGRTBL_H
+#include "dbareamodelhandler.h"
 
-#include "dbsqlitedepartmentpersontbl.h"
-
-class DbSqliteAreaMgrTbl : public DbSqliteMapTbl
-{
-public:
-    DbSqliteAreaMgrTbl(DbSqlite* db);
-    QList<DbModel*> getListPerson(const QString& areaUid, int status = ITEM_MAP_STATUS_ACTIVE);
-
-protected:
-    virtual void addTableField(DbSqliteTableBuilder* builder);
-    virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
-private:
-    static const qint32 KVersionCode;
-};
-
-#endif // DBSQLITEAREAMGRTBL_H

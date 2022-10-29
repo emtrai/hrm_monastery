@@ -51,8 +51,14 @@ public:
 
     QString getFullName();
 
-    qint64 countryName() const;
-    void setCountryName(qint64 newCountryName);
+    QString countryName() const;
+    void setCountryName(QString newCountryName);
+
+    QString personUid() const;
+    void setPersonUid(QString newPersonUid);
+
+    QString personName() const;
+    void setPersonName(QString newPersonName);
 
 protected:
     virtual DbModelHandler* getDbModelHandler();
@@ -60,9 +66,11 @@ private:
     Person* mManager;
     QHash<qint32, QList<Person*>> mMember; // role, list of member
     Country* country;
-    qint64 mCountryName;
+    QString mCountryName; // just for display, not store to db
     qint64 mCountryDbId;
     qint64 mPersonDbId;
+    QString mPersonUid;
+    QString mPersonName; // just for display, not store to db
     QString mRemark;
     QString mCountryUid;
 

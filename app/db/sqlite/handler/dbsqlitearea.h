@@ -23,17 +23,28 @@
 #define DBSQLITEAREA_H
 
 #include "dbsqlitemodelhandler.h"
+#include "dbareamodelhandler.h"
 
 class DbSqliteTbl;
 
-class DbSqliteArea : public DbSqliteModelHandler
+class DbSqliteArea : public DbSqliteModelHandler, public DbAreaModelHandler
 {
 public:
     DbSqliteArea();
     static DbSqliteArea* getInstance();
     virtual const QString getName();
+    virtual QList<DbModel*> getListPersonInCharges(const QString& areaUid, int status = 0);
+    virtual QList<DbModel*> getListCommunities(const QString& areaUid, int status = 0);
+    virtual ErrCode addPersonInChargeOfArea(const Area *area,
+                                            const Person* per,
+                                            int status = 0,
+                                            qint64 startdate = 0,
+                                            qint64 enddate = 0,
+                                            const QString& remark = nullptr);
+
 protected:
     virtual DbSqliteTbl* getMainTbl();
+    virtual DbSqliteTbl* getTable(const QString& modelName);
 private:
 
 private:

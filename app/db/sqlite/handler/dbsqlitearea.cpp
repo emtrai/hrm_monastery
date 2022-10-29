@@ -20,11 +20,18 @@
  * Brief:
  */
 #include "dbsqlitearea.h"
+#include "area.h"
+#include "community.h"
+#include "person.h"
 #include "logger.h"
 #include "defs.h"
 
 #include "dbsqlitedefs.h"
 #include "dbsqlite.h"
+#include "table/dbsqliteareamgrtbl.h"
+#include "table/dbsqlitecommunitytbl.h"
+#include "model/areaperson.h"
+#include "model/areacommunity.h"
 
 DbSqliteArea::DbSqliteArea()
 {
@@ -36,7 +43,58 @@ const QString DbSqliteArea::getName()
     return KModelHdlArea;
 }
 
+QList<DbModel *> DbSqliteArea::getListPersonInCharges(const QString &areaUid, int status)
+{
+    traced;
+    DbSqliteAreaMgrTbl* tbl = (DbSqliteAreaMgrTbl*)DbSqlite::getInstance()
+                                          ->getTable(KTableAreaPerson);
+    QList<DbModel *> list = tbl->getListPerson(areaUid, status);
+    tracedr(list.count());
+    return list;
+}
+
+QList<DbModel *> DbSqliteArea::getListCommunities(const QString &areaUid, int status)
+{
+    traced;
+    DbSqliteCommunityTbl* tbl = (DbSqliteCommunityTbl*)DbSqlite::getInstance()
+                                  ->getTable(KTableCommunity);
+    QList<DbModel *> list = tbl->getListCommunitiesInArea(areaUid, status);
+    tracedr(list.count());
+    return list;
+}
+
+ErrCode DbSqliteArea::addPersonInChargeOfArea(const Area *area, const Person *per, int status, qint64 startdate, qint64 enddate, const QString &remark)
+{
+    traced;
+    ErrCode err = ErrNone;
+//    DbSqliteAreaMgrTbl* tbl = (DbSqliteAreaMgrTbl*)DbSqlite::getInstance()
+//                                          ->getTable(KTableAreaPerson);
+    logd("Build AreaPerson map object");
+//    AreaPerson* model = new AreaPerson();
+    SAVE_MAP_MODEL(AreaPerson, area, per, status, startdate, enddate, remark);
+
+    tracedr(err);
+    return err;
+}
+
+
 DbSqliteTbl *DbSqliteArea::getMainTbl()
 {
     return (DbSqliteTbl*)DbSqlite::getInstance()->getTable(KTableArea);
+}
+
+DbSqliteTbl *DbSqliteArea::getTable(const QString &modelName)
+{
+    traced;
+    DbSqliteTbl* tbl = nullptr;
+    logd("modelname '%s'", modelName.toStdString().c_str());
+    if (modelName == KModelNameAreaComm) {
+        tbl = DbSqlite::table(KTableAreaCommunity);
+    } else if (modelName == KModelNameAreaPerson) {
+        tbl = DbSqlite::table(KTableAreaPerson);
+    } else {
+        tbl = getMainTbl();
+    }
+    tracede;
+    return tbl;
 }

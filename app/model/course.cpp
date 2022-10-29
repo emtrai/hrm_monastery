@@ -53,6 +53,16 @@ DbModelHandler *Course::getDbModelHandler()
     return DB->getModelHandler(KModelHdlCourse);
 }
 
+qint32 Course::courseType() const
+{
+    return mCourseType;
+}
+
+void Course::setCourseType(qint32 newCourseType)
+{
+    mCourseType = newCourseType;
+}
+
 const QString &Course::remark() const
 {
     return mRemark;

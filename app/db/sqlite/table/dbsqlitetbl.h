@@ -76,6 +76,7 @@ public:
     virtual int search(const QString& keyword, const DbModelBuilder& builder, QList<DbModel*>* outList = nullptr);
 
 
+
     /**
      * @brief Search
      * @param keyword keyword
@@ -95,8 +96,9 @@ protected:
     virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
     virtual int runQuery(QSqlQuery& qry, const DbModelBuilder& builder,
                       QList<DbModel *> *outList = nullptr);
-
+    virtual QString getSearchQueryString(const QString& cond = nullptr);
     virtual QSqlQuery *getAllQuery();
+    virtual QString getAllQueryString();
 public:
 
     virtual DbSqlite *db() const;

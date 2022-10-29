@@ -58,6 +58,7 @@ const char* const KFieldChurchUid = "church_uid";
 const char* const KFieldMissionUid = "mission_uid";
 const char* const KFieldAreaUid = "area_uid";
 const char* const KFieldAreaDbId = "area_dbid";
+const char* const KFieldAreaName = "area_name";
 const char* const KFieldDepartmentUid = "depart_uid";
 const char* const KFieldDepartmentDbId = "depart_dbid";
 const char* const KFieldPreset = "preset";
@@ -71,6 +72,7 @@ const char* const KFieldShortName = "shortname";
 const char* const KFieldCountryDbId = "country_dbid";
 const char* const KFieldCountryShortName = "country_shortname";
 const char* const KFieldCountryUid = "country_uid";
+const char* const KFieldCountryName = "country_name";
 const char* const KFieldEthnic = "ethnic"; // dan toc
 const char* const KFieldState = "state"; // tinh/thanh/bang
 const char* const KFieldProvince = "province"; // tinh/thanh/bang
@@ -143,11 +145,13 @@ const char* const KFieldSaintUid = "saint_uid";
 const char* const KFieldSaintDbId = "saint_dbid";
 const char* const KFieldPersonUid = "person_uid";
 const char* const KFieldPersonDbId = "person_dbid";
+const char* const KFieldPersonName = "person_name";
 const char* const KFieldRoleUid = "role_uid";
 const char* const KFieldRoleName = "role_name";
 const char* const KFieldTermUid = "term_uid";
 const char* const KFieldTermName = "term_name";
 const char* const KFieldCommunityName = "community_name";
+const char* const KFieldCourseType = "course_type";
 
 
 // TABLES NAME
@@ -175,6 +179,7 @@ const char* const KTableDeptMgr = "dept_mgr";
 const char* const KTableCommPerson = "comm_person";
 const char* const KTableAreaPerson = "area_person";
 const char* const KTableDepartPerson = "depart_person";
+const char* const KTableAreaCommunity = "area_community";
 
 // TODO: move to class???
 QString getDateTypeString(TableFieldDatatype_t dataType);

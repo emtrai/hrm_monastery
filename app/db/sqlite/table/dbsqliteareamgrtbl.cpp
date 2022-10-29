@@ -26,15 +26,17 @@
 #include "defs.h"
 #include "logger.h"
 #include "dbsqlitetablebuilder.h"
+#include "model/saintperson.h"
 #include "dbsqliteinsertbuilder.h"
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QHash>
+#include "table/dbsqlitepersontbl.h"
 
 const qint32 DbSqliteAreaMgrTbl::KVersionCode = VERSION_CODE(0,0,1);
 
 DbSqliteAreaMgrTbl::DbSqliteAreaMgrTbl(DbSqlite *db):
-    DbSqliteDepartmentPersonTbl(db, KTableAreaPerson, KTableAreaPerson, KVersionCode)
+    DbSqliteMapTbl(db, KTableAreaPerson, KTableAreaPerson, KVersionCode)
 {
     traced;
 
@@ -42,4 +44,54 @@ DbSqliteAreaMgrTbl::DbSqliteAreaMgrTbl(DbSqlite *db):
     mFieldNameDbId1 = KFieldAreaDbId;
     mFieldNameUid2 = KFieldPersonUid;
     mFieldNameDbId2 = KFieldPersonDbId;
+}
+
+QList<DbModel *> DbSqliteAreaMgrTbl::getListPerson(const QString &areaUid, int status)
+{
+    traced;
+    logi("areaUid '%s'", areaUid.toStdString().c_str());
+    /*
+     * SELECT * FROM "KTableAreaPerson"
+     *  JOIN "KTablePerson"
+     *  ON "KTableAreaPerson"."KFieldPersonUid" = "KTablePerson"."KFieldUid"
+     *  WHERE "KTableAreaPerson"."KFieldAreaUid" = :uid
+     */
+    QList<DbModel *> list = DbSqliteMapTbl::getListItems(KTableAreaPerson,
+                                                         KTablePerson,
+                                                         KFieldPersonUid,
+                                                         KFieldUid,
+                                                         KFieldAreaUid,
+                                                         &Person::build,
+                                                         areaUid,
+                                                         status);
+
+    tracede;
+    return list;
+}
+
+void DbSqliteAreaMgrTbl::addTableField(DbSqliteTableBuilder *builder)
+{
+    traced;
+    DbSqliteMapTbl::addTableField(builder);
+    builder->addField(KFieldRoleUid, TEXT);// TODO: use this????
+    tracede;
+}
+
+void DbSqliteAreaMgrTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+{
+    traced;
+    DbSqliteMapTbl::updateModelFromQuery(item, qry);
+    QString modelName = item->modelName();
+    logd("update for map model '%s'", modelName.toStdString().c_str());
+    if (modelName == KModelNamePerson)
+    {
+        logd("update for person model");
+        DbSqlitePersonTbl* tbl = dynamic_cast<DbSqlitePersonTbl*>(DbSqlite::table(KTablePerson));
+        tbl->updateModelFromQuery(item, qry);
+
+
+    } else {
+        loge("Invalid mapp model '%s', do nothing", modelName.toStdString().c_str());
+    }
+    tracede;
 }

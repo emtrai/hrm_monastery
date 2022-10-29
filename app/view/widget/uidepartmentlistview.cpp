@@ -125,7 +125,7 @@ ErrCode UIDepartmentListView::onMenuActionListPerson(QMenu *menu, UITableMenuAct
     if (item != nullptr) {
         item->dump();
         UIDepartmentPersonListView* view = (UIDepartmentPersonListView*)
-            UITableViewFactory::getView(ViewType::DEPARTMENT_PERSON);
+            UITableViewFactory::getView(ViewType::VIEW_DEPARTMENT_PERSON);
 
         view->setDepartment(item);
         MainWindow::getInstance()->switchView(view);

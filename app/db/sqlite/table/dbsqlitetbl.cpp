@@ -277,10 +277,16 @@ QSqlQuery *DbSqliteTbl::getAllQuery()
 
     traced;
     // TODO: check record status????
-    QString queryString = QString("SELECT * FROM %1").arg(name());
+    QString queryString = getAllQueryString();
     qry->prepare(queryString);
     logd("Query String '%s'", queryString.toStdString().c_str());
     return qry;
+}
+
+QString DbSqliteTbl::getAllQueryString()
+{
+    traced;
+    return getSearchQueryString();
 }
 
 
@@ -445,6 +451,18 @@ int DbSqliteTbl::search(const QString &keyword, const DbModelBuilder &builder, Q
     return cnt;
 }
 
+QString DbSqliteTbl::getSearchQueryString(const QString& cond)
+{
+    traced;
+    QString queryString = QString("SELECT * FROM %1")
+                              .arg(name());
+    if (!cond.isEmpty()) {
+        queryString += QString(" WHERE %1").arg(cond);
+    }
+    logd("queryString: %s", queryString.toStdString().c_str());
+    return queryString;
+}
+
 int DbSqliteTbl::search(const QString& keyword, const QHash<QString, int>& inFields,
                         const DbModelBuilder& builder,
                         QList<DbModel*>* outList,
@@ -461,6 +479,7 @@ int DbSqliteTbl::search(const QString& keyword, const QHash<QString, int>& inFie
         if (!cond.isEmpty()) {
             cond += " OR ";
         }
+        logd("field %s", field.toStdString().c_str());
         if (inFields.value(field) == TEXT){
             if (isExact) {
                 cond += QString("lower(%1) = :keywordexact").arg(field);
@@ -473,8 +492,10 @@ int DbSqliteTbl::search(const QString& keyword, const QHash<QString, int>& inFie
         }
     }
 
-    QString queryString = QString("SELECT * FROM %1 WHERE %2")
-                              .arg(name(), cond);
+//    QString queryString = QString("SELECT * FROM %1 WHERE %2")
+//                              .arg(name(), cond);
+    logd("Query cond '%s'", cond.toStdString().c_str());
+    QString queryString = getSearchQueryString(cond);
 
     qry.prepare(queryString);
     logd("Query String '%s'", queryString.toStdString().c_str());

@@ -49,6 +49,7 @@
 #include "table/dbsqlitecommunitydeptmaptbl.h"
 #include "table/dbsqlitedepartmentpersontbl.h"
 #include "table/dbsqliteroletbl.h"
+#include "table/dbsqliteareamgrtbl.h"
 
 #include "dbsqlitedefs.h"
 #include "dbsqliteedu.h"
@@ -108,6 +109,7 @@ void DbSqlite::setupTables()
     appendTable(new DbSqliteCommunityPersonTbl(this));
     appendTable(new DbSqliteCommunityDeptMapTbl(this));
     appendTable(new DbSqliteDepartmentPersonTbl(this));
+    appendTable(new DbSqliteAreaMgrTbl(this));
 }
 
 void DbSqlite::setupModelHandler()

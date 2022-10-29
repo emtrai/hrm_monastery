@@ -41,6 +41,24 @@ UICommunityListView::~UICommunityListView()
 {
     traced;
 }
+
+void UICommunityListView::initHeader()
+{
+    traced;
+    UICommonListView::initHeader();
+    mHeader.append(tr("Vùng"));
+}
+
+void UICommunityListView::updateItem(DbModel *item, UITableItem *tblItem)
+{
+    traced;
+
+    UICommonListView::updateItem(item, tblItem);
+    Community* model = (Community*) item;
+    tblItem->addValue(model->areaName());
+}
+
+
 ErrCode UICommunityListView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act)
 {
     traced;
@@ -129,7 +147,7 @@ ErrCode UICommunityListView::onMenuActionListDepartment(QMenu *menu, UITableMenu
     Community* community = dynamic_cast<Community*>(act->getData());
     if (community != nullptr) {
         community->dump();
-        UIDepartmentListView* view = (UIDepartmentListView*)UITableViewFactory::getView(ViewType::DEPARTMENT);
+        UIDepartmentListView* view = (UIDepartmentListView*)UITableViewFactory::getView(ViewType::VIEW_DEPARTMENT);
 
         view->setCommunity(community);
         MainWindow::getInstance()->switchView(view);
@@ -195,5 +213,15 @@ ErrCode UICommunityListView::onLoad()
     foreach (Community* item, items) {
         mItemList.append(dynamic_cast<DbModel*>(item));
     }
+    tracede;
+    return ErrNone;
+}
+
+ErrCode UICommunityListView::onReload()
+{
+    traced;
+    COMMUNITYCTL->loadFromDb();
+    onLoad();
+    tracede;
     return ErrNone;
 }

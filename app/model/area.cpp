@@ -27,7 +27,9 @@
 #include "dbmodel.h"
 
 
-Area::Area()
+Area::Area():
+      mCountryDbId(0)
+    , mPersonDbId(0)
 {
 
 }
@@ -84,12 +86,32 @@ DbModelHandler *Area::getDbModelHandler()
     return DB->getModelHandler(KModelHdlArea);
 }
 
-qint64 Area::countryName() const
+QString Area::personName() const
+{
+    return mPersonName;
+}
+
+void Area::setPersonName(QString newPersonName)
+{
+    mPersonName = newPersonName;
+}
+
+QString Area::personUid() const
+{
+    return mPersonUid;
+}
+
+void Area::setPersonUid(QString newPersonUid)
+{
+    mPersonUid = newPersonUid;
+}
+
+QString Area::countryName() const
 {
     return mCountryName;
 }
 
-void Area::setCountryName(qint64 newCountryName)
+void Area::setCountryName(QString newCountryName)
 {
     mCountryName = newCountryName;
 }

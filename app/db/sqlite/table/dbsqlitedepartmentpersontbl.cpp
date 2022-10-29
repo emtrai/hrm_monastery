@@ -101,6 +101,7 @@ void DbSqliteDepartmentPersonTbl::addTableField(DbSqliteTableBuilder *builder)
     DbSqliteMapTbl::addTableField(builder);
     builder->addField(KFieldRoleUid, TEXT);
     builder->addField(KFieldCourseUid, TEXT);
+    tracede;
 }
 
 ErrCode DbSqliteDepartmentPersonTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)

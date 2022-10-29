@@ -71,7 +71,7 @@ QList<DbModel *> DbSqliteCommunityPersonTbl::getListPerson(const QString &commun
     cnt = runQuery(qry, &Person::build, &outList);
 
     logi("Found %d", cnt);
-
+    tracede;
     return outList;
 }
 
@@ -91,4 +91,5 @@ void DbSqliteCommunityPersonTbl::updateModelFromQuery(DbModel *item, const QSqlQ
     } else {
         loge("Invalid mapp model '%s', do nothing", modelName.toStdString().c_str());
     }
+    tracede;
 }

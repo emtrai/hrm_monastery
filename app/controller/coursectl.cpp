@@ -46,12 +46,18 @@ DbModel *CourseCtl::buildModel(void *items, const QString &fmt)
     item->setName(itemList->at(idx++));
     item->setNameId(item->name());
     item->setPeriod(itemList->at(idx++));
+
     QString startDate = itemList->at(idx++).trimmed();
     if (!startDate.isEmpty())
         item->setStartDate(Utils::dateFromString(startDate));
+
     QString endDate = itemList->at(idx++).trimmed();
     if (!endDate.isEmpty())
         item->setEndDate(Utils::dateFromString(endDate));
+
+    // TODO: validate if toInt ok or not ok
+    qint32 courseType = itemList->at(idx++).trimmed().toInt();
+    item->setCourseType(courseType);
 
     if (sz > idx) {
         QString remark = itemList->at(idx++);

@@ -52,7 +52,7 @@ DbSqliteTbl *DbSqliteCommunity::getTable(const QString &modelName)
     } else {
         tbl = getMainTbl();
     }
-
+    tracede;
     return tbl;
 }
 
@@ -82,25 +82,26 @@ ErrCode DbSqliteCommunity::addPerson2Community(const Community *comm, const Pers
 {
     traced;
     ErrCode err = ErrNone;
-    DbSqliteCommunityPersonTbl* tbl = (DbSqliteCommunityPersonTbl*)DbSqlite::getInstance()
-                                          ->getTable(KTableCommPerson);
+//    DbSqliteCommunityPersonTbl* tbl = (DbSqliteCommunityPersonTbl*)DbSqlite::getInstance()
+//                                          ->getTable(KTableCommPerson);
     logd("Build map object");
-    CommunityPerson* model = new CommunityPerson();
-    model->setDbId1(comm->dbId());
-    model->setUid1(comm->uid());
-    model->setDbId2(per->dbId());
-    model->setUid2(per->uid());
-    model->setStatus(status);
-    model->setStartDate(startdate);
-    model->setEndDate(enddate);
-    if (!remark.isEmpty())
-        model->setRemark(remark);
+//    CommunityPerson* model = new CommunityPerson();
+    SAVE_MAP_MODEL(CommunityPerson, comm, per, status, startdate, enddate, remark);
+//    model->setDbId1(comm->dbId());
+//    model->setUid1(comm->uid());
+//    model->setDbId2(per->dbId());
+//    model->setUid2(per->uid());
+//    model->setStatus(status);
+//    model->setStartDate(startdate);
+//    model->setEndDate(enddate);
+//    if (!remark.isEmpty())
+//        model->setRemark(remark);
 
-    logd("Add to db");
-    err = model->save();
+//    logd("Add to db");
+//    err = model->save();
 
-    delete model;
-    model = nullptr;
+//    delete model;
+//    model = nullptr;
     tracedr(err);
     return err;
 }

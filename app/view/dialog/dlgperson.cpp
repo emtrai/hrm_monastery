@@ -727,9 +727,9 @@ void DlgPerson::loadArea()
 {
     traced;
     ui->cbArea->clear();
-    QList<Area*> listItems = INSTANCE(AreaCtl)->getAreaList();
+    QList<DbModel*> listItems = INSTANCE(AreaCtl)->getAllItems();
     ui->cbArea->addItem(tr("Không xác đinh"), KUidNone);
-    foreach(Area* item, listItems){
+    foreach(DbModel* item, listItems){
         ui->cbArea->addItem(item->name(), item->uid());
     }
 }

@@ -37,6 +37,21 @@ DbSqliteCommunityTbl::DbSqliteCommunityTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableCommunity, KTableCommunity, KVersionCode)
 {}
 
+QList<DbModel *> DbSqliteCommunityTbl::getListCommunitiesInArea(const QString &areaUid, int status)
+{
+    traced;
+    QList<DbModel *> olist;
+    int ret = 0;
+    QHash<QString, int> fields;
+    fields.insert(KFieldAreaUid, TEXT);
+    // TODO: check status???
+    logd("Start search area uid %s", areaUid.toStdString().c_str());
+    ret = search(areaUid, fields, &Community::builder, &olist, true);
+    logd("ret=%d", ret);
+    tracede;
+    return olist;
+}
+
 
 ErrCode DbSqliteCommunityTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
 {
@@ -49,6 +64,8 @@ ErrCode DbSqliteCommunityTbl::insertTableField(DbSqliteInsertBuilder *builder, c
     builder->addValue(KFieldCreateDate, cmm->createDate());
     builder->addValue(KFieldFeastDay, cmm->feastDate());
     builder->addValue(KFieldParentUid, cmm->parentUid());
+    builder->addValue(KFieldAreaUid, cmm->areaUid());
+    builder->addValue(KFieldAreaDbId, cmm->areaDbId());
     builder->addValue(KFieldStatus, (qint32) cmm->getStatus());
     builder->addValue(KFieldImgPath, cmm->imgPath());
     return ErrNone;
@@ -62,6 +79,10 @@ void DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
     cmm->setCreateDate(qry.value(KFieldCreateDate).toInt());
     cmm->setImgPath(qry.value(KFieldImgPath).toString());
     cmm->setParentUid(qry.value(KFieldParentUid).toString());
+    cmm->setAreaUid(qry.value(KFieldAreaUid).toString());
+    cmm->setAreaDbId(qry.value(KFieldAreaDbId).toInt());
+    if (qry.value(KFieldAreaName).isValid())
+        cmm->setAreaName(qry.value(KFieldAreaName).toString());
     cmm->setAddr(qry.value(KFieldAddr).toString());
     cmm->setTel(qry.value(KFieldTel).toString());
     cmm->setEmail(qry.value(KFieldEmail).toString());
@@ -70,6 +91,19 @@ void DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
     cmm->setStatus((CommunityStatus)qry.value(KFieldStatus).toInt());
 }
 
+QString DbSqliteCommunityTbl::getSearchQueryString(const QString &cond)
+{
+    traced;
+    QString queryString = QString("SELECT *, %2.%5 AS %6 FROM %1 JOIN %2 ON %1.%3 = %2.%4")
+                              .arg(name(), KTableArea)
+                              .arg(KFieldAreaUid, KFieldUid)
+                              .arg(KFieldName, KFieldAreaName);
+    if (!cond.isEmpty()) {
+        queryString += QString(" WHERE %1").arg(cond);
+    }
+    logd("queryString: %s", queryString.toStdString().c_str());
+    return queryString;
+}
 
 void DbSqliteCommunityTbl::addTableField(DbSqliteTableBuilder *builder)
 {
@@ -82,6 +116,7 @@ void DbSqliteCommunityTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldCEOUid, TEXT);
     builder->addField(KFieldChurchUid, TEXT);
     builder->addField(KFieldAreaUid, TEXT);
+    builder->addField(KFieldAreaDbId, TEXT);
     builder->addField(KFieldLevel, INT32);
     builder->addField(KFieldParentUid, TEXT);
     builder->addField(KFieldCreateDate, INT64);

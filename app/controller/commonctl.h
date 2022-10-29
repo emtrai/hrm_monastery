@@ -14,27 +14,41 @@
  * limitations under the License.
  *
  *
- * Filename: dbsqliteareamgrtbl.h
+ * Filename: commonctl.h
  * Author: Anh, Ngo Huy
- * Created date:10/8/2022
+ * Created date:10/29/2022
  * Brief:
  */
-#ifndef DBSQLITEAREAMGRTBL_H
-#define DBSQLITEAREAMGRTBL_H
+#ifndef COMMONCTL_H
+#define COMMONCTL_H
 
-#include "dbsqlitedepartmentpersontbl.h"
+#include "controller.h"
+#include <QList>
 
-class DbSqliteAreaMgrTbl : public DbSqliteMapTbl
+class DbModel;
+
+
+class CommonCtl : public Controller
 {
+
 public:
-    DbSqliteAreaMgrTbl(DbSqlite* db);
-    QList<DbModel*> getListPerson(const QString& areaUid, int status = ITEM_MAP_STATUS_ACTIVE);
+    // Load Community from file
+    ErrCode loadFromFile(const QString& path);
+
+    virtual ErrCode loadFromDb();
+    const QList<DbModel*> getAllItems(bool reload = false);
 
 protected:
-    virtual void addTableField(DbSqliteTableBuilder* builder);
-    virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
-private:
-    static const qint32 KVersionCode;
+    CommonCtl();
+
+    virtual QList<DbModel*> getItemFromDb();
+
+    virtual void clearItemList(QList<DbModel*>* list);
+
+protected:
+
+    QList<DbModel*> mItemList;
+
 };
 
-#endif // DBSQLITEAREAMGRTBL_H
+#endif // COMMONCTL_H

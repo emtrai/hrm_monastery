@@ -38,6 +38,7 @@ SOURCES += \
     address.cpp \
     cache/cachectl.cpp \
     controller/areactl.cpp \
+    controller/commonctl.cpp \
     controller/communityctl.cpp \
     config/config.cpp \
     controller/controller.cpp \
@@ -52,6 +53,7 @@ SOURCES += \
     controller/statusctl.cpp \
     controller/workctl.cpp \
     crypto/crypto.cpp \
+    db/dbareamodelhandler.cpp \
     db/dbcommunitymodelhandler.cpp \
     db/dbctl.cpp \
     db/dbdepartmentmodelhandler.cpp \
@@ -82,6 +84,8 @@ SOURCES += \
     db/sqlite/handler/dbsqliteedu.cpp \
     db/sqlite/handler/dbsqliteethnic.cpp \
     db/sqlite/handler/dbsqliteevent.cpp \
+    db/sqlite/model/areacommunity.cpp \
+    db/sqlite/model/areaperson.cpp \
     db/sqlite/model/communitydept.cpp \
     db/sqlite/model/communityperson.cpp \
     db/sqlite/model/deptmgr.cpp \
@@ -171,6 +175,7 @@ SOURCES += \
     view/dialog/dlgprovince.cpp \
     view/dialog/dlgsaint.cpp \
     view/dialog/dlgsearchperson.cpp \
+    view/widget/uiarealistview.cpp \
     view/widget/uicommonlistview.cpp \
     view/widget/uicommunitylistview.cpp \
     view/widget/uicommunitypersonlistview.cpp \
@@ -179,6 +184,7 @@ SOURCES += \
     view/widget/uiitembutton.cpp \
     view/widget/uimulticomboxview.cpp \
     view/widget/uipersonlistview.cpp \
+    view/widget/uirolelistview.cpp \
     view/widget/uisaintlistview.cpp \
     view/widget/uisummarizeview.cpp \
     view/widget/uitableview.cpp \
@@ -188,6 +194,7 @@ HEADERS += \
     address.h \
     cache/cachectl.h \
     controller/areactl.h \
+    controller/commonctl.h \
     controller/communityctl.h \
     config/config.h \
     controller/controller.h \
@@ -202,6 +209,7 @@ HEADERS += \
     controller/statusctl.h \
     controller/workctl.h \
     crypto/crypto.h \
+    db/dbareamodelhandler.h \
     db/dbcommunitymodelhandler.h \
     db/dbctl.h \
     db/dbdefs.h \
@@ -233,6 +241,8 @@ HEADERS += \
     db/sqlite/handler/dbsqlitespecialist.h \
     db/sqlite/handler/dbsqlitestatus.h \
     db/sqlite/handler/dbsqlitework.h \
+    db/sqlite/model/areacommunity.h \
+    db/sqlite/model/areaperson.h \
     db/sqlite/model/communitydept.h \
     db/sqlite/model/communityperson.h \
     db/sqlite/model/deptmgr.h \
@@ -324,6 +334,7 @@ HEADERS += \
     view/dialog/dlgprovince.h \
     view/dialog/dlgsaint.h \
     view/dialog/dlgsearchperson.h \
+    view/widget/uiarealistview.h \
     view/widget/uicommonlistview.h \
     view/widget/uicommunitylistview.h \
     view/widget/uicommunitypersonlistview.h \
@@ -332,6 +343,7 @@ HEADERS += \
     view/widget/uiitembutton.h \
     view/widget/uimulticomboxview.h \
     view/widget/uipersonlistview.h \
+    view/widget/uirolelistview.h \
     view/widget/uisaintlistview.h \
     view/widget/uisummarizeview.h \
     view/widget/uitableview.h \

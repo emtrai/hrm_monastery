@@ -3,6 +3,7 @@
     {
         "id":"MAIN",
         "parentid":"",
+        "areaid":"VN_NT",
         "name":"Hội dòng",
         "church":"",
         "addr":"",
@@ -19,6 +20,7 @@
         {
         "id":"MTGNG",
         "parentid":"MAIN",
+        "areaid":"VN_BMT",
         "name":"CĐ. THÁNH GIA",
         "church":"GX. THÁNH GIA",
         "addr":"Số 10 Đông Phước, P. Phước Long, Bình Tân, NT",
@@ -35,6 +37,7 @@
         {
         "id":"BONAVENTURA",
         "parentid":"MAIN",
+        "areaid":"VN_BMT",
         "name":"CĐ. BONAVENTURA",
         "church":"GX. PHƯỚC HÒA",
         "addr":"Lô  5 + 7 + 9, Đường A6, Khu tái Định Cư VCN",

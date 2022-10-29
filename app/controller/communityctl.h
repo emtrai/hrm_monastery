@@ -41,7 +41,7 @@ public:
 
     ErrCode loadFromDb();
 
-    const QList<Community*> getCommunityList();
+    const QList<Community*> getCommunityList(bool reload = false);
     const QList<DbModel*> getPersonList(const QString& communityUid);
     ErrCode addPerson2Community(const Community* comm,
                       const Person* per,

@@ -48,6 +48,7 @@ MainWindow::MainWindow(QWidget *parent)
     , mPersonView(nullptr)
     , mAreaView(nullptr)
     , mDepartView(nullptr)
+    , mRoleView(nullptr)
     , mCurrentView(nullptr)
 {
     gInstance = this;
@@ -62,7 +63,8 @@ MainWindow::MainWindow(QWidget *parent)
     mSaintsView = UITableViewFactory::getView(ViewType::SAINT);
     mPersonView = UITableViewFactory::getView(ViewType::PERSON);
     mAreaView = UITableViewFactory::getView(ViewType::AREA);
-    mDepartView = UITableViewFactory::getView(ViewType::DEPARTMENT);
+    mDepartView = UITableViewFactory::getView(ViewType::VIEW_DEPARTMENT);
+    mRoleView = UITableViewFactory::getView(ViewType::VIEW_ROLE);
 
     mHomeView = new QTextBrowser(this);
     mHomeView->clearHistory();
@@ -82,6 +84,7 @@ MainWindow::MainWindow(QWidget *parent)
     mMainViews.append((QWidget*)mHomeView);
     mMainViews.append((QWidget*)mCommunityView);
     mMainViews.append((QWidget*)mDepartView);
+    mMainViews.append((QWidget*)mRoleView);
 
     switchView(mHomeView);
 
@@ -160,7 +163,7 @@ QWidget *MainWindow::getView(ViewType type)
     QWidget *nextView = nullptr;
     logd("type %d", type);
     switch (type) {
-    case ViewType::DEPARTMENT:
+    case ViewType::VIEW_DEPARTMENT:
         nextView = mDepartView;
         break;
     default:
@@ -205,13 +208,19 @@ void MainWindow::loadOtherMenu()
                                         tr("Thánh"));
     QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionSaints_2_triggered()));
 
+
     act = otherMenu->addAction(QIcon(QString::fromUtf8(":/icon/icon/icons8-earth-planet-80")),
                                tr("Khu vực"));
     QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionArea_triggered()));
 
+
     act = otherMenu->addAction(QIcon(QString::fromUtf8(":/icon/icon/icons8-unit-80.png")),
                                tr("Các ban"));
-                               QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionDepart_triggered()));
+    QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionDepart_triggered()));
+
+    act = otherMenu->addAction(QIcon(QString::fromUtf8(":/icon/icon/icons8-unit-80.png")),
+                               tr("Vị trí/vai trò"));
+    QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionRole_triggered()));
 
     otherButton->setMenu(otherMenu);
     // actionDummy? stupid? but it works
@@ -255,7 +264,6 @@ void MainWindow::loadImportMenu()
     QIcon mImportCommunityIcon;
     mImportCommunityIcon.addFile(QString::fromUtf8(":/icon/icon/icons8-community-64 (1).png"), QSize(), QIcon::Normal, QIcon::On);
     mActionImportCommunityList->setIcon(mImportCommunityIcon);
-
 
     importMenu->addAction(mActionImportCommunityList);
      // TODO: when menu is clear???? check it careffully
@@ -379,6 +387,13 @@ void MainWindow::on_actionDepart_triggered()
 {
     traced;
     switchView(mDepartView);
+    tracede;
+}
+
+void MainWindow::on_actionRole_triggered()
+{
+    traced;
+    switchView(mRoleView);
     tracede;
 }
 

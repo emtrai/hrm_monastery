@@ -123,6 +123,36 @@ DbModelHandler *Community::getDbModelHandler()
     return DbCtl::getDb()->getCommunityModelHandler();
 }
 
+const QString &Community::areaName() const
+{
+    return mAreaName;
+}
+
+void Community::setAreaName(const QString &newAreaName)
+{
+    mAreaName = newAreaName;
+}
+
+qint64 Community::areaDbId() const
+{
+    return mAreaDbId;
+}
+
+void Community::setAreaDbId(qint64 newAreaDbId)
+{
+    mAreaDbId = newAreaDbId;
+}
+
+const QString &Community::areaUid() const
+{
+    return mAreaUid;
+}
+
+void Community::setAreaUid(const QString &newAreaUid)
+{
+    mAreaUid = newAreaUid;
+}
+
 const QString &Community::imgPath() const
 {
     return mImgPath;

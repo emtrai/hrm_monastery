@@ -14,27 +14,30 @@
  * limitations under the License.
  *
  *
- * Filename: dbsqliteareamgrtbl.h
+ * Filename: uirolelistview.h
  * Author: Anh, Ngo Huy
- * Created date:10/8/2022
+ * Created date:10/25/2022
  * Brief:
  */
-#ifndef DBSQLITEAREAMGRTBL_H
-#define DBSQLITEAREAMGRTBL_H
+#ifndef UIROLELISTVIEW_H
+#define UIROLELISTVIEW_H
 
-#include "dbsqlitedepartmentpersontbl.h"
+#include "uicommonlistview.h"
 
-class DbSqliteAreaMgrTbl : public DbSqliteMapTbl
+class UIRoleListView : public UICommonListView
 {
-public:
-    DbSqliteAreaMgrTbl(DbSqlite* db);
-    QList<DbModel*> getListPerson(const QString& areaUid, int status = ITEM_MAP_STATUS_ACTIVE);
 
+public:
+    explicit UIRoleListView(QWidget *parent = nullptr);
+    virtual ~UIRoleListView();
 protected:
-    virtual void addTableField(DbSqliteTableBuilder* builder);
-    virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
-private:
-    static const qint32 KVersionCode;
+    virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
+    virtual ErrCode onMenuActionDelete(QMenu* menu, UITableMenuAction* act);
+    virtual void onViewItem(UITableWidgetItem *item);
+
+    virtual QString getTitle();
+protected:
+    virtual ErrCode onLoad();
 };
 
-#endif // DBSQLITEAREAMGRTBL_H
+#endif // UIROLELISTVIEW_H

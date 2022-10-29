@@ -37,7 +37,7 @@
     while(0)
 
 #define traced logd("IN>> %s", __func__)
-#define tracedr(ret) logd("<<END %s with ret=%d", __func__, ret)
+#define tracedr(ret) logd("<<END %s with ret=%d", __func__, (int)ret)
 #define tracede logd("<<END %s", __func__)
 
 // TODO: push log to file, make separate thread to writing log, to avoid impact

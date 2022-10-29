@@ -14,36 +14,34 @@
  * limitations under the License.
  *
  *
- * Filename: uicommunitylistview.h
+ * Filename: uiarealistview.h
  * Author: Anh, Ngo Huy
- * Created date:8/11/2022
+ * Created date:10/29/2022
  * Brief:
  */
-#ifndef UICOMMUNITYLISTVIEW_H
-#define UICOMMUNITYLISTVIEW_H
+#ifndef UIAREALISTVIEW_H
+#define UIAREALISTVIEW_H
 
 #include "uicommonlistview.h"
+class Area;
 
-class UICommunityListView : public UICommonListView
+class UIAreaListView : public UICommonListView
 {
 public:
-    explicit UICommunityListView(QWidget *parent = nullptr);
-    virtual ~UICommunityListView();
+    explicit UIAreaListView(QWidget *parent = nullptr);
+    virtual ~UIAreaListView();
 protected:
     void initHeader();
     void updateItem(DbModel *item, UITableItem *tblItem);
     virtual QList<UITableMenuAction*> getMenuItemActions(const QMenu* menu,
                                                           UITableWidgetItem* item);
-    virtual ErrCode onMenuActionListPerson(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onMenuActionListDepartment(QMenu* menu, UITableMenuAction* act);
-//    virtual ErrCode onMenuAction(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionDelete(QMenu* menu, UITableMenuAction* act);
-//    virtual ErrCode onMenuActionView(QMenu* menu, UITableMenuAction* act);
+    //    virtual ErrCode onMenuActionView(QMenu* menu, UITableMenuAction* act);
     virtual void onViewItem(UITableWidgetItem *item);
-protected:
-    virtual ErrCode onLoad();
-    virtual ErrCode onReload();
+    virtual Controller* getController();
+
+    virtual QList<DbModel*> getListItem();
 };
 
-#endif // UICOMMUNITYLISTVIEW_H
+#endif // UIAREALISTVIEW_H

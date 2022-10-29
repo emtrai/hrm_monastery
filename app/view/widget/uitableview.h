@@ -140,6 +140,11 @@ protected:
     virtual QList<UITableItem*> getListItem(qint32 page, qint32 perPage, qint32 totalPages);
     virtual qint32 getTotalItems();
     virtual ErrCode onLoad();
+    /**
+     * @brief Reload data, may need to re-fetch data from db instead of cache
+     * @return
+     */
+    virtual ErrCode onReload();
     virtual void importRequested(const QString& fpath);
     virtual void onViewItem(UITableWidgetItem *item);
 
@@ -152,6 +157,7 @@ protected:
     virtual ErrCode onMenuActionDelete(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionEdit(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionView(QMenu* menu, UITableMenuAction* act);
+    virtual ErrCode onMenuActionReload(QMenu* menu, UITableMenuAction* act);
 
     virtual void onFilter(const QString& catetory, qint64 opFlags, const QString& keywords);
 

@@ -122,6 +122,12 @@ int Controller::search(const QString &keyword, QList<DbModel *> *outList)
     return ret;
 }
 
+ErrCode Controller::loadFromDb()
+{
+    traced;
+    return ErrNotSupport;
+}
+
 
 DbModel *Controller::buildModel(void *items, const QString &fmt)
 {
@@ -129,6 +135,20 @@ DbModel *Controller::buildModel(void *items, const QString &fmt)
     UNUSED(items);
     UNUSED(fmt);
     return nullptr;
+}
+
+const char *Controller::getPrebuiltFileName()
+{
+    traced;
+    return nullptr;
+
+}
+
+const char *Controller::getPrebuiltFileType()
+{
+    traced;
+    return nullptr;
+
 }
 
 
@@ -211,4 +231,19 @@ ErrCode Controller::oneCSVItemCallback(const QStringList &items, void* caller, v
 void Controller::onLoad(){
     traced;
     logd("Onload %s", mName.toStdString().c_str());
+    ErrCode ret = ErrNone;
+    QString fname = getPrebuiltFileName();
+    if (!fname.isEmpty()) {
+        logi("Check & load from prebuilt file");
+        ret = check2UpdateDbFromPrebuiltFile(fname, getPrebuiltFileType());
+        logd("check2UpdateDbFromPrebuiltFile ret=%d", ret);
+        // TODO: should do lazyload???
+    } else {
+        logi("Not load from prebuilt file");
+    }
+
+    ret = loadFromDb(); // TODO: handle error case????
+    logd("load from db ret=%d", ret);
+    tracede;
+
 }

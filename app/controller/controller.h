@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QList>
 #include "errcode.h"
 
 #include "exportfactory.h"
@@ -30,8 +31,14 @@ public:
     virtual DbModel* doImportOneItem(int importFileType, const QStringList& items, quint32 idx);
 
     virtual int search(const QString& keyword, QList<DbModel*>* outList = nullptr);
+
+    virtual ErrCode loadFromDb();
 protected:
     virtual DbModel *buildModel(void* items, const QString& fmt);
+
+    virtual const char* getPrebuiltFileName();
+    virtual const char* getPrebuiltFileType();
+
     virtual ErrCode check2UpdateDbFromPrebuiltFile(const QString& fname,
                                                    const QString& ftype);
     virtual ErrCode doOneCSVItemCallback(const QStringList& items, void* param);

@@ -27,6 +27,8 @@
 #include "view/widget/uicommunitypersonlistview.h"
 #include "view/widget/uidepartmentlistview.h"
 #include "view/widget/uidepartmentpersonlistview.h"
+#include "view/widget/uirolelistview.h"
+#include "view/widget/uiarealistview.h"
 
 UITableView *UITableViewFactory::getView(ViewType type, QWidget *parent )
 {
@@ -44,16 +46,19 @@ UITableView *UITableViewFactory::getView(ViewType type, QWidget *parent )
         view = new UICommunityListView(parent);
         break;
     case AREA:
-        view = new UICommonListView(parent);
+        view = new UIAreaListView(parent);
         break;
     case COMMUNITY_PERSON:
         view = new UICommunityPersonListView(parent);
         break;
-    case DEPARTMENT:
+    case VIEW_DEPARTMENT:
         view = new UIDepartmentListView(parent);
         break;
-    case DEPARTMENT_PERSON:
+    case VIEW_DEPARTMENT_PERSON:
         view = new UIDepartmentPersonListView(parent);
+        break;
+    case VIEW_ROLE:
+        view = new UIRoleListView(parent);
         break;
     default:
         break;

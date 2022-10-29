@@ -56,37 +56,20 @@ DbModel *AreaCtl::buildModel(void *items, const QString &fmt)
     return item;
 }
 
-
-
-const QList<Area *> AreaCtl::getAreaList(const QString &country)
+const char *AreaCtl::getPrebuiltFileName()
 {
-    traced;
-
-    return mAreaList; // TODO: copy constructor???
+    return KPrebuiltAreaCSVFileName;
 }
 
-
-const QList<Area *> AreaCtl::getAreaList()
+const char *AreaCtl::getPrebuiltFileType()
 {
-    traced;
-
-    return mAreaList; // TODO: copy constructor???
+    return KFileTypeCSV;
 }
 
-
-void AreaCtl::onLoad()
+QList<DbModel *> AreaCtl::getItemFromDb()
 {
     traced;
-    ErrCode ret = ErrNone;
-    ret = check2UpdateDbFromPrebuiltFile(KPrebuiltAreaCSVFileName, KFileTypeCSV);
-    // TODO: should do lazy load??? load all consume much memory
-    QList items = DB->getModelHandler(KModelHdlArea)->getAll(&Area::builder);
-    //    mItemList.append();
-    logd("Load %d item", (int)items.count());
-    foreach (DbModel* model, items){
-        Area* item = (Area*)model;
-        mAreaList.append(item);
-    }
-    tracede;
+    return DB->getModelHandler(KModelHdlArea)->getAll(&Area::builder);
 }
+
 

@@ -49,6 +49,7 @@ void DbSqliteAreaTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldCountryUid, TEXT); // DB ID
     builder->addField(KFieldCountryDbId, INT64); // DB ID
     builder->addField(KFieldPersonDbId, INT64); // DB ID
+    builder->addField(KFieldPersonUid, TEXT); //
     builder->addField(KFieldRemark, TEXT);
     tracede;
 }
@@ -63,6 +64,7 @@ ErrCode DbSqliteAreaTbl::insertTableField(DbSqliteInsertBuilder *builder,
     builder->addValue(KFieldCountryUid, model->countryUid());
     builder->addValue(KFieldCountryDbId, model->countryDbId());
     builder->addValue(KFieldPersonDbId, model->personDbId());
+    builder->addValue(KFieldPersonUid, model->personUid());
     builder->addValue(KFieldRemark, model->remark());
     tracede;
     return ErrNone;
@@ -76,6 +78,26 @@ void DbSqliteAreaTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
     model->setCountryUid(qry.value(KFieldCountryUid).toString());//TODO: load country obj
     model->setCountryDbId(qry.value(KFieldCountryDbId).toInt());//TODO: load country obj
     model->setPersonDbId(qry.value(KFieldPersonDbId).toInt());
+    model->setPersonUid(qry.value(KFieldPersonUid).toString());
     model->setRemark(qry.value(KFieldRemark).toString());
+    if (qry.value(KFieldPersonName).isValid())
+        model->setPersonName(qry.value(KFieldPersonName).toString());
+    if (qry.value(KFieldCountryName).isValid())
+        model->setCountryName(qry.value(KFieldCountryName).toString());
+
     tracede;
+}
+
+QString DbSqliteAreaTbl::getSearchQueryString(const QString &cond)
+{
+    traced;
+    QString queryString = QString("SELECT *, %2.%5 AS %6 FROM %1 LEFT JOIN %2 ON %1.%3 = %2.%4")
+                              .arg(name(), KTableCountry)
+                              .arg(KFieldCountryUid, KFieldUid)
+                              .arg(KFieldName, KFieldCountryName);
+    if (!cond.isEmpty()) {
+        queryString += QString(" WHERE %1").arg(cond);
+    }
+    logd("queryString: %s", queryString.toStdString().c_str());
+    return queryString;
 }

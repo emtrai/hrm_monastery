@@ -104,6 +104,13 @@ Community* CommunityCtl::parseOneItem(const QJsonObject& jobj)
             ret->setCreateDateFromString(tmp);
     }
 
+
+    if (jobj.contains(JSON_AREA_UID)){
+        QString tmp = jobj[JSON_AREA_UID].toString().trimmed();
+        if (!tmp.isEmpty())
+            ret->setAreaUid(tmp);
+    }
+
     return ret;
 
 }
@@ -161,12 +168,7 @@ void CommunityCtl::onLoad()
     ErrCode ret = ErrNone;
     ret = check2UpdateDbFromPrebuiltFile(KPrebuiltCommunityJsonFileName, KFileTypeJson);
     // TODO: should do lazyload???
-    QList items = DB->getModelHandler(KModelHdlCommunity)->getAll(&Community::builder);
-    //    mItemList.append();
-    foreach (DbModel* model, items){
-        model->dump();
-        mListCommunity.append((Community*) model);
-    }
+    loadFromDb();
     tracede;
 }
 
@@ -180,10 +182,19 @@ ErrCode CommunityCtl::loadFromFile(const QString &path)
 ErrCode CommunityCtl::loadFromDb()
 {
     traced;
-    return ErrNone;
+    ErrCode err = ErrNone;
+    mListCommunity.clear(); // TODO: clear each item to avoid data leak?????
+    QList items = DB->getModelHandler(KModelHdlCommunity)->getAll(&Community::builder);
+    foreach (DbModel* model, items){
+        model->dump();
+        mListCommunity.append((Community*) model);
+    }
+    logd("load %d item from db", mListCommunity.count());
+    tracedr(err);
+    return err;
 }
 
-const QList<Community *> CommunityCtl::getCommunityList()
+const QList<Community *> CommunityCtl::getCommunityList(bool reload)
 {
 //    QList<Community*> list;
 //    traced;
@@ -202,6 +213,10 @@ const QList<Community *> CommunityCtl::getCommunityList()
 //    }
 //    return list;
     traced;
+    logd("reload %d", reload);
+    if (reload) {
+        loadFromDb();
+    }
     return mListCommunity;
 }
 

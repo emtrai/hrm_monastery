@@ -87,6 +87,8 @@ const char* const KModelNameMap = "map_model";
 const char* const KModelNamePersonDept = "person_dept";
 const char* const KModelNameRole = "role";
 const char* const KModelNameDepartment = "department";
+const char* const KModelNameAreaComm = "area_community";
+const char* const KModelNameAreaPerson = "area_person";
 
 const char* const KDataFormatList = "QList";
 const char* const KDataFormatStringList = "QStringList";
@@ -192,5 +194,6 @@ const char* const JSON_STATUS = "status";
 const char* const JSON_FEASTDAY = "feastday";
 const char* const JSON_ESTABLISH = "establishday";
 const char* const JSON_COMMUNITY_UID = "communityid";
+const char* const JSON_AREA_UID = "areaid";
 
 #endif // DEFS_H

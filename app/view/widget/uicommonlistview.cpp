@@ -60,9 +60,33 @@ qint32 UICommonListView::getTotalItems()
     return mItemList.count();
 }
 
+QList<DbModel *> UICommonListView::getListItem()
+{
+    return QList<DbModel*>();
+}
+
+Controller *UICommonListView::getController()
+{
+    return nullptr;
+}
+
 ErrCode UICommonListView::onLoad()
 {
     traced;
+    mItemList.clear(); // TODO: clean up item data???
+    mItemList = getListItem();
+    tracede;
+    return ErrNone;
+}
+
+ErrCode UICommonListView::onReload()
+{
+    traced;
+    Controller* ctl = getController();
+    if (ctl != nullptr)
+        ctl->loadFromDb();
+    onLoad();
+    tracede;
     return ErrNone;
 }
 

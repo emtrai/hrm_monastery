@@ -23,6 +23,11 @@
 #define COURSE_H
 
 #include <dbmodel.h>
+typedef enum CourseType {
+    COURSE_TYPE_COURSE = 0, // khoa hoc
+    COURSE_TYPE_TERM, // nhiem ki
+    COURSE_TYPE_MAX
+};
 
 class Course : public DbModel
 {
@@ -42,12 +47,16 @@ public:
     const QString &remark() const;
     void setRemark(const QString &newRemark);
 
+    qint32 courseType() const;
+    void setCourseType(qint32 newCourseType);
+
 protected:
     virtual DbModelHandler *getDbModelHandler();
 private:
     qint64 mStartDate;
     qint64 mEndDate;
     QString mPeriod;
+    qint32 mCourseType;
     QString mRemark;
 };
 

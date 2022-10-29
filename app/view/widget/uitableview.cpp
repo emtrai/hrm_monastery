@@ -82,8 +82,9 @@ void UITableView::setupUI()
 void UITableView::reload()
 {
     traced;
-    onLoad();
+    onReload();
     onUpdatePage(1);
+    tracede;
 }
 
 void UITableView::showEvent(QShowEvent *ev)
@@ -152,6 +153,12 @@ ErrCode UITableView::onLoad()
     return ErrNone;
 }
 
+ErrCode UITableView::onReload()
+{
+    traced;
+    return onLoad();
+}
+
 void UITableView::importRequested(const QString& fpath)
 {
     traced;
@@ -162,6 +169,7 @@ void UITableView::onViewItem(UITableWidgetItem *item)
     traced;
     logd("parent class, nothing to do");
 }
+
 
 QMenu* UITableView::buildPopupMenu(UITableWidgetItem* item)
 {
@@ -215,6 +223,10 @@ QList<UITableMenuAction *> UITableView::getMenuCommonActions(const QMenu* menu)
                                 return this->onMenuActionAdd(m, a);
                           }));
 
+    actionList.append(UITableMenuAction::build(tr("Tải lại"), this)
+                                                               ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                                                   return this->onMenuActionReload(m, a);
+                                                               }));
     return actionList;
 }
 
@@ -266,6 +278,13 @@ ErrCode UITableView::onMenuActionView(QMenu *menu, UITableMenuAction *act)
     onViewItem((UITableWidgetItem*)act->tblItem());
     return ErrNone;
 
+}
+
+ErrCode UITableView::onMenuActionReload(QMenu *menu, UITableMenuAction *act)
+{
+    traced;
+    reload();
+    tracede;
 }
 
 void UITableView::onFilter(const QString &catetory, qint64 opFlags, const QString &keywords)

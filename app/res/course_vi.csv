@@ -1,3 +1,4 @@
-#name, period,startdate,enddate,remark
-1990,1990-2000,,,
-2000,2000-2010,,,
+#name, period,startdate,enddate,coursetype,remark
+1990,1990-2000,,,0,
+2000,2000-2010,,,0,
+2000-2005,2000-2005,,,1,

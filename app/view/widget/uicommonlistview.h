@@ -26,6 +26,7 @@
 
 #include "dbmodel.h"
 #include "errcode.h"
+#include "controller.h"
 
 class UICommonListView : public UITableView
 {
@@ -36,7 +37,10 @@ protected:
     virtual QList<UITableItem*> getListItem(qint32 page, qint32 perPage, qint32 totalPages);
     virtual void updateItem(DbModel* item, UITableItem* tblItem);
     virtual qint32 getTotalItems();
+    virtual QList<DbModel*> getListItem();
+    virtual Controller* getController();
     virtual ErrCode onLoad();
+    virtual ErrCode onReload();
     virtual void initHeader();
 
 protected:
