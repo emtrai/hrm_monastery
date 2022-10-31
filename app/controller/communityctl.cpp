@@ -162,15 +162,15 @@ ErrCode CommunityCtl::parsePrebuiltFile(const QString &fpath, const QString &fty
     return ret;
 }
 
-void CommunityCtl::onLoad()
-{
-    traced;
-    ErrCode ret = ErrNone;
-    ret = check2UpdateDbFromPrebuiltFile(KPrebuiltCommunityJsonFileName, KFileTypeJson);
-    // TODO: should do lazyload???
-    loadFromDb();
-    tracede;
-}
+//void CommunityCtl::onLoad()
+//{
+//    traced;
+//    ErrCode ret = ErrNone;
+//    ret = check2UpdateDbFromPrebuiltFile(KPrebuiltCommunityJsonFileName, KFileTypeJson);
+//    // TODO: should do lazyload???
+//    loadFromDb();
+//    tracede;
+//}
 
 ErrCode CommunityCtl::loadFromFile(const QString &path)
 {
@@ -179,46 +179,46 @@ ErrCode CommunityCtl::loadFromFile(const QString &path)
     return ErrNone;
 }
 
-ErrCode CommunityCtl::loadFromDb()
-{
-    traced;
-    ErrCode err = ErrNone;
-    mListCommunity.clear(); // TODO: clear each item to avoid data leak?????
-    QList items = DB->getModelHandler(KModelHdlCommunity)->getAll(&Community::builder);
-    foreach (DbModel* model, items){
-        model->dump();
-        mListCommunity.append((Community*) model);
-    }
-    logd("load %d item from db", mListCommunity.count());
-    tracedr(err);
-    return err;
-}
-
-const QList<Community *> CommunityCtl::getCommunityList(bool reload)
-{
-//    QList<Community*> list;
+//ErrCode CommunityCtl::loadFromDb()
+//{
 //    traced;
-//    DbModelHandler* modelHandler = DbCtl::getDb()->getCommunityModelHandler();
-//    if (modelHandler != nullptr){
-//        QList<DbModel*> lstModel = modelHandler->getAll(&Community::builder);
-//        if (!lstModel.empty()) {
-//            foreach (DbModel* item, lstModel){
-//                list.append((Community*)item);
-//            }
-//        }
+//    ErrCode err = ErrNone;
+//    mListCommunity.clear(); // TODO: clear each item to avoid data leak?????
+//    QList items = DB->getModelHandler(KModelHdlCommunity)->getAll(&Community::builder);
+//    foreach (DbModel* model, items){
+//        model->dump();
+//        mListCommunity.append((Community*) model);
+//    }
+//    logd("load %d item from db", mListCommunity.count());
+//    tracedr(err);
+//    return err;
+//}
 
+//const QList<Community *> CommunityCtl::getCommunityList(bool reload)
+//{
+////    QList<Community*> list;
+////    traced;
+////    DbModelHandler* modelHandler = DbCtl::getDb()->getCommunityModelHandler();
+////    if (modelHandler != nullptr){
+////        QList<DbModel*> lstModel = modelHandler->getAll(&Community::builder);
+////        if (!lstModel.empty()) {
+////            foreach (DbModel* item, lstModel){
+////                list.append((Community*)item);
+////            }
+////        }
+
+////    }
+////    else{
+////        loge("DbSaint not ready");
+////    }
+////    return list;
+//    traced;
+//    logd("reload %d", reload);
+//    if (reload) {
+//        loadFromDb();
 //    }
-//    else{
-//        loge("DbSaint not ready");
-//    }
-//    return list;
-    traced;
-    logd("reload %d", reload);
-    if (reload) {
-        loadFromDb();
-    }
-    return mListCommunity;
-}
+//    return mListCommunity;
+//}
 
 const QList<DbModel *> CommunityCtl::getPersonList(const QString &communityUid)
 {
@@ -233,5 +233,20 @@ ErrCode CommunityCtl::addPerson2Community(const Community *comm, const Person *p
     traced;
     DbCommunityModelHandler* model =  dynamic_cast<DbCommunityModelHandler*>(DB->getModelHandler(KModelHdlCommunity));
     return model->addPerson2Community(comm, per, status, startdate, enddate, remark);
+}
+
+const char *CommunityCtl::getPrebuiltFileName()
+{
+    return KPrebuiltCommunityJsonFileName;
+}
+
+const char *CommunityCtl::getPrebuiltFileType()
+{
+    return KFileTypeJson;
+}
+
+QList<DbModel *> CommunityCtl::getItemFromDb()
+{
+    return DB->getModelHandler(KModelHdlCommunity)->getAll(&Community::builder);
 }
 

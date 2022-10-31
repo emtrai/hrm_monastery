@@ -38,6 +38,12 @@ public:
     virtual ErrCode loadFromDb();
     const QList<DbModel*> getAllItems(bool reload = false);
 
+    /* Derived class should implement below functions
+     * virtual const char* getPrebuiltFileName();
+     * virtual const char* getPrebuiltFileType();
+     * virtual QList<DbModel*> getItemFromDb();
+     */
+
 protected:
     CommonCtl();
 

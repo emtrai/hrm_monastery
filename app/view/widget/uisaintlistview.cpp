@@ -41,13 +41,14 @@ UISaintListView::~UISaintListView()
 
 ErrCode UISaintListView::onLoad()
 {
-    QList<Saint*> items = SaintCtl::getInstance()->getListSaints();
+
     traced;
     mItemList.clear(); // TODO: clean up item data
+    mItemList = SAINTCTL->getAllItems();
     // TODO: loop to much, redundant, do something better?
-    foreach (Saint* item, items) {
-        mItemList.append(static_cast<DbModel*>(item));
-    }
+//    foreach (Saint* item, items) {
+//        mItemList.append(static_cast<DbModel*>(item));
+//    }
     return ErrNone;
 }
 
@@ -71,12 +72,12 @@ void UISaintListView::initHeader()
     mHeader.append(tr("Ghi chú"));
 }
 
-void UISaintListView::onFilter(const QString &catetory, qint64 opFlags, const QString &keywords)
+int UISaintListView::onFilter(int catetoryid, const QString &catetory, qint64 opFlags, const QString &keywords)
 {
     traced;
     QList<DbModel*> list;
     logd("Search %s", keywords.toStdString().c_str());
-    int cnt = SaintCtl::getInstance()->search(keywords, &list);
+    int cnt = SAINTCTL->search(keywords, &list);
     logd("Search ret %d", cnt);
     mItemList.clear(); // TODO: clean up item data
     // TODO: loop to much, redundant, do something better?
@@ -88,4 +89,5 @@ void UISaintListView::onFilter(const QString &catetory, qint64 opFlags, const QS
         logi("Nothing to add");
     }
     reload();
+    return cnt;
 }

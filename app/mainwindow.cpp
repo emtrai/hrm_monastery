@@ -37,6 +37,21 @@
 
 #include "view/dialog/dlgimportpersonlistresult.h"
 #include "personctl.h"
+#include "dialog/dlgabout.h"
+
+
+#define ADD_MENU_ITEM(menu, func, name, iconPath) \
+do { \
+        QAction* act = new QAction(this);\
+        act->setText(tr(name));\
+        QIcon icon;\
+        icon.addFile(QString::fromUtf8(iconPath), QSize(), QIcon::Normal, QIcon::On);\
+        act->setIcon(icon);\
+        QObject::connect(act, SIGNAL(triggered()), this, SLOT(func()));\
+        menu->addAction(act);\
+} while (0)
+
+
 
 MainWindow* MainWindow::gInstance = nullptr;
 
@@ -56,6 +71,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     loadImportMenu();
     loadOtherMenu();
+    loadExportMenu();
 
     mSummarizeView = new UISummarizeView();
 
@@ -188,6 +204,14 @@ void MainWindow::loadHomePageFile()
     // TODO: should log to file???
 }
 
+#define ADD_ACTION_ITEM(menu, func, name, iconPath) \
+    do { \
+        QAction* act = nullptr;\
+        act = menu->addAction(QIcon(QString::fromUtf8(iconPath)), \
+                                   tr(name)); \
+        QObject::connect(act, SIGNAL(triggered()), this, SLOT(func())); \
+    } while (0)
+
 
 void MainWindow::loadOtherMenu()
 {
@@ -203,72 +227,180 @@ void MainWindow::loadOtherMenu()
     otherButton->setIcon(icon);
 
     QMenu *otherMenu = new QMenu(otherButton);
-    // TODO: when other menu clear? check it
-    QAction* act = otherMenu->addAction(QIcon(QString::fromUtf8(":/icon/icon/icons8-saint-64")),
-                                        tr("Thánh"));
-    QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionSaints_2_triggered()));
-
-
-    act = otherMenu->addAction(QIcon(QString::fromUtf8(":/icon/icon/icons8-earth-planet-80")),
-                               tr("Khu vực"));
-    QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionArea_triggered()));
-
-
-    act = otherMenu->addAction(QIcon(QString::fromUtf8(":/icon/icon/icons8-unit-80.png")),
-                               tr("Các ban"));
-    QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionDepart_triggered()));
-
-    act = otherMenu->addAction(QIcon(QString::fromUtf8(":/icon/icon/icons8-unit-80.png")),
-                               tr("Vị trí/vai trò"));
-    QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionRole_triggered()));
 
     otherButton->setMenu(otherMenu);
     // actionDummy? stupid? but it works
     ui->toolBar->insertWidget(ui->actionDummy, otherButton);
+
+    ADD_ACTION_ITEM(otherMenu,
+                    on_actionArea_triggered,
+                    "Khu vực/Vùng",
+                    ICON_PATH("icons8-earth-planet-80"));
+
+    ADD_ACTION_ITEM(otherMenu,
+                    on_actionSaints_2_triggered,
+                    "Thánh",
+                    ICON_PATH("icons8-saint-64"));
+
+
+    ADD_ACTION_ITEM(otherMenu,
+                    on_actionRole_triggered,
+                    "Vị trí/vai trò",
+                    ICON_PATH("icons8-unit-80"));
+
+
+    ADD_ACTION_ITEM(otherMenu,
+                    on_actionCountry_triggered,
+                    "Quốc gia",
+                    ICON_PATH("icons8-catholic-64"));
+
+
+
+    ADD_ACTION_ITEM(otherMenu,
+                    on_actionProvince_triggered,
+                    "Tỉnh/Thành phố/Bang",
+                       ICON_PATH("icons8-catholic-64"));
+
+    ADD_ACTION_ITEM(otherMenu,
+                    on_actionMisson_triggered,
+                    "Nhiệm vụ xã hội",
+                    ICON_PATH("icons8-catholic-64"));
+
+
+    ADD_ACTION_ITEM(otherMenu,
+                    on_actionSpeclialist_triggered,
+                    "Chuyên môn",
+                    ICON_PATH("icons8-catholic-64"));
+
+    ADD_ACTION_ITEM(otherMenu,
+                    on_actionEducation_triggered,
+                    "Giáo dục",
+                    ICON_PATH("icons8-catholic-64"));
+
+    ADD_ACTION_ITEM(otherMenu,
+                    on_actionWork_triggered,
+                    "Công việc",
+                    ICON_PATH("icons8-catholic-64"));
+
+    ADD_ACTION_ITEM(otherMenu,
+                    on_actionEthnic_triggered,
+                    "Dân tộc",
+                    ICON_PATH("icons8-catholic-64"));
+//    QAction* act = nullptr;
+
+//    act = otherMenu->addAction(QIcon(QString::fromUtf8(":/icon/icon/icons8-earth-planet-80")),
+//                               tr("Khu vực"));
+//    QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionArea_triggered()));
+
+    // TODO: when other menu clear? check it
+//    act = otherMenu->addAction(QIcon(QString::fromUtf8(":/icon/icon/icons8-saint-64")),
+//                                        tr("Thánh"));
+//                   QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionSaints_2_triggered()));
+
+
+//    act = otherMenu->addAction(QIcon(QString::fromUtf8(":/icon/icon/icons8-unit-80.png")),
+//                               tr("Vị trí/vai trò"));
+//    QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionRole_triggered()));
+
 }
 
 void MainWindow::loadImportMenu()
 {
     traced;
 
-    QToolButton *importButton = new QToolButton(this);
+    mImportButton = new QToolButton(this);
     // TODO: when import button be clear? check it
-    importButton->setText(tr("&Nhập"));
-    importButton->setPopupMode(QToolButton::InstantPopup);
-    importButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    mImportButton->setText(tr("&Nhập dữ liệu"));
+    mImportButton->setPopupMode(QToolButton::InstantPopup);
+    mImportButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     QIcon icon;
     icon.addFile(QString::fromUtf8(":/icon/icon/icons8-import-64"), QSize(), QIcon::Normal, QIcon::On);
-    importButton->setIcon(icon);
+    mImportButton->setIcon(icon);
 
-    QMenu *importMenu = new QMenu(importButton);
+    QMenu *importMenu = new QMenu(mImportButton);
 
-    mActionImportPersonList = new QAction(this);
-    mActionImportPersonList->setObjectName(QString::fromUtf8("action_ImportPersonList"));
-    mActionImportPersonList->setText(tr("Danh sách Nữ tu"));
-    QIcon mImportPersonListIcon;
-    mImportPersonListIcon.addFile(QString::fromUtf8(":/icon/icon/icons8-nun-64.png"), QSize(), QIcon::Normal, QIcon::On);
-    mActionImportPersonList->setIcon(mImportPersonListIcon);
-    QObject::connect(mActionImportPersonList, SIGNAL(triggered()), this, SLOT(on_action_ImportPersonList_triggered()));
-    importMenu->addAction(mActionImportPersonList);
+    // TODO: when menu is clear???? check it careffully
+    mImportButton->setMenu(importMenu);
+    ui->toolBar->insertWidget(ui->action_New, mImportButton);
 
-    mActionImportPerson = new QAction(this);
-    mActionImportPerson->setObjectName(QString::fromUtf8("action_ImportPerson"));
-    mActionImportPerson->setText(tr("Nữ tu"));
-    mActionImportPerson->setIcon(mImportPersonListIcon);
-//    QObject::connect(mActionImportPerson, SIGNAL(triggered()), this, SLOT(on_action_ImportPersonList_triggered()));
-    importMenu->addAction(mActionImportPerson);
+    ADD_MENU_ITEM(importMenu,
+                  on_action_ImportPersonList_triggered,
+                  "Danh sách Nữ Tu",
+                  ":/icon/icon/icons8-nun-64.png");
 
-    mActionImportCommunityList = new QAction(this);
-    mActionImportCommunityList->setObjectName(QString::fromUtf8("action_ImportCommunityList"));
-    mActionImportCommunityList->setText(tr("Danh sách Cộng đoàn"));
-    QIcon mImportCommunityIcon;
-    mImportCommunityIcon.addFile(QString::fromUtf8(":/icon/icon/icons8-community-64 (1).png"), QSize(), QIcon::Normal, QIcon::On);
-    mActionImportCommunityList->setIcon(mImportCommunityIcon);
+    ADD_MENU_ITEM(importMenu,
+                  on_action_ImportPerson_triggered,
+                  "Nữ Tu",
+                  ":/icon/icon/icons8-nun-64.png");
 
-    importMenu->addAction(mActionImportCommunityList);
-     // TODO: when menu is clear???? check it careffully
-    importButton->setMenu(importMenu);
-    ui->toolBar->insertWidget(ui->action_New, importButton);
+    ADD_MENU_ITEM(importMenu,
+                  on_action_ImportCommunityList_triggered,
+                  "Danh sách Cộng đoàn",
+                  ":/icon/icon/icons8-community-64 (1).png");
+
+    ADD_MENU_ITEM(importMenu,
+                  on_action_ImportCommunity_triggered,
+                  "Cộng đoàn",
+                  ":/icon/icon/icons8-community-64 (1).png");
+
+//    mActionImportPersonList = new QAction(this);
+//    mActionImportPersonList->setObjectName(QString::fromUtf8("action_ImportPersonList"));
+//    mActionImportPersonList->setText(tr("Danh sách Nữ tu"));
+//    QIcon mImportPersonListIcon;
+//    mImportPersonListIcon.addFile(QString::fromUtf8(":/icon/icon/icons8-nun-64.png"), QSize(), QIcon::Normal, QIcon::On);
+//    mActionImportPersonList->setIcon(mImportPersonListIcon);
+//    QObject::connect(mActionImportPersonList, SIGNAL(triggered()), this, SLOT(on_action_ImportPersonList_triggered()));
+//    importMenu->addAction(mActionImportPersonList);
+
+//    mActionImportPerson = new QAction(this);
+//    mActionImportPerson->setObjectName(QString::fromUtf8("action_ImportPerson"));
+//    mActionImportPerson->setText(tr("Nữ tu"));
+//    mActionImportPerson->setIcon(mImportPersonListIcon);
+////    QObject::connect(mActionImportPerson, SIGNAL(triggered()), this, SLOT(on_action_ImportPersonList_triggered()));
+//    importMenu->addAction(mActionImportPerson);
+
+//    mActionImportCommunityList = new QAction(this);
+//    mActionImportCommunityList->setObjectName(QString::fromUtf8("action_ImportCommunityList"));
+//    mActionImportCommunityList->setText(tr("Danh sách Cộng đoàn"));
+//    QIcon mImportCommunityIcon;
+//    mImportCommunityIcon.addFile(QString::fromUtf8(":/icon/icon/icons8-community-64 (1).png"), QSize(), QIcon::Normal, QIcon::On);
+//    mActionImportCommunityList->setIcon(mImportCommunityIcon);
+//    importMenu->addAction(mActionImportCommunityList);
+
+    tracede;
+}
+
+void MainWindow::loadExportMenu()
+{
+    traced;
+
+    mExportButton = new QToolButton(this);
+    // TODO: when import button be clear? check it
+    mExportButton->setText(tr("&Xuất dữ liệu"));
+    mExportButton->setPopupMode(QToolButton::InstantPopup);
+    mExportButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    QIcon icon;
+    icon.addFile(QString::fromUtf8(":/icon/icon/icons8-export-100"), QSize(), QIcon::Normal, QIcon::On);
+    mExportButton->setIcon(icon);
+
+    QMenu *exportMenu = new QMenu(mExportButton);
+    // TODO: when menu is clear???? check it careffully
+    mExportButton->setMenu(exportMenu);
+    ui->toolBar->insertWidget(ui->action_New, mExportButton);
+
+    ADD_MENU_ITEM(exportMenu,
+                  on_action_ExportPersonList_triggered,
+                  "Danh sách Nữ tu",
+                  ICON_PATH("icons8-nun-64.png"));
+
+    tracede;
+
+}
+
+void MainWindow::on_action_ImportPerson_triggered()
+{
+    traced;
+    // TODO: implement it
 }
 
 void MainWindow::on_action_ImportPersonList_triggered()
@@ -293,6 +425,21 @@ void MainWindow::on_action_ImportPersonList_triggered()
         dlg->exec();
         delete dlg;
     }
+
+}
+
+void MainWindow::on_action_ImportCommunityList_triggered()
+{
+    traced;
+    UNDER_DEV(tr("Nhập danh sách Cộng Đoàn từ tập tin"));
+    // TODO: implement it
+}
+
+void MainWindow::on_action_ImportCommunity_triggered()
+{
+    traced;
+    UNDER_DEV(tr("Nhập Cộng Đoàn từ tập tin"));
+    // TODO: implement it
 
 }
 
@@ -374,6 +521,7 @@ void MainWindow::on_actionPerson_triggered()
 void MainWindow::on_actionSearch_triggered()
 {
     traced;
+    UNDER_DEV(tr("Tìm kiếm thông tin"));
 }
 
 void MainWindow::on_actionArea_triggered()
@@ -383,12 +531,6 @@ void MainWindow::on_actionArea_triggered()
     tracede;
 }
 
-void MainWindow::on_actionDepart_triggered()
-{
-    traced;
-    switchView(mDepartView);
-    tracede;
-}
 
 void MainWindow::on_actionRole_triggered()
 {
@@ -400,5 +542,116 @@ void MainWindow::on_actionRole_triggered()
 MainWindow *MainWindow::getInstance()
 {
     return gInstance;
+}
+
+
+void MainWindow::on_actionDept_triggered()
+{
+    traced;
+    switchView(mDepartView);
+    tracede;
+
+}
+
+void MainWindow::on_action_ExportPersonList_triggered()
+{
+    traced;
+    UNDER_DEV(tr("Xuất danh sách nữ tu ra tập tin"));
+}
+
+
+void MainWindow::on_action_About_triggered()
+{
+    DlgAbout* dlg = new DlgAbout(this);
+    dlg->exec();
+    delete dlg;
+}
+
+
+void MainWindow::on_action_Backup_triggered()
+{
+    traced;
+    UNDER_DEV(tr("Sao lưu dữ liệu"));
+    // TODO: implement it
+
+}
+
+
+void MainWindow::on_actionRestore_triggered()
+{
+    traced;
+    UNDER_DEV(tr("Phục hồi dữ liệu đã sao lưu"));
+    // TODO: implement it
+
+}
+
+
+void MainWindow::on_actionRevert_triggered()
+{
+    traced;
+    UNDER_DEV(tr("Khôi phục dữ liệu (khôi phục dữ liệu cũ, trong trường hợp dữ liệu hiện tại bị lỗi)"));
+    // TODO: implement it
+
+}
+
+
+void MainWindow::on_action_Help_triggered()
+{
+    traced;
+    UNDER_DEV(tr("Hướng dẫn sử dụng phần mềm"));
+    // TODO: implement it
+
+}
+
+void MainWindow::on_actionEthnic_triggered()
+{
+    traced;
+    UNDER_DEV(tr("Dân tộc"));
+    // TODO: implement it
+}
+
+void MainWindow::on_actionWork_triggered()
+{
+
+    traced;
+    UNDER_DEV(tr("Công việc"));
+    // TODO: implement it
+
+}
+
+void MainWindow::on_actionEducation_triggered()
+{
+
+    traced;
+    UNDER_DEV(tr("Giáo dục"));
+    // TODO: implement it
+}
+
+void MainWindow::on_actionSpeclialist_triggered()
+{
+    traced;
+    UNDER_DEV(tr("Chuyên môn"));
+    // TODO: implement it
+}
+
+void MainWindow::on_actionMisson_triggered()
+{
+    traced;
+    UNDER_DEV(tr("Nhiệm vụ"));
+    // TODO: implement it
+}
+
+void MainWindow::on_actionProvince_triggered()
+{
+    traced;
+    UNDER_DEV(tr("Tỉnh/Thành phố/Bang"));
+    // TODO: implement it
+}
+
+void MainWindow::on_actionCountry_triggered()
+{
+    traced;
+    UNDER_DEV(tr("Quốc gia"));
+    // TODO: implement it
 }
 

@@ -27,15 +27,16 @@
 #include "community.h"
 #include "utils.h"
 #include <QPushButton>
+#include "dbmodel.h"
 
 DlgAddCommunityHistory::DlgAddCommunityHistory(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DlgAddCommunityHistory)
 {
     ui->setupUi(this);
-    mListCommunity = COMMUNITYCTL->getCommunityList();
+    mListCommunity = COMMUNITYCTL->getAllItems();
     if (!mListCommunity.empty()){
-        foreach(Community* item, mListCommunity){
+        foreach(DbModel* item, mListCommunity){
             ui->cbCommunity->addItem(item->name(), item->dbId());
         }
     }
@@ -61,7 +62,7 @@ const Community *DlgAddCommunityHistory::getCommunity()
     logd("index %d", index);
     if (index >= 0){
         // TODO: index > array, index of combo box match with index of list???
-        com = mListCommunity.at(index);
+        com = (Community*)mListCommunity.at(index);
     }
     return com;
 }

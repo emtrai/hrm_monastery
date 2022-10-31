@@ -42,6 +42,9 @@ protected:
     virtual ErrCode onLoad();
     virtual ErrCode onReload();
     virtual void initHeader();
+    virtual void initFilterFields();
+    virtual void initFilterOperators();
+    virtual QHash<QString, QString> getFilterKeywords(int fieldId, const QString& fieldText);
 
 protected:
     QList<DbModel*> mItemList;

@@ -31,6 +31,11 @@ public:
     virtual DbModel* doImportOneItem(int importFileType, const QStringList& items, quint32 idx);
 
     virtual int search(const QString& keyword, QList<DbModel*>* outList = nullptr);
+    virtual int filter(int catetoryid,
+                       const QString& catetory,
+                       qint64 opFlags,
+                       const QString& keywords,
+                       QList<DbModel*>* outList = nullptr);
 
     virtual ErrCode loadFromDb();
 protected:

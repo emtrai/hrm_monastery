@@ -38,6 +38,14 @@ protected:
     virtual void importRequested(const QString& fpath);
     virtual void onViewItem(UITableWidgetItem *item);
     virtual QString getTitle();
+
+    virtual void initFilterFields();
+
+    virtual int onFilter(int catetoryid,
+                          const QString& catetory,
+                          qint64 opFlags,
+                          const QString& keywords);
+
 private:
     void cleanUpItem();
 //public:

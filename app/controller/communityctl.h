@@ -26,22 +26,23 @@
 #include "logger.h"
 #include "errcode.h"
 #include "controller.h"
+#include "commonctl.h"
 
 #define COMMUNITYCTL (CommunityCtl::getInstance())
 
 class Community;
 class Person;
 
-class CommunityCtl: public Controller
+class CommunityCtl: public CommonCtl
 {
 
 public:
     // Load Community from file
     ErrCode loadFromFile(const QString& path);
 
-    ErrCode loadFromDb();
+//    ErrCode loadFromDb();
 
-    const QList<Community*> getCommunityList(bool reload = false);
+//    const QList<Community*> getCommunityList(bool reload = false);
     const QList<DbModel*> getPersonList(const QString& communityUid);
     ErrCode addPerson2Community(const Community* comm,
                       const Person* per,
@@ -49,6 +50,11 @@ public:
                       qint64 startdate = 0,
                       qint64 enddate = 0,
                       const QString& remark = nullptr);
+
+    virtual const char* getPrebuiltFileName();
+    virtual const char* getPrebuiltFileType();
+    virtual QList<DbModel*> getItemFromDb();
+
 private:
     CommunityCtl();
 
@@ -61,10 +67,10 @@ protected:
 private:
     static CommunityCtl* gInstance;
 
-    QList<Community*> mListCommunity;
+//    QList<Community*> mListCommunity;
 
-public slots:
-    virtual void onLoad();
+//public slots:
+//    virtual void onLoad();
 };
 
 #endif // COMMUNITYCTL_H

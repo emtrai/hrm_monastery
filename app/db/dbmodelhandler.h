@@ -69,6 +69,11 @@ public:
      */
     virtual int searchAll(const QString& keyword, QList<DbModel*>* outList = nullptr);
 
+    virtual int filter(int fieldId,
+                       int operatorId,
+                       const QString& keyword,
+                       QList<DbModel*>* outList = nullptr);
+
     // TODO: implement filter with operator (equal, greater, in range, etc.)
 
     virtual DbModel *getByName(const QString& name, const DbModelBuilder& builder);

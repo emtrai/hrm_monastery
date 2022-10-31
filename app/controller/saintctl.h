@@ -27,11 +27,14 @@
 #include <QStringList>
 #include <QHash>
 #include "saint.h"
+#include "commonctl.h"
 
-class SaintCtl : public Controller
+#define SAINTCTL SaintCtl::getInstance()
+
+class SaintCtl : public CommonCtl
 {
 public:
-    QList<Saint*> getListSaints();
+//    QList<Saint*> getListSaints();
     virtual DbModel* doImportOneItem(int importFileType, const QStringList& items, quint32 idx);
     virtual DbModelHandler* getModelHandler();
 private:
@@ -40,7 +43,10 @@ private:
 protected:
     DbModel *buildModel(void *items, const QString &fmt);
     virtual ErrCode parsePrebuiltFile(const QString &fpath, const QString &ftype);
+    virtual const char* getPrebuiltFileName();
+    virtual const char* getPrebuiltFileType();
 
+    virtual QList<DbModel*> getItemFromDb();
 public:
     static SaintCtl *getInstance();
 
@@ -49,8 +55,8 @@ private:
     static SaintCtl* gInstance;
     QList<QString> mImportFields;
 
-public slots:
-    virtual void onLoad();
+//public slots:
+//    virtual void onLoad();
 };
 
 #endif // SAINTCTL_H

@@ -60,6 +60,14 @@ int DbModelHandler::searchAll(const QString &keyword, QList<DbModel *> *outList)
     return 0;
 }
 
+int DbModelHandler::filter(int fieldId, int operatorId, const QString &keyword, QList<DbModel *> *outList)
+{
+    traced;
+    loge("Default filter one, do nothing");
+    return 0;
+
+}
+
 DbModel *DbModelHandler::getByName(const QString &name, const DbModelBuilder &builder)
 {
     traced;

@@ -26,6 +26,7 @@
 #include <QAbstractButton>
 
 class Community;
+class DbModel;
 
 namespace Ui {
 class DlgAddCommunityHistory;
@@ -49,7 +50,7 @@ private slots:
 //    void on_buttonBox_clicked( QAbstractButton * button );
 private:
     Ui::DlgAddCommunityHistory *ui;
-    QList<Community*> mListCommunity;
+    QList<DbModel*> mListCommunity;
 };
 
 #endif // DLGADDCOMMUNITYHISTORY_H

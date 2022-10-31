@@ -38,25 +38,25 @@ SaintCtl *SaintCtl::gInstance = nullptr;
 #define SPLIT ','
 
 
-QList<Saint*> SaintCtl::getListSaints()
-{
-    traced;
-    QList<Saint*> list;
-    DbModelHandler* dbSaint = DbCtl::getDb()->getSaintModelHandler();
-    if (dbSaint != nullptr){
-        QList<DbModel*> lstModel = dbSaint->getAll(&Saint::builder);
-        if (!lstModel.empty()) {
-            foreach (DbModel* item, lstModel){
-                list.append((Saint*)item);
-            }
-        }
+//QList<Saint*> SaintCtl::getListSaints()
+//{
+//    traced;
+//    QList<Saint*> list;
+//    DbModelHandler* dbSaint = DbCtl::getDb()->getSaintModelHandler();
+//    if (dbSaint != nullptr){
+//        QList<DbModel*> lstModel = dbSaint->getAll(&Saint::builder);
+//        if (!lstModel.empty()) {
+//            foreach (DbModel* item, lstModel){
+//                list.append((Saint*)item);
+//            }
+//        }
 
-    }
-    else{
-        loge("DbSaint not ready");
-    }
-    return list;
-}
+//    }
+//    else{
+//        loge("DbSaint not ready");
+//    }
+//    return list;
+//}
 
 DbModel *SaintCtl::doImportOneItem(int importFileType, const QStringList &items, quint32 idx)
 {
@@ -183,19 +183,35 @@ ErrCode SaintCtl::parsePrebuiltFile(const QString &fpath, const QString &ftype)
     return ret;
 }
 
+const char *SaintCtl::getPrebuiltFileName()
+{
+    return KPrebuiltSaintCSVFileName;
+}
+
+const char *SaintCtl::getPrebuiltFileType()
+{
+    return KFileTypeCSV;
+}
+
+QList<DbModel *> SaintCtl::getItemFromDb()
+{
+    traced;
+    return DB->getModelHandler(KModelHdlSaint)->getAll(&Saint::builder);
+}
+
 DbModelHandler *SaintCtl::getModelHandler()
 {
     traced;
     return DB->getModelHandler(KModelHdlSaint);
 }
 
-void SaintCtl::onLoad()
-{
-    traced;
-    ErrCode ret = ErrNone;
-    ret = check2UpdateDbFromPrebuiltFile(KPrebuiltSaintCSVFileName, KFileTypeCSV);
+//void SaintCtl::onLoad()
+//{
+//    traced;
+//    ErrCode ret = ErrNone;
+//    ret = check2UpdateDbFromPrebuiltFile(KPrebuiltSaintCSVFileName, KFileTypeCSV);
 
-}
+//}
 
 SaintCtl *SaintCtl::getInstance()
 {

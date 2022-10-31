@@ -21,7 +21,9 @@
  */
 #include "uicommonlistview.h"
 #include "logger.h"
-
+#include "saintctl.h"
+#include "communityctl.h"
+#include "filter.h"
 
 UICommonListView::UICommonListView(QWidget *parent):
     UITableView(parent)
@@ -75,6 +77,7 @@ ErrCode UICommonListView::onLoad()
     traced;
     mItemList.clear(); // TODO: clean up item data???
     mItemList = getListItem();
+    clearFilter();
     tracede;
     return ErrNone;
 }
@@ -96,5 +99,48 @@ void UICommonListView::initHeader()
     mHeader.append(tr("ID"));
     mHeader.append(tr("Mã định danh"));
     mHeader.append(tr("Tên"));
+        tracede;
+}
+
+void UICommonListView::initFilterFields()
+{
+    traced;
+    appendFilterField(FILTER_FIELD_NAME, tr("Tên"));
     tracede;
+}
+
+void UICommonListView::initFilterOperators()
+{
+    traced;
+    appendFilterOperator(FILTER_OP_EQUAL, tr("Là"));
+    appendFilterOperator(FILTER_OP_NOT_EQUAL, tr("Khác"));
+    appendFilterOperator(FILTER_OP_CONTAIN, tr("Có"));
+    appendFilterOperator(FILTER_OP_NOT_CONTAIN, tr("Không có"));
+    tracede;
+}
+
+QHash<QString, QString> UICommonListView::getFilterKeywords(int fieldId, const QString &fieldText)
+{
+    traced;
+    logd("Query search keywords form db, field %d, %s", fieldId, fieldText.toStdString().c_str());
+    QHash<QString, QString> keywords;
+    QList<DbModel*> modelList;
+    switch (fieldId) {
+    case FILTER_FIELD_HOLLY_NAME:
+        modelList = SAINTCTL->getAllItems();
+        break;
+    case FILTER_FIELD_COMMUNITY:
+        modelList = COMMUNITYCTL->getAllItems();
+        break;
+    default:
+        loge("Field %d not supported", fieldId);
+    };
+    if (modelList.count() > 0) {
+        foreach (DbModel* item, modelList) {
+            keywords.insert(item->uid(), item->name());
+        }
+    }
+    logd("found %d keywords", (int)keywords.count());
+    tracede;
+    return keywords;
 }

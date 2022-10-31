@@ -14,29 +14,30 @@
  * limitations under the License.
  *
  *
- * Filename: uisaintlistview.h
+ * Filename: dlgabout.h
  * Author: Anh, Ngo Huy
- * Created date:8/11/2022
+ * Created date:10/29/2022
  * Brief:
  */
-#ifndef UISAINTLISTVIEW_H
-#define UISAINTLISTVIEW_H
+#ifndef DLGABOUT_H
+#define DLGABOUT_H
 
-#include "uicommonlistview.h"
-#include "saint.h"
+#include <QDialog>
 
-class UISaintListView : public UICommonListView
+namespace Ui {
+class DlgAbout;
+}
+
+class DlgAbout : public QDialog
 {
+    Q_OBJECT
+
 public:
-    explicit UISaintListView(QWidget *parent = nullptr);
-    virtual ~UISaintListView();
-protected:
-    virtual ErrCode onLoad();
-    virtual void updateItem(DbModel* item, UITableItem* tblItem);
-    virtual void initHeader();
+    explicit DlgAbout(QWidget *parent = nullptr);
+    ~DlgAbout();
 
-    virtual int onFilter(int catetoryid, const QString& catetory, qint64 opFlags, const QString& keywords);
-
+private:
+    Ui::DlgAbout *ui;
 };
 
-#endif // UISAINTLISTVIEW_H
+#endif // DLGABOUT_H

@@ -44,6 +44,9 @@ protected:
     virtual QHash<QString, QString> getFieldsCheckExists(const DbModel* item);
     QHash<QString, int> getSearchFields();
     QList<QString> getNameFields();
+    virtual QString getSearchQueryString(const QString& cond = nullptr);
+
+
 //    ErrCode_t addPerson(const Person* person);
 
 //protected:

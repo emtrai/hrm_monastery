@@ -31,6 +31,7 @@
 #include <QGuiApplication>
 #include <QRect>
 #include <QComboBox>
+#include <QObject>
 
 // yymd
 #define YMD_TO_INT(y,m,d) (((y) << 16) | ((m) << 8) | (d))
@@ -536,4 +537,20 @@ ErrCode Utils::getCurrentComboxDataString(const QComboBox *cb, QString *data, QS
     }
     tracedr(ret);
     return ret;
+}
+
+void Utils::showDlgUnderDev(const QString &info)
+{
+    QMessageBox msgBox;
+    traced;
+    QString msg = QObject::tr("Tính năng đang phát triển");
+    if (!info.isEmpty()) {
+        msg += QObject::tr("\n* "); // TODO: translation???
+        msg += info;
+    }
+    logd("Info%s", msg.toStdString().c_str());
+    msgBox.setText(msg);
+    msgBox.setStandardButtons(QMessageBox::Close);
+    msgBox.exec();
+    tracede;
 }

@@ -207,6 +207,19 @@ int DbSqlitePerson::search(const QString &keyword, QList<DbModel *> *outList)
     return tbl->search(keyword, &Person::build, outList);
 }
 
+int DbSqlitePerson::filter(int fieldId, int operatorId, const QString &keyword, QList<DbModel *> *outList)
+{
+    traced;
+    DbSqliteTbl* tbl = getMainTbl();
+    // assume main tbl is not null, if not programming error,
+    // and require override search function
+    Q_ASSERT(tbl != nullptr);
+
+    int ret = tbl->filter(fieldId, operatorId, keyword,  &Person::build, outList);
+    tracedr(ret);
+    return ret;
+}
+
 
 const QString DbSqlitePerson::getName()
 {

@@ -14,6 +14,9 @@ DEFINES += FEATURE_system_sqlite=OFF
 DEFINES += TEST_ENABLE
 # DEFINES += LOG_LEVEL=4
 DEFINES = DEBUG_TRACE
+DEFINES += VER_MAJOR=0
+DEFINES += VER_MINOR=1
+DEFINES += VER_PATCH=0
 
 INCLUDEPATH += $$PWD/db
 INCLUDEPATH += $$PWD/db/sqlite
@@ -159,6 +162,7 @@ SOURCES += \
     statistic/statistic.cpp \
     test/testctl.cpp \
     utils.cpp \
+    view/dialog/dlgabout.cpp \
     view/dialog/dlgaddcommunityhistory.cpp \
     view/dialog/dlgaddevent.cpp \
     view/dialog/dlgaddpersonevent.cpp \
@@ -280,6 +284,7 @@ HEADERS += \
     export/exporthtml.h \
     export/iexporter.h \
     file/filectl.h \
+    filter.h \
     import/iimporter.h \
     import/importcsv.h \
     import/importcsvlist.h \
@@ -318,6 +323,7 @@ HEADERS += \
     std.h \
     test/testctl.h \
     utils.h \
+    view/dialog/dlgabout.h \
     view/dialog/dlgaddcommunityhistory.h \
     view/dialog/dlgaddevent.h \
     view/dialog/dlgaddpersonevent.h \
@@ -351,6 +357,7 @@ HEADERS += \
 
 FORMS += \
     mainwindow.ui \
+    view/dialog/dlgabout.ui \
     view/dialog/dlgaddcommunityhistory.ui \
     view/dialog/dlgaddevent.ui \
     view/dialog/dlgaddpersonevent.ui \

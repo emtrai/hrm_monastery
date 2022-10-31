@@ -90,6 +90,13 @@ public:
                        bool isExact = false);
 
     virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
+
+    virtual int filter(int fieldId,
+                       int operatorId,
+                       const QString& keyword,
+                       const DbModelBuilder& builder,
+                       QList<DbModel*>* outList = nullptr);
+
 protected:
     virtual QString getSqlCmdCreateTable();
     virtual void addTableField(DbSqliteTableBuilder* builder);
@@ -97,6 +104,7 @@ protected:
     virtual int runQuery(QSqlQuery& qry, const DbModelBuilder& builder,
                       QList<DbModel *> *outList = nullptr);
     virtual QString getSearchQueryString(const QString& cond = nullptr);
+    virtual QString getFilterQueryString(int fieldId, const QString& cond = nullptr);
     virtual QSqlQuery *getAllQuery();
     virtual QString getAllQueryString();
 public:

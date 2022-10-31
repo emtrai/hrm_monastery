@@ -155,6 +155,11 @@ DbPersonModelHandler *PersonCtl::modelHdl()
     return mModelHdl;
 }
 
+DbModelHandler *PersonCtl::getModelHandler()
+{
+    return modelHdl();
+}
+
 void PersonCtl::onLoad()
 {
     traced;

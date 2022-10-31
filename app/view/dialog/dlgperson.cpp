@@ -567,9 +567,9 @@ void DlgPerson::loadSaints()
         ui->wgSaint->layout()->addWidget(cbSaints);
     }
     cbSaints->clearAll();
-    QList<Saint*> saints = SaintCtl::getInstance()->getListSaints();
+    QList<DbModel*> saints = SAINTCTL->getAllItems();
 
-    foreach (Saint* saint, saints) {
+    foreach (DbModel* saint, saints) {
         logd(">> Saint %s", saint->name().toStdString().c_str());
         cbSaints->addItem(saint->name(), saint->uid());
     }
@@ -703,10 +703,10 @@ void DlgPerson::loadCommunity()
 {
     traced;
     logd("Load community");
-    QList<Community*> listCommunity = COMMUNITYCTL->getCommunityList();
+    QList<DbModel*> listCommunity = COMMUNITYCTL->getAllItems();
     ui->cbCommunity->clear();
     ui->cbCommunity->addItem(tr("Không xác đinh"), KUidNone);
-    foreach(Community* item, listCommunity){
+    foreach(DbModel* item, listCommunity){
         ui->cbCommunity->addItem(item->name(), item->uid());
     }
 

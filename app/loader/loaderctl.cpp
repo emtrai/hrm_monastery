@@ -71,7 +71,7 @@ void LoaderCtl::registerAll()
     traced;
     add2Loader(DbCtl::getInstance());
     add2Loader(Location::getInstance());
-    add2Loader(SaintCtl::getInstance());
+    add2Loader(SAINTCTL);
     add2Loader(EduCtl::getInstance());
     add2Loader(SpecialistCtl::getInstance());
     add2Loader(CountryCtl::getInstance());

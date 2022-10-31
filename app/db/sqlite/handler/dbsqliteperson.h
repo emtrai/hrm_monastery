@@ -64,6 +64,11 @@ public:
      * @return the number of found items
      */
     virtual int search(const QString& keyword, QList<DbModel*>* outList = nullptr);
+    virtual int filter(int fieldId,
+                       int operatorId,
+                       const QString& keyword,
+                       QList<DbModel*>* outList = nullptr);
+
 protected:
     virtual DbSqliteTbl* getMainTbl();
 private:

@@ -122,6 +122,27 @@ int Controller::search(const QString &keyword, QList<DbModel *> *outList)
     return ret;
 }
 
+int Controller::filter(int catetoryid,
+                       const QString &catetory,
+                       qint64 opFlags,
+                       const QString &keywords,
+                       QList<DbModel*>* outList)
+{
+    int ret = 0;
+    traced;
+    DbModelHandler *hdl = getModelHandler();
+    if (hdl != nullptr) {
+        ret = hdl->filter(catetoryid, opFlags, keywords, outList);
+    } else {
+        loge("Unknown handler, DERIVED class should implement this");
+        ret = 0;
+        // TODO: should throw exception???
+    }
+
+    tracedr(ret);
+    return ret;
+}
+
 ErrCode Controller::loadFromDb()
 {
     traced;

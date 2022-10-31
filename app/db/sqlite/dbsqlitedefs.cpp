@@ -21,12 +21,37 @@
  */
 #include "dbsqlitedefs.h"
 #include <QMap>
+#include "filter.h"
 
 QString getDateTypeString(TableFieldDatatype_t dataType){
-    QMap<TableFieldDatatype_t, QString> map;
+    static QMap<TableFieldDatatype_t, QString> map;
     map[TEXT] = "TEXT";
     map[INT32] = "INTEGER";
     map[INT64] = "INTEGER";
 
     return map[dataType];
+}
+
+QString getFieldNameFromId(int fieldId, bool* isOk)
+{
+    static QMap<int, QString> fieldMap;
+    if (isOk) *isOk = false;
+    fieldMap[FILTER_FIELD_NAME] = KFieldName;
+    fieldMap[FILTER_FIELD_FULL_NAME] = KFieldFullName;
+    fieldMap[FILTER_FIELD_HOLLY_NAME] = KFieldHollyName;
+    fieldMap[FILTER_FIELD_ADDRESS] = KFieldAddr;
+    fieldMap[FILTER_FIELD_AREA] = KFieldAreaName;
+    fieldMap[FILTER_FIELD_COMMUNITY] = KFieldCommunityName;
+    fieldMap[FILTER_FIELD_DEPARTMENT] = KFieldDepartmentName;
+    fieldMap[FILTER_FIELD_WORK] = KFieldWorkName;
+    fieldMap[FILTER_FIELD_EDUCATION] = KFieldIEduName;
+    fieldMap[FILTER_FIELD_SPECIALIST] = KFieldSpecialistName;
+    fieldMap[FILTER_FIELD_MISSON] = KFieldMissionName;
+
+    if (fieldMap.contains(fieldId)) {
+        if (isOk) *isOk = true;
+        return fieldMap[fieldId];
+    } else {
+        return QString();
+    }
 }

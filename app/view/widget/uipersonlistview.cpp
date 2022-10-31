@@ -30,6 +30,8 @@
 #include "view/dialog/dlgimportpersonlistresult.h"
 #include "view/dialog/dlghtmlviewer.h"
 #include <QFile>
+#include "filter.h"
+
 UIPersonListView::UIPersonListView(QWidget *parent):
     UICommonListView(parent)
 {
@@ -44,13 +46,14 @@ UIPersonListView::~UIPersonListView()
 
 ErrCode UIPersonListView::onLoad()
 {
-    QList<DbModel*> items = PersonCtl::getInstance()->getAllPerson();
     traced;
+    QList<DbModel*> items = PersonCtl::getInstance()->getAllPerson();
     mItemList.clear(); // TODO: clean up item data
     // TODO: loop to much, redundant, do something better?
     foreach (DbModel* item, items) {
         mItemList.append(item);
     }
+    clearFilter();
     return ErrNone;
 }
 
@@ -133,6 +136,32 @@ void UIPersonListView::onViewItem(UITableWidgetItem *item)
 QString UIPersonListView::getTitle()
 {
     return tr("Danh sách nữ tu");
+}
+
+void UIPersonListView::initFilterFields()
+{
+    traced;
+    appendFilterField(FILTER_FIELD_FULL_NAME, tr("Họ tên"));
+    appendFilterField(FILTER_FIELD_COMMUNITY, tr("Cộng đoàn"));
+    appendFilterField(FILTER_FIELD_HOLLY_NAME, tr("Tên Thánh"));
+    appendFilterField(FILTER_FIELD_EDUCATION, tr("Giáo dục"));
+    appendFilterField(FILTER_FIELD_SPECIALIST, tr("Chuyên môn"));
+    appendFilterField(FILTER_FIELD_WORK, tr("Công việc"));
+    tracede;
+}
+
+int UIPersonListView::onFilter(int catetoryid,
+                                const QString &catetory,
+                                qint64 opFlags,
+                                const QString &keywords)
+{
+    traced;
+    mItemList.clear(); // TODO: clean up item data
+    int ret = PERSONCTL->filter(catetoryid, catetory, opFlags, keywords, &mItemList);
+    logd("filter ret %d", ret);
+    logd("mItemList cnt %d", mItemList.count());
+    tracede;
+    return ret;
 }
 
 void UIPersonListView::cleanUpItem()

@@ -125,7 +125,38 @@ int DbSqliteModelHandler::search(const QString& keyword, QList<DbModel*>* outLis
 
 }
 
+int DbSqliteModelHandler::filter(int fieldId,
+                                 int operatorId,
+                                 const QString &keyword,
+                                 QList<DbModel *> *outList)
+{
+    traced;
+    DbSqliteTbl* tbl = getMainTbl();
+    DbModelBuilder* builder = getMainBuilder();
+    // assume main tbl is not null, if not programming error,
+    // and require override search function
+    Q_ASSERT(tbl != nullptr);
+    Q_ASSERT(builder != nullptr);
+
+    int ret = tbl->filter(fieldId, operatorId, keyword, *builder, outList);
+    tracedr(ret);
+    return ret;
+}
+
 DbSqliteTbl *DbSqliteModelHandler::getTable(const QString& modelName)
 {
     return getMainTbl();
+}
+
+DbModelBuilder *DbSqliteModelHandler::getBuilder(const QString &modelName)
+{
+    loge("DEFAULT getBuilder, should not be called");
+    return nullptr;
+}
+
+DbModelBuilder *DbSqliteModelHandler::getMainBuilder()
+{
+
+    loge("DEFAULT getMainBuilder, should not be called");
+    return nullptr;
 }

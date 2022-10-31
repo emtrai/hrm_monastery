@@ -56,11 +56,13 @@ const char* const KFieldDbStatus = "dbstatus";
 const char* const KFieldCEOUid = "ceouid";
 const char* const KFieldChurchUid = "church_uid";
 const char* const KFieldMissionUid = "mission_uid";
+const char* const KFieldMissionName = "mission_name";
 const char* const KFieldAreaUid = "area_uid";
 const char* const KFieldAreaDbId = "area_dbid";
 const char* const KFieldAreaName = "area_name";
 const char* const KFieldDepartmentUid = "depart_uid";
 const char* const KFieldDepartmentDbId = "depart_dbid";
+const char* const KFieldDepartmentName = "depart_name";
 const char* const KFieldPreset = "preset";
 const char* const KFieldGender = "gender";
 const char* const KFieldFeastDay = "feastday";
@@ -152,6 +154,8 @@ const char* const KFieldTermUid = "term_uid";
 const char* const KFieldTermName = "term_name";
 const char* const KFieldCommunityName = "community_name";
 const char* const KFieldCourseType = "course_type";
+const char* const KFieldWorkName = "work_name";
+const char* const KFieldSpecialistName = "specialist_name";
 
 
 // TABLES NAME
@@ -183,5 +187,6 @@ const char* const KTableAreaCommunity = "area_community";
 
 // TODO: move to class???
 QString getDateTypeString(TableFieldDatatype_t dataType);
+QString getFieldNameFromId(int fieldId, bool* isOk = nullptr);
 
 #endif // DBSQLITEDEFS_H

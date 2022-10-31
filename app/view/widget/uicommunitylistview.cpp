@@ -206,13 +206,14 @@ QList<UITableMenuAction *> UICommunityListView::getMenuItemActions(const QMenu* 
 
 ErrCode UICommunityListView::onLoad()
 {
-    QList<Community*> items = COMMUNITYCTL->getCommunityList();
+//    QList<Community*> items = COMMUNITYCTL->getAllItems();
     traced;
     mItemList.clear(); // TODO: clean up item data
+    mItemList = COMMUNITYCTL->getAllItems();
     // TODO: loop to much, redundant, do something better?
-    foreach (Community* item, items) {
-        mItemList.append(dynamic_cast<DbModel*>(item));
-    }
+//    foreach (Community* item, items) {
+//        mItemList.append(dynamic_cast<DbModel*>(item));
+//    }
     tracede;
     return ErrNone;
 }

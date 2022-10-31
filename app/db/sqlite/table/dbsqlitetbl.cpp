@@ -34,6 +34,7 @@
 #include <QSqlRecord>
 #include <QSqlError>
 #include <QHash>
+#include "filter.h"
 
 DbSqliteTbl::~DbSqliteTbl(){
     traced;
@@ -242,6 +243,70 @@ void DbSqliteTbl::updateModelFromQuery(DbModel* item, const QSqlQuery& qry)
     tracede;
 }
 
+int DbSqliteTbl::filter(int fieldId,
+                        int operatorId,
+                        const QString& keyword,
+                        const DbModelBuilder& builder,
+                        QList<DbModel*>* outList)
+{
+    traced;
+    // TODO: implement it
+    // TODO: check data typpe text vs integer
+    QSqlQuery qry;
+    qint32 cnt = 0;
+    logi("Filter keyword '%s'", keyword.toStdString().c_str());
+    QString cond;
+    bool isOk = false;
+    QString fieldName = getFieldNameFromId(fieldId, &isOk);
+    if (isOk && !fieldName.isEmpty()) {
+        switch (operatorId) {
+        case FILTER_OP_EQUAL:
+            cond = QString("lower(%1) = :keywordexact").arg(fieldName);
+            break;
+        case FILTER_OP_NOT_EQUAL:
+            cond = QString("lower(%1) != :keywordexact").arg(fieldName);
+            break;
+
+        case FILTER_OP_CONTAIN:
+            cond = QString("lower(%1) like :keyword").arg(fieldName);
+            break;
+
+        case FILTER_OP_NOT_CONTAIN:
+            cond = QString("lower(%1) not like :keyword").arg(fieldName);
+            break;
+        case FILTER_OP_LESS:
+            cond = QString("lower(%1) < :value").arg(fieldName);
+            break;
+        case FILTER_OP_LESS_EQ:
+            cond = QString("lower(%1) <= :value").arg(fieldName);
+            break;
+        case FILTER_OP_GREATER:
+            cond = QString("lower(%1) > :value").arg(fieldName);
+            break;
+        case FILTER_OP_GREATER_EQ:
+            cond = QString("lower(%1) >= :value").arg(fieldName);
+            break;
+        default:
+            break;
+        }
+    }
+    logd("Query cond '%s'", cond.toStdString().c_str());
+    QString queryString = getSearchQueryString(cond);
+
+    qry.prepare(queryString);
+    logd("Query String '%s'", queryString.toStdString().c_str());
+
+    // TODO: check sql injection issue
+    qry.bindValue( ":keyword", QString("%%1%").arg(keyword.trimmed().toLower()) );
+    qry.bindValue( ":keywordexact", QString("%1").arg(keyword.trimmed().toLower()) );
+    qry.bindValue( ":value", QString("%1").arg(keyword.trimmed().toLower()) );
+    cnt = runQuery(qry, builder, outList);
+
+    logi("Found %d", cnt);
+
+    return cnt;
+}
+
 int DbSqliteTbl::runQuery(QSqlQuery &qry, const DbModelBuilder& builder,
                        QList<DbModel *> *outList)
 {
@@ -313,6 +378,7 @@ QList<DbModel *> DbSqliteTbl::getAll(const DbModelBuilder& builder)
     }
     else {
         loge( "Failed to execute %s", qry->lastQuery().toStdString().c_str() );
+        loge( "Last error %s", qry->lastError().text().toStdString().c_str() );
     }
 
     logd("Found %d", (int)list.size());
@@ -463,6 +529,15 @@ QString DbSqliteTbl::getSearchQueryString(const QString& cond)
     return queryString;
 }
 
+QString DbSqliteTbl::getFilterQueryString(int fieldId, const QString &cond)
+{
+    traced;
+    UNUSED(fieldId);
+    QString queryString = getSearchQueryString(cond);
+    tracede;
+    return queryString;
+}
+
 int DbSqliteTbl::search(const QString& keyword, const QHash<QString, int>& inFields,
                         const DbModelBuilder& builder,
                         QList<DbModel*>* outList,
@@ -473,7 +548,7 @@ int DbSqliteTbl::search(const QString& keyword, const QHash<QString, int>& inFie
     // TODO: exact and not exact match???
     QSqlQuery qry;
     qint32 cnt = 0;
-    logi("Search Saint '%s'", keyword.toStdString().c_str());
+    logi("Search keyword '%s'", keyword.toStdString().c_str());
     QString cond;
     foreach (QString field, inFields.keys()) {
         if (!cond.isEmpty()) {

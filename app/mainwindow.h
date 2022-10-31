@@ -24,7 +24,7 @@
 
 #include <QMainWindow>
 #include <QTextBrowser>
-
+#include <QToolButton>
 #include "view/widget/uisummarizeview.h"
 #include "view/widget/uitableview.h"
 #include "view/widget/uitableviewfactory.h"
@@ -54,6 +54,7 @@ QT_END_NAMESPACE
      void loadHomePageFile();
      void loadOtherMenu();
      void loadImportMenu();
+     void loadExportMenu();
 
  private:
     Ui::MainWindow *ui;
@@ -67,14 +68,24 @@ QT_END_NAMESPACE
     QList<QWidget*> mMainViews;
     QTextBrowser* mHomeView;
     QWidget* mCurrentView;
+
+    QToolButton *mImportButton;
     QAction* mActionImportPersonList;
     QAction* mActionImportPerson;
     QAction* mActionImportCommunityList;
+
+    QToolButton *mExportButton;
+    QAction* mActionExportPersonList;
+
+
  signals:
     void load();
 
  private slots:
+     void on_action_ImportPerson_triggered();
      void on_action_ImportPersonList_triggered();
+     void on_action_ImportCommunityList_triggered();
+     void on_action_ImportCommunity_triggered();
      void on_action_New_triggered();
      void on_actionNew_Community_triggered();
      void on_actionImportComm_triggered();
@@ -85,8 +96,30 @@ QT_END_NAMESPACE
      void on_actionPerson_triggered();
      void on_actionSearch_triggered();
      void on_actionArea_triggered();
-     void on_actionDepart_triggered();
      void on_actionRole_triggered();
+     void on_actionDept_triggered();
+
+     void on_action_ExportPersonList_triggered();
+
+     void on_action_About_triggered();
+
+     void on_action_Backup_triggered();
+
+     void on_actionRestore_triggered();
+
+     void on_actionRevert_triggered();
+
+     void on_action_Help_triggered();
+
+
+     void on_actionEthnic_triggered();
+     void on_actionWork_triggered();
+     void on_actionEducation_triggered();
+     void on_actionSpeclialist_triggered();
+     void on_actionMisson_triggered();
+     void on_actionProvince_triggered();
+     void on_actionCountry_triggered();
+
  private:
      static MainWindow* gInstance;
 };

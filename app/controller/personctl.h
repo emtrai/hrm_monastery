@@ -30,6 +30,8 @@ class Person;
 class Event;
 class DbPersonModelHandler;
 
+#define PERSONCTL PersonCtl::getInstance()
+
 // TODO: observer Person change?
 class PersonCtl: public Controller
 {
@@ -58,6 +60,8 @@ public:
 
     DbPersonModelHandler *modelHdl();
 
+protected:
+    virtual DbModelHandler* getModelHandler();
 private:
     static PersonCtl* gInstance;
     QList<QString> mImportFields;

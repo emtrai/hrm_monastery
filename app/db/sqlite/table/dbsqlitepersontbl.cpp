@@ -363,6 +363,21 @@ QList<QString> DbSqlitePersonTbl::getNameFields()
     list.append(KFieldLastName);
     return list;
 }
+
+QString DbSqlitePersonTbl::getSearchQueryString(const QString &cond)
+{
+    traced;
+    QString queryString = QString("SELECT *, (%2 || ' ' || %3) AS %4  FROM %1")
+                              .arg(name())
+                              .arg(KFieldLastName, KFieldFirstName, KFieldFullName)
+                                ;
+    if (!cond.isEmpty()) {
+        queryString += QString(" WHERE %1").arg(cond);
+    }
+    logd("queryString: %s", queryString.toStdString().c_str());
+    return queryString;
+}
+
 QHash<QString, QString> DbSqlitePersonTbl::getFieldsCheckExists(const DbModel *item)
 {
     traced;

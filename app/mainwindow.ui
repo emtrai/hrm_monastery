@@ -32,44 +32,6 @@
     </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>800</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menuTools">
-    <property name="title">
-     <string>Công cụ</string>
-    </property>
-    <addaction name="action_Backup"/>
-    <addaction name="actionRestore"/>
-   </widget>
-   <widget class="QMenu" name="menuHelp">
-    <property name="title">
-     <string>Thông tin</string>
-    </property>
-    <addaction name="action_Help"/>
-    <addaction name="action_About"/>
-   </widget>
-   <widget class="QMenu" name="menuOthers">
-    <property name="title">
-     <string>Khác</string>
-    </property>
-    <addaction name="actionProvince"/>
-    <addaction name="actionEducation"/>
-    <addaction name="actionMission"/>
-    <addaction name="actionWork"/>
-    <addaction name="actionEthnic"/>
-    <addaction name="actionSpecialist"/>
-   </widget>
-   <addaction name="menuTools"/>
-   <addaction name="menuOthers"/>
-   <addaction name="menuHelp"/>
-  </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
@@ -88,16 +50,44 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionHome"/>
-   <addaction name="actionOrgInfo"/>
    <addaction name="actionSummarize"/>
    <addaction name="actionPerson"/>
    <addaction name="actionCommunity"/>
+   <addaction name="actionDept"/>
+   <addaction name="actionOrgInfo"/>
    <addaction name="actionDummy"/>
    <addaction name="separator"/>
    <addaction name="action_New"/>
    <addaction name="separator"/>
    <addaction name="actionSearch"/>
    <addaction name="separator"/>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Công cụ</string>
+    </property>
+    <addaction name="action_Backup"/>
+    <addaction name="actionRestore"/>
+    <addaction name="actionRevert"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Thông tin</string>
+    </property>
+    <addaction name="action_Help"/>
+    <addaction name="action_About"/>
+   </widget>
+   <addaction name="menuTools"/>
+   <addaction name="menuHelp"/>
   </widget>
   <action name="action_New">
    <property name="icon">
@@ -106,7 +96,7 @@
     </iconset>
    </property>
    <property name="text">
-    <string>Thêm thành viên</string>
+    <string>Thêm Nữ tu</string>
    </property>
   </action>
   <action name="action_Export">
@@ -134,7 +124,7 @@
   </action>
   <action name="action_About">
    <property name="text">
-    <string>&amp;About</string>
+    <string>Thông tin ứng dụng</string>
    </property>
   </action>
   <action name="actionNew_Community">
@@ -301,7 +291,23 @@
     <bool>false</bool>
    </property>
   </action>
+  <action name="actionDept">
+   <property name="icon">
+    <iconset resource="icon.qrc">
+     <normaloff>:/icon/icon/icons8-diversity-64.png</normaloff>:/icon/icon/icons8-diversity-64.png</iconset>
+   </property>
+   <property name="text">
+    <string>Ban</string>
+   </property>
+  </action>
+  <action name="actionRevert">
+   <property name="text">
+    <string>Khôi phục</string>
+   </property>
+  </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="icon.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -103,6 +103,28 @@ do { \
             }\
         }\
     } while (0)
+#define ICON_ROOT_PATH ":/icon/icon"
+#define ICON_PATH(name) ICON_ROOT_PATH "/" name
+
+#define UNDER_DEV(...) Utils::showDlgUnderDev(__VA_ARGS__)
+
+#define GET_VAL_INT_FROM_CB(widget, out) \
+    do { \
+        QString currtxt = widget->currentText().trimmed();\
+        if (!currtxt.isEmpty()){ \
+            int index = widget->findText(currtxt);\
+            logd("item %s, index %d", currtxt.toStdString().c_str(), index);\
+            if (index >= 0){ \
+                QVariant value = widget->itemData(index);\
+                if (!value.isNull()) { \
+                    out = value.toInt(); \
+                }\
+            }\
+        }\
+    } while (0)
+
+
+#define UNUSED(param) (void)param
 
 typedef ErrCode (*func_one_csv_item_t)(const QStringList& items, void* caller, void* param);
 typedef ErrCode (*func_one_csv_field_t)(const QString& key, const QString& value, void* caller, void* param);
@@ -165,6 +187,7 @@ public:
     static int getCurrentComboxIndex(const QComboBox *cb);;
     static QString getCurrentComboxDataString(const QComboBox *cb, bool *isOk = nullptr);
     static ErrCode getCurrentComboxDataString(const QComboBox *cb, QString* data, QString* name = nullptr);
+    static void showDlgUnderDev(const QString& info = nullptr);
 };
 
 #endif // UTILS_H

@@ -26,6 +26,7 @@
 #include <QFileDialog>
 #include <QMenu>
 #include "filectl.h"
+#include "utils.h"
 
 UITableView::UITableView(QWidget *parent) :
     QFrame(parent),
@@ -76,6 +77,9 @@ void UITableView::setupUI()
     ui->tblList->setHorizontalHeaderLabels(getHeader());
 
     setTitle(getTitle());
+
+    loadFilterFields();
+    loadFilterOperators();
     tracede;
 }
 
@@ -83,6 +87,13 @@ void UITableView::reload()
 {
     traced;
     onReload();
+    onUpdatePage(1);
+    tracede;
+}
+
+void UITableView::refesh()
+{
+    traced;
     onUpdatePage(1);
     tracede;
 }
@@ -114,6 +125,7 @@ void UITableView::onUpdatePage(qint32 page)
 
     qint32 total = getTotalItems();
     if (total > 0){
+        // TODO: remove paging, as it not need????
         qint32 perPage = ((mItemPerPage != 0) && (mItemPerPage < total))?mItemPerPage:total;
         qint32 totalPages = total/perPage;
         logd("total %d perpage %d totaPage %d", total, perPage, totalPages);
@@ -124,9 +136,6 @@ void UITableView::onUpdatePage(qint32 page)
             tbl->insertRow(idx);
             QStringList values = item->valueList();
             for (int i = 0; i < values.count(); ++i) {
-//                QTableWidgetItem* wgitem = new QTableWidgetItem(values.value(i));
-//                wgitem->setData(Qt::UserRole, idx);
-//                tbl->setItem(idx, i, wgitem);
                 tbl->setItem(idx, i, UITableWidgetItem::build(values.value(i), i, idx, item));
 
             }
@@ -140,6 +149,27 @@ void UITableView::onUpdatePage(qint32 page)
 QList<UITableItem *> UITableView::getListItem(qint32 page, qint32 perPage, qint32 totalPages)
 {
     return (mFpDataReq != nullptr)?mFpDataReq(page, perPage, totalPages):QList<UITableItem *>();
+}
+
+QList<UITableItem *> UITableView::getListAllItem()
+{
+    traced;
+    QList<UITableItem*> items;
+    // TODO: fix me please!!!
+    qint32 total = getTotalItems();
+    logd("total item %d", total);
+    if (total > 0){
+        // TODO: remove paging, as it not need????
+        qint32 perPage = ((mItemPerPage != 0) && (mItemPerPage < total))?mItemPerPage:total;
+        qint32 totalPages = total/perPage;
+        logd("total %d perpage %d totaPage %d", total, perPage, totalPages);
+
+        items = getListItem(0, perPage, totalPages);
+    } else {
+        logd("Not item to load");
+    }
+    traced;
+    return items;
 }
 
 qint32 UITableView::getTotalItems()
@@ -171,7 +201,7 @@ void UITableView::onViewItem(UITableWidgetItem *item)
 }
 
 
-QMenu* UITableView::buildPopupMenu(UITableWidgetItem* item)
+QMenu* UITableView::buildPopupMenu(UITableWidgetItem* item, const QList<UITableItem*>& items)
 {
     traced;
     if (mMenu == nullptr) {
@@ -182,19 +212,18 @@ QMenu* UITableView::buildPopupMenu(UITableWidgetItem* item)
 
     QList<UITableMenuAction*> actions = getMenuCommonActions(mMenu);
 
-
-    if (item != nullptr){
-//        QVariant data = item->data(Qt::UserRole);
-//        bool ok = false;
-//        int idx = data.toInt(&ok);
-//        logd("item data ok %d idx %d", ok, idx);
-//        if (!ok) {
-//            idx = -1;
-//        }
-
-        QList<UITableMenuAction*> itemActions = getMenuItemActions(mMenu, item);
+    if (items.count() > 1){
+        QList<UITableMenuAction*> itemActions = getMenuMultiItemActions(mMenu, items);
         if (!itemActions.empty()) {
             actions.append(itemActions);
+        }
+    } else {
+        if (item != nullptr){
+
+            QList<UITableMenuAction*> itemActions = getMenuItemActions(mMenu, item);
+            if (!itemActions.empty()) {
+                actions.append(itemActions);
+            }
         }
     }
 //    mMenu->addSeparator();
@@ -202,11 +231,8 @@ QMenu* UITableView::buildPopupMenu(UITableWidgetItem* item)
         connect(act, &QAction::triggered, [this, act](){
             logd("lambda trigger call");
             act->callback()(this->menu(), act);
-//                    onMenuActionTrigger(this->mMenu, act);
-//                    act->callback(this, act);
-//                    this->onMenuAddAction(mN)
                     // TODO: handle return???
-                });
+            });
         mMenu->addAction(act);
     }
 
@@ -250,6 +276,20 @@ QList<UITableMenuAction *> UITableView::getMenuItemActions(const QMenu* menu,
     return actionList;
 }
 
+QList<UITableMenuAction *> UITableView::getMenuMultiItemActions(const QMenu *menu, const QList<UITableItem *>& items)
+{
+    traced;
+    traced;
+    QList<UITableMenuAction*> actionList;
+    actionList.append(UITableMenuAction::buildMultiItem(tr("Xoá"), this, &items)
+                                           ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                               return this->onMenuActionMultiDelete(m, a);
+                                           }));
+    tracede;
+    return actionList;
+
+}
+
 
 ErrCode UITableView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act)
 {
@@ -259,6 +299,13 @@ ErrCode UITableView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act)
 }
 
 ErrCode UITableView::onMenuActionDelete(QMenu *menu, UITableMenuAction *act)
+{
+    traced;
+    // TODO: handle it
+    return ErrNone;
+}
+
+ErrCode UITableView::onMenuActionMultiDelete(QMenu *menu, UITableMenuAction *act)
 {
     traced;
     // TODO: handle it
@@ -287,10 +334,111 @@ ErrCode UITableView::onMenuActionReload(QMenu *menu, UITableMenuAction *act)
     tracede;
 }
 
-void UITableView::onFilter(const QString &catetory, qint64 opFlags, const QString &keywords)
+int UITableView::onFilter(int catetoryid, const QString &catetory, qint64 opFlags, const QString &keywords)
 {
     traced;
     logi("DEFAULT filter, should not caller here, DERIVED CLASS implement this");
+    logd("category id %d", catetoryid);
+    logd("category '%s'", catetory.toStdString().c_str());
+    logd("opFlags %d", opFlags);
+    logd("keywords %s", keywords.toStdString().c_str());
+    tracede;
+    return -1;
+}
+
+QHash<int, QString> UITableView::getFilterFields()
+{
+    traced;
+    return mFilterFields;
+}
+
+void UITableView::appendFilterField(int id, const QString &txt)
+{
+    traced;
+    logd("Add filter field %d, %s", id, txt.toStdString().c_str());
+    if (!mFilterFields.contains(id))
+        mFilterFields.insert(id, txt);
+    else
+        loge("Filter field id %d already exist", id);
+    tracede;
+}
+
+void UITableView::initFilterFields()
+{
+    traced;
+    logi("Default init filter field, do nothing");
+}
+
+void UITableView::loadFilterFields()
+{
+    traced;
+    initFilterFields();
+    QHash<int, QString> fields = getFilterFields();
+    foreach(int key, fields.keys()) {
+        ui->cbCategory->addItem(fields[key], key);
+    }
+    tracede;
+}
+
+void UITableView::onFilterFieldChange(int fieldId, const QString &fieldText)
+{
+    traced;
+    logd("Filter fieldId %d, text '%s'", fieldId, fieldText.toStdString().c_str());
+    ui->cbKeyword->clear();
+    ui->cbKeyword->clearEditText();
+    QHash<QString, QString> fields = getFilterKeywords(fieldId, fieldText);
+    foreach(QString key, fields.keys()) {
+        ui->cbKeyword->addItem(fields[key], key);
+    }
+    tracede;
+}
+
+void UITableView::clearFilter()
+{
+    traced;
+    ui->cbKeyword->clearEditText();
+    tracede;
+}
+
+void UITableView::initFilterOperators()
+{
+    traced;
+    logi("Default init filter operators, do nothing");
+}
+
+QHash<int, QString> UITableView::getFilterOperators()
+{
+    traced;
+    return mFilterOps;
+}
+
+void UITableView::appendFilterOperator(int id, const QString &txt)
+{
+    traced;
+    logd("Add filter op %d, %s", id, txt.toStdString().c_str());
+    if (!mFilterOps.contains(id))
+        mFilterOps.insert(id, txt);
+    else
+        loge("filter op id %d already exist", id);
+    tracede;
+}
+
+void UITableView::loadFilterOperators()
+{
+    traced;
+    initFilterOperators();
+    QHash<int, QString> fields = getFilterOperators();
+    foreach(int key, fields.keys()) {
+        ui->cbSearchOp->addItem(fields[key], key);
+    }
+    tracede;
+}
+
+QHash<QString, QString> UITableView::getFilterKeywords(int fieldId, const QString &fieldText)
+{
+    traced;
+    logi("Default one, nothing to do");
+    return QHash<QString, QString>();
 }
 
 qint32 UITableView::itemPerPage() const
@@ -419,22 +567,54 @@ void UITableView::on_tblList_itemDoubleClicked(QTableWidgetItem *item)
 void UITableView::customMenuRequested(QPoint pos)
 {
     traced;
+
+    QTableWidget *tbl = ui->tblList;
+    QItemSelectionModel *select = tbl->selectionModel();
+    QList<UITableItem*> selectedItem;
+    if (select->hasSelection()) {
+        QModelIndexList selected = select->selectedRows();
+        logd("Selected %d rows", selected.count());
+        QList<UITableItem*> items = getListAllItem();
+        for(int i=0; i< selected.count(); i++)
+        {
+            QModelIndex index = selected.at(i);
+            logd("Selected row idx %d", index.row());
+            if (index.row() < items.count())
+                selectedItem.append(items.at(index.row()));
+
+        }
+    } else {
+        logd("not row selected");
+    }
+
 //    QModelIndex index = ui->tblList->indexAt(pos);
     // TODO: hande it
-    int row = ui->tblList->rowAt(pos.y());
-    int col = ui->tblList->rowAt(pos.x());
+    int row = tbl->rowAt(pos.y());
+    int col = tbl->rowAt(pos.x());
     logd("menu at row=%d col=%d", row, col);
 //    cell = ui->tblList->item(row, col);
-    UITableWidgetItem *item = (UITableWidgetItem*)ui->tblList->itemAt(pos);
-    QMenu* menu = buildPopupMenu(item);
-    menu->popup(ui->tblList->viewport()->mapToGlobal(pos));
+    UITableWidgetItem *item = (UITableWidgetItem*)tbl->itemAt(pos);
+    QMenu* menu = buildPopupMenu(item, selectedItem);
+    menu->popup(tbl->viewport()->mapToGlobal(pos));
 }
 
 
 void UITableView::on_btnFilter_clicked()
 {
     traced;
-    onFilter(ui->cbCategory->currentText(), 0, ui->cbKeyword->currentText());
+    int categoryId = -1;
+    int opFlags = -1;
+    QString categoryTxt = ui->cbCategory->currentText().trimmed();
+    GET_VAL_INT_FROM_CB(ui->cbCategory, categoryId);
+    GET_VAL_INT_FROM_CB(ui->cbSearchOp, opFlags);
+    QString keyword = ui->cbKeyword->currentText().trimmed();
+    logd("call on filter id %d, opFlags %d, keyword %s", categoryId, opFlags, keyword.toStdString().c_str());
+    int ret = onFilter(categoryId, categoryTxt, opFlags, keyword);
+    logd("onFilter result %d", ret);
+    if (ret >= 0) {
+        refesh();
+    }
+    tracede;
 }
 
 //void UITableView::on_cbKeyword_returnPressed()
@@ -471,6 +651,20 @@ UITableMenuAction *UITableMenuAction::build(const QString &text, QObject *parent
     return menu;
 }
 
+UITableMenuAction *UITableMenuAction::buildMultiItem(const QString &text, QObject *parent, const QList<UITableItem *> *items, qint32 idx)
+{
+    traced;
+    UITableMenuAction* menu = new UITableMenuAction(text, parent);
+    if (items != nullptr && !items->empty()) {
+        foreach (UITableItem* item, *items) {
+            menu->addItemList(item);
+        }
+    } else {
+        logd("Not UITableItem to add");
+    }
+    return menu;
+}
+
 const std::function<ErrCode (QMenu *, UITableMenuAction *)> &UITableMenuAction::callback() const
 {
     return mCallback;
@@ -497,6 +691,22 @@ DbModel *UITableMenuAction::getData()
     }
     logi("invalid data");
     return nullptr;
+}
+
+UITableMenuAction* UITableMenuAction::setItemList(const QList<UITableItem *> &newItemList)
+{
+    traced;
+    mItemList = newItemList;
+    return this;
+}
+
+UITableMenuAction *UITableMenuAction::addItemList(UITableItem *newItemList)
+{
+    traced;
+    if (newItemList != nullptr) {
+        mItemList.append(newItemList);
+    }
+    return this;
 }
 
 void UITableView::on_btnAdd_clicked()
@@ -558,3 +768,15 @@ void UITableWidgetItem::setIdx(qint32 newIdx)
 {
     mIdx = newIdx;
 }
+
+void UITableView::on_cbCategory_currentIndexChanged(int index)
+{
+    traced;
+    int categoryId = -1;
+    QString categoryTxt = ui->cbCategory->currentText().trimmed();
+    GET_VAL_INT_FROM_CB(ui->cbCategory, categoryId);
+
+    onFilterFieldChange(categoryId, categoryTxt);
+    tracede;
+}
+
