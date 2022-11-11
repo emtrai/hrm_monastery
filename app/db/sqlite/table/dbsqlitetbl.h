@@ -30,6 +30,7 @@
 class DbSqlite;
 class DbSqliteTableBuilder;
 class DbSqliteInsertBuilder;
+class DbSqliteUpdateBuilder;
 class QSqlQuery;
 
 class DbSqliteTbl
@@ -49,6 +50,7 @@ public:
     virtual void setVersionCode(uint32_t newVersionCode);
 
     virtual ErrCode add(DbModel* item);
+    virtual ErrCode update(DbModel* item);
     virtual ErrCode updateUid(const DbModel* item, const QString& uid);
 
     virtual bool isExist(const DbModel* item);
@@ -101,6 +103,17 @@ protected:
     virtual QString getSqlCmdCreateTable();
     virtual void addTableField(DbSqliteTableBuilder* builder);
     virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
+    /**
+     * @brief Update table field
+     * @param builder
+     * @param item
+     * @return
+     */
+    virtual ErrCode updateTableField(DbSqliteUpdateBuilder* builder,
+                                     const QList<QString>& updateField,
+                                         const DbModel *item);
+    virtual ErrCode updateTableCondition(DbSqliteUpdateBuilder* builder,
+                                     const DbModel *item);
     virtual int runQuery(QSqlQuery& qry, const DbModelBuilder& builder,
                       QList<DbModel *> *outList = nullptr);
     virtual QString getSearchQueryString(const QString& cond = nullptr);

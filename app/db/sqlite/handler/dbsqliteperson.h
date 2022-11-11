@@ -37,6 +37,7 @@ public:
     DbSqlitePerson();
     virtual const QString getName();
     virtual ErrCode add(DbModel* model);
+    virtual ErrCode update(DbModel* model);
     virtual ErrCode add2Table(DbModel* model, DbSqliteTbl* tbl);
     virtual bool exist(const DbModel* edu);
     virtual QList<DbModel*> getAll(DbModelBuilder builder, const char* modelName = nullptr);
@@ -69,6 +70,7 @@ public:
                        const QString& keyword,
                        QList<DbModel*>* outList = nullptr);
 
+    virtual QList<DbModel*> getSpecialistList(const QString& personUid);
 protected:
     virtual DbSqliteTbl* getMainTbl();
 private:

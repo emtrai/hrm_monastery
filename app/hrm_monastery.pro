@@ -64,6 +64,7 @@ SOURCES += \
     db/dbmodel.cpp \
     db/dbmodelhandler.cpp \
     db/dbpersonmodelhandler.cpp \
+    db/dbspecialistmodelhandler.cpp \
     db/idatabase.cpp \
     db/sqlite/dbsqlite.cpp \
     db/sqlite/dbsqlitedefs.cpp \
@@ -93,6 +94,7 @@ SOURCES += \
     db/sqlite/model/communityperson.cpp \
     db/sqlite/model/deptmgr.cpp \
     db/sqlite/model/mapdbmodel.cpp \
+    db/sqlite/model/specialistperson.cpp \
     db/sqlite/table/dbsqliteareamgrtbl.cpp \
     db/sqlite/table/dbsqliteareatbl.cpp \
     db/sqlite/table/dbsqlitecommunitydeptmaptbl.cpp \
@@ -114,6 +116,7 @@ SOURCES += \
     db/sqlite/table/dbsqliteroletbl.cpp \
     db/sqlite/table/dbsqlitesaintpersonmaptbl.cpp \
     db/sqlite/table/dbsqlitesainttbl.cpp \
+    db/sqlite/table/dbsqlitespecialistpersontbl.cpp \
     db/sqlite/table/dbsqlitespecialisttbl.cpp \
     db/sqlite/table/dbsqlitestatustbl.cpp \
     db/sqlite/table/dbsqlitetbl.cpp \
@@ -124,6 +127,7 @@ SOURCES += \
     export/exporthtml.cpp \
     export/iexporter.cpp \
     file/filectl.cpp \
+    filter.cpp \
     import/iimporter.cpp \
     import/importcsv.cpp \
     import/importcsvlist.cpp \
@@ -222,6 +226,7 @@ HEADERS += \
     db/dbmodel.h \
     db/dbmodelhandler.h \
     db/dbpersonmodelhandler.h \
+    db/dbspecialistmodelhandler.h \
     db/idatabase.h \
     db/sqlite/dbsqlite.h \
     db/sqlite/dbsqlitedefs.h \
@@ -251,6 +256,7 @@ HEADERS += \
     db/sqlite/model/communityperson.h \
     db/sqlite/model/deptmgr.h \
     db/sqlite/model/mapdbmodel.h \
+    db/sqlite/model/specialistperson.h \
     db/sqlite/table/dbsqliteareamgrtbl.h \
     db/sqlite/table/dbsqliteareatbl.h \
     db/sqlite/table/dbsqlitecommunitydeptmaptbl.h \
@@ -272,6 +278,7 @@ HEADERS += \
     db/sqlite/table/dbsqliteroletbl.h \
     db/sqlite/table/dbsqlitesaintpersonmaptbl.h \
     db/sqlite/table/dbsqlitesainttbl.h \
+    db/sqlite/table/dbsqlitespecialistpersontbl.h \
     db/sqlite/table/dbsqlitespecialisttbl.h \
     db/sqlite/table/dbsqlitestatustbl.h \
     db/sqlite/table/dbsqlitetbl.h \

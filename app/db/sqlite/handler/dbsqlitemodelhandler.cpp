@@ -57,6 +57,31 @@ ErrCode DbSqliteModelHandler::add(DbModel *model)
     return err;
 }
 
+ErrCode DbSqliteModelHandler::update(DbModel *model)
+{
+    traced;
+    ErrCode_t err = ErrNone;
+
+    // TODO: should check if some sub-item not exist???
+    // i.e.import person, but country, holly name, etc. not exist, need to check and add it
+
+    if (model != nullptr){
+        DbSqliteTbl* tbl = getTable(model->modelName());
+        if (tbl->isExist(model)){
+            err = tbl->update(model);
+        } else {
+            err = ErrNotExist;
+            loge("model %s not exist", model->name().toStdString().c_str());
+        }
+    }
+    else{
+        err = ErrInvalidArg;
+        loge("invalid argument");
+    }
+
+    return err;
+}
+
 bool DbSqliteModelHandler::exist(const DbModel *edu)
 {
     traced;

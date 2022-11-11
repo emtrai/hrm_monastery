@@ -26,6 +26,8 @@
 #include "errcode.h"
 #include "personevent.h"
 
+class Specialist;
+
 class DbPersonModelHandler : public virtual DbModelHandler
 {
 public:
@@ -35,6 +37,7 @@ public:
     virtual QList<PersonEvent*>* getListEvents( const QString& personUid,
                                                 const QString* eventUid = nullptr,
                                                 qint64 date = 0) = 0;
+    virtual QList<DbModel*> getSpecialistList(const QString& personUid) = 0;
 };
 
 #endif // DBPERSONMODELHANDLER_H

@@ -253,6 +253,7 @@ Person *DlgPerson::buildPerson()
 
     // edu name
     SET_VAL_FROM_CBOX(ui->cbEdu, per->setEduUid, per->setEduName);
+    per->setEduDetail(ui->txtEduDetail->toPlainText().trimmed());
 
     //specialist
     QList<QVariant> specialist = cbSpecialist->valueItems();
@@ -260,6 +261,7 @@ Person *DlgPerson::buildPerson()
     foreach (QVariant id, specialist){
         per->addSpecialistUid(id.toString());
     }
+    per->setSpecialistInfo(ui->txtSpecialistInfo->toPlainText().trimmed());
 
     SET_VAL_FROM_CBOX(ui->cbCourse, per->setCourseUid, per->setCourse);
     SET_VAL_FROM_CBOX(ui->cbCountry, per->setCountryUid, per->setCountryName);
@@ -764,18 +766,21 @@ void DlgPerson::loadCourse()
 void DlgPerson::on_buttonBox_clicked( QAbstractButton * button )
 {
     traced;
-
+    bool ok2Save = false;
+    ErrCode ret = ErrNone;
     QDialogButtonBox::StandardButton btn = ui->buttonBox->standardButton( button );
     logd("btn: %d", btn);
     if (btn == QDialogButtonBox::StandardButton::Save)
     {
         QRegularExpression re("(\\d{4}[\\/\\.\\-](0?[1-9]|1[012])[\\/\\.\\-](0?[1-9]|[12][0-9]|3[01]))|\\d{4}");
-
+        ok2Save = true;
         QString birthday = ui->txtBirthday->text();
         logd("check match birthday %s", birthday.toStdString().c_str());
         QRegularExpressionMatch match = re.match(birthday);
+
         if (!match.hasMatch())
         {
+            ok2Save = false;
             QMessageBox msgBox;
             msgBox.setText("Birthday not suitable");
             msgBox.setStandardButtons(QMessageBox::Cancel);
@@ -783,8 +788,27 @@ void DlgPerson::on_buttonBox_clicked( QAbstractButton * button )
             msgBox.setDefaultButton(QMessageBox::Cancel);
             msgBox.exec();
         }
+        logd("ok2save %d", ok2Save);
+        if (ok2Save) {
+            // TODO: check should we save here? or let caller save???
+            // TODO: dialg with mode: add new, update, store directly, etc.
+            Person* per = buildPerson();
+            logd("Save it");
+            ret = per->save();
+            logi("Save person result %d", ret);
+            if (ret == ErrNone) {
+                logd("Save ok, close dialog");
+                QDialog::accept();
+            } else {
+                Utils::showErrorBox("Failed to store person");
+            }
+        }
 
+    } else {
+        logd("Do nothing, cancel");
+        QDialog::close();
     }
+    tracede;
 }
 
 

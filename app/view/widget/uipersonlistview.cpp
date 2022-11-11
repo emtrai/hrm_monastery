@@ -21,6 +21,7 @@
  */
 #include "uipersonlistview.h"
 #include "personctl.h"
+#include "specialistctl.h"
 #include "utils.h"
 #include "logger.h"
 #include <QList>
@@ -64,6 +65,7 @@ void UIPersonListView::updateItem(DbModel *item, UITableItem *tblItem)
     tblItem->addValue(per->uid());
     tblItem->addValue(per->hollyName());
     tblItem->addValue(per->getFullName());
+    tblItem->addValue(per->communityName());
     tblItem->addValue(Utils::date2String(per->birthday()));
     tblItem->addValue(per->birthPlace());
     tblItem->addValue(Utils::date2String(per->feastDay(), DATE_FORMAT_MD)); // seem feastday convert repeate many time, make it common????
@@ -81,6 +83,7 @@ void UIPersonListView::initHeader()
     mHeader.append(tr("ID"));
     mHeader.append(tr("Tên Thánh"));
     mHeader.append(tr("Họ tên"));
+    mHeader.append(tr("Cộng đoàn"));
     mHeader.append(tr("Năm sinh"));
     mHeader.append(tr("Nơi sinh"));
     mHeader.append(tr("Ngày bổn mạng"));
@@ -144,9 +147,10 @@ void UIPersonListView::initFilterFields()
     appendFilterField(FILTER_FIELD_FULL_NAME, tr("Họ tên"));
     appendFilterField(FILTER_FIELD_COMMUNITY, tr("Cộng đoàn"));
     appendFilterField(FILTER_FIELD_HOLLY_NAME, tr("Tên Thánh"));
-    appendFilterField(FILTER_FIELD_EDUCATION, tr("Giáo dục"));
+    appendFilterField(FILTER_FIELD_EDUCATION, tr("Học vấn"));
     appendFilterField(FILTER_FIELD_SPECIALIST, tr("Chuyên môn"));
     appendFilterField(FILTER_FIELD_WORK, tr("Công việc"));
+    appendFilterField(FILTER_FIELD_BIRTHDAY, tr("Ngày sinh"));
     tracede;
 }
 

@@ -34,6 +34,7 @@ class DbSqliteUpdateBuilder
 public:
     static DbSqliteUpdateBuilder* build(const QString& tblName);
     DbSqliteUpdateBuilder* addValue(const QString& field, const QString& value);
+    DbSqliteUpdateBuilder* addValue(const QString& field, qint64 value);
     DbSqliteUpdateBuilder* addCond(const QString& field, const QString& value);
     QSqlQuery* buildSqlQuery(const QString* cond = nullptr);
 private:

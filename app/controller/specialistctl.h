@@ -27,7 +27,7 @@
 #include <QStringList>
 #include "specialist.h"
 
-
+#define SPECIALISTCTL SpecialistCtl::getInstance()
 class SpecialistCtl : public Controller
 {
 public:
@@ -41,6 +41,7 @@ protected:
 public:
     QList<Specialist*> getAll();
     static SpecialistCtl* getInstance();
+    virtual QList<DbModel*> getListPerson(const QString& specialistUid);
 
 private:
     static SpecialistCtl* gInstance;

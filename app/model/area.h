@@ -33,6 +33,8 @@ class Area : public DbModel
 public:
     Area();
     static DbModel *builder();
+    virtual QString modelName() const;
+
     Country *getCountry() const;
     void setCountry(Country *newCountry);
 

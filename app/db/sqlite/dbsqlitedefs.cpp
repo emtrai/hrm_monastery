@@ -22,6 +22,55 @@
 #include "dbsqlitedefs.h"
 #include <QMap>
 #include "filter.h"
+#include "errcode.h"
+#include "logger.h"
+#include "defs.h"
+
+static bool s_fieldMapInit = false;
+static QMap<int, QString> s_fieldMap;
+
+
+static bool s_itemFieldMapInit = false;
+static QMap<QString, QString> s_itemFieldMap;
+
+static void initFieldMap()
+{
+    traced;
+    logd("s_fieldMapInit %d", s_fieldMapInit);
+    if (!s_fieldMapInit) {
+        logd("Init field map");
+        s_fieldMap[FILTER_FIELD_NAME] = KFieldName;
+        s_fieldMap[FILTER_FIELD_FULL_NAME] = KFieldFullName;
+        s_fieldMap[FILTER_FIELD_HOLLY_NAME] = KFieldHollyName;
+        s_fieldMap[FILTER_FIELD_ADDRESS] = KFieldAddr;
+        s_fieldMap[FILTER_FIELD_AREA] = KFieldAreaName;
+        s_fieldMap[FILTER_FIELD_COMMUNITY] = KFieldCommunityName;
+        s_fieldMap[FILTER_FIELD_DEPARTMENT] = KFieldDepartmentName;
+        s_fieldMap[FILTER_FIELD_WORK] = KFieldWorkName;
+        s_fieldMap[FILTER_FIELD_EDUCATION] = KFieldEduName;
+        s_fieldMap[FILTER_FIELD_SPECIALIST] = KFieldSpecialistName;
+        s_fieldMap[FILTER_FIELD_MISSON] = KFieldMissionName;
+        s_fieldMapInit = true;
+    }
+
+    tracede;
+}
+
+
+static void initItemFieldMap()
+{
+    traced;
+    logd("s_itemFieldMapInit %d", s_itemFieldMapInit);
+    if (!s_itemFieldMapInit) {
+        logd("Init item field map");
+        s_itemFieldMap[KItemName] = KFieldName;
+        s_itemFieldMap[KItemUid] = KFieldUid;
+        // TODO: add more and more???
+        s_fieldMapInit = true;
+    }
+
+    tracede;
+}
 
 QString getDateTypeString(TableFieldDatatype_t dataType){
     static QMap<TableFieldDatatype_t, QString> map;
@@ -34,24 +83,18 @@ QString getDateTypeString(TableFieldDatatype_t dataType){
 
 QString getFieldNameFromId(int fieldId, bool* isOk)
 {
-    static QMap<int, QString> fieldMap;
+    initFieldMap();
     if (isOk) *isOk = false;
-    fieldMap[FILTER_FIELD_NAME] = KFieldName;
-    fieldMap[FILTER_FIELD_FULL_NAME] = KFieldFullName;
-    fieldMap[FILTER_FIELD_HOLLY_NAME] = KFieldHollyName;
-    fieldMap[FILTER_FIELD_ADDRESS] = KFieldAddr;
-    fieldMap[FILTER_FIELD_AREA] = KFieldAreaName;
-    fieldMap[FILTER_FIELD_COMMUNITY] = KFieldCommunityName;
-    fieldMap[FILTER_FIELD_DEPARTMENT] = KFieldDepartmentName;
-    fieldMap[FILTER_FIELD_WORK] = KFieldWorkName;
-    fieldMap[FILTER_FIELD_EDUCATION] = KFieldIEduName;
-    fieldMap[FILTER_FIELD_SPECIALIST] = KFieldSpecialistName;
-    fieldMap[FILTER_FIELD_MISSON] = KFieldMissionName;
 
-    if (fieldMap.contains(fieldId)) {
+    if (s_fieldMap.contains(fieldId)) {
         if (isOk) *isOk = true;
-        return fieldMap[fieldId];
+        return s_fieldMap[fieldId];
     } else {
         return QString();
     }
+}
+
+QString getFieldNameFromItemName(const QString &itemName, bool *isOk)
+{
+
 }

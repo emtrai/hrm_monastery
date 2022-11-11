@@ -32,13 +32,23 @@
 #include <QRect>
 #include <QComboBox>
 #include <QObject>
-
+#include <QDateTime>
 // yymd
 #define YMD_TO_INT(y,m,d) (((y) << 16) | ((m) << 8) | (d))
 
-qint64 Utils::getCurrentTimeMs()
+qint64 Utils::currentTimeMs()
 {
-    return 0;
+    return QDateTime::currentMSecsSinceEpoch();
+}
+
+QString Utils::timeMsToDatestring(qint64 timeMs, const QString &format)
+{
+    traced;
+    logd("conver time ms %ld", timeMs);
+    QString time = QDateTime::fromSecsSinceEpoch(timeMs).toString(format);
+    logd("time in string %s", time.toStdString().c_str());
+    tracede;
+    return time;
 }
 
 Gender Utils::genderFromString(const QString &gender)

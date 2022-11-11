@@ -46,6 +46,7 @@ protected:
     QList<QString> getNameFields();
     virtual QString getSearchQueryString(const QString& cond = nullptr);
 
+    virtual QString getFilterQueryString(int fieldId, const QString& cond = nullptr);
 
 //    ErrCode_t addPerson(const Person* person);
 

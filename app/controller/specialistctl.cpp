@@ -27,6 +27,7 @@
 #include "filectl.h"
 #include "specialist.h"
 #include "dbctl.h"
+#include "dbspecialistmodelhandler.h"
 
 #define SPLIT ','
 
@@ -91,6 +92,12 @@ SpecialistCtl *SpecialistCtl::getInstance()
     }
 
     return gInstance;
+}
+
+QList<DbModel *> SpecialistCtl::getListPerson(const QString &specialistUid)
+{
+    DbSpecialistModelHandler* hdl = dynamic_cast<DbSpecialistModelHandler*>(DB->getSpecialistModelHandler());
+    return hdl->getListPerson(specialistUid);
 }
 
 void SpecialistCtl::onLoad()

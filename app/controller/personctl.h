@@ -44,6 +44,11 @@ public:
     QList<DbModel*> getListEvent(const Person* person); // TODO: should move to separate event controller?
 
     virtual DbModel* doImportOneItem(int importFileType, const QStringList& items, quint32 idx);
+    virtual int filter(int catetoryid,
+                       const QString& catetory,
+                       qint64 opFlags,
+                       const QString& keywords,
+                       QList<DbModel*>* outList = nullptr);
 private:
     PersonCtl();
 

@@ -49,27 +49,27 @@ void Saint::initImportFields()
     traced;
     // TODO: check fields like holly name, country, etc. and mark invalid field???
 
-    mImportFields.insert(KExportFieldUid, [this](const QString& value){
+    mImportFields.insert(KItemUid, [this](const QString& value){
         this->setUid(value);
     });
 
-    mImportFields.insert(KExportFieldName, [this](const QString& value){
+    mImportFields.insert(KItemName, [this](const QString& value){
         this->setName(value);
     });
 
-    mImportFields.insert(KExportFieldFullName, [this](const QString& value){
+    mImportFields.insert(KItemFullName, [this](const QString& value){
         this->setFullName(value);
     });
-    mImportFields.insert(KExportFieldOriginName, [this](const QString& value){
+    mImportFields.insert(KItemOriginName, [this](const QString& value){
         this->setOriginName(value);
     });
-    mImportFields.insert(KExportFieldGender, [this](const QString& value){
+    mImportFields.insert(KItemGender, [this](const QString& value){
         this->setGender(value);
     });
-    mImportFields.insert(KExportFieldFeastDay, [this](const QString& value){
+    mImportFields.insert(KItemFeastDay, [this](const QString& value){
         this->setFeastDay(value);
     });
-    mImportFields.insert(KExportFieldRemark, [this](const QString& value){
+    mImportFields.insert(KItemRemark, [this](const QString& value){
         this->setRemark(value);
     });
 }

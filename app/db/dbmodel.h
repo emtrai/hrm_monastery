@@ -25,6 +25,7 @@
 #include <QString>
 #include "errcode.h"
 #include "exportfactory.h"
+#include <QList>
 
 class DbModel;
 class DbModelHandler;
@@ -56,7 +57,23 @@ public:
     virtual QString buildUid(const QString* seed = nullptr);
 
 
+    /**
+     * @brief Save all info. or create new
+     * All information will be stored/replaced
+     * @return Error code
+     */
     virtual ErrCode save();
+    /**
+     * @brief Update modified info
+     * @return Error code
+     */
+    virtual ErrCode update();
+    /**
+     * @brief remove data from db
+     * @return
+     */
+    virtual ErrCode remove();
+
     virtual ErrCode exportTo(const QString &fpath, ExportType type);
 
     virtual qint32 dbStatus() const;
@@ -88,18 +105,32 @@ public:
     void appendValidateMsg(const QString &newValidateMsg);
     void cleanValidateResult();
 
+    qint64 createdTime() const;
+    void setCreatedTime(qint64 newCreatedTime);
+
+    qint64 lastUpdatedTime() const;
+    void setLastUpdatedTime(qint64 newLastUpdatedTime);
+
+    const QList<QString> &updatedField() const;
+
 protected:
     virtual DbModelHandler* getDbModelHandler() = 0;
     virtual ErrCode prepare2Save();
+    virtual void markItemAsModified(const QString& itemName);
 protected:
     QHash<QString, ErrCode>* mValidateResult;
     QString mValidateMsg;
+    QList<QString> mUpdatedField; // List of fields/info were changed its value
+
 private:
     qint64 mDbId;
     QString mName;// TODO: support multi languate???
     QString mUid;
-    QString mHistory;
+    QString mHistory; // History on DB
     qint32 mDbStatus;
+    // TODO: time calculated from 1970 will be reset on 2038!!
+    qint64 mCreatedTime; // time in ms, since epoc time (1970)
+    qint64 mLastUpdatedTime; // time in ms, since epoc time (1970)
 };
 
 #endif // DBMODEL_H

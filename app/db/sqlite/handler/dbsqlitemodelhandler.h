@@ -43,6 +43,8 @@ public:
      */
     virtual ErrCode add(DbModel* model);
 
+    virtual ErrCode update(DbModel* model);
+
     /**
      * @brief Check if model exist in db
      * @param edu

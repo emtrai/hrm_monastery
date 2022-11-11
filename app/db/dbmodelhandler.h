@@ -34,6 +34,7 @@ public:
     DbModelHandler();
 
     virtual ErrCode add(DbModel* model) = 0;
+    virtual ErrCode update(DbModel* model) = 0;
 
     /**
      * @brief Check if model exist in db

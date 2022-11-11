@@ -25,6 +25,7 @@
 #include "logger.h"
 
 #include "dbctl.h"
+#include "defs.h"
 
 Specialist::Specialist(QObject *parent)
     : QObject{parent}
@@ -35,6 +36,11 @@ Specialist::Specialist(QObject *parent)
 DbModel *Specialist::builder()
 {
     return new Specialist();
+}
+
+QString Specialist::modelName() const
+{
+    return KModelNameSpecialist;
 }
 
 DbModelHandler *Specialist::getDbModelHandler()

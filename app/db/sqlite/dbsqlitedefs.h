@@ -51,6 +51,8 @@ const char* const KFieldLevel = "level";
 const char* const KFieldParentUid = "parent_uid";
 const char* const KFieldCreateDate = "createdate";
 const char* const KFieldDateFormat = "dateformat";
+const char* const KFieldCreateTime = "create_time";
+const char* const KFieldLastUpdateItme = "LastUpdateTime";
 const char* const KFieldStatus = "status";
 const char* const KFieldDbStatus = "dbstatus";
 const char* const KFieldCEOUid = "ceouid";
@@ -97,8 +99,9 @@ const char* const KFieldNationalityName = "nationality_name";
 const char* const KFieldNationalityUid = "nationality_uid";
 const char* const KFieldEthnicName = "ethnic_name";
 const char* const KFieldEthnicUid = "ethnic_uid";
-const char* const KFieldIEduName = "edu_name";
-const char* const KFieldIEduUid = "edu_uid";
+const char* const KFieldEduName = "edu_name";
+const char* const KFieldEduUid = "edu_uid";
+const char* const KFieldEduDetail = "edu_detail";
 const char* const KFieldPeriod = "period";
 const char* const KFieldStartDate = "start_date";
 const char* const KFieldEndDate = "end_date";
@@ -156,6 +159,9 @@ const char* const KFieldCommunityName = "community_name";
 const char* const KFieldCourseType = "course_type";
 const char* const KFieldWorkName = "work_name";
 const char* const KFieldSpecialistName = "specialist_name";
+const char* const KFieldSpecialistDbId = "specialist_dbid";
+const char* const KFieldSpecialistUid = "specialist_uid";
+const char* const KFieldExperienceHistory = "experience_history";
 
 
 // TABLES NAME
@@ -184,9 +190,11 @@ const char* const KTableCommPerson = "comm_person";
 const char* const KTableAreaPerson = "area_person";
 const char* const KTableDepartPerson = "depart_person";
 const char* const KTableAreaCommunity = "area_community";
+const char* const KTableSpecialistPerson = "specialist_person";
 
 // TODO: move to class???
 QString getDateTypeString(TableFieldDatatype_t dataType);
 QString getFieldNameFromId(int fieldId, bool* isOk = nullptr);
+QString getFieldNameFromItemName(const QString& itemName, bool* isOk = nullptr);
 
 #endif // DBSQLITEDEFS_H

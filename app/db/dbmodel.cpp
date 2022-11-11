@@ -39,11 +39,11 @@ DbModel::DbModel():
 DbModel::DbModel(const DbModel &model)
 {
     traced;
-    setDbId(model.dbId());
-    setName(model.name());
-    setUid(model.uid());
-    setDbStatus(model.dbStatus());
-    setHistory(model.history());
+    mDbId = model.dbId();
+    mName = model.name();
+    mUid = model.uid();
+    mDbStatus = model.dbStatus();
+    mHistory = model.history();
     // TODO: mValidateResult
 }
 
@@ -77,6 +77,8 @@ const QString &DbModel::name() const
 void DbModel::setName(const QString &newName)
 {
     mName = newName;
+
+    markItemAsModified(KItemName);
 }
 
 qint64 DbModel::dbId() const
@@ -96,7 +98,8 @@ const QString &DbModel::uid() const
 
 void DbModel::setUid(const QString &newUid)
 {
-    mUid= newUid;
+    mUid = newUid;
+    markItemAsModified(KItemUid);
 }
 
 void DbModel::buildUidIfNotSet()
@@ -125,6 +128,45 @@ ErrCode DbModel::prepare2Save()
     return ErrNone;
 }
 
+void DbModel::markItemAsModified(const QString &itemName)
+{
+    traced;
+    logd("mark item %s as modified", itemName.toStdString().c_str());
+
+    if (!mUpdatedField.contains(itemName)) {
+        mUpdatedField.append(itemName);
+    } else {
+        logd("Item already existed");
+    }
+
+    tracede;
+}
+
+const QList<QString> &DbModel::updatedField() const
+{
+    return mUpdatedField;
+}
+
+qint64 DbModel::lastUpdatedTime() const
+{
+    return mLastUpdatedTime;
+}
+
+void DbModel::setLastUpdatedTime(qint64 newLastUpdatedTime)
+{
+    mLastUpdatedTime = newLastUpdatedTime;
+}
+
+qint64 DbModel::createdTime() const
+{
+    return mCreatedTime;
+}
+
+void DbModel::setCreatedTime(qint64 newCreatedTime)
+{
+    mCreatedTime = newCreatedTime;
+}
+
 ErrCode DbModel::save()
 {
     traced;
@@ -148,6 +190,24 @@ ErrCode DbModel::save()
     return ret;
 }
 
+ErrCode DbModel::update()
+{
+    traced;
+    ErrCode ret = ErrNone;
+    // TODO
+    tracedr(ret);
+    return ret;
+}
+
+ErrCode DbModel::remove()
+{
+    traced;
+    ErrCode ret = ErrNone;
+    // TODO
+    tracedr(ret);
+    return ret;
+}
+
 ErrCode DbModel::exportTo(const QString &fpath, ExportType type)
 {
     traced;
@@ -167,6 +227,7 @@ qint32 DbModel::dbStatus() const
 void DbModel::setDbStatus(qint32 newDbStatus)
 {
     mDbStatus = newDbStatus;
+    markItemAsModified(KItemDbStatus);
 }
 
 const QString &DbModel::history() const
@@ -177,6 +238,8 @@ const QString &DbModel::history() const
 void DbModel::setHistory(const QString &newHistory)
 {
     mHistory = newHistory;
+
+    markItemAsModified(KItemDbHistory);
 }
 
 bool DbModel::isValid()
@@ -191,9 +254,11 @@ void DbModel::dump()
     // TODO: dump to stdout, sdderr or file???
 #ifdef DEBUG_TRACE
     logd("- modelName %s", modelName().toStdString().c_str());
-    logd("- DbId %d", dbId());
+    logd("- DbId %lld", dbId());
     logd("- Uid %s", uid().toStdString().c_str());
     logd("- Name %s", name().toStdString().c_str());
+    logd("- mCreatedTime %s", Utils::timeMsToDatestring(createdTime()).toStdString().c_str());
+    logd("- mLastUpdatedTime %s", Utils::timeMsToDatestring(lastUpdatedTime()).toStdString().c_str());
 #endif //DEBUG_TRACE
 }
 

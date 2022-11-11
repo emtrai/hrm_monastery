@@ -23,18 +23,22 @@
 #define DBSQLITESPECIALIST_H
 
 #include "dbsqlitemodelhandler.h"
+#include "dbspecialistmodelhandler.h"
 
 //class Specialist;
 class DbSqliteSpecialistTbl;
 
-class DbSqliteSpecialist : public DbSqliteModelHandler
+class DbSqliteSpecialist : public DbSqliteModelHandler, public DbSpecialistModelHandler
 {
 public:
     DbSqliteSpecialist();
     static DbSqliteSpecialist* getInstance();
     virtual const QString getName();
+    virtual QList<DbModel*> getListPerson(const QString& specialistUid);
+
 protected:
     virtual DbSqliteTbl* getMainTbl();
+    virtual DbSqliteTbl* getTable(const QString& modelName);
 private:
 
 private:

@@ -31,14 +31,38 @@ DbSqliteUpdateBuilder *DbSqliteUpdateBuilder::build(const QString &tblName)
 DbSqliteUpdateBuilder *DbSqliteUpdateBuilder::addValue(const QString &field, const QString &value)
 {
     traced;
-    mValue.insert(field, value);
+    logd("add field %s, value %s", field.toStdString().c_str(), value.toStdString().c_str());
+    if (!mValue.contains(field)) {
+        mValue.insert(field, value);
+    } else {
+        logi("Field %s already exist", field.toStdString().c_str());
+    }
+    tracede;
+    return this;
+}
+
+DbSqliteUpdateBuilder *DbSqliteUpdateBuilder::addValue(const QString &field, qint64 value)
+{
+    traced;
+    logd("add field int %s, value %d", field.toStdString().c_str(), value);
+    if (!mValue.contains(field)) {
+        mValue.insert(field, QString("%1").arg(value));
+    } else {
+        logi("Field %s already exist", field.toStdString().c_str());
+    }
+    tracede;
     return this;
 }
 
 DbSqliteUpdateBuilder *DbSqliteUpdateBuilder::addCond(const QString &field, const QString &value)
 {
     traced;
-    mCondition.insert(field, value);
+    logd("add cond %s, value %s", field.toStdString().c_str(), value.toStdString().c_str());
+    if (!mCondition.contains(field)) {
+        mCondition.insert(field, value);
+    } else {
+        logi("Field %s already exist", field.toStdString().c_str());
+    }
     return this;
 }
 

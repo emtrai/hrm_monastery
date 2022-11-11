@@ -24,6 +24,7 @@
 #include "dbsqlitespecialist.h"
 #include "dbsqlite.h"
 #include "table/dbsqlitespecialisttbl.h"
+#include "table/dbsqlitespecialistpersontbl.h"
 #include "defs.h"
 #include "dbsqlitedefs.h"
 
@@ -49,9 +50,37 @@ const QString DbSqliteSpecialist::getName()
     return KModelHdlSpecialist;
 }
 
+QList<DbModel *> DbSqliteSpecialist::getListPerson(const QString &specialistUid)
+{
+    traced;
+    DbSqliteSpecialistPersonTbl* tbl =
+        (DbSqliteSpecialistPersonTbl*)DbSqlite::getInstance()->getTable(KTableSpecialistPerson);
+    // assume main tbl is not null, if not programming error,
+    // and require override search function
+    Q_ASSERT(tbl != nullptr);
+    QList<DbModel *> list = tbl->getListPerson(specialistUid);
+    logd("found %lld", list.count());
+    tracede;
+    return list;
+}
+
 DbSqliteTbl *DbSqliteSpecialist::getMainTbl()
 {
     return (DbSqliteSpecialistTbl*)DbSqlite::getInstance()->getTable(KTableSpecialist);
+}
+
+DbSqliteTbl *DbSqliteSpecialist::getTable(const QString &modelName)
+{
+    traced;
+    DbSqliteTbl* tbl = nullptr;
+    logd("modelname '%s'", modelName.toStdString().c_str());
+    if (modelName == KModelNameSpecialistPerson) {
+        tbl = DbSqlite::table(KTableSpecialistPerson);
+    } else {
+        tbl = getMainTbl();
+    }
+    tracede;
+    return tbl;
 }
 
 

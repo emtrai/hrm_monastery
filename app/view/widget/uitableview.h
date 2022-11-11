@@ -187,10 +187,7 @@ protected:
     virtual void initFilterFields();
     virtual void loadFilterFields();
 
-    virtual void initFilterOperators();
-    virtual QHash<int, QString> getFilterOperators();
-    virtual void appendFilterOperator(int id, const QString& txt);
-    virtual void loadFilterOperators();
+    virtual void loadFilterOperators(int fieldId);
 
 
     virtual void onFilterFieldChange(int fieldId, const QString& fieldText);
@@ -226,7 +223,6 @@ protected:
     quint32 mCurrentPage;
     quint32 mTotalPages;
     QMenu* mMenu;
-    QHash<int, QString> mFilterOps;// search operator
     QHash<int, QString> mFilterFields;
 };
 

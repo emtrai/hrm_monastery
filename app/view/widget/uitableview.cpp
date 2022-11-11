@@ -27,6 +27,7 @@
 #include <QMenu>
 #include "filectl.h"
 #include "utils.h"
+#include "filter.h"
 
 UITableView::UITableView(QWidget *parent) :
     QFrame(parent),
@@ -79,7 +80,8 @@ void UITableView::setupUI()
     setTitle(getTitle());
 
     loadFilterFields();
-    loadFilterOperators();
+    int key = ui->cbCategory->currentData().toInt();
+    loadFilterOperators(key);
     tracede;
 }
 
@@ -400,34 +402,12 @@ void UITableView::clearFilter()
     tracede;
 }
 
-void UITableView::initFilterOperators()
+void UITableView::loadFilterOperators(int fieldId)
 {
     traced;
-    logi("Default init filter operators, do nothing");
-}
-
-QHash<int, QString> UITableView::getFilterOperators()
-{
-    traced;
-    return mFilterOps;
-}
-
-void UITableView::appendFilterOperator(int id, const QString &txt)
-{
-    traced;
-    logd("Add filter op %d, %s", id, txt.toStdString().c_str());
-    if (!mFilterOps.contains(id))
-        mFilterOps.insert(id, txt);
-    else
-        loge("filter op id %d already exist", id);
-    tracede;
-}
-
-void UITableView::loadFilterOperators()
-{
-    traced;
-    initFilterOperators();
-    QHash<int, QString> fields = getFilterOperators();
+    logd("fieldid %d", fieldId);
+    ui->cbSearchOp->clear();
+    QHash<int, QString> fields = getFilterOpsList(fieldId);
     foreach(int key, fields.keys()) {
         ui->cbSearchOp->addItem(fields[key], key);
     }
@@ -777,6 +757,7 @@ void UITableView::on_cbCategory_currentIndexChanged(int index)
     GET_VAL_INT_FROM_CB(ui->cbCategory, categoryId);
 
     onFilterFieldChange(categoryId, categoryTxt);
+    loadFilterOperators(categoryId);
     tracede;
 }
 

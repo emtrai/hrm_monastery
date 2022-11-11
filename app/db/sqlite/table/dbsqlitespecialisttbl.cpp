@@ -41,3 +41,15 @@ DbSqliteSpecialistTbl::DbSqliteSpecialistTbl(DbSqlite* db)
 {
     traced;
 }
+
+void DbSqliteSpecialistTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+{
+    traced;
+    DbSqliteTbl::updateModelFromQuery(item, qry);
+    if (item->name().isEmpty()) {
+        if (!qry.isNull(KFieldSpecialistName)) { /* name may be in this field, not name field*/
+            item->setName(qry.value(KFieldSpecialistName).toString());
+        }
+    }
+    tracede;
+}

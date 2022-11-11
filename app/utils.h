@@ -141,7 +141,8 @@ class QComboBox;
 class Utils
 {
 public:
-    static qint64 getCurrentTimeMs();
+    static qint64 currentTimeMs();
+    static QString timeMsToDatestring(qint64 timMs, const QString& format = "yyyy/MM/dd hh:mm:ss");
     static Gender genderFromString(const QString& gender);
     /**
     * Y/M/D

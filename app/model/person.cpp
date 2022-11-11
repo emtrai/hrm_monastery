@@ -197,14 +197,14 @@ void Person::initExportFields()
 {
     traced;
     // TODO: took to much memory for this, should put in in PersonCtl????
-    mExportFields.insert(KExportFieldImgPath, [this](){
+    mExportFields.insert(KItemImgPath, [this](){
         QString imgPath = this->imgPath();
         if (imgPath.isEmpty()){
             imgPath = ":/icon/icon/unknown.png";
         }
         return imgPath;
     });
-    mExportFields.insert(KExportFieldFullName, [this](){
+    mExportFields.insert(KItemFullName, [this](){
         QString name;
         if (!this->lastName().isEmpty()){
             name = this->lastName();
@@ -216,90 +216,117 @@ void Person::initExportFields()
         return name;
 
     });
-    mExportFields.insert(KExportFieldBirthday, [this](){
+    mExportFields.insert(KItemBirthday, [this](){
         return Utils::date2String(this->birthday());});
-    mExportFields.insert(KExportFieldBirthplace, [this](){
+    mExportFields.insert(KItemBirthplace, [this](){
         return this->birthPlace();
     });
-    mExportFields.insert(KExportFieldHollyName, [this](){
+    mExportFields.insert(KItemHollyName, [this](){
         return this->hollyName();
     });
-    mExportFields.insert(KExportFieldFeastDay, [this](){
+    mExportFields.insert(KItemFeastDay, [this](){
         return Utils::date2String(this->feastDay(), DATE_FORMAT_MD);
     });
-    mExportFields.insert(KExportFieldNationality, [this](){
+    mExportFields.insert(KItemNationality, [this](){
         return this->nationalityName();
     });
-    mExportFields.insert(KExportFieldEthnic, [this](){
+    mExportFields.insert(KItemEthnic, [this](){
         return this->ethnicName();
     });
-    mExportFields.insert(KExportFieldIDcard, [this](){
+    mExportFields.insert(KItemIDcard, [this](){
         return this->idCard();
     });
-    mExportFields.insert(KExportFieldIDcardIssueDate,  [this](){
+    mExportFields.insert(KItemIDcardIssueDate,  [this](){
         return Utils::date2String(this->idCardIssueDate(), DATE_FORMAT_YMD);
     });
-    mExportFields.insert(KExportFieldIDcardIssuer,  [this](){
+    mExportFields.insert(KItemIDcardIssuer,  [this](){
         return this->idCardIssuePlace();
     });
-    mExportFields.insert(KExportFieldStatus, nullptr);
-    mExportFields.insert(KExportFieldRetireDate, nullptr);
-    mExportFields.insert(KExportFieldRetirePlace, nullptr); //"retire_place";
-    mExportFields.insert(KExportFieldDeadDate, nullptr); //"dead_date";
-    mExportFields.insert(KExportFieldDeadPlace, nullptr); //"dead_place";
-    mExportFields.insert(KExportFieldCountry, nullptr); //"country";
-    mExportFields.insert(KExportFieldProvince, nullptr); //"province";
-    mExportFields.insert(KExportFieldAddress, [this](){
+    mExportFields.insert(KItemStatus, nullptr);
+    mExportFields.insert(KItemRetireDate, nullptr);
+    mExportFields.insert(KItemRetirePlace, nullptr); //"retire_place";
+    mExportFields.insert(KItemDeadDate, nullptr); //"dead_date";
+    mExportFields.insert(KItemDeadPlace, nullptr); //"dead_place";
+    mExportFields.insert(KItemCountry, nullptr); //"country";
+    mExportFields.insert(KItemProvince, nullptr); //"province";
+    mExportFields.insert(KItemAddress, [this](){
         return this->addr();
     }); //"address";
-    mExportFields.insert(KExportFieldChurchAddress, [this](){
+    mExportFields.insert(KItemChurchAddress, [this](){
         return this->churchAddr();
     }); //"church_addr";
-    mExportFields.insert(KExportFieldTel, [this](){
+    mExportFields.insert(KItemTel, [this](){
         return this->tel().join(";");
     }); //"telephone";
-    mExportFields.insert(KExportFieldEmail, [this](){
+    mExportFields.insert(KItemEmail, [this](){
         return this->email().join(";");
     }); //"email";
-    mExportFields.insert(KExportFieldOtherContant, nullptr); //"othercontact";
-    mExportFields.insert(KExportFieldEdu, nullptr); //"education";
-    mExportFields.insert(KExportFieldSpeciaist, nullptr); //"specialist";
-    mExportFields.insert(KExportFieldWork, nullptr); //"work";
-    mExportFields.insert(KExportFieldWorkHistory, nullptr); //"work_history";
-    mExportFields.insert(KExportFieldCommunity, nullptr); //"community";
-    mExportFields.insert(KExportFieldCommunityHistory, nullptr); //"community_history";
-    mExportFields.insert(KExportFieldDad, nullptr); //"dad";
-    mExportFields.insert(KExportFieldDadBirthday, nullptr); //"dad_birthday";
-    mExportFields.insert(KExportFieldDadAddr, nullptr); //"dad_addr";
-    mExportFields.insert(KExportFieldMom, nullptr); //"mom";
-    mExportFields.insert(KExportFieldMomBirthday, nullptr); //"mom_birthday";
-    mExportFields.insert(KExportFieldMomAddr, nullptr); //"mom_addr";
-    mExportFields.insert(KExportFieldFamilyHistory, nullptr); //"family_history";
-    mExportFields.insert(KExportFieldFamilyContact, nullptr); //"family_contact";
-    mExportFields.insert(KExportFieldChristenDate, nullptr); //"christen_date";
-    mExportFields.insert(KExportFieldChristenPlace, nullptr); //"christen_place";
-    mExportFields.insert(KExportFieldEucharistDate, nullptr); //"eucharist_date";
-    mExportFields.insert(KExportFieldEucharistPlace, nullptr); //"eucharist_place";
-    mExportFields.insert(KExportFieldHollyDate, nullptr); //"holly_date";
-    mExportFields.insert(KExportFieldHollyPlace, nullptr); //"holly_place";
-    mExportFields.insert(KExportFieldCourse, nullptr); //"course";
-    mExportFields.insert(KExportFieldJoinDate, nullptr); //"join_date";
-    mExportFields.insert(KExportFieldJoinPIC, nullptr); //"join_pic";
-    mExportFields.insert(KExportFieldPreTrainDate, nullptr); //"pre_train_date";
-    mExportFields.insert(KExportFieldPreTrainPIC, nullptr); //"pre_train_pic";
-    mExportFields.insert(KExportFieldTrainDate, nullptr); //"train_date";
-    mExportFields.insert(KExportFieldTrainPIC, nullptr); //"train_pic";
-    mExportFields.insert(KExportFieldVowsDate, nullptr); //"vows_date";
-    mExportFields.insert(KExportFieldVowsCEO, nullptr); //"vows_ceo";
-    mExportFields.insert(KExportFieldEternalVowsDate, nullptr); //"eternal_vows_date";
-    mExportFields.insert(KExportFieldEternalVowsCEO, nullptr); //"eternal_vows_ceo";
-    mExportFields.insert(KExportFieldEternalVowsPIC, nullptr); //"eternal_vows_pic";
-    mExportFields.insert(KExportFieldBankDate, nullptr); //"bank_date";
-    mExportFields.insert(KExportFieldBankPlace, nullptr); //"bank_place";
-    mExportFields.insert(KExportFieldGoldenDate, nullptr); //"golden_date";
-    mExportFields.insert(KExportFieldGoldenPlace, nullptr); //"golden_place";
-    mExportFields.insert(KExportFieldEternalDate, nullptr); //"eternal_date";
-    mExportFields.insert(KExportFieldEternalPlace, nullptr); //"eternal_place";
+    mExportFields.insert(KItemOtherContant, nullptr); //"othercontact";
+    mExportFields.insert(KItemEdu, nullptr); //"education";
+    mExportFields.insert(KItemEduUid, [this](){
+        return this->eduUid();
+    }); //"edu uid";
+    mExportFields.insert(KItemSpeciaist,  [this](){
+        logd("get specialist info to export");
+        DbPersonModelHandler* hdl = dynamic_cast<DbPersonModelHandler*>(getDbModelHandler());
+        QList<DbModel*> list = hdl->getSpecialistList(this->uid());
+        QString specialist;
+        if (list.count() > 0) {
+            foreach (DbModel* item, list) {
+                if (!specialist.isEmpty()){
+                    specialist += ",";
+                }
+                item->dump();
+                specialist += item->name();
+            }
+        }
+        logd("specialist %s", specialist.toStdString().c_str());
+        // TODO: free memory????
+        return specialist;
+    }); //"specialist";
+    mExportFields.insert(KItemSpeciaistUid, [this](){
+        QStringList list = this->specialistUidList();
+        if (list.count() > 0)
+            return list.join(",");
+        else
+            return QString();
+    }); //"specialist uid";
+    mExportFields.insert(KItemWork, nullptr); //"work";
+    mExportFields.insert(KItemWorkHistory, nullptr); //"work_history";
+    mExportFields.insert(KItemCommunity, nullptr); //"community";
+    mExportFields.insert(KItemCommunityHistory, nullptr); //"community_history";
+    mExportFields.insert(KItemDad, nullptr); //"dad";
+    mExportFields.insert(KItemDadBirthday, nullptr); //"dad_birthday";
+    mExportFields.insert(KItemDadAddr, nullptr); //"dad_addr";
+    mExportFields.insert(KItemMom, nullptr); //"mom";
+    mExportFields.insert(KItemMomBirthday, nullptr); //"mom_birthday";
+    mExportFields.insert(KItemMomAddr, nullptr); //"mom_addr";
+    mExportFields.insert(KItemFamilyHistory, nullptr); //"family_history";
+    mExportFields.insert(KItemFamilyContact, nullptr); //"family_contact";
+    mExportFields.insert(KItemChristenDate, nullptr); //"christen_date";
+    mExportFields.insert(KItemChristenPlace, nullptr); //"christen_place";
+    mExportFields.insert(KItemEucharistDate, nullptr); //"eucharist_date";
+    mExportFields.insert(KItemEucharistPlace, nullptr); //"eucharist_place";
+    mExportFields.insert(KItemHollyDate, nullptr); //"holly_date";
+    mExportFields.insert(KItemHollyPlace, nullptr); //"holly_place";
+    mExportFields.insert(KItemCourse, nullptr); //"course";
+    mExportFields.insert(KItemJoinDate, nullptr); //"join_date";
+    mExportFields.insert(KItemJoinPIC, nullptr); //"join_pic";
+    mExportFields.insert(KItemPreTrainDate, nullptr); //"pre_train_date";
+    mExportFields.insert(KItemPreTrainPIC, nullptr); //"pre_train_pic";
+    mExportFields.insert(KItemTrainDate, nullptr); //"train_date";
+    mExportFields.insert(KItemTrainPIC, nullptr); //"train_pic";
+    mExportFields.insert(KItemVowsDate, nullptr); //"vows_date";
+    mExportFields.insert(KItemVowsCEO, nullptr); //"vows_ceo";
+    mExportFields.insert(KItemEternalVowsDate, nullptr); //"eternal_vows_date";
+    mExportFields.insert(KItemEternalVowsCEO, nullptr); //"eternal_vows_ceo";
+    mExportFields.insert(KItemEternalVowsPIC, nullptr); //"eternal_vows_pic";
+    mExportFields.insert(KItemBankDate, nullptr); //"bank_date";
+    mExportFields.insert(KItemBankPlace, nullptr); //"bank_place";
+    mExportFields.insert(KItemGoldenDate, nullptr); //"golden_date";
+    mExportFields.insert(KItemGoldenPlace, nullptr); //"golden_place";
+    mExportFields.insert(KItemEternalDate, nullptr); //"eternal_date";
+    mExportFields.insert(KItemEternalPlace, nullptr); //"eternal_place";
 
 }
 
@@ -308,155 +335,158 @@ void Person::initImportFields()
     traced;
     // TODO: check fields like holly name, country, etc. and mark invalid field???
 
-    mImportFields.insert(KExportFieldImgPath, [this](const QString& value){this->setImgPath(value);});
-    mImportFields.insert(KExportFieldFullName, [this](const QString& value){
+    mImportFields.insert(KItemImgPath, [this](const QString& value){this->setImgPath(value);});
+    mImportFields.insert(KItemFullName, [this](const QString& value){
         this->setNameFromFullName(value);
     });
-    mImportFields.insert(KExportFieldBirthday, [this](const QString& value){
+    mImportFields.insert(KItemBirthday, [this](const QString& value){
         this->setBirthday(value);
     });
-    mImportFields.insert(KExportFieldBirthplace, [this](const QString& value){
+    mImportFields.insert(KItemBirthplace, [this](const QString& value){
         this->setBirthPlace(value);
     });
-    mImportFields.insert(KExportFieldHollyName, [this](const QString& value){this->setHollyName(value);});
-    mImportFields.insert(KExportFieldFeastDay, [this](const QString& value){this->setFeastDay(value);});
-    mImportFields.insert(KExportFieldNationality, [this](const QString& value){this->setNationalityName(value);});
-    mImportFields.insert(KExportFieldEthnic, [this](const QString& value){this->setEthnicName(value);});
-    mImportFields.insert(KExportFieldIDcard, [this](const QString& value){
+    mImportFields.insert(KItemHollyName, [this](const QString& value){this->setHollyName(value);});
+    mImportFields.insert(KItemFeastDay, [this](const QString& value){this->setFeastDay(value);});
+    mImportFields.insert(KItemNationality, [this](const QString& value){this->setNationalityName(value);});
+    mImportFields.insert(KItemEthnic, [this](const QString& value){this->setEthnicName(value);});
+    mImportFields.insert(KItemIDcard, [this](const QString& value){
         this->setIdCard(value);
     });
-    mImportFields.insert(KExportFieldIDcardIssueDate, [this](const QString& value){
+    mImportFields.insert(KItemIDcardIssueDate, [this](const QString& value){
         this->setIdCardIssueDate(value);
     });
-    mImportFields.insert(KExportFieldIDcardIssuer, [this](const QString& value){
+    mImportFields.insert(KItemIDcardIssuer, [this](const QString& value){
         this->setIdCardIssuePlace(value);
     });
-    mImportFields.insert(KExportFieldStatus, nullptr); // TODO: implement this
-    mImportFields.insert(KExportFieldRetireDate,  [this](const QString& value){
+    mImportFields.insert(KItemStatus, nullptr); // TODO: implement this
+    mImportFields.insert(KItemRetireDate,  [this](const QString& value){
         this->setRetireDate(value);
     });
-    mImportFields.insert(KExportFieldRetirePlace, [this](const QString& value){
+    mImportFields.insert(KItemRetirePlace, [this](const QString& value){
         this->setRetirePlace(value);
     }); //"retire_place";
-    mImportFields.insert(KExportFieldDeadDate, [this](const QString& value){
+    mImportFields.insert(KItemDeadDate, [this](const QString& value){
         this->setDeadDate(value);
     }); //"dead_date";
-    mImportFields.insert(KExportFieldDeadPlace, [this](const QString& value){
+    mImportFields.insert(KItemDeadPlace, [this](const QString& value){
         this->setDeadPlace(value);
     }); //"dead_place";
-    mImportFields.insert(KExportFieldCountry, [this](const QString& value){
+    mImportFields.insert(KItemCountry, [this](const QString& value){
         this->setCountryName(value);
     }); //"country";
-    mImportFields.insert(KExportFieldProvince, [this](const QString& value){
+    mImportFields.insert(KItemProvince, [this](const QString& value){
         this->setProvinceName(value);
     }); //"province";
-    mImportFields.insert(KExportFieldAddress, [this](const QString& value){
+    mImportFields.insert(KItemAddress, [this](const QString& value){
         this->setAddr(value);
     }); //"address";
-    mImportFields.insert(KExportFieldChurchAddress, [this](const QString& value){
+    mImportFields.insert(KItemChurchAddress, [this](const QString& value){
         this->setChurchAddr(value);
     }); //"church_addr";
-    mImportFields.insert(KExportFieldTel, [this](const QString& value){
+    mImportFields.insert(KItemTel, [this](const QString& value){
         this->setTel(value);
     }); //"telephone";
-    mImportFields.insert(KExportFieldEmail, [this](const QString& value){
+    mImportFields.insert(KItemEmail, [this](const QString& value){
         this->setEmail(value);
     }); //"email";
-    mImportFields.insert(KExportFieldOtherContant, [this](const QString& value){
+    mImportFields.insert(KItemOtherContant, [this](const QString& value){
         this->setOtherContact(value);
     }); //"othercontact";
-    mImportFields.insert(KExportFieldEdu, [this](const QString& value){
+    mImportFields.insert(KItemEdu, [this](const QString& value){
         this->setEduName(value);
     }); //"education";
-    mImportFields.insert(KExportFieldSpeciaist, [this](const QString& value){
+    mImportFields.insert(KItemEduUid, [this](const QString& value){
+        this->setEduUid(value);
+    }); //"education";
+    mImportFields.insert(KItemSpeciaist, [this](const QString& value){
         this->setSpecialistNames(value);
     }); //"specialist";
-    mImportFields.insert(KExportFieldWork, nullptr); //"work"; // TODO
-    mImportFields.insert(KExportFieldWorkHistory, nullptr); //"work_history"; // TODO
-    mImportFields.insert(KExportFieldCommunity, nullptr); //"community"; // TODO
-    mImportFields.insert(KExportFieldCommunityHistory, nullptr); //"community_history"; // TODO
-    mImportFields.insert(KExportFieldDad, [this](const QString& value){
+    mImportFields.insert(KItemWork, nullptr); //"work"; // TODO
+    mImportFields.insert(KItemWorkHistory, nullptr); //"work_history"; // TODO
+    mImportFields.insert(KItemCommunity, nullptr); //"community"; // TODO
+    mImportFields.insert(KItemCommunityHistory, nullptr); //"community_history"; // TODO
+    mImportFields.insert(KItemDad, [this](const QString& value){
         this->setDadName(value);
     }); //"dad";
-    mImportFields.insert(KExportFieldDadBirthday, [this](const QString& value){
+    mImportFields.insert(KItemDadBirthday, [this](const QString& value){
         this->setDadBirthday(value);
     }); //"dad_birthday";
-    mImportFields.insert(KExportFieldDadAddr,  [this](const QString& value){
+    mImportFields.insert(KItemDadAddr,  [this](const QString& value){
         this->setDadAddr(value);
     }); //"dad_addr";
-    mImportFields.insert(KExportFieldMom,  [this](const QString& value){
+    mImportFields.insert(KItemMom,  [this](const QString& value){
         this->setMomName(value);
     }); //"mom";
-    mImportFields.insert(KExportFieldMomBirthday,  [this](const QString& value){
+    mImportFields.insert(KItemMomBirthday,  [this](const QString& value){
         this->setMomBirthday(value);
     }); //"mom_birthday";
-    mImportFields.insert(KExportFieldMomAddr, [this](const QString& value){
+    mImportFields.insert(KItemMomAddr, [this](const QString& value){
         this->setMomAddr(value);
     }); //"mom_addr";
-    mImportFields.insert(KExportFieldFamilyHistory, [this](const QString& value){
+    mImportFields.insert(KItemFamilyHistory, [this](const QString& value){
         this->setFamilyHistory(value);
     }); //"family_history";
-    mImportFields.insert(KExportFieldFamilyContact, [this](const QString& value){
+    mImportFields.insert(KItemFamilyContact, [this](const QString& value){
         this->setFamilyContact(value);
     }); //"family_contact";
-    mImportFields.insert(KExportFieldChristenDate, [this](const QString& value){
+    mImportFields.insert(KItemChristenDate, [this](const QString& value){
         this->setChristenDate(value);
     }); //"christen_date";
-    mImportFields.insert(KExportFieldChristenPlace, [this](const QString& value){
+    mImportFields.insert(KItemChristenPlace, [this](const QString& value){
         this->setChristenPlace(value);
     }); //"christen_place";
-    mImportFields.insert(KExportFieldEucharistDate, [this](const QString& value){
+    mImportFields.insert(KItemEucharistDate, [this](const QString& value){
         this->setEucharistDate(value);
     }); //"eucharist_date";
-    mImportFields.insert(KExportFieldEucharistPlace, [this](const QString& value){
+    mImportFields.insert(KItemEucharistPlace, [this](const QString& value){
         this->setEucharistPlace(value);
     }); //"eucharist_place";
-    mImportFields.insert(KExportFieldHollyDate, [this](const QString& value){
+    mImportFields.insert(KItemHollyDate, [this](const QString& value){
         this->setHollyDate(value);
     }); //"holly_date";
-    mImportFields.insert(KExportFieldHollyPlace, [this](const QString& value){
+    mImportFields.insert(KItemHollyPlace, [this](const QString& value){
         this->setHollyPlace(value);
     }); //"holly_place";
-    mImportFields.insert(KExportFieldCourse, [this](const QString& value){
+    mImportFields.insert(KItemCourse, [this](const QString& value){
         this->setCourse(value);
     }); //"course";
-    mImportFields.insert(KExportFieldJoinDate, [this](const QString& value){
+    mImportFields.insert(KItemJoinDate, [this](const QString& value){
         this->setJoinDate(value);
     }); //"join_date";
-    mImportFields.insert(KExportFieldJoinPIC, nullptr); //"join_pic";
-    mImportFields.insert(KExportFieldPreTrainDate,  [this](const QString& value){
+    mImportFields.insert(KItemJoinPIC, nullptr); //"join_pic";
+    mImportFields.insert(KItemPreTrainDate,  [this](const QString& value){
         this->setPreTrainJoinDate(value);
     }); //"pre_train_date";
-    mImportFields.insert(KExportFieldPreTrainPIC, nullptr); //"pre_train_pic";
-    mImportFields.insert(KExportFieldTrainDate, [this](const QString& value){
+    mImportFields.insert(KItemPreTrainPIC, nullptr); //"pre_train_pic";
+    mImportFields.insert(KItemTrainDate, [this](const QString& value){
         this->setTrainJoinDate(value);
     }); //"train_date";
-    mImportFields.insert(KExportFieldTrainPIC, nullptr); //"train_pic";
-    mImportFields.insert(KExportFieldVowsDate,  [this](const QString& value){
+    mImportFields.insert(KItemTrainPIC, nullptr); //"train_pic";
+    mImportFields.insert(KItemVowsDate,  [this](const QString& value){
         this->setVowsDate(value);
     }); //"vows_date";
-    mImportFields.insert(KExportFieldVowsCEO, nullptr); //"vows_ceo";
-    mImportFields.insert(KExportFieldEternalVowsDate,  [this](const QString& value){
+    mImportFields.insert(KItemVowsCEO, nullptr); //"vows_ceo";
+    mImportFields.insert(KItemEternalVowsDate,  [this](const QString& value){
         this->setEternalVowsDate(value);
     }); //"eternal_vows_date";
-    mImportFields.insert(KExportFieldEternalVowsCEO, nullptr); //"eternal_vows_ceo";
-    mImportFields.insert(KExportFieldEternalVowsPIC, nullptr); //"eternal_vows_pic";
-    mImportFields.insert(KExportFieldBankDate,  [this](const QString& value){
+    mImportFields.insert(KItemEternalVowsCEO, nullptr); //"eternal_vows_ceo";
+    mImportFields.insert(KItemEternalVowsPIC, nullptr); //"eternal_vows_pic";
+    mImportFields.insert(KItemBankDate,  [this](const QString& value){
         this->setBankDate(value);
     }); //"bank_date";
-    mImportFields.insert(KExportFieldBankPlace,  [this](const QString& value){
+    mImportFields.insert(KItemBankPlace,  [this](const QString& value){
         this->setBankPlace(value);
     }); //"bank_place";
-    mImportFields.insert(KExportFieldGoldenDate,  [this](const QString& value){
+    mImportFields.insert(KItemGoldenDate,  [this](const QString& value){
         this->setGoldenDate(value);
     }); //"golden_date";
-    mImportFields.insert(KExportFieldGoldenPlace,  [this](const QString& value){
+    mImportFields.insert(KItemGoldenPlace,  [this](const QString& value){
         this->setGoldenPlace(value);
     }); //"golden_place";
-    mImportFields.insert(KExportFieldEternalDate,  [this](const QString& value){
+    mImportFields.insert(KItemEternalDate,  [this](const QString& value){
         this->setEternalDate(value);
     }); //"eternal_date";
-    mImportFields.insert(KExportFieldEternalPlace,  [this](const QString& value){
+    mImportFields.insert(KItemEternalPlace,  [this](const QString& value){
         this->setEternalPlace(value);
     }); //"eternal_place";
 }
@@ -479,7 +509,7 @@ ErrCode Person::validate()
     if (ret == ErrNone) {
         ret = checkAndUpdateSaintListFromHollyName();
         if (ret != ErrNone) {
-            appendValidateResult(KExportFieldHollyName, ErrNotFound);
+            appendValidateResult(KItemHollyName, ErrNotFound);
             appendValidateMsg(QString("Saint %1 not found").arg(hollyName()));
             ret = ErrInvalidData;
         }
@@ -680,6 +710,26 @@ ErrCode Person::prepare2Save()
     return ret;
 }
 
+const QString &Person::specialistInfo() const
+{
+    return mSpecialistInfo;
+}
+
+void Person::setSpecialistInfo(const QString &newSpecialistInfo)
+{
+    mSpecialistInfo = newSpecialistInfo;
+}
+
+const QString &Person::eduDetail() const
+{
+    return mEduDetail;
+}
+
+void Person::setEduDetail(const QString &newEduDetail)
+{
+    mEduDetail = newEduDetail;
+}
+
 const QString &Person::communityName() const
 {
     return mCommunityName;
@@ -698,6 +748,7 @@ const QString &Person::communityUid() const
 void Person::setCommunityUid(const QString &newCommunityUid)
 {
     mCommunityUid = newCommunityUid;
+    markItemAsModified(KItemCommunity);
 }
 
 const QString &Person::departName() const

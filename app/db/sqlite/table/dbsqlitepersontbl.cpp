@@ -31,6 +31,8 @@
 
 #include <QSqlQuery>
 
+#include "filter.h"
+
 const qint32 DbSqlitePersonTbl::KVersionCode = VERSION_CODE(0,0,1);
 
 
@@ -62,13 +64,15 @@ void DbSqlitePersonTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldFeastDay, TEXT);
 
 //    builder->addField(KFieldEthnicName, TEXT);
-//    builder->addField(KFieldIEduName, TEXT);
+//    builder->addField(KFieldEduName, TEXT);
 
 
     builder->addField(KFieldNationalityUid, TEXT);
     builder->addField(KFieldEthnicUid, TEXT);
-    builder->addField(KFieldIEduUid, TEXT);
+    builder->addField(KFieldEduUid, TEXT);
+    builder->addField(KFieldEduDetail, TEXT);
     builder->addField(KFieldCourseUid, TEXT);
+    builder->addField(KFieldSpecialistUid, TEXT);
 
     builder->addField(KFieldCountryUid, TEXT);
     builder->addField(KFieldProvinceUid, TEXT);
@@ -164,7 +168,8 @@ ErrCode DbSqlitePersonTbl::insertTableField(DbSqliteInsertBuilder *builder, cons
 
     builder->addValue(KFieldNationalityUid, per->nationalityUid());
     builder->addValue(KFieldEthnicUid, per->ethnicUid());
-    builder->addValue(KFieldIEduUid, per->eduUid());
+    builder->addValue(KFieldEduUid, per->eduUid());
+    builder->addValue(KFieldEduDetail, per->eduDetail());
     builder->addValue(KFieldCourseUid, per->courseUid());
 
     builder->addValue(KFieldCountryUid, per->countryUid());
@@ -245,6 +250,8 @@ void DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry
 {
     traced;
     DbSqliteTbl::updateModelFromQuery(item, qry);
+    // TODO: separate into short info and full info, to avoid consume too much memory?
+    // TODO: paging to avoid too much memory?
     Person* cmm = (Person*) item;
     cmm->setImgId(qry.value(KFieldImgId).toString());
 
@@ -265,7 +272,8 @@ void DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry
     cmm->setNationalityUid(qry.value(KFieldNationalityUid).toString());
     cmm->setEthnicUid(qry.value(KFieldEthnicUid).toString());
 
-    cmm->setEduUid(qry.value(KFieldIEduUid).toString());
+    cmm->setEduUid(qry.value(KFieldEduUid).toString());
+    cmm->setEduDetail(qry.value(KFieldEduDetail).toString());
 
     cmm->setCourseUid(qry.value(KFieldCourseUid).toString());
 
@@ -367,10 +375,41 @@ QList<QString> DbSqlitePersonTbl::getNameFields()
 QString DbSqlitePersonTbl::getSearchQueryString(const QString &cond)
 {
     traced;
-    QString queryString = QString("SELECT *, (%2 || ' ' || %3) AS %4  FROM %1")
+    QString queryString = QString("SELECT *, (%2 || ' ' || %3) AS %4 FROM %1 " \
+                                  " LEFT JOIN %5 ON %1.%6 = %5.%7 ")
                               .arg(name())
                               .arg(KFieldLastName, KFieldFirstName, KFieldFullName)
+                              .arg(KTableCommunity, KFieldCommunityUid, KFieldUid)
                                 ;
+
+    if (!cond.isEmpty()) {
+        queryString += QString(" WHERE %1").arg(cond);
+    }
+    logd("queryString: %s", queryString.toStdString().c_str());
+    return queryString;
+}
+
+QString DbSqlitePersonTbl::getFilterQueryString(int fieldId, const QString &cond)
+{
+    traced;
+    logd("fieldId %d", fieldId);
+    QString joinQuery;
+    switch (fieldId) {
+    case FILTER_FIELD_EDUCATION:
+        joinQuery = QString("%1.%2 AS %3 LEFT JOIN %1 ON %4 = %1.%5")
+                        .arg(KTableEdu, KFieldName, KFieldEduName)
+                        .arg(KFieldEduUid, KFieldUid)
+            ;
+        break;
+    default: // TODO: implement more
+        break;
+    }
+
+    QString queryString = QString("SELECT *, (%2 || ' ' || %3) AS %4 %5  FROM %1")
+                              .arg(name())
+                              .arg(KFieldLastName, KFieldFirstName, KFieldFullName)
+                              .arg((joinQuery.isEmpty()?"":"," + joinQuery))
+        ;
     if (!cond.isEmpty()) {
         queryString += QString(" WHERE %1").arg(cond);
     }

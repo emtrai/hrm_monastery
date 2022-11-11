@@ -27,8 +27,10 @@
 #include "dbsqlite.h"
 #include "dbsqlitepersonevent.h"
 #include "table/dbsqlitepersoneventtbl.h"
+#include "table/dbsqlitespecialistpersontbl.h"
 #include "personevent.h"
 #include "model/saintperson.h"
+#include "model/specialistperson.h"
 #include "dbctl.h"
 
 GET_INSTANCE_IMPL(DbSqlitePerson)
@@ -67,15 +69,38 @@ ErrCode DbSqlitePerson::add(DbModel *model)
             Person* per = dynamic_cast<Person*>(model);
             QStringList saintList = per->saintUidList();
             if (!saintList.empty()) {
-                SaintPerson* saint = (SaintPerson*)SaintPerson::build();
-                saint->setPersonDbId(per->dbId());
-                saint->setPersonUid(per->uid());
+                logd("set saintList for person, no saintList %d", saintList.count());
+
                 foreach (QString item, saintList) {
+                    SaintPerson* saint = (SaintPerson*)SaintPerson::build();
+                    saint->setPersonDbId(per->dbId());
+                    saint->setPersonUid(per->uid());
                     saint->setSaintUid(item);
                     logd("Save saint/person, saint uid '%s'", item.toStdString().c_str());
                     err = saint->save();
+                    // TODO: handle error case
+                    delete saint;
                 }
-                delete saint;
+            } else {
+                logd("no saint for person");
+            }
+
+            logd("Check to add person - specialist ");
+            QStringList list = per->specialistUidList();
+            if (!list.empty()) {
+                logd("set specialist for person, no. specialist %d", list.count());
+
+                foreach (QString item, list) {
+                    SpecialistPerson* model = (SpecialistPerson*)SpecialistPerson::build();
+                    model->setPersonUid(per->uid());
+                    model->setSpecialistUid(item);
+                    logd("Save specialist/person, model uid '%s'", item.toStdString().c_str());
+                    err = model->save();
+                    // TODO: handle error case
+                    delete model;
+                }
+            } else {
+                logd("no specialist for person");
             }
         }
     }
@@ -84,6 +109,31 @@ ErrCode DbSqlitePerson::add(DbModel *model)
         loge("invalid argument");
     }
     tracedr(err);
+    return err;
+}
+
+ErrCode DbSqlitePerson::update(DbModel *model)
+{
+    traced;
+    ErrCode_t err = ErrNone;
+
+    // TODO: should check if some sub-item not exist???
+    // i.e.import person, but country, holly name, etc. not exist, need to check and add it
+
+    if (model != nullptr){
+        DbSqliteTbl* tbl = getMainTbl(); // TODO: check model name to get proper table??
+        if (tbl->isExist(model)){
+            err = tbl->update(model);
+        } else {
+            err = ErrNotExist;
+            loge("model %s not exist", model->name().toStdString().c_str());
+        }
+    }
+    else{
+        err = ErrInvalidArg;
+        loge("invalid argument");
+    }
+
     return err;
 }
 
@@ -218,6 +268,19 @@ int DbSqlitePerson::filter(int fieldId, int operatorId, const QString &keyword, 
     int ret = tbl->filter(fieldId, operatorId, keyword,  &Person::build, outList);
     tracedr(ret);
     return ret;
+}
+
+QList<DbModel *> DbSqlitePerson::getSpecialistList(const QString &personUid)
+{
+    traced;
+    DbSqliteSpecialistPersonTbl* tbl = (DbSqliteSpecialistPersonTbl*)DbSqlite::getInstance()->getTable(KTableSpecialistPerson);
+    // assume main tbl is not null, if not programming error,
+    // and require override search function
+    Q_ASSERT(tbl != nullptr);
+    QList<DbModel *> list = tbl->getListSpecialist(personUid);
+    logd("found %d", list.count());
+    tracede;
+    return list;
 }
 
 

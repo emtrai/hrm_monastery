@@ -109,15 +109,6 @@ void UICommonListView::initFilterFields()
     tracede;
 }
 
-void UICommonListView::initFilterOperators()
-{
-    traced;
-    appendFilterOperator(FILTER_OP_EQUAL, tr("Là"));
-    appendFilterOperator(FILTER_OP_NOT_EQUAL, tr("Khác"));
-    appendFilterOperator(FILTER_OP_CONTAIN, tr("Có"));
-    appendFilterOperator(FILTER_OP_NOT_CONTAIN, tr("Không có"));
-    tracede;
-}
 
 QHash<QString, QString> UICommonListView::getFilterKeywords(int fieldId, const QString &fieldText)
 {

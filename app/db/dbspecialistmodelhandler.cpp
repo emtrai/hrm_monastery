@@ -14,27 +14,10 @@
  * limitations under the License.
  *
  *
- * Filename: dbsqlitespecialisttbl.h
+ * Filename: dbspecialistmodelhandler.cpp
  * Author: Anh, Ngo Huy
- * Created date:8/8/2022
+ * Created date:11/4/2022
  * Brief:
  */
-#ifndef DBSQLITESPECIALISTTBL_H
-#define DBSQLITESPECIALISTTBL_H
+#include "dbspecialistmodelhandler.h"
 
-#include "dbsqlitetbl.h"
-class Specialist;
-
-// Chuyen mon
-class DbSqliteSpecialistTbl : public DbSqliteTbl
-{
-public:
-    DbSqliteSpecialistTbl(DbSqlite* db);
-
-
-    virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
-private:
-    static const qint32 KVersionCode;
-};
-
-#endif // DBSQLITESPECIALISTTBL_H

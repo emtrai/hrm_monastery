@@ -14,27 +14,23 @@
  * limitations under the License.
  *
  *
- * Filename: dbsqlitespecialisttbl.h
+ * Filename: dbspecialistmodelhandler.h
  * Author: Anh, Ngo Huy
- * Created date:8/8/2022
+ * Created date:11/4/2022
  * Brief:
  */
-#ifndef DBSQLITESPECIALISTTBL_H
-#define DBSQLITESPECIALISTTBL_H
+#ifndef DBSPECIALISTMODELHANDLER_H
+#define DBSPECIALISTMODELHANDLER_H
 
-#include "dbsqlitetbl.h"
-class Specialist;
+#include <QString>
 
-// Chuyen mon
-class DbSqliteSpecialistTbl : public DbSqliteTbl
+class DbModel;
+
+class DbSpecialistModelHandler
 {
 public:
-    DbSqliteSpecialistTbl(DbSqlite* db);
+    virtual QList<DbModel*> getListPerson(const QString& specialistUid) = 0;
 
-
-    virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
-private:
-    static const qint32 KVersionCode;
 };
 
-#endif // DBSQLITESPECIALISTTBL_H
+#endif // DBSPECIALISTMODELHANDLER_H

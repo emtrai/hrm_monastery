@@ -142,10 +142,84 @@ ErrCode_t DbSqliteTbl::add(DbModel *item)
 
 }
 
+ErrCode DbSqliteTbl::updateTableField(DbSqliteUpdateBuilder *builder,
+                                      const QList<QString>& updateField,
+                                      const DbModel *item)
+{
+    traced;
+    ErrCode err = ErrNone;
+    logd("Add %d field to update", updateField.count());
+    foreach (QString field, updateField) {
+        logd("Update field %s", field.toStdString().c_str());
+        if (field == KItemUid) {
+            builder->addValue(KFieldUid, item->uid());
+        } else if (field == KItemName){
+            builder->addValue(KFieldName, item->name());
+        }
+    }
+    tracedr(err);
+    return err;
+}
+
+ErrCode DbSqliteTbl::updateTableCondition(DbSqliteUpdateBuilder *builder, const DbModel *item)
+{
+    traced;
+    ErrCode err = ErrNone;
+    builder->addCond(KFieldId, item->uid());
+    tracedr(err);
+    return err;
+}
+
+ErrCode DbSqliteTbl::update(DbModel *item)
+{
+    traced;
+    ErrCode_t err = ErrNone;
+    DbSqliteUpdateBuilder* updateBuilder = nullptr;
+    QSqlQuery* updateQry = nullptr;
+    QList<QString> updatedFields = item->updatedField();
+    if (updatedFields.count() > 0){
+        logd("build update builder");
+        // TODO: check to make sure that uid does not exist?????
+        updateBuilder = DbSqliteUpdateBuilder::build(name());
+        err = updateTableCondition(updateBuilder, item);
+        if (err == ErrNone) {
+            err = updateTableField(updateBuilder, updatedFields, item);
+            logd("updateTableField ret %d", err);
+        } else {
+            loge("update table cond failed err %d", err);
+        }
+
+        if (err == ErrNone){
+            logd("Build SQL Query and execute");
+            updateBuilder->addValue(KFieldLastUpdateItme, Utils::currentTimeMs());
+            updateQry = updateBuilder->buildSqlQuery();
+            err = db()->execQuery(updateQry);
+            logd("execQuery err %d", err);
+        } else {
+            loge("Faild to update table field %d", err);
+        }
+    } else {
+        loge("Nothing to update");
+    }
+
+
+    if (updateBuilder) {
+        delete updateBuilder;
+        updateBuilder = nullptr;
+    }
+    if (updateQry) {
+        delete updateQry;
+        updateQry = nullptr;
+    }
+    tracedr(err);
+    return err;
+}
+
 ErrCode DbSqliteTbl::updateUid(const DbModel *item, const QString &uid)
 {
     traced;
     ErrCode ret = ErrNone;
+    // TODO:implement it
     tracedr(ret);
     return ret;
 }
@@ -240,6 +314,8 @@ void DbSqliteTbl::updateModelFromQuery(DbModel* item, const QSqlQuery& qry)
     item->setUid(qry.value(KFieldUid).toString());
     item->setHistory(qry.value(KFieldHistory).toString());
     item->setDbStatus(qry.value(KFieldRecordStatus).toInt());
+    item->setCreatedTime(qry.value(KFieldCreateTime).toInt());
+    item->setLastUpdatedTime(qry.value(KFieldLastUpdateItme).toInt());
     tracede;
 }
 
@@ -291,7 +367,7 @@ int DbSqliteTbl::filter(int fieldId,
         }
     }
     logd("Query cond '%s'", cond.toStdString().c_str());
-    QString queryString = getSearchQueryString(cond);
+    QString queryString = getFilterQueryString(fieldId, cond);
 
     qry.prepare(queryString);
     logd("Query String '%s'", queryString.toStdString().c_str());
@@ -371,6 +447,8 @@ QList<DbModel *> DbSqliteTbl::getAll(const DbModelBuilder& builder)
             item->setDbStatus(qry->value(KFieldRecordStatus).toInt());
             item->setName(qry->value(KFieldName).toString());
             item->setUid(qry->value(KFieldUid).toString());
+            item->setCreatedTime(qry->value(KFieldCreateTime).toInt());
+            item->setLastUpdatedTime(qry->value(KFieldLastUpdateItme).toInt());
             // TODO: validate value before, i.e. toInt return ok
             updateModelFromQuery(item, *qry);
             list.append(item); // TODO: when it cleaned up?????
@@ -414,6 +492,8 @@ DbModel *DbSqliteTbl::getModel(qint64 dbId, const DbModelBuilder& builder)
         item->setDbStatus(qry.value(KFieldRecordStatus).toInt());
         item->setName(qry.value(KFieldName).toString());
         item->setUid(qry.value(KFieldUid).toString());
+        item->setCreatedTime(qry.value(KFieldCreateTime).toInt());
+        item->setLastUpdatedTime(qry.value(KFieldLastUpdateItme).toInt());
         updateModelFromQuery(item, qry);
     }
 
@@ -520,7 +600,7 @@ int DbSqliteTbl::search(const QString &keyword, const DbModelBuilder &builder, Q
 QString DbSqliteTbl::getSearchQueryString(const QString& cond)
 {
     traced;
-    QString queryString = QString("SELECT * FROM %1")
+    QString queryString = QString("SELECT * FROM %2")
                               .arg(name());
     if (!cond.isEmpty()) {
         queryString += QString(" WHERE %1").arg(cond);
@@ -610,6 +690,8 @@ void DbSqliteTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldUid, TEXT);
     builder->addField(KFieldName, TEXT);
     builder->addField(KFieldHistory, TEXT);
+    builder->addField(KFieldCreateTime, INT64);
+    builder->addField(KFieldLastUpdateItme, INT64);
 }
 
 ErrCode DbSqliteTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
@@ -622,6 +704,11 @@ ErrCode DbSqliteTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbMo
     if (!item->history().isEmpty())
         builder->addValue(KFieldHistory, item->history());
     builder->addValue(KFieldRecordStatus, item->dbStatus());
+    // TODO: timezone issue?
+    // TODO: time of computer suddenly not correct/change???,
+    // should store last open time than compare???
+    builder->addValue(KFieldCreateTime, Utils::currentTimeMs());
+    builder->addValue(KFieldLastUpdateItme, Utils::currentTimeMs());
     tracede;
     return ErrNone;
 }

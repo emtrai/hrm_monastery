@@ -28,8 +28,12 @@
 #include "person.h"
 #include "personevent.h"
 #include "filectl.h"
+#include "specialistctl.h"
 #include "event.h"
 #include "dbpersonmodelhandler.h"
+#include "filter.h"
+#include "dbspecialistmodelhandler.h"
+
 PersonCtl* PersonCtl::gInstance = nullptr;
 
 ErrCode PersonCtl::addPerson(Person *person)
@@ -100,6 +104,43 @@ DbModel *PersonCtl::doImportOneItem(int importFileType, const QStringList &items
 
     tracedr(ret);
     return person;
+}
+
+int PersonCtl::filter(int catetoryid, const QString &catetory, qint64 opFlags, const QString &keywords, QList<DbModel *> *outList)
+{
+    traced;
+    int ret = 0;
+    logd("category id %d", catetoryid);
+    if (catetoryid == FILTER_FIELD_SPECIALIST) {
+        logd("filder by specialist");
+        QList<DbModel *> specialistList;
+        ret = SPECIALISTCTL->filter(catetoryid, catetory, opFlags, keywords, &specialistList);
+        logd("Found %d specialist", ret);
+        DbSpecialistModelHandler* specialistHdl = dynamic_cast<DbSpecialistModelHandler*>(DB->getModelHandler(KModelHdlSpecialist));
+        if (ret > 0){
+            logd("search person for each specialist");
+            foreach (DbModel* item, specialistList) {
+
+                logd("specialist uid %s, name %s",
+                     item->uid().toStdString().c_str(),
+                     item->name().toStdString().c_str());
+                QList<DbModel *> perList = specialistHdl->getListPerson(item->uid());
+                if (perList.count() > 0) {
+                    logd("found %d person", perList.count());
+                    outList->append(perList);
+                } else {
+                    logd("not found any person");
+                }
+            }
+        } else {
+            logi("No specialist found");
+        }
+    } else {
+        logd("generic filter");
+        ret = Controller::filter(catetoryid, catetory, opFlags, keywords, outList);
+    }
+    tracedr(ret);
+    return ret;
 }
 
 

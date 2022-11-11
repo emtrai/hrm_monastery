@@ -46,7 +46,8 @@ public:
                                   const QString &fieldUid1Cond,
                                   const DbModelBuilder &builder,
                                   const QString &uid,
-                                  int status = ITEM_MAP_STATUS_ACTIVE);
+                                  int status = ITEM_MAP_STATUS_ACTIVE,
+                                  const QString& selectedField = "*");
 
 protected:
     virtual void addTableField(DbSqliteTableBuilder* builder);

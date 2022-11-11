@@ -393,6 +393,12 @@ class Person: public DbModel, public IExporter, public IImporter
             const QString &communityName() const;
             void setCommunityName(const QString &newCommunityName);
 
+            const QString &eduDetail() const;
+            void setEduDetail(const QString &newEduDetail);
+
+            const QString &specialistInfo() const;
+            void setSpecialistInfo(const QString &newSpecialistInfo);
+
         protected:
             virtual DbModelHandler *getDbModelHandler();
             virtual const QString exportTemplatePath() const;
@@ -436,10 +442,12 @@ class Person: public DbModel, public IExporter, public IImporter
             // education
             QString mEduUid;
             QString mEduName;
+            QString mEduDetail;
 
 
             QStringList mSpecialistUidList;
             QStringList mSpecialistNameList;
+            QString mSpecialistInfo;
 
             //course
             QString mCourseUid;
@@ -473,7 +481,7 @@ class Person: public DbModel, public IExporter, public IImporter
             QString mDepartName;
 
 
-            //community
+            //community (current)
             QString mCommunityUid;
             QString mCommunityName;
 

@@ -39,6 +39,11 @@ DbModel *Area::builder()
     return new Area();
 }
 
+QString Area::modelName() const
+{
+    return KModelNameArea;
+}
+
 Country *Area::getCountry() const
 {
     return country;

@@ -22,11 +22,14 @@
 #ifndef FILTER_H
 #define FILTER_H
 
+#include <QString>
+#include <QHash>
 
 enum FilterField {
     FILTER_FIELD_NAME = 0,
     FILTER_FIELD_FULL_NAME,
     FILTER_FIELD_HOLLY_NAME,
+    FILTER_FIELD_BIRTHDAY,
     FILTER_FIELD_ADDRESS,
     FILTER_FIELD_AREA,
     FILTER_FIELD_COMMUNITY,
@@ -40,7 +43,7 @@ enum FilterField {
 };
 
 enum FilterOperation {
-    FILTER_OP_EQUAL = 0,
+    FILTER_OP_EQUAL = 1,
     FILTER_OP_NOT_EQUAL,
     FILTER_OP_LESS,
     FILTER_OP_LESS_EQ,
@@ -48,9 +51,9 @@ enum FilterOperation {
     FILTER_OP_GREATER_EQ,
     FILTER_OP_CONTAIN,
     FILTER_OP_NOT_CONTAIN,
-    FILTER_OP_MAX,
+    FILTER_OP_MAX, // MAX MUST BE LESS THAN 32, AS IT's BITWISE
     };
 
-
+QHash<int, QString> getFilterOpsList(int filterField);
 
 #endif // FILTER_H
