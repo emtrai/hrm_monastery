@@ -68,6 +68,7 @@ public:
     UITableWidgetItem(const QString &text);
     static UITableWidgetItem* build(const QString& txt, qint32 itemIdx = 0, qint32 idx = 0, UITableItem* mItem = nullptr);
     UITableItem *item() const;
+    DbModel *itemData() const;
     void setItem(UITableItem *newItem);
     qint32 itemIdx() const;
     void setItemIdx(qint32 newItemIdx);
@@ -81,21 +82,19 @@ private:
     qint32 mIdx; // idx of items (row id)
 };
 
+enum UITableMenuActionType {
+    MENU_ACTION_NORMAL = 0,
+    MENU_ACTION_SEPARATE
+};
+
 class UITableMenuAction: public QAction {
+
 public:
+    UITableMenuAction(QObject *parent = nullptr);
     UITableMenuAction(const QString &text, QObject *parent = nullptr);
     UITableWidgetItem *tblItem() const;
     UITableMenuAction* setTblItem(UITableWidgetItem *newTblItem);
 
-    static UITableMenuAction* build(const QString &text,
-                                    QObject *parent = nullptr,
-                                    UITableWidgetItem* item = nullptr,
-                                    qint32 idx = 0);
-
-    static UITableMenuAction* buildMultiItem(const QString &text,
-                                    QObject *parent = nullptr,
-                                    const QList<UITableItem*>* items = nullptr,
-                                    qint32 idx = 0);
 
     const std::function<ErrCode (QMenu *, UITableMenuAction *)> &callback() const;
     UITableMenuAction* setCallback(const std::function<ErrCode (QMenu *, UITableMenuAction *)> &newCallback);
@@ -103,11 +102,25 @@ public:
     UITableMenuAction* setItemList(const QList<UITableItem *> &newItemList);
     UITableMenuAction* addItemList(UITableItem* newItemList);
 
+    UITableMenuActionType menuType() const;
+    void setMenuType(UITableMenuActionType newMenuType);
+public:
+    static UITableMenuAction* build(const QString &text,
+                                    QObject *parent = nullptr,
+                                    UITableWidgetItem* item = nullptr,
+                                    qint32 idx = 0);
+
+    static UITableMenuAction* buildMultiItem(const QString &text,
+                                             QObject *parent = nullptr,
+                                             const QList<UITableItem*>* items = nullptr,
+                                             qint32 idx = 0);
+
+    static UITableMenuAction* buildSeparateAction();
 private:
     UITableWidgetItem* mTblItem;
     QList<UITableItem*> mItemList;
     std::function<ErrCode(QMenu* menu, UITableMenuAction* act)> mCallback;
-
+    UITableMenuActionType mMenuType;
 };
 
 class UITableView : public QFrame
@@ -156,6 +169,7 @@ protected:
     virtual ErrCode onReload();
     virtual void importRequested(const QString& fpath);
     virtual void onViewItem(UITableWidgetItem *item);
+    virtual void onEditItem(UITableWidgetItem *item);
 
     // MENU
     virtual QMenu* buildPopupMenu(UITableWidgetItem* item, const QList<UITableItem*>& items);

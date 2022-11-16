@@ -106,6 +106,24 @@ DbModel *PersonCtl::doImportOneItem(int importFileType, const QStringList &items
     return person;
 }
 
+DbModel *PersonCtl::doImportOneItem(int importFileType, const QHash<QString, QString> &items, quint32 idx)
+{
+    ErrCode ret = ErrNone;
+    Person* person = nullptr;
+    int i = 0;
+    logd("idx = %d", idx);
+    person = (Person*)Person::build();
+    foreach (QString field, items.keys()) {
+        QString value = items.value(field);
+        logd("Import field %s", field.toStdString().c_str());
+        logd("Import value %s", value.toStdString().c_str());
+        ret = person->onImportItem(importFileType, field, value, idx);
+    }
+
+    tracedr(ret);
+    return person;
+}
+
 int PersonCtl::filter(int catetoryid, const QString &catetory, qint64 opFlags, const QString &keywords, QList<DbModel *> *outList)
 {
     traced;

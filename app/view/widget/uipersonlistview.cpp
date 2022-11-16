@@ -32,6 +32,7 @@
 #include "view/dialog/dlghtmlviewer.h"
 #include <QFile>
 #include "filter.h"
+#include "dlgperson.h"
 
 UIPersonListView::UIPersonListView(QWidget *parent):
     UICommonListView(parent)
@@ -134,6 +135,25 @@ void UIPersonListView::onViewItem(UITableWidgetItem *item)
         loge("Invalid idx");
         // TODO: popup message???
     }
+    tracede;
+}
+
+void UIPersonListView::onEditItem(UITableWidgetItem *item)
+{
+    traced;
+    DbModel* model = item->itemData();
+//    logd("idx=%d",idx);
+    if (model){
+        Person* per = (Person*)model;
+        DlgPerson* dlg = DlgPerson::buildDlg(this, per);
+        dlg->exec();
+        delete dlg;
+
+    } else {
+        loge("Invalid item data");
+        // TODO: popup message???
+    }
+    tracede;
 }
 
 QString UIPersonListView::getTitle()
@@ -150,7 +170,7 @@ void UIPersonListView::initFilterFields()
     appendFilterField(FILTER_FIELD_EDUCATION, tr("Học vấn"));
     appendFilterField(FILTER_FIELD_SPECIALIST, tr("Chuyên môn"));
     appendFilterField(FILTER_FIELD_WORK, tr("Công việc"));
-    appendFilterField(FILTER_FIELD_BIRTHDAY, tr("Ngày sinh"));
+    appendFilterField(FILTER_FIELD_COURSE, tr("Khoá"));
     tracede;
 }
 

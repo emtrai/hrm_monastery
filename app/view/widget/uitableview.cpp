@@ -202,6 +202,13 @@ void UITableView::onViewItem(UITableWidgetItem *item)
     logd("parent class, nothing to do");
 }
 
+void UITableView::onEditItem(UITableWidgetItem *item)
+{
+    traced;
+    logd("parent class, nothing to do");
+
+}
+
 
 QMenu* UITableView::buildPopupMenu(UITableWidgetItem* item, const QList<UITableItem*>& items)
 {
@@ -215,6 +222,7 @@ QMenu* UITableView::buildPopupMenu(UITableWidgetItem* item, const QList<UITableI
     QList<UITableMenuAction*> actions = getMenuCommonActions(mMenu);
 
     if (items.count() > 1){
+        actions.append(UITableMenuAction::buildSeparateAction());
         QList<UITableMenuAction*> itemActions = getMenuMultiItemActions(mMenu, items);
         if (!itemActions.empty()) {
             actions.append(itemActions);
@@ -222,6 +230,7 @@ QMenu* UITableView::buildPopupMenu(UITableWidgetItem* item, const QList<UITableI
     } else {
         if (item != nullptr){
 
+            actions.append(UITableMenuAction::buildSeparateAction());
             QList<UITableMenuAction*> itemActions = getMenuItemActions(mMenu, item);
             if (!itemActions.empty()) {
                 actions.append(itemActions);
@@ -229,13 +238,18 @@ QMenu* UITableView::buildPopupMenu(UITableWidgetItem* item, const QList<UITableI
         }
     }
 //    mMenu->addSeparator();
+    // TODO: free memory allocated for actions!!!!
     foreach (UITableMenuAction* act, actions) {
-        connect(act, &QAction::triggered, [this, act](){
-            logd("lambda trigger call");
-            act->callback()(this->menu(), act);
-                    // TODO: handle return???
-            });
-        mMenu->addAction(act);
+        if (act->menuType() == MENU_ACTION_SEPARATE) {
+            mMenu->addSeparator();
+        } else {
+            connect(act, &QAction::triggered, [this, act](){
+                logd("lambda trigger call");
+                act->callback()(this->menu(), act);
+                        // TODO: handle return???
+                });
+            mMenu->addAction(act);
+        }
     }
 
     return mMenu;
@@ -317,7 +331,7 @@ ErrCode UITableView::onMenuActionMultiDelete(QMenu *menu, UITableMenuAction *act
 ErrCode UITableView::onMenuActionEdit(QMenu *menu, UITableMenuAction *act)
 {
     traced;
-    // TODO: handle it
+    onEditItem((UITableWidgetItem*)act->tblItem());
     return ErrNone;
 }
 
@@ -604,9 +618,18 @@ void UITableView::on_btnFilter_clicked()
 //}
 
 
+UITableMenuAction::UITableMenuAction(QObject *parent):
+    QAction(parent),
+    mTblItem(nullptr),
+    mMenuType(MENU_ACTION_NORMAL)
+{
+
+}
+
 UITableMenuAction::UITableMenuAction(const QString &text, QObject *parent):
     QAction(text, parent),
-    mTblItem(nullptr)
+    mTblItem(nullptr),
+    mMenuType(MENU_ACTION_NORMAL)
 {
     traced;
 }
@@ -643,6 +666,15 @@ UITableMenuAction *UITableMenuAction::buildMultiItem(const QString &text, QObjec
         logd("Not UITableItem to add");
     }
     return menu;
+}
+
+UITableMenuAction *UITableMenuAction::buildSeparateAction()
+{
+    traced;
+    UITableMenuAction* act = new UITableMenuAction();
+    act->setMenuType(MENU_ACTION_SEPARATE);
+    tracede;
+    return act;
 }
 
 const std::function<ErrCode (QMenu *, UITableMenuAction *)> &UITableMenuAction::callback() const
@@ -689,6 +721,16 @@ UITableMenuAction *UITableMenuAction::addItemList(UITableItem *newItemList)
     return this;
 }
 
+UITableMenuActionType UITableMenuAction::menuType() const
+{
+    return mMenuType;
+}
+
+void UITableMenuAction::setMenuType(UITableMenuActionType newMenuType)
+{
+    mMenuType = newMenuType;
+}
+
 void UITableView::on_btnAdd_clicked()
 {
     traced;
@@ -722,6 +764,19 @@ UITableWidgetItem *UITableWidgetItem::build(const QString &txt, qint32 itemIdx, 
 UITableItem *UITableWidgetItem::item() const
 {
     return mItem;
+}
+
+DbModel *UITableWidgetItem::itemData() const
+{
+    traced;
+    DbModel* model = nullptr;
+    if (mItem != nullptr) {
+        model = mItem->data();
+    } else {
+        logd("mItem is nullptr");
+    }
+    tracede;
+    return model;
 }
 
 void UITableWidgetItem::setItem(UITableItem *newItem)

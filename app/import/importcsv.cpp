@@ -38,7 +38,7 @@ ImportCSV::ImportCSV()
 ErrCode ImportCSV::importFrom(int importFileType, IImporter *importer, const QString &fpath, void* tag)
 {
     traced;
-    QHash<QString, QString> item;
+    QList<QHash<QString, QString>> items;
     ErrCode ret = ErrNone;
 
     if (importer == nullptr){
@@ -52,18 +52,28 @@ ErrCode ImportCSV::importFrom(int importFileType, IImporter *importer, const QSt
         // Intend to use callback, but considering the case that error happend when
         // parsing --> date stored by callback may invalid
         // parse and check whole will ensure parsing finished ok
-        ret = Utils::parseDataFromCSVFile(fpath, &item);
+        ret = Utils::parseDataFromCSVFile(fpath, &items);
     }
     if (ret == ErrNone){
-        int cnt = item.count();
-        logd("Parsed %d key", cnt);
-        int idx = 0;
-        if (cnt > 0) {
-            foreach (QString key, item.keys()) {
-                logd("key %s", key.toStdString().c_str());
-                logd("val %s", item.value(key).toStdString().c_str());
-                importer->onImportItem(importFileType, key, item.value(key), idx++, tag);
+        int noItem = items.count();
+        logd("noItem %d", noItem);
+        if (noItem > 0) {
+            foreach (QHash item, items) {
+                int cnt = item.count();
+                logd("Parsed %d key", cnt);
+                int idx = 0;
+                if (cnt > 0) {
+                    importer->onImportItem(importFileType, item, idx++, tag);
+
+//                    foreach (QString key, item.keys()) {
+//                        logd("key %s", key.toStdString().c_str());
+//                        logd("val %s", item.value(key).toStdString().c_str());
+//                        importer->onImportItem(importFileType, key, item.value(key), idx++, tag);
+//                    }
+                }
             }
+        } else {
+            logd("no item");
         }
     }
 

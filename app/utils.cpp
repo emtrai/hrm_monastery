@@ -205,6 +205,7 @@ void Utils::date2ymd(qint64 date, int *pday, int *pmonth, int *pyear)
 }
 
 #define COMMENT '#'
+#define NEXT_LINE '\\'
 ErrCode Utils::parseCSVFile(const QString &filePath,
     std::function<ErrCode(const QStringList& items, void* caller, void* param, quint32 idx)> cb,
     void *caller,
@@ -277,16 +278,19 @@ ErrCode Utils::parseCSVFile(const QString &filePath,
     return ret;
 }
 
+
+#define START_NEW_ITEM "=="
 ErrCode Utils::parseDataFromCSVFile(const QString &filePath,
-                                    QHash<QString, QString>* items,
+                                    QList<QHash<QString, QString>>* items,
                                     QChar splitBy,
                                     func_one_csv_field_t cb,
+                                    func_one_csv_item_complete_t oneModelCB,
                                     void* caller,
                                     void* paramCb)
 {
     traced;
     ErrCode ret = ErrNone;
-    if (!filePath.isEmpty() && (items != nullptr))
+    if (!filePath.isEmpty())
     {
         QFile file(filePath);
         if (file.exists()){
@@ -294,24 +298,66 @@ ErrCode Utils::parseDataFromCSVFile(const QString &filePath,
             if (file.open(QIODevice::ReadOnly | QIODevice::Text)){
                 QTextStream stream(&file );
                 qint32 cnt = 0;
+                bool value_cont = false;
+                bool item_ready = false;
                 // TODO: catch exception????
+                QHash<QString, QString> fields;
+                QString key;
+                QString value;
                 while(!stream.atEnd()) {
                     QString line = stream.readLine();
                     logd("> Line '%s'", line.toStdString().c_str());
                     line = line.simplified();
-                    if (!line.isEmpty() && !line.startsWith(COMMENT))
-                    {
-                        int idx = line.indexOf(splitBy);
-                        QString key;
-                        QString value;
-                        logd("idx %d", idx);
-                        if (idx >= 0){
-                            key = line.mid(0, idx).simplified().toUpper();
-                            value = line.mid(idx+1).trimmed();
+                    if (!line.isEmpty() || value_cont) {
+                        if (value_cont) {
+                            if (line.endsWith(NEXT_LINE)) {
+                                value += line.first(line.length()-1);
+                                value_cont = true;
+                                item_ready = false;
+                            } else {
+                                value += line;
+                                value_cont = false;
+                                item_ready = true;
+                            }
+                        } else if (line.startsWith(START_NEW_ITEM)) {
+                            if (items != nullptr) {
+                                items->append(fields);
+                            }
+                            if (oneModelCB != nullptr) {
+                                oneModelCB(fields, caller, paramCb);
+                            }
+
+                            fields.clear();
+
+                            value_cont = false;
+                            item_ready = false;
+                        } else if (!line.startsWith(COMMENT)) {
+                            int idx = line.indexOf(splitBy);
+                            logd("idx %d", idx);
+                            if (idx >= 0){
+                                key = line.mid(0, idx).simplified().toUpper();
+                                value = line.mid(idx+1).trimmed();
+                                if (value.endsWith(NEXT_LINE)) {
+                                    value_cont = true;
+                                    item_ready = false;
+                                    value.truncate(value.length()-1);
+                                } else {
+                                    value_cont = false;
+                                    item_ready = true;
+                                }
+                            } else {
+                                item_ready = false;
+                                value_cont = false;
+                            }
+                        } else {
+                            value_cont = false;
+                            item_ready = false;
+                        }
+                        if (item_ready) {
                             logd("key %s", key.toStdString().c_str());
                             logd("value %s", value.toStdString().c_str());
                             if (items != nullptr) {
-                                items->insert(key, value);
+                                fields.insert(key, value);
                             }
                             if (cb != nullptr){
                                 logd("Parse one CSV field, call callback");
@@ -321,6 +367,8 @@ ErrCode Utils::parseDataFromCSVFile(const QString &filePath,
                                     break;
                                 }
                             }
+                            key.clear();
+                            value.clear();
                         }
                         // TODO: if not found delimiter, what next???
                         // TODO: handle wrap line?
@@ -330,6 +378,14 @@ ErrCode Utils::parseDataFromCSVFile(const QString &filePath,
                         logi("Skip line %d", cnt);
                     }
                     cnt ++;
+                }
+                if (fields.count() > 0) {
+                    if (items != nullptr) {
+                        items->append(fields);
+                    }
+                    if (oneModelCB != nullptr) {
+                        oneModelCB(fields, caller, paramCb);
+                    }
                 }
                 file.close();
             }
@@ -564,3 +620,4 @@ void Utils::showDlgUnderDev(const QString &info)
     msgBox.exec();
     tracede;
 }
+

@@ -30,7 +30,8 @@
 DbModel::DbModel():
     mDbId(0),
     mDbStatus(0),
-    mValidateResult(nullptr)
+    mValidateResult(nullptr),
+    mMarkModified(false)
 {
     traced;
 
@@ -44,6 +45,7 @@ DbModel::DbModel(const DbModel &model)
     mUid = model.uid();
     mDbStatus = model.dbStatus();
     mHistory = model.history();
+    mMarkModified = model.markModified();
     // TODO: mValidateResult
 }
 
@@ -131,20 +133,61 @@ ErrCode DbModel::prepare2Save()
 void DbModel::markItemAsModified(const QString &itemName)
 {
     traced;
-    logd("mark item %s as modified", itemName.toStdString().c_str());
+    if (markModified()) {
+        logd("mark item %s as modified", itemName.toStdString().c_str());
 
-    if (!mUpdatedField.contains(itemName)) {
-        mUpdatedField.append(itemName);
+        if (!mUpdatedField.contains(itemName)) {
+            mUpdatedField.append(itemName);
+        } else {
+            logd("Item already existed");
+        }
     } else {
-        logd("Item already existed");
+        logd("Skip mark modified for %s", itemName.toStdString().c_str());
     }
 
     tracede;
 }
 
+
+
+void DbModel::checkModifiedThenSet(QString &cur, const QString &next, const QString &itemName)
+{
+    CHECK_MODIFIED_THEN_SET(cur, next, itemName);
+}
+
+void DbModel::checkModifiedThenSet(qint32 &cur, qint32 next, const QString &itemName)
+{
+    CHECK_MODIFIED_THEN_SET(cur, next, itemName);
+}
+
+void DbModel::checkModifiedThenSet(qint64 &cur, qint64 next, const QString &itemName)
+{
+    CHECK_MODIFIED_THEN_SET(cur, next, itemName);
+}
+
+bool DbModel::markModified() const
+{
+    return mMarkModified;
+}
+
+void DbModel::setMarkModified(bool newMarkModified)
+{
+    logd("set mark modify %d", newMarkModified);
+    mMarkModified = newMarkModified;
+}
+
 const QList<QString> &DbModel::updatedField() const
 {
     return mUpdatedField;
+}
+
+void DbModel::resetAllModifiedMark()
+{
+    traced;
+    logd("Total marked item: %d", mUpdatedField.count());
+    mUpdatedField.clear();
+    logd("Total marked item after clear: %d", mUpdatedField.count());
+    tracede;
 }
 
 qint64 DbModel::lastUpdatedTime() const

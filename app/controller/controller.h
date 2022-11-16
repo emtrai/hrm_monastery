@@ -28,7 +28,9 @@ public:
     virtual ErrCode exportToFile(DbModel* model, ExportType type, QString* fpath);
     virtual ErrCode importFromFile(IImporter *importer, ImportType type, const QString& fpath, QList<DbModel*>*outList = nullptr);
     virtual ErrCode onImportItem(int importFileType, const QStringList& items, quint32 idx = 0, void* tag = nullptr);
+    virtual ErrCode onImportItem(int importFileType, const QHash<QString, QString>& items, quint32 idx = 0, void* tag = nullptr);
     virtual DbModel* doImportOneItem(int importFileType, const QStringList& items, quint32 idx);
+    virtual DbModel* doImportOneItem(int importFileType, const QHash<QString, QString>& items, quint32 idx);
 
     virtual int search(const QString& keyword, QList<DbModel*>* outList = nullptr);
     virtual int filter(int catetoryid,

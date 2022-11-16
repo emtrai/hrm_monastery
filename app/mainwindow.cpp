@@ -400,7 +400,25 @@ void MainWindow::loadExportMenu()
 void MainWindow::on_action_ImportPerson_triggered()
 {
     traced;
-    // TODO: implement it
+    // TODO: show dialog to select which type of file to be imported???
+    QString fname = QFileDialog::getOpenFileName(
+        this,
+        tr("Open file"),
+        FileCtl::getAppDataDir(),
+        tr("CSV Files (*.csv);;Excel (*.xls *.xlsx)"));
+    // TODO: this is duplicate code, make it common please
+    if (!fname.isEmpty()){
+        logd("File %s is selected", fname.toStdString().c_str());
+        QList<DbModel*> list;
+        logd("Import from file %s", fname.toStdString().c_str());
+        ErrCode ret = INSTANCE(PersonCtl)->importFromFile(nullptr, ImportType::IMPORT_CSV, fname, &list);
+        logd("Import result %d", ret);
+        logd("No of import item %d", list.count());
+        DlgImportPersonListResult* dlg = new DlgImportPersonListResult();
+        dlg->setup(list);
+        dlg->exec();
+        delete dlg;
+    }
 }
 
 void MainWindow::on_action_ImportPersonList_triggered()

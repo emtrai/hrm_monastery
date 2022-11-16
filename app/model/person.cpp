@@ -261,7 +261,7 @@ void Person::initExportFields()
     mExportFields.insert(KItemEmail, [this](){
         return this->email().join(";");
     }); //"email";
-    mExportFields.insert(KItemOtherContant, nullptr); //"othercontact";
+    mExportFields.insert(KItemOtherContact, nullptr); //"othercontact";
     mExportFields.insert(KItemEdu, nullptr); //"education";
     mExportFields.insert(KItemEduUid, [this](){
         return this->eduUid();
@@ -389,7 +389,7 @@ void Person::initImportFields()
     mImportFields.insert(KItemEmail, [this](const QString& value){
         this->setEmail(value);
     }); //"email";
-    mImportFields.insert(KItemOtherContant, [this](const QString& value){
+    mImportFields.insert(KItemOtherContact, [this](const QString& value){
         this->setOtherContact(value);
     }); //"othercontact";
     mImportFields.insert(KItemEdu, [this](const QString& value){
@@ -521,11 +521,16 @@ ErrCode Person::validate()
 ErrCode Person::fromCSVFile(const QString &fname)
 {
     traced;
+    QList<QHash<QString, QString>> items;
     QHash<QString, QString> item;
     logd("parse csv file %s", fname.toStdString().c_str());
-    ErrCode ret = Utils::parseDataFromCSVFile(fname, &item);
+    ErrCode ret = Utils::parseDataFromCSVFile(fname, &items);
     if (ret == ErrNone){
-        logd("Parsed %d key", item.count());
+        logd("Parsed %d key", items.count());
+        // TODO: fixme if it's actually suitable??
+        if (items.count() > 0) {
+            item = items.at(0); // use 1st one only
+        }
         if (item.contains(KCsvItemName)){
             logd("Set name");
             setName(item.value(KCsvItemName));
@@ -557,7 +562,8 @@ const QString &Person::personCode() const
 
 void Person::setPersonCode(const QString &newPersonCode)
 {
-    mPersonCode = newPersonCode;
+    CHECK_MODIFIED_THEN_SET(mPersonCode, newPersonCode, KItemPersonCode);
+//    mPersonCode = newPersonCode;
 }
 
 const QString &Person::firstName() const
@@ -567,7 +573,8 @@ const QString &Person::firstName() const
 
 void Person::setFirstName(const QString &newFirstName)
 {
-    mFirstName = newFirstName;
+    CHECK_MODIFIED_THEN_SET(mFirstName, newFirstName, KItemFullName);
+//    mFirstName = newFirstName;
 }
 
 
@@ -578,7 +585,9 @@ const QString &Person::birthPlace() const
 
 void Person::setBirthPlace(const QString &newBirthPlace)
 {
-    mBirthPlace = newBirthPlace;
+//    mBirthPlace = newBirthPlace;
+
+    CHECK_MODIFIED_THEN_SET(mBirthPlace, newBirthPlace, KItemBirthplace);
 }
 
 qint64 Person::birthday() const
@@ -588,7 +597,8 @@ qint64 Person::birthday() const
 
 void Person::setBirthday(qint64 newBirthday)
 {
-    mBirthday = newBirthday;
+//    mBirthday = newBirthday;
+    CHECK_MODIFIED_THEN_SET(mBirthday, newBirthday, KItemBirthday);
 }
 
 void Person::setBirthday(const QString &newBirthday)
@@ -611,21 +621,29 @@ const QString &Person::lastName() const
 
 void Person::setLastName(const QString &newLastName)
 {
-    mLastName = newLastName;
+    CHECK_MODIFIED_THEN_SET(mLastName, newLastName, KItemFullName);
+//    mLastName = newLastName;
 }
 
 
 ErrCode Person::setNameFromFullName(const QString &name)
 {
     QStringList items = name.trimmed().split(" ", Qt::SkipEmptyParts);
+    QString firstName;
+    QString lastName;
     if (items.length() > 0){
-        mFirstName = items.last();
+        firstName = items.last();
         items.removeLast();
     }
     // TODO: this is vietnamese style only, how about name in Englist style???
-    mLastName = items.join(" ");
-    logd("first name %s", mFirstName.toStdString().c_str());
-    logd("last name %s", mLastName.toStdString().c_str());
+    lastName = items.join(" ");
+    logd("first name %s", firstName.toStdString().c_str());
+    logd("last name %s", lastName.toStdString().c_str());
+    if ((firstName != mFirstName) || (lastName != mLastName)) { // FIXME: not good condition checking, but let it be
+        mFirstName = firstName;
+        mLastName = lastName;
+        markItemAsModified(KItemFullName);
+    }
 
     return ErrNone;
 }
@@ -645,7 +663,8 @@ qint64 Person::christenDate() const
 
 void Person::setChristenDate(qint64 newChristenDate)
 {
-    mChristenDate = newChristenDate;
+    CHECK_MODIFIED_THEN_SET(mChristenDate, newChristenDate, KItemChristenDate);
+//    mChristenDate = newChristenDate;
 }
 
 void Person::setChristenDate(const QString &newChristenDate,
@@ -717,7 +736,8 @@ const QString &Person::specialistInfo() const
 
 void Person::setSpecialistInfo(const QString &newSpecialistInfo)
 {
-    mSpecialistInfo = newSpecialistInfo;
+    CHECK_MODIFIED_THEN_SET(mSpecialistInfo, newSpecialistInfo, KItemSpeciaistInfo);
+//    mSpecialistInfo = newSpecialistInfo;
 }
 
 const QString &Person::eduDetail() const
@@ -727,7 +747,8 @@ const QString &Person::eduDetail() const
 
 void Person::setEduDetail(const QString &newEduDetail)
 {
-    mEduDetail = newEduDetail;
+    CHECK_MODIFIED_THEN_SET(mEduDetail, newEduDetail, KItemEduDetail);
+//    mEduDetail = newEduDetail;
 }
 
 const QString &Person::communityName() const
@@ -737,7 +758,8 @@ const QString &Person::communityName() const
 
 void Person::setCommunityName(const QString &newCommunityName)
 {
-    mCommunityName = newCommunityName;
+    CHECK_MODIFIED_THEN_SET(mCommunityName, newCommunityName, KItemCommunity);
+//    mCommunityName = newCommunityName;
 }
 
 const QString &Person::communityUid() const
@@ -747,8 +769,9 @@ const QString &Person::communityUid() const
 
 void Person::setCommunityUid(const QString &newCommunityUid)
 {
-    mCommunityUid = newCommunityUid;
-    markItemAsModified(KItemCommunity);
+    CHECK_MODIFIED_THEN_SET(mCommunityUid, newCommunityUid, KItemCommunity);
+//    mCommunityUid = newCommunityUid;
+//    markItemAsModified(KItemCommunity);
 }
 
 const QString &Person::departName() const
@@ -758,7 +781,8 @@ const QString &Person::departName() const
 
 void Person::setDepartName(const QString &newDepartName)
 {
-    mDepartName = newDepartName;
+    CHECK_MODIFIED_THEN_SET(mDepartName, newDepartName, KItemDepartment);
+//    mDepartName = newDepartName;
 }
 
 const QString &Person::departUid() const
@@ -768,7 +792,8 @@ const QString &Person::departUid() const
 
 void Person::setDepartUid(const QString &newDepartUid)
 {
-    mDepartUid = newDepartUid;
+    CHECK_MODIFIED_THEN_SET(mDepartUid, newDepartUid, KItemDepartment);
+//    mDepartUid = newDepartUid;
 }
 
 const QString &Person::areaName() const
@@ -778,7 +803,8 @@ const QString &Person::areaName() const
 
 void Person::setAreaName(const QString &newAreaName)
 {
-    mAreaName = newAreaName;
+    CHECK_MODIFIED_THEN_SET(mAreaName, newAreaName, KItemArea);
+//    mAreaName = newAreaName;
 }
 
 const QString &Person::areaUid() const
@@ -788,7 +814,8 @@ const QString &Person::areaUid() const
 
 void Person::setAreaUid(const QString &newAreaUid)
 {
-    mAreaUid = newAreaUid;
+    CHECK_MODIFIED_THEN_SET(mAreaUid, newAreaUid, KItemArea);
+//    mAreaUid = newAreaUid;
 }
 
 const QString &Person::nationalityName() const
@@ -798,7 +825,8 @@ const QString &Person::nationalityName() const
 
 void Person::setNationalityName(const QString &newNationalityName)
 {
-    mNationalityName = newNationalityName;
+//    mNationalityName = newNationalityName;
+    CHECK_MODIFIED_THEN_SET(mNationalityName, newNationalityName, KItemNationality);
 }
 
 void Person::dump()
@@ -835,7 +863,8 @@ qint64 Person::feastDay() const
 
 void Person::setFeastDay(qint64 newFeastDay)
 {
-    mFeastDay = newFeastDay;
+//    mFeastDay = newFeastDay;
+    CHECK_MODIFIED_THEN_SET(mFeastDay, newFeastDay, KItemFeastDay);
 }
 
 void Person::setFeastDay(const QString &newFeastDay,
@@ -851,7 +880,8 @@ const QString &Person::eucharistPlace() const
 
 void Person::setEucharistPlace(const QString &newEucharistPlace)
 {
-    mEucharistPlace = newEucharistPlace;
+    CHECK_MODIFIED_THEN_SET(mEucharistPlace, newEucharistPlace, KItemEucharistPlace);
+//    mEucharistPlace = newEucharistPlace;
 }
 
 qint64 Person::eucharistDate() const
@@ -861,7 +891,8 @@ qint64 Person::eucharistDate() const
 
 void Person::setEucharistDate(qint64 newEucharistDate)
 {
-    mEucharistDate = newEucharistDate;
+    CHECK_MODIFIED_THEN_SET(mEucharistDate, newEucharistDate, KItemEucharistDate);
+//    mEucharistDate = newEucharistDate;
 }
 
 void Person::setEucharistDate(const QString &newEucharistDate, const QString &format)
@@ -876,7 +907,8 @@ const QString &Person::otherContact() const
 
 void Person::setOtherContact(const QString &newOtherContact)
 {
-    mOtherContact = newOtherContact;
+    CHECK_MODIFIED_THEN_SET(mOtherContact, newOtherContact, KItemOtherContact);
+//    mOtherContact = newOtherContact;
 }
 
 const QHash<QString, QString> &Person::workUidList() const
@@ -886,7 +918,8 @@ const QHash<QString, QString> &Person::workUidList() const
 
 void Person::setWorkUidList(const QHash<QString, QString> &newWorkUidList)
 {
-    mWorkUidList = newWorkUidList;
+    mWorkUidList = newWorkUidList; // TODO: check change before set???
+    markItemAsModified(KItemWork);
 }
 
 const QHash<QString, QString> &Person::educationUidList() const
@@ -897,6 +930,7 @@ const QHash<QString, QString> &Person::educationUidList() const
 void Person::setEducationUidList(const QHash<QString, QString> &newEducationUidList)
 {
     mEducationUidList = newEducationUidList;
+    markItemAsModified(KItemEducation);
 }
 
 const QList<Work *> &Person::workList() const
@@ -907,6 +941,7 @@ const QList<Work *> &Person::workList() const
 void Person::setWorkList(const QList<Work *> &newWorkList)
 {
     mWorkList = newWorkList;
+    markItemAsModified(KItemWork);
 }
 
 const QList<Education *> &Person::educationList() const
@@ -917,6 +952,7 @@ const QList<Education *> &Person::educationList() const
 void Person::setEducationList(const QList<Education *> &newEducationList)
 {
     mEducationList = newEducationList;
+    markItemAsModified(KItemEducation);
 }
 
 const QStringList &Person::eventUidList() const
@@ -927,6 +963,7 @@ const QStringList &Person::eventUidList() const
 void Person::setEventUidList(const QStringList &newEventUidList)
 {
     mEventUidList = newEventUidList;
+    markItemAsModified(KItemEvent);
 }
 
 const QString &Person::imgId() const
@@ -936,7 +973,8 @@ const QString &Person::imgId() const
 
 void Person::setImgId(const QString &newImgId)
 {
-    mImgId = newImgId;
+    CHECK_MODIFIED_THEN_SET(mImgId, newImgId, KItemImg);
+//    mImgId = newImgId;
 }
 
 const QString &Person::deadPlace() const
@@ -946,7 +984,8 @@ const QString &Person::deadPlace() const
 
 void Person::setDeadPlace(const QString &newDeadPlace)
 {
-    mDeadPlace = newDeadPlace;
+    CHECK_MODIFIED_THEN_SET(mDeadPlace, newDeadPlace, KItemDeadPlace);
+//    mDeadPlace = newDeadPlace;
 }
 
 qint64 Person::deadDate() const
@@ -956,7 +995,8 @@ qint64 Person::deadDate() const
 
 void Person::setDeadDate(qint64 newDeadDate)
 {
-    mDeadDate = newDeadDate;
+    CHECK_MODIFIED_THEN_SET(mDeadDate, newDeadDate, KItemDeadDate);
+//    mDeadDate = newDeadDate;
 }
 
 void Person::setDeadDate(const QString &newDeadDate, const QString &format)
@@ -971,7 +1011,8 @@ const QString &Person::retirePlace() const
 
 void Person::setRetirePlace(const QString &newRetirePlace)
 {
-    mRetirePlace = newRetirePlace;
+//    mRetirePlace = newRetirePlace;
+    CHECK_MODIFIED_THEN_SET(mRetirePlace, newRetirePlace, KItemRetirePlace);
 }
 
 qint64 Person::retireDate() const
@@ -981,7 +1022,8 @@ qint64 Person::retireDate() const
 
 void Person::setRetireDate(qint64 newRetireDate)
 {
-    mRetireDate = newRetireDate;
+    CHECK_MODIFIED_THEN_SET(mRetireDate, newRetireDate, KItemRetireDate);
+//    mRetireDate = newRetireDate;
 }
 
 void Person::setRetireDate(const QString &newRetireDate, const QString &format)
@@ -997,7 +1039,8 @@ const QString &Person::statusName() const
 
 void Person::setStatusName(const QString &newStatusName)
 {
-    mStatusName = newStatusName;
+    CHECK_MODIFIED_THEN_SET(mStatusName, newStatusName, KItemStatus);
+//    mStatusName = newStatusName;
 }
 
 const QString &Person::statusUid() const
@@ -1007,7 +1050,8 @@ const QString &Person::statusUid() const
 
 void Person::setStatusUid(const QString &newStatusUid)
 {
-    mStatusUid = newStatusUid;
+    CHECK_MODIFIED_THEN_SET(mStatusUid, newStatusUid, KItemStatus);
+//    mStatusUid = newStatusUid;
 }
 
 const QString &Person::eternalPlace() const
@@ -1017,7 +1061,8 @@ const QString &Person::eternalPlace() const
 
 void Person::setEternalPlace(const QString &newEternalPlace)
 {
-    mEternalPlace = newEternalPlace;
+    CHECK_MODIFIED_THEN_SET(mEternalPlace, newEternalPlace, KItemEternalPlace);
+//    mEternalPlace = newEternalPlace;
 }
 
 qint64 Person::eternalDate() const
@@ -1027,7 +1072,8 @@ qint64 Person::eternalDate() const
 
 void Person::setEternalDate(qint64 newEternalDate)
 {
-    mEternalDate = newEternalDate;
+    CHECK_MODIFIED_THEN_SET(mEternalDate, newEternalDate, KItemEternalDate);
+//    mEternalDate = newEternalDate;
 }
 
 void Person::setEternalDate(const QString &newEternalDate, const QString &format)
@@ -1042,7 +1088,8 @@ const QString &Person::goldenPlace() const
 
 void Person::setGoldenPlace(const QString &newGoldenPlace)
 {
-    mGoldenPlace = newGoldenPlace;
+    CHECK_MODIFIED_THEN_SET(mGoldenPlace, newGoldenPlace, KItemGoldenPlace);
+//    mGoldenPlace = newGoldenPlace;
 }
 
 qint64 Person::goldenDate() const
@@ -1052,7 +1099,8 @@ qint64 Person::goldenDate() const
 
 void Person::setGoldenDate(qint64 newGoldenDate)
 {
-    mGoldenDate = newGoldenDate;
+    CHECK_MODIFIED_THEN_SET(mGoldenDate, newGoldenDate, KItemGoldenDate);
+//    mGoldenDate = newGoldenDate;
 }
 
 void Person::setGoldenDate(const QString &newGoldenDate, const QString &format)
@@ -1067,7 +1115,8 @@ const QString &Person::bankPlace() const
 
 void Person::setBankPlace(const QString &newBankPlace)
 {
-    mBankPlace = newBankPlace;
+    CHECK_MODIFIED_THEN_SET(mBankPlace, newBankPlace, KItemGoldenDate);
+//    mBankPlace = newBankPlace;
 }
 
 qint64 Person::bankDate() const
@@ -1077,7 +1126,8 @@ qint64 Person::bankDate() const
 
 void Person::setBankDate(qint64 newBankDate)
 {
-    mBankDate = newBankDate;
+    CHECK_MODIFIED_THEN_SET(mBankDate, newBankDate, KItemBankDate);
+//    mBankDate = newBankDate;
 }
 
 void Person::setBankDate(const QString &newBankDate, const QString &format)
@@ -1092,7 +1142,8 @@ const QString &Person::eternalVowsPICName() const
 
 void Person::setEternalVowsPICName(const QString &newEternalVowsName)
 {
-    mEternalVowsPICName = newEternalVowsName;
+    CHECK_MODIFIED_THEN_SET(mEternalVowsPICName, newEternalVowsName, KItemEternalVowsCEO);
+//    mEternalVowsPICName = newEternalVowsName;
 }
 
 const QString &Person::eternalVowsPICUid() const
@@ -1102,7 +1153,8 @@ const QString &Person::eternalVowsPICUid() const
 
 void Person::setEternalVowsPICUid(const QString &newEternalVowsPICUid)
 {
-    mEternalVowsPICUid = newEternalVowsPICUid;
+    CHECK_MODIFIED_THEN_SET(mEternalVowsPICUid, newEternalVowsPICUid, KItemEternalVowsCEO);
+//    mEternalVowsPICUid = newEternalVowsPICUid;
 }
 
 const QString &Person::eternalVowsCEOName() const
@@ -1112,7 +1164,8 @@ const QString &Person::eternalVowsCEOName() const
 
 void Person::setEternalVowsCEOName(const QString &newEternalVowsCEOName)
 {
-    mEternalVowsCEOName = newEternalVowsCEOName;
+    CHECK_MODIFIED_THEN_SET(mEternalVowsCEOName, newEternalVowsCEOName, KItemEternalVowsCEO);
+//    mEternalVowsCEOName = newEternalVowsCEOName;
 }
 
 const QString &Person::eternalVowsCEOUid() const
@@ -1122,7 +1175,8 @@ const QString &Person::eternalVowsCEOUid() const
 
 void Person::setEternalVowsCEOUid(const QString &newEternalVowsCEOUid)
 {
-    mEternalVowsCEOUid = newEternalVowsCEOUid;
+    CHECK_MODIFIED_THEN_SET(mEternalVowsCEOUid, newEternalVowsCEOUid, KItemEternalVowsCEO);
+//    mEternalVowsCEOUid = newEternalVowsCEOUid;
 }
 
 qint64 Person::eternalVowsDate() const
@@ -1132,7 +1186,8 @@ qint64 Person::eternalVowsDate() const
 
 void Person::setEternalVowsDate(qint64 newEternalVowsDate)
 {
-    mEternalVowsDate = newEternalVowsDate;
+    CHECK_MODIFIED_THEN_SET(mEternalVowsDate, newEternalVowsDate, KItemEternalVowsDate);
+//    mEternalVowsDate = newEternalVowsDate;
 }
 
 void Person::setEternalVowsDate(const QString &newEternalVowsDate, const QString &format)
@@ -1147,7 +1202,8 @@ qint64 Person::vowsDate() const
 
 void Person::setVowsDate(qint64 newVowsDate)
 {
-    mVowsDate = newVowsDate;
+    CHECK_MODIFIED_THEN_SET(mVowsDate, newVowsDate, KItemVowsDate);
+//    mVowsDate = newVowsDate;
 }
 
 void Person::setVowsDate(const QString &newVowsDate, const QString &format)
@@ -1162,7 +1218,8 @@ const QString &Person::vowsCEOName() const
 
 void Person::setVowsCEOName(const QString &newVowsCEOName)
 {
-    mVowsCEOName = newVowsCEOName;
+    CHECK_MODIFIED_THEN_SET(mVowsCEOName, newVowsCEOName, KItemVowsCEO);
+//    mVowsCEOName = newVowsCEOName;
 }
 
 const QString &Person::vowsCEOUid() const
@@ -1172,7 +1229,8 @@ const QString &Person::vowsCEOUid() const
 
 void Person::setVowsCEOUid(const QString &newVowsCEOUid)
 {
-    mVowsCEOUid = newVowsCEOUid;
+    CHECK_MODIFIED_THEN_SET(mVowsCEOUid, newVowsCEOUid, KItemVowsCEO);
+//    mVowsCEOUid = newVowsCEOUid;
 }
 
 const QString &Person::trainPICName() const
@@ -1182,7 +1240,8 @@ const QString &Person::trainPICName() const
 
 void Person::setTrainPICName(const QString &newTrainPICName)
 {
-    mTrainPICName = newTrainPICName;
+    CHECK_MODIFIED_THEN_SET(mTrainPICName, newTrainPICName, KItemTrainPIC);
+//    mTrainPICName = newTrainPICName;
 }
 
 const QString &Person::trainPICUid() const
@@ -1192,7 +1251,8 @@ const QString &Person::trainPICUid() const
 
 void Person::setTrainPICUid(const QString &newTrainPICUid)
 {
-    mTrainPICUid = newTrainPICUid;
+    CHECK_MODIFIED_THEN_SET(mTrainPICUid, newTrainPICUid, KItemTrainPIC);
+//    mTrainPICUid = newTrainPICUid;
 }
 
 const QString &Person::preTrainPICName() const
@@ -1202,7 +1262,8 @@ const QString &Person::preTrainPICName() const
 
 void Person::setPreTrainPICName(const QString &newPreTrainPICName)
 {
-    mPreTrainPICName = newPreTrainPICName;
+    CHECK_MODIFIED_THEN_SET(mPreTrainPICName, newPreTrainPICName, KItemPreTrainPIC);
+//    mPreTrainPICName = newPreTrainPICName;
 }
 
 const QString &Person::preTrainPICUid() const
@@ -1212,7 +1273,8 @@ const QString &Person::preTrainPICUid() const
 
 void Person::setPreTrainPICUid(const QString &newPreTrainPICUid)
 {
-    mPreTrainPICUid = newPreTrainPICUid;
+    CHECK_MODIFIED_THEN_SET(mPreTrainPICUid, newPreTrainPICUid, KItemPreTrainPIC);
+//    mPreTrainPICUid = newPreTrainPICUid;
 }
 
 qint64 Person::preTrainJoinDate() const
@@ -1222,7 +1284,8 @@ qint64 Person::preTrainJoinDate() const
 
 void Person::setPreTrainJoinDate(qint64 newPreTrainJoinDate)
 {
-    mPreTrainJoinDate = newPreTrainJoinDate;
+    CHECK_MODIFIED_THEN_SET(mPreTrainJoinDate, newPreTrainJoinDate, KItemPreTrainDate);
+//    mPreTrainJoinDate = newPreTrainJoinDate;
 }
 
 void Person::setPreTrainJoinDate(const QString &newPreTrainJoinDate, const QString &format)
@@ -1237,7 +1300,8 @@ const QString &Person::joinPICName() const
 
 void Person::setJoinPICName(const QString &newJoinPICName)
 {
-    mJoinPICName = newJoinPICName;
+    CHECK_MODIFIED_THEN_SET(mJoinPICName, newJoinPICName, KItemJoinPIC);
+//    mJoinPICName = newJoinPICName;
 }
 
 const QString &Person::joinPICUid() const
@@ -1247,7 +1311,8 @@ const QString &Person::joinPICUid() const
 
 void Person::setJoinPICUid(const QString &newJoinPICUid)
 {
-    mJoinPICUid = newJoinPICUid;
+    CHECK_MODIFIED_THEN_SET(mJoinPICUid, newJoinPICUid, KItemJoinPIC);
+//    mJoinPICUid = newJoinPICUid;
 }
 
 qint64 Person::joinDate() const
@@ -1257,7 +1322,8 @@ qint64 Person::joinDate() const
 
 void Person::setJoinDate(qint64 newJoinDate)
 {
-    mJoinDate = newJoinDate;
+    CHECK_MODIFIED_THEN_SET(mJoinDate, newJoinDate, KItemJoinDate);
+//    mJoinDate = newJoinDate;
 }
 
 void Person::setJoinDate(const QString &newJoinDate, const QString &format)
@@ -1272,7 +1338,8 @@ const QString &Person::familyContact() const
 
 void Person::setFamilyContact(const QString &newFamilyContact)
 {
-    mFamilyContact = newFamilyContact;
+    CHECK_MODIFIED_THEN_SET(mFamilyContact, newFamilyContact, KItemFamilyContact);
+//    mFamilyContact = newFamilyContact;
 }
 
 qint64 Person::hollyDate() const
@@ -1282,7 +1349,8 @@ qint64 Person::hollyDate() const
 
 void Person::setHollyDate(qint64 newHollyDate)
 {
-    mHollyDate = newHollyDate;
+    CHECK_MODIFIED_THEN_SET(mHollyDate, newHollyDate, KItemHollyDate);
+//    mHollyDate = newHollyDate;
 }
 
 void Person::setHollyDate(const QString &newHollyDate, const QString &format)
@@ -1297,7 +1365,8 @@ const QString &Person::hollyPlace() const
 
 void Person::setHollyPlace(const QString &newHollyPlace)
 {
-    mHollyPlace = newHollyPlace;
+    CHECK_MODIFIED_THEN_SET(mHollyPlace, newHollyPlace, KItemHollyPlace);
+//    mHollyPlace = newHollyPlace;
 }
 
 const QString &Person::christenPlace() const
@@ -1307,7 +1376,8 @@ const QString &Person::christenPlace() const
 
 void Person::setChristenPlace(const QString &newChristenPlace)
 {
-    mChristenPlace = newChristenPlace;
+    CHECK_MODIFIED_THEN_SET(mChristenPlace, newChristenPlace, KItemChristenPlace);
+//    mChristenPlace = newChristenPlace;
 }
 
 const QString &Person::familyHistory() const
@@ -1317,7 +1387,8 @@ const QString &Person::familyHistory() const
 
 void Person::setFamilyHistory(const QString &newFamilyHistory)
 {
-    mFamilyHistory = newFamilyHistory;
+    CHECK_MODIFIED_THEN_SET(mFamilyHistory, newFamilyHistory, KItemFamilyHistory);
+//    mFamilyHistory = newFamilyHistory;
 }
 
 const QString &Person::momAddr() const
@@ -1327,7 +1398,8 @@ const QString &Person::momAddr() const
 
 void Person::setMomAddr(const QString &newMomAddr)
 {
-    mMomAddr = newMomAddr;
+    CHECK_MODIFIED_THEN_SET(mMomAddr, newMomAddr, KItemMomAddr);
+//    mMomAddr = newMomAddr;
 }
 
 qint64 Person::momBirthday() const
@@ -1337,7 +1409,8 @@ qint64 Person::momBirthday() const
 
 void Person::setMomBirthday(qint64 newMomBirthday)
 {
-    mMomBirthday = newMomBirthday;
+    CHECK_MODIFIED_THEN_SET(mMomBirthday, newMomBirthday, KItemMomBirthday);
+//    mMomBirthday = newMomBirthday;
 }
 
 void Person::setMomBirthday(const QString &newMomBirthday, const QString &format)
@@ -1352,7 +1425,8 @@ const QString &Person::momName() const
 
 void Person::setMomName(const QString &newMomName)
 {
-    mMomName = newMomName;
+    CHECK_MODIFIED_THEN_SET(mMomName, newMomName, KItemMom);
+//    mMomName = newMomName;
 }
 
 const QString &Person::dadAddr() const
@@ -1362,7 +1436,8 @@ const QString &Person::dadAddr() const
 
 void Person::setDadAddr(const QString &newDadAddr)
 {
-    mDadAddr = newDadAddr;
+    CHECK_MODIFIED_THEN_SET(mDadAddr, newDadAddr, KItemDadAddr);
+//    mDadAddr = newDadAddr;
 }
 
 qint64 Person::dadBirthday() const
@@ -1372,7 +1447,8 @@ qint64 Person::dadBirthday() const
 
 void Person::setDadBirthday(qint64 newDadBirthday)
 {
-    mDadBirthday = newDadBirthday;
+    CHECK_MODIFIED_THEN_SET(mDadBirthday, newDadBirthday, KItemDadBirthday);
+//    mDadBirthday = newDadBirthday;
 }
 
 void Person::setDadBirthday(const QString &newDadBirthday, const QString &format)
@@ -1387,7 +1463,8 @@ const QString &Person::dadName() const
 
 void Person::setDadName(const QString &newDadName)
 {
-    mDadName = newDadName;
+    CHECK_MODIFIED_THEN_SET(mDadName, newDadName, KItemDad);
+//    mDadName = newDadName;
 }
 
 const QStringList &Person::tel() const
@@ -1397,12 +1474,18 @@ const QStringList &Person::tel() const
 
 void Person::setTel(const QStringList &newTel)
 {
-    mTel = newTel;
+    CHECK_MODIFIED_THEN_SET_QLIST_STRING(mTel, newTel, KItemTel);
+//    if (!Utils::isSameList<QString>(mTel, newTel)) {
+//        mTel.clear();
+//        mTel.append(newTel);
+////        mTel = newTel;
+//        markItemAsModified(KItemTel);
+//    }
 }
 
 void Person::setTel(const QString &newTel)
 {
-    mTel = newTel.split(';');
+    setTel(newTel.split(';'));
 }
 
 const QStringList &Person::email() const
@@ -1412,12 +1495,18 @@ const QStringList &Person::email() const
 
 void Person::setEmail(const QStringList &newEmail)
 {
-    mEmail = newEmail;
+    CHECK_MODIFIED_THEN_SET_QLIST_STRING(mEmail, newEmail, KItemEmail);
+//    if (!Utils::isSameList<QString>(mEmail, newEmail)) {
+//        mEmail.clear();
+//        mEmail.append(newEmail);
+//        markItemAsModified(KItemTel);
+//    }
+//    mEmail = newEmail;
 }
 
 void Person::setEmail(const QString &newEmail)
 {
-    mEmail = newEmail.split(';');
+    setEmail(newEmail.split(';'));
 }
 
 const QString &Person::churchAddr() const
@@ -1427,7 +1516,8 @@ const QString &Person::churchAddr() const
 
 void Person::setChurchAddr(const QString &newChurchAddr)
 {
-    mChurchAddr = newChurchAddr;
+    CHECK_MODIFIED_THEN_SET(mChurchAddr, newChurchAddr, KItemChurchAddress);
+//    mChurchAddr = newChurchAddr;
 }
 
 const QString &Person::addr() const
@@ -1437,7 +1527,8 @@ const QString &Person::addr() const
 
 void Person::setAddr(const QString &newAddr)
 {
-    mAddr = newAddr;
+    CHECK_MODIFIED_THEN_SET(mAddr, newAddr, KItemAddress);
+//    mAddr = newAddr;
 }
 
 const QString &Person::provinceName() const
@@ -1447,7 +1538,8 @@ const QString &Person::provinceName() const
 
 void Person::setProvinceName(const QString &newProvinceName)
 {
-    mProvinceName = newProvinceName;
+    CHECK_MODIFIED_THEN_SET(mProvinceName, newProvinceName, KItemProvince);
+//    mProvinceName = newProvinceName;
 }
 
 const QString &Person::provinceUid() const
@@ -1457,7 +1549,8 @@ const QString &Person::provinceUid() const
 
 void Person::setProvinceUid(const QString &newProvinceUid)
 {
-    mProvinceUid = newProvinceUid;
+    CHECK_MODIFIED_THEN_SET(mProvinceUid, newProvinceUid, KItemProvince);
+//    mProvinceUid = newProvinceUid;
 }
 
 const QString &Person::countryName() const
@@ -1467,7 +1560,8 @@ const QString &Person::countryName() const
 
 void Person::setCountryName(const QString &newCountryName)
 {
-    mCountryName = newCountryName;
+    CHECK_MODIFIED_THEN_SET(mCountryName, newCountryName, KItemCountry);
+//    mCountryName = newCountryName;
 }
 
 const QString &Person::countryUid() const
@@ -1477,7 +1571,8 @@ const QString &Person::countryUid() const
 
 void Person::setCountryUid(const QString &newCountryUid)
 {
-    mCountryUid = newCountryUid;
+    CHECK_MODIFIED_THEN_SET(mCountryUid, newCountryUid, KItemCountry);
+//    mCountryUid = newCountryUid;
 }
 
 const QString &Person::courseUid() const
@@ -1487,7 +1582,8 @@ const QString &Person::courseUid() const
 
 void Person::setCourseUid(const QString &newCourseUid)
 {
-    mCourseUid = newCourseUid;
+    CHECK_MODIFIED_THEN_SET(mCourseUid, newCourseUid, KItemCourse);
+//    mCourseUid = newCourseUid;
 }
 
 const QString &Person::course() const
@@ -1497,7 +1593,8 @@ const QString &Person::course() const
 
 void Person::setCourse(const QString &newCourse)
 {
-    mCourse = newCourse;
+    CHECK_MODIFIED_THEN_SET(mCourse, newCourse, KItemCourse);
+//    mCourse = newCourse;
 }
 
 const QStringList &Person::specialistUidList() const
@@ -1507,22 +1604,31 @@ const QStringList &Person::specialistUidList() const
 
 void Person::setSpecialistUidList(const QStringList &newSpecialistUidList)
 {
-    mSpecialistUidList = newSpecialistUidList;
+    CHECK_MODIFIED_THEN_SET_QLIST_STRING(mSpecialistUidList, newSpecialistUidList, KItemSpeciaist);
+//    CHECK_MODIFIED_THEN_SET(mSpecialistUidList, newSpecialistUidList, KItemSpeciaist);
+//    mSpecialistUidList = newSpecialistUidList;
 }
 
 void Person::setSpecialistNames(const QString &newSpecialists, const QString &split)
 {
-    mSpecialistNameList = newSpecialists.split(split); // TODO: check to remove redudant
+    setSpecialistUidList(newSpecialists.split(split));
+//    mSpecialistNameList = newSpecialists.split(split);
+    // TODO: check to remove redudant, check if they're same list
+//    markItemAsModified(KItemSpeciaist);
 }
 
 void Person::clearSpecialistUid()
 {
     mSpecialistUidList.clear();
+    markItemAsModified(KItemSpeciaist);
 }
 
 void Person::addSpecialistUid(const QString &uid)
 {
-    mSpecialistUidList.append(uid);
+    if (!mSpecialistUidList.contains(uid)) {
+        mSpecialistUidList.append(uid);
+        markItemAsModified(KItemSpeciaist);
+    }
 }
 
 const QString &Person::eduName() const
@@ -1532,7 +1638,8 @@ const QString &Person::eduName() const
 
 void Person::setEduName(const QString &newEduName)
 {
-    mEduName = newEduName;
+    CHECK_MODIFIED_THEN_SET(mEduName, newEduName, KItemEdu);
+//    mEduName = newEduName;
 }
 
 const QString &Person::eduUid() const
@@ -1542,7 +1649,8 @@ const QString &Person::eduUid() const
 
 void Person::setEduUid(const QString &newEduUid)
 {
-    mEduUid = newEduUid;
+    CHECK_MODIFIED_THEN_SET(mEduUid, newEduUid, KItemEdu);
+//    mEduUid = newEduUid;
 }
 
 const QString &Person::idCardIssuePlace() const
@@ -1552,7 +1660,8 @@ const QString &Person::idCardIssuePlace() const
 
 void Person::setIdCardIssuePlace(const QString &newIdCardIssuePlace)
 {
-    mIdCardIssuePlace = newIdCardIssuePlace;
+    CHECK_MODIFIED_THEN_SET(mIdCardIssuePlace, newIdCardIssuePlace, KItemIDcardIssuer);
+//    mIdCardIssuePlace = newIdCardIssuePlace;
 }
 
 qint64 Person::idCardIssueDate() const
@@ -1562,12 +1671,13 @@ qint64 Person::idCardIssueDate() const
 
 void Person::setIdCardIssueDate(qint64 newIdCardIssueDate)
 {
-    mIdCardIssueDate = newIdCardIssueDate;
+    CHECK_MODIFIED_THEN_SET(mIdCardIssueDate, newIdCardIssueDate, KItemIDcardIssueDate);
+//    mIdCardIssueDate = newIdCardIssueDate;
 }
 
 void Person::setIdCardIssueDate(const QString &newIdCardIssueDate)
 {
-    mIdCardIssueDate = Utils::dateFromString(newIdCardIssueDate);
+    setIdCardIssueDate(Utils::dateFromString(newIdCardIssueDate));
 }
 
 const QString &Person::idCard() const
@@ -1577,7 +1687,8 @@ const QString &Person::idCard() const
 
 void Person::setIdCard(const QString &newIdCard)
 {
-    mIdCard = newIdCard;
+    CHECK_MODIFIED_THEN_SET(mIdCard, newIdCard, KItemIDcard);
+//    mIdCard = newIdCard;
 }
 
 const QString &Person::ethnicName() const
@@ -1587,7 +1698,8 @@ const QString &Person::ethnicName() const
 
 void Person::setEthnicName(const QString &newEthnicName)
 {
-    mEthnicName = newEthnicName;
+    CHECK_MODIFIED_THEN_SET(mEthnicName, newEthnicName, KItemEthnic);
+//    mEthnicName = newEthnicName;
 }
 
 const QString &Person::ethnicUid() const
@@ -1597,7 +1709,8 @@ const QString &Person::ethnicUid() const
 
 void Person::setEthnicUid(const QString &newEthnicUid)
 {
-    mEthnicUid = newEthnicUid;
+//    mEthnicUid = newEthnicUid;
+    CHECK_MODIFIED_THEN_SET(mEthnicUid, newEthnicUid, KItemEthnic);
 }
 
 const QString &Person::nationalityUid() const
@@ -1607,7 +1720,8 @@ const QString &Person::nationalityUid() const
 
 void Person::setNationalityUid(const QString &newNationalityUid)
 {
-    mNationalityUid = newNationalityUid;
+//    mNationalityUid = newNationalityUid;
+    CHECK_MODIFIED_THEN_SET(mNationalityUid, newNationalityUid, KItemNationality);
 }
 
 const QString &Person::hollyName() const
@@ -1617,7 +1731,8 @@ const QString &Person::hollyName() const
 
 void Person::setHollyName(const QString &newHollyName)
 {
-    mHollyName = newHollyName;
+//    mHollyName = newHollyName;
+    CHECK_MODIFIED_THEN_SET(mHollyName, newHollyName, KItemHolly);
 }
 
 ErrCode Person::checkAndUpdateSaintListFromHollyName()
@@ -1660,7 +1775,9 @@ const QStringList &Person::saintUidList() const
 
 void Person::setSaintUidList(const QStringList &newSaintUidList)
 {
-    mSaintUidList = newSaintUidList;
+//    mSaintUidList = newSaintUidList;
+    CHECK_MODIFIED_THEN_SET_QLIST_STRING(mSaintUidList, newSaintUidList, KItemHolly);
+
 }
 
 void Person::clearSaintUid()
@@ -1670,8 +1787,10 @@ void Person::clearSaintUid()
 
 void Person::addSaintUid(const QString &saint)
 {
-    if (!mSaintUidList.contains(saint))
+    if (!mSaintUidList.contains(saint)) {
         mSaintUidList.append(saint);
+        markItemAsModified(KItemHolly);
+    }
 }
 
 qint64 Person::trainJoinDate() const

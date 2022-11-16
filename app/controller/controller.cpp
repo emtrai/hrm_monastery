@@ -99,9 +99,42 @@ ErrCode Controller::onImportItem(int importFileType, const QStringList &items, q
 
 }
 
+ErrCode Controller::onImportItem(int importFileType, const QHash<QString, QString> &items, quint32 idx, void *tag)
+{
+    traced;
+    ErrCode ret = ErrNone;
+    DbModel* model = doImportOneItem(importFileType, items, idx);
+    QList<DbModel*> *list = (QList<DbModel*>*)tag;
+    if (model != nullptr) {
+        if (list != nullptr) {
+            list->append(model);
+        } else {
+            delete model;
+        }
+    } else {
+        // do nothing
+        // TODO: handle error case
+        // be ware the case that fist item is header!!
+    }
+    // TODO: handle error case
+    tracedr(ret);
+    return ret;
+
+}
+
 DbModel* Controller::doImportOneItem(int importFileType, const QStringList &items, quint32 idx)
 {
     traced;
+    loge("DEFAULT doImportOneItem, MUST BE IMPLEMENTED IN DERIVED CLASS");
+    // TODO: make it abstract????
+    return nullptr;
+}
+
+DbModel *Controller::doImportOneItem(int importFileType, const QHash<QString, QString> &items, quint32 idx)
+{
+    traced;
+    loge("DEFAULT doImportOneItem, MUST BE IMPLEMENTED IN DERIVED CLASS");
+    // TODO: make it abstract????
     return nullptr;
 }
 

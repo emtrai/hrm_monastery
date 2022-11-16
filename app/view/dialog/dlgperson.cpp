@@ -87,7 +87,9 @@ DlgPerson::DlgPerson(QWidget *parent) :
     mPerson(nullptr),
     cbSaints(nullptr),
     cbSpecialist(nullptr),
-    mEditMode(Mode::NEW)
+    mEditMode(Mode::NEW),
+    mIsNew(true),
+    mIsSelfSave(true)
 {
     traced;
     setupUI();
@@ -213,6 +215,7 @@ Person *DlgPerson::buildPerson()
     traced;
     // TODO: backup data to restore later??
     Person* per = person();
+    per->setMarkModified(true); // start marking fields which are modified
     // Image
     per->setImgPath(ui->lblImgPath->text().trimmed());
     // person code
@@ -346,10 +349,16 @@ Person *DlgPerson::buildPerson()
 
 }
 
-ErrCode DlgPerson::fromPerson(const Person *per)
+ErrCode DlgPerson::fromPerson(const Person *model)
 {
     traced;
     ErrCode ret = ErrNone;
+    if (model == nullptr) {
+        loge("Invalid person info to clone");
+        return ErrInvalidData;
+    }
+    Person* per = person();
+    per->clone(*model);
     if (per == nullptr){
         ret = ErrInvalidArg; // TODO: should raise assert instead???
     }
@@ -772,6 +781,12 @@ void DlgPerson::on_buttonBox_clicked( QAbstractButton * button )
     logd("btn: %d", btn);
     if (btn == QDialogButtonBox::StandardButton::Save)
     {
+        if (!mIsSelfSave) {
+            logd("not mIsSelfSave, just call accept");
+            QDialog::accept();
+            return;
+        }
+        logd("mIsSelfSave, do save");
         QRegularExpression re("(\\d{4}[\\/\\.\\-](0?[1-9]|1[012])[\\/\\.\\-](0?[1-9]|[12][0-9]|3[01]))|\\d{4}");
         ok2Save = true;
         QString birthday = ui->txtBirthday->text();
@@ -793,11 +808,18 @@ void DlgPerson::on_buttonBox_clicked( QAbstractButton * button )
             // TODO: check should we save here? or let caller save???
             // TODO: dialg with mode: add new, update, store directly, etc.
             Person* per = buildPerson();
-            logd("Save it");
-            ret = per->save();
-            logi("Save person result %d", ret);
+
+            if (mIsNew) {
+                logd("Save it");
+                ret = per->save();
+            } else {
+                logd("Update it");
+                ret = per->update();
+            }
+            logi("Save/Update person result %d", ret);
+
             if (ret == ErrNone) {
-                logd("Save ok, close dialog");
+                logd("Save/update ok, close dialog");
                 QDialog::accept();
             } else {
                 Utils::showErrorBox("Failed to store person");
@@ -916,6 +938,23 @@ Person *DlgPerson::person(bool newone)
     }
 
     return mPerson;
+}
+
+DlgPerson *DlgPerson::buildDlg(QWidget *parent, Person *per)
+{
+    traced;
+    DlgPerson* dlg = nullptr;
+    dlg = new DlgPerson(parent);
+    dlg->setIsSelfSave(true);
+    if (per != nullptr) {
+        dlg->fromPerson(per);
+        dlg->setIsNew(false);
+    } else {
+        dlg->setIsNew(true);
+    }
+
+    tracede;
+    return dlg;
 }
 
 
@@ -1147,5 +1186,25 @@ void DlgPerson::on_btnAddArea_clicked()
     traced;
     // TODO: implement add area
 
+}
+
+bool DlgPerson::isSelfSave() const
+{
+    return mIsSelfSave;
+}
+
+void DlgPerson::setIsSelfSave(bool newIsSelfSave)
+{
+    mIsSelfSave = newIsSelfSave;
+}
+
+bool DlgPerson::isNew() const
+{
+    return mIsNew;
+}
+
+void DlgPerson::setIsNew(bool newIsNew)
+{
+    mIsNew = newIsNew;
 }
 

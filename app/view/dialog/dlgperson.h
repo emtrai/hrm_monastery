@@ -51,8 +51,8 @@ class DlgPerson : public QDialog, public UIMultiComboxViewListener
 
                     Person *person(bool newone=false);
 
-             private slots:
-                 void on_btnImport_clicked();
+                public:
+                    static DlgPerson* buildDlg(QWidget *parent = nullptr, Person* per = nullptr);
 
              private:
                 Ui::DlgPerson *ui;
@@ -73,6 +73,12 @@ class DlgPerson : public QDialog, public UIMultiComboxViewListener
                 DlgPerson::Mode editMode() const;
                 void setEditMode(DlgPerson::Mode newEditMode);
 
+                bool isNew() const;
+                void setIsNew(bool newIsNew);
+
+                bool isSelfSave() const;
+                void setIsSelfSave(bool newIsSelfSave);
+
             private:
                 void loadEdu();
                 void loadSaints();
@@ -92,6 +98,7 @@ class DlgPerson : public QDialog, public UIMultiComboxViewListener
                 void cleanEvent();
 
 private slots:
+    void on_btnImport_clicked();
     void on_buttonBox_clicked( QAbstractButton * button );
     void on_btnEditNation_clicked();
     void on_cbCountry_currentIndexChanged(int index);
@@ -131,6 +138,8 @@ private:
     DlgPerson::Mode mEditMode;
 
     QList<PersonEvent*> mListPersonEvent;
+    bool mIsNew; // true: add new, false: edit/update
+    bool mIsSelfSave; //true: auto save on accept, false: not save
 };
 
 #endif // DLGPERSON_H

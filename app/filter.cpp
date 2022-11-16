@@ -54,6 +54,7 @@ static void initFilterOps()
         s_FilterOper.insert(FILTER_FIELD_AREA, OPERATOR_FOR_STRING);
         s_FilterOper.insert(FILTER_FIELD_COMMUNITY, OPERATOR_FOR_STRING);
         s_FilterOper.insert(FILTER_FIELD_EDUCATION, OPERATOR_FOR_STRING);
+        s_FilterOper.insert(FILTER_FIELD_COURSE, OPERATOR_FOR_STRING);
 
         s_FilterOperName.insert(FILTER_OP_EQUAL, QObject::tr("= / Bằng"));
         s_FilterOperName.insert(FILTER_OP_NOT_EQUAL, QObject::tr("!= / Khác"));

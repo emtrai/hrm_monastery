@@ -127,6 +127,7 @@ do { \
 #define UNUSED(param) (void)param
 
 typedef ErrCode (*func_one_csv_item_t)(const QStringList& items, void* caller, void* param);
+typedef ErrCode (*func_one_csv_item_complete_t)(const QHash<QString, QString>& items, void* caller, void* param);
 typedef ErrCode (*func_one_csv_field_t)(const QString& key, const QString& value, void* caller, void* param);
 
 enum UidNameConvertType {
@@ -170,12 +171,13 @@ public:
                                 qint32* cnt = nullptr
                                 );
     static ErrCode parseDataFromCSVFile(const QString& filePath,
-                                QHash<QString, QString>* items = nullptr,
-                                QChar splitBy = DEFAULT_CSV_FIELD_SPLIT,
-                                func_one_csv_field_t cb = nullptr,
-                                void* caller = nullptr,
-                                void* paramCb = nullptr
-                                );
+                                        QList<QHash<QString, QString>>* items = nullptr,
+                                        QChar splitBy = DEFAULT_CSV_FIELD_SPLIT,
+                                        func_one_csv_field_t oneFieldCB = nullptr,
+                                        func_one_csv_item_complete_t oneModelCB = nullptr,
+                                        void* caller = nullptr,
+                                        void* paramCb = nullptr
+                                        );
     static QString getPrebuiltFileByLang(const QString& prebuiltName, bool lang = true);
     static QString UidFromName(const QString& name, UidNameConvertType type = SIMPLIFY_UPPER, bool* isOk = nullptr);
     static QString removeVietnameseSign(const QString& vietnameseString);
@@ -189,6 +191,36 @@ public:
     static QString getCurrentComboxDataString(const QComboBox *cb, bool *isOk = nullptr);
     static ErrCode getCurrentComboxDataString(const QComboBox *cb, QString* data, QString* name = nullptr);
     static void showDlgUnderDev(const QString& info = nullptr);
+
+    template<class T>
+    static bool isSameList(const QList<T>& l1, const QList<T>& l2);
 };
 
+
+template<class T>
+bool Utils::isSameList(const QList<T>& l1, const QList<T>& l2)
+{
+    traced;
+    bool ret = false;
+    logd("compare l1 cnt=%d l2 cnt=%d", l1.count(), l2.count());
+    if (l1.count() != l2.count()) {
+        ret = false;
+    } else {
+        int cnt = l1.count();
+        if (cnt != 0) {
+            ret = true;
+            for (int i = 0; i < cnt; i ++){
+                if (l1[i] != l2[i]) { // TODO: pointer issue!!!!
+                    ret = false;
+                    break;
+                }
+            }
+        } else {
+            ret = true;
+        }
+    }
+    logd("is same list: %d", ret);
+    tracede;
+    return ret;
+}
 #endif // UTILS_H

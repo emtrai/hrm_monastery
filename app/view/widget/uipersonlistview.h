@@ -37,6 +37,7 @@ protected:
 protected:
     virtual void importRequested(const QString& fpath);
     virtual void onViewItem(UITableWidgetItem *item);
+    virtual void onEditItem(UITableWidgetItem *item);
     virtual QString getTitle();
 
     virtual void initFilterFields();

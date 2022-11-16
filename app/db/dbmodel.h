@@ -26,6 +26,24 @@
 #include "errcode.h"
 #include "exportfactory.h"
 #include <QList>
+#include "utils.h"
+
+#define CHECK_MODIFIED_THEN_SET(cur, next, itemName) \
+    do { \
+        if (cur != next) { \
+            cur = next; \
+            markItemAsModified(itemName); \
+        } \
+    } while (0)
+
+#define CHECK_MODIFIED_THEN_SET_QLIST_STRING(cur, next, itemName) \
+    do { \
+        if (!Utils::isSameList<QString>(cur, next)) { \
+            cur.clear(); \
+            cur.append(next); \
+            markItemAsModified(itemName); \
+        } \
+    } while (0)
 
 class DbModel;
 class DbModelHandler;
@@ -113,14 +131,26 @@ public:
 
     const QList<QString> &updatedField() const;
 
+    /**
+     * @brief Clear list of all changes marked
+     * Set that all changes are clear marked, start new mark for change
+     */
+    virtual void resetAllModifiedMark();
+    bool markModified() const;
+    void setMarkModified(bool newMarkModified);
+
 protected:
     virtual DbModelHandler* getDbModelHandler() = 0;
     virtual ErrCode prepare2Save();
     virtual void markItemAsModified(const QString& itemName);
+    virtual void checkModifiedThenSet(QString& cur, const QString& next, const QString& itemName);
+    virtual void checkModifiedThenSet(qint32& cur, qint32 next, const QString& itemName);
+    virtual void checkModifiedThenSet(qint64& cur, qint64 next, const QString& itemName);
 protected:
     QHash<QString, ErrCode>* mValidateResult;
     QString mValidateMsg;
     QList<QString> mUpdatedField; // List of fields/info were changed its value
+    bool mMarkModified; // true: check & mark item as modified when it's changed. false: not mark anything
 
 private:
     qint64 mDbId;
