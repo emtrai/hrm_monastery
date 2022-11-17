@@ -172,7 +172,11 @@ bool DbModel::markModified() const
 
 void DbModel::setMarkModified(bool newMarkModified)
 {
-    logd("set mark modify %d", newMarkModified);
+    logd("set mark modify %d, olde %d", newMarkModified, mMarkModified);
+    if (newMarkModified) {
+        // start mark modified, reset all previous info if any
+        resetAllModifiedMark();
+    }
     mMarkModified = newMarkModified;
 }
 
@@ -237,9 +241,16 @@ ErrCode DbModel::update()
 {
     traced;
     ErrCode ret = ErrNone;
-    // TODO
+    DbModelHandler* dbModelHdl = getDbModelHandler();
+    if (dbModelHdl != nullptr){
+        ret = dbModelHdl->update(this);
+    }
+    else{
+        ret = ErrDbNotReady;
+        loge("db not ready");
+    }
     tracedr(ret);
-    return ret;
+    return ret;;
 }
 
 ErrCode DbModel::remove()

@@ -47,6 +47,8 @@ Person::~Person()
 void Person::clone(const Person &per)
 {
     traced;
+    mDbId = per.dbId();
+    mUid = per.uid();
     mPersonCode = per.personCode();
     mFirstName = per.firstName();
     mLastName = per.lastName();
@@ -165,6 +167,8 @@ QString Person::buildUid(const QString *seed)
 {
     traced;
     QString uid;
+    // FIXME: there are some case that this is not suitable, i.e. info like name
+    // is change, no birthday/birthplace info, etc.
     QString uidName = QString("%1_%2_%3").arg(getFullName()).arg(birthday()).arg(birthPlace());
     if (seed != nullptr) {
         uidName += "_" + *seed;

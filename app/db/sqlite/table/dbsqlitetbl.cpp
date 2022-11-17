@@ -165,7 +165,7 @@ ErrCode DbSqliteTbl::updateTableCondition(DbSqliteUpdateBuilder *builder, const 
 {
     traced;
     ErrCode err = ErrNone;
-    builder->addCond(KFieldId, item->uid());
+    builder->addCond(KFieldUid, item->uid());
     tracedr(err);
     return err;
 }

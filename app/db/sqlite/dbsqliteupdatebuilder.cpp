@@ -99,16 +99,18 @@ QSqlQuery *DbSqliteUpdateBuilder::buildSqlQuery(const QString *cond)
     logd("Query String '%s'", queryString.toStdString().c_str());
     foreach( QString field, mValue.keys() )
     {
+        QString id = ":val_" + field;
         logd("Bind update command field '%s', value '%s'",
-             field.toStdString().c_str(), mValue.value(field).toStdString().c_str());
-        qry->bindValue(":val_" + field, mValue.value(field));
+             id.toStdString().c_str(), mValue.value(field).toStdString().c_str());
+        qry->bindValue(id, mValue.value(field));
 
     }
     foreach( QString field, mCondition.keys() )
     {
+        QString id = ":cond_" + field;
         logd("Bind update cond field '%s', value '%s'",
-             field.toStdString().c_str(), mCondition.value(field).toStdString().c_str());
-        qry->bindValue(":cond_" + field, mCondition.value(field));
+             id.toStdString().c_str(), mCondition.value(field).toStdString().c_str());
+        qry->bindValue(id, mCondition.value(field));
 
     }
     return qry;

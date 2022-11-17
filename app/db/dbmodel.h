@@ -28,6 +28,7 @@
 #include <QList>
 #include "utils.h"
 
+// if (markModified()) logd("value is different '%s'", QString("'%1' vs '%2'").arg(cur, next).toStdString().c_str());
 #define CHECK_MODIFIED_THEN_SET(cur, next, itemName) \
     do { \
         if (cur != next) { \
@@ -152,7 +153,7 @@ protected:
     QList<QString> mUpdatedField; // List of fields/info were changed its value
     bool mMarkModified; // true: check & mark item as modified when it's changed. false: not mark anything
 
-private:
+protected:
     qint64 mDbId;
     QString mName;// TODO: support multi languate???
     QString mUid;

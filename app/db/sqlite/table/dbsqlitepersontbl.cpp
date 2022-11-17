@@ -22,6 +22,7 @@
 #include "dbsqlitepersontbl.h"
 #include "dbsqlitetablebuilder.h"
 #include "dbsqliteinsertbuilder.h"
+#include "dbsqliteupdatebuilder.h"
 #include "dbsqlitedefs.h"
 #include "person.h"
 #include "dbsqlite.h"
@@ -348,6 +349,25 @@ void DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry
 
 
     // TODO: add field relate to list, like holly list, community, etc.
+}
+
+ErrCode DbSqlitePersonTbl::updateTableField(DbSqliteUpdateBuilder *builder,
+                                            const QList<QString> &updateField,
+                                            const DbModel *item)
+{
+    traced;
+    ErrCode err = ErrNone;
+    logd("Add %d field to update", updateField.count());
+    Person* per = (Person*) item;
+    foreach (QString field, updateField) {
+        logd("Update field %s", field.toStdString().c_str());
+        if (field == KItemFullName) {
+            builder->addValue(KFieldFirstName, per->firstName());
+            builder->addValue(KFieldLastName, per->lastName());
+        }
+    }
+    tracedr(err);
+    return err;
 }
 QHash<QString, int> DbSqlitePersonTbl::getSearchFields()
 {
