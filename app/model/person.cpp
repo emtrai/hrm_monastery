@@ -30,10 +30,27 @@
 #include "defs.h"
 #include <QMap>
 #include "dbpersonmodelhandler.h"
+#include "saintctl.h"
 
-Person::Person():
-    mChristenDate(0),
-    mBirthday(0)
+Person::Person():DbModel()
+    , mChristenDate(0)
+    , mBirthday(0)
+    , mFeastDay(0)
+    , mIdCardIssueDate(0)
+    , mDadBirthday(0)
+    , mMomBirthday(0)
+    , mEucharistDate(0)
+    , mHollyDate(0)
+    , mJoinDate(0)
+    , mPreTrainJoinDate(0)
+    , mTrainJoinDate(0)
+    , mVowsDate(0)
+    , mEternalVowsDate(0)
+    , mBankDate(0)
+    , mGoldenDate(0)
+    , mEternalDate(0)
+    , mRetireDate(0)
+    , mDeadDate(0)
 {
     init();
 }
@@ -42,6 +59,7 @@ Person::Person():
 Person::~Person()
 {
     traced;
+    // TODO: free resource
 }
 
 void Person::clone(const Person &per)
@@ -58,6 +76,7 @@ void Person::clone(const Person &per)
 
     mHollyName = per.hollyName();
     mSaintUidList = per.saintUidList();
+    mSaintUidNameMap.insert(per.saintUidNameMap());
 
     mImgId = per.imgId();
     mImgPath = per.imgPath();
@@ -349,9 +368,12 @@ void Person::initImportFields()
     mImportFields.insert(KItemBirthplace, [this](const QString& value){
         this->setBirthPlace(value);
     });
-    mImportFields.insert(KItemHollyName, [this](const QString& value){this->setHollyName(value);});
+    mImportFields.insert(KItemHollyName, [this](const QString& value){
+        this->setHollyName(value, true);
+    });
     mImportFields.insert(KItemFeastDay, [this](const QString& value){this->setFeastDay(value);});
     mImportFields.insert(KItemNationality, [this](const QString& value){this->setNationalityName(value);});
+    mImportFields.insert(KItemEthnicUID, [this](const QString& value){this->setEthnicUid(value);});
     mImportFields.insert(KItemEthnic, [this](const QString& value){this->setEthnicName(value);});
     mImportFields.insert(KItemIDcard, [this](const QString& value){
         this->setIdCard(value);
@@ -511,8 +533,13 @@ ErrCode Person::validate()
     }
 
     if (ret == ErrNone) {
-        ret = checkAndUpdateSaintListFromHollyName();
-        if (ret != ErrNone) {
+//        ret = checkAndUpdateSaintListFromHollyName();
+        QHash<QString, QString> uidList;
+        ret = SAINTCTL->getSaintUidListFromName(mHollyName, &uidList);
+        if (ret == ErrNone) {
+            mSaintUidNameMap.insert(uidList);
+            mSaintUidList.append(uidList.keys());
+        } else {
             appendValidateResult(KItemHollyName, ErrNotFound);
             appendValidateMsg(QString("Saint %1 not found").arg(hollyName()));
             ret = ErrInvalidData;
@@ -727,10 +754,29 @@ ErrCode Person::prepare2Save()
     DbModelHandler* saintHdlr = nullptr;
     ErrCode ret = DbModel::prepare2Save();
     if (ret == ErrNone) {
-        ret = checkAndUpdateSaintListFromHollyName();
+//        ret = checkAndUpdateSaintListFromHollyName();
+        if (mSaintUidList.count() == 0 && mHollyName.length() > 0) {
+            logd("Saint id list is zero, but holly name exist");
+            QHash<QString, QString> uidList;
+            ret = SAINTCTL->getSaintUidListFromName(mHollyName, &uidList);
+            if (ret == ErrNone) {
+                mSaintUidNameMap.insert(uidList);
+                mSaintUidList.append(uidList.keys());
+            }
+        }
     }
     tracedr(ret);
     return ret;
+}
+
+const QHash<QString, QString> &Person::saintUidNameMap() const
+{
+    return mSaintUidNameMap;
+}
+
+void Person::setSaintUidNameMap(const QHash<QString, QString> &newSaintUidNameMap)
+{
+    mSaintUidNameMap = newSaintUidNameMap;
 }
 
 const QString &Person::specialistInfo() const
@@ -1733,48 +1779,83 @@ const QString &Person::hollyName() const
     return mHollyName;
 }
 
-void Person::setHollyName(const QString &newHollyName)
+QStringList Person::hollyNameInList()
+{
+    QStringList nameList;
+    foreach (QString name, mHollyName.split(HOLLYNAME_SPLIT)) {
+        nameList.append(name.trimmed());
+    }
+    return nameList;
+}
+
+void Person::setHollyName(const QString &newHollyName, bool parseUid)
 {
 //    mHollyName = newHollyName;
     CHECK_MODIFIED_THEN_SET(mHollyName, newHollyName, KItemHolly);
+
+    logd("parseUid %d", parseUid);
+    if (parseUid){
+        QHash<QString, QString> uidList;
+        ErrCode ret = ErrNone;
+        ret = SAINTCTL->getSaintUidListFromName(mHollyName, &uidList);
+        if (ret == ErrNone) {
+            mSaintUidNameMap.insert(uidList);
+            mSaintUidList.append(uidList.keys());
+        } else {
+            loge("Failed to get uid from holly name %d", ret);
+        }
+    } else {
+        logd("Skip parsing holly name to uid");
+    }
 }
 
-ErrCode Person::checkAndUpdateSaintListFromHollyName()
-{
-    traced;
-    DbModelHandler* saintHdlr = nullptr;
-    ErrCode ret = ErrNone;
-    saintHdlr = dynamic_cast<DbModelHandler*>(DB->getModelHandler(KModelHdlSaint));
-    if (saintHdlr == nullptr) {
-        loge("Invalid Saint handler");
-        ret = ErrFailed;
-    }
-    if (ret == ErrNone) {
-        if (mSaintUidList.empty() && !mHollyName.isEmpty()) {
-            QStringList names = mHollyName.split(",");
-            DbModel* model = nullptr;
-            QString hollyNotFound;
-            foreach (QString name, names) {
-                logd("Check saint name '%s'", name.toStdString().c_str());
-                model = saintHdlr->getByName(name.trimmed());
-                if (model) {
-                    logd("update saint uid %s", model->uid().toStdString().c_str());
-                    addSaintUid(model->uid());
-                } else {
-                    loge("Saint '%s' not found in db", name.toStdString().c_str());
-                    ret = ErrNotFound;
-                    break;
-                }
-            }
-        }
-    }
-    tracedr(ret);
-    return ret;
-}
+//ErrCode Person::checkAndUpdateSaintListFromHollyName()
+//{
+//    traced;
+//    DbModelHandler* saintHdlr = nullptr;
+//    ErrCode ret = ErrNone;
+//    saintHdlr = dynamic_cast<DbModelHandler*>(DB->getModelHandler(KModelHdlSaint));
+//    if (saintHdlr == nullptr) {
+//        loge("Invalid Saint handler");
+//        ret = ErrFailed;
+//    }
+//    if (ret == ErrNone) {
+//        if (mSaintUidList.empty() && !mHollyName.isEmpty()) {
+//            QStringList names = mHollyName.split(",");
+//            DbModel* model = nullptr;
+//            QString hollyNotFound;
+//            foreach (QString name, names) {
+//                logd("Check saint name '%s'", name.toStdString().c_str());
+//                model = saintHdlr->getByName(name.trimmed());
+//                if (model) {
+//                    logd("update saint uid %s", model->uid().toStdString().c_str());
+//                    addSaintUid(model->uid());
+//                } else {
+//                    loge("Saint '%s' not found in db", name.toStdString().c_str());
+//                    ret = ErrNotFound;
+//                    break;
+//                }
+//            }
+//        }
+//    }
+//    tracedr(ret);
+//    return ret;
+//}
 
 const QStringList &Person::saintUidList() const
 {
     return mSaintUidList;
+}
+
+QString Person::saintUidListInString()
+{
+    traced;
+    QString val;
+    if (mSaintUidList.count() > 0){
+        val = mSaintUidList.join(HOLLYNAME_SPLIT);
+    }
+    logd("UidList in string %s", val.toStdString().c_str());
+    return val;
 }
 
 void Person::setSaintUidList(const QStringList &newSaintUidList)
@@ -1782,6 +1863,12 @@ void Person::setSaintUidList(const QStringList &newSaintUidList)
 //    mSaintUidList = newSaintUidList;
     CHECK_MODIFIED_THEN_SET_QLIST_STRING(mSaintUidList, newSaintUidList, KItemHolly);
 
+}
+
+void Person::setSaintUidList(const QString &newSaintUidList)
+{
+    traced;
+    setSaintUidList(newSaintUidList.split(HOLLYNAME_SPLIT));
 }
 
 void Person::clearSaintUid()

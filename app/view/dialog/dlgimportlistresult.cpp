@@ -25,6 +25,8 @@
 #include "errcode.h"
 #include "utils.h"
 
+#define ITEM_CHECK (Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable)
+
 UIImportItem *UIImportItem::build(void *data)
 {
     return new UIImportItem(data);
@@ -163,6 +165,7 @@ ErrCode DlgImportListResult::onLoad()
             if (val != nullptr) {
                 ErrCode valRes = val->validate();
                 if (valRes == ErrNone) {
+                    widgetItem->setFlags(ITEM_CHECK);
                     widgetItem->setCheckState(Qt::CheckState::Unchecked);
                 } else if (valRes == ErrExisted){
                     widgetItem->setIcon(icDup);
@@ -236,5 +239,24 @@ void DlgImportListResult::accept()
         QDialog::accept();
     else
         Utils::showErrorBox(QString(tr("Lỗi ! Mã lỗi %1").arg(ret)));
+}
+
+
+void DlgImportListResult::on_chkSelect_stateChanged(int arg1)
+{
+    traced;
+    logd("state %d", arg1);
+    bool isChecked = (arg1 == Qt::Checked);
+    QTableWidget* tbl = ui->tblList;
+    QList<DbModel *> selectedItem;
+    int cnt = tbl->rowCount();
+    for (int idx = 0; idx < cnt; idx++){
+        QTableWidgetItem *widgetItem = tbl->item(idx, 0);
+        logd("item flag %d", widgetItem->flags());
+        if (widgetItem->flags() == ITEM_CHECK) {
+            widgetItem->setCheckState(isChecked ? Qt::CheckState::Checked : Qt::CheckState::Unchecked );
+        }
+    }
+    tracede;
 }
 

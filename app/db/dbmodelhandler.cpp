@@ -72,13 +72,28 @@ DbModel *DbModelHandler::getByName(const QString &name, const DbModelBuilder &bu
 {
     traced;
     loge("Default one, do nothing");
-    return nullptr;
+    return nullptr;// TODO: throw exception????
 }
 
 DbModel *DbModelHandler::getByName(const QString &name)
 {
     traced;
     loge("Default one, do nothing");
-    return nullptr;
+    return nullptr;// TODO: throw exception????
+}
+
+DbModel *DbModelHandler::getByUid(const QString &uid, const DbModelBuilder &builder)
+{
+
+    traced;
+    loge("Default one, do nothing");
+    return nullptr;// TODO: throw exception????
+}
+
+DbModel *DbModelHandler::getByUid(const QString &uid)
+{
+    traced;
+    loge("Default one, do nothing");
+    return nullptr; // TODO: throw exception????
 }
 

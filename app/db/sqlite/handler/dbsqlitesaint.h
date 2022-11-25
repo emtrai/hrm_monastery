@@ -34,6 +34,7 @@ public:
     static DbSqliteSaint* getInstance();
     virtual const QString getName();
     virtual DbModel *getByName(const QString& name);
+    virtual DbModel *getByUid(const QString& name);
 
 protected:
     virtual DbSqliteTbl* getMainTbl();

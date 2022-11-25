@@ -68,52 +68,15 @@ void UIMultiComboxView::on_btnAdd_clicked()
     ErrCode ret = ErrNone;
     QString currtxt = ui->cbItems->currentText().trimmed();
 
-    int index = ui->cbItems->findText(currtxt);
-    logd("index %d", index);
-    if (index < 0){
-        if (mListener != nullptr) {
-            ret = mListener->onNewItem(this, currtxt, false);
-        } else {
-            ret = ErrNotFound;
-            loge("not found data");
-        }
-        if (ret == ErrNone){
-            index = ui->cbItems->findText(currtxt);
-            if (index < 0){
-                ret = ErrNotFound;
-                loge("not found data");
-            }
-        }
+    if (!currtxt.isEmpty()) {
+        addSelectedItemByName(currtxt);
     }
-    if (ret == ErrNone){
-        QVariant value = ui->cbItems->itemData(index);
-
-        if (mValueList.keys().contains(currtxt)) {
-            logi("Existed %s", currtxt.toStdString().c_str());
-            return;
-        }
-
-        UIItemButton* lbl = new UIItemButton();
-
-        QObject::connect(lbl,
-                         SIGNAL(clicked(UIItemButton*,QVariant)),
-                         this,
-                         SLOT(on_item_clicked(UIItemButton*,QVariant)));
-        lbl->setText(currtxt);
-        lbl->setValue(value);
-        // TODO: use text/name as key for array here, something quite bad!!!
-        mValueList.insert(currtxt, value);
-        ui->formLayout->addWidget(lbl);
-        if (mListener != nullptr) {
-            mListener->onItemAdded(this, currtxt, value);
-        }
-        mButtonList.append(lbl);
-    }
+    tracede;
 }
 
 void UIMultiComboxView::on_item_clicked( UIItemButton * button, QVariant value){
     traced;
-    logd("Remain count %d", mValueList.count());
+    logd("Remain count %lld", mValueList.count());
     mValueList.remove(button->text());
     logd("Remove %s", button->text().toStdString().c_str());
     ui->formLayout->removeWidget(button);
@@ -148,6 +111,55 @@ void UIMultiComboxView::clearAll()
     }
 
 }
+
+void UIMultiComboxView::addSelectedItemByName(const QString &txt)
+{
+    traced;
+    ErrCode ret = ErrNone;
+
+    int index = ui->cbItems->findText(txt);
+    logd("index %d", index);
+    if (index < 0){
+        if (mListener != nullptr) {
+            ret = mListener->onNewItem(this, txt, false);
+        } else {
+            ret = ErrNotFound;
+            loge("not found data");
+        }
+        if (ret == ErrNone){
+            index = ui->cbItems->findText(txt);
+            if (index < 0){
+                ret = ErrNotFound;
+                loge("not found data");
+            }
+        }
+    }
+    if (ret == ErrNone){
+        QVariant value = ui->cbItems->itemData(index);
+
+        if (mValueList.keys().contains(txt)) {
+            logi("Existed %s", txt.toStdString().c_str());
+            return;
+        }
+
+        UIItemButton* lbl = new UIItemButton();
+
+        QObject::connect(lbl,
+                         SIGNAL(clicked(UIItemButton*,QVariant)),
+                         this,
+                         SLOT(on_item_clicked(UIItemButton*,QVariant)));
+        lbl->setText(txt);
+        lbl->setValue(value);
+        // TODO: use text/name as key for array here, something quite bad!!!
+        mValueList.insert(txt, value);
+        ui->formLayout->addWidget(lbl);
+        if (mListener != nullptr) {
+            mListener->onItemAdded(this, txt, value);
+        }
+        mButtonList.append(lbl);
+    }
+}
+
 
 const QHash<QString, QVariant> &UIMultiComboxView::items() const
 {

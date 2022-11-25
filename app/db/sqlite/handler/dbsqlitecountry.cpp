@@ -25,6 +25,7 @@
 
 #include "dbsqlitedefs.h"
 #include "dbsqlite.h"
+#include "country.h"
 
 DbSqliteCountry::DbSqliteCountry()
 {
@@ -34,6 +35,20 @@ DbSqliteCountry::DbSqliteCountry()
 const QString DbSqliteCountry::getName()
 {
     return KModelHdlCountry;
+}
+
+DbModel *DbSqliteCountry::getByName(const QString &name)
+{
+    traced;
+    return DbSqliteModelHandler::getByName(name, Country::builder);
+    
+}
+
+DbModel *DbSqliteCountry::getByUid(const QString &uid)
+{
+    traced;
+    return DbSqliteModelHandler::getByUid(uid, Country::builder);
+    
 }
 
 DbSqliteTbl *DbSqliteCountry::getMainTbl()

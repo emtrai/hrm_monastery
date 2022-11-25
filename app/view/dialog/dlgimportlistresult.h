@@ -73,6 +73,9 @@ protected:
 protected:
     QStringList mHeader;
     QList<DbModel*> mList;
+private slots:
+    void on_chkSelect_stateChanged(int arg1);
+
 private:
     Ui::DlgImportListResult *ui;
 };

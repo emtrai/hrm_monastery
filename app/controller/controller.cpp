@@ -155,6 +155,25 @@ int Controller::search(const QString &keyword, QList<DbModel *> *outList)
     return ret;
 }
 
+DbModel *Controller::getModelByName(const QString &name)
+{
+    traced;
+    DbModel* model = nullptr;
+    traced;
+    DbModelHandler *hdl = getModelHandler();
+    logd("name %s", name.toStdString().c_str());
+    if (hdl != nullptr) {
+        model = hdl->getByName(name);
+    } else {
+        loge("Unknown handler, DERIVED class should implement this");
+        model = nullptr;
+        // TODO: should throw exception???
+    }
+
+    tracede;
+    return model;
+}
+
 int Controller::filter(int catetoryid,
                        const QString &catetory,
                        qint64 opFlags,

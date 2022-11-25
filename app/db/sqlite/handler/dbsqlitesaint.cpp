@@ -55,6 +55,12 @@ DbModel *DbSqliteSaint::getByName(const QString &name)
     return DbSqliteModelHandler::getByName(name, &Saint::build);
 }
 
+DbModel *DbSqliteSaint::getByUid(const QString &name)
+{
+    traced;
+    return DbSqliteModelHandler::getByUid(name, &Saint::build);
+}
+
 DbSqliteTbl *DbSqliteSaint::getMainTbl()
 {
     return (DbSqliteSaintTbl*)DbSqlite::getInstance()->getTable(KTableSaint);

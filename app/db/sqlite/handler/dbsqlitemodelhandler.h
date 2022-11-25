@@ -64,6 +64,8 @@ public:
 
     virtual DbModel *getByName(const QString& name, const DbModelBuilder& builder);
     virtual DbModel *getByName(const QString& name);
+    virtual DbModel *getByUid(const QString& uid, const DbModelBuilder& builder);
+    virtual DbModel *getByUid(const QString& uid);
     /**
      * @brief getName
      * @return Model Handler name

@@ -30,6 +30,9 @@
 #define CSV_ITEM_SPLIT ','
 #define CSV_SUBITEM_SPLIT ';'
 
+// TODO: make it common in other file????
+#define HOLLYNAME_SPLIT ","
+
 enum Gender{
     FEMALE = 0,
     MALE,
@@ -119,6 +122,7 @@ const char* const KItemFeastDay = "NGAY_BON_MANG";
 const char* const KItemArea = "KHU_VUC";
 const char* const KItemNationality = "QUOC_TICH";
 const char* const KItemNationalityUid = "nationality_uid";
+const char* const KItemEthnicUID = "MA_DAN_TOC";
 const char* const KItemEthnic = "DAN_TOC";
 const char* const KItemIDcard = "CAN_CUOC_CONG_DAN";
 const char* const KItemIDcardIssueDate = "NGAY_CAP_CCCD";

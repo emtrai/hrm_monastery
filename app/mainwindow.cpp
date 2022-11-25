@@ -69,6 +69,11 @@ MainWindow::MainWindow(QWidget *parent)
     gInstance = this;
     ui->setupUi(this);
 
+
+    QCoreApplication::setApplicationName( QString(tr("Quản lý hội dòng")) );
+    setWindowTitle( QCoreApplication::applicationName() );
+
+
     loadImportMenu();
     loadOtherMenu();
     loadExportMenu();
@@ -323,10 +328,10 @@ void MainWindow::loadImportMenu()
     mImportButton->setMenu(importMenu);
     ui->toolBar->insertWidget(ui->action_New, mImportButton);
 
-    ADD_MENU_ITEM(importMenu,
-                  on_action_ImportPersonList_triggered,
-                  "Danh sách Nữ Tu",
-                  ":/icon/icon/icons8-nun-64.png");
+//    ADD_MENU_ITEM(importMenu,
+//                  on_action_ImportPersonList_triggered,
+//                  "Danh sách Nữ Tu",
+//                  ":/icon/icon/icons8-nun-64.png");
 
     ADD_MENU_ITEM(importMenu,
                   on_action_ImportPerson_triggered,

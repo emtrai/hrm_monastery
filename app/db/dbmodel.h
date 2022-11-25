@@ -153,7 +153,6 @@ protected:
     QList<QString> mUpdatedField; // List of fields/info were changed its value
     bool mMarkModified; // true: check & mark item as modified when it's changed. false: not mark anything
 
-protected:
     qint64 mDbId;
     QString mName;// TODO: support multi languate???
     QString mUid;

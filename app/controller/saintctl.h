@@ -37,6 +37,9 @@ public:
 //    QList<Saint*> getListSaints();
     virtual DbModel* doImportOneItem(int importFileType, const QStringList& items, quint32 idx);
     virtual DbModelHandler* getModelHandler();
+    ErrCode getSaintUidListFromName(const QString& name, QHash<QString, QString>* uidList = nullptr);
+    QString getHollyNameFromSaintUidList(const QStringList& uidList);
+    QString getHollyNameFromSaintUidList(const QString& uidList);
 private:
     SaintCtl();
 

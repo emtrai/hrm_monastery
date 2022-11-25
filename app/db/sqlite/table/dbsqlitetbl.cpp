@@ -569,6 +569,29 @@ DbModel *DbSqliteTbl::getByName(const QString &keyword, const DbModelBuilder &bu
     return retDb;
 }
 
+DbModel *DbSqliteTbl::getByUid(const QString &uid, const DbModelBuilder &builder)
+{
+    traced;
+    QHash<QString, int> inFields;
+    QList<DbModel*> outList;
+    DbModel* retDb = nullptr;
+    inFields.insert(KFieldUid, TEXT); // TODO: make this common with name field above???
+    logi("Search by uid '%s'", uid.toStdString().c_str());
+    qint32 cnt = 0;
+    cnt = DbSqliteTbl::search (uid, inFields, builder, &outList, true);
+
+    logi("Found %d", cnt);
+    if (cnt > 0 && outList.count() > 0){
+        logd("Found, return 1st element");
+        retDb = outList[0];
+    } else {
+        logi("Not found uid '%s'", uid.toStdString().c_str());
+        // TODO: safe to print unicode log????
+    }
+
+    return retDb;
+}
+
 int DbSqliteTbl::search(const QString &keyword, QList<DbModel *> *outList)
 {
     traced;

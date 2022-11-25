@@ -69,6 +69,9 @@ public:
     const QString &name() const;
     void clearAll();
 
+    void addSelectedItemByName(const QString& txt);
+protected:
+
 private slots:
     void on_btnAdd_clicked();
     void on_item_clicked( UIItemButton * button, QVariant value );

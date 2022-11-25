@@ -65,6 +65,7 @@ public:
 
     virtual QList<QString> getNameFields();
     virtual DbModel *getByName(const QString& keyword, const DbModelBuilder& builder);
+    virtual DbModel *getByUid(const QString& uid, const DbModelBuilder& builder);
 
     /**
      * @brief Search item by keywords

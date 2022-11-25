@@ -22,6 +22,7 @@
 #include "dbsqliteethnic.h"
 #include "logger.h"
 #include "defs.h"
+#include "ethnic.h"
 
 #include "dbsqlitedefs.h"
 #include "dbsqlite.h"
@@ -34,6 +35,18 @@ DbSqliteEthnic::DbSqliteEthnic()
 const QString DbSqliteEthnic::getName()
 {
     return KModelHdlEthnic;
+}
+
+DbModel *DbSqliteEthnic::getByName(const QString &name)
+{
+    traced;
+    return DbSqliteModelHandler::getByName(name, Ethnic::builder);
+}
+
+DbModel *DbSqliteEthnic::getByUid(const QString &uid)
+{
+    traced;
+    return DbSqliteModelHandler::getByUid(uid, Ethnic::builder);
 }
 
 DbSqliteTbl *DbSqliteEthnic::getMainTbl()

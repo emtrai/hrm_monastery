@@ -28,10 +28,13 @@
 #include "dbdefs.h"
 
 DbModel::DbModel():
-    mDbId(0),
-    mDbStatus(0),
-    mValidateResult(nullptr),
-    mMarkModified(false)
+      mDbId(0)
+    , mDbStatus(0)
+    , mValidateResult(nullptr)
+    , mMarkModified(false)
+    , mCreatedTime(false)
+    , mLastUpdatedTime(false)
+
 {
     traced;
 
@@ -53,6 +56,7 @@ DbModel::DbModel(const DbModel *model):DbModel(*model)
 {
     traced;
 }
+
 
 DbModel::~DbModel()
 {

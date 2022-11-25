@@ -374,7 +374,10 @@ ErrCode DlgPerson::fromPerson(const Person *model)
     ui->txtName->setText(per->getFullName());
     ui->txtBirthday->setText(Utils::date2String(per->birthday()));
 
-    // TODO: set saint list
+    // TODO: fix issue of show saint adding dialog if name is not exist in list
+    foreach (QString saintName, per->hollyNameInList()) {
+        cbSaints->addSelectedItemByName(saintName);
+    }
     // cbSaints
 
     ui->txtSaint->setText(per->hollyName());
@@ -383,6 +386,7 @@ ErrCode DlgPerson::fromPerson(const Person *model)
     // TODO: country, ethinic, nationality, etc.
     // cbCountry
     // cbEthic
+
     ui->txtIDCard->setText(per->idCard());
 
     ui->txtIdCardDate->setText(Utils::date2String(per->idCardIssueDate()));
@@ -965,7 +969,7 @@ void DlgPerson::on_btnImg_clicked()
         this,
         tr("Open file"),
         FileCtl::getAppDataDir(),
-        tr("PNG Files (*.png);;JPEG (*.jpg *.jpeg)"));
+        tr("Image Files (*.png *.jpg *.bmp *.jpeg)")); // TODO: make it common?
 
     if (!fname.isEmpty()){
         logd("File %s is selected", fname.toStdString().c_str());

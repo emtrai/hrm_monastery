@@ -62,6 +62,9 @@ void DbSqlitePersonTbl::addTableField(DbSqliteTableBuilder *builder)
 
     // just caching, official check mapping table holly vs person
     builder->addField(KFieldHollyName, TEXT);
+    // list of saint uid, separated by comma
+    // TODO: table saint - person neccessary anymore????
+    builder->addField(KFieldSaintUid, TEXT);
     builder->addField(KFieldFeastDay, TEXT);
 
 //    builder->addField(KFieldEthnicName, TEXT);
@@ -165,6 +168,7 @@ ErrCode DbSqlitePersonTbl::insertTableField(DbSqliteInsertBuilder *builder, cons
     builder->addValue(KFieldIDCardIssuePlace, per->idCardIssuePlace());
 
     builder->addValue(KFieldHollyName, per->hollyName());
+    builder->addValue(KFieldSaintUid, per->saintUidListInString());
     builder->addValue(KFieldFeastDay, per->feastDay());
 
     builder->addValue(KFieldNationalityUid, per->nationalityUid());
@@ -268,6 +272,7 @@ void DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry
     cmm->setIdCardIssuePlace(qry.value(KFieldIDCardIssuePlace).toString());
 
     cmm->setHollyName(qry.value(KFieldHollyName).toString());
+    cmm->setSaintUidList(qry.value(KFieldSaintUid).toString());
     cmm->setFeastDay(qry.value(KFieldFeastDay).toString());
 
     cmm->setNationalityUid(qry.value(KFieldNationalityUid).toString());

@@ -33,6 +33,7 @@ public:
     virtual DbModel* doImportOneItem(int importFileType, const QHash<QString, QString>& items, quint32 idx);
 
     virtual int search(const QString& keyword, QList<DbModel*>* outList = nullptr);
+    virtual DbModel* getModelByName(const QString& name);
     virtual int filter(int catetoryid,
                        const QString& catetory,
                        qint64 opFlags,
