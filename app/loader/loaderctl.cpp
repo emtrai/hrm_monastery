@@ -93,16 +93,17 @@ void LoaderCtl::registerAll()
 void LoaderCtl::onLoad()
 {
     traced;
+    if (mListener) mListener->onStart();
     foreach(  Controller* ctl, mListCtl )
         ctl->onLoad();
     // TODO: call on separate thread?
     // TODO: timeout???
     if (mListener != nullptr){
-        mListener(ErrNone, mListenerData);
+        mListener->onFinish(ErrNone, mListenerData);
     }
 }
 
-void LoaderCtl::setOnFinishLoadListener(OnFinishLoadListener_t listener, void* data){
+void LoaderCtl::setOnFinishLoadListener(LoaderListener* listener, void* data){
     mListener = listener;
     mListenerData = data;
     // TODO: check if mListener exist or make list of listener???

@@ -801,9 +801,8 @@ void DlgPerson::on_buttonBox_clicked( QAbstractButton * button )
         {
             ok2Save = false;
             QMessageBox msgBox;
-            msgBox.setText("Birthday not suitable");
+            msgBox.setText("Ngày sinh không đúng");
             msgBox.setStandardButtons(QMessageBox::Cancel);
-            msgBox.addButton(QMessageBox::Cancel);
             msgBox.setDefaultButton(QMessageBox::Cancel);
             msgBox.exec();
         }
@@ -826,7 +825,7 @@ void DlgPerson::on_buttonBox_clicked( QAbstractButton * button )
                 logd("Save/update ok, close dialog");
                 QDialog::accept();
             } else {
-                Utils::showErrorBox("Failed to store person");
+                Utils::showErrorBox("Lỗi, không thể lưu thông tin");
             }
         }
 

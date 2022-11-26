@@ -362,6 +362,8 @@ ErrCode_t DbSqlite::startTransaction()
 {
     traced;
     mDb.transaction();
+    tracede;
+    return ErrNone;
 }
 
 ErrCode_t DbSqlite::endTransaction()
@@ -371,5 +373,7 @@ ErrCode_t DbSqlite::endTransaction()
     if (!mDb.commit()){
         mDb.rollback();
     }
+    tracede;
+    return ErrNone;
 }
 

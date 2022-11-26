@@ -41,6 +41,7 @@ protected:
     virtual ErrCode onMenuActionDelete(QMenu* menu, UITableMenuAction* act);
 //    virtual ErrCode onMenuActionView(QMenu* menu, UITableMenuAction* act);
     virtual void onViewItem(UITableWidgetItem *item);
+        virtual QString getTitle();
 protected:
     virtual ErrCode onLoad();
     virtual ErrCode onReload();

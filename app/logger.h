@@ -27,8 +27,10 @@
 #define THIS_FILE __FILE__
 #endif
 
+#define NO_OP do {} while (0)
 // TODO: check debug macro
 
+#ifdef DEBUG_LOG
 // TODO: add process id???
 #define logd(fmt,...) \
     do{ \
@@ -36,9 +38,23 @@
     }\
     while(0)
 
+#else // !DEBUG_LOG
+
+#define logd(fmt,...) NO_OP
+
+#endif // DEBUG_LOG
+
+#ifdef DEBUG_TRACE
 #define traced logd("IN>> %s", __func__)
 #define tracedr(ret) logd("<<END %s with ret=%d", __func__, (int)ret)
 #define tracede logd("<<END %s", __func__)
+
+#else // DEBUG_TRACE
+
+#define traced NO_OP
+#define tracedr(ret) NO_OP
+#define tracede NO_OP
+#endif // DEBUG_TRACE
 
 // TODO: push log to file, make separate thread to writing log, to avoid impact
 // to performance of application

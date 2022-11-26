@@ -67,7 +67,7 @@ DlgImportListResult::DlgImportListResult(QWidget *parent) :
 {
     traced;
     ui->setupUi(this);
-    DIALOG_SIZE_SHOW(this);
+//    DIALOG_SIZE_SHOW(this);
 }
 
 DlgImportListResult::~DlgImportListResult()

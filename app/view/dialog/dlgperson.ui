@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>601</width>
+    <width>720</width>
     <height>672</height>
    </rect>
   </property>
@@ -26,7 +26,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Thêm Nữ tu</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -38,9 +38,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-508</y>
-        <width>560</width>
-        <height>3122</height>
+        <y>0</y>
+        <width>696</width>
+        <height>3298</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">

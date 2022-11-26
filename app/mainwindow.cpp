@@ -114,7 +114,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     logd("connect");
     LoaderCtl* loader = LoaderCtl::getInstance();
-    loader->setOnFinishLoadListener(MainWindow::onFinishLoading, this);
+    loader->setOnFinishLoadListener(this    , this);
     QObject::connect(this, SIGNAL(load()), loader, SLOT(onLoad()));
 }
 
@@ -154,7 +154,8 @@ void MainWindow::switchView(QWidget *nextView)
     if (mCurrentView != nullptr) {
         logd("hide currentl widget");
         mCurrentView->hide();
-        ui->centralwidget->layout()->replaceWidget(mCurrentView, nextView);
+        ui->centralLayout->replaceWidget(mCurrentView, nextView);
+//        ui->centralwidget->layout()->replaceWidget(mCurrentView, nextView);
         // TODO: make this as stack????
         if (!mMainViews.contains(mCurrentView)) {
             logd("Not in cached view, remove");
@@ -170,7 +171,9 @@ void MainWindow::switchView(QWidget *nextView)
         }
     }
     else{
-        ui->centralwidget->layout()->addWidget(nextView);
+//        ui->centralwidget->layout()->addWidget(nextView);
+        ui->centralLayout->addWidget(nextView);
+
     }
     logd("show next");
     mCurrentView = nextView;
@@ -193,6 +196,23 @@ QWidget *MainWindow::getView(ViewType type)
     }
     tracede;
     return nextView;
+}
+
+void MainWindow::onStart()
+{
+traced;
+}
+
+void MainWindow::onProgress(int percentage)
+{
+    traced;
+
+}
+
+void MainWindow::onFinish(ErrCode ret, void *data)
+{
+    traced;
+
 }
 
 

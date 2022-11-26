@@ -28,8 +28,16 @@
 #include <QObject>
 #include <QString>
 #include <QList>
+#include "errcode.h"
 
 typedef void (*OnFinishLoadListener_t)(int result, void* data);
+
+class LoaderListener {
+public:
+    virtual void onStart() = 0;
+    virtual void onProgress (int percentage) = 0;
+    virtual void onFinish(ErrCode ret, void* data) = 0;
+};
 
 class LoaderCtl: public QObject
 {
@@ -38,7 +46,7 @@ public:
     LoaderCtl();
     static LoaderCtl* getInstance();
 
-    void setOnFinishLoadListener(OnFinishLoadListener_t listener, void* data = nullptr);
+    void setOnFinishLoadListener(LoaderListener* listener, void* data = nullptr);
 private:
 
     void add2Loader( Controller* ctl);
@@ -49,7 +57,8 @@ private:
 
     QList< Controller*> mListCtl;
 
-    OnFinishLoadListener_t mListener;
+//    OnFinishLoadListener_t mListener;
+    LoaderListener* mListener;
     void* mListenerData;
 
 public slots:

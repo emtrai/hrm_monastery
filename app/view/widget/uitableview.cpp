@@ -39,6 +39,7 @@ UITableView::UITableView(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->tblList->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->tblList->verticalHeader()->setVisible(false);
     connect(ui->tblList, SIGNAL(customContextMenuRequested(QPoint)),
             SLOT(customMenuRequested(QPoint)));
 //    QObject::connect(ui->cbKeyword, SIGNAL(returnPressed()), this, SLOT(on_cbKeyword_returnPressed()));
@@ -536,7 +537,7 @@ void UITableView::setTitle(const QString &title)
 
 QString UITableView::getTitle()
 {
-    return "";
+    return tr("Danh sách");
 }
 
 quint32 UITableView::currentPage() const

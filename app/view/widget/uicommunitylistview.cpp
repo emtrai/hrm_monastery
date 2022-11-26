@@ -130,6 +130,11 @@ void UICommunityListView::onViewItem(UITableWidgetItem *item)
     }
 }
 
+QString UICommunityListView::getTitle()
+{
+    return tr("Danh sách cộng đoàn");
+}
+
 
 
 ErrCode UICommunityListView::onMenuActionListPerson(QMenu *menu, UITableMenuAction *act)

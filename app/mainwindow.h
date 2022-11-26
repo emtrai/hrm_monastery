@@ -29,12 +29,13 @@
 #include "view/widget/uitableview.h"
 #include "view/widget/uitableviewfactory.h"
 #include <QAction>
-
+#include "loader/loaderctl.h"
 QT_BEGIN_NAMESPACE
     namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
-    class MainWindow : public QMainWindow
+
+    class MainWindow : public QMainWindow, public LoaderListener
 {
     Q_OBJECT
 
@@ -50,6 +51,11 @@ QT_END_NAMESPACE
      void switchView(ViewType type);
      void switchView(QWidget* nextView);
      QWidget* getView(ViewType type);
+    protected:
+
+     virtual void onStart();
+     virtual void onProgress (int percentage);
+     virtual void onFinish(ErrCode ret, void* data);
  private:
      void loadHomePageFile();
      void loadOtherMenu();
