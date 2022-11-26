@@ -1,3 +1,18 @@
-Ten: Ngo Huy Anh
-Ma: 1212
-Ngay rua toi: 2010/11/11
+
+# Dùng Dùng'==' để tách thông tin giữa các nữ tu
+# Thêm '\' vào cuối trong trường hợp trường thông tin nằm trên nhiều dòng
+
+TEN_DAY_DU: Ngô huy Ánh
+TEN_THANH: Giacobe, Phero
+NGAY_RUA_TOI: 2010/11/11
+NGAY_SINH:2002/01/03
+NOI_SINH:Hàm Thuận Nam, \
+Bình thuận
+
+==
+TEN_DAY_DU: Ngô Đức Anh
+TEN_THANH: Phero, Gioan, Giacobe
+NGAY_RUA_TOI: 2015
+NOI_SINH:Hồ Chí Minh
+NGAY_SINH:2015
+DAN_TOC:Kinh
