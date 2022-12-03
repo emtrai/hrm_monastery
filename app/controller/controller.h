@@ -34,6 +34,7 @@ public:
 
     virtual int search(const QString& keyword, QList<DbModel*>* outList = nullptr);
     virtual DbModel* getModelByName(const QString& name);
+    virtual DbModel* getModelByUid(const QString& uid);
     virtual int filter(int catetoryid,
                        const QString& catetory,
                        qint64 opFlags,
@@ -41,6 +42,9 @@ public:
                        QList<DbModel*>* outList = nullptr);
 
     virtual ErrCode loadFromDb();
+    ErrCode getUidListFromName(const QString& name, QHash<QString, QString>* uidList = nullptr, const char* hdlName = nullptr);
+    QString getNameFromUidList(const QStringList& uidList, const char* hdlName = nullptr);
+    QString getNameFromUidList(const QString& uidList, const char* hdlName = nullptr);
 protected:
     virtual DbModel *buildModel(void* items, const QString& fmt);
 

@@ -45,6 +45,7 @@ public:
 protected:
     virtual DbSqliteTbl* getMainTbl();
     virtual DbSqliteTbl* getTable(const QString& modelName);
+    virtual DbModelBuilder getMainBuilder();
 private:
 
 private:

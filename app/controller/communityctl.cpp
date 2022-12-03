@@ -247,6 +247,11 @@ const char *CommunityCtl::getPrebuiltFileType()
 
 QList<DbModel *> CommunityCtl::getItemFromDb()
 {
-    return DB->getModelHandler(KModelHdlCommunity)->getAll(&Community::builder);
+    return getModelHandler()->getAll(&Community::builder);
+}
+
+DbModelHandler *CommunityCtl::getModelHandler()
+{
+    return DB->getModelHandler(KModelHdlCommunity);
 }
 

@@ -51,6 +51,9 @@ public:
                        qint64 opFlags,
                        const QString& keywords,
                        QList<DbModel*>* outList = nullptr);
+
+    // TODO: consider this in specialist or in person????
+    QList<DbModel *> getSpecialistList(const QString &personUid);
 private:
     PersonCtl();
 

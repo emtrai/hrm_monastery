@@ -346,6 +346,19 @@ ErrCode DbModel::validate()
     return ErrNone;
 }
 
+bool DbModel::isExist()
+{
+    bool isExist = false;
+    traced;
+    DbModelHandler* hdlr = this->getDbModelHandler();
+    if (hdlr->exist(this)) {
+        loge("Model already existed");
+        isExist = true;
+    }
+    tracedr(isExist);
+    return isExist;
+}
+
 QHash<QString, ErrCode> *DbModel::validateResult() const
 {
     return mValidateResult;

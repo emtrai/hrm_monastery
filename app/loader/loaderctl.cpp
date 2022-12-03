@@ -75,7 +75,9 @@ void LoaderCtl::registerAll()
     add2Loader(EduCtl::getInstance());
     add2Loader(SpecialistCtl::getInstance());
     add2Loader(CountryCtl::getInstance());
+#ifndef SKIP_PERSON_PROVINE
     add2Loader(ProvinceCtl::getInstance());
+#endif
     add2Loader(EthnicCtl::getInstance());
     add2Loader(MissionCtl::getInstance());
     add2Loader(PersonCtl::getInstance());

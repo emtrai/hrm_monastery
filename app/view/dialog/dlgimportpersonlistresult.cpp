@@ -33,6 +33,7 @@ DlgImportPersonListResult::DlgImportPersonListResult(QWidget *parent):DlgImportL
 void DlgImportPersonListResult::initHeader()
 {
     traced;
+    mHeader.append(tr("Mã"));
     mHeader.append(tr("Tên Thánh"));
     mHeader.append(tr("Họ tên"));
     mHeader.append(tr("Năm sinh"));
@@ -51,6 +52,7 @@ QList<UIImportItem *> *DlgImportPersonListResult::getItems()
     foreach (DbModel* item, mList) {
         Person* per = (Person*)item;
         UIImportItem* wgitem = UIImportItem::build(item);
+        wgitem->addValue(per->personCode());
         wgitem->addValue(per->hollyName());
         wgitem->addValue(per->getFullName());
         wgitem->addValue(Utils::date2String(per->birthday()));

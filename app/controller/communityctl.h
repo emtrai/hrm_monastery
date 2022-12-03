@@ -54,6 +54,7 @@ public:
     virtual const char* getPrebuiltFileName();
     virtual const char* getPrebuiltFileType();
     virtual QList<DbModel*> getItemFromDb();
+    virtual DbModelHandler* getModelHandler();
 
 private:
     CommunityCtl();

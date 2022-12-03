@@ -111,10 +111,14 @@ public:
     const QString &areaName() const;
     void setAreaName(const QString &newAreaName);
 
+    const QString &communityCode() const;
+    void setCommunityCode(const QString &newCommunityCode);
+
 protected:
     virtual DbModelHandler* getDbModelHandler();
 private:
     QString mImgPath;
+    QString mCommunityCode;    // TODO: community code: to be use later???
     QString mAddr;
     QString mProvince;
     QString mCountry;

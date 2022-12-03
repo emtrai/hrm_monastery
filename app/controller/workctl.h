@@ -26,6 +26,8 @@
 #include "utils.h"
 #include <QList>
 
+#define WORKCTL INSTANCE(WorkCtl)
+
 class Work;
 
 class WorkCtl : public Controller
@@ -35,6 +37,7 @@ class WorkCtl : public Controller
 public:
     WorkCtl();
     virtual ~WorkCtl();
+    virtual DbModelHandler* getModelHandler();
 protected:
     DbModel *buildModel(void *items, const QString &fmt);
 public:

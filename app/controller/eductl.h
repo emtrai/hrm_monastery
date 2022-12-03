@@ -27,6 +27,8 @@
 #include <QStringList>
 #include "education.h"
 
+#define EDUCTL EduCtl::getInstance()
+
 class EduCtl : public Controller
 {
 private:
@@ -39,6 +41,7 @@ private:
 protected:
     DbModel *buildModel(void *items, const QString &fmt);
 public:
+    virtual DbModelHandler* getModelHandler();
     QList<Education*> getListEdu();
     static EduCtl* getInstance();
 

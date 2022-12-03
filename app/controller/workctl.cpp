@@ -39,6 +39,11 @@ WorkCtl::~WorkCtl()
     traced;
 }
 
+DbModelHandler *WorkCtl::getModelHandler()
+{
+    return DB->getModelHandler(KModelHdlWork);
+}
+
 // Format: id,name,remark
 DbModel *WorkCtl::buildModel(void *items, const QString &fmt)
 {

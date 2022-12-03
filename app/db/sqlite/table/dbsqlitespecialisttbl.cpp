@@ -48,7 +48,12 @@ void DbSqliteSpecialistTbl::updateModelFromQuery(DbModel *item, const QSqlQuery 
     DbSqliteTbl::updateModelFromQuery(item, qry);
     if (item->name().isEmpty()) {
         if (!qry.isNull(KFieldSpecialistName)) { /* name may be in this field, not name field*/
+            logd("update name from field %s", KFieldSpecialistName);
             item->setName(qry.value(KFieldSpecialistName).toString());
+        }
+        if (!qry.isNull(KFieldSpecialistUid)) { /* name may be in this field, not uid field*/
+            logd("update uid from field %s", KFieldSpecialistUid);
+            item->setUid(qry.value(KFieldSpecialistUid).toString());
         }
     }
     tracede;

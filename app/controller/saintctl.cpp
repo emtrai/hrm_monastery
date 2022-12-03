@@ -204,97 +204,117 @@ DbModelHandler *SaintCtl::getModelHandler()
     return DB->getModelHandler(KModelHdlSaint);
 }
 
+//ErrCode SaintCtl::getSaintUidListFromName(const QString &hollyName, QHash<QString, QString>* list)
+//{
+//    traced;
+//    DbModelHandler* saintHdlr = nullptr;
+//    ErrCode ret = ErrNone;
+//    QHash<QString, QString> uidList;
+//    saintHdlr = dynamic_cast<DbModelHandler*>(DB->getModelHandler(KModelHdlSaint));
+//    if (saintHdlr == nullptr) {
+//        loge("Invalid Saint handler");
+//        ret = ErrFailed;
+//    }
+//    // TODO: read from cache?? there'll be a lot of saints
+//    if (ret == ErrNone) {
+//        if (!hollyName.isEmpty()) {
+//            QStringList names = hollyName.split(HOLLYNAME_SPLIT);
+//            DbModel* model = nullptr;
+//            QString hollyNotFound;
+//            foreach (QString name, names) {
+//                logd("Check saint name '%s'", name.toStdString().c_str());
+//                model = saintHdlr->getByName(name.trimmed());
+//                if (model) {
+//                    logd("update saint uid %s", model->uid().toStdString().c_str());
+//                    uidList.insert(model->uid(), model->name());
+//                    delete model;
+//                } else {
+//                    loge("Saint '%s' not found in db", name.toStdString().c_str());
+//                    ret = ErrNotFound;
+//                    break;
+//                }
+//            }
+//        }
+//    }
+
+//    if (ret == ErrNone && uidList.count() > 0 && list != nullptr) {
+//        logd("found %d saint from name %s", uidList.count(), hollyName.toStdString().c_str());
+//        list->insert(uidList);
+//    }
+//    tracedr(ret);
+//    return ret;
+//}
+
+//QString SaintCtl::getHollyNameFromSaintUidList(const QStringList &uidList)
+//{
+//    traced;
+//    DbModelHandler* saintHdlr = nullptr;
+//    ErrCode ret = ErrNone;
+//    QString hollyName;
+//    QStringList hollyNameList;
+//    saintHdlr = dynamic_cast<DbModelHandler*>(DB->getModelHandler(KModelHdlSaint));
+//    if (saintHdlr == nullptr) {
+//        loge("Invalid Saint handler");
+//        ret = ErrFailed;
+//    }
+//    // TODO: read from cache?? there'll be a lot of saints
+//    if (ret == ErrNone) {
+//        if (!uidList.isEmpty()) {
+//            DbModel* model = nullptr;
+//            foreach (QString uid, uidList) {
+//                // TODO: cached it instead of reload from scratch??
+//                logd("Check saint uid '%s'", uid.toStdString().c_str());
+//                model = saintHdlr->getByUid(uid.trimmed());
+//                if (model) {
+//                    logd("update saint name %s", model->name().toStdString().c_str());
+//                    hollyNameList.append(model->name());
+//                    delete model;
+//                } else {
+//                    loge("Saint uid '%s' not found in db", uid.toStdString().c_str());
+//                    ret = ErrNotFound;
+//                    break;
+//                }
+//            }
+//        } else {
+//            logi("No saint uid to check");
+//        }
+//    }
+
+//    if (ret == ErrNone && hollyNameList.count() > 0) {
+//        logd("Found %d saint", hollyNameList.count());
+//        hollyName = hollyNameList.join(HOLLYNAME_SPLIT);
+//    }
+//    tracedr(ret);
+//    return hollyName;
+
+//}
+
+//QString SaintCtl::getHollyNameFromSaintUidList(const QString &uidList)
+//{
+//    traced;
+//    return getHollyNameFromSaintUidList(uidList.split(HOLLYNAME_SPLIT));
+//}
+
 ErrCode SaintCtl::getSaintUidListFromName(const QString &hollyName, QHash<QString, QString>* list)
 {
     traced;
-    DbModelHandler* saintHdlr = nullptr;
-    ErrCode ret = ErrNone;
-    QHash<QString, QString> uidList;
-    saintHdlr = dynamic_cast<DbModelHandler*>(DB->getModelHandler(KModelHdlSaint));
-    if (saintHdlr == nullptr) {
-        loge("Invalid Saint handler");
-        ret = ErrFailed;
-    }
-    // TODO: read from cache?? there'll be a lot of saints
-    if (ret == ErrNone) {
-        if (!hollyName.isEmpty()) {
-            QStringList names = hollyName.split(HOLLYNAME_SPLIT);
-            DbModel* model = nullptr;
-            QString hollyNotFound;
-            foreach (QString name, names) {
-                logd("Check saint name '%s'", name.toStdString().c_str());
-                model = saintHdlr->getByName(name.trimmed());
-                if (model) {
-                    logd("update saint uid %s", model->uid().toStdString().c_str());
-                    uidList.insert(model->uid(), model->name());
-                    delete model;
-                } else {
-                    loge("Saint '%s' not found in db", name.toStdString().c_str());
-                    ret = ErrNotFound;
-                    break;
-                }
-            }
-        }
-    }
 
-    if (ret == ErrNone && uidList.count() > 0 && list != nullptr) {
-        logd("found %d saint from name %s", uidList.count(), hollyName.toStdString().c_str());
-        list->insert(uidList);
-    }
-    tracedr(ret);
-    return ret;
+    return getUidListFromName(hollyName, list);
 }
 
 QString SaintCtl::getHollyNameFromSaintUidList(const QStringList &uidList)
 {
     traced;
-    DbModelHandler* saintHdlr = nullptr;
-    ErrCode ret = ErrNone;
-    QString hollyName;
-    QStringList hollyNameList;
-    saintHdlr = dynamic_cast<DbModelHandler*>(DB->getModelHandler(KModelHdlSaint));
-    if (saintHdlr == nullptr) {
-        loge("Invalid Saint handler");
-        ret = ErrFailed;
-    }
-    // TODO: read from cache?? there'll be a lot of saints
-    if (ret == ErrNone) {
-        if (!uidList.isEmpty()) {
-            DbModel* model = nullptr;
-            foreach (QString uid, uidList) {
-                // TODO: cached it instead of reload from scratch??
-                logd("Check saint uid '%s'", uid.toStdString().c_str());
-                model = saintHdlr->getByUid(uid.trimmed());
-                if (model) {
-                    logd("update saint name %s", model->name().toStdString().c_str());
-                    hollyNameList.append(model->name());
-                    delete model;
-                } else {
-                    loge("Saint uid '%s' not found in db", uid.toStdString().c_str());
-                    ret = ErrNotFound;
-                    break;
-                }
-            }
-        } else {
-            logi("No saint uid to check");
-        }
-    }
 
-    if (ret == ErrNone && hollyNameList.count() > 0) {
-        logd("Found %d saint", hollyNameList.count());
-        hollyName = hollyNameList.join(HOLLYNAME_SPLIT);
-    }
-    tracedr(ret);
-    return hollyName;
+    return getNameFromUidList(uidList);
 
 }
 
 QString SaintCtl::getHollyNameFromSaintUidList(const QString &uidList)
 {
     traced;
-    return getHollyNameFromSaintUidList(uidList.split(HOLLYNAME_SPLIT));
+    return getNameFromUidList(uidList);
 }
-
 //void SaintCtl::onLoad()
 //{
 //    traced;

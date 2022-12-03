@@ -38,6 +38,7 @@
 //TODO: change default split to '|'? '|' is not common used like ','
 #define DEFAULT_CSV_ITEM_SPLIT ','
 #define CSV_LIST_ITEM_SPLIT '|'
+#define NAME_ITEM_SPLIT ','
 
 #define GET_INSTALCE_DECL(className) \
     public:\
@@ -190,6 +191,7 @@ public:
     static int getCurrentComboxIndex(const QComboBox *cb);;
     static QString getCurrentComboxDataString(const QComboBox *cb, bool *isOk = nullptr);
     static ErrCode getCurrentComboxDataString(const QComboBox *cb, QString* data, QString* name = nullptr);
+    static ErrCode setSelectItemComboxByData(QComboBox *cb, const QVariant& data);
     static void showDlgUnderDev(const QString& info = nullptr);
 
     template<class T>

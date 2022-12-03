@@ -89,7 +89,7 @@ protected:
     virtual DbSqliteTbl* getMainTbl() = 0;
     virtual DbSqliteTbl* getTable(const QString& modelName);
     virtual DbModelBuilder* getBuilder(const QString& modelName);
-    virtual DbModelBuilder* getMainBuilder();
+    virtual DbModelBuilder getMainBuilder();
 };
 
 #endif // DBSQLITEMODELHANDLER_H

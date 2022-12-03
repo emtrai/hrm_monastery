@@ -38,7 +38,9 @@ public:
 protected:
     DbModel *buildModel(void *items, const QString &fmt);
 public:
+    virtual DbModelHandler* getModelHandler();
     const QList<Ethnic*>* getEthnicList(const QString& country);
+    const QList<Ethnic*> getAllEthnics();
     const QHash<QString, QList<Ethnic*>*> getEthnicList();
     static EthnicCtl* getInstance();
 

@@ -59,6 +59,7 @@ public:
     DbModel(const DbModel& model);
     DbModel(const DbModel* model);
     virtual ~DbModel();
+    // TODO: override operation ==?
 
 
     virtual QString modelName() const;
@@ -115,6 +116,7 @@ public:
      * @return ErrNone on ok, ErrInvalidData if data is invalid, other error code otherwhise
      */
     virtual ErrCode validate();
+    virtual bool isExist();
 
     QHash<QString, ErrCode> *validateResult() const;
 

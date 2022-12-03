@@ -31,6 +31,7 @@ class DbSqliteWork : public DbSqliteModelHandler
 public:
     DbSqliteWork();
     virtual const QString getName();
+    virtual DbModelBuilder getMainBuilder();
 protected:
     virtual DbSqliteTbl* getMainTbl();
 };

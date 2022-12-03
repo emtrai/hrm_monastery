@@ -48,13 +48,24 @@ ErrCode Config::init()
 
 QString Config::getNextPersonalCode()
 {
+    traced;
     return getInstance()->doGetNextPersonalCode();
 }
 
 QString Config::doGetNextPersonalCode()
 {
-    return QString("%1%2").arg(mConfigKeyValue.value("codeprefix"),
-                               QString::number(QRandomGenerator::global()->bounded(1000)));
+    traced;
+    // TODO: this is just dummy persone code, IMPLEMENT IT AGAIN
+//    int id = Utils::currentTimeMs();
+//    logd("id %d", id);
+//    QString code = "MS" + QString::number(id).rightJustified(8, '0');
+    QString code = QString("%1%2").arg(mConfigKeyValue.value("codeprefix"),
+                                       QString::number(QRandomGenerator::global()->bounded(1000)));
+    logd("MS code %s", code.toStdString().c_str());
+    tracede;
+    return code;
+
+
 }
 
 

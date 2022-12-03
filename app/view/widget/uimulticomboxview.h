@@ -43,10 +43,10 @@ class UIMultiComboxView;
 class UIMultiComboxViewListener {
 public:
     // slient: add new item silently, don't ask/popup up anything
-    virtual ErrCode onNewItem(UIMultiComboxView* ui, const QString& value, bool silent) = 0;
-    virtual void onItemAdded(UIMultiComboxView* ui, const QString& name, const QVariant& value) = 0;
-    virtual void onItemDeleted(UIMultiComboxView* ui, const QString& name, const QVariant& value) = 0;
-    virtual void onClearAll() = 0;
+    virtual ErrCode onComboxNewItem(UIMultiComboxView* ui, const QString& value, bool silent) = 0;
+    virtual void onComboxItemAdded(UIMultiComboxView* ui, const QString& name, const QVariant& value) = 0;
+    virtual void onComboxItemDeleted(UIMultiComboxView* ui, const QString& name, const QVariant& value) = 0;
+    virtual void onComboxClearAll() = 0;
 };
 
 class UIMultiComboxView : public QFrame
@@ -70,6 +70,7 @@ public:
     void clearAll();
 
     void addSelectedItemByName(const QString& txt);
+    void addSelectedItemByData(const QVariant& data);
 protected:
 
 private slots:

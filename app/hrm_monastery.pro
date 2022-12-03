@@ -11,13 +11,20 @@ QT += gui
 
 DEFINES += FEATURE_system_sqlite=OFF
 
-#DEFINES += TEST_ENABLE
-# DEFINES += LOG_LEVEL=4
-#DEFINES = DEBUG_TRACE
-#DEFINES += DEBUG_LOG
+DEFINES += TEST_ENABLE
+DEFINES += LOG_LEVEL=4
+DEFINES += DEBUG_TRACE
+DEFINES += DEBUG_LOG
 DEFINES += VER_MAJOR=0
 DEFINES += VER_MINOR=1
 DEFINES += VER_PATCH=0
+
+# Supporting provine for person is quite complicated
+# as it need to sync up with country
+# Need to re-check login before enable it again
+# don't want to clean up code, just keep it for later use if have time
+# TODO: check to support person province info
+DEFINES += SKIP_PERSON_PROVINE
 
 INCLUDEPATH += $$PWD/db
 INCLUDEPATH += $$PWD/db/sqlite

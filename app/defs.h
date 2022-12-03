@@ -32,6 +32,7 @@
 
 // TODO: make it common in other file????
 #define HOLLYNAME_SPLIT ","
+#define NAME_SPLIT ","
 
 enum Gender{
     FEMALE = 0,
@@ -146,9 +147,11 @@ const char* const KItemSpeciaist = "CHUYEN_MON";
 const char* const KItemSpeciaistInfo = "CHI_TIET_CHUYEN_MON";
 const char* const KItemSpeciaistUid = "MA_CHUYEN_MON";
 const char* const KItemWork = "CONG_VIEC";
+const char* const KItemWorkId = "MA_CONG_VIEC";
 const char* const KItemWorkHistory = "LICH_SU_CONG_TAC";
 const char* const KItemDepartment = "PHONG_BAN";
 const char* const KItemCommunity = "CONG_DOAN";
+const char* const KItemCommunityId = "MA_CONG_DOAN";
 const char* const KItemCommunityHistory = "LICH_SU_CONG_DOAN";
 const char* const KItemDad = "TEN_CHA"; // TODO: holly name of dad?
 const char* const KItemDadBirthday = "NGAY_SINH_CHA";

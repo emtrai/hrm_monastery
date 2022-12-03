@@ -129,9 +129,16 @@ DbModel *DbSqliteModelHandler::getByName(const QString &name, const DbModelBuild
 DbModel *DbSqliteModelHandler::getByName(const QString &name)
 {
     traced;
-    loge("SHOULD NOT BE CALLED, MUST BE IMPLEMENTED BY DERIVED CLASS");
+    DbModel *model = nullptr;
+    DbModelBuilder builder = getMainBuilder();
+    if (builder) {
+        model = getByName(name, builder);
+    } else {
+        loge("NO BUILDER, SHOULD NOT BE CALLED, MUST BE IMPLEMENTED BY DERIVED CLASS");
+    }
     // TODO: throw exception???
-    return nullptr;
+    tracede;
+    return model;
 }
 
 DbModel *DbSqliteModelHandler::getByUid(const QString &uid, const DbModelBuilder &builder)
@@ -147,9 +154,16 @@ DbModel *DbSqliteModelHandler::getByUid(const QString &uid, const DbModelBuilder
 DbModel *DbSqliteModelHandler::getByUid(const QString &uid)
 {
     traced;
-    loge("SHOULD NOT BE CALLED, MUST BE IMPLEMENTED BY DERIVED CLASS");
+    DbModel *model = nullptr;
+    DbModelBuilder builder = getMainBuilder();
+    if (builder) {
+        model = getByUid(uid, builder);
+    } else {
+        loge("NO BUILDER, SHOULD NOT BE CALLED, MUST BE IMPLEMENTED BY DERIVED CLASS");
+    }
     // TODO: throw exception???
-    return nullptr;
+    tracede;
+    return model;
 }
 
 const QString DbSqliteModelHandler::getName()
@@ -175,16 +189,17 @@ int DbSqliteModelHandler::filter(int fieldId,
 {
     traced;
     DbSqliteTbl* tbl = getMainTbl();
-    DbModelBuilder* builder = getMainBuilder();
+    DbModelBuilder builder = getMainBuilder();
     // assume main tbl is not null, if not programming error,
     // and require override search function
     Q_ASSERT(tbl != nullptr);
     Q_ASSERT(builder != nullptr);
 
-    int ret = tbl->filter(fieldId, operatorId, keyword, *builder, outList);
+    int ret = tbl->filter(fieldId, operatorId, keyword, builder, outList);
     tracedr(ret);
     return ret;
 }
+
 
 DbSqliteTbl *DbSqliteModelHandler::getTable(const QString& modelName)
 {
@@ -197,7 +212,7 @@ DbModelBuilder *DbSqliteModelHandler::getBuilder(const QString &modelName)
     return nullptr;
 }
 
-DbModelBuilder *DbSqliteModelHandler::getMainBuilder()
+DbModelBuilder DbSqliteModelHandler::getMainBuilder()
 {
 
     loge("DEFAULT getMainBuilder, should not be called");

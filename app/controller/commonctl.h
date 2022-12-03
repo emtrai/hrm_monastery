@@ -43,7 +43,6 @@ public:
      * virtual const char* getPrebuiltFileType();
      * virtual QList<DbModel*> getItemFromDb();
      */
-
 protected:
     CommonCtl();
 

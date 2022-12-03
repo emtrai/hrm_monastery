@@ -92,6 +92,9 @@ public:
                        QList<DbModel*>* outList = nullptr,
                        bool isExact = false);
 
+
+    // TODO: separate it into 2 info: detail and brief????
+    // as some model has a lots of information, such as person, community
     virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
 
     virtual int filter(int fieldId,

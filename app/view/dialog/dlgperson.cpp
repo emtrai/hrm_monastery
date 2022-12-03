@@ -140,8 +140,6 @@ void DlgPerson::setupUI()
 
     DIALOG_SIZE_SHOW(this);
 
-    ui->txtCode->setText(Config::getNextPersonalCode());
-
 
     QStringList communityListHdr;
     // TODO: translation
@@ -171,6 +169,7 @@ void DlgPerson::setupUI()
     /*
      * LOAD DATA
      */
+    loadPersonCode();
 
     loadStatus();
 
@@ -189,9 +188,20 @@ void DlgPerson::setupUI()
     logd("Load ethic");
     loadEthnic();
 
+#ifndef SKIP_PERSON_PROVINE
+    //TODO: I supported this by history, but not completed it yet
+    // main issue is mapping between province and country, causing build dialog from
+    // person info be complicated. It's possible, but need time to do
+    // Will do it, if have time
+
     // State/Province
     logd("Load state/province");
     loadProvince();
+#else
+    ui->cbProvince->setVisible(false);
+    ui->lblProvince->setVisible(false);
+    ui->btnAddProvince->setVisible(false);
+#endif // SKIP_PERSON_PROVINE
 
     // Community
     loadCommunity();
@@ -205,8 +215,6 @@ void DlgPerson::setupUI()
     // load Event
     loadEvent(true);
 
-    loadArea();
-    loadDepartment();
 
 }
 
@@ -268,16 +276,15 @@ Person *DlgPerson::buildPerson()
 
     SET_VAL_FROM_CBOX(ui->cbCourse, per->setCourseUid, per->setCourse);
     SET_VAL_FROM_CBOX(ui->cbCountry, per->setCountryUid, per->setCountryName);
-
+#ifndef SKIP_PERSON_PROVINE
     SET_VAL_FROM_CBOX(ui->cbProvince, per->setProvinceUid, per->setProvinceName);
+#endif
     per->setAddr(ui->txtAddr->toPlainText().trimmed());
     per->setChurchAddr(ui->txtChurch->toPlainText().trimmed());
     per->setEmail(ui->txtEmail->text().split(SPLIT_EMAIL_PHONE));
     per->setTel(ui->txtPhone->text().split(SPLIT_EMAIL_PHONE));
     per->setOtherContact(ui->txtOtherContact->toPlainText().trimmed());
 
-    SET_VAL_FROM_CBOX(ui->cbArea, per->setAreaUid, per->setAreaName);
-    SET_VAL_FROM_CBOX(ui->cbDepart, per->setDepartUid, per->setDepartName);
     SET_VAL_FROM_CBOX(ui->cbCommunity, per->setCommunityUid, per->setCommunityName);
 
 
@@ -337,6 +344,11 @@ Person *DlgPerson::buildPerson()
     SET_DATE_VAL_FROM_WIDGET(ui->txtDeadDate, per->setDeadDate);
     per->setDeadPlace(ui->txtDeadPlace->text().trimmed());
 
+    // work
+    logd("set work");
+    SET_VAL_FROM_CBOX(ui->cbWork, per->setCurrentWorkUid, per->setCurrentWorkName);
+
+
     //event
 //    QList<QVariant> specialist = ui->tblEvents->item
 //    per->clearSpecialistUid();
@@ -359,6 +371,7 @@ ErrCode DlgPerson::fromPerson(const Person *model)
     }
     Person* per = person();
     per->clone(*model);
+    per->validate(); // TODO: should call validate here???
     if (per == nullptr){
         ret = ErrInvalidArg; // TODO: should raise assert instead???
     }
@@ -374,30 +387,47 @@ ErrCode DlgPerson::fromPerson(const Person *model)
     ui->txtName->setText(per->getFullName());
     ui->txtBirthday->setText(Utils::date2String(per->birthday()));
 
+    // cbSaints
     // TODO: fix issue of show saint adding dialog if name is not exist in list
     foreach (QString saintName, per->hollyNameInList()) {
         cbSaints->addSelectedItemByName(saintName);
     }
-    // cbSaints
-
     ui->txtSaint->setText(per->hollyName());
+    // ngay bon mang
     ui->txtFeastDay->setText(Utils::date2String(per->feastDay(), DATE_FORMAT_MD));
+    // birthday
     ui->txtBirthplace->setText(per->birthPlace());
     // TODO: country, ethinic, nationality, etc.
-    // cbCountry
+    // cbNationality
+    Utils::setSelectItemComboxByData(ui->cbNationality, per->nationalityUid());
     // cbEthic
+    Utils::setSelectItemComboxByData(ui->cbEthic, per->ethnicUid());
 
+    // id card
     ui->txtIDCard->setText(per->idCard());
-
     ui->txtIdCardDate->setText(Utils::date2String(per->idCardIssueDate()));
     ui->txtIdCardPlace->setText(per->idCardIssuePlace());
     // cbEdu
+    Utils::setSelectItemComboxByData(ui->cbEdu, per->eduUid());
+
     // cbSpecialist
+    QList<DbModel*> specialistList = PERSONCTL->getSpecialistList(per->uid());
+    logd("set specialist, no. item %d", specialistList.count());
+    foreach (DbModel* item, specialistList) {
+        cbSpecialist->addSelectedItemByData(item->uid());
+    }
+
     // cbCourse
+    Utils::setSelectItemComboxByData(ui->cbCourse, per->courseUid());
     // cbCountry
+    Utils::setSelectItemComboxByData(ui->cbCountry, per->countryUid());
     // cbProvince
-    //
+#ifndef SKIP_PERSON_PROVINE
+    Utils::setSelectItemComboxByData(ui->cbProvince, per->provinceUid());
+#endif
+    // dia chi
     ui->txtAddr->setPlainText(per->addr());
+    // giao xu
     ui->txtChurch->setPlainText(per->churchAddr());
     ui->txtEmail->setText(per->email().join(SPLIT_EMAIL_PHONE));
     ui->txtPhone->setText(per->tel().join(SPLIT_EMAIL_PHONE));
@@ -414,18 +444,23 @@ ErrCode DlgPerson::fromPerson(const Person *model)
     ui->txtFamilyHistory->setPlainText(per->familyHistory());
     ui->txtFamilyContact->setPlainText(per->familyContact());
 
+    // ngay rua toi
     ui->txtChristenDate->setText(Utils::date2String(per->christenDate()));
     ui->txtChristenPlace->setText(per->christenPlace());
 
-
+    // bi tich thanh the
     ui->txtEucharisDate->setText(Utils::date2String(per->eucharistDate()));
     ui->txtEucharistPlace->setText(per->eucharistPlace());
 
+    // bi tich them suc
     ui->txtHollyDate->setText(Utils::date2String(per->hollyDate()));
     ui->txtHollyPlace->setText(per->hollyPlace());
 
+    // ngay nhap tu
     ui->txtJoinDate->setText(Utils::date2String(per->joinDate()));
-    //cbJoinPIC
+    //cbJoinPIC (nguoi dac trach)
+
+    // ngay gia nhap tien tap vien
     ui->txtPreTrainJoinDate->setText(Utils::date2String(per->preTrainJoinDate()));
     //cbPreTrainJoinPIC
     ui->txtTrainJoinDate->setText(Utils::date2String(per->trainJoinDate()));
@@ -453,11 +488,19 @@ ErrCode DlgPerson::fromPerson(const Person *model)
     ui->txtDeadDate->setText(Utils::date2String(per->deadDate()));
     ui->txtDeadPlace->setText(per->deadPlace());
 
+    // current work
+    logd("load work");
+    Utils::setSelectItemComboxByData(ui->cbWork, per->currentWorkUid());
+
+    logd("load community");
+    Utils::setSelectItemComboxByData(ui->cbCommunity, per->communityUid());
+
     tracedr(ret);
     return ret;
 }
 
-ErrCode DlgPerson::onNewItem(UIMultiComboxView *ui, const QString &value, bool silent)
+
+ErrCode DlgPerson::onComboxNewItem(UIMultiComboxView *ui, const QString &value, bool silent)
 {
     traced;
     ErrCode ret = ErrNone;
@@ -515,7 +558,21 @@ ErrCode DlgPerson::onNewItem(UIMultiComboxView *ui, const QString &value, bool s
     return ret;
 }
 
-void DlgPerson::onItemAdded(UIMultiComboxView *cb, const QString &name, const QVariant &value)
+void DlgPerson::multiComboxItemUpdate(UIMultiComboxView *cb, QLineEdit* txt)
+{
+    traced;
+    QHash<QString, QVariant> items = cb->items();
+    QString str;
+    foreach (QString value, items.keys()) {
+        if (!str.isEmpty()) str.append(NAME_ITEM_SPLIT);
+        str.append(value);
+    }
+    if (txt) txt->setText(str);
+    tracede;
+}
+
+
+void DlgPerson::onComboxItemAdded(UIMultiComboxView *cb, const QString &name, const QVariant &value)
 {
     traced;
     logd("name %s", cb->name().toStdString().c_str());
@@ -523,19 +580,13 @@ void DlgPerson::onItemAdded(UIMultiComboxView *cb, const QString &name, const QV
 
     // TODO: separate processing to multi functions????
     if (cb->name() == KUiMultiComboxNameSaint) {
-        QHash<QString, QVariant> items = cb->items();
-        QString str;
-        foreach (QString value, items.keys()) {
-            if (!str.isEmpty()) str.append(" ");
-            str.append(value);
-        }
-        ui->txtSaint->setText(str);
+        multiComboxItemUpdate(cb, ui->txtSaint);
     }
 
-
+    tracede;
 }
 
-void DlgPerson::onItemDeleted(UIMultiComboxView *cb, const QString &name, const QVariant &value)
+void DlgPerson::onComboxItemDeleted(UIMultiComboxView *cb, const QString &name, const QVariant &value)
 {
     traced;
     logd("name %s", cb->name().toStdString().c_str());
@@ -543,17 +594,12 @@ void DlgPerson::onItemDeleted(UIMultiComboxView *cb, const QString &name, const 
 
     // TODO: separate processing to multi functions????
     if (cb->name() == KUiMultiComboxNameSaint) {
-        QHash<QString, QVariant> items = cb->items();
-        QString str;
-        foreach (QString value, items.keys()) {
-            if (!str.isEmpty()) str.append(" ");
-            str.append(value);
-        }
-        ui->txtSaint->setText(str);
+        multiComboxItemUpdate(cb, ui->txtSaint);
     }
+    tracede;
 }
 
-void DlgPerson::onClearAll()
+void DlgPerson::onComboxClearAll()
 {
     traced;
 }
@@ -616,10 +662,10 @@ void DlgPerson::loadEthnic()
 
     // Someone may have US nationality, but Ethic is Kinh, as their original is VN
     logd("Reload course");
-    ui->cbCourse->clear();
-    QList<Course*> listCourse = INSTANCE(CourseCtl)->getCourseList();
-    foreach(Course* item, listCourse){
-        ui->cbCourse->addItem(item->name(), item->uid());
+    ui->cbEthic->clear();
+    QList<Ethnic*> list = ETHNIC->getAllEthnics();
+    foreach(Ethnic* item, list){
+        ui->cbEthic->addItem(item->name(), item->uid()); // TODO: name include country?
     }
 }
 
@@ -738,27 +784,6 @@ void DlgPerson::loadStatus()
 
 }
 
-void DlgPerson::loadArea()
-{
-    traced;
-    ui->cbArea->clear();
-    QList<DbModel*> listItems = INSTANCE(AreaCtl)->getAllItems();
-    ui->cbArea->addItem(tr("Không xác đinh"), KUidNone);
-    foreach(DbModel* item, listItems){
-        ui->cbArea->addItem(item->name(), item->uid());
-    }
-}
-
-void DlgPerson::loadDepartment()
-{
-    traced;
-    ui->cbDepart->clear();
-    QList<Department*> listItems = INSTANCE(DepartCtl)->getDeptList();
-    ui->cbDepart->addItem(tr("Không xác đinh"), KUidNone);
-    foreach(Department* item, listItems){
-        ui->cbDepart->addItem(item->name(), item->uid());
-    }
-}
 
 void DlgPerson::loadCourse()
 {
@@ -1058,6 +1083,7 @@ void DlgPerson::on_btnAddEdu_clicked()
 void DlgPerson::on_btnAddProvince_clicked()
 {
     traced;
+#ifndef SKIP_PERSON_PROVINE
     DlgProvince * dlg = new DlgProvince();
     if (dlg == nullptr) {
         loge("Open dlg province fail, No memory");
@@ -1069,6 +1095,9 @@ void DlgPerson::on_btnAddProvince_clicked()
 
     }
     delete dlg;
+#else
+    loge("PROVINE IS DISABLED!!! SHOULD NOT CALL HERE!!!");
+#endif
 }
 
 
@@ -1177,20 +1206,6 @@ void DlgPerson::on_btnDelEvent_clicked()
 }
 
 
-void DlgPerson::on_btnAddDepart_clicked()
-{
-    traced;
-    // TODO: implement add department
-}
-
-
-void DlgPerson::on_btnAddArea_clicked()
-{
-    traced;
-    // TODO: implement add area
-
-}
-
 bool DlgPerson::isSelfSave() const
 {
     return mIsSelfSave;
@@ -1199,6 +1214,15 @@ bool DlgPerson::isSelfSave() const
 void DlgPerson::setIsSelfSave(bool newIsSelfSave)
 {
     mIsSelfSave = newIsSelfSave;
+}
+
+void DlgPerson::loadPersonCode()
+{
+    traced;
+
+    ui->txtCode->setText(Config::getNextPersonalCode());
+
+    tracede;
 }
 
 bool DlgPerson::isNew() const

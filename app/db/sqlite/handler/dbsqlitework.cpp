@@ -25,6 +25,7 @@
 
 #include "dbsqlitedefs.h"
 #include "dbsqlite.h"
+#include "work.h"
 
 GET_INSTANCE_IMPL(DbSqliteWork)
 
@@ -37,6 +38,11 @@ DbSqliteWork::DbSqliteWork()
 const QString DbSqliteWork::getName()
 {
     return KModelHdlWork;
+}
+
+DbModelBuilder DbSqliteWork::getMainBuilder()
+{
+    return (DbModelBuilder)Work::builder;
 }
 
 DbSqliteTbl *DbSqliteWork::getMainTbl()

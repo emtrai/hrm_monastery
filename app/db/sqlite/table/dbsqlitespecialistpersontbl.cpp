@@ -119,9 +119,11 @@ QList<DbModel *> DbSqliteSpecialistPersonTbl::getListSpecialist(const QString &p
                                                          &Specialist::builder, /*builder*/
                                                          personUid, /*uid*/
                                                          status,
-                                                         QString("*, %1.%2 AS %3")
+                                                         QString("*, %1.%2 AS %3, %1.%4 AS %5")
                                                              .arg(KTableSpecialist, KFieldName)
                                                              .arg(KFieldSpecialistName)
+                                                             .arg(KFieldUid)
+                                                             .arg(KFieldSpecialistUid)
                                                          );
 
     tracede;

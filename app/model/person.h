@@ -42,6 +42,7 @@ class Church;
 class Education;
 class Work;
 class Person;
+class Controller;
 
 typedef QString *GET_DATA_FUNC();
 
@@ -58,7 +59,12 @@ public:
      * @return ErrNone on ok, ErrInvalidData if data is invalid, other error code otherwhise
      */
     virtual ErrCode validate();
-
+private:
+    ErrCode commonCheckField(QString& name,
+                             QString& uid,
+                             Controller* controller,
+                             const char* const itemName,
+                             int& invalidField);
 public:
     Person();
     virtual ~Person();
@@ -152,11 +158,13 @@ public:
 
     const QStringList &specialistUidList() const;
     void setSpecialistUidList(const QStringList &newSpecialistUidList);
-    void setSpecialistNames(const QString &newSpecialists,
-                        const QString& split=",");
+    void setSpecialistUidList(const QString &newSpecialistUidList);
+    void setSpecialistNames(const QString &newSpecialists, bool parseUid = false);
     void clearSpecialistUid();
     void addSpecialistUid(const QString& uid);
 
+    const QStringList &specialistNameList() const;
+    void setSpecialistNameList(const QStringList &newSpecialistNameList);
 
     const QString &course() const;
     void setCourse(const QString &newCourse);
@@ -401,6 +409,13 @@ public:
     const QHash<QString, QString> &saintUidNameMap() const;
     void setSaintUidNameMap(const QHash<QString, QString> &newSaintUidNameMap);
 
+
+    const QString &currentWorkUid() const;
+    void setCurrentWorkUid(const QString &newCurrentWorkUid);
+
+    const QString &currentWorkName() const;
+    void setCurrentWorkName(const QString &newCurrentWorkName);
+
 protected:
     virtual DbModelHandler *getDbModelHandler();
     virtual const QString exportTemplatePath() const;
@@ -450,6 +465,7 @@ protected:
 
     QStringList mSpecialistUidList;
     QStringList mSpecialistNameList;
+    QHash<QString, QString> mSpecialistUidNameMap; // TODO: duplicate with mSpecialistUidList??
     QString mSpecialistInfo;
 
     //course
@@ -521,6 +537,10 @@ protected:
 
     QList<Education*> mEducationList;
     QList<Work*> mWorkList;
+
+    // cong viec hien tai
+    QString mCurrentWorkUid;
+    QString mCurrentWorkName;
 
     qint64 mJoinDate; // ngay nhap tu
     QString mJoinPICUid;

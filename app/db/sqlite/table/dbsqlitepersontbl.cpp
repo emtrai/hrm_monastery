@@ -148,6 +148,9 @@ void DbSqlitePersonTbl::addTableField(DbSqliteTableBuilder *builder)
 
     builder->addField(KFieldDeadDate, INT64);
     builder->addField(KFieldDeadPlace, TEXT);
+
+    // current work
+    builder->addField(KFieldWorkUid, TEXT);
 }
 
 ErrCode DbSqlitePersonTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
@@ -247,10 +250,15 @@ ErrCode DbSqlitePersonTbl::insertTableField(DbSqliteInsertBuilder *builder, cons
     builder->addValue(KFieldDeadDate, per->deadDate());
     builder->addValue(KFieldDeadPlace, per->deadPlace());
 
+    // current work
+    builder->addValue(KFieldWorkUid, per->currentWorkUid());
+
     // TODO: add field relate to list, like holly list, community, etc.
     return ErrNone;
 }
 
+// TODO: separate it into 2 info: detail and brief????
+// as person has a lots of information
 void DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     traced;
@@ -273,6 +281,7 @@ void DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry
 
     cmm->setHollyName(qry.value(KFieldHollyName).toString());
     cmm->setSaintUidList(qry.value(KFieldSaintUid).toString());
+    // TODO: reconsider should store list of saint uid in person table or make mapping table???
     cmm->setFeastDay(qry.value(KFieldFeastDay).toString());
 
     cmm->setNationalityUid(qry.value(KFieldNationalityUid).toString());
@@ -283,8 +292,12 @@ void DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry
 
     cmm->setCourseUid(qry.value(KFieldCourseUid).toString());
 
+    // TODO: set specialist list here????
+
     cmm->setCountryUid(qry.value(KFieldCountryUid).toString());
     cmm->setProvinceUid(qry.value(KFieldProvinceUid).toString());
+    // TODO: province belong to a country, same name may exist in different company
+    // it's a little complicated, comeback with this later
     cmm->setAddr(qry.value(KFieldAddr).toString());
     cmm->setChurchAddr(qry.value(KFieldChurchAddr).toString());
     cmm->setEmail(qry.value(KFieldEmail).toString());
@@ -352,6 +365,8 @@ void DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry
     cmm->setDeadDate(qry.value(KFieldDeadDate).toInt());
     cmm->setDeadPlace(qry.value(KFieldDeadPlace).toString());
 
+    cmm->setCurrentWorkUid(qry.value(KFieldWorkUid).toString());
+
 
     // TODO: add field relate to list, like holly list, community, etc.
 }
@@ -385,6 +400,7 @@ QHash<QString, int> DbSqlitePersonTbl::getSearchFields()
     inFields[KFieldIDCard] = TEXT;
     inFields[KFieldAddr] = TEXT;
     inFields[KFieldContact] = TEXT;
+    inFields[KFieldWorkName] = TEXT;
     return inFields;
 }
 

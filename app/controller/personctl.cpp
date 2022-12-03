@@ -51,6 +51,9 @@ ErrCode PersonCtl::addPerson(const QString &fname)
     traced;
     Person *person = new Person();
     ErrCode ret = person->fromCSVFile(fname);
+    // TODO: should call Config to update next person code in case of saving new person
+    // succeed??
+    // reason: when import, imported person will have code, but it may not be saved to db
 
     if (ret == ErrNone){
         ret = person->save();
@@ -161,6 +164,16 @@ int PersonCtl::filter(int catetoryid, const QString &catetory, qint64 opFlags, c
     return ret;
 }
 
+
+QList<DbModel *> PersonCtl::getSpecialistList(const QString &personUid)
+{
+    traced;
+    DbPersonModelHandler* hdl = dynamic_cast<DbPersonModelHandler*>(getModelHandler());
+    logd("get specialist list of person uid %s", personUid.toStdString().c_str());
+    QList<DbModel*> list = hdl->getSpecialistList(personUid);
+    logd("No. item: %d", list.count());
+    return list;
+}
 
 PersonCtl::PersonCtl():
     mModelHdl(nullptr)

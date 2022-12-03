@@ -6,6 +6,8 @@
 #include "dbmodel.h"
 #include "dbmodelhandler.h"
 #include "iimporter.h"
+#include "dbctl.h"
+
 Controller::Controller()
 {
     traced;
@@ -174,6 +176,25 @@ DbModel *Controller::getModelByName(const QString &name)
     return model;
 }
 
+DbModel *Controller::getModelByUid(const QString &uid)
+{
+    traced;
+    DbModel* model = nullptr;
+    traced;
+    DbModelHandler *hdl = getModelHandler();
+    logd("uid %s", uid.toStdString().c_str());
+    if (hdl != nullptr) {
+        model = hdl->getByUid(uid);
+    } else {
+        loge("Unknown handler, DERIVED class should implement this");
+        model = nullptr;
+        // TODO: should throw exception???
+    }
+
+    tracede;
+    return model;
+}
+
 int Controller::filter(int catetoryid,
                        const QString &catetory,
                        qint64 opFlags,
@@ -202,6 +223,110 @@ ErrCode Controller::loadFromDb()
 }
 
 
+ErrCode Controller::getUidListFromName(const QString &name, QHash<QString, QString> *list, const char *hdlName)
+{
+    traced;
+    DbModelHandler* hdlr = nullptr;
+    ErrCode ret = ErrNone;
+    QHash<QString, QString> uidList;
+    if (hdlName != nullptr) {
+        logd("model hdl name %s", hdlName);
+        hdlr = dynamic_cast<DbModelHandler*>(DB->getModelHandler(hdlName));
+    } else {
+        logd("Use default model hdl");
+        hdlr = getModelHandler();
+    }
+
+    if (hdlr == nullptr) {
+        loge("Invalid handler");
+        ret = ErrFailed;
+    }
+    // TODO: read from cache?? there'll be a lot of items
+    if (ret == ErrNone) {
+        if (!name.isEmpty()) {
+            QStringList names = name.split(HOLLYNAME_SPLIT);
+            DbModel* model = nullptr;
+            QString hollyNotFound;
+            foreach (QString name, names) {
+                logd("Check name '%s'", name.toStdString().c_str());
+                model = hdlr->getByName(name.trimmed());
+                if (model) {
+                    logd("update uid %s", model->uid().toStdString().c_str());
+                    uidList.insert(model->uid(), model->name());
+                    delete model;
+                } else {
+                    loge("Name '%s' not found in db", name.toStdString().c_str());
+                    ret = ErrNotFound;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (ret == ErrNone && uidList.count() > 0 && list != nullptr) {
+        logd("found %d model from name %s", uidList.count(), name.toStdString().c_str());
+        list->insert(uidList);
+    }
+    tracedr(ret);
+    return ret;
+}
+
+QString Controller::getNameFromUidList(const QStringList &uidList, const char *hdlName)
+{
+    traced;
+    DbModelHandler* hdlr = nullptr;
+    ErrCode ret = ErrNone;
+    QString name;
+    QStringList nameList;
+    if (hdlName != nullptr) {
+        logd("model hdl name %s", hdlName);
+        hdlr = dynamic_cast<DbModelHandler*>(DB->getModelHandler(hdlName));
+    } else {
+        logd("Use default model hdl");
+        hdlr = getModelHandler();
+    }
+
+    if (hdlr == nullptr) {
+        loge("Invalid handler");
+        ret = ErrFailed;
+    }
+    // TODO: read from cache?? there'll be a lot of saints
+    if (ret == ErrNone) {
+        if (!uidList.isEmpty()) {
+            DbModel* model = nullptr;
+            foreach (QString uid, uidList) {
+                // TODO: cached it instead of reload from scratch??
+                logd("Check uid '%s'", uid.toStdString().c_str());
+                model = hdlr->getByUid(uid.trimmed());
+                if (model) {
+                    logd("update name %s", model->name().toStdString().c_str());
+                    nameList.append(model->name());
+                    delete model;
+                } else {
+                    loge("uid '%s' not found in db", uid.toStdString().c_str());
+                    ret = ErrNotFound;
+                    break;
+                }
+            }
+        } else {
+            logi("No saint uid to check");
+        }
+    }
+
+    if (ret == ErrNone && nameList.count() > 0) {
+        logd("Found %d saint", nameList.count());
+        name = nameList.join(NAME_SPLIT);
+    }
+    tracedr(ret);
+    return name;
+}
+
+QString Controller::getNameFromUidList(const QString &uidList, const char *hdlName)
+{
+    traced;
+    return getNameFromUidList(uidList.split(NAME_SPLIT), hdlName);
+
+}
 DbModel *Controller::buildModel(void *items, const QString &fmt)
 {
     traced;

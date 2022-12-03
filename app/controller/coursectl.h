@@ -28,6 +28,8 @@
 
 class Course;
 
+#define COURSECTL INSTANCE(CourseCtl)
+
 class CourseCtl : public Controller
 {
     GET_INSTALCE_DECL(CourseCtl);

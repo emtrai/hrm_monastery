@@ -87,7 +87,6 @@ const QList<DbModel *> CommonCtl::getAllItems(bool reload)
     return mItemList;
 }
 
-
 CommonCtl::CommonCtl()
 {
     traced;

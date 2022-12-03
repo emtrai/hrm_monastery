@@ -31,6 +31,7 @@
 
 #define SQLITE (DbSqlite::getInstance())
 
+// TODO: make it as library????
 class DbSqliteTbl;
 
 // THIS IS ONE INTERFACE FOR ALL OPERATION RELATING TO DB

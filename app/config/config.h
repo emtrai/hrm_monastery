@@ -27,6 +27,9 @@
 #include "errcode.h"
 #include <QString>
 #include <QMap>
+
+#define CONFIG Config::getInstance()
+
 class Config:public QObject
 {
     Q_OBJECT

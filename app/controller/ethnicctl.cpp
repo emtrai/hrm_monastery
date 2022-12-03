@@ -53,12 +53,26 @@ DbModel *EthnicCtl::buildModel(void *items, const QString &fmt)
     return item;
 }
 
+DbModelHandler *EthnicCtl::getModelHandler()
+{
+    return DB->getModelHandler(KModelHdlEthnic);
+}
+
 const QList<Ethnic *>* EthnicCtl::getEthnicList(const QString &country)
 {
     traced;
     if (mEthnicList.contains(country))
         return mEthnicList[country];
     return nullptr;
+}
+
+const QList<Ethnic *> EthnicCtl::getAllEthnics()
+{
+    QList<Ethnic *>listAll;
+    foreach (QList<Ethnic*>* list,  mEthnicList.values()){
+        listAll.append(*list);
+    }
+    return listAll;
 }
 
 const QHash<QString, QList<Ethnic*>*> EthnicCtl::getEthnicList()

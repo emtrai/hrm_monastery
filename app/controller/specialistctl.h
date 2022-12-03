@@ -38,6 +38,7 @@ public:
 //                                      void* param);
 protected:
     DbModel *buildModel(void *items, const QString &fmt);
+    virtual DbModelHandler* getModelHandler();
 public:
     QList<Specialist*> getAll();
     static SpecialistCtl* getInstance();

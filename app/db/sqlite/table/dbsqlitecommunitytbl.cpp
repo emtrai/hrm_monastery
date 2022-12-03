@@ -58,6 +58,8 @@ ErrCode DbSqliteCommunityTbl::insertTableField(DbSqliteInsertBuilder *builder, c
     traced;
     DbSqliteTbl::insertTableField(builder, item); // TODO: handle error code
     Community* cmm = (Community*) item;
+    // TODO: community code: to be use later???
+    builder->addValue(KFieldCommunityCode, cmm->communityCode());
     builder->addValue(KFieldAddr, cmm->addr());
     builder->addValue(KFieldTel, cmm->tel());
     builder->addValue(KFieldEmail, cmm->email());
@@ -76,6 +78,7 @@ void DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
     traced;
     DbSqliteTbl::updateModelFromQuery(item, qry);
     Community* cmm = (Community*) item;
+    cmm->setCommunityCode(qry.value(KFieldCommunityCode).toString());
     cmm->setCreateDate(qry.value(KFieldCreateDate).toInt());
     cmm->setImgPath(qry.value(KFieldImgPath).toString());
     cmm->setParentUid(qry.value(KFieldParentUid).toString());
@@ -94,10 +97,12 @@ void DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
 QString DbSqliteCommunityTbl::getSearchQueryString(const QString &cond)
 {
     traced;
-    QString queryString = QString("SELECT *, %2.%5 AS %6 FROM %1 JOIN %2 ON %1.%3 = %2.%4")
+    QString queryString = QString("SELECT *, %2.%4 AS %7, %2.%5 AS %6 FROM %1 JOIN %2 ON %1.%3 = %2.%4")
                               .arg(name(), KTableArea)
                               .arg(KFieldAreaUid, KFieldUid)
-                              .arg(KFieldName, KFieldAreaName);
+                              .arg(KFieldName, KFieldAreaName)
+                              .arg(KFieldAreaUid)
+        ;
     if (!cond.isEmpty()) {
         queryString += QString(" WHERE %1").arg(cond);
     }
@@ -109,6 +114,12 @@ void DbSqliteCommunityTbl::addTableField(DbSqliteTableBuilder *builder)
 {
     traced;
     DbSqliteTbl::addTableField(builder);
+    // TODO: community code: to be use later???
+    // TODO: purpose of community code: it's human readable
+    // can be changed/updated later
+    // can be used as identification which is more dynamic than UID
+    // UID: need to fix, must not changed, as it'll impact to many table/field
+    builder->addField(KFieldCommunityCode, TEXT);
     builder->addField(KFieldImgPath, TEXT);
     builder->addField(KFieldAddr, TEXT);
     builder->addField(KFieldTel, TEXT);

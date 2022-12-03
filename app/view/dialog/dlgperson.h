@@ -30,6 +30,7 @@ class Person;
 class QComboBox;
 class DbModel;
 class PersonEvent;
+class QLineEdit;
 namespace Ui {
 class DlgPerson;
 }
@@ -61,12 +62,12 @@ class DlgPerson : public QDialog, public UIMultiComboxViewListener
                 void setupUI();
                 Person *buildPerson();
                 ErrCode fromPerson(const Person* person);
-
+                void multiComboxItemUpdate(UIMultiComboxView *cb, QLineEdit* txt = nullptr);
              public:
-                virtual ErrCode onNewItem(UIMultiComboxView* ui, const QString& value, bool silent);
-                virtual void onItemAdded(UIMultiComboxView* ui, const QString& name, const QVariant& value);
-                virtual void onItemDeleted(UIMultiComboxView* ui, const QString& name, const QVariant& value);
-                virtual void onClearAll();
+                virtual ErrCode onComboxNewItem(UIMultiComboxView* ui, const QString& value, bool silent);
+                virtual void onComboxItemAdded(UIMultiComboxView* ui, const QString& name, const QVariant& value);
+                virtual void onComboxItemDeleted(UIMultiComboxView* ui, const QString& name, const QVariant& value);
+                virtual void onComboxClearAll();
 
 //protected:
                 //    virtual void accept();
@@ -80,6 +81,7 @@ class DlgPerson : public QDialog, public UIMultiComboxViewListener
                 void setIsSelfSave(bool newIsSelfSave);
 
             private:
+                void loadPersonCode();
                 void loadEdu();
                 void loadSaints();
                 void loadSpecialist();
@@ -90,9 +92,6 @@ class DlgPerson : public QDialog, public UIMultiComboxViewListener
                 void loadWork();
                 void loadCommunity();
                 void loadStatus();
-                void loadArea();
-                void loadDepartment();
-
 
                 void loadEvent(bool reloadAll = false);
                 void cleanEvent();
@@ -127,9 +126,6 @@ private slots:
 
     void on_btnDelEvent_clicked();
 
-    void on_btnAddDepart_clicked();
-
-    void on_btnAddArea_clicked();
 
 private:
     Person* mPerson;

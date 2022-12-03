@@ -163,15 +163,19 @@ ErrCode DlgImportListResult::onLoad()
 
             DbModel* val = (DbModel* )item->data();
             if (val != nullptr) {
-                ErrCode valRes = val->validate();
-                if (valRes == ErrNone) {
-                    widgetItem->setFlags(ITEM_CHECK);
-                    widgetItem->setCheckState(Qt::CheckState::Unchecked);
-                } else if (valRes == ErrExisted){
+                bool isExist = val->isExist();
+                if (isExist) {
                     widgetItem->setIcon(icDup);
                 } else {
-                    widgetItem->setIcon(icNok);
+                    ErrCode valRes = val->validate();
+                    if (valRes == ErrNone) {
+                        widgetItem->setFlags(ITEM_CHECK);
+                        widgetItem->setCheckState(Qt::CheckState::Unchecked);
+                    } else {
+                        widgetItem->setIcon(icNok);
+                    }
                 }
+
             } else {
                 widgetItem->setIcon(icNok);
             }
@@ -217,7 +221,7 @@ void DlgImportListResult::accept()
 {
     traced;
     ErrCode ret = ErrNone;
-
+    // TODO: show dialog to confirm when dialog is closed/saved???
     if (mList.count() > 0) {
         QTableWidget* tbl = ui->tblList;
         QList<DbModel *> selectedItem;
@@ -257,6 +261,7 @@ void DlgImportListResult::on_chkSelect_stateChanged(int arg1)
             widgetItem->setCheckState(isChecked ? Qt::CheckState::Checked : Qt::CheckState::Unchecked );
         }
     }
+    // TODO: allow to edit item before saving????
     tracede;
 }
 

@@ -48,6 +48,11 @@ DbModel *EduCtl::buildModel(void *items, const QString &fmt)
     edu->setName(itemList->at(idx++));
     return edu;
 }
+
+DbModelHandler *EduCtl::getModelHandler()
+{
+    return DB->getModelHandler(KModelHdlEdu);
+}
 //ErrCode EduCtl::doOneCSVItemCallback(const QStringList &items, void *param)
 //{
 //    traced;

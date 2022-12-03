@@ -395,7 +395,9 @@ int DbSqliteTbl::runQuery(QSqlQuery &qry, const DbModelBuilder& builder,
             // TODO: check if any better way to get the number of items;
             cnt++;
             if (outList != nullptr){
+                logd("found one build item");
                 DbModel* item = builder();
+                logd("Updae model from query");
                 updateModelFromQuery(item, qry);
                 outList->append(item); // TODO: when it cleaned up?????
             }
@@ -539,7 +541,7 @@ QList<QString> DbSqliteTbl::getNameFields()
 {
     traced;
     QList<QString> list;
-    list.append(KFieldName); // TODO: make as class member?
+    list.append(QString("%1.%2").arg(name(), KFieldName)); // TODO: make as class member?
     return list;
 }
 
@@ -575,7 +577,7 @@ DbModel *DbSqliteTbl::getByUid(const QString &uid, const DbModelBuilder &builder
     QHash<QString, int> inFields;
     QList<DbModel*> outList;
     DbModel* retDb = nullptr;
-    inFields.insert(KFieldUid, TEXT); // TODO: make this common with name field above???
+    inFields.insert(QString("%1.%2").arg(name(), KFieldUid), TEXT); // TODO: make this common with name field above???
     logi("Search by uid '%s'", uid.toStdString().c_str());
     qint32 cnt = 0;
     cnt = DbSqliteTbl::search (uid, inFields, builder, &outList, true);
@@ -682,7 +684,19 @@ int DbSqliteTbl::search(const QString& keyword, const QHash<QString, int>& inFie
     qry.bindValue( ":keyword", QString("%%1%").arg(keyword.trimmed().toLower()) );
     qry.bindValue( ":keywordexact", QString("%1").arg(keyword.trimmed().toLower()) );
     qry.bindValue( ":value", QString("%1").arg(keyword.trimmed().toLower()) );
-    cnt = runQuery(qry, builder, outList);
+    try {
+        cnt = runQuery(qry, builder, outList);
+    } catch(const std::runtime_error& ex) {
+        loge("Runtime Exception! %s", ex.what());
+        cnt = 0;
+    } catch (const std::exception& ex) {
+        loge("Exception! %s", ex.what());
+        cnt = 0;
+    } catch (...) {
+        loge("Exception! Unknown");
+        cnt = 0;
+    }
+
 
     logi("Found %d", cnt);
 

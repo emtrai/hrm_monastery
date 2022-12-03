@@ -51,6 +51,12 @@ DbModel *SpecialistCtl::buildModel(void *items, const QString &fmt)
     return specialist;
 }
 
+DbModelHandler *SpecialistCtl::getModelHandler()
+{
+    return DB->getModelHandler(KModelHdlSpecialist);
+
+}
+
 //ErrCode SpecialistCtl::doOneCSVItemCallback(const QStringList &items, void *param)
 //{
 //    traced;
@@ -96,9 +102,13 @@ SpecialistCtl *SpecialistCtl::getInstance()
 
 QList<DbModel *> SpecialistCtl::getListPerson(const QString &specialistUid)
 {
+    logd("get list person of specialist uid %s", specialistUid.toStdString().c_str());
     DbSpecialistModelHandler* hdl = dynamic_cast<DbSpecialistModelHandler*>(DB->getSpecialistModelHandler());
-    return hdl->getListPerson(specialistUid);
+    QList<DbModel*> list =  hdl->getListPerson(specialistUid);
+    logd("No. item: %d", list.count());
+    return list;
 }
+
 
 void SpecialistCtl::onLoad()
 {

@@ -65,6 +65,7 @@ ErrCode DbSqlitePerson::add(DbModel *model)
 
         err = add2Table(model, tbl);
         if (err == ErrNone && name == KModelNamePerson) {
+            // mapping saint - person
             logd("Check to add saint - person ");
             Person* per = dynamic_cast<Person*>(model);
             QStringList saintList = per->saintUidList();
@@ -85,6 +86,7 @@ ErrCode DbSqlitePerson::add(DbModel *model)
                 logd("no saint for person");
             }
 
+            // map person specialist
             logd("Check to add person - specialist ");
             QStringList list = per->specialistUidList();
             if (!list.empty()) {
@@ -102,6 +104,8 @@ ErrCode DbSqlitePerson::add(DbModel *model)
             } else {
                 logd("no specialist for person");
             }
+
+
         }
     }
     else{

@@ -69,6 +69,12 @@ MainWindow::MainWindow(QWidget *parent)
     gInstance = this;
     ui->setupUi(this);
 
+    // TODO: separted software into multiple parts/components???
+    // App for main GUI
+    // libraries: import, export, sqlite database, etc.
+    // Purpose: easy to update software
+    // TODO: verson control for each component???
+
 
     QCoreApplication::setApplicationName( QString(tr("Quản lý hội dòng")) );
     setWindowTitle( QCoreApplication::applicationName() );
@@ -280,12 +286,12 @@ void MainWindow::loadOtherMenu()
                     ICON_PATH("icons8-catholic-64"));
 
 
-
+#ifndef SKIP_PERSON_PROVINE
     ADD_ACTION_ITEM(otherMenu,
                     on_actionProvince_triggered,
                     "Tỉnh/Thành phố/Bang",
                        ICON_PATH("icons8-catholic-64"));
-
+#endif
     ADD_ACTION_ITEM(otherMenu,
                     on_actionMisson_triggered,
                     "Nhiệm vụ xã hội",

@@ -123,6 +123,16 @@ DbModelHandler *Community::getDbModelHandler()
     return DbCtl::getDb()->getCommunityModelHandler();
 }
 
+const QString &Community::communityCode() const
+{
+    return mCommunityCode;
+}
+
+void Community::setCommunityCode(const QString &newCommunityCode)
+{
+    mCommunityCode = newCommunityCode;
+}
+
 const QString &Community::areaName() const
 {
     return mAreaName;

@@ -27,6 +27,7 @@
 #include "table/dbsqlitespecialistpersontbl.h"
 #include "defs.h"
 #include "dbsqlitedefs.h"
+#include "specialist.h"
 
 DbSqliteSpecialist* DbSqliteSpecialist::gInstance = nullptr;
 
@@ -81,6 +82,11 @@ DbSqliteTbl *DbSqliteSpecialist::getTable(const QString &modelName)
     }
     tracede;
     return tbl;
+}
+
+DbModelBuilder DbSqliteSpecialist::getMainBuilder()
+{
+    return (DbModelBuilder)Specialist::builder;
 }
 
 

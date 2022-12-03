@@ -31,6 +31,17 @@
 #include <QMap>
 #include "dbpersonmodelhandler.h"
 #include "saintctl.h"
+#include "countryctl.h"
+#include "ethnicctl.h"
+#include "eductl.h"
+#include "coursectl.h"
+#include "provincectl.h"
+#include "specialistctl.h"
+#include "workctl.h"
+#include "communityctl.h"
+
+#include "config.h"
+
 
 Person::Person():DbModel()
     , mChristenDate(0)
@@ -173,6 +184,12 @@ void Person::clone(const Person &per)
     mDeadPlace = per.deadPlace();
 
     mEventUidList = per.eventUidList();
+
+    mCommunityUid = per.communityUid();
+    mCommunityName = per.communityName();
+    mCurrentWorkUid = per.currentWorkUid();
+    mCurrentWorkName = per.currentWorkName();
+
 
 }
 
@@ -359,6 +376,9 @@ void Person::initImportFields()
     // TODO: check fields like holly name, country, etc. and mark invalid field???
 
     mImportFields.insert(KItemImgPath, [this](const QString& value){this->setImgPath(value);});
+    mImportFields.insert(KItemPersonCode, [this](const QString& value){
+        this->setPersonCode(value);
+    });
     mImportFields.insert(KItemFullName, [this](const QString& value){
         this->setNameFromFullName(value);
     });
@@ -425,11 +445,24 @@ void Person::initImportFields()
         this->setEduUid(value);
     }); //"education";
     mImportFields.insert(KItemSpeciaist, [this](const QString& value){
-        this->setSpecialistNames(value);
+        this->setSpecialistNames(value, true);
     }); //"specialist";
-    mImportFields.insert(KItemWork, nullptr); //"work"; // TODO
+    mImportFields.insert(KItemSpeciaistUid, [this](const QString& value){
+        this->setSpecialistUidList(value);
+    }); //"specialist";
+    mImportFields.insert(KItemWork, [this](const QString& value){
+        this->setCurrentWorkName(value);
+    }); //"work"; // TODO
+    mImportFields.insert(KItemWorkId, [this](const QString& value){
+        this->setCurrentWorkUid(value);
+    }); //"work"; // TODO
     mImportFields.insert(KItemWorkHistory, nullptr); //"work_history"; // TODO
-    mImportFields.insert(KItemCommunity, nullptr); //"community"; // TODO
+    mImportFields.insert(KItemCommunity, [this](const QString& value){
+        this->setCommunityName(value);
+    }); //"community"; // TODO
+    mImportFields.insert(KItemCommunityId, [this](const QString& value){
+        this->setCommunityUid(value);
+    }); //"community"; // TODO
     mImportFields.insert(KItemCommunityHistory, nullptr); //"community_history"; // TODO
     mImportFields.insert(KItemDad, [this](const QString& value){
         this->setDadName(value);
@@ -517,34 +550,107 @@ void Person::initImportFields()
     }); //"eternal_place";
 }
 
+ErrCode Person::commonCheckField(QString& name,
+                                 QString& uid,
+                                 Controller* controller,
+                                 const char* const itemName,
+                                 int& invalidField)
+{
+    traced;
+    ErrCode ret = ErrNone;
+
+    loge("Check item %s", itemName);
+    if (name.isEmpty() && uid.isEmpty()) {
+        logd("Data of %s empty, nothing to do", itemName);
+        ret = ErrNone;
+        // TODO: check logic again, all empty mean valid????
+    } else {
+        DbModel* model = nullptr;
+        if (!uid.isEmpty()) {
+            logd("get model by uid '%s'", uid.toStdString().c_str());
+            model = controller->getModelByUid(uid);
+        } else if (!name.isEmpty()) {
+            logd("get model by name '%s'", name.toStdString().c_str());
+            model = controller->getModelByName(name);
+        } else {
+            logd("name & id is empty");
+            ret = ErrInvalidData;
+        }
+        // TODO: something stupid check here ^^
+        if (ret == ErrNone) {
+            if (model) {
+                uid = model->uid();
+                name = model->name();
+                // TODO: is is safe to delete here???
+                delete model;
+            } else {
+                loge("Not found %s info", itemName);
+                appendValidateResult(itemName, ErrNotFound);
+                appendValidateMsg(QString("%1 '%2' not found").arg(itemName, name));
+                ret = ErrInvalidData;
+                invalidField++;
+            }
+        }
+
+    }
+    tracedr(ret);
+    return ret;
+}
 ErrCode Person::validate()
 {
     traced;
     // TODO: cached value???
     ErrCode ret = ErrNone;
+    int invaidField = 0;
     DbModelHandler* personHdlr = this->getDbModelHandler();
     if (personHdlr == nullptr) {
         loge("Invalid Person handler");
-        ret = ErrFailed;
-    }
-    if (ret == ErrNone && personHdlr->exist(this)) {
-        loge("Person already existed");
-        ret = ErrExisted;
+        return ErrFailed;
     }
 
-    if (ret == ErrNone) {
 //        ret = checkAndUpdateSaintListFromHollyName();
-        QHash<QString, QString> uidList;
-        ret = SAINTCTL->getSaintUidListFromName(mHollyName, &uidList);
-        if (ret == ErrNone) {
-            mSaintUidNameMap.insert(uidList);
-            mSaintUidList.append(uidList.keys());
-        } else {
-            appendValidateResult(KItemHollyName, ErrNotFound);
-            appendValidateMsg(QString("Saint %1 not found").arg(hollyName()));
-            ret = ErrInvalidData;
-        }
+    // Holly name / saint list
+    // Holly name to saint list
+    // TODO: saint uid list to holly name???
+    QHash<QString, QString> saintUidList;
+    ret = SAINTCTL->getSaintUidListFromName(mHollyName, &saintUidList);
+    if (ret == ErrNone) {
+        mSaintUidNameMap.insert(saintUidList);
+        mSaintUidList.append(saintUidList.keys());
+    } else {
+        appendValidateResult(KItemHollyName, ErrNotFound);
+        appendValidateMsg(QString("Saint %1 not found").arg(hollyName()));
+        invaidField ++;
+        loge("Invalid holly name %s", mHollyName.toStdString().c_str());
     }
+
+    // country
+    ret = commonCheckField(mCountryName, mCountryUid, COUNTRYCTL, KItemCountry, invaidField);
+
+
+    // TODO: check logic again, all empty mean valid, should have field must has data???????
+
+    // nationality
+    ret = commonCheckField(mNationalityName, mNationalityUid, COUNTRYCTL, KItemNationality, invaidField);
+    // TODO: same ethnic name, but different country???
+    ret = commonCheckField(mEthnicName, mEthnicUid, ETHNIC, KItemEthnic, invaidField);
+    ret = commonCheckField(mEduName, mEduUid, EDUCTL, KItemEdu, invaidField);
+    ret = commonCheckField(mCourse, mCourseUid, COURSECTL, KItemCourse, invaidField);
+
+    // TODO: province: check with country??? as province belong to a country
+#ifndef SKIP_PERSON_PROVINE
+    ret = commonCheckField(mProvinceName, mProvinceUid, PROVINCE, KItemProvince, invaidField);
+#endif
+    ret = commonCheckField(mCurrentWorkName, mCurrentWorkUid, WORKCTL, KItemWork, invaidField);
+    ret = commonCheckField(mCommunityName, mCommunityUid, COMMUNITYCTL, KItemCommunity, invaidField);
+
+    if (invaidField > 0) {
+        loge("%d invalid field", invaidField);
+        ret = ErrInvalidData;
+    }
+
+
+
     tracedr(ret);
     return ret;
 }
@@ -769,6 +875,29 @@ ErrCode Person::prepare2Save()
     return ret;
 }
 
+const QString &Person::currentWorkName() const
+{
+    return mCurrentWorkName;
+}
+
+void Person::setCurrentWorkName(const QString &newCurrentWorkName)
+{
+    CHECK_MODIFIED_THEN_SET(mCurrentWorkName, newCurrentWorkName, KItemWork);
+    // TODO: load work uid???
+}
+
+const QString &Person::currentWorkUid() const
+{
+    return mCurrentWorkUid;
+}
+
+void Person::setCurrentWorkUid(const QString &newCurrentWorkUid)
+{
+    CHECK_MODIFIED_THEN_SET(mCurrentWorkUid, newCurrentWorkUid, KItemWork);
+    // TODO: load work name????
+}
+
+
 const QHash<QString, QString> &Person::saintUidNameMap() const
 {
     return mSaintUidNameMap;
@@ -888,7 +1017,6 @@ void Person::dump()
     logd("- LastName %s", lastName().toStdString().c_str());
     logd("- HollyName %s", hollyName().toStdString().c_str());
 }
-
 ErrCode Person::onImportItem(int importFileType, const QString &keyword, const QString &value, quint32 idx, void* tag)
 {
     traced;
@@ -901,6 +1029,13 @@ ErrCode Person::onImportItem(int importFileType, const QString &keyword, const Q
         std::function<void(const QString& value)> func = mImportFields.value(keyword);
         if (func != nullptr) func(value);
     }
+    if (mPersonCode.isEmpty()) {
+        logd("No person code, auto gen");
+        // TODO: should make temp code??? to distingue with official one
+        mPersonCode = CONFIG->getNextPersonalCode();
+        // TODO: numer is increased, but not save --> may cause much dummy code?
+    }
+
 
     tracedr(ret);
     return ret;
@@ -1656,15 +1791,43 @@ void Person::setSpecialistUidList(const QStringList &newSpecialistUidList)
 {
     CHECK_MODIFIED_THEN_SET_QLIST_STRING(mSpecialistUidList, newSpecialistUidList, KItemSpeciaist);
 //    CHECK_MODIFIED_THEN_SET(mSpecialistUidList, newSpecialistUidList, KItemSpeciaist);
-//    mSpecialistUidList = newSpecialistUidList;
+    //    mSpecialistUidList = newSpecialistUidList;
 }
 
-void Person::setSpecialistNames(const QString &newSpecialists, const QString &split)
+void Person::setSpecialistUidList(const QString &newSpecialistUidList)
 {
-    setSpecialistUidList(newSpecialists.split(split));
+    setSpecialistUidList(newSpecialistUidList.split(NAME_SPLIT));
+}
+
+void Person::setSpecialistNames(const QString &newSpecialists, bool parseUid)
+{
+//    setSpecialistUidList(newSpecialists.split(NAME_SPLIT));
 //    mSpecialistNameList = newSpecialists.split(split);
     // TODO: check to remove redudant, check if they're same list
 //    markItemAsModified(KItemSpeciaist);
+    traced;
+    QStringList list;
+    foreach (QString name, newSpecialists.split(NAME_SPLIT)) {
+        list.append(name.trimmed());
+    }
+    CHECK_MODIFIED_THEN_SET_QLIST_STRING(mSpecialistNameList, list, KItemSpeciaist);
+
+    logd("parseUid %d", parseUid);
+    if (parseUid){
+        QHash<QString, QString> uidList;
+        ErrCode ret = ErrNone;
+        ret = SPECIALISTCTL->getUidListFromName(newSpecialists, &uidList);
+        if (ret == ErrNone) {
+            mSpecialistUidNameMap.insert(uidList);
+            mSpecialistUidList.append(uidList.keys());
+        } else {
+            loge("Failed to get uid from specialist name %d", ret);
+        }
+    } else {
+        logd("Skip parsing specialist to uid");
+    }
+    tracede;
+
 }
 
 void Person::clearSpecialistUid()
@@ -1679,6 +1842,16 @@ void Person::addSpecialistUid(const QString &uid)
         mSpecialistUidList.append(uid);
         markItemAsModified(KItemSpeciaist);
     }
+}
+
+const QStringList &Person::specialistNameList() const
+{
+    return mSpecialistNameList;
+}
+
+void Person::setSpecialistNameList(const QStringList &newSpecialistNameList)
+{
+    mSpecialistNameList = newSpecialistNameList;
 }
 
 const QString &Person::eduName() const
@@ -1862,7 +2035,7 @@ void Person::setSaintUidList(const QStringList &newSaintUidList)
 {
 //    mSaintUidList = newSaintUidList;
     CHECK_MODIFIED_THEN_SET_QLIST_STRING(mSaintUidList, newSaintUidList, KItemHolly);
-
+    // TODO: get name????
 }
 
 void Person::setSaintUidList(const QString &newSaintUidList)

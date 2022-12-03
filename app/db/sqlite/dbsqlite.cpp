@@ -94,7 +94,9 @@ void DbSqlite::setupTables()
     appendTable(new DbSqliteEduTbl(this));
     appendTable(new DbSqliteSpecialistTbl(this));
     appendTable(new DbSqliteCountryTbl(this));
+#ifndef SKIP_PERSON_PROVINE
     appendTable(new DbSqliteProvinceTbl(this));
+#endif
     appendTable(new DbSqliteEthnicTbl(this));
     appendTable(new DbSqliteMissionTbl(this));
     appendTable(new DbSqliteCommunityTbl(this));
@@ -123,7 +125,9 @@ void DbSqlite::setupModelHandler()
     appendModelHandler(new DbSqliteSpecialist());
     appendModelHandler(new DbSqliteCountry());
     appendModelHandler(new DbSqliteEthnic());
+#ifndef SKIP_PERSON_PROVINE
     appendModelHandler(new DbSqliteProvince());
+#endif
     appendModelHandler(new DbSqliteMission());
     appendModelHandler(new DbSqliteCommunity());
     appendModelHandler(new DbSqliteArea());

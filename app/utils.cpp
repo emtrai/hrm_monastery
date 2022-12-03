@@ -605,6 +605,27 @@ ErrCode Utils::getCurrentComboxDataString(const QComboBox *cb, QString *data, QS
     return ret;
 }
 
+ErrCode Utils::setSelectItemComboxByData(QComboBox *cb, const QVariant &data)
+{
+    traced;
+    int cnt = cb->count();
+    logd ("no. item %d", cnt);
+    ErrCode ret = ErrNotFound;
+    for (int i = 0; i < cnt; i++) {
+        QVariant val = cb->itemData(i);
+        // TODO: assume data is string, how about others kind of value????
+        if (val.isValid() && data == val) {
+            cb->setCurrentIndex(i);
+            ret = ErrNone;
+            logd("found item at %d: %s", i, data.toString().toStdString().c_str());
+            break;
+        }
+    }
+    tracedr(ret);
+    return ret;
+}
+
+
 void Utils::showDlgUnderDev(const QString &info)
 {
     QMessageBox msgBox;
