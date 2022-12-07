@@ -95,7 +95,7 @@ class DlgPerson : public QDialog, public UIMultiComboxViewListener
 
                 void loadEvent(bool reloadAll = false);
                 void cleanEvent();
-
+                void searchPerson(QLineEdit* wget);
 private slots:
     void on_btnImport_clicked();
     void on_buttonBox_clicked( QAbstractButton * button );
@@ -126,6 +126,17 @@ private slots:
 
     void on_btnDelEvent_clicked();
 
+    void on_btnSearchJoinPIC_clicked();
+
+    void on_btnSearchPreTrainJoinPIC_clicked();
+
+    void on_btnSearchTrainPIC_clicked();
+
+    void on_btnSearchVowsCEO_clicked();
+
+    void on_btnSearchEternalVowsPIC_clicked();
+
+    void on_btnSearchEternalVowsCEO_clicked();
 
 private:
     Person* mPerson;

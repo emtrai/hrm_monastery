@@ -34,6 +34,8 @@ QT_BEGIN_NAMESPACE
     namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
+class Person;
+class DlgWait;
 
     class MainWindow : public QMainWindow, public LoaderListener
 {
@@ -44,6 +46,7 @@ QT_END_NAMESPACE
             ~MainWindow();
             static MainWindow *getInstance();
 
+            static void showAddEditPerson(bool isSelfUpdate = true, Person* per = nullptr);
         protected:
      void showEvent(QShowEvent *ev);
      static void onFinishLoading(int ret, void* data);
@@ -53,9 +56,8 @@ QT_END_NAMESPACE
      QWidget* getView(ViewType type);
     protected:
 
-     virtual void onStart();
-     virtual void onProgress (int percentage);
-     virtual void onFinish(ErrCode ret, void* data);
+     virtual void onLoadController (Controller* ctl);
+     void doShowAddEditPerson(bool isSelfUpdate = true, Person* per = nullptr);
  private:
      void loadHomePageFile();
      void loadOtherMenu();
@@ -82,12 +84,13 @@ QT_END_NAMESPACE
 
     QToolButton *mExportButton;
     QAction* mActionExportPersonList;
-
+    DlgWait* mWaitDlg;
 
  signals:
     void load();
 
  private slots:
+    void onLoad();
      void on_action_ImportPerson_triggered();
      void on_action_ImportPersonList_triggered();
      void on_action_ImportCommunityList_triggered();

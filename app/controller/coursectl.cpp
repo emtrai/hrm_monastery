@@ -29,7 +29,7 @@
 
 GET_INSTANCE_IMPL(CourseCtl)
 
-CourseCtl::CourseCtl()
+CourseCtl::CourseCtl():Controller(KModelHdlCourse)
 {
     traced;
 }

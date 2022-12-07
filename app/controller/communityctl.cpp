@@ -37,9 +37,9 @@
 
 CommunityCtl* CommunityCtl::gInstance = nullptr;
 
-CommunityCtl::CommunityCtl()
+CommunityCtl::CommunityCtl():CommonCtl(KModelHdlCommunity)
 {
-
+    traced;
 }
 
 CommunityCtl *CommunityCtl::getInstance()

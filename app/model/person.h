@@ -416,6 +416,8 @@ public:
     const QString &currentWorkName() const;
     void setCurrentWorkName(const QString &newCurrentWorkName);
 
+    const QHash<QString, std::function<QString (const QString&)> > &exportFields() const;
+
 protected:
     virtual DbModelHandler *getDbModelHandler();
     virtual const QString exportTemplatePath() const;
@@ -425,7 +427,7 @@ protected:
     virtual ErrCode prepare2Save();
 
 protected:
-    QHash<QString, std::function<QString(void)>> mExportFields;
+    QHash<QString, std::function<QString(const QString&)>> mExportFields;
     QHash<QString, std::function<void(const QString&)>> mImportFields;
     QString mPersonCode;
 

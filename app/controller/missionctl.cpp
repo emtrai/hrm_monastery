@@ -29,7 +29,7 @@
 MissionCtl* MissionCtl::gInstance = nullptr;
 
 
-MissionCtl::MissionCtl()
+MissionCtl::MissionCtl():Controller(KModelHdlMission)
 {
     traced;
 }

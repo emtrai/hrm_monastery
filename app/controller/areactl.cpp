@@ -29,7 +29,7 @@
 
 GET_INSTANCE_IMPL(AreaCtl)
 
-AreaCtl::AreaCtl()
+AreaCtl::AreaCtl():CommonCtl(KModelHdlArea)
 {
     traced;
 }

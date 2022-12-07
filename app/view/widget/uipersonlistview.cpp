@@ -33,6 +33,7 @@
 #include <QFile>
 #include "filter.h"
 #include "dlgperson.h"
+#include "mainwindow.h"
 
 UIPersonListView::UIPersonListView(QWidget *parent):
     UICommonListView(parent)
@@ -63,7 +64,7 @@ void UIPersonListView::updateItem(DbModel *item, UITableItem *tblItem)
 {
     traced;
     Person* per = (Person*) item;
-    tblItem->addValue(per->uid());
+    tblItem->addValue(per->personCode());
     tblItem->addValue(per->hollyName());
     tblItem->addValue(per->getFullName());
     tblItem->addValue(per->communityName());
@@ -81,7 +82,7 @@ void UIPersonListView::updateItem(DbModel *item, UITableItem *tblItem)
 void UIPersonListView::initHeader()
 {
     traced;
-    mHeader.append(tr("ID"));
+    mHeader.append(tr("Mã"));
     mHeader.append(tr("Tên Thánh"));
     mHeader.append(tr("Họ tên"));
     mHeader.append(tr("Cộng đoàn"));
@@ -114,6 +115,15 @@ void UIPersonListView::importRequested(const QString &fpath)
     dlg->setup(list);
     dlg->exec();
     delete dlg;
+}
+
+ErrCode UIPersonListView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act)
+{
+    traced;
+    ErrCode ret = ErrNone;
+    MainWindow::showAddEditPerson();
+    tracedr(ret);
+    return ret;
 }
 
 void UIPersonListView::onViewItem(UITableWidgetItem *item)

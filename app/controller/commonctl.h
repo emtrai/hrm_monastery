@@ -45,6 +45,7 @@ public:
      */
 protected:
     CommonCtl();
+    CommonCtl(const QString& name);
 
     virtual QList<DbModel*> getItemFromDb();
 

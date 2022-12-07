@@ -95,12 +95,12 @@ QList<DbModel *> UIAreaListView::getListItem()
 }
 
 
-QList<UITableMenuAction *> UIAreaListView::getMenuItemActions(const QMenu* menu,
-                                            UITableWidgetItem *item)
+QList<UITableMenuAction *> UIAreaListView::getMenuMultiItemActions(const QMenu *menu,
+                                                                   const QList<UITableItem *>& items)
 {
     traced;
 //    logd("idx %d", idx);
-    QList<UITableMenuAction*> actionList = UITableView::getMenuItemActions(menu, item);
+    QList<UITableMenuAction*> actionList = UITableView::getMenuMultiItemActions(menu, items);
 
     return actionList;
 

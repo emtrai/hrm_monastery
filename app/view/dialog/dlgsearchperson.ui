@@ -24,12 +24,16 @@
        <item>
         <widget class="QLabel" name="label">
          <property name="text">
-          <string>Họ tên</string>
+          <string>Nội dung</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="txtName"/>
+        <widget class="QLineEdit" name="txtName">
+         <property name="placeholderText">
+          <string>Họ tên, mã số, v.v.v</string>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QPushButton" name="btnSearch">

@@ -91,3 +91,8 @@ CommonCtl::CommonCtl()
 {
     traced;
 }
+
+CommonCtl::CommonCtl(const QString &name):Controller(name)
+{
+    traced;
+}

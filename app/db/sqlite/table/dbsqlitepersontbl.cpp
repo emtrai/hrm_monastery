@@ -34,6 +34,7 @@
 
 #include "filter.h"
 
+
 const qint32 DbSqlitePersonTbl::KVersionCode = VERSION_CODE(0,0,1);
 
 
@@ -395,12 +396,12 @@ QHash<QString, int> DbSqlitePersonTbl::getSearchFields()
     inFields[KFieldFirstName] = TEXT;
     inFields[KFieldLastName] = TEXT;
     inFields[KFieldHollyName] = TEXT;
-    inFields[KFieldEmail] = TEXT;
-    inFields[KFieldTel] = TEXT;
+    inFields[COLUMN_NAME(name(), KFieldEmail)] = TEXT;
+    inFields[COLUMN_NAME(name(), KFieldTel)] = TEXT;
     inFields[KFieldIDCard] = TEXT;
-    inFields[KFieldAddr] = TEXT;
+    inFields[COLUMN_NAME(name(), KFieldAddr)] = TEXT;
     inFields[KFieldContact] = TEXT;
-    inFields[KFieldWorkName] = TEXT;
+//    inFields[KFieldWorkName] = TEXT;
     return inFields;
 }
 

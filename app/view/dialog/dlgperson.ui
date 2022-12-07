@@ -38,9 +38,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-1084</y>
+        <y>-2260</y>
         <width>679</width>
-        <height>3038</height>
+        <height>3044</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -305,9 +305,6 @@
          <item row="12" column="1">
           <widget class="QLineEdit" name="txtIdCardPlace"/>
          </item>
-         <item row="57" column="1">
-          <widget class="QComboBox" name="cbPreTrainJoinPIC"/>
-         </item>
          <item row="19" column="0">
           <widget class="QLabel" name="label_60">
            <property name="text">
@@ -432,9 +429,6 @@
            </item>
           </layout>
          </item>
-         <item row="64" column="1">
-          <widget class="QComboBox" name="cbEternalVowsCEO"/>
-         </item>
          <item row="50" column="0">
           <widget class="QLabel" name="label_67">
            <property name="text">
@@ -445,12 +439,16 @@
          <item row="55" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_8">
            <item>
-            <widget class="QComboBox" name="cbJoinPIC"/>
+            <widget class="QLineEdit" name="txtJoinPIC">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
            </item>
            <item>
-            <widget class="QToolButton" name="toolButton">
+            <widget class="QToolButton" name="btnSearchJoinPIC">
              <property name="text">
-              <string>Tìm kiếm</string>
+              <string>Tìm</string>
              </property>
              <property name="icon">
               <iconset>
@@ -631,9 +629,6 @@
             <string>Nơi cấp CMND</string>
            </property>
           </widget>
-         </item>
-         <item row="59" column="1">
-          <widget class="QComboBox" name="cbTrainPIC"/>
          </item>
          <item row="22" column="1">
           <widget class="QLineEdit" name="txtDeadPlace"/>
@@ -1074,9 +1069,6 @@
          <item row="38" column="1">
           <widget class="QLineEdit" name="txtDad"/>
          </item>
-         <item row="61" column="1">
-          <widget class="QComboBox" name="cbVowsCEO"/>
-         </item>
          <item row="6" column="1">
           <widget class="QLineEdit" name="txtBirthplace"/>
          </item>
@@ -1208,9 +1200,6 @@
          </item>
          <item row="56" column="1">
           <widget class="QLineEdit" name="txtPreTrainJoinDate"/>
-         </item>
-         <item row="63" column="1">
-          <widget class="QComboBox" name="cbEternalVowsPIC"/>
          </item>
          <item row="7" column="1">
           <widget class="QLineEdit" name="txtFeastDay">
@@ -1384,6 +1373,116 @@
             <string>Thông tin học vấn</string>
            </property>
           </widget>
+         </item>
+         <item row="57" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_13">
+           <item>
+            <widget class="QLineEdit" name="txtPreTrainJoinPIC"/>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnSearchPreTrainJoinPIC">
+             <property name="text">
+              <string>Tìm</string>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normalon>:/icon/icon/icons8-search-64.png</normalon>
+              </iconset>
+             </property>
+             <property name="toolButtonStyle">
+              <enum>Qt::ToolButtonTextBesideIcon</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="59" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_14">
+           <item>
+            <widget class="QLineEdit" name="txtTrainPIC"/>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnSearchTrainPIC">
+             <property name="text">
+              <string>Tìm</string>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normalon>:/icon/icon/icons8-search-64.png</normalon>
+              </iconset>
+             </property>
+             <property name="toolButtonStyle">
+              <enum>Qt::ToolButtonTextBesideIcon</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="61" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_16">
+           <item>
+            <widget class="QLineEdit" name="txtVowsCEO"/>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnSearchVowsCEO">
+             <property name="text">
+              <string>Tìm</string>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normalon>:/icon/icon/icons8-search-64.png</normalon>
+              </iconset>
+             </property>
+             <property name="toolButtonStyle">
+              <enum>Qt::ToolButtonTextBesideIcon</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="63" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_17">
+           <item>
+            <widget class="QLineEdit" name="txtEternalVowsPIC"/>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnSearchEternalVowsPIC">
+             <property name="text">
+              <string>Tìm</string>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normalon>:/icon/icon/icons8-search-64.png</normalon>
+              </iconset>
+             </property>
+             <property name="toolButtonStyle">
+              <enum>Qt::ToolButtonTextBesideIcon</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="64" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_18">
+           <item>
+            <widget class="QLineEdit" name="txtEternalVowsCEO"/>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnSearchEternalVowsCEO">
+             <property name="text">
+              <string>Tìm</string>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normalon>:/icon/icon/icons8-search-64.png</normalon>
+              </iconset>
+             </property>
+             <property name="toolButtonStyle">
+              <enum>Qt::ToolButtonTextBesideIcon</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
         </layout>
        </item>

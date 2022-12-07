@@ -42,6 +42,18 @@
 
 #include "config.h"
 
+// TODO: show person code instead of uid?? uid should use for debug only?
+#define EXPORT_PERSON_INFO_COMMON_IMPL(item, uid, name) \
+    logd("export %s", item.toStdString().c_str());\
+    logd("uid %s", uid.toStdString().c_str());\
+    logd("name %s", name.toStdString().c_str());\
+    QString val; \
+    if (!uid.isEmpty()) { \
+        val = QString("%1 (%2...)").arg(name, uid.left(8)); \
+        logd("PIC %s", val.toStdString().c_str()); \
+    } \
+    return val;
+
 
 Person::Person():DbModel()
     , mChristenDate(0)
@@ -190,6 +202,9 @@ void Person::clone(const Person &per)
     mCurrentWorkUid = per.currentWorkUid();
     mCurrentWorkName = per.currentWorkName();
 
+//    foreach (QString key, per.exportFields().keys()) {
+//        mExportFields.insert(key, per.exportFields()[key]); // TODO: use iterator ??
+//    }
 
 }
 
@@ -237,14 +252,14 @@ void Person::initExportFields()
 {
     traced;
     // TODO: took to much memory for this, should put in in PersonCtl????
-    mExportFields.insert(KItemImgPath, [this](){
+    mExportFields.insert(KItemImgPath, [this](const QString& item){
         QString imgPath = this->imgPath();
         if (imgPath.isEmpty()){
             imgPath = ":/icon/icon/unknown.png";
         }
         return imgPath;
     });
-    mExportFields.insert(KItemFullName, [this](){
+    mExportFields.insert(KItemFullName, [this](const QString& item){
         QString name;
         if (!this->lastName().isEmpty()){
             name = this->lastName();
@@ -256,30 +271,30 @@ void Person::initExportFields()
         return name;
 
     });
-    mExportFields.insert(KItemBirthday, [this](){
+    mExportFields.insert(KItemBirthday, [this](const QString& item){
         return Utils::date2String(this->birthday());});
-    mExportFields.insert(KItemBirthplace, [this](){
+    mExportFields.insert(KItemBirthplace, [this](const QString& item){
         return this->birthPlace();
     });
-    mExportFields.insert(KItemHollyName, [this](){
+    mExportFields.insert(KItemHollyName, [this](const QString& item){
         return this->hollyName();
     });
-    mExportFields.insert(KItemFeastDay, [this](){
+    mExportFields.insert(KItemFeastDay, [this](const QString& item){
         return Utils::date2String(this->feastDay(), DATE_FORMAT_MD);
     });
-    mExportFields.insert(KItemNationality, [this](){
+    mExportFields.insert(KItemNationality, [this](const QString& item){
         return this->nationalityName();
     });
-    mExportFields.insert(KItemEthnic, [this](){
+    mExportFields.insert(KItemEthnic, [this](const QString& item){
         return this->ethnicName();
     });
-    mExportFields.insert(KItemIDcard, [this](){
+    mExportFields.insert(KItemIDcard, [this](const QString& item){
         return this->idCard();
     });
-    mExportFields.insert(KItemIDcardIssueDate,  [this](){
+    mExportFields.insert(KItemIDcardIssueDate,  [this](const QString& item){
         return Utils::date2String(this->idCardIssueDate(), DATE_FORMAT_YMD);
     });
-    mExportFields.insert(KItemIDcardIssuer,  [this](){
+    mExportFields.insert(KItemIDcardIssuer,  [this](const QString& item){
         return this->idCardIssuePlace();
     });
     mExportFields.insert(KItemStatus, nullptr);
@@ -289,24 +304,24 @@ void Person::initExportFields()
     mExportFields.insert(KItemDeadPlace, nullptr); //"dead_place";
     mExportFields.insert(KItemCountry, nullptr); //"country";
     mExportFields.insert(KItemProvince, nullptr); //"province";
-    mExportFields.insert(KItemAddress, [this](){
+    mExportFields.insert(KItemAddress, [this](const QString& item){
         return this->addr();
     }); //"address";
-    mExportFields.insert(KItemChurchAddress, [this](){
+    mExportFields.insert(KItemChurchAddress, [this](const QString& item){
         return this->churchAddr();
     }); //"church_addr";
-    mExportFields.insert(KItemTel, [this](){
+    mExportFields.insert(KItemTel, [this](const QString& item){
         return this->tel().join(";");
     }); //"telephone";
-    mExportFields.insert(KItemEmail, [this](){
+    mExportFields.insert(KItemEmail, [this](const QString& item){
         return this->email().join(";");
     }); //"email";
     mExportFields.insert(KItemOtherContact, nullptr); //"othercontact";
     mExportFields.insert(KItemEdu, nullptr); //"education";
-    mExportFields.insert(KItemEduUid, [this](){
+    mExportFields.insert(KItemEduUid, [this](const QString& item){
         return this->eduUid();
     }); //"edu uid";
-    mExportFields.insert(KItemSpeciaist,  [this](){
+    mExportFields.insert(KItemSpeciaist,  [this](const QString& item){
         logd("get specialist info to export");
         DbPersonModelHandler* hdl = dynamic_cast<DbPersonModelHandler*>(getDbModelHandler());
         QList<DbModel*> list = hdl->getSpecialistList(this->uid());
@@ -324,7 +339,7 @@ void Person::initExportFields()
         // TODO: free memory????
         return specialist;
     }); //"specialist";
-    mExportFields.insert(KItemSpeciaistUid, [this](){
+    mExportFields.insert(KItemSpeciaistUid, [this](const QString& item){
         QStringList list = this->specialistUidList();
         if (list.count() > 0)
             return list.join(",");
@@ -350,10 +365,23 @@ void Person::initExportFields()
     mExportFields.insert(KItemHollyDate, nullptr); //"holly_date";
     mExportFields.insert(KItemHollyPlace, nullptr); //"holly_place";
     mExportFields.insert(KItemCourse, nullptr); //"course";
-    mExportFields.insert(KItemJoinDate, nullptr); //"join_date";
-    mExportFields.insert(KItemJoinPIC, nullptr); //"join_pic";
+    mExportFields.insert(KItemJoinDate, [this](const QString& item){
+        return Utils::date2String(this->joinDate(), DATE_FORMAT_YMD);
+    }); //"join_date";
+    mExportFields.insert(KItemJoinPIC, [this](const QString& item){
+        EXPORT_PERSON_INFO_COMMON_IMPL(item, this->joinPICUid(), this->joinPICName());
+//        QString val;
+//        if (!this->joinPICUid().isEmpty()) {
+//            QString("%1 (%2...)").arg(this->joinPICName(), this->joinPICUid().left(8));
+//            logd("Join PIC %s", val.toStdString().c_str());
+//        }
+//        // TODO: show person code instead of uid?? uid should use for debug only?
+//        return val;
+    }); //"join_pic";
     mExportFields.insert(KItemPreTrainDate, nullptr); //"pre_train_date";
-    mExportFields.insert(KItemPreTrainPIC, nullptr); //"pre_train_pic";
+    mExportFields.insert(KItemPreTrainPIC, [this](const QString& item){
+        EXPORT_PERSON_INFO_COMMON_IMPL(item, this->joinPICUid(), this->joinPICName());
+    }); //"pre_train_pic";
     mExportFields.insert(KItemTrainDate, nullptr); //"train_date";
     mExportFields.insert(KItemTrainPIC, nullptr); //"train_pic";
     mExportFields.insert(KItemVowsDate, nullptr); //"vows_date";
@@ -846,8 +874,8 @@ ErrCode Person::getExportDataString(const QString &keyword, QString *data) const
     traced;
     logd("keyword %s", keyword.toStdString().c_str());
     if (mExportFields.contains(keyword)){
-        std::function<QString()> func = mExportFields.value(keyword);
-        if (func != nullptr) *data = func();
+        std::function<QString(const QString&)> func = mExportFields.value(keyword);
+        if (func != nullptr) *data = func(keyword);
     }
     // TODO: raise exception when error occur???
 
@@ -873,6 +901,11 @@ ErrCode Person::prepare2Save()
     }
     tracedr(ret);
     return ret;
+}
+
+const QHash<QString, std::function<QString (const QString&)> > &Person::exportFields() const
+{
+    return mExportFields;
 }
 
 const QString &Person::currentWorkName() const
@@ -1016,6 +1049,8 @@ void Person::dump()
     logd("- FirstName %s", firstName().toStdString().c_str());
     logd("- LastName %s", lastName().toStdString().c_str());
     logd("- HollyName %s", hollyName().toStdString().c_str());
+    logd("- JoinPIC Name %s", joinPICName().toStdString().c_str());
+    logd("- JoinPIC Uid %s", joinPICUid().toStdString().c_str());
 }
 ErrCode Person::onImportItem(int importFileType, const QString &keyword, const QString &value, quint32 idx, void* tag)
 {

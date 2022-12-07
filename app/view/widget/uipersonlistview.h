@@ -36,6 +36,7 @@ protected:
     virtual void initHeader();
 protected:
     virtual void importRequested(const QString& fpath);
+    virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
     virtual void onViewItem(UITableWidgetItem *item);
     virtual void onEditItem(UITableWidgetItem *item);
     virtual QString getTitle();

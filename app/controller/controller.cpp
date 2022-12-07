@@ -18,6 +18,11 @@ Controller::Controller(const QString& name):mName(name)
     traced;
 }
 
+const QString &Controller::getName()
+{
+    return mName;
+}
+
 DbModelHandler *Controller::getModelHandler()
 {
     traced;

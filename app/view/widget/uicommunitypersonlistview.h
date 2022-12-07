@@ -42,8 +42,8 @@ protected:
     virtual void initHeader();
     virtual void updateItem(DbModel* item, UITableItem* tblItem);
 
-    virtual QList<UITableMenuAction*> getMenuItemActions(const QMenu* menu,
-                                                          UITableWidgetItem* item);
+    virtual QList<UITableMenuAction*> getMenuMultiItemActions(const QMenu *menu,
+                                                               const QList<UITableItem *>& items);
     virtual ErrCode onMenuActionListPerson(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionListDepartment(QMenu* menu, UITableMenuAction* act);
 //    virtual ErrCode onMenuAction(QMenu* menu, UITableMenuAction* act);

@@ -29,7 +29,8 @@
 
 GET_INSTANCE_IMPL(RoleCtl)
 
-RoleCtl::RoleCtl()
+RoleCtl::RoleCtl():
+    Controller(KModelHdlRole)
 {
     traced;
 }

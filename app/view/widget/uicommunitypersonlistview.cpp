@@ -120,12 +120,12 @@ ErrCode UICommunityPersonListView::onMenuActionListDepartment(QMenu *menu, UITab
 
 }
 
-QList<UITableMenuAction *> UICommunityPersonListView::getMenuItemActions(const QMenu* menu,
-                                            UITableWidgetItem *item)
+QList<UITableMenuAction *> UICommunityPersonListView::getMenuMultiItemActions(const QMenu *menu,
+                                                                              const QList<UITableItem *>& items)
 {
     traced;
 //    logd("idx %d", idx);
-    QList<UITableMenuAction*> actionList = UITableView::getMenuItemActions(menu, item);
+    QList<UITableMenuAction*> actionList = UITableView::getMenuMultiItemActions(menu, items);
 
 //    actionList.append(UITableMenuAction::build(tr("Danh sách nữ tu"), this)
 //                                              ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{

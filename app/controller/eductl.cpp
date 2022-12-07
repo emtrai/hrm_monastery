@@ -32,7 +32,7 @@
 
 EduCtl* EduCtl::gInstance = nullptr;
 
-EduCtl::EduCtl(): mLoaded(false)
+EduCtl::EduCtl():Controller(KModelHdlEdu), mLoaded(false)
 {
 
 }

@@ -191,6 +191,7 @@ SOURCES += \
     view/dialog/dlgprovince.cpp \
     view/dialog/dlgsaint.cpp \
     view/dialog/dlgsearchperson.cpp \
+    view/dialog/dlgwait.cpp \
     view/widget/uiarealistview.cpp \
     view/widget/uicommonlistview.cpp \
     view/widget/uicommunitylistview.cpp \
@@ -355,6 +356,7 @@ HEADERS += \
     view/dialog/dlgprovince.h \
     view/dialog/dlgsaint.h \
     view/dialog/dlgsearchperson.h \
+    view/dialog/dlgwait.h \
     view/widget/uiarealistview.h \
     view/widget/uicommonlistview.h \
     view/widget/uicommunitylistview.h \
@@ -388,6 +390,7 @@ FORMS += \
     view/dialog/dlgprovince.ui \
     view/dialog/dlgsaint.ui \
     view/dialog/dlgsearchperson.ui \
+    view/dialog/dlgwait.ui \
     view/widget/uimulticomboxview.ui \
     view/widget/uisummarizeview.ui \
     view/widget/uitableview.ui

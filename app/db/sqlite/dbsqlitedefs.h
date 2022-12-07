@@ -30,6 +30,9 @@ typedef enum TableFieldDatatype {
     // WARNING: if any change on this, check impact to all, as some assumed only text/int
 }TableFieldDatatype_t;
 
+
+#define COLUMN_NAME(tblName, field) QString("%1.%2").arg(tblName, field)
+
 const char* const KFieldUid = "uid";
 const char* const KFieldNameId = "nameid";
 const char* const KFieldName = "name";

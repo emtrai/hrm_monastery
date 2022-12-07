@@ -36,7 +36,7 @@ DlgSearchPerson::DlgSearchPerson(QWidget *parent, bool isMulti) :
     ui->setupUi(this);
     QStringList header;
     // TODO: translation
-    header.append(tr("ID"));
+    header.append(tr("Mã"));
     header.append(tr("Tên Thánh"));
     header.append(tr("Họ tên"));
     header.append(tr("Năm sinh"));
@@ -93,7 +93,7 @@ void DlgSearchPerson::on_btnSearch_clicked()
                 logd("idx=%d", idx);
                 per->dump();
                 tbl->insertRow(idx);
-                tbl->setItem(idx, col++, new QTableWidgetItem(per->uid()));
+                tbl->setItem(idx, col++, new QTableWidgetItem(per->personCode()));
                 tbl->setItem(idx, col++, new QTableWidgetItem(per->hollyName()));
                 tbl->setItem(idx, col++, new QTableWidgetItem(per->getFullName()));
                 tbl->setItem(idx, col++, new QTableWidgetItem(Utils::date2String(per->birthday())));

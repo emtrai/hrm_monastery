@@ -29,7 +29,8 @@
 
 GET_INSTANCE_IMPL(WorkCtl)
 
-WorkCtl::WorkCtl()
+WorkCtl::WorkCtl():
+    Controller(KModelHdlWork)
 {
     traced;
 }

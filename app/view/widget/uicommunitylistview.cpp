@@ -191,7 +191,7 @@ ErrCode UICommunityListView::onMenuActionListDepartment(QMenu *menu, UITableMenu
 }
 
 QList<UITableMenuAction *> UICommunityListView::getMenuItemActions(const QMenu* menu,
-                                            UITableWidgetItem *item)
+                                                                   UITableWidgetItem* item)
 {
     traced;
 //    logd("idx %d", idx);

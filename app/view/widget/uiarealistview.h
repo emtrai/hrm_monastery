@@ -33,8 +33,8 @@ public:
 protected:
     void initHeader();
     void updateItem(DbModel *item, UITableItem *tblItem);
-    virtual QList<UITableMenuAction*> getMenuItemActions(const QMenu* menu,
-                                                          UITableWidgetItem* item);
+    virtual QList<UITableMenuAction*> getMenuMultiItemActions(const QMenu *menu,
+                                                               const QList<UITableItem *>& items);
     virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionDelete(QMenu* menu, UITableMenuAction* act);
     //    virtual ErrCode onMenuActionView(QMenu* menu, UITableMenuAction* act);

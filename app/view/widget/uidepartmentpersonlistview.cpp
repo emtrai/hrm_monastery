@@ -147,12 +147,12 @@ ErrCode UIDepartmentPersonListView::onMenuActionListDepartment(QMenu *menu, UITa
 
 }
 
-QList<UITableMenuAction *> UIDepartmentPersonListView::getMenuItemActions(const QMenu* menu,
-                                                                         UITableWidgetItem *item)
+QList<UITableMenuAction *> UIDepartmentPersonListView::getMenuMultiItemActions(const QMenu *menu,
+                                                                                const QList<UITableItem *>& items)
 {
     traced;
     //    logd("idx %d", idx);
-    QList<UITableMenuAction*> actionList = UITableView::getMenuItemActions(menu, item);
+    QList<UITableMenuAction*> actionList = UITableView::getMenuMultiItemActions(menu, items);
 
     //    actionList.append(UITableMenuAction::build(tr("Danh sách ban"), this)
     //                                          ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{

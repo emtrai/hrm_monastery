@@ -34,11 +34,12 @@
 #include "utils.h"
 #include <QToolButton>
 #include <QFileDialog>
+#include <QThread>
 
 #include "view/dialog/dlgimportpersonlistresult.h"
 #include "personctl.h"
 #include "dialog/dlgabout.h"
-
+#include "dlgwait.h"
 
 #define ADD_MENU_ITEM(menu, func, name, iconPath) \
 do { \
@@ -65,6 +66,7 @@ MainWindow::MainWindow(QWidget *parent)
     , mDepartView(nullptr)
     , mRoleView(nullptr)
     , mCurrentView(nullptr)
+    , mWaitDlg(nullptr)
 {
     gInstance = this;
     ui->setupUi(this);
@@ -120,8 +122,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     logd("connect");
     LoaderCtl* loader = LoaderCtl::getInstance();
-    loader->setOnFinishLoadListener(this    , this);
-    QObject::connect(this, SIGNAL(load()), loader, SLOT(onLoad()));
+    loader->setOnFinishLoadListener(this, this);
+//    QObject::connect(this, SIGNAL(load()), loader, SLOT(onLoad()));
+    QObject::connect(this, SIGNAL(load()), this, SLOT(onLoad()));
 }
 
 
@@ -142,6 +145,12 @@ MainWindow::~MainWindow()
 void MainWindow::onFinishLoading(int ret, void* data){
     traced;
 
+}
+
+void MainWindow::showAddEditPerson(bool isSelfUpdate, Person *per)
+{
+    traced;
+    getInstance()->doShowAddEditPerson(isSelfUpdate, per);
 }
 
 void MainWindow::switchView(ViewType type)
@@ -204,21 +213,26 @@ QWidget *MainWindow::getView(ViewType type)
     return nextView;
 }
 
-void MainWindow::onStart()
-{
-traced;
-}
-
-void MainWindow::onProgress(int percentage)
+void MainWindow::onLoadController (Controller* ctl)
 {
     traced;
-
+    logd("on load ctrl %s", ctl->getName().toStdString().c_str());
+    if (mWaitDlg != nullptr) {
+        mWaitDlg->setMessage(ctl->getName());
+    }
+//    QThread::msleep(500);
+    tracede;
 }
 
-void MainWindow::onFinish(ErrCode ret, void *data)
+void MainWindow::doShowAddEditPerson(bool isSelfUpdate, Person *per)
 {
     traced;
-
+    logd("isSelfUpdate %d", isSelfUpdate);
+    DlgPerson* dlg = DlgPerson::buildDlg(this, per);
+    dlg->setIsSelfSave(isSelfUpdate);
+    dlg->exec();
+    delete dlg;
+    tracede;
 }
 
 
@@ -426,6 +440,29 @@ void MainWindow::loadExportMenu()
 
     tracede;
 
+}
+
+void MainWindow::onLoad()
+{
+    traced;
+    if (!mWaitDlg)
+        mWaitDlg = new DlgWait(this);
+    mWaitDlg->setMessage("Loadding");
+    mWaitDlg->setAllowCancel(false);
+    mWaitDlg->show(nullptr,
+          nullptr,
+          [this](ErrCode* err, void* data, DlgWait* dlg) {
+            logd("Call loader on load");
+            LoaderCtl::getInstance()->onLoad();
+            return nullptr;
+          },
+        [this](ErrCode err, void* data, void* result, DlgWait* dlg) {
+            logd("Finished, close wait dlg");
+            dlg->forceClose();
+            return ErrNone;
+        }
+        );
+    tracede;
 }
 
 void MainWindow::on_action_ImportPerson_triggered()

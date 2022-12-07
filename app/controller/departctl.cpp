@@ -36,7 +36,7 @@
 
 GET_INSTANCE_IMPL(DepartCtl)
 
-DepartCtl::DepartCtl()
+DepartCtl::DepartCtl():Controller(KModelHdlDept)
 {
     traced;
 }

@@ -81,7 +81,8 @@ DbModel *SaintCtl::doImportOneItem(int importFileType, const QStringList &items,
     return saint;
 }
 
-SaintCtl::SaintCtl()
+SaintCtl::SaintCtl():
+    CommonCtl(KModelHdlSaint)
 {
 
 }

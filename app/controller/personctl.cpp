@@ -176,6 +176,7 @@ QList<DbModel *> PersonCtl::getSpecialistList(const QString &personUid)
 }
 
 PersonCtl::PersonCtl():
+    Controller(KModelHdlPerson),
     mModelHdl(nullptr)
 {
 }

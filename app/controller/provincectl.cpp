@@ -28,7 +28,8 @@
 
 ProvinceCtl* ProvinceCtl::gInstance = nullptr;
 
-ProvinceCtl::ProvinceCtl()
+ProvinceCtl::ProvinceCtl():
+    Controller(KModelHdlProvince)
 {
     traced;
 }

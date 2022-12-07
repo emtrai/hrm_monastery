@@ -62,6 +62,8 @@ private:
     QStringList mValueList;
     DbModel* mData;
 };
+
+
 class UITableWidgetItem: public QTableWidgetItem
 {
 public:
@@ -170,6 +172,7 @@ protected:
     virtual void importRequested(const QString& fpath);
     virtual void onViewItem(UITableWidgetItem *item);
     virtual void onEditItem(UITableWidgetItem *item);
+//    virtual void onDeleteItem(UITableItem *item);
 
     // MENU
     virtual QMenu* buildPopupMenu(UITableWidgetItem* item, const QList<UITableItem*>& items);
@@ -179,7 +182,6 @@ protected:
 //    virtual ErrCode onMenuActionTrigger(QMenu* menu, UITableMenuAction*);
     virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionDelete(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onMenuActionMultiDelete(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionEdit(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionView(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionReload(QMenu* menu, UITableMenuAction* act);

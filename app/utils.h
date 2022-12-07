@@ -104,6 +104,37 @@ do { \
             }\
         }\
     } while (0)
+
+#define SET_VAL_FROM_TEXTBOX(widget, itemName, func, functxt) \
+do { \
+    logd("SET_VAL_FROM_TEXTBOX, itemName %s", itemName);\
+    QString currtxt = widget->text().trimmed();\
+    if (!currtxt.isEmpty()){ \
+        logd("currtxt %s", currtxt.toStdString().c_str());\
+        QVariant value = widget->property(itemName);\
+        if (!value.isNull()) {\
+            logd("value %s", value.toString().toStdString().c_str());\
+            func(value.toString());\
+            functxt(currtxt);\
+        } else {\
+            logd("%s has no data", itemName);\
+        }\
+    }\
+} while (0)
+
+#define SET_TEXTBOX_FROM_VALUE(wget, itemName, value, txt) \
+do { \
+    logd("SET_TEXTBOX_FROM_VALUE, itemName %s", itemName);\
+    if (!txt.isEmpty()){ \
+        logd("txt %s", txt.toStdString().c_str());\
+        wget->setText(txt);\
+        logd("setProperty %s", value.toStdString().c_str());\
+        wget->setProperty(itemName, value);\
+    } else {\
+        logd("%s has no data", itemName);\
+    }\
+} while (0)
+
 #define ICON_ROOT_PATH ":/icon/icon"
 #define ICON_PATH(name) ICON_ROOT_PATH "/" name
 

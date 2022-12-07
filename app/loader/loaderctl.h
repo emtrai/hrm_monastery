@@ -34,9 +34,7 @@ typedef void (*OnFinishLoadListener_t)(int result, void* data);
 
 class LoaderListener {
 public:
-    virtual void onStart() = 0;
-    virtual void onProgress (int percentage) = 0;
-    virtual void onFinish(ErrCode ret, void* data) = 0;
+    virtual void onLoadController (Controller* ctl) = 0;
 };
 
 class LoaderCtl: public QObject

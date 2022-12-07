@@ -27,7 +27,7 @@
 #include "dbctl.h"
 EthnicCtl* EthnicCtl::gInstance = nullptr;
 
-EthnicCtl::EthnicCtl()
+EthnicCtl::EthnicCtl():Controller(KModelHdlEthnic)
 {
     traced;
 }

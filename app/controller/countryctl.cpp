@@ -26,7 +26,7 @@
 #include "dbctl.h"
 CountryCtl* CountryCtl::gInstance = nullptr;
 
-CountryCtl::CountryCtl()
+CountryCtl::CountryCtl():Controller(KModelHdlCountry)
 {
     traced;
 }

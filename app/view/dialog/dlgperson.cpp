@@ -49,6 +49,7 @@
 #include "view/dialog/dlgcourse.h"
 #include "view/dialog/dlgprovince.h"
 #include "view/dialog/dlgaddpersonevent.h"
+#include "view/dialog/dlgsearchperson.h"
 
 #include "community.h"
 
@@ -75,7 +76,8 @@
 
 #define SPLIT_EMAIL_PHONE ";"
 
-
+#define PERSON_DISPLAY_NAME_SPLIT "-"
+#define PERSON_DISPLAY_NAME(per) QString("%1" PERSON_DISPLAY_NAME_SPLIT "%2").arg(per->personCode(), per->getFullName())
 
 const char* const KUiMultiComboxNameSaint = "saint";
 const char* const KUiMultiComboxNameSpecialist = "specialist";
@@ -310,22 +312,25 @@ Person *DlgPerson::buildPerson()
     per->setHollyPlace(ui->txtHollyPlace->text().trimmed());
 
     SET_DATE_VAL_FROM_WIDGET(ui->txtJoinDate, per->setJoinDate);
-    SET_VAL_FROM_CBOX(ui->cbJoinPIC, per->setJoinPICUid, per->setJoinPICName);
+
+    logd("set join PIC");
+//    SET_VAL_FROM_CBOX(ui->cbJoinPIC, per->setJoinPICUid, per->setJoinPICName);
+    SET_VAL_FROM_TEXTBOX(ui->txtJoinPIC, KItemUid, per->setJoinPICUid, per->setJoinPICName);
 
 
     SET_DATE_VAL_FROM_WIDGET(ui->txtPreTrainJoinDate, per->setPreTrainJoinDate);
-    SET_VAL_FROM_CBOX(ui->cbPreTrainJoinPIC, per->setPreTrainPICUid, per->setPreTrainPICName);
+    SET_VAL_FROM_TEXTBOX(ui->txtPreTrainJoinPIC, KItemUid, per->setPreTrainPICUid, per->setPreTrainPICName);
 
     SET_DATE_VAL_FROM_WIDGET(ui->txtTrainJoinDate, per->setTrainJoinDate);
-    SET_VAL_FROM_CBOX(ui->cbTrainPIC, per->setTrainPICUid, per->setTrainPICName);
+    SET_VAL_FROM_TEXTBOX(ui->txtTrainPIC, KItemUid, per->setTrainPICUid, per->setTrainPICName);
 
 
     SET_DATE_VAL_FROM_WIDGET(ui->txtVowsDate, per->setVowsDate);
-    SET_VAL_FROM_CBOX(ui->cbVowsCEO, per->setVowsCEOUid, per->setVowsCEOName);
+    SET_VAL_FROM_TEXTBOX(ui->txtVowsCEO, KItemUid, per->setVowsCEOUid, per->setVowsCEOName);
 
     SET_DATE_VAL_FROM_WIDGET(ui->txtEternalVowsDate, per->setEternalVowsDate);
-    SET_VAL_FROM_CBOX(ui->cbEternalVowsPIC, per->setEternalVowsPICUid, per->setEternalVowsPICName);
-    SET_VAL_FROM_CBOX(ui->cbEternalVowsCEO, per->setEternalVowsCEOUid, per->setEternalVowsCEOName);
+    SET_VAL_FROM_TEXTBOX(ui->txtEternalVowsPIC, KItemUid, per->setEternalVowsPICUid, per->setEternalVowsPICName);
+    SET_VAL_FROM_TEXTBOX(ui->txtEternalVowsCEO, KItemUid, per->setEternalVowsCEOUid, per->setEternalVowsCEOName);
 
     SET_DATE_VAL_FROM_WIDGET(ui->txtBankDate, per->setBankDate);
     per->setBankPlace(ui->txtBankPlace->text().trimmed());
@@ -348,7 +353,6 @@ Person *DlgPerson::buildPerson()
     logd("set work");
     SET_VAL_FROM_CBOX(ui->cbWork, per->setCurrentWorkUid, per->setCurrentWorkName);
 
-
     //event
 //    QList<QVariant> specialist = ui->tblEvents->item
 //    per->clearSpecialistUid();
@@ -357,6 +361,7 @@ Person *DlgPerson::buildPerson()
 //    }
 
     per->dump();
+    tracede;
     return per;
 
 }
@@ -458,18 +463,32 @@ ErrCode DlgPerson::fromPerson(const Person *model)
 
     // ngay nhap tu
     ui->txtJoinDate->setText(Utils::date2String(per->joinDate()));
+    SET_TEXTBOX_FROM_VALUE(ui->txtJoinPIC, KItemUid, per->joinPICUid(), per->joinPICName());
     //cbJoinPIC (nguoi dac trach)
 
     // ngay gia nhap tien tap vien
     ui->txtPreTrainJoinDate->setText(Utils::date2String(per->preTrainJoinDate()));
     //cbPreTrainJoinPIC
+    SET_TEXTBOX_FROM_VALUE(ui->txtPreTrainJoinPIC, KItemUid,
+                           per->preTrainPICUid(), per->preTrainPICName());
+
     ui->txtTrainJoinDate->setText(Utils::date2String(per->trainJoinDate()));
     //cbTrainPIC
+    SET_TEXTBOX_FROM_VALUE(ui->txtTrainPIC, KItemUid,
+                           per->trainPICUid(), per->trainPICName());
+
     ui->txtVowsDate->setText(Utils::date2String(per->vowsDate()));
     //cbVowsCEO
+    SET_TEXTBOX_FROM_VALUE(ui->txtVowsCEO, KItemUid,
+                           per->vowsCEOUid(), per->vowsCEOName());
+
     ui->txtEternalVowsDate->setText(Utils::date2String(per->eternalVowsDate()));
     //cbEternalVowsPIC
+    SET_TEXTBOX_FROM_VALUE(ui->txtEternalVowsPIC, KItemUid,
+                           per->eternalVowsPICUid(), per->eternalVowsPICName());
     //cbEternalVowsCEO
+    SET_TEXTBOX_FROM_VALUE(ui->txtEternalVowsCEO, KItemUid,
+                           per->eternalVowsCEOUid(), per->eternalVowsCEOName());
 
     ui->txtBankDate->setText(Utils::date2String(per->bankDate()));
     ui->txtBankPlace->setText(per->bankPlace());
@@ -760,6 +779,30 @@ void DlgPerson::cleanEvent()
     }
 }
 
+void DlgPerson::searchPerson(QLineEdit *wget)
+{
+    traced;
+    DlgSearchPerson * dlg = new DlgSearchPerson();
+    if (dlg == nullptr) {
+        loge("Open dlg DlgAddPersonEvent fail, No memory");
+        return; // TODO: open dlg??
+    }
+    dlg->setIsMultiSelection(false);
+
+    if (dlg->exec() == QDialog::Accepted){
+        Person* per = dlg->person();
+        if (per != nullptr) {
+            wget->setText(per->getFullName());
+            logd("setProperty %s", per->uid().toStdString().c_str());
+            wget->setProperty(KItemUid, per->uid());
+        } else {
+            logi("No person selected");
+        }
+    }
+    delete dlg;
+    tracede;
+}
+
 void DlgPerson::loadCommunity()
 {
     traced;
@@ -954,6 +997,7 @@ void DlgPerson::on_btnPreview_clicked()
         viewer->setSubject("Person");
         viewer->exec();
     }
+    tracede;
 }
 
 Person *DlgPerson::person(bool newone)
@@ -1233,5 +1277,58 @@ bool DlgPerson::isNew() const
 void DlgPerson::setIsNew(bool newIsNew)
 {
     mIsNew = newIsNew;
+}
+
+
+void DlgPerson::on_btnSearchJoinPIC_clicked()
+{
+    traced;
+    searchPerson(ui->txtJoinPIC);
+    tracede;
+}
+
+
+void DlgPerson::on_btnSearchPreTrainJoinPIC_clicked()
+{
+    traced;
+    searchPerson(ui->txtPreTrainJoinPIC);
+    tracede;
+
+}
+
+
+void DlgPerson::on_btnSearchTrainPIC_clicked()
+{
+    traced;
+    searchPerson(ui->txtTrainPIC);
+    tracede;
+
+}
+
+
+void DlgPerson::on_btnSearchVowsCEO_clicked()
+{
+    traced;
+    searchPerson(ui->txtVowsCEO);
+    tracede;
+
+}
+
+
+void DlgPerson::on_btnSearchEternalVowsPIC_clicked()
+{
+    traced;
+    searchPerson(ui->txtEternalVowsPIC);
+    tracede;
+
+}
+
+
+void DlgPerson::on_btnSearchEternalVowsCEO_clicked()
+{
+    traced;
+    searchPerson(ui->txtEternalVowsCEO);
+    tracede;
+
 }
 

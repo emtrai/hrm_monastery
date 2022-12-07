@@ -29,7 +29,8 @@
 
 
 GET_INSTANCE_IMPL(StatusCtl)
-StatusCtl::StatusCtl()
+StatusCtl::StatusCtl():
+    Controller(KModelHdlStatus)
 {
     traced;
 }

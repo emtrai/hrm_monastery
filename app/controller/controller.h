@@ -20,6 +20,7 @@ class Controller: public QObject, public IImporter
 public:
     Controller();
     Controller(const QString& name);
+    virtual const QString& getName();
 
     virtual DbModelHandler* getModelHandler();
     virtual ErrCode addNew(DbModel* model);

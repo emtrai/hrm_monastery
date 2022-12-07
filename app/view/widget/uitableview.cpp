@@ -300,7 +300,7 @@ QList<UITableMenuAction *> UITableView::getMenuMultiItemActions(const QMenu *men
     QList<UITableMenuAction*> actionList;
     actionList.append(UITableMenuAction::buildMultiItem(tr("Xoá"), this, &items)
                                            ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
-                                               return this->onMenuActionMultiDelete(m, a);
+                                               return this->onMenuActionDelete(m, a);
                                            }));
     tracede;
     return actionList;
@@ -322,12 +322,6 @@ ErrCode UITableView::onMenuActionDelete(QMenu *menu, UITableMenuAction *act)
     return ErrNone;
 }
 
-ErrCode UITableView::onMenuActionMultiDelete(QMenu *menu, UITableMenuAction *act)
-{
-    traced;
-    // TODO: handle it
-    return ErrNone;
-}
 
 ErrCode UITableView::onMenuActionEdit(QMenu *menu, UITableMenuAction *act)
 {
@@ -651,7 +645,12 @@ UITableMenuAction *UITableMenuAction::build(const QString &text, QObject *parent
 {
     traced;
     UITableMenuAction* menu = new UITableMenuAction(text, parent);
+    if (item)
+        menu->addItemList(item->item());
+    else
+        logd("item is null");
     menu->setTblItem(item);
+    tracede;
     return menu;
 }
 

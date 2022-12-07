@@ -33,7 +33,9 @@
 
 SpecialistCtl* SpecialistCtl::gInstance = nullptr;
 
-SpecialistCtl::SpecialistCtl(): mLoaded(false)
+SpecialistCtl::SpecialistCtl():
+    Controller(KModelHdlSpecialist),
+    mLoaded(false)
 {
 
 }
