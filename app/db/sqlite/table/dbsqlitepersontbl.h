@@ -41,6 +41,7 @@ public:
     virtual ErrCode updateTableField(DbSqliteUpdateBuilder* builder,
                                      const QList<QString>& updateField,
                                      const DbModel *item);
+    virtual ErrCode updateCommunity(const QString& uid, const QString& communityUid);
 protected:
     virtual void addTableField(DbSqliteTableBuilder* builder);
     virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);

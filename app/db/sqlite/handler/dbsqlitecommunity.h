@@ -35,6 +35,8 @@ public:
     DbSqliteCommunity();
     static DbSqliteCommunity* getInstance();
     virtual const QString getName();
+    // TODO: mapping community & person stored in person tbl and community&person mapping table
+    // risk of inconsistant data
     virtual QList<DbModel*> getListPerson(const QString& uid);
     virtual ErrCode addPerson2Community(const Community *comm,
                                       const Person* per,

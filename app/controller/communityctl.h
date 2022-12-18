@@ -55,7 +55,7 @@ public:
     virtual const char* getPrebuiltFileType();
     virtual QList<DbModel*> getItemFromDb();
     virtual DbModelHandler* getModelHandler();
-
+    virtual ErrCode addPerson(Community* comm, Person* per);
 private:
     CommunityCtl();
 

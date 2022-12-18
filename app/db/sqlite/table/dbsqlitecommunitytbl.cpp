@@ -110,6 +110,11 @@ QString DbSqliteCommunityTbl::getSearchQueryString(const QString &cond)
     return queryString;
 }
 
+DbModelBuilder DbSqliteCommunityTbl::mainModelBuilder()
+{
+    return &Community::builder;
+}
+
 void DbSqliteCommunityTbl::addTableField(DbSqliteTableBuilder *builder)
 {
     traced;

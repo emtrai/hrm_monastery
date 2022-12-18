@@ -30,12 +30,26 @@
 #include "view/widget/uitableviewfactory.h"
 #include <QAction>
 #include "loader/loaderctl.h"
+#include "view/widget/baseview.h"
 QT_BEGIN_NAMESPACE
     namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
+#define MAIN MainWindow::getInstance()
+
+// TODO: full state machine/state transition check/report incident
+enum AppState {
+    APP_STATE_NOT_READY = 0,
+    APP_STATE_INITING,
+    APP_STATE_LOADING,
+    APP_STATE_READY,
+    APP_STATE_LOAD_ERR,
+    APP_STATE_ERROR
+};
+
 class Person;
 class DlgWait;
+
 
     class MainWindow : public QMainWindow, public LoaderListener
 {
@@ -47,17 +61,21 @@ class DlgWait;
             static MainWindow *getInstance();
 
             static void showAddEditPerson(bool isSelfUpdate = true, Person* per = nullptr);
+            static void showImportDlg();
         protected:
      void showEvent(QShowEvent *ev);
-     static void onFinishLoading(int ret, void* data);
  public:
      void switchView(ViewType type);
      void switchView(QWidget* nextView);
      QWidget* getView(ViewType type);
-    protected:
+     AppState appState() const;
+     void setAppState(AppState newAppState);
+
+ protected:
 
      virtual void onLoadController (Controller* ctl);
      void doShowAddEditPerson(bool isSelfUpdate = true, Person* per = nullptr);
+     void doShowImportPerson();
  private:
      void loadHomePageFile();
      void loadOtherMenu();
@@ -85,6 +103,7 @@ class DlgWait;
     QToolButton *mExportButton;
     QAction* mActionExportPersonList;
     DlgWait* mWaitDlg;
+    AppState mAppState;
 
  signals:
     void load();
@@ -128,6 +147,8 @@ class DlgWait;
      void on_actionMisson_triggered();
      void on_actionProvince_triggered();
      void on_actionCountry_triggered();
+
+     void on_actionBack_triggered();
 
  private:
      static MainWindow* gInstance;

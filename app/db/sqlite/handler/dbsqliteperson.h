@@ -71,6 +71,12 @@ public:
                        QList<DbModel*>* outList = nullptr);
 
     virtual QList<DbModel*> getSpecialistList(const QString& personUid);
+
+    virtual ErrCode updateCommunity(const QString& personUid, const QString& communityUid);
+    // TODO: mapping community & person stored in person tbl and community&person mapping table
+    // risk of inconsistant data
+    // this function will try to get list of person in community using data (communityuid) in person table
+    virtual QList<DbModel*> getListPersonInCommunity(const QString& communityUid);
 protected:
     virtual DbSqliteTbl* getMainTbl();
 private:

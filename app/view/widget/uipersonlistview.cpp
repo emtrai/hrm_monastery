@@ -30,10 +30,13 @@
 #include "utils.h"
 #include "view/dialog/dlgimportpersonlistresult.h"
 #include "view/dialog/dlghtmlviewer.h"
+#include "view/dialog/dlgsearchcommunity.h"
 #include <QFile>
 #include "filter.h"
 #include "dlgperson.h"
 #include "mainwindow.h"
+#include "community.h"
+#include "communityctl.h"
 
 UIPersonListView::UIPersonListView(QWidget *parent):
     UICommonListView(parent)
@@ -50,7 +53,25 @@ UIPersonListView::~UIPersonListView()
 ErrCode UIPersonListView::onLoad()
 {
     traced;
-    QList<DbModel*> items = PersonCtl::getInstance()->getAllPerson();
+    QList<DbModel*> items;
+    if (mFilterList.count() > 0) {
+        // TODO: multi filter items???? should limite???? what the hell is it
+        foreach (FilterItem* item, mFilterList) {
+            logd("filter item %s", STR2CHA(item->item()));
+            if (item->item() == KItemCommunity) {
+                // TODO: how about keyword? assume value only?????
+                QList<DbModel*> list = PERSONCTL->getPersonInCommunity(item->value().toString());
+                if (list.count() > 0) {
+                    items.append(list);
+                }
+            } else {
+                ASSERT(0, "not this filter item!!!");
+            }
+        }
+    } else {
+        logd("get all person");
+        items = PersonCtl::getInstance()->getAllPerson();
+    }
     mItemList.clear(); // TODO: clean up item data
     // TODO: loop to much, redundant, do something better?
     foreach (DbModel* item, items) {
@@ -117,11 +138,88 @@ void UIPersonListView::importRequested(const QString &fpath)
     delete dlg;
 }
 
+QList<UITableMenuAction *> UIPersonListView::getMenuCommonActions(const QMenu *menu)
+{
+    traced;
+    QList<UITableMenuAction*> actionList = UITableView::getMenuCommonActions(menu);
+    actionList.append(UITableMenuAction::build(tr("Nhập từ tập tin"), this)
+                                                   ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                                       return this->onMenuActionImport(m, a);
+                                                   }));
+    tracede;
+    return actionList;
+}
+
+QList<UITableMenuAction *> UIPersonListView::getMenuItemActions(const QMenu *menu, UITableWidgetItem *item)
+{
+    traced;
+    QList<UITableMenuAction*> actionList = UITableView::getMenuItemActions(menu, item);
+    actionList.append(UITableMenuAction::build(tr("Đổi cộng đoàn"), this, item)
+                                                   ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                                       return this->onChangeCommunity(m, a);
+                                                   }));
+    tracede;
+    return actionList;
+}
+
+QList<UITableMenuAction *> UIPersonListView::getMenuMultiItemActions(const QMenu *menu, const QList<UITableItem *> &items)
+{
+    traced;
+    QList<UITableMenuAction*> actionList = UITableView::getMenuMultiItemActions(menu, items);
+    actionList.append(UITableMenuAction::buildMultiItem(tr("Đổi cộng đoàn"), this, &items)
+                                                   ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                                       return this->onChangeCommunity(m, a);
+                                                   }));
+    tracede;
+    return actionList;
+}
+
 ErrCode UIPersonListView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act)
 {
     traced;
     ErrCode ret = ErrNone;
     MainWindow::showAddEditPerson();
+    tracedr(ret);
+    return ret;
+}
+
+ErrCode UIPersonListView::onMenuActionImport(QMenu *menu, UITableMenuAction *act)
+{
+    traced;
+    ErrCode ret = ErrNone;
+    MainWindow::showImportDlg();
+    tracedr(ret);
+    return ret;
+}
+
+ErrCode UIPersonListView::onChangeCommunity(QMenu *menu, UITableMenuAction *act)
+{
+    traced;
+    ErrCode ret = ErrNone;
+    DlgSearchCommunity* dlg = DlgSearchCommunity::build(this, false);
+    dlg->setIsMultiSelection(false);
+    dlg->enableGetAllSupport();
+
+    if (dlg->exec() == QDialog::Accepted){
+        Community* comm = (Community*)dlg->selectedItem();
+        if (comm != nullptr) {
+            comm->dump();
+            QList<DbModel*> items;
+            int cnt = act->itemListData(items);
+            logd("No. selected person %d", cnt);
+            foreach (DbModel* item, items){
+                logd("Add person to community");
+                item->dump();
+                COMMUNITYCTL->addPerson(comm, (Person*) item);
+            }
+            // TODO: implement this
+        } else {
+            logi("No community selected");
+        }
+    } else {
+        logd("not accept???");
+    }
+    delete dlg;
     tracedr(ret);
     return ret;
 }
@@ -187,7 +285,8 @@ void UIPersonListView::initFilterFields()
 int UIPersonListView::onFilter(int catetoryid,
                                 const QString &catetory,
                                 qint64 opFlags,
-                                const QString &keywords)
+                                const QString &keywords,
+                               const QVariant *value)
 {
     traced;
     mItemList.clear(); // TODO: clean up item data
@@ -197,6 +296,7 @@ int UIPersonListView::onFilter(int catetoryid,
     tracede;
     return ret;
 }
+
 
 void UIPersonListView::cleanUpItem()
 {

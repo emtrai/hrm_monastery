@@ -782,7 +782,7 @@ void DlgPerson::cleanEvent()
 void DlgPerson::searchPerson(QLineEdit *wget)
 {
     traced;
-    DlgSearchPerson * dlg = new DlgSearchPerson();
+    DlgSearchPerson * dlg = DlgSearchPerson::build(this);
     if (dlg == nullptr) {
         loge("Open dlg DlgAddPersonEvent fail, No memory");
         return; // TODO: open dlg??
@@ -790,7 +790,7 @@ void DlgPerson::searchPerson(QLineEdit *wget)
     dlg->setIsMultiSelection(false);
 
     if (dlg->exec() == QDialog::Accepted){
-        Person* per = dlg->person();
+        Person* per = (Person*)dlg->selectedItem();
         if (per != nullptr) {
             wget->setText(per->getFullName());
             logd("setProperty %s", per->uid().toStdString().c_str());

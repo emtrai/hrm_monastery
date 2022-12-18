@@ -52,7 +52,7 @@ void UICommunityPersonListView::loadCommunityPerson(const QString &communityUid,
 ErrCode UICommunityPersonListView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act)
 {
     traced;
-    DlgSearchPerson * dlg = new DlgSearchPerson();
+    DlgSearchPerson * dlg = DlgSearchPerson::build(this, true);
     if (dlg == nullptr) {
         loge("Open dlg DlgAddPersonEvent fail, No memory");
         return ErrNone; // TODO: open dlg??
@@ -60,11 +60,12 @@ ErrCode UICommunityPersonListView::onMenuActionAdd(QMenu *menu, UITableMenuActio
     dlg->setIsMultiSelection(true);
 
     if (dlg->exec() == QDialog::Accepted){
-        QList<Person *>  list = dlg->personList();
+        QList<DbModel *>  list = dlg->selectedItems();
         logd("Selected %d per ", list.count());
         int cnt = 0;
         if (list.count() > 0) {
-            foreach(Person* per, list) {
+            foreach(DbModel* item, list) {
+                Person* per = (Person*) item;
                 logd("Add per %s to comm %s ", per->getFullName().toStdString().c_str(),
                      community()->name().toStdString().c_str());
                 ErrCode ret = CommunityCtl::getInstance()->addPerson2Community(community(), per);

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>DlgSearchPerson</class>
- <widget class="QDialog" name="DlgSearchPerson">
+ <class>DlgSearch</class>
+ <widget class="QDialog" name="DlgSearch">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -16,6 +16,16 @@
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QLabel" name="lblTitle">
+       <property name="text">
+        <string>Tìm kiếm</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <property name="topMargin">
@@ -47,6 +57,13 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QPushButton" name="btnAll">
+         <property name="text">
+          <string>Tất cả</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
      <item>
@@ -75,7 +92,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>DlgSearchPerson</receiver>
+   <receiver>DlgSearch</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -91,7 +108,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>DlgSearchPerson</receiver>
+   <receiver>DlgSearch</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

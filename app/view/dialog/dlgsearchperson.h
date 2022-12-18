@@ -16,44 +16,36 @@
  *
  * Filename: dlgsearchperson.h
  * Author: Anh, Ngo Huy
- * Created date:9/20/2022
+ * Created date:12/9/2022
  * Brief:
  */
 #ifndef DLGSEARCHPERSON_H
 #define DLGSEARCHPERSON_H
 
-#include <QDialog>
+#include "dlgsearch.h"
 
 class Person;
-namespace Ui {
-class DlgSearchPerson;
-}
 
-class DlgSearchPerson : public QDialog
+class DlgSearchPerson : public DlgSearch
 {
-    Q_OBJECT
-
 public:
-    explicit DlgSearchPerson(QWidget *parent = nullptr, bool isMulti = false);
     ~DlgSearchPerson();
-
-
-    Person *person() const;
-    QList<Person*> personList();
-
-    bool getIsMultiSelection() const;
-    void setIsMultiSelection(bool newIsMultiSelection);
+    static DlgSearchPerson* build(QWidget *parent = nullptr, bool isMulti = false);
+protected:
+    DlgSearchPerson(QWidget *parent = nullptr, bool isMulti = false);
 
 protected:
-    void accept();
-private slots:
-    void on_btnSearch_clicked();
 
+    virtual QString getTitle();
+    virtual void initHeader();
+
+    virtual int onSearch(const QString& keyword);
+    virtual void clearAll();
+    virtual DbModel* getItemAtIdx(int idx);
+    virtual QString getValueOfItemAt(int idx, int col, QString header, DbModel* item);
 private:
-    Ui::DlgSearchPerson *ui;
-    QList<Person*> mSelectedPersons;
-    QList<Person*> mListPerson;
-    bool mIsMultiSelection;
+    QList<Person*> mListItems;
+
 };
 
 #endif // DLGSEARCHPERSON_H

@@ -30,6 +30,8 @@
 #include <QList>
 #include "errcode.h"
 
+#define LOADERCTL LoaderCtl::getInstance()
+
 typedef void (*OnFinishLoadListener_t)(int result, void* data);
 
 class LoaderListener {
@@ -48,18 +50,22 @@ public:
 private:
 
     void add2Loader( Controller* ctl);
+    void add2PreLoader( Controller* ctl);
     void registerAll();
-
+    void runLoader(QList< Controller*>& list);
 private:
     static LoaderCtl* gInstance;
 
     QList< Controller*> mListCtl;
+    QList< Controller*> mPreLoadListCtl;
 
 //    OnFinishLoadListener_t mListener;
     LoaderListener* mListener;
     void* mListenerData;
 
-public slots:
+//public slots:
+public:
+    virtual void preLoad();
     virtual void onLoad();
 };
 

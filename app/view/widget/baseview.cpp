@@ -14,29 +14,14 @@
  * limitations under the License.
  *
  *
- * Filename: uisaintlistview.h
+ * Filename: baseview.cpp
  * Author: Anh, Ngo Huy
- * Created date:8/11/2022
+ * Created date:12/17/2022
  * Brief:
  */
-#ifndef UISAINTLISTVIEW_H
-#define UISAINTLISTVIEW_H
+#include "baseview.h"
 
-#include "uicommonlistview.h"
-#include "saint.h"
-
-class UISaintListView : public UICommonListView
+BaseView::BaseView()
 {
-public:
-    explicit UISaintListView(QWidget *parent = nullptr);
-    virtual ~UISaintListView();
-protected:
-    virtual ErrCode onLoad();
-    virtual void updateItem(DbModel* item, UITableItem* tblItem);
-    virtual void initHeader();
 
-    virtual int onFilter(int catetoryid, const QString& catetory, qint64 opFlags, const QString& keywords, const QVariant *value);
-
-};
-
-#endif // UISAINTLISTVIEW_H
+}

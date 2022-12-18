@@ -24,6 +24,7 @@
 
 #include <QString>
 #include <QHash>
+#include <QVariant>
 
 enum FilterField {
     FILTER_FIELD_NAME = 0,
@@ -56,5 +57,25 @@ enum FilterOperation {
     };
 
 QHash<int, QString> getFilterOpsList(int filterField);
+
+
+class FilterItem {
+
+    // TODO: copy constructor??
+    // TODO: operator = override??
+public:
+    FilterItem(const QString& item, const QString& keyword, const QVariant& value);
+    const QString &item() const;
+    void setItem(const QString &newItem);
+    const QString &keyword() const;
+    void setKeyword(const QString &newKeyword);
+    const QVariant &value() const;
+    void setValue(const QVariant &newValue);
+private:
+    QString mItem; // filer item, such as community, etc.
+    QString mKeyword; // keyword, if specified, will "contain"
+    QVariant mValue; // value, if specified, will "exact". If value is set, keyword is ignored
+};
+
 
 #endif // FILTER_H

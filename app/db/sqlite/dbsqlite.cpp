@@ -251,6 +251,11 @@ DbSqliteTbl *DbSqlite::table(const QString &tblName)
     return DbSqlite::getInstance()->getTable(tblName);
 }
 
+DbModelHandler *DbSqlite::handler(const QString &name)
+{
+    return DbSqlite::getInstance()->getModelHandler(name);
+}
+
 
 DbSqlite* DbSqlite::getInstance(){
     if (gInstance == nullptr){

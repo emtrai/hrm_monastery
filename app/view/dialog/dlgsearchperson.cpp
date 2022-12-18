@@ -16,151 +16,119 @@
  *
  * Filename: dlgsearchperson.cpp
  * Author: Anh, Ngo Huy
- * Created date:9/20/2022
+ * Created date:12/9/2022
  * Brief:
  */
 #include "dlgsearchperson.h"
-#include "ui_dlgsearchperson.h"
 #include "logger.h"
-#include "personctl.h"
-#include "utils.h"
 #include "person.h"
+#include "personctl.h"
 
-DlgSearchPerson::DlgSearchPerson(QWidget *parent, bool isMulti) :
-    QDialog(parent),
-    ui(new Ui::DlgSearchPerson),
-//    mPerson(nullptr),
-    mIsMultiSelection(isMulti)
-{
-    traced;
-    ui->setupUi(this);
-    QStringList header;
-    // TODO: translation
-    header.append(tr("Mã"));
-    header.append(tr("Tên Thánh"));
-    header.append(tr("Họ tên"));
-    header.append(tr("Năm sinh"));
-    header.append(tr("Nơi sinh"));
-    header.append(tr("Cộng đoàn"));
-    ui->tblList->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui->tblList->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
-
-    if (mIsMultiSelection)
-        ui->tblList->setSelectionMode(QAbstractItemView::SelectionMode::MultiSelection);
-    else
-        ui->tblList->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
-
-    ui->tblList->setShowGrid(true);
-    ui->tblList->setColumnCount(header.count());
-    //    ui->tblCommunityList->setMinimumWidth(500);
-    ui->tblList->setMinimumHeight(500); // TODO: define default fix?
-
-    ui->tblList->setHorizontalHeaderLabels(header);
-
-}
 
 DlgSearchPerson::~DlgSearchPerson()
 {
     traced;
-    delete ui;
 }
 
-
-
-void DlgSearchPerson::on_btnSearch_clicked()
+DlgSearchPerson *DlgSearchPerson::build(QWidget *parent, bool isMulti)
 {
     traced;
-    QTableWidget* tbl = ui->tblList;
-    QString name = ui->txtName->text().trimmed();
-//    mPerson = nullptr;
-    mSelectedPersons.clear();
-    if (!name.isEmpty()) {
-        tbl->clearContents();
-        tbl->model()->removeRows(0, tbl->rowCount());
-        mListPerson.clear();
-        mListPerson = INSTANCE(PersonCtl)->searchPerson(name);
-        logd("Found %d per", mListPerson.count());
-        if (mListPerson.count() > 0) {
-
-            qint32 col = 0;
-            qint32 idx = tbl->rowCount();
-
-            foreach(Person* per, mListPerson) {
-                col = 0;
-                if (per == nullptr) {
-                    continue;
-                }
-                logd("idx=%d", idx);
-                per->dump();
-                tbl->insertRow(idx);
-                tbl->setItem(idx, col++, new QTableWidgetItem(per->personCode()));
-                tbl->setItem(idx, col++, new QTableWidgetItem(per->hollyName()));
-                tbl->setItem(idx, col++, new QTableWidgetItem(per->getFullName()));
-                tbl->setItem(idx, col++, new QTableWidgetItem(Utils::date2String(per->birthday())));
-                tbl->setItem(idx, col++, new QTableWidgetItem(per->birthPlace()));
-                idx++;
-            }
-        } else {
-            logi("No person");
-        }
-    } else {
-        loge("Nothing to search");
-        Utils::showErrorBox(tr("Nhập tên để tìm")); // TODO: translation
-    }
+    // TODO: create factory class and move this to factory???
+    DlgSearchPerson* ret = new DlgSearchPerson(parent, isMulti);
+    ret->setupUi();
+    tracede;
+    return ret;
 }
 
-bool DlgSearchPerson::getIsMultiSelection() const
-{
-    return mIsMultiSelection;
-}
-
-void DlgSearchPerson::setIsMultiSelection(bool newIsMultiSelection)
-{
-    mIsMultiSelection = newIsMultiSelection;
-    if (mIsMultiSelection)
-        ui->tblList->setSelectionMode(QAbstractItemView::SelectionMode::MultiSelection);
-    else
-        ui->tblList->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
-}
-
-Person *DlgSearchPerson::person() const
-{
-    return (mSelectedPersons.count() > 0)?mSelectedPersons.at(0):nullptr;
-}
-
-QList<Person *> DlgSearchPerson::personList()
-{
-    return mSelectedPersons;
-}
-
-void DlgSearchPerson::accept()
+DlgSearchPerson::DlgSearchPerson(QWidget *parent, bool isMulti):
+    DlgSearch(parent, isMulti)
 {
     traced;
-    // TODO: validate data
-    QTableWidget* tbl = ui->tblList;
-    QItemSelectionModel* selectionModel = tbl->selectionModel();
-    QModelIndexList selection = selectionModel->selectedRows();
-    logd("Selection count %d", (int)selection.count());
-    // only select one
-    if (selection.count() > 0) {
-        for(int i=0; i< selection.count(); i++)
-        {
-            QModelIndex index = selection.at(i);
-            // TODO: validate value
-            Person* per =  mListPerson.at(index.row());
-            mSelectedPersons.append(per);
-        }
-//        QModelIndex index = selection.at(0);
-//        mPerson = mListPerson.at(index.row());
-//        if (mPerson == nullptr) {
-//            loge("No person found, what's wrong???");
-//            // TODO: handle this error special case
-//        }
-    } else {
-        loge("Nothing to select");
-        // TODO:show warning dialog???
-    }
-    QDialog::accept();
-
 }
 
+QString DlgSearchPerson::getTitle()
+{
+    return tr("Tìm kiếm Nữ tu");
+}
+
+
+int DlgSearchPerson::onSearch(const QString &keyword)
+{
+    traced;
+    clearAll();
+    mListItems = INSTANCE(PersonCtl)->searchPerson(keyword);
+    tracede;
+    return mListItems.count();
+}
+
+void DlgSearchPerson::clearAll()
+{
+    traced;
+    DlgSearch::clearAll();
+    // TODO: clear each element of list????
+    mListItems.clear();
+    tracede;
+}
+
+DbModel *DlgSearchPerson::getItemAtIdx(int idx)
+{
+    traced;
+    DbModel* ret = nullptr;
+    logd("get item at idx=%d", idx);
+    if (idx >= 0 && idx < mListItems.count()) {
+        ret = (DbModel*)mListItems[idx];
+    } else {
+        loge("invalid idx %d", idx);
+    }
+    tracede;
+    return ret;
+}
+void DlgSearchPerson::initHeader()
+{
+    // TODO: translation
+    mHeader.append(tr("Mã"));
+    mHeader.append(tr("Tên Thánh"));
+    mHeader.append(tr("Họ tên"));
+    mHeader.append(tr("Năm sinh"));
+    mHeader.append(tr("Nơi sinh"));
+    mHeader.append(tr("Cộng đoàn"));
+    // WARNING: any change on this, must update to getValueOfItemAt
+}
+
+QString DlgSearchPerson::getValueOfItemAt(int idx, int col, QString header, DbModel* item)
+{
+    traced;
+    QString val;
+    logd("idx = %d, col = %d", idx, col);
+    if (item != nullptr) {
+        logd("item is nullptr, get from index");
+        item = getItemAtIdx(idx);
+    }
+    if (item != nullptr){
+        Person* per = (Person*)item;
+
+        // TODO: improve this, i.e. app callback to mHeader?
+        switch (col) {
+        case 0:
+            val = per->personCode();
+            break;
+        case 1:
+            val = per->hollyName();
+            break;
+        case 2:
+            val = per->getFullName();
+            break;
+        case 3:
+            val = Utils::date2String(per->birthday());
+            break;
+        case 4:
+            val = per->birthPlace();
+            break;
+        case 5:
+            val = per->communityName();
+            break;
+        }
+    }
+    tracede;
+    return val;
+}

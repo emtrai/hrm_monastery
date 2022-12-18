@@ -30,6 +30,8 @@
 #include "uicommunitypersonlistview.h"
 #include "uidepartmentlistview.h"
 #include "uitableviewfactory.h"
+#include "uipersonlistview.h"
+#include "uitableview.h"
 
 UICommunityListView::UICommunityListView(QWidget *parent):
     UICommonListView(parent)
@@ -140,8 +142,20 @@ QString UICommunityListView::getTitle()
 ErrCode UICommunityListView::onMenuActionListPerson(QMenu *menu, UITableMenuAction *act)
 {
     traced;
+    ErrCode ret = ErrNone;
+    Community* community = dynamic_cast<Community*>(act->getData());
+    if (community != nullptr) {
+        community->dump();
+        UITableView* view = (UITableView*)MAIN->getView(ViewType::PERSON);
+        view->addFilter(KItemCommunity, QString(), QVariant(community->uid()));
+        MainWindow::getInstance()->switchView(view);
+    } else {
+        loge("no community info");
+        ret = ErrNoData;
+    }
 
-    return ErrNone;
+    tracedr(ret);
+    return ret;
 
 }
 

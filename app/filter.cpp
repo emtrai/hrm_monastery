@@ -98,3 +98,48 @@ QHash<int, QString> getFilterOpsList(int filterField)
     tracede;
     return opsList;
 }
+
+const QString &FilterItem::keyword() const
+{
+    return mKeyword;
+}
+
+void FilterItem::setKeyword(const QString &newKeyword)
+{
+    mKeyword = newKeyword;
+}
+
+const QVariant &FilterItem::value() const
+{
+    return mValue;
+}
+
+void FilterItem::setValue(const QVariant &newValue)
+{
+    mValue = newValue;
+}
+
+FilterItem::FilterItem(const QString &item, const QString &keyword, const QVariant& value)
+{
+    traced;
+    mItem = item;
+    if (!keyword.isEmpty())
+        mKeyword = keyword;
+    else
+        logd("no keyword");
+    if (value.isValid())
+        mValue = value;
+    else
+        logd("no value");
+    tracede;
+}
+
+const QString &FilterItem::item() const
+{
+    return mItem;
+}
+
+void FilterItem::setItem(const QString &newItem)
+{
+    mItem = newItem;
+}

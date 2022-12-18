@@ -31,5 +31,6 @@
         <file>icon/icons8-unit-80.png</file>
         <file>icon/icons8-export-100.png</file>
         <file>icon/icons8-catholic-64.png</file>
+        <file>icon/icons8-back-arrow-64.png</file>
     </qresource>
 </RCC>

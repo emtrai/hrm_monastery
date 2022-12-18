@@ -36,7 +36,25 @@ protected:
     virtual void initHeader();
 protected:
     virtual void importRequested(const QString& fpath);
+    virtual QList<UITableMenuAction*> getMenuCommonActions(const QMenu* menu);
+    /**
+     * @brief Get menu actions list when an item is selected
+     * @param menu
+     * @param item
+     * @return
+     */
+    virtual QList<UITableMenuAction*> getMenuItemActions(const QMenu* menu, UITableWidgetItem* item);
+    /**
+     * @brief get menu action list when multi item is selected
+     * @param menu
+     * @param items
+     * @return
+     */
+    virtual QList<UITableMenuAction*> getMenuMultiItemActions(const QMenu* menu, const QList<UITableItem *>& items);
+
     virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
+    virtual ErrCode onMenuActionImport(QMenu* menu, UITableMenuAction* act);
+    virtual ErrCode onChangeCommunity(QMenu* menu, UITableMenuAction* act);
     virtual void onViewItem(UITableWidgetItem *item);
     virtual void onEditItem(UITableWidgetItem *item);
     virtual QString getTitle();
@@ -46,7 +64,7 @@ protected:
     virtual int onFilter(int catetoryid,
                           const QString& catetory,
                           qint64 opFlags,
-                          const QString& keywords);
+                          const QString& keywords, const QVariant *value);
 
 private:
     void cleanUpItem();

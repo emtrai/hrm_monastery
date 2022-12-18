@@ -14,29 +14,28 @@
  * limitations under the License.
  *
  *
- * Filename: uisaintlistview.h
+ * Filename: baseview.h
  * Author: Anh, Ngo Huy
- * Created date:8/11/2022
+ * Created date:12/17/2022
  * Brief:
  */
-#ifndef UISAINTLISTVIEW_H
-#define UISAINTLISTVIEW_H
+#ifndef BASEVIEW_H
+#define BASEVIEW_H
+#include "errcode.h"
 
-#include "uicommonlistview.h"
-#include "saint.h"
 
-class UISaintListView : public UICommonListView
+typedef std::function<ErrCode(void* data)> ActionFunc_t;
+
+
+class BaseView
 {
 public:
-    explicit UISaintListView(QWidget *parent = nullptr);
-    virtual ~UISaintListView();
+    BaseView();
+    virtual int getViewType() = 0;
+//    virtual ErrCode runAction() = 0;
 protected:
-    virtual ErrCode onLoad();
-    virtual void updateItem(DbModel* item, UITableItem* tblItem);
-    virtual void initHeader();
-
-    virtual int onFilter(int catetoryid, const QString& catetory, qint64 opFlags, const QString& keywords, const QVariant *value);
-
+    ActionFunc_t mShowActionFunc;// action to run when view show
+    bool mShowActionFuncRunOnce; // TODO: support other mode? run once, run on resume, run on pause, etc.???
 };
 
-#endif // UISAINTLISTVIEW_H
+#endif // BASEVIEW_H

@@ -32,6 +32,7 @@
 #include "model/saintperson.h"
 #include "model/specialistperson.h"
 #include "dbctl.h"
+#include "table/dbsqlitepersontbl.h"
 
 GET_INSTANCE_IMPL(DbSqlitePerson)
 
@@ -285,6 +286,36 @@ QList<DbModel *> DbSqlitePerson::getSpecialistList(const QString &personUid)
     logd("found %d", list.count());
     tracede;
     return list;
+}
+
+ErrCode DbSqlitePerson::updateCommunity(const QString &personUid, const QString &communityUid)
+{
+    traced;
+    ErrCode ret = ErrNone;
+    DbSqlitePersonTbl* tbl = (DbSqlitePersonTbl*)DbSqlite::getInstance()->getTable(KTablePerson);
+    if (tbl) {
+        ret = tbl->updateCommunity(personUid, communityUid);
+    } else {
+        loge("invalid DbSqlitePersonTbl");
+        ret = ErrInvalidData;
+    }
+    tracedr(ret);
+    return ret;
+}
+
+QList<DbModel *> DbSqlitePerson::getListPersonInCommunity(const QString &communityUid)
+{
+    traced;
+    int cnt = 0;
+    DbSqlitePersonTbl* tbl = (DbSqlitePersonTbl*)DbSqlite::getInstance()->getTable(KTablePerson);
+    QHash<QString, int> inFields;
+    inFields[KFieldCommunityUid] = TEXT;
+    QList<DbModel*> outList;
+    logd("Search wit community uid %s", STR2CHA(communityUid));
+    cnt = tbl->search(communityUid, inFields, &Person::build, &outList, true);
+    logd("Search community found %d", cnt);
+    tracede;
+    return outList;
 }
 
 

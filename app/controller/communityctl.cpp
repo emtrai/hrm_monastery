@@ -255,3 +255,14 @@ DbModelHandler *CommunityCtl::getModelHandler()
     return DB->getModelHandler(KModelHdlCommunity);
 }
 
+ErrCode CommunityCtl::addPerson(Community* comm, Person *per)
+{
+    traced;
+    ErrCode ret = ErrNone;
+    logd("add person to community");
+    per->dump();
+    ret = addPerson2Community(comm, per);
+    tracedr(ret);
+    return ret;
+}
+

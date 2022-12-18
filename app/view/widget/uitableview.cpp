@@ -256,6 +256,11 @@ QMenu* UITableView::buildPopupMenu(UITableWidgetItem* item, const QList<UITableI
     return mMenu;
 }
 
+/**
+ * @brief Common menu action
+ * @param menu
+ * @return
+ */
 QList<UITableMenuAction *> UITableView::getMenuCommonActions(const QMenu* menu)
 {
     traced;
@@ -295,7 +300,6 @@ QList<UITableMenuAction *> UITableView::getMenuItemActions(const QMenu* menu,
 
 QList<UITableMenuAction *> UITableView::getMenuMultiItemActions(const QMenu *menu, const QList<UITableItem *>& items)
 {
-    traced;
     traced;
     QList<UITableMenuAction*> actionList;
     actionList.append(UITableMenuAction::buildMultiItem(tr("Xoá"), this, &items)
@@ -345,7 +349,7 @@ ErrCode UITableView::onMenuActionReload(QMenu *menu, UITableMenuAction *act)
     tracede;
 }
 
-int UITableView::onFilter(int catetoryid, const QString &catetory, qint64 opFlags, const QString &keywords)
+int UITableView::onFilter(int catetoryid, const QString &catetory, qint64 opFlags, const QString &keywords, const QVariant *value)
 {
     traced;
     logi("DEFAULT filter, should not caller here, DERIVED CLASS implement this");
@@ -355,6 +359,17 @@ int UITableView::onFilter(int catetoryid, const QString &catetory, qint64 opFlag
     logd("keywords %s", keywords.toStdString().c_str());
     tracede;
     return -1;
+}
+
+ErrCode UITableView::setFilter(const QString &item, const QString &keywords, const QVariant *value)
+{
+    traced;
+    ErrCode err = ErrNotSupport;
+    loge("WARNING, filter not supported default one, MUST BE CALLED BY DERIVED CLASS");
+    // TODO: should popup, crash app, to notice developer????
+    // just print log silently here may be forgotten
+    tracede;
+    return err;
 }
 
 QHash<int, QString> UITableView::getFilterFields()
@@ -408,6 +423,7 @@ void UITableView::clearFilter()
 {
     traced;
     ui->cbKeyword->clearEditText();
+    mFilterList.clear(); // TODO: if clear here, so, how "back" function work????
     tracede;
 }
 
@@ -428,6 +444,32 @@ QHash<QString, QString> UITableView::getFilterKeywords(int fieldId, const QStrin
     traced;
     logi("Default one, nothing to do");
     return QHash<QString, QString>();
+}
+
+ErrCode UITableView::addFilter(const QString &filterItem, const QString &keyword, const QVariant &value)
+{
+    traced;
+    ErrCode err = ErrNone;
+    // TODO: check duplicate???
+    FilterItem* item = nullptr;
+    logd("Add filter for item %s", STR2CHA(filterItem));
+    if (!filterItem.isEmpty()) {
+        logd("keyword %s", STR2CHA(keyword));
+        item = new FilterItem(filterItem, keyword, value);
+        // TODO: check keyword or value exist???
+
+        if (item) {
+            mFilterList.append(item);
+        } else {
+            err = ErrNoMemory;
+            loge("no memory for new filter");
+        }
+    } else {
+        err = ErrInvalidArg;
+        loge("no data/info for filter");
+    }
+    tracedr(err);
+    return err;
 }
 
 qint32 UITableView::itemPerPage() const
@@ -593,12 +635,17 @@ void UITableView::on_btnFilter_clicked()
     traced;
     int categoryId = -1;
     int opFlags = -1;
+    bool isOk = false;
     QString categoryTxt = ui->cbCategory->currentText().trimmed();
     GET_VAL_INT_FROM_CB(ui->cbCategory, categoryId);
     GET_VAL_INT_FROM_CB(ui->cbSearchOp, opFlags);
     QString keyword = ui->cbKeyword->currentText().trimmed();
+    QString value = Utils::getCurrentComboxDataString(ui->cbKeyword, &isOk);
+    QVariant val;
+    if (isOk) val.setValue(value);
+    // TODO: val is local variable, is it safe? in case onFilter is called on thread context
     logd("call on filter id %d, opFlags %d, keyword %s", categoryId, opFlags, keyword.toStdString().c_str());
-    int ret = onFilter(categoryId, categoryTxt, opFlags, keyword);
+    int ret = onFilter(categoryId, categoryTxt, opFlags, keyword, isOk?&val:nullptr);
     logd("onFilter result %d", ret);
     if (ret >= 0) {
         refesh();
@@ -675,6 +722,28 @@ UITableMenuAction *UITableMenuAction::buildSeparateAction()
     act->setMenuType(MENU_ACTION_SEPARATE);
     tracede;
     return act;
+}
+
+const QList<UITableItem *> &UITableMenuAction::itemList() const
+{
+    return mItemList;
+}
+
+int UITableMenuAction::itemListData(QList<DbModel *>&outList)
+{
+    traced;
+    if (mItemList.count() > 0) {
+        logd("selected %d items", mItemList.count());
+        foreach (UITableItem* item, mItemList) {
+            if (item->data() != nullptr) {
+                outList.append(item->data());
+            }
+        }
+    } else {
+        logi("no selected item for menu");
+    }
+    tracedr(outList.count());
+    return outList.count();
 }
 
 const std::function<ErrCode (QMenu *, UITableMenuAction *)> &UITableMenuAction::callback() const

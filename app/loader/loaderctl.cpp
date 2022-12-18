@@ -66,10 +66,16 @@ void LoaderCtl::add2Loader( Controller* ctl)
     mListCtl.append(ctl);
 }
 
+void LoaderCtl::add2PreLoader(Controller *ctl)
+{
+    traced;
+    mPreLoadListCtl.append(ctl);
+}
+
 void LoaderCtl::registerAll()
 {
     traced;
-    add2Loader(DbCtl::getInstance());
+    add2PreLoader(DbCtl::getInstance());
     add2Loader(Location::getInstance());
     add2Loader(SAINTCTL);
     add2Loader(EduCtl::getInstance());
@@ -92,18 +98,34 @@ void LoaderCtl::registerAll()
     add2Loader(RoleCtl::getInstance());
 }
 
-void LoaderCtl::onLoad()
+void LoaderCtl::runLoader(QList<Controller *> &list)
 {
     traced;
-    foreach(  Controller* ctl, mListCtl ) {
+    foreach(  Controller* ctl, list ) {
         if (mListener != nullptr){
             mListener->onLoadController(ctl);
         }
+        logd("load '%s'", ctl->getName().toStdString().c_str());
         ctl->onLoad();
     }
     // TODO: call on separate thread?
     // TODO: timeout???
 
+    tracede;
+}
+
+void LoaderCtl::preLoad()
+{
+    traced;
+    runLoader(mPreLoadListCtl);
+    tracede;
+}
+
+void LoaderCtl::onLoad()
+{
+    traced;
+    runLoader(mListCtl);
+    tracede;
 }
 
 void LoaderCtl::setOnFinishLoadListener(LoaderListener* listener, void* data){

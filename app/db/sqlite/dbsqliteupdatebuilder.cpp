@@ -91,6 +91,7 @@ QSqlQuery *DbSqliteUpdateBuilder::buildSqlQuery(const QString *cond)
 
     (void)cond;
     // TODO: condition?
+    // TODO: type int vs string? if string, should put into ''?
     QString queryString = QStringLiteral(
                               "UPDATE %1 SET %2 WHERE %3")
                               .arg(mName, values, conds);

@@ -48,10 +48,12 @@ public:
 
     virtual uint32_t versionCode() const;
     virtual void setVersionCode(uint32_t newVersionCode);
+    virtual int getDataType(const QString& field);
 
     virtual ErrCode add(DbModel* item);
     virtual ErrCode update(DbModel* item);
     virtual ErrCode updateUid(const DbModel* item, const QString& uid);
+    virtual ErrCode update(const QString& uid, const QHash<QString, QString>& fieldValues);
 
     virtual bool isExist(const DbModel* item);
     virtual QHash<QString, QString> getFieldsCheckExists(const DbModel* item);
@@ -124,6 +126,7 @@ protected:
     virtual QString getFilterQueryString(int fieldId, const QString& cond = nullptr);
     virtual QSqlQuery *getAllQuery();
     virtual QString getAllQueryString();
+    virtual DbModelBuilder mainModelBuilder();
 public:
 
     virtual DbSqlite *db() const;
@@ -133,6 +136,7 @@ protected: // allow derived class can get info
     QString mName;
     uint32_t mVersionCode;
     DbSqlite* mDb;
+    QHash<QString, int> mFieldDataTypeMap;
 };
 
 #endif // DBSQLITETBL_H

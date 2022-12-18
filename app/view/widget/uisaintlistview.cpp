@@ -72,7 +72,7 @@ void UISaintListView::initHeader()
     mHeader.append(tr("Ghi chú"));
 }
 
-int UISaintListView::onFilter(int catetoryid, const QString &catetory, qint64 opFlags, const QString &keywords)
+int UISaintListView::onFilter(int catetoryid, const QString &catetory, qint64 opFlags, const QString &keywords, const QVariant *value)
 {
     traced;
     QList<DbModel*> list;

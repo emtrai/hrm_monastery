@@ -158,6 +158,17 @@ do { \
 
 #define UNUSED(param) (void)param
 
+#define STR2CHA(val) val.toStdString().c_str()
+
+// TODO: re-implement this one!!!!!
+#define ASSERT(cond, msg) \
+        do { \
+            if (!(cond)) { \
+                loge("FATAL ERROR! %s", msg); \
+                qFatal(msg); \
+            } \
+        } while(0)
+
 typedef ErrCode (*func_one_csv_item_t)(const QStringList& items, void* caller, void* param);
 typedef ErrCode (*func_one_csv_item_complete_t)(const QHash<QString, QString>& items, void* caller, void* param);
 typedef ErrCode (*func_one_csv_field_t)(const QString& key, const QString& value, void* caller, void* param);

@@ -38,6 +38,12 @@ public:
                                                 const QString* eventUid = nullptr,
                                                 qint64 date = 0) = 0;
     virtual QList<DbModel*> getSpecialistList(const QString& personUid) = 0;
+    virtual ErrCode updateCommunity(const QString& personUid, const QString& communityUid) = 0;
+
+    // TODO: mapping community & person stored in person tbl and community&person mapping table
+    // risk of inconsistant data
+    // this function will try to get list of person in community using data (communityuid) in person table
+    virtual QList<DbModel*> getListPersonInCommunity(const QString& communityUid) = 0;
 };
 
 #endif // DBPERSONMODELHANDLER_H

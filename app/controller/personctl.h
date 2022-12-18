@@ -41,6 +41,7 @@ public:
     ErrCode addPerson (const QString& fname);
     ErrCode AddListPersons(const QString& fname);
     QList<DbModel*> getAllPerson();
+    QList<DbModel*> getPersonInCommunity(const QString& communityUid);
     QList<DbModel*> getListEvent(const Person* person); // TODO: should move to separate event controller?
 
     virtual DbModel* doImportOneItem(int importFileType, const QStringList& items, quint32 idx);

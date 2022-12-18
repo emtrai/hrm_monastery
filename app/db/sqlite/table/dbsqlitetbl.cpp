@@ -42,6 +42,9 @@ DbSqliteTbl::~DbSqliteTbl(){
 DbSqliteTbl::DbSqliteTbl(DbSqlite* db)
 {
     mDb = db;
+    mFieldDataTypeMap[KFieldId] = INT64;
+    mFieldDataTypeMap[KFieldUid] = TEXT;
+    mFieldDataTypeMap[KFieldName] = TEXT;
 }
 
 DbSqliteTbl::DbSqliteTbl(DbSqlite* db, const QString& baseName, const QString& name, qint32 versionCode)
@@ -80,6 +83,20 @@ uint32_t DbSqliteTbl::versionCode() const
 void DbSqliteTbl::setVersionCode(uint32_t newVersionCode)
 {
     mVersionCode = newVersionCode;
+}
+
+int DbSqliteTbl::getDataType(const QString &field)
+{
+    int ret = -1;
+    traced;
+    logd("get data type for field %s", STR2CHA(field));
+    if (this->mFieldDataTypeMap.contains(field)){
+        ret = mFieldDataTypeMap.value(field);
+    } else {
+        loge("field '%s' not exist", STR2CHA(field));
+    }
+    tracedr(ret);
+    return ret;
 }
 
 ErrCode_t DbSqliteTbl::add(DbModel *item)
@@ -222,6 +239,50 @@ ErrCode DbSqliteTbl::updateUid(const DbModel *item, const QString &uid)
     // TODO:implement it
     tracedr(ret);
     return ret;
+}
+
+ErrCode DbSqliteTbl::update(const QString &uid, const QHash<QString, QString>& fieldValues)
+{
+    traced;
+    ErrCode_t err = ErrNone;
+    DbSqliteUpdateBuilder* updateBuilder = nullptr;
+    QSqlQuery* updateQry = nullptr;
+    QList<QString> updatedFields = fieldValues.keys();
+    if (updatedFields.count() > 0){
+        logd("build update builder");
+        // TODO: check to make sure that uid does not exist?????
+        updateBuilder = DbSqliteUpdateBuilder::build(name());
+        updateBuilder->addCond(KFieldUid, uid);
+        // TODO: data type? (int vs string, different representation)
+        foreach (QString field, updatedFields) {
+            logd("Update field %s", field.toStdString().c_str());
+            updateBuilder->addValue(field, fieldValues[field]);
+        }
+
+        if (err == ErrNone){
+            logd("Build SQL Query and execute");
+            updateBuilder->addValue(KFieldLastUpdateItme, Utils::currentTimeMs());
+            updateQry = updateBuilder->buildSqlQuery();
+            err = db()->execQuery(updateQry);
+            logd("execQuery err %d", err);
+        } else {
+            loge("Faild to update table field %d", err);
+        }
+    } else {
+        loge("Nothing to update");
+    }
+
+
+    if (updateBuilder) {
+        delete updateBuilder;
+        updateBuilder = nullptr;
+    }
+    if (updateQry) {
+        delete updateQry;
+        updateQry = nullptr;
+    }
+    tracedr(err);
+    return err;
 }
 
 bool DbSqliteTbl::isExist(const DbModel *item)
@@ -432,6 +493,11 @@ QString DbSqliteTbl::getAllQueryString()
     return getSearchQueryString();
 }
 
+DbModelBuilder DbSqliteTbl::mainModelBuilder()
+{
+    return nullptr;
+}
+
 
 
 QList<DbModel *> DbSqliteTbl::getAll(const DbModelBuilder& builder)
@@ -597,15 +663,22 @@ DbModel *DbSqliteTbl::getByUid(const QString &uid, const DbModelBuilder &builder
 int DbSqliteTbl::search(const QString &keyword, QList<DbModel *> *outList)
 {
     traced;
-    logi("Default search one, DO NOTHING, derived class must implement this");
-    return 0;
+    int ret = 0;
+    DbModelBuilder builder = mainModelBuilder();
+    if (builder != nullptr) {
+        ret = search(keyword, builder, outList);
+    } else {
+        logi("No buider, Default search one, DO NOTHING, derived class must implement this or implement mainModelBuilder");
+        ret = 0;
+    }
+    return ret;
 }
 
 QHash<QString, int> DbSqliteTbl::getSearchFields()
 {
     traced;
     QHash<QString, int> list;
-    list[KFieldName] = TEXT; // TODO: make as class member?
+    list[COLUMN_NAME(name(), KFieldName)] = TEXT; // TODO: make as class member?
     return list;
 }
 

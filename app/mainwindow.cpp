@@ -67,9 +67,16 @@ MainWindow::MainWindow(QWidget *parent)
     , mRoleView(nullptr)
     , mCurrentView(nullptr)
     , mWaitDlg(nullptr)
+    , mAppState(APP_STATE_NOT_READY)
 {
+    mAppState = APP_STATE_INITING;
     gInstance = this;
     ui->setupUi(this);
+
+    LOADERCTL->setOnFinishLoadListener(this, this);
+    LOADERCTL->preLoad();
+    // TODO: sync data?
+    // TODO: register data sync account? (i.e sync/backup to google account
 
     // TODO: separted software into multiple parts/components???
     // App for main GUI
@@ -121,8 +128,6 @@ MainWindow::MainWindow(QWidget *parent)
     Config::init();
 
     logd("connect");
-    LoaderCtl* loader = LoaderCtl::getInstance();
-    loader->setOnFinishLoadListener(this, this);
 //    QObject::connect(this, SIGNAL(load()), loader, SLOT(onLoad()));
     QObject::connect(this, SIGNAL(load()), this, SLOT(onLoad()));
 }
@@ -133,8 +138,9 @@ void MainWindow::showEvent(QShowEvent *ev)
     QMainWindow::showEvent(ev);
     logd("On load");
 
-    logd("emit load");
-    emit load();
+    logd("emit load, curr state %d", appState());
+    if (appState() == APP_STATE_INITING)
+        emit load();
 }
 
 MainWindow::~MainWindow()
@@ -142,15 +148,19 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::onFinishLoading(int ret, void* data){
-    traced;
-
-}
 
 void MainWindow::showAddEditPerson(bool isSelfUpdate, Person *per)
 {
     traced;
     getInstance()->doShowAddEditPerson(isSelfUpdate, per);
+    tracede;
+}
+
+void MainWindow::showImportDlg()
+{
+    traced;
+    getInstance()->doShowImportPerson();
+    tracede;
 }
 
 void MainWindow::switchView(ViewType type)
@@ -205,6 +215,9 @@ QWidget *MainWindow::getView(ViewType type)
     case ViewType::VIEW_DEPARTMENT:
         nextView = mDepartView;
         break;
+    case ViewType::PERSON:
+        nextView = mPersonView;
+        break;
     default:
         loge("Unknown type %d", type);
         break;
@@ -232,6 +245,32 @@ void MainWindow::doShowAddEditPerson(bool isSelfUpdate, Person *per)
     dlg->setIsSelfSave(isSelfUpdate);
     dlg->exec();
     delete dlg;
+    tracede;
+}
+
+void MainWindow::doShowImportPerson()
+{
+    traced;
+    ErrCode err = ErrNone;
+    // TODO: show dialog to select which type of file to be imported???
+    QString fname = QFileDialog::getOpenFileName(
+        this,
+        tr("Open file"),
+        FileCtl::getAppDataDir(),
+        tr("CSV Files (*.csv);;Excel (*.xls *.xlsx)"));
+    // TODO: this is duplicate code, make it common please
+    if (!fname.isEmpty()){
+        logd("File %s is selected", fname.toStdString().c_str());
+        QList<DbModel*> list;
+        logd("Import from file %s", fname.toStdString().c_str());
+        ErrCode ret = INSTANCE(PersonCtl)->importFromFile(nullptr, ImportType::IMPORT_CSV, fname, &list);
+        logd("Import result %d", ret);
+        logd("No of import item %d", list.count());
+        DlgImportPersonListResult* dlg = new DlgImportPersonListResult();
+        dlg->setup(list);
+        dlg->exec();
+        delete dlg;
+    }
     tracede;
 }
 
@@ -442,9 +481,21 @@ void MainWindow::loadExportMenu()
 
 }
 
+AppState MainWindow::appState() const
+{
+    return mAppState;
+}
+
+void MainWindow::setAppState(AppState newAppState)
+{
+    logd("set app state %d --> %d", mAppState, newAppState);
+    mAppState = newAppState;
+}
+
 void MainWindow::onLoad()
 {
     traced;
+    mAppState = APP_STATE_LOADING;
     if (!mWaitDlg)
         mWaitDlg = new DlgWait(this);
     mWaitDlg->setMessage("Loadding");
@@ -459,34 +510,20 @@ void MainWindow::onLoad()
         [this](ErrCode err, void* data, void* result, DlgWait* dlg) {
             logd("Finished, close wait dlg");
             dlg->forceClose();
+            this->setAppState(APP_STATE_READY);
             return ErrNone;
         }
         );
+//    LoaderCtl::getInstance()->onLoad();
+//    this->setAppState(APP_STATE_READY);
     tracede;
 }
 
 void MainWindow::on_action_ImportPerson_triggered()
 {
     traced;
-    // TODO: show dialog to select which type of file to be imported???
-    QString fname = QFileDialog::getOpenFileName(
-        this,
-        tr("Open file"),
-        FileCtl::getAppDataDir(),
-        tr("CSV Files (*.csv);;Excel (*.xls *.xlsx)"));
-    // TODO: this is duplicate code, make it common please
-    if (!fname.isEmpty()){
-        logd("File %s is selected", fname.toStdString().c_str());
-        QList<DbModel*> list;
-        logd("Import from file %s", fname.toStdString().c_str());
-        ErrCode ret = INSTANCE(PersonCtl)->importFromFile(nullptr, ImportType::IMPORT_CSV, fname, &list);
-        logd("Import result %d", ret);
-        logd("No of import item %d", list.count());
-        DlgImportPersonListResult* dlg = new DlgImportPersonListResult();
-        dlg->setup(list);
-        dlg->exec();
-        delete dlg;
-    }
+    doShowImportPerson();
+    tracede;
 }
 
 void MainWindow::on_action_ImportPersonList_triggered()
@@ -739,5 +776,12 @@ void MainWindow::on_actionCountry_triggered()
     traced;
     UNDER_DEV(tr("Quốc gia"));
     // TODO: implement it
+}
+
+
+void MainWindow::on_actionBack_triggered()
+{
+    traced;
+    UNDER_DEV(tr("Quay lại màn hình trước"));
 }
 

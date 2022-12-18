@@ -14,29 +14,36 @@
  * limitations under the License.
  *
  *
- * Filename: uisaintlistview.h
+ * Filename: dlgsearchcommunity.h
  * Author: Anh, Ngo Huy
- * Created date:8/11/2022
+ * Created date:12/12/2022
  * Brief:
  */
-#ifndef UISAINTLISTVIEW_H
-#define UISAINTLISTVIEW_H
+#ifndef DLGSEARCHCOMMUNITY_H
+#define DLGSEARCHCOMMUNITY_H
 
-#include "uicommonlistview.h"
-#include "saint.h"
+#include "dlgsearch.h"
 
-class UISaintListView : public UICommonListView
+class DbModel;
+
+class DlgSearchCommunity : public DlgSearch
 {
 public:
-    explicit UISaintListView(QWidget *parent = nullptr);
-    virtual ~UISaintListView();
+    ~DlgSearchCommunity();
+    static DlgSearchCommunity* build(QWidget *parent = nullptr, bool isMulti = false);
 protected:
-    virtual ErrCode onLoad();
-    virtual void updateItem(DbModel* item, UITableItem* tblItem);
-    virtual void initHeader();
+    DlgSearchCommunity(QWidget *parent = nullptr, bool isMulti = false);
 
-    virtual int onFilter(int catetoryid, const QString& catetory, qint64 opFlags, const QString& keywords, const QVariant *value);
+protected:
 
+    virtual QString getTitle();
+
+    virtual int onSearch(const QString& keyword);
+    virtual int onGetAll();
+    virtual void clearAll();
+    virtual DbModel* getItemAtIdx(int idx);
+private:
+    QList<DbModel*> mListItems;
 };
 
-#endif // UISAINTLISTVIEW_H
+#endif // DLGSEARCHCOMMUNITY_H

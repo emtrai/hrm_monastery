@@ -79,4 +79,5 @@ IDatabase* DbCtl::getDb(){
 void DbCtl::onLoad(){
     traced;
     mDatabase->loadDb(dbInfo);
+    tracede;
 }

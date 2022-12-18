@@ -63,6 +63,7 @@ public:
     virtual DbModelHandler* getModelHandler(const QString& name);
 
     static DbSqliteTbl* table(const QString& tblName);
+    static DbModelHandler* handler(const QString& name);
 private:
 
     DbSqlite();

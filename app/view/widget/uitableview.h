@@ -27,6 +27,7 @@
 #include <QTableWidgetItem>
 #include <QAction>
 #include "errcode.h"
+#include "filter.h"
 
 class UITableItem;
 class QMenu;
@@ -118,6 +119,9 @@ public:
                                              qint32 idx = 0);
 
     static UITableMenuAction* buildSeparateAction();
+    const QList<UITableItem *> &itemList() const;
+    int itemListData(QList<DbModel *>&outList);
+
 private:
     UITableWidgetItem* mTblItem;
     QList<UITableItem*> mItemList;
@@ -155,6 +159,16 @@ public:
 
     QMenu *menu() const;
 
+
+    /**
+     * @brief Add filters
+     * @param filterItem filter item, such as KItemCommunity, etc.
+     * @param keyword keyword for search, search with concept of "contain"
+     * @param value value of search, search exact, normally it's uid.
+     * @return
+     */
+    virtual ErrCode addFilter(const QString& filterItem, const QString& keyword, const QVariant& value);
+
 protected:
     virtual QString getTitle();
     virtual QStringList getHeader();
@@ -176,8 +190,25 @@ protected:
 
     // MENU
     virtual QMenu* buildPopupMenu(UITableWidgetItem* item, const QList<UITableItem*>& items);
+    /**
+     * @brief Common menu action, always show
+     * @param menu
+     * @return list of menu action
+     */
     virtual QList<UITableMenuAction*> getMenuCommonActions(const QMenu* menu);
+    /**
+     * @brief Get menu actions list when an item is selected
+     * @param menu
+     * @param item
+     * @return
+     */
     virtual QList<UITableMenuAction*> getMenuItemActions(const QMenu* menu, UITableWidgetItem* item);
+    /**
+     * @brief get menu action list when multi item is selected
+     * @param menu
+     * @param items
+     * @return
+     */
     virtual QList<UITableMenuAction*> getMenuMultiItemActions(const QMenu* menu, const QList<UITableItem *>& items);
 //    virtual ErrCode onMenuActionTrigger(QMenu* menu, UITableMenuAction*);
     virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
@@ -194,8 +225,8 @@ protected:
      * @param keywords
      * @return >= 0: the number of items, < 0: error
      */
-    virtual int onFilter(int catetoryid, const QString& catetory, qint64 opFlags, const QString& keywords);
-
+    virtual int onFilter(int catetoryid, const QString& catetory, qint64 opFlags, const QString& keywords, const QVariant *value);
+    virtual ErrCode setFilter(const QString& item, const QString& keywords, const QVariant *value);
 
     virtual QHash<int, QString> getFilterFields();
     virtual void appendFilterField(int id, const QString& txt);
@@ -217,6 +248,7 @@ protected:
      * @return Hash map, with uid and text
      */
     virtual QHash<QString, QString> getFilterKeywords(int fieldId, const QString& fieldText);
+
 
 private slots:
     void on_btnImport_clicked();
@@ -240,6 +272,9 @@ protected:
     quint32 mTotalPages;
     QMenu* mMenu;
     QHash<int, QString> mFilterFields;
+    QList<FilterItem*> mFilterList; // filters, OR condition?
+    // TODO: should be OR or AND condition? can select???
+
 };
 
 #endif // UITABLEVIEW_H

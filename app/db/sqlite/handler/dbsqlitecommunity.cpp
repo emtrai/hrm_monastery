@@ -29,6 +29,8 @@
 #include "model/communityperson.h"
 #include "person.h"
 #include "community.h"
+#include "handler/dbsqliteperson.h"
+#include "dbpersonmodelhandler.h"
 
 DbSqliteCommunity* DbSqliteCommunity::gInstance = nullptr;
 
@@ -78,6 +80,9 @@ const QString DbSqliteCommunity::getName()
 QList<DbModel *> DbSqliteCommunity::getListPerson(const QString &uid)
 {
     traced;
+    // Get from commumity&person mapping table, how about community uid info in person tble??
+    // TODO: need to sync information with communityuid on person table
+    // RISK OF INCONSITANT!!!!!!!
     DbSqliteCommunityPersonTbl* tbl = (DbSqliteCommunityPersonTbl*)DbSqlite::getInstance()
                                           ->getTable(KTableCommPerson);
     return tbl->getListPerson(uid);
@@ -91,7 +96,20 @@ ErrCode DbSqliteCommunity::addPerson2Community(const Community *comm, const Pers
 //                                          ->getTable(KTableCommPerson);
     logd("Build map object");
 //    CommunityPerson* model = new CommunityPerson();
-    SAVE_MAP_MODEL(CommunityPerson, comm, per, status, startdate, enddate, remark);
+    // TODO: err on macro SAVE_MAP_MODEL
+    DbPersonModelHandler* hdl = dynamic_cast<DbPersonModelHandler*>(DbSqlite::handler(KModelHdlPerson));
+    if (hdl) {
+        logd("update community uid of each person first");
+        err = hdl->updateCommunity(per->uid(), comm->uid());
+    } else {
+        err = ErrInvalidData;
+        loge("not found handler %s", KModelHdlPerson);
+    }
+    if (err == ErrNone) {
+        logd("Save mapping community and person");
+        // TODO: update status of old one?
+        SAVE_MAP_MODEL(CommunityPerson, comm, per, status, startdate, enddate, remark);
+    }
 //    model->setDbId1(comm->dbId());
 //    model->setUid1(comm->uid());
 //    model->setDbId2(per->dbId());

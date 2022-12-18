@@ -76,6 +76,16 @@ QList<DbModel *> PersonCtl::getAllPerson()
     return modelHdl()->getAll(&Person::build, KModelNamePerson);
 }
 
+QList<DbModel *> PersonCtl::getPersonInCommunity(const QString &communityUid)
+{
+    traced;
+    logd("get person in community uid %s", STR2CHA(communityUid));
+    QList<DbModel*> list = modelHdl()->getListPersonInCommunity(communityUid);
+    logd("found %d item", list.count());
+    tracede;
+    return list;
+}
+
 QList<DbModel *> PersonCtl::getListEvent(const Person* person)
 {
     traced;

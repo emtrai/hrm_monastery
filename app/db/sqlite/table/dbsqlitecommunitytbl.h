@@ -43,6 +43,8 @@ protected:
     virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
     virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
     virtual QString getSearchQueryString(const QString& cond = nullptr);
+
+    virtual DbModelBuilder mainModelBuilder();
 private:
     static const qint32 KVersionCode;
 };

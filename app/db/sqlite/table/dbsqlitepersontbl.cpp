@@ -33,7 +33,7 @@
 #include <QSqlQuery>
 
 #include "filter.h"
-
+#include "utils.h"
 
 const qint32 DbSqlitePersonTbl::KVersionCode = VERSION_CODE(0,0,1);
 
@@ -306,6 +306,7 @@ void DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry
     cmm->setOtherContact(qry.value(KFieldContact).toString());
 
     cmm->setCommunityUid(qry.value(KFieldCommunityUid).toString());
+    cmm->setCommunityName(qry.value(KFieldCommunityName).toString());
     cmm->setDepartUid(qry.value(KFieldDepartmentUid).toString());
     cmm->setAreaUid(qry.value(KFieldAreaUid).toString());
     // TODO: search and set name
@@ -385,6 +386,8 @@ ErrCode DbSqlitePersonTbl::updateTableField(DbSqliteUpdateBuilder *builder,
         if (field == KItemFullName) {
             builder->addValue(KFieldFirstName, per->firstName());
             builder->addValue(KFieldLastName, per->lastName());
+        } else if (field == KItemCommunity) {
+            builder->addValue(KFieldCommunityUid, per->communityUid());
         }
     }
     tracedr(err);
@@ -417,11 +420,11 @@ QList<QString> DbSqlitePersonTbl::getNameFields()
 QString DbSqlitePersonTbl::getSearchQueryString(const QString &cond)
 {
     traced;
-    QString queryString = QString("SELECT *, (%2 || ' ' || %3) AS %4 FROM %1 " \
+    QString queryString = QString("SELECT *, (%2 || ' ' || %3) AS %4, %5.%8 AS %9 FROM %1 " \
                                   " LEFT JOIN %5 ON %1.%6 = %5.%7 ")
                               .arg(name())
                               .arg(KFieldLastName, KFieldFirstName, KFieldFullName)
-                              .arg(KTableCommunity, KFieldCommunityUid, KFieldUid)
+                              .arg(KTableCommunity, KFieldCommunityUid, KFieldUid, KFieldName, KFieldCommunityName)
                                 ;
 
     if (!cond.isEmpty()) {
@@ -457,6 +460,18 @@ QString DbSqlitePersonTbl::getFilterQueryString(int fieldId, const QString &cond
     }
     logd("queryString: %s", queryString.toStdString().c_str());
     return queryString;
+}
+
+ErrCode DbSqlitePersonTbl::updateCommunity(const QString &uid, const QString &communityUid)
+{
+    traced;
+    ErrCode ret = ErrNone;
+    logd("update community for person, uid '%s', community uid '%s'", STR2CHA(uid), STR2CHA(communityUid));
+    QHash<QString, QString> fields;
+    fields[KFieldCommunityUid] = communityUid;
+    ret = this->update(uid, fields);
+    tracedr(ret);
+    return ret;
 }
 
 QHash<QString, QString> DbSqlitePersonTbl::getFieldsCheckExists(const DbModel *item)
