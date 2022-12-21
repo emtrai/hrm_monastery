@@ -79,6 +79,9 @@ public:
     virtual QString modelName() const;
     virtual int modelType() const;
 
+    const QString &changeHistory() const;
+    void setChangeHistory(const QString &newChangeHistory);
+
 protected:
     QString mUid1;
     qint64 mDbId1;
@@ -89,6 +92,7 @@ protected:
     qint32 mStatus;
     QString mRemark;
     QString mParentUid;
+    QString mChangeHistory;
 };
 
 #endif // MAPDBMODEL_H

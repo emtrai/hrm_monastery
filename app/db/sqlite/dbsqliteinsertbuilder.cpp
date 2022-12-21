@@ -22,7 +22,8 @@
 #include "dbsqliteinsertbuilder.h"
 #include "logger.h"
 #include "errcode.h"
-
+#include "dbctl.h"
+#include "dbsqlite.h"
 class TableInsertItem {
 public:
     TableInsertItem(const QString& name);
@@ -195,7 +196,8 @@ QSqlQuery* DbSqliteInsertBuilder::buildSqlQuery(const QString *cond)
     QString queryString = QStringLiteral(
                "INSERT INTO %1(%2) VALUES(%3)")
         .arg(mName, fields, values);
-    QSqlQuery* qry = new QSqlQuery();
+//    DB->openDb();
+    QSqlQuery* qry = new QSqlQuery(SQLITE->currentDb());
     qry->prepare(queryString);
     logd("Query String '%s'", queryString.toStdString().c_str());
     foreach( TableInsertItem* item, mFields )

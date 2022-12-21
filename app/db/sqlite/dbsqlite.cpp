@@ -25,6 +25,7 @@
 #include <QSqlDriver>
 #include <QSqlError>
 #include <QSqlQuery>
+#include <QThreadStorage>
 
 #include <QSqlDatabase>
 #include "dbsqlitetablebuilder.h"
@@ -75,7 +76,36 @@
 
 static const QString DRIVER("QSQLITE");
 
+// TODO: enhance performance of db access via refer to https://lnj.gitlab.io/post/multithreaded-databases-with-qtsql/
+
 DbSqlite* DbSqlite::gInstance = nullptr;
+QThreadStorage<DatabaseConnection *> DbSqlite::mDatabaseConnections;
+
+// ref: https://lnj.gitlab.io/post/multithreaded-databases-with-qtsql/
+DatabaseConnection::DatabaseConnection(QString uri)
+    //        : mName(QString::number(QRandomGenerator::global()->generate(), 36))
+    : mName(QString::number((quintptr)QThread::currentThreadId()))
+{
+    traced;
+    auto database = QSqlDatabase::addDatabase(DRIVER, mName);
+    logd("create db connection name=%s, uri=%s", STR2CHA(mName), STR2CHA(uri));
+    database.setDatabaseName(uri);
+    database.open();
+    tracede;
+}
+
+DatabaseConnection::~DatabaseConnection()
+{
+    logd("remote db connection %s", STR2CHA(mName));
+    QSqlDatabase::removeDatabase(mName);
+}
+
+QSqlDatabase DatabaseConnection::database()
+{
+    logd("db connection name=%s", STR2CHA(mName));
+    return QSqlDatabase::database(mName);
+}
+
 
 DbSqlite::DbSqlite()
 {
@@ -165,7 +195,19 @@ ErrCode_t DbSqlite::checkOrCreateAllTables()
 {
     traced;
     ErrCode_t err = ErrCode_t::ErrNone;
-
+//    err = openDb();
+//    if (err == ErrNone) {
+//        foreach (QString key, mListTbl.keys())
+//        {
+//            logd("check & create table '%s'", key.toStdString().c_str());
+//            err = mListTbl[key]->checkOrCreateTable();
+//            if (err != ErrNone) // TODO: should break? return critical error????
+//                break;
+//        }
+//        closeDb();
+//    } else {
+//        loge("Failed to open db for create table");
+//    }
     foreach (QString key, mListTbl.keys())
     {
         logd("check & create table '%s'", key.toStdString().c_str());
@@ -173,7 +215,6 @@ ErrCode_t DbSqlite::checkOrCreateAllTables()
         if (err != ErrNone) // TODO: should break? return critical error????
             break;
     }
-
     tracedr(err);
     return err;
 }
@@ -256,6 +297,49 @@ DbModelHandler *DbSqlite::handler(const QString &name)
     return DbSqlite::getInstance()->getModelHandler(name);
 }
 
+ErrCode DbSqlite::openDb()
+{
+    traced;
+    ErrCode err = ErrNone;
+    if (mCurrentDb.isOpen()) {
+        logd("close existing db");
+        mCurrentDb.close();
+    }
+    mCurrentDb = getDbConnection();
+    // TODO: re-implement this, race condition???
+    traced;
+    return err;
+}
+
+void DbSqlite::closeDb()
+{
+    traced;
+    if (mCurrentDb.isValid() && mCurrentDb.isOpen()) {
+        logd("close Db");
+        mCurrentDb.close();
+    } else {
+        logd("Db not open");
+    }
+    tracede;
+}
+
+QSqlDatabase DbSqlite::currentDb()
+{
+    traced;
+    if (!mDatabaseConnections.hasLocalData()) {
+        logd("db connection not exist, create new one");
+        mDatabaseConnections.setLocalData(new DatabaseConnection(mDbUri));
+    } else {
+        logd("db connection already exist, use existing one");
+    }
+    return mDatabaseConnections.localData()->database();
+}
+
+QSqlQuery DbSqlite::createQuery()
+{
+    return QSqlQuery(currentDb());
+}
+
 
 DbSqlite* DbSqlite::getInstance(){
     if (gInstance == nullptr){
@@ -272,28 +356,29 @@ ErrCode_t DbSqlite::loadDb(const DbInfo* dbInfo){
 
         if(QSqlDatabase::isDriverAvailable(DRIVER))
         {
-            mDb = QSqlDatabase::addDatabase(DRIVER);
-            QString uri;
+//            mDb = QSqlDatabase::addDatabase(DRIVER);
+//            QString uri;
             if (dbInfo->uri().isNull())
-                uri = ":memory:";
+                mDbUri = ":memory:";
             else
-                uri = dbInfo->uri();
+                mDbUri = dbInfo->uri();
 
-            logd("Db connect to uri %s", uri.toStdString().c_str());
+            logd("Db connect to uri %s", mDbUri.toStdString().c_str());
 
-            mDb.setDatabaseName(uri);
+//            mDb.setDatabaseName(mDbUri);
+            mDb = currentDb();
             logd("Feature LastInsertId %d", mDb.driver()->hasFeature(QSqlDriver::LastInsertId));
             logd("Feature Transactions %d", mDb.driver()->hasFeature(QSqlDriver::Transactions));
             logd("Feature PreparedQueries %d", mDb.driver()->hasFeature(QSqlDriver::PreparedQueries));
 
-            if(!mDb.open()){
-                loge("Database connect ERROR %s", mDb.lastError().text().toStdString().c_str());
-                err = ErrFailed;
-            }
-            else{
-                logi("Connected to db %s", uri.toStdString().c_str());
-                err = ErrNone;
-            }
+//            if(!mDb.open()){
+//                loge("Database connect ERROR %s", mDb.lastError().text().toStdString().c_str());
+//                err = ErrFailed;
+//            }
+//            else{
+//                logi("Connected to db %s", uri.toStdString().c_str());
+//                err = ErrNone;
+//            }
 
             if (ErrNone == err){
                 err = checkOrCreateAllTables();
@@ -316,22 +401,30 @@ ErrCode_t DbSqlite::loadDb(const DbInfo* dbInfo){
 
 ErrCode_t DbSqlite::execQuery(const QString &sql)
 {
-    QSqlQuery qry;
     ErrCode_t err = ErrNone;
     traced;
     logd("Execute query %s", sql.toStdString().c_str());
-    mDb.transaction();
 
-    qry.prepare(sql);
-    if( !qry.exec() ) {
+    // TODO: re-implement this, race condition? resource leakage???
+//    err = openDb();
+    QSqlQuery qry(currentDb());
+    if (err == ErrNone) {
+        currentDb().transaction();
 
-        loge( "Failed to execute %s", qry.executedQuery().toStdString().c_str() );
-        loge( "Last error %s", qry.lastError().text().toStdString().c_str() );
-        err = ErrFailSqlQuery;
-    }
+        qry.prepare(sql);
+        if( !qry.exec() ) {
 
-    if (!mDb.commit()){
-        mDb.rollback();
+            loge( "Failed to execute %s", qry.executedQuery().toStdString().c_str() );
+            loge( "Last error %s", qry.lastError().text().toStdString().c_str() );
+            err = ErrFailSqlQuery;
+        }
+
+        if (!currentDb().commit()){
+            currentDb().rollback();
+        }
+        currentDb().close();
+    } else {
+        loge("exe query failed, open db failed %d", err);
     }
     tracedr(err);
     return err;
@@ -370,7 +463,13 @@ ErrCode_t DbSqlite::execQueryNoTrans(QSqlQuery *qry)
 ErrCode_t DbSqlite::startTransaction()
 {
     traced;
-    mDb.transaction();
+    ErrCode err = ErrNone;
+//    err = openDb();
+    if (err == ErrNone)
+        currentDb().transaction();
+    else
+        loge("Start transaction failed, open db failed %d", err);
+    // TODO: re-implement this, race condition? resource leakage???
     tracede;
     return ErrNone;
 }
@@ -378,11 +477,35 @@ ErrCode_t DbSqlite::startTransaction()
 ErrCode_t DbSqlite::endTransaction()
 {
     traced;
-
-    if (!mDb.commit()){
-        mDb.rollback();
+    ErrCode err = ErrNone;
+//    err = openDb();
+    if (!currentDb().commit()){
+        currentDb().rollback();
     }
+//    closeDb();
+    // TODO: re-implement this, race condition? resource leakage???
     tracede;
     return ErrNone;
+}
+
+QSqlDatabase DbSqlite::getDbConnection()
+{
+    traced;
+    // Starting with Qt 5.11, sharing the same connection between threads is not allowed.
+    // Use a dedicated connection for each thread requiring access to the database,
+    // using the thread address as connection name.
+
+    const QString connName = QString::number((quintptr)QThread::currentThreadId());
+    logd("conntion name %s", STR2CHA(connName));
+    QSqlDatabase db = QSqlDatabase::database(connName);
+    if (!db.isOpen() || !db.isValid()) {
+        db = QSqlDatabase::cloneDatabase(mDb, connName);
+        if (!db.open()) {
+            qCritical() << "Failed to open db connection" + connName;
+        }
+    }
+    tracede;
+    return db;
+
 }
 

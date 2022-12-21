@@ -32,7 +32,8 @@
 #include "dbsqlitetablebuilder.h"
 #include "dbsqliteinsertbuilder.h"
 #include "personevent.h"
-
+#include "dbctl.h"
+#include "dbsqlite.h"
 
 const qint32 DbSqlitePersonEventTbl::KVersionCode = VERSION_CODE(0,0,1);
 
@@ -98,7 +99,8 @@ QList<PersonEvent *> *DbSqlitePersonEventTbl::getListEvents(const QString &perso
                                                             qint64 date)
 {
     traced;
-    QSqlQuery qry;
+//    DB->openDb();
+    QSqlQuery qry(SQLITE->currentDb());
     ErrCode ret = ErrNone;
     traced;
     QString queryString = QString("SELECT * "

@@ -33,7 +33,8 @@
 #include <QSqlRecord>
 #include <QHash>
 #include "dbdefs.h"
-
+#include "dbctl.h"
+#include "dbsqlite.h"
 
 DbSqliteMapTbl::DbSqliteMapTbl(DbSqlite* db):DbSqliteTbl(db)
 {
@@ -68,7 +69,8 @@ QList<DbModel *> DbSqliteMapTbl::getListItems(const QString &mapTblName,
                                               const QString& selectedField)
 {
     traced;
-    QSqlQuery qry;
+//    DB->openDb();
+    QSqlQuery qry(SQLITE->currentDb());
     qint32 cnt = 0;
     if (uid.isEmpty()){
         loge("Invalid uid");
@@ -107,6 +109,7 @@ void DbSqliteMapTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldStartDate, INT64);
     builder->addField(KFieldEndDate, INT64);
     builder->addField(KFieldRemark, TEXT);
+    builder->addField(KFieldChangeHistory, TEXT);
     builder->addField(KFieldParentUid, TEXT);
 }
 
@@ -125,7 +128,9 @@ ErrCode DbSqliteMapTbl::insertTableField(DbSqliteInsertBuilder *builder, const D
         builder->addValue(KFieldStartDate, model->startDate());
         builder->addValue(KFieldEndDate, model->endDate());
         builder->addValue(KFieldRemark, model->remark());
+        builder->addValue(KFieldChangeHistory, model->changeHistory());
         builder->addValue(KFieldParentUid, model->parentUid());
+        // TODO: implement change history by event, i.e. IN:<datetime>, OUT:<datetime.
     }
     tracedr(ret);
     return ret;
@@ -148,6 +153,7 @@ void DbSqliteMapTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
         model->setStartDate(qry.value(KFieldStartDate).toInt());
         model->setEndDate(qry.value(KFieldEndDate).toInt());
         model->setRemark(qry.value(KFieldRemark).toString());
+        model->setChangeHistory(qry.value(KFieldChangeHistory).toString());
         model->setParentUid(qry.value(KFieldParentUid).toString());
     } else {
         loge("Invalid mapp model '%s', do nothing", item->modelName().toStdString().c_str());

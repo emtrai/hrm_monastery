@@ -159,6 +159,16 @@ ErrCode UICommunityListView::onMenuActionListPerson(QMenu *menu, UITableMenuActi
 
 }
 
+// Show lis of people in all period
+ErrCode UICommunityListView::onMenuActionListPersonHistory(QMenu *menu, UITableMenuAction *act)
+{
+    traced;
+    ErrCode err = ErrNone;
+    UNDER_DEV("Danh sách nữ tu ở tất cả thời kì");
+    tracedr(err);
+    return err;
+}
+
 ErrCode UICommunityListView::onMenuActionListDepartment(QMenu *menu, UITableMenuAction *act)
 {
     traced;
@@ -211,10 +221,14 @@ QList<UITableMenuAction *> UICommunityListView::getMenuItemActions(const QMenu* 
 //    logd("idx %d", idx);
     QList<UITableMenuAction*> actionList = UITableView::getMenuItemActions(menu, item);
 
-    actionList.append(UITableMenuAction::build(tr("Danh sách nữ tu"), this, item)
+    actionList.append(UITableMenuAction::build(tr("Danh sách nữ tu hiện tại"), this, item)
                                               ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                return this->onMenuActionListPerson(m, a);
                                            }));
+    actionList.append(UITableMenuAction::build(tr("Lịch sử danh sách nữ tu"), this, item)
+                                                                                ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                                                                    return this->onMenuActionListPersonHistory(m, a);
+                                                                                }));
     actionList.append(UITableMenuAction::build(tr("Danh sách ban"), this, item)
                                           ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                               return this->onMenuActionListDepartment(m, a);

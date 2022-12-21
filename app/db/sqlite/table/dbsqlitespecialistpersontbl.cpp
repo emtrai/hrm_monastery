@@ -37,6 +37,7 @@
 #include "table/dbsqlitespecialisttbl.h"
 #include "specialist.h"
 #include "dbctl.h"
+#include "dbsqlite.h"
 
 const qint32 DbSqliteSpecialistPersonTbl::KVersionCode = VERSION_CODE(0,0,1);
 
@@ -68,7 +69,8 @@ QList<DbModel *> DbSqliteSpecialistPersonTbl::getListPerson(
     const QString &specialistUid, int status)
 {
     traced;
-    QSqlQuery qry;
+//    DB->openDb();
+    QSqlQuery qry(SQLITE->currentDb());
     qint32 cnt = 0;
     if (specialistUid.isEmpty()){
         loge("Invalid specialistUid uid");
@@ -98,7 +100,8 @@ QList<DbModel *> DbSqliteSpecialistPersonTbl::getListPerson(
 QList<DbModel *> DbSqliteSpecialistPersonTbl::getListSpecialist(const QString &personUid, int status)
 {
     traced;
-    QSqlQuery qry;
+//    DB->openDb();
+//    QSqlQuery qry(SQLITE->currentDb());
     qint32 cnt = 0;
     if (personUid.isEmpty()){
         loge("Invalid personUid uid");

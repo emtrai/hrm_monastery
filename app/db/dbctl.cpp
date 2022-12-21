@@ -29,6 +29,7 @@
 #include "dbsqlitecommunity.h"
 #include "dbsqliteedu.h"
 #include "dbsqlitespecialist.h"
+#include "filectl.h"
 
 DbCtl* DbCtl::gInstance = nullptr;
 
@@ -38,16 +39,16 @@ DbCtl::DbCtl():Controller("DbCtl")
     mDatabase = DbSqlite::getInstance();
     dbInfo = new DbInfo();
     // TODO: refactor this code
-    QString appPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    QDir appDirPath(appPath);
-    logd("App path %s", appPath.toStdString().c_str());
+//    QString appPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+//    QDir appDirPath(appPath);
+//    logd("App path %s", appPath.toStdString().c_str());
 
-    if (!appDirPath.exists()){
-        logi("App path not exist, create new one");
-        appDirPath.mkpath(appDirPath.absolutePath());
-    }
+//    if (!appDirPath.exists()){
+//        logi("App path not exist, create new one");
+//        appDirPath.mkpath(appDirPath.absolutePath());
+//    }
 
-    QString dbPath = appDirPath.filePath("test.db");
+    QString dbPath = FileCtl::getAppDataDir("test.db");
 
     logd("dbPath %s", dbPath.toStdString().c_str());
     dbInfo->setUri(dbPath);
@@ -61,6 +62,21 @@ DbCtl::DbCtl():Controller("DbCtl")
 IDatabase *DbCtl::database() const
 {
     return mDatabase;
+}
+
+ErrCode DbCtl::openDb()
+{
+    traced;
+    ErrCode ret = getDb()->openDb();
+    tracedr(ret);
+    return ret;
+}
+
+void DbCtl::closeDb()
+{
+    traced;
+    getDb()->closeDb();
+    tracede;
 }
 
 DbCtl* DbCtl::getInstance(){

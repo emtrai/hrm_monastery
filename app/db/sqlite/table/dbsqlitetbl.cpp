@@ -35,6 +35,8 @@
 #include <QSqlError>
 #include <QHash>
 #include "filter.h"
+#include "dbctl.h"
+#include "dbsqlite.h"
 
 DbSqliteTbl::~DbSqliteTbl(){
     traced;
@@ -287,7 +289,8 @@ ErrCode DbSqliteTbl::update(const QString &uid, const QHash<QString, QString>& f
 
 bool DbSqliteTbl::isExist(const DbModel *item)
 {
-    QSqlQuery qry;
+//    DB->openDb();
+    QSqlQuery qry(SQLITE->currentDb());
     bool exist = false;
     bool queryOk = false;
     traced;
@@ -389,7 +392,8 @@ int DbSqliteTbl::filter(int fieldId,
     traced;
     // TODO: implement it
     // TODO: check data typpe text vs integer
-    QSqlQuery qry;
+//    DB->openDb();
+    QSqlQuery qry(SQLITE->currentDb());
     qint32 cnt = 0;
     logi("Filter keyword '%s'", keyword.toStdString().c_str());
     QString cond;
@@ -477,8 +481,9 @@ int DbSqliteTbl::runQuery(QSqlQuery &qry, const DbModelBuilder& builder,
 QSqlQuery *DbSqliteTbl::getAllQuery()
 {
     traced;
-    QSqlQuery* qry = new QSqlQuery();
+//    DB->openDb();
 
+    QSqlQuery* qry = new QSqlQuery(SQLITE->currentDb());
     traced;
     // TODO: check record status????
     QString queryString = getAllQueryString();
@@ -535,10 +540,11 @@ QList<DbModel *> DbSqliteTbl::getAll(const DbModelBuilder& builder)
 
 DbModel *DbSqliteTbl::getModel(qint64 dbId, const DbModelBuilder& builder)
 {
-    QSqlQuery qry;
+    traced;
+//    DB->openDb();
+    QSqlQuery qry(SQLITE->currentDb());
     ErrCode err = ErrNone;
     DbModel* item = nullptr;
-    traced;
     // TODO: check record status????
     QString queryString = QString("SELECT * FROM %1 where id=:id").arg(name());
     qry.prepare(queryString);
@@ -722,9 +728,10 @@ int DbSqliteTbl::search(const QString& keyword, const QHash<QString, int>& inFie
                         bool isExact)
 {
     traced;
+//    DB->openDb();
     // TODO: implement it
     // TODO: exact and not exact match???
-    QSqlQuery qry;
+    QSqlQuery qry(SQLITE->currentDb());
     qint32 cnt = 0;
     logi("Search keyword '%s'", keyword.toStdString().c_str());
     QString cond;

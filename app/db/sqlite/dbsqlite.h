@@ -28,12 +28,27 @@
 #include <QSqlQuery>
 #include <QMap>
 #include <QSqlDatabase>
+#include <QThreadStorage>
 
 #define SQLITE (DbSqlite::getInstance())
 
 // TODO: make it as library????
 class DbSqliteTbl;
 
+// https://lnj.gitlab.io/post/multithreaded-databases-with-qtsql/
+class DatabaseConnection
+{
+    Q_DISABLE_COPY(DatabaseConnection)
+public:
+    DatabaseConnection(QString uri);
+
+    virtual ~DatabaseConnection();
+
+    QSqlDatabase database();
+
+private:
+    QString mName;
+};
 // THIS IS ONE INTERFACE FOR ALL OPERATION RELATING TO DB
 // TODO: should separate person, community, saint, etc. into separate class????
 // It's quite stupid when putting everything here
@@ -53,7 +68,7 @@ public:
     virtual ErrCode_t execQueryNoTrans(QSqlQuery* qry);
     virtual ErrCode_t startTransaction();
     virtual ErrCode_t endTransaction();
-
+    QSqlDatabase getDbConnection();
 //    virtual ErrCode_t addCommunity(const Community* comm);
     virtual DbSqliteTbl* getTable(const QString& tblName);
     virtual DbModelHandler *getEduModelHandler();
@@ -64,6 +79,12 @@ public:
 
     static DbSqliteTbl* table(const QString& tblName);
     static DbModelHandler* handler(const QString& name);
+    virtual ErrCode openDb();
+    virtual void closeDb();
+
+    QSqlDatabase currentDb();
+    QSqlQuery createQuery();
+
 private:
 
     DbSqlite();
@@ -88,11 +109,16 @@ private:
     QMap<QString, DbSqliteTbl*> mListTbl;
     QMap<QString, DbModelHandler*> mModelHdlList;
     QSqlDatabase mDb;
+    QSqlDatabase mCurrentDb; // TODO: race condition???
+    QString mDbUri;
 
 public:
     static DbSqlite* getInstance();
 
     const QSqlDatabase &db() const;
+
+public:
+    static QThreadStorage<DatabaseConnection *> mDatabaseConnections;
 };
 
 #endif // DBSQLITE_H

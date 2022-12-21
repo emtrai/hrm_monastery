@@ -146,3 +146,13 @@ int MapDbModel::modelType() const
 {
     return MODEL_MAP;
 }
+
+const QString &MapDbModel::changeHistory() const
+{
+    return mChangeHistory;
+}
+
+void MapDbModel::setChangeHistory(const QString &newChangeHistory)
+{
+    mChangeHistory = newChangeHistory;
+}

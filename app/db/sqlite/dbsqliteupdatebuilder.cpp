@@ -22,6 +22,8 @@
 #include "dbsqliteupdatebuilder.h"
 #include "logger.h"
 #include "errcode.h"
+#include "dbctl.h"
+#include "dbsqlite.h"
 
 DbSqliteUpdateBuilder *DbSqliteUpdateBuilder::build(const QString &tblName)
 {
@@ -95,7 +97,8 @@ QSqlQuery *DbSqliteUpdateBuilder::buildSqlQuery(const QString *cond)
     QString queryString = QStringLiteral(
                               "UPDATE %1 SET %2 WHERE %3")
                               .arg(mName, values, conds);
-    QSqlQuery* qry = new QSqlQuery();
+//    DB->openDb();
+    QSqlQuery* qry = new QSqlQuery(SQLITE->currentDb());
     qry->prepare(queryString);
     logd("Query String '%s'", queryString.toStdString().c_str());
     foreach( QString field, mValue.keys() )

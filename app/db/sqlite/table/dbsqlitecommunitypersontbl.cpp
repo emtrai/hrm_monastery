@@ -32,6 +32,8 @@
 #include <QSqlRecord>
 #include <QHash>
 #include "table/dbsqlitepersontbl.h"
+#include "dbctl.h"
+#include "dbsqlite.h"
 
 const qint32 DbSqliteCommunityPersonTbl::KVersionCode = VERSION_CODE(0,0,1);
 
@@ -49,7 +51,8 @@ DbSqliteCommunityPersonTbl::DbSqliteCommunityPersonTbl(DbSqlite *db):
 QList<DbModel *> DbSqliteCommunityPersonTbl::getListPerson(const QString &communityUid, int status)
 {
     traced;
-    QSqlQuery qry;
+//    DB->openDb();
+    QSqlQuery qry (SQLITE->currentDb());
     qint32 cnt = 0;
     if (communityUid.isEmpty()){
         loge("Invalid community uid");

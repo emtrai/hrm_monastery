@@ -31,6 +31,8 @@
 #include "logger.h"
 #include "dbsqlitetablebuilder.h"
 #include "dbsqliteinsertbuilder.h"
+#include "dbctl.h"
+#include "dbsqlite.h"
 
 
 const qint32 DbSqliteDepartTbl::KVersionCode = VERSION_CODE(0,0,1);
@@ -99,7 +101,8 @@ void DbSqliteDepartTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry
 QSqlQuery *DbSqliteDepartTbl::getAllQuery()
 {
     traced;
-    QSqlQuery* qry = new QSqlQuery();
+//    DB->openDb();
+    QSqlQuery* qry = new QSqlQuery(SQLITE->currentDb());
 
     traced;
     // TODO: check record status????

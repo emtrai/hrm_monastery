@@ -38,6 +38,7 @@
 #include "role.h"
 #include "course.h"
 #include "department.h"
+#include "dbsqlite.h"
 
 const qint32 DbSqliteDepartmentPersonTbl::KVersionCode = VERSION_CODE(0,0,1);
 
@@ -68,7 +69,8 @@ DbSqliteDepartmentPersonTbl::DbSqliteDepartmentPersonTbl(DbSqlite *db,
 QList<DbModel *> DbSqliteDepartmentPersonTbl::getListPerson(const QString &departUid, int status)
 {
     traced;
-    QSqlQuery qry;
+//    DB->openDb();
+    QSqlQuery qry(SQLITE->currentDb());
     qint32 cnt = 0;
     if (departUid.isEmpty()){
         loge("Invalid departUid uid");

@@ -22,6 +22,7 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 #include <QDebug>
+#include <QThread>
 
 #ifndef THISFILE
 #define THIS_FILE __FILE__
@@ -34,7 +35,7 @@
 // TODO: add process id???
 #define logd(fmt,...) \
     do{ \
-        qDebug("D %s %s[%d] " fmt, THIS_FILE, __func__, __LINE__,##__VA_ARGS__); \
+        qDebug("D %ld %s %s[%d] " fmt, (long)QThread::currentThreadId(), THIS_FILE, __func__, __LINE__,##__VA_ARGS__); \
     }\
     while(0)
 
@@ -61,13 +62,13 @@
 // TODO: Show crash/critical error on dialog
 #define loge(fmt, ...) \
     do{ \
-            qDebug("E %s %s[%d] " fmt, THIS_FILE, __func__, __LINE__,##__VA_ARGS__); \
+            qDebug("E %ld %s %s[%d] " fmt, (long)QThread::currentThreadId(), THIS_FILE, __func__, __LINE__,##__VA_ARGS__); \
     }\
     while(0)
 
 #define logi(fmt, ...) \
 do{ \
-        qDebug("I %s %s[%d] " fmt, THIS_FILE, __func__, __LINE__,##__VA_ARGS__); \
+        qDebug("I %ld %s %s[%d] " fmt, (long)QThread::currentThreadId(), THIS_FILE, __func__, __LINE__,##__VA_ARGS__); \
 }\
     while(0)
 

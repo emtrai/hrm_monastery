@@ -35,6 +35,7 @@ protected:
     virtual QList<UITableMenuAction*> getMenuItemActions(const QMenu* menu,
                                                           UITableWidgetItem* item);
     virtual ErrCode onMenuActionListPerson(QMenu* menu, UITableMenuAction* act);
+    virtual ErrCode onMenuActionListPersonHistory(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionListDepartment(QMenu* menu, UITableMenuAction* act);
 //    virtual ErrCode onMenuAction(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);

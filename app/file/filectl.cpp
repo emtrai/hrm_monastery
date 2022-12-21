@@ -52,7 +52,8 @@ void FileCtl::init()
 
 QString FileCtl::getAppDataDir(const QString& subDir)
 {
-    QString appPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+
+    static QString appPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QDir appDirPath(appPath);
     logd("App path %s", appPath.toStdString().c_str());
 

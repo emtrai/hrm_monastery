@@ -167,6 +167,7 @@ const char* const KFieldSpecialistName = "specialist_name";
 const char* const KFieldSpecialistDbId = "specialist_dbid";
 const char* const KFieldSpecialistUid = "specialist_uid";
 const char* const KFieldExperienceHistory = "experience_history";
+const char* const KFieldChangeHistory = "change_history";
 
 
 // TABLES NAME

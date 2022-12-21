@@ -51,6 +51,12 @@ class DbModelHandler;
 class IExporter;
 
 typedef DbModel*(*DbModelBuilder)(void);
+enum DB_RECORD_STATUS {
+    DB_RECORD_NOT_READY = 0, // record not ready
+    DB_RECORD_ACTIVE, // record ready to use
+    DB_RECORD_DElETED, // record already deleted
+    DB_RECORD_MAX
+};
 
 class DbModel
 {
