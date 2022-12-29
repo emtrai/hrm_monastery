@@ -30,6 +30,7 @@
 #include "dbsqlitetablebuilder.h"
 #include "dbsqliteinsertbuilder.h"
 #include "dbsqliteupdatebuilder.h"
+#include "dbsqlitedeletebuilder.h"
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QSqlError>
@@ -37,6 +38,7 @@
 #include "filter.h"
 #include "dbctl.h"
 #include "dbsqlite.h"
+
 
 DbSqliteTbl::~DbSqliteTbl(){
     traced;
@@ -125,7 +127,7 @@ ErrCode_t DbSqliteTbl::add(DbModel *item)
                 QString uid = item->buildUid(&dbIdStr);
                 // TODO: check to make sure that uid does not exist?????
                 updateBuilder = DbSqliteUpdateBuilder::build(name());
-                updateBuilder->addCond(KFieldId, dbIdStr);
+                updateBuilder->addCond(KFieldId, dbIdStr, INT64);
                 updateBuilder->addValue(KFieldUid, uid);
                 QSqlQuery* updateQry = updateBuilder->buildSqlQuery();
                 err = db()->execQuery(updateQry);
@@ -243,7 +245,7 @@ ErrCode DbSqliteTbl::updateUid(const DbModel *item, const QString &uid)
     return ret;
 }
 
-ErrCode DbSqliteTbl::update(const QString &uid, const QHash<QString, QString>& fieldValues)
+ErrCode DbSqliteTbl::update(const QString &uid, const QHash<QString, FieldValue>& fieldValues)
 {
     traced;
     ErrCode_t err = ErrNone;
@@ -258,12 +260,13 @@ ErrCode DbSqliteTbl::update(const QString &uid, const QHash<QString, QString>& f
         // TODO: data type? (int vs string, different representation)
         foreach (QString field, updatedFields) {
             logd("Update field %s", field.toStdString().c_str());
-            updateBuilder->addValue(field, fieldValues[field]);
+            updateBuilder->addValue(field, fieldValues[field].value, fieldValues[field].dataType);
         }
 
         if (err == ErrNone){
             logd("Build SQL Query and execute");
             updateBuilder->addValue(KFieldLastUpdateItme, Utils::currentTimeMs());
+            // TODO: update history????
             updateQry = updateBuilder->buildSqlQuery();
             err = db()->execQuery(updateQry);
             logd("execQuery err %d", err);
@@ -278,6 +281,56 @@ ErrCode DbSqliteTbl::update(const QString &uid, const QHash<QString, QString>& f
     if (updateBuilder) {
         delete updateBuilder;
         updateBuilder = nullptr;
+    }
+    if (updateQry) {
+        delete updateQry;
+        updateQry = nullptr;
+    }
+    tracedr(err);
+    return err;
+}
+
+ErrCode DbSqliteTbl::deleteSoft(DbModel *item)
+{
+    ErrCode err = ErrNone;
+    traced;
+    // TODO: made delete condition customize/dynamic by deleteCondition
+//    QHash<QString, QString> deleteCond = deleteCondition(item);
+//    if (deleteCond.count() > 0) {
+//        update(item->uid(), )
+//    }
+    QHash<QString, FieldValue> fields;
+    fields.insert(KFieldRecordStatus, FieldValue(QString::number(DB_RECORD_DElETED), INT32));
+    err = update(item->uid(), fields);
+    tracedr(err);
+    return err;
+}
+
+ErrCode DbSqliteTbl::deleteHard(DbModel *item)
+{
+    traced;
+    ErrCode_t err = ErrNone;
+    DbSqliteDeleteBuilder* deleteBuilder = nullptr;
+    QSqlQuery* updateQry = nullptr;
+    QList<QString> updatedFields = item->updatedField();
+    logd("build delete builder");
+    // TODO: check to make sure that uid does not exist?????
+    deleteBuilder = DbSqliteDeleteBuilder::build(name());
+    err = deleteCondition(deleteBuilder, item);
+    if (err == ErrNone){
+        logd("Build SQL Query and execute");
+        updateQry = deleteBuilder->buildSqlQuery();
+        err = db()->execQuery(updateQry);
+        updateQry->clear();
+        logd("execQuery err %d", err);
+    } else {
+        loge("Faild to delete item in table, err=%d", err);
+    }
+
+
+    if (deleteBuilder) {
+        delete deleteBuilder;
+        deleteBuilder = nullptr;
     }
     if (updateQry) {
         delete updateQry;
@@ -514,6 +567,7 @@ QList<DbModel *> DbSqliteTbl::getAll(const DbModelBuilder& builder)
 
     if( qry->exec() )
     {
+        logd("Get all number of item %d", qry->size());
         while (qry->next()) {
             DbModel* item = builder();
             item->setDbId(qry->value(KFieldId).toInt());
@@ -820,7 +874,7 @@ ErrCode DbSqliteTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbMo
         builder->addValue(KFieldName, item->name());
     if (!item->history().isEmpty())
         builder->addValue(KFieldHistory, item->history());
-    builder->addValue(KFieldRecordStatus, item->dbStatus());
+//    builder->addValue(KFieldRecordStatus, item->dbStatus());
     // TODO: timezone issue?
     // TODO: time of computer suddenly not correct/change???,
     // should store last open time than compare???
@@ -828,6 +882,15 @@ ErrCode DbSqliteTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbMo
     builder->addValue(KFieldLastUpdateItme, Utils::currentTimeMs());
     tracede;
     return ErrNone;
+}
+
+ErrCode DbSqliteTbl::deleteCondition(DbSqliteDeleteBuilder *builder, const DbModel *item)
+{
+    traced;
+    ErrCode err = ErrNone;
+    builder->addCond(KFieldUid, item->uid());
+    tracedr(err);
+    return err;
 }
 
 

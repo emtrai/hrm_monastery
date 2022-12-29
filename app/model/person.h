@@ -68,7 +68,7 @@ private:
 public:
     Person();
     virtual ~Person();
-    virtual void clone(const Person& per);
+    virtual void clone(const DbModel* per);
     virtual void buildUidIfNotSet();
     virtual QString buildUid(const QString* seed = nullptr);
     virtual QString modelName() const;

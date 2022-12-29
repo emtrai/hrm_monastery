@@ -76,6 +76,7 @@ SOURCES += \
     db/idatabase.cpp \
     db/sqlite/dbsqlite.cpp \
     db/sqlite/dbsqlitedefs.cpp \
+    db/sqlite/dbsqlitedeletebuilder.cpp \
     db/sqlite/dbsqliteinsertbuilder.cpp \
     db/sqlite/dbsqliteupdatebuilder.cpp \
     db/sqlite/handler/dbsqlitemission.cpp \
@@ -178,6 +179,7 @@ SOURCES += \
     view/dialog/dlgaddcommunityhistory.cpp \
     view/dialog/dlgaddevent.cpp \
     view/dialog/dlgaddpersonevent.cpp \
+    view/dialog/dlgcommonmodel.cpp \
     view/dialog/dlgcommunity.cpp \
     view/dialog/dlgcountry.cpp \
     view/dialog/dlgcourse.cpp \
@@ -242,6 +244,7 @@ HEADERS += \
     db/idatabase.h \
     db/sqlite/dbsqlite.h \
     db/sqlite/dbsqlitedefs.h \
+    db/sqlite/dbsqlitedeletebuilder.h \
     db/sqlite/dbsqliteinsertbuilder.h \
     db/sqlite/dbsqliteupdatebuilder.h \
     db/sqlite/handler/dbsqlitearea.h \
@@ -346,6 +349,7 @@ HEADERS += \
     view/dialog/dlgaddcommunityhistory.h \
     view/dialog/dlgaddevent.h \
     view/dialog/dlgaddpersonevent.h \
+    view/dialog/dlgcommonmodel.h \
     view/dialog/dlgcommunity.h \
     view/dialog/dlgcountry.h \
     view/dialog/dlgcourse.h \

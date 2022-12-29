@@ -64,6 +64,26 @@ ErrCode PersonCtl::addPerson(const QString &fname)
     return ret;
 }
 
+ErrCode PersonCtl::markPersonDelete(Person *person)
+{
+    traced;
+    ErrCode_t err = ErrNone;
+    // TODO: check null
+    err = person->markRemove();
+
+    return err;
+}
+
+ErrCode PersonCtl::deletePerson(Person *person)
+{
+    traced;
+    ErrCode_t err = ErrNone;
+    // TODO: check null
+    err = person->remove();
+
+    return err;
+}
+
 ErrCode PersonCtl::AddListPersons(const QString &fname)
 {
     traced;

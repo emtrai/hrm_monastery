@@ -210,6 +210,12 @@ void UITableView::onEditItem(UITableWidgetItem *item)
 
 }
 
+void UITableView::onDeleteItem(UITableWidgetItem *item)
+{
+    traced;
+    logd("parent class, nothing to do");
+}
+
 
 QMenu* UITableView::buildPopupMenu(UITableWidgetItem* item, const QList<UITableItem*>& items)
 {
@@ -322,7 +328,7 @@ ErrCode UITableView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act)
 ErrCode UITableView::onMenuActionDelete(QMenu *menu, UITableMenuAction *act)
 {
     traced;
-    // TODO: handle it
+    onDeleteItem((UITableWidgetItem*)act->tblItem());
     return ErrNone;
 }
 

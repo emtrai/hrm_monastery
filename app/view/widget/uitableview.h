@@ -186,6 +186,7 @@ protected:
     virtual void importRequested(const QString& fpath);
     virtual void onViewItem(UITableWidgetItem *item);
     virtual void onEditItem(UITableWidgetItem *item);
+    virtual void onDeleteItem(UITableWidgetItem *item);
 //    virtual void onDeleteItem(UITableItem *item);
 
     // MENU

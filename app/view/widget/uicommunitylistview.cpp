@@ -65,6 +65,7 @@ ErrCode UICommunityListView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act
 {
     traced;
     // TODO: handle it
+    MainWindow::showAddEditCommunity(true, nullptr);
     return ErrNone;
 }
 

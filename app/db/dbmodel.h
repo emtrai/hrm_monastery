@@ -67,6 +67,7 @@ public:
     virtual ~DbModel();
     // TODO: override operation ==?
 
+    virtual void clone(const DbModel* per);
 
     virtual QString modelName() const;
     virtual int modelType() const;
@@ -99,6 +100,7 @@ public:
      * @return
      */
     virtual ErrCode remove();
+    virtual ErrCode markRemove();
 
     virtual ErrCode exportTo(const QString &fpath, ExportType type);
 

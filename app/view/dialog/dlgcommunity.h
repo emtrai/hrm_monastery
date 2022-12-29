@@ -23,18 +23,25 @@
 #define DLGCOMMUNITY_H
 
 #include <QDialog>
+#include "errcode.h"
+#include "dlgcommonmodel.h"
 
 namespace Ui {
 class DlgCommunity;
 }
 
-class DlgCommunity : public QDialog
+class Community;
+class DlgCommunity : public QDialog, public DlgCommonModel
 {
     Q_OBJECT
-
-        public:
+    DLG_BUILDER(DlgCommunity)
+public:
                  explicit DlgCommunity(QWidget *parent = nullptr);
     ~DlgCommunity();
+    virtual DbModel *buildModel();
+protected:
+    virtual DbModel* newModel();
+public:
 
 private:
     Ui::DlgCommunity *ui;

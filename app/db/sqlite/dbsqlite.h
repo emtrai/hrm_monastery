@@ -29,6 +29,7 @@
 #include <QMap>
 #include <QSqlDatabase>
 #include <QThreadStorage>
+#include "dbsqlitedefs.h"
 
 #define SQLITE (DbSqlite::getInstance())
 
@@ -49,6 +50,16 @@ public:
 private:
     QString mName;
 };
+
+struct FieldValue
+{
+    FieldValue();
+    FieldValue(const FieldValue& item);
+    FieldValue(const QString& value, int dataType = TEXT);
+    QString value;
+    int dataType;
+};
+
 // THIS IS ONE INTERFACE FOR ALL OPERATION RELATING TO DB
 // TODO: should separate person, community, saint, etc. into separate class????
 // It's quite stupid when putting everything here
@@ -79,8 +90,6 @@ public:
 
     static DbSqliteTbl* table(const QString& tblName);
     static DbModelHandler* handler(const QString& name);
-    virtual ErrCode openDb();
-    virtual void closeDb();
 
     QSqlDatabase currentDb();
     QSqlQuery createQuery();

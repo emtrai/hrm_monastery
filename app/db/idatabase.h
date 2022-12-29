@@ -59,8 +59,6 @@ public:
     virtual DbModelHandler* getCommunityModelHandler() = 0;
 
     virtual DbModelHandler* getModelHandler(const QString& name) = 0;
-    virtual ErrCode openDb() = 0;
-    virtual void closeDb() = 0;
 };
 
 #endif // IDATABASE_H

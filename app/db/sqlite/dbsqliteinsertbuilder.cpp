@@ -194,8 +194,9 @@ QSqlQuery* DbSqliteInsertBuilder::buildSqlQuery(const QString *cond)
     (void)cond;
     // TODO: condition?
     QString queryString = QStringLiteral(
-               "INSERT INTO %1(%2) VALUES(%3)")
-        .arg(mName, fields, values);
+               "INSERT INTO %1(%2, %3) VALUES(%4, %5)")
+        .arg(mName, fields, KFieldRecordStatus, values)
+        .arg(DB_RECORD_ACTIVE);
 //    DB->openDb();
     QSqlQuery* qry = new QSqlQuery(SQLITE->currentDb());
     qry->prepare(queryString);

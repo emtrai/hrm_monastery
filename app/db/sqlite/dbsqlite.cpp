@@ -100,12 +100,34 @@ DatabaseConnection::~DatabaseConnection()
     QSqlDatabase::removeDatabase(mName);
 }
 
+
 QSqlDatabase DatabaseConnection::database()
 {
     logd("db connection name=%s", STR2CHA(mName));
     return QSqlDatabase::database(mName);
 }
 
+
+FieldValue::FieldValue()
+{
+    dataType = TEXT;
+}
+
+FieldValue::FieldValue(const FieldValue &item)
+{
+    traced;
+    logd("copy constructor");
+    value = item.value;
+    dataType = item.dataType;
+}
+
+FieldValue::FieldValue(const QString &value, int dataType)
+{
+    traced;
+    logd("constructor");
+    this->value = value;
+    this->dataType = dataType;
+}
 
 DbSqlite::DbSqlite()
 {
@@ -297,35 +319,10 @@ DbModelHandler *DbSqlite::handler(const QString &name)
     return DbSqlite::getInstance()->getModelHandler(name);
 }
 
-ErrCode DbSqlite::openDb()
-{
-    traced;
-    ErrCode err = ErrNone;
-    if (mCurrentDb.isOpen()) {
-        logd("close existing db");
-        mCurrentDb.close();
-    }
-    mCurrentDb = getDbConnection();
-    // TODO: re-implement this, race condition???
-    traced;
-    return err;
-}
-
-void DbSqlite::closeDb()
-{
-    traced;
-    if (mCurrentDb.isValid() && mCurrentDb.isOpen()) {
-        logd("close Db");
-        mCurrentDb.close();
-    } else {
-        logd("Db not open");
-    }
-    tracede;
-}
-
 QSqlDatabase DbSqlite::currentDb()
 {
     traced;
+    // TODO: handle race condition issue when access db? should use mutex???
     if (!mDatabaseConnections.hasLocalData()) {
         logd("db connection not exist, create new one");
         mDatabaseConnections.setLocalData(new DatabaseConnection(mDbUri));
@@ -480,6 +477,7 @@ ErrCode_t DbSqlite::endTransaction()
     ErrCode err = ErrNone;
 //    err = openDb();
     if (!currentDb().commit()){
+        logd("rollback");
         currentDb().rollback();
     }
 //    closeDb();

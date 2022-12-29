@@ -375,7 +375,7 @@ ErrCode DlgPerson::fromPerson(const Person *model)
         return ErrInvalidData;
     }
     Person* per = person();
-    per->clone(*model);
+    per->clone(model);
     per->validate(); // TODO: should call validate here???
     if (per == nullptr){
         ret = ErrInvalidArg; // TODO: should raise assert instead???

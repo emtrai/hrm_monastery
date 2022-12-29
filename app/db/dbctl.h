@@ -38,8 +38,6 @@ public:
     static IDatabase* getDb();
     IDatabase *database() const;
 
-    static ErrCode openDb();
-    static void closeDb();
 
 private:
     DbCtl();

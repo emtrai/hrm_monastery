@@ -14,14 +14,13 @@
  * limitations under the License.
  *
  *
- * Filename: dbsqliteupdatebuilder.h
+ * Filename: dbsqlitedeletebuilder.h
  * Author: Anh, Ngo Huy
- * Created date:10/5/2022
+ * Created date:12/22/2022
  * Brief:
  */
-#ifndef DBSQLITEUPDATEBUILDER_H
-#define DBSQLITEUPDATEBUILDER_H
-
+#ifndef DBSQLITEDELETEBUILDER_H
+#define DBSQLITEDELETEBUILDER_H
 
 #include <QString>
 #include <QObject>
@@ -31,22 +30,19 @@
 
 class FieldValue;
 
-class DbSqliteUpdateBuilder
+class DbSqliteDeleteBuilder
 {
 public:
-    static DbSqliteUpdateBuilder* build(const QString& tblName);
-    DbSqliteUpdateBuilder* addValue(const QString& field, const QString& value, int dataType = TEXT);
-    DbSqliteUpdateBuilder* addValue(const QString& field, qint64 value);
-    DbSqliteUpdateBuilder* addCond(const QString& field, const QString& value, int dataType = TEXT);
+    static DbSqliteDeleteBuilder* build(const QString& tblName);
+    DbSqliteDeleteBuilder* addCond(const QString& field, const QString& value, int dataType = TEXT);
     QSqlQuery* buildSqlQuery(const QString* cond = nullptr);
 private:
 
-    DbSqliteUpdateBuilder(const QString& name);
+    DbSqliteDeleteBuilder(const QString& name);
 
 private:
     QString mName;
-    QHash<QString, FieldValue> mValue;
     QHash<QString, FieldValue> mCondition;
 };
 
-#endif // DBSQLITEUPDATEBUILDER_H
+#endif // DBSQLITEDELETEBUILDER_H

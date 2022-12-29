@@ -21,6 +21,9 @@
  */
 #include "dlgcommunity.h"
 #include "ui_dlgcommunity.h"
+#include "logger.h"
+#include "errcode.h"
+#include "community.h"
 
 DlgCommunity::DlgCommunity(QWidget *parent) :
     QDialog(parent),
@@ -37,4 +40,15 @@ DlgCommunity::DlgCommunity(QWidget *parent) :
 DlgCommunity::~DlgCommunity()
 {
     delete ui;
+}
+
+DbModel *DlgCommunity::buildModel()
+{
+// TODO: implement this
+    return model();
+}
+
+DbModel *DlgCommunity::newModel()
+{
+    return Community::builder();
 }

@@ -40,6 +40,7 @@
 #include "personctl.h"
 #include "dialog/dlgabout.h"
 #include "dlgwait.h"
+#include "dialog/dlgcommunity.h"
 
 #define ADD_MENU_ITEM(menu, func, name, iconPath) \
 do { \
@@ -156,6 +157,13 @@ void MainWindow::showAddEditPerson(bool isSelfUpdate, Person *per)
     tracede;
 }
 
+void MainWindow::showAddEditCommunity(bool isSelfUpdate, Community *com)
+{
+    traced;
+    getInstance()->doShowAddEditCommunity(isSelfUpdate, com);
+    tracede;
+}
+
 void MainWindow::showImportDlg()
 {
     traced;
@@ -243,6 +251,16 @@ void MainWindow::doShowAddEditPerson(bool isSelfUpdate, Person *per)
     logd("isSelfUpdate %d", isSelfUpdate);
     DlgPerson* dlg = DlgPerson::buildDlg(this, per);
     dlg->setIsSelfSave(isSelfUpdate);
+    dlg->exec();
+    delete dlg;
+    tracede;
+}
+
+void MainWindow::doShowAddEditCommunity(bool isSelfUpdate, Community *com)
+{
+    traced;
+    logd("isSelfUpdate %d", isSelfUpdate);
+    DlgCommunity* dlg = DlgCommunity::build(this, isSelfUpdate, (DbModel*)com);
     dlg->exec();
     delete dlg;
     tracede;

@@ -35,6 +35,18 @@ public:
 
     virtual ErrCode add(DbModel* model) = 0;
     virtual ErrCode update(DbModel* model) = 0;
+    /**
+     * @brief delete by change status to delete
+     * @param model
+     * @return
+     */
+    virtual ErrCode deleteSoft(DbModel* model) = 0;
+    /**
+     * @brief delete completely from db
+     * @param model
+     * @return
+     */
+    virtual ErrCode deleteHard(DbModel* model) = 0;
 
     /**
      * @brief Check if model exist in db

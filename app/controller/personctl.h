@@ -39,6 +39,8 @@ public:
     virtual ~PersonCtl();
     ErrCode addPerson(Person* person);
     ErrCode addPerson (const QString& fname);
+    ErrCode markPersonDelete(Person* person);
+    ErrCode deletePerson(Person* person);
     ErrCode AddListPersons(const QString& fname);
     QList<DbModel*> getAllPerson();
     QList<DbModel*> getPersonInCommunity(const QString& communityUid);

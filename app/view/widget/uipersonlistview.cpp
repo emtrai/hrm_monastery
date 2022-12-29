@@ -264,6 +264,22 @@ void UIPersonListView::onEditItem(UITableWidgetItem *item)
     tracede;
 }
 
+void UIPersonListView::onDeleteItem(UITableWidgetItem *item)
+{
+    traced;
+    DbModel* model = item->itemData();
+    //    logd("idx=%d",idx);
+    if (model){
+        logd("DELETE item:");
+        model->dump();
+        model->remove(); // TODO: call markRemove
+    } else {
+        loge("Invalid item data");
+        // TODO: popup message???
+    }
+    tracede;
+}
+
 QString UIPersonListView::getTitle()
 {
     return tr("Danh sách nữ tu");

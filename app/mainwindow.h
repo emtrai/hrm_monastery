@@ -49,6 +49,7 @@ enum AppState {
 
 class Person;
 class DlgWait;
+class Community;
 
 
     class MainWindow : public QMainWindow, public LoaderListener
@@ -61,6 +62,7 @@ class DlgWait;
             static MainWindow *getInstance();
 
             static void showAddEditPerson(bool isSelfUpdate = true, Person* per = nullptr);
+            static void showAddEditCommunity(bool isSelfUpdate = true, Community* com = nullptr);
             static void showImportDlg();
         protected:
      void showEvent(QShowEvent *ev);
@@ -75,6 +77,7 @@ class DlgWait;
 
      virtual void onLoadController (Controller* ctl);
      void doShowAddEditPerson(bool isSelfUpdate = true, Person* per = nullptr);
+     void doShowAddEditCommunity(bool isSelfUpdate = true, Community* com = nullptr);
      void doShowImportPerson();
  private:
      void loadHomePageFile();

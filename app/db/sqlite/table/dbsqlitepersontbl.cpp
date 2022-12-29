@@ -467,8 +467,8 @@ ErrCode DbSqlitePersonTbl::updateCommunity(const QString &uid, const QString &co
     traced;
     ErrCode ret = ErrNone;
     logd("update community for person, uid '%s', community uid '%s'", STR2CHA(uid), STR2CHA(communityUid));
-    QHash<QString, QString> fields;
-    fields[KFieldCommunityUid] = communityUid;
+    QHash<QString, FieldValue> fields;
+    fields[KFieldCommunityUid] = FieldValue(communityUid);
     ret = this->update(uid, fields);
     tracedr(ret);
     return ret;

@@ -50,6 +50,7 @@ DbModel::DbModel(const DbModel &model)
     mHistory = model.history();
     mMarkModified = model.markModified();
     // TODO: mValidateResult
+    tracede;
 }
 
 DbModel::DbModel(const DbModel *model):DbModel(*model)
@@ -61,6 +62,18 @@ DbModel::DbModel(const DbModel *model):DbModel(*model)
 DbModel::~DbModel()
 {
     traced;
+}
+
+void DbModel::clone(const DbModel *model)
+{
+    traced;
+    mDbId = model->dbId();
+    mUid = model->uid();
+    mName = model->name();
+    mDbStatus = model->dbStatus();
+    mHistory = model->history();
+    mMarkModified = model->markModified();
+    tracede;
 }
 
 
@@ -254,14 +267,37 @@ ErrCode DbModel::update()
         loge("db not ready");
     }
     tracedr(ret);
-    return ret;;
+    return ret;
 }
 
 ErrCode DbModel::remove()
 {
     traced;
     ErrCode ret = ErrNone;
-    // TODO
+    DbModelHandler* dbModelHdl = getDbModelHandler();
+    if (dbModelHdl != nullptr){
+        ret = dbModelHdl->deleteHard(this);
+    }
+    else{
+        ret = ErrDbNotReady;
+        loge("db not ready");
+    }
+    tracedr(ret);
+    return ret;
+}
+
+ErrCode DbModel::markRemove()
+{
+    traced;
+    ErrCode ret = ErrNone;
+    DbModelHandler* dbModelHdl = getDbModelHandler();
+    if (dbModelHdl != nullptr){
+        ret = dbModelHdl->deleteSoft(this);
+    }
+    else{
+        ret = ErrDbNotReady;
+        loge("db not ready");
+    }
     tracedr(ret);
     return ret;
 }

@@ -27,11 +27,15 @@
 
 #include "dbmodel.h"
 #include <QHash>
+#include "dbsqlitedefs.h"
+
 class DbSqlite;
 class DbSqliteTableBuilder;
 class DbSqliteInsertBuilder;
 class DbSqliteUpdateBuilder;
+class DbSqliteDeleteBuilder;
 class QSqlQuery;
+class FieldValue;
 
 class DbSqliteTbl
 {
@@ -53,7 +57,20 @@ public:
     virtual ErrCode add(DbModel* item);
     virtual ErrCode update(DbModel* item);
     virtual ErrCode updateUid(const DbModel* item, const QString& uid);
-    virtual ErrCode update(const QString& uid, const QHash<QString, QString>& fieldValues);
+    virtual ErrCode update(const QString& uid, const QHash<QString, FieldValue>& fieldValues);
+
+    /**
+     * @brief delete by marking as delete
+     * @param item
+     * @return
+     */
+    virtual ErrCode deleteSoft(DbModel* item);
+    /**
+     * @brief delete completely form db
+     * @param item
+     * @return
+     */
+    virtual ErrCode deleteHard(DbModel* item);
 
     virtual bool isExist(const DbModel* item);
     virtual QHash<QString, QString> getFieldsCheckExists(const DbModel* item);
@@ -79,7 +96,6 @@ public:
 
     virtual QHash<QString, int> getSearchFields();
     virtual int search(const QString& keyword, const DbModelBuilder& builder, QList<DbModel*>* outList = nullptr);
-
 
 
     /**
@@ -109,6 +125,9 @@ protected:
     virtual QString getSqlCmdCreateTable();
     virtual void addTableField(DbSqliteTableBuilder* builder);
     virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
+
+    virtual ErrCode deleteCondition(DbSqliteDeleteBuilder *builder, const DbModel *item);
+
     /**
      * @brief Update table field
      * @param builder

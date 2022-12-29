@@ -57,6 +57,7 @@ protected:
     virtual ErrCode onChangeCommunity(QMenu* menu, UITableMenuAction* act);
     virtual void onViewItem(UITableWidgetItem *item);
     virtual void onEditItem(UITableWidgetItem *item);
+    virtual void onDeleteItem(UITableWidgetItem *item);
     virtual QString getTitle();
 
     virtual void initFilterFields();

@@ -30,12 +30,12 @@ DbSqliteUpdateBuilder *DbSqliteUpdateBuilder::build(const QString &tblName)
     return new DbSqliteUpdateBuilder(tblName);
 }
 
-DbSqliteUpdateBuilder *DbSqliteUpdateBuilder::addValue(const QString &field, const QString &value)
+DbSqliteUpdateBuilder *DbSqliteUpdateBuilder::addValue(const QString &field, const QString &value, int dataType)
 {
     traced;
     logd("add field %s, value %s", field.toStdString().c_str(), value.toStdString().c_str());
     if (!mValue.contains(field)) {
-        mValue.insert(field, value);
+        mValue.insert(field, FieldValue(value, dataType));
     } else {
         logi("Field %s already exist", field.toStdString().c_str());
     }
@@ -48,7 +48,7 @@ DbSqliteUpdateBuilder *DbSqliteUpdateBuilder::addValue(const QString &field, qin
     traced;
     logd("add field int %s, value %d", field.toStdString().c_str(), value);
     if (!mValue.contains(field)) {
-        mValue.insert(field, QString("%1").arg(value));
+        mValue.insert(field, FieldValue(QString("%1").arg(value), INT64));
     } else {
         logi("Field %s already exist", field.toStdString().c_str());
     }
@@ -56,12 +56,12 @@ DbSqliteUpdateBuilder *DbSqliteUpdateBuilder::addValue(const QString &field, qin
     return this;
 }
 
-DbSqliteUpdateBuilder *DbSqliteUpdateBuilder::addCond(const QString &field, const QString &value)
+DbSqliteUpdateBuilder *DbSqliteUpdateBuilder::addCond(const QString &field, const QString &value, int dataType)
 {
     traced;
     logd("add cond %s, value %s", field.toStdString().c_str(), value.toStdString().c_str());
     if (!mCondition.contains(field)) {
-        mCondition.insert(field, value);
+        mCondition.insert(field, FieldValue(value, dataType));
     } else {
         logi("Field %s already exist", field.toStdString().c_str());
     }
@@ -105,16 +105,16 @@ QSqlQuery *DbSqliteUpdateBuilder::buildSqlQuery(const QString *cond)
     {
         QString id = ":val_" + field;
         logd("Bind update command field '%s', value '%s'",
-             id.toStdString().c_str(), mValue.value(field).toStdString().c_str());
-        qry->bindValue(id, mValue.value(field));
+             id.toStdString().c_str(), mValue.value(field).value.toStdString().c_str());
+        qry->bindValue(id, mValue.value(field).value); // TODO: check data type
 
     }
     foreach( QString field, mCondition.keys() )
     {
         QString id = ":cond_" + field;
         logd("Bind update cond field '%s', value '%s'",
-             id.toStdString().c_str(), mCondition.value(field).toStdString().c_str());
-        qry->bindValue(id, mCondition.value(field));
+             id.toStdString().c_str(), mCondition.value(field).value.toStdString().c_str());
+        qry->bindValue(id, mCondition.value(field).value); // TODO: check datatype
 
     }
     return qry;

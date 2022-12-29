@@ -64,20 +64,6 @@ IDatabase *DbCtl::database() const
     return mDatabase;
 }
 
-ErrCode DbCtl::openDb()
-{
-    traced;
-    ErrCode ret = getDb()->openDb();
-    tracedr(ret);
-    return ret;
-}
-
-void DbCtl::closeDb()
-{
-    traced;
-    getDb()->closeDb();
-    tracede;
-}
 
 DbCtl* DbCtl::getInstance(){
     traced;

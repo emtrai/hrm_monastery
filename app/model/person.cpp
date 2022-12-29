@@ -85,122 +85,122 @@ Person::~Person()
     // TODO: free resource
 }
 
-void Person::clone(const Person &per)
+void Person::clone(const DbModel *model)
 {
     traced;
-    mDbId = per.dbId();
-    mUid = per.uid();
-    mPersonCode = per.personCode();
-    mFirstName = per.firstName();
-    mLastName = per.lastName();
+    DbModel::clone(model);
+    Person* per = (Person*) model;
+    mPersonCode = per->personCode();
+    mFirstName = per->firstName();
+    mLastName = per->lastName();
 
-    mBirthday = per.birthday();
-    mBirthPlace = per.birthPlace();
+    mBirthday = per->birthday();
+    mBirthPlace = per->birthPlace();
 
-    mHollyName = per.hollyName();
-    mSaintUidList = per.saintUidList();
-    mSaintUidNameMap.insert(per.saintUidNameMap());
+    mHollyName = per->hollyName();
+    mSaintUidList = per->saintUidList();
+    mSaintUidNameMap.insert(per->saintUidNameMap());
 
-    mImgId = per.imgId();
-    mImgPath = per.imgPath();
+    mImgId = per->imgId();
+    mImgPath = per->imgPath();
 
-    mNationalityUid = per.nationalityUid();
-    mNationalityName = per.nationalityName();
+    mNationalityUid = per->nationalityUid();
+    mNationalityName = per->nationalityName();
 
-    mEthnicUid = per.ethnicUid();
-    mEthnicName = per.ethnicName();
+    mEthnicUid = per->ethnicUid();
+    mEthnicName = per->ethnicName();
 
-    mIdCard = per.idCard();
-    mIdCardIssuePlace = per.idCardIssuePlace();
-    mIdCardIssueDate = per.idCardIssueDate();
+    mIdCard = per->idCard();
+    mIdCardIssuePlace = per->idCardIssuePlace();
+    mIdCardIssueDate = per->idCardIssueDate();
 
-    mEduUid = per.eduUid();
-    mEduName = per.eduName();
+    mEduUid = per->eduUid();
+    mEduName = per->eduName();
 
-    mSpecialistUidList = per.specialistUidList();
+    mSpecialistUidList = per->specialistUidList();
 
-    mCourseUid = per.courseUid();
-    mCourse = per.course();
+    mCourseUid = per->courseUid();
+    mCourse = per->course();
 
-    mCountryUid = per.countryUid();
-    mCountryName = per.countryName();
-    mProvinceUid = per.provinceUid();
-    mProvinceName = per.provinceName();
-    mAddr = per.addr();
-    mChurchAddr = per.churchAddr();
-    mEmail = per.email();
-    mTel = per.tel();
-    mOtherContact = per.otherContact();
+    mCountryUid = per->countryUid();
+    mCountryName = per->countryName();
+    mProvinceUid = per->provinceUid();
+    mProvinceName = per->provinceName();
+    mAddr = per->addr();
+    mChurchAddr = per->churchAddr();
+    mEmail = per->email();
+    mTel = per->tel();
+    mOtherContact = per->otherContact();
 
-    mDadName = per.dadName();
-    mDadBirthday = per.dadBirthday();
-    mDadAddr = per.dadAddr();
+    mDadName = per->dadName();
+    mDadBirthday = per->dadBirthday();
+    mDadAddr = per->dadAddr();
 
-    mMomName = per.momName();
-    mMomBirthday = per.momBirthday();
-    mMomAddr = per.momAddr();
+    mMomName = per->momName();
+    mMomBirthday = per->momBirthday();
+    mMomAddr = per->momAddr();
 
-    mFamilyHistory = per.familyHistory();
-    mFamilyContact = per.familyContact();
+    mFamilyHistory = per->familyHistory();
+    mFamilyContact = per->familyContact();
 
-    mChristenDate = per.christenDate();
-    mChristenPlace = per.christenPlace();
+    mChristenDate = per->christenDate();
+    mChristenPlace = per->christenPlace();
 
-    mEucharistPlace = per.eucharistPlace();
-    mEucharistDate = per.eucharistDate();
+    mEucharistPlace = per->eucharistPlace();
+    mEucharistDate = per->eucharistDate();
 
-    mHollyPlace = per.hollyPlace();
-    mHollyDate = per.hollyDate();
+    mHollyPlace = per->hollyPlace();
+    mHollyDate = per->hollyDate();
     // TODO:   mEducationList,    mWorkList;
-    mEducationUidList = per.educationUidList();
-    mWorkUidList = per.workUidList();
+    mEducationUidList = per->educationUidList();
+    mWorkUidList = per->workUidList();
 
-    mJoinDate = per.joinDate();
-    mJoinPICUid = per.joinPICUid();
-    mJoinPICName = per.joinPICName();
+    mJoinDate = per->joinDate();
+    mJoinPICUid = per->joinPICUid();
+    mJoinPICName = per->joinPICName();
 
-    mPreTrainJoinDate = per.preTrainJoinDate();
-    mPreTrainPICUid = per.preTrainPICUid();
-    mPreTrainPICName = per.preTrainPICName();
-    mTrainJoinDate = per.trainJoinDate();
+    mPreTrainJoinDate = per->preTrainJoinDate();
+    mPreTrainPICUid = per->preTrainPICUid();
+    mPreTrainPICName = per->preTrainPICName();
+    mTrainJoinDate = per->trainJoinDate();
 
-    mTrainPICUid = per.trainPICUid();
-    mTrainPICName = per.trainPICName();
+    mTrainPICUid = per->trainPICUid();
+    mTrainPICName = per->trainPICName();
 
-    mVowsDate = per.vowsDate();
-    mVowsCEOUid = per.vowsCEOUid();
-    mVowsCEOName = per.vowsCEOName();
+    mVowsDate = per->vowsDate();
+    mVowsCEOUid = per->vowsCEOUid();
+    mVowsCEOName = per->vowsCEOName();
 
-    mEternalVowsDate = per.eternalVowsDate();
-    mEternalVowsCEOUid = per.eternalVowsCEOUid();
-    mEternalVowsCEOName = per.eternalVowsCEOName();
-    mEternalVowsPICUid = per.eternalVowsPICUid();
-    mEternalVowsPICName = per.eternalVowsPICName();
+    mEternalVowsDate = per->eternalVowsDate();
+    mEternalVowsCEOUid = per->eternalVowsCEOUid();
+    mEternalVowsCEOName = per->eternalVowsCEOName();
+    mEternalVowsPICUid = per->eternalVowsPICUid();
+    mEternalVowsPICName = per->eternalVowsPICName();
 
-    mBankDate = per.bankDate();
-    mBankPlace = per.bankPlace();
+    mBankDate = per->bankDate();
+    mBankPlace = per->bankPlace();
 
-    mGoldenDate = per.goldenDate();
-    mGoldenPlace = per.goldenPlace();
+    mGoldenDate = per->goldenDate();
+    mGoldenPlace = per->goldenPlace();
 
-    mEternalDate = per.eternalDate();
-    mEternalPlace = per.eternalPlace();
+    mEternalDate = per->eternalDate();
+    mEternalPlace = per->eternalPlace();
 
-    mStatusUid = per.statusUid();
-    mStatusName = per.statusName();
+    mStatusUid = per->statusUid();
+    mStatusName = per->statusName();
 
-    mRetireDate = per.retireDate();
-    mRetirePlace = per.retirePlace();
+    mRetireDate = per->retireDate();
+    mRetirePlace = per->retirePlace();
 
-    mDeadDate = per.deadDate();
-    mDeadPlace = per.deadPlace();
+    mDeadDate = per->deadDate();
+    mDeadPlace = per->deadPlace();
 
-    mEventUidList = per.eventUidList();
+    mEventUidList = per->eventUidList();
 
-    mCommunityUid = per.communityUid();
-    mCommunityName = per.communityName();
-    mCurrentWorkUid = per.currentWorkUid();
-    mCurrentWorkName = per.currentWorkName();
+    mCommunityUid = per->communityUid();
+    mCommunityName = per->communityName();
+    mCurrentWorkUid = per->currentWorkUid();
+    mCurrentWorkName = per->currentWorkName();
 
 //    foreach (QString key, per.exportFields().keys()) {
 //        mExportFields.insert(key, per.exportFields()[key]); // TODO: use iterator ??

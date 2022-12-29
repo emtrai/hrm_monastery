@@ -82,6 +82,56 @@ ErrCode DbSqliteModelHandler::update(DbModel *model)
     return err;
 }
 
+ErrCode DbSqliteModelHandler::deleteSoft(DbModel *model)
+{
+    traced;
+    ErrCode err = ErrNone;
+    // TODO: should check if some sub-item not exist???
+    // i.e.import person, but country, holly name, etc. not exist, need to check and add it
+
+    if (model != nullptr){
+        DbSqliteTbl* tbl = getTable(model->modelName());
+        if (tbl->isExist(model)){
+            err = tbl->deleteSoft(model);
+        } else {
+            err = ErrNotExist;
+            loge("model %s not exist", model->name().toStdString().c_str());
+        }
+    }
+    else{
+        err = ErrInvalidArg;
+        loge("invalid argument");
+    }
+
+    tracedr(err);
+    return err;
+}
+
+ErrCode DbSqliteModelHandler::deleteHard(DbModel *model)
+{
+    traced;
+    ErrCode err = ErrNone;
+    // TODO: should check if some sub-item not exist???
+    // i.e.import person, but country, holly name, etc. not exist, need to check and add it
+
+    if (model != nullptr){
+        DbSqliteTbl* tbl = getTable(model->modelName());
+        if (tbl->isExist(model)){
+            err = tbl->deleteHard(model);
+        } else {
+            err = ErrNotExist;
+            loge("model %s not exist", model->name().toStdString().c_str());
+        }
+    }
+    else{
+        err = ErrInvalidArg;
+        loge("invalid argument");
+    }
+
+    tracedr(err);
+    return err;
+}
+
 bool DbSqliteModelHandler::exist(const DbModel *edu)
 {
     traced;
