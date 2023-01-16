@@ -266,3 +266,15 @@ ErrCode CommunityCtl::addPerson(Community* comm, Person *per)
     return ret;
 }
 
+QHash<int, QString> CommunityCtl::getStatusIdNameMap()
+{
+    traced;
+    QHash<int, QString> map;
+    map.insert(INACTIVE, "Không hoạt động");
+    map.insert(ACTIVE, "Đang hoạt động");
+    map.insert(BUILDING, "Đang xây dựng");
+    // TODO: make it as static to load once only???
+    tracede;
+    return map;
+}
+

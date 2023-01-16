@@ -25,10 +25,12 @@
 #include "controller.h"
 #include "dbmodel.h"
 #include "country.h"
+#include "commonctl.h"
+
 
 #define COUNTRYCTL (CountryCtl::getInstance())
 
-class CountryCtl : public Controller
+class CountryCtl : public CommonCtl
 {
 public:
     CountryCtl();
@@ -36,6 +38,9 @@ public:
     virtual DbModelHandler* getModelHandler();
 protected:
     DbModel *buildModel(void *items, const QString &fmt);
+    virtual const char *getPrebuiltFileName();
+    virtual const char* getPrebuiltFileType();
+    virtual QList<DbModel*> getItemFromDb();
 public:
     QList<Country*> getCountryList();
     QStringList getRegionList();

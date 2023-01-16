@@ -65,7 +65,7 @@ ErrCode UICommunityListView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act
 {
     traced;
     // TODO: handle it
-    MainWindow::showAddEditCommunity(true, nullptr);
+    MainWindow::showAddEditCommunity(false, nullptr, this);
     return ErrNone;
 }
 
@@ -74,6 +74,26 @@ ErrCode UICommunityListView::onMenuActionDelete(QMenu *menu, UITableMenuAction *
     traced;
     // TODO: handle it
     return ErrNone;
+}
+
+ErrCode UICommunityListView::onMenuActionAddPerson(QMenu *menu, UITableMenuAction *act)
+{
+    traced;
+    ErrCode err = ErrNotImpl;
+    Utils::showDlgUnderDev();
+    // TODO: implement it
+    tracedr(err);
+    return err;
+}
+
+ErrCode UICommunityListView::onMenuActionAddDepart(QMenu *menu, UITableMenuAction *act)
+{
+    traced;
+    ErrCode err = ErrNotImpl;
+    // TODO: implement it
+    Utils::showDlgUnderDev();
+    tracedr(err);
+    return err;
 }
 
 //ErrCode UICommunityListView::onMenuActionView(QMenu *menu, UITableMenuAction *act)
@@ -215,6 +235,16 @@ ErrCode UICommunityListView::onMenuActionListDepartment(QMenu *menu, UITableMenu
     return ret;
 }
 
+ErrCode UICommunityListView::onMenuActionListManagers(QMenu *menu, UITableMenuAction *act)
+{
+    traced;
+    ErrCode err = ErrNotImpl;
+    Utils::showDlgUnderDev();
+    // TODO: implement it
+    tracedr(err);
+    return err;
+}
+
 QList<UITableMenuAction *> UICommunityListView::getMenuItemActions(const QMenu* menu,
                                                                    UITableWidgetItem* item)
 {
@@ -234,6 +264,18 @@ QList<UITableMenuAction *> UICommunityListView::getMenuItemActions(const QMenu* 
                                           ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                               return this->onMenuActionListDepartment(m, a);
                                           }));
+    actionList.append(UITableMenuAction::build(tr("Ban Quản Lý"), this, item)
+                                          ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                              return this->onMenuActionListManagers(m, a);
+                                          }));
+    actionList.append(UITableMenuAction::build(tr("Thêm nữ tu"), this, item)
+                                                ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                                    return this->onMenuActionListDepartment(m, a);
+                                                }));
+    actionList.append(UITableMenuAction::build(tr("Thêm ban"), this, item)
+                                                   ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                                       return this->onMenuActionListDepartment(m, a);
+                                                   }));
     return actionList;
 
 }
@@ -259,4 +301,13 @@ ErrCode UICommunityListView::onReload()
     onLoad();
     tracede;
     return ErrNone;
+}
+
+void UICommunityListView::onDbModelReady(ErrCode ret, DbModel *model, DlgCommonEditModel *dlg)
+{
+    traced;
+    if (model){
+        model->dump();
+    }
+    tracede;
 }

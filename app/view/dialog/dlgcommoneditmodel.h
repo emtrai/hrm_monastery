@@ -19,11 +19,13 @@
  * Created date:12/29/2022
  * Brief:
  */
-#ifndef DLGCOMMONMODEL_H
-#define DLGCOMMONMODEL_H
+#ifndef DLGCOMMONEDITMODEL_H
+#define DLGCOMMONEDITMODEL_H
 #include "errcode.h"
 #include "logger.h"
-
+#include <QDialog>
+#include "commonctl.h"
+#include <QComboBox>
 
 #define DLG_BUILDER(className) \
 public: \
@@ -43,12 +45,19 @@ inline static className* build(QWidget *parent = nullptr, bool isSelfSave = true
 }
 
 class DbModel;
+class DlgCommonEditModel;
 
-class DlgCommonModel
+class CommonEditModelListener
 {
 public:
-    DlgCommonModel();
-    virtual ~DlgCommonModel();
+    virtual void onDbModelReady(ErrCode ret, DbModel* model, DlgCommonEditModel* dlg) = 0;
+};
+
+class DlgCommonEditModel: public QDialog
+{
+public:
+    DlgCommonEditModel(QWidget *parent);
+    virtual ~DlgCommonEditModel();
     virtual bool isNew() const;
     virtual void setIsNew(bool newIsNew);
 
@@ -58,13 +67,16 @@ public:
      * @brief build data for model, using dialog/wiget data
      * @return
      */
-    virtual DbModel *buildModel() = 0;
+    virtual ErrCode buildModel(DbModel* model, QString errMsg) = 0;
     /**
      * @brief build model from input model object
      * @param model
      * @return
      */
     virtual ErrCode fromModel(const DbModel* model);
+
+    CommonEditModelListener *listener() const;
+    void setListener(CommonEditModelListener *newListener);
 
 protected:
     /**
@@ -77,11 +89,22 @@ protected:
      * @return
      */
     virtual DbModel* model();
+
+    virtual void accept();
+    /**
+     * @brief Validate data of dialog
+     * @param msg: output message if validate is not ok
+     * @return
+     */
+    virtual bool onValidateData(QString& msg) = 0;
+
+    virtual ErrCode loadList(QComboBox* cb, CommonCtl* ctrl);
 protected:
 
     DbModel* mModel;
     bool mIsNew; // true: add new, false: edit/update
     bool mIsSelfSave; //true: auto save on accept, false: not save
+    CommonEditModelListener* mListener;
 };
 
-#endif // DLGCOMMONMODEL_H
+#endif // DLGCOMMONEDITMODEL_H

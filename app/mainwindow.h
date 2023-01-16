@@ -31,6 +31,8 @@
 #include <QAction>
 #include "loader/loaderctl.h"
 #include "view/widget/baseview.h"
+#include "view/dialog/dlgcommoneditmodel.h"
+
 QT_BEGIN_NAMESPACE
     namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -51,7 +53,6 @@ class Person;
 class DlgWait;
 class Community;
 
-
     class MainWindow : public QMainWindow, public LoaderListener
 {
     Q_OBJECT
@@ -62,7 +63,8 @@ class Community;
             static MainWindow *getInstance();
 
             static void showAddEditPerson(bool isSelfUpdate = true, Person* per = nullptr);
-            static void showAddEditCommunity(bool isSelfUpdate = true, Community* com = nullptr);
+            static void showAddEditCommunity(bool isSelfUpdate = true, Community* com = nullptr,
+                                             CommonEditModelListener* listener = nullptr);
             static void showImportDlg();
         protected:
      void showEvent(QShowEvent *ev);
@@ -77,11 +79,13 @@ class Community;
 
      virtual void onLoadController (Controller* ctl);
      void doShowAddEditPerson(bool isSelfUpdate = true, Person* per = nullptr);
-     void doShowAddEditCommunity(bool isSelfUpdate = true, Community* com = nullptr);
+     void doShowAddEditCommunity(bool isSelfUpdate = true, Community* com = nullptr,
+                                 CommonEditModelListener* listener = nullptr);
      void doShowImportPerson();
  private:
      void loadHomePageFile();
      void loadOtherMenu();
+     void loadOtherAddMenu();
      void loadImportMenu();
      void loadExportMenu();
 
@@ -152,6 +156,7 @@ class Community;
      void on_actionCountry_triggered();
 
      void on_actionBack_triggered();
+
 
  private:
      static MainWindow* gInstance;

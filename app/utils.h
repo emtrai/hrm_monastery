@@ -75,8 +75,8 @@ do { \
 } while (0)
 
 
-#define SET_DATE_VAL_FROM_WIDGET(widget,func) \
-    do { \
+#define SET_DATE_FORMAT_VAL_FROM_WIDGET(widget,func, format) \
+do { \
         QString val = widget->text().trimmed();\
         func(0);\
         if (!val.isEmpty()){ \
@@ -87,6 +87,21 @@ do { \
         }\
     } \
 } while (0)
+
+
+//#define SET_DATE_VAL_FROM_WIDGET(widget,func) \
+//do { \
+//        QString val = widget->text().trimmed();\
+//        func(0);\
+//        if (!val.isEmpty()){ \
+//            bool isOk = false;\
+//            qint64 date = Utils::dateFromString(val, DATE_FORMAT_YMD, &isOk);\
+//            if (isOk && date > 0){\
+//                func(date);\
+//        }\
+//    } \
+//} while (0)
+#define SET_DATE_VAL_FROM_WIDGET(widget,func) SET_DATE_FORMAT_VAL_FROM_WIDGET(widget, func, DATE_FORMAT_YMD)
 
 
 #define SET_VAL_FROM_CBOX(widget,func, functxt) \
@@ -104,6 +119,22 @@ do { \
             }\
         }\
     } while (0)
+
+// TODO: should common with above macro???
+// TODO: should check if value is actually integer??? exception???
+#define SET_INT_VAL_FROM_CBOX(widget,func, functxt) \
+do { \
+    int index = ui->cbStatus->currentIndex(); \
+    QString currtxt = widget->currentText().trimmed();\
+    logd("index %d, name %s", index, STR2CHA(currtxt));\
+    if (index >= 0){ \
+        QVariant value = widget->itemData(index);\
+        if (!value.isValid()) {\
+            func(value.toInt());\
+            functxt(currtxt);\
+        }\
+    }\
+} while (0)
 
 #define SET_VAL_FROM_TEXTBOX(widget, itemName, func, functxt) \
 do { \

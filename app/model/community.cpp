@@ -93,6 +93,13 @@ void Community::setStatus(CommunityStatus newStatus)
     status = newStatus;
 }
 
+void Community::setStatus(int newStatus)
+{
+    if (newStatus < COMMUNITY_STATUS_MAX) {
+        status = (CommunityStatus)newStatus;
+    }
+}
+
 //ErrCode_t Community::save()
 //{
 //    return DbCtl::getInstance()->dbCommunity()->add(this);
@@ -121,6 +128,56 @@ void Community::setCloseDate(qint64 newCloseDate)
 DbModelHandler *Community::getDbModelHandler()
 {
     return DbCtl::getDb()->getCommunityModelHandler();
+}
+
+const QString &Community::currentCEOUid() const
+{
+    return mCurrentCEOUid;
+}
+
+void Community::setCurrentCEOUid(const QString &newCurrentCEOUid)
+{
+    mCurrentCEOUid = newCurrentCEOUid;
+}
+
+const QString &Community::currentCEO() const
+{
+    return mCurrentCEO;
+}
+
+void Community::setCurrentCEO(const QString &newCurrentCEO)
+{
+    mCurrentCEO = newCurrentCEO;
+}
+
+const QString &Community::parentName() const
+{
+    return mParentName;
+}
+
+void Community::setParentName(const QString &newParentName)
+{
+    mParentName = newParentName;
+}
+
+const QString &Community::statusName() const
+{
+    return mStatusName;
+}
+
+void Community::setStatusName(const QString &newStatusName)
+{
+    mStatusName = newStatusName;
+}
+
+const QString &Community::countryUid() const
+{
+    return mCountryUid;
+}
+
+void Community::setCountryUid(const QString &newCountryUid)
+{
+    mCountryUid = newCountryUid;
 }
 
 const QString &Community::communityCode() const
@@ -208,6 +265,7 @@ void Community::dump()
     logd("- Name %s", name().toStdString().c_str());
     logd("- Addr %s", addr().toStdString().c_str());
     logd("- Feastday %s", Utils::date2String(mFeastDate).toStdString().c_str());
+    logd("- CEO Uid %s", currentCEOUid().toStdString().c_str());
 #endif //DEBUG_TRACE
 }
 

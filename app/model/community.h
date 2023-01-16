@@ -67,6 +67,7 @@ public:
 
     CommunityStatus getStatus() const;
     void setStatus(CommunityStatus newStatus);
+    void setStatus(int newStatus);
 
 //    ErrCode save();
 //    void dump();
@@ -114,6 +115,22 @@ public:
     const QString &communityCode() const;
     void setCommunityCode(const QString &newCommunityCode);
 
+    const QString &countryUid() const;
+    void setCountryUid(const QString &newCountryUid);
+
+
+    const QString &statusName() const;
+    void setStatusName(const QString &newStatusName);
+
+    const QString &parentName() const;
+    void setParentName(const QString &newParentName);
+
+    const QString &currentCEO() const;
+    void setCurrentCEO(const QString &newCurrentCEO);
+
+    const QString &currentCEOUid() const;
+    void setCurrentCEOUid(const QString &newCurrentCEOUid);
+
 protected:
     virtual DbModelHandler* getDbModelHandler();
 private:
@@ -122,17 +139,20 @@ private:
     QString mAddr;
     QString mProvince;
     QString mCountry;
+    QString mCountryUid;
     QString mChurch;
     QString mTel;
     QString mEmail;
     qint32 mLevel; // level 0: root, Level 1, Level 2 (belong to level 1), etc...
     Community* mParent;
+    QString mParentName;
     QString mParentUid;
 
     qint64 mCreateDate;
     qint64 mCloseDate;
     qint64 mFeastDate;
     CommunityStatus status;
+    QString mStatusName;
 
     QString mBrief;
     QString mFullInfo;
@@ -146,6 +166,9 @@ private:
     QString mAreaUid;
     qint64 mAreaDbId;
     QString mAreaName; // just for display, not store in db of community
+
+    QString mCurrentCEO;
+    QString mCurrentCEOUid;
 };
 
 #endif // COMMUNITY_H

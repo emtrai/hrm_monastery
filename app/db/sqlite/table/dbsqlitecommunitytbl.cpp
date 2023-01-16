@@ -69,7 +69,10 @@ ErrCode DbSqliteCommunityTbl::insertTableField(DbSqliteInsertBuilder *builder, c
     builder->addValue(KFieldAreaUid, cmm->areaUid());
     builder->addValue(KFieldAreaDbId, cmm->areaDbId());
     builder->addValue(KFieldStatus, (qint32) cmm->getStatus());
+    builder->addValue(KFieldCountryUid, cmm->countryUid());
+    builder->addValue(KFieldChurchAddr, cmm->church());
     builder->addValue(KFieldImgPath, cmm->imgPath());
+    builder->addValue(KFieldCEOUid, cmm->currentCEOUid());
     return ErrNone;
 }
 
@@ -84,6 +87,8 @@ void DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
     cmm->setParentUid(qry.value(KFieldParentUid).toString());
     cmm->setAreaUid(qry.value(KFieldAreaUid).toString());
     cmm->setAreaDbId(qry.value(KFieldAreaDbId).toInt());
+    cmm->setCountryUid(qry.value(KFieldCountryUid).toString());
+    cmm->setChurch(qry.value(KFieldChurchAddr).toString());
     if (qry.value(KFieldAreaName).isValid())
         cmm->setAreaName(qry.value(KFieldAreaName).toString());
     cmm->setAddr(qry.value(KFieldAddr).toString());
@@ -92,6 +97,7 @@ void DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
     cmm->setFeastDate(qry.value(KFieldFeastDay).toInt());
     cmm->setCreateDate(qry.value(KFieldCreateDate).toInt());
     cmm->setStatus((CommunityStatus)qry.value(KFieldStatus).toInt());
+    cmm->setCurrentCEOUid(qry.value(KFieldCEOUid).toString()); // TODO: check and set name as well
 }
 
 QString DbSqliteCommunityTbl::getSearchQueryString(const QString &cond)
@@ -127,10 +133,11 @@ void DbSqliteCommunityTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldCommunityCode, TEXT);
     builder->addField(KFieldImgPath, TEXT);
     builder->addField(KFieldAddr, TEXT);
+    builder->addField(KFieldCountryUid, TEXT);
     builder->addField(KFieldTel, TEXT);
     builder->addField(KFieldEmail, TEXT);
     builder->addField(KFieldCEOUid, TEXT);
-    builder->addField(KFieldChurchUid, TEXT);
+    builder->addField(KFieldChurchAddr, TEXT);
     builder->addField(KFieldAreaUid, TEXT);
     builder->addField(KFieldAreaDbId, TEXT);
     builder->addField(KFieldLevel, INT32);

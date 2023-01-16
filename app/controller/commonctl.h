@@ -47,6 +47,10 @@ protected:
     CommonCtl();
     CommonCtl(const QString& name);
 
+    /**
+     * @brief Get list of item all items from db, must be implemented by derived class
+     * @return
+     */
     virtual QList<DbModel*> getItemFromDb();
 
     virtual void clearItemList(QList<DbModel*>* list);

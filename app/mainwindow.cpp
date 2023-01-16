@@ -93,6 +93,7 @@ MainWindow::MainWindow(QWidget *parent)
     loadImportMenu();
     loadOtherMenu();
     loadExportMenu();
+    loadOtherAddMenu();
 
     mSummarizeView = new UISummarizeView();
 
@@ -157,10 +158,10 @@ void MainWindow::showAddEditPerson(bool isSelfUpdate, Person *per)
     tracede;
 }
 
-void MainWindow::showAddEditCommunity(bool isSelfUpdate, Community *com)
+void MainWindow::showAddEditCommunity(bool isSelfUpdate, Community *com, CommonEditModelListener* listener)
 {
     traced;
-    getInstance()->doShowAddEditCommunity(isSelfUpdate, com);
+    getInstance()->doShowAddEditCommunity(isSelfUpdate, com, listener);
     tracede;
 }
 
@@ -256,11 +257,12 @@ void MainWindow::doShowAddEditPerson(bool isSelfUpdate, Person *per)
     tracede;
 }
 
-void MainWindow::doShowAddEditCommunity(bool isSelfUpdate, Community *com)
+void MainWindow::doShowAddEditCommunity(bool isSelfUpdate, Community *com, CommonEditModelListener* listener)
 {
     traced;
     logd("isSelfUpdate %d", isSelfUpdate);
     DlgCommunity* dlg = DlgCommunity::build(this, isSelfUpdate, (DbModel*)com);
+    dlg->setListener(listener);
     dlg->exec();
     delete dlg;
     tracede;
@@ -315,7 +317,7 @@ void MainWindow::loadHomePageFile()
     } while (0)
 
 
-void MainWindow::loadOtherMenu()
+void MainWindow::loadOtherAddMenu()
 {
     traced;
 
@@ -323,6 +325,34 @@ void MainWindow::loadOtherMenu()
     // TODO: when other button be clear? check it
     otherButton->setText(tr("&Khác"));
     otherButton->setPopupMode(QToolButton::InstantPopup);
+    otherButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    QIcon icon;
+    icon.addFile(QString::fromUtf8(":/icon/icon/icons8-add-64"), QSize(), QIcon::Normal, QIcon::On);
+    otherButton->setIcon(icon);
+
+    QMenu *otherMenu = new QMenu(otherButton);
+
+    otherButton->setMenu(otherMenu);
+    // actionDummy? stupid? but it works
+    ui->toolBar->insertWidget(ui->actionDummyAdd, otherButton);
+
+    ADD_ACTION_ITEM(otherMenu,
+                    on_actionNew_Community_triggered,
+                    "Cộng đoàn",
+                    ICON_PATH("icons8-community-64"));
+
+
+
+}
+
+void MainWindow::loadOtherMenu()
+{
+    traced;
+
+    QToolButton *otherButton = new QToolButton(this);
+    // TODO: when other button be clear? check it
+    otherButton->setText(tr("&Khác"));
+        otherButton->setPopupMode(QToolButton::InstantPopup);
     otherButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     QIcon icon;
     icon.addFile(QString::fromUtf8(":/icon/icon/icons8-diversity-64"), QSize(), QIcon::Normal, QIcon::On);
@@ -361,7 +391,7 @@ void MainWindow::loadOtherMenu()
     ADD_ACTION_ITEM(otherMenu,
                     on_actionProvince_triggered,
                     "Tỉnh/Thành phố/Bang",
-                       ICON_PATH("icons8-catholic-64"));
+                    ICON_PATH("icons8-catholic-64"));
 #endif
     ADD_ACTION_ITEM(otherMenu,
                     on_actionMisson_triggered,
@@ -388,22 +418,21 @@ void MainWindow::loadOtherMenu()
                     on_actionEthnic_triggered,
                     "Dân tộc",
                     ICON_PATH("icons8-catholic-64"));
-//    QAction* act = nullptr;
+    //    QAction* act = nullptr;
 
-//    act = otherMenu->addAction(QIcon(QString::fromUtf8(":/icon/icon/icons8-earth-planet-80")),
-//                               tr("Khu vực"));
-//    QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionArea_triggered()));
+    //    act = otherMenu->addAction(QIcon(QString::fromUtf8(":/icon/icon/icons8-earth-planet-80")),
+    //                               tr("Khu vực"));
+    //    QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionArea_triggered()));
 
     // TODO: when other menu clear? check it
-//    act = otherMenu->addAction(QIcon(QString::fromUtf8(":/icon/icon/icons8-saint-64")),
-//                                        tr("Thánh"));
-//                   QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionSaints_2_triggered()));
+    //    act = otherMenu->addAction(QIcon(QString::fromUtf8(":/icon/icon/icons8-saint-64")),
+    //                                        tr("Thánh"));
+    //                   QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionSaints_2_triggered()));
 
 
-//    act = otherMenu->addAction(QIcon(QString::fromUtf8(":/icon/icon/icons8-unit-80.png")),
-//                               tr("Vị trí/vai trò"));
-//    QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionRole_triggered()));
-
+    //    act = otherMenu->addAction(QIcon(QString::fromUtf8(":/icon/icon/icons8-unit-80.png")),
+    //                               tr("Vị trí/vai trò"));
+    //    QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionRole_triggered()));
 }
 
 void MainWindow::loadImportMenu()
@@ -438,12 +467,12 @@ void MainWindow::loadImportMenu()
     ADD_MENU_ITEM(importMenu,
                   on_action_ImportCommunityList_triggered,
                   "Danh sách Cộng đoàn",
-                  ":/icon/icon/icons8-community-64 (1).png");
+                  ":/icon/icon/icons8-community-64.png");
 
     ADD_MENU_ITEM(importMenu,
                   on_action_ImportCommunity_triggered,
                   "Cộng đoàn",
-                  ":/icon/icon/icons8-community-64 (1).png");
+                  ":/icon/icon/icons8-community-64.png");
 
 //    mActionImportPersonList = new QAction(this);
 //    mActionImportPersonList->setObjectName(QString::fromUtf8("action_ImportPersonList"));

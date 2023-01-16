@@ -26,7 +26,7 @@
 #include "dbctl.h"
 CountryCtl* CountryCtl::gInstance = nullptr;
 
-CountryCtl::CountryCtl():Controller(KModelHdlCountry)
+CountryCtl::CountryCtl():CommonCtl(KModelHdlCountry)
 {
     traced;
 }
@@ -64,6 +64,21 @@ DbModel *CountryCtl::buildModel(void *items, const QString &fmt)
     item->setContinent(itemList->at(idx++));
 
     return item;
+}
+
+const char *CountryCtl::getPrebuiltFileName()
+{
+    return KPrebuiltCountryCSVFileName;
+}
+
+const char *CountryCtl::getPrebuiltFileType()
+{
+    return KFileTypeCSV;
+}
+
+QList<DbModel *> CountryCtl::getItemFromDb()
+{
+    return getModelHandler()->getAll(&Country::builder);
 }
 
 QList<Country *> CountryCtl::getCountryList()

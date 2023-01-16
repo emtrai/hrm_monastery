@@ -23,136 +23,201 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-717</y>
+        <y>-454</y>
         <width>462</width>
-        <height>1202</height>
+        <height>909</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <layout class="QGridLayout" name="gridLayout">
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_8">
+         <item row="5" column="1">
+          <widget class="QLineEdit" name="txtTel"/>
+         </item>
+         <item row="12" column="1">
+          <widget class="QTextEdit" name="txtInfo"/>
+         </item>
+         <item row="8" column="0">
+          <widget class="QLabel" name="label_6">
            <property name="text">
-            <string>Address</string>
+            <string>Tình trạng</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>Giáo xứ</string>
            </property>
           </widget>
          </item>
          <item row="8" column="1">
-          <widget class="QPlainTextEdit" name="plainTextEdit"/>
+          <widget class="QComboBox" name="cbStatus"/>
          </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>Name</string>
-           </property>
-          </widget>
-         </item>
-         <item row="14" column="0">
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>History</string>
-           </property>
-          </widget>
-         </item>
-         <item row="9" column="0">
-          <widget class="QLabel" name="label_6">
-           <property name="text">
-            <string>Status</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="3,1">
+         <item row="14" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
            <item>
-            <widget class="QComboBox" name="comboBox_3"/>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButton_4">
-             <property name="text">
-              <string>+</string>
+            <widget class="QLineEdit" name="txtCEO">
+             <property name="readOnly">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
-          </layout>
-         </item>
-         <item row="16" column="0">
-          <widget class="QLabel" name="label_16">
-           <property name="text">
-            <string>Members</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="label_9">
-           <property name="text">
-            <string>Province</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="3,1">
-             <item>
-              <widget class="QComboBox" name="comboBox_4"/>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButton_3">
-               <property name="text">
-                <string>+</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
+            <widget class="QPushButton" name="btnSearchCEO">
+             <property name="text">
+              <string>Tìm</string>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normalon>:/icon/icon/icons8-search-64.png</normalon>
+              </iconset>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
          <item row="1" column="0">
           <widget class="QLabel" name="label_15">
            <property name="text">
-            <string>Area</string>
+            <string>Khu vực</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="3,1">
+         <item row="11" column="0">
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>Cộng đoàn cha</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="3,1">
            <item>
-            <widget class="QComboBox" name="comboBox_5"/>
+            <widget class="QComboBox" name="cbCountry"/>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton_6">
+            <widget class="QPushButton" name="btnAddCountry">
              <property name="text">
-              <string>+</string>
+              <string>Thêm</string>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normalon>:/icon/icon/icons8-create-64 (1).png</normalon>
+              </iconset>
              </property>
             </widget>
            </item>
           </layout>
          </item>
-         <item row="7" column="0">
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_8">
+           <property name="text">
+            <string>Địa chỉ</string>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="1">
+          <widget class="QLineEdit" name="txtEstablishDate"/>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_11">
+           <property name="text">
+            <string>Số điện thoại</string>
+           </property>
+          </widget>
+         </item>
+         <item row="13" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Lịch sử</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QPlainTextEdit" name="txtChurch"/>
+         </item>
+         <item row="14" column="0">
+          <widget class="QLabel" name="label_17">
+           <property name="text">
+            <string>Tổng phụ trách</string>
+           </property>
+          </widget>
+         </item>
+         <item row="11" column="1">
+          <widget class="QComboBox" name="cbParentCommunity"/>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Tên</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
           <widget class="QLabel" name="label_12">
            <property name="text">
             <string>Email</string>
            </property>
           </widget>
          </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="label_10">
+         <item row="6" column="1">
+          <widget class="QPlainTextEdit" name="txtEmail"/>
+         </item>
+         <item row="3" column="1">
+          <widget class="QPlainTextEdit" name="txtAddr"/>
+         </item>
+         <item row="12" column="0">
+          <widget class="QLabel" name="label_3">
            <property name="text">
-            <string>Country</string>
+            <string>Thông tin</string>
            </property>
           </widget>
          </item>
-         <item row="7" column="1">
-          <widget class="QPlainTextEdit" name="plainTextEdit_3"/>
+         <item row="9" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Ngày thành lập</string>
+           </property>
+          </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEdit"/>
+         <item row="1" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="3,1">
+           <item>
+            <widget class="QComboBox" name="cbArea"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnAddArea">
+             <property name="text">
+              <string>Thêm</string>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normalon>:/icon/icon/icons8-create-64 (1).png</normalon>
+              </iconset>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
-         <item row="11" column="1">
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_13">
+           <property name="text">
+            <string>Ngày bổn mạng</string>
+           </property>
+          </widget>
+         </item>
+         <item row="10" column="0">
+          <widget class="QLabel" name="label_14">
+           <property name="text">
+            <string>Hình ảnh</string>
+           </property>
+          </widget>
+         </item>
+         <item row="10" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>
-            <widget class="QGraphicsView" name="graphicsView"/>
+            <widget class="QGraphicsView" name="imgPicture"/>
            </item>
            <item>
             <widget class="QPushButton" name="pushButton_5">
@@ -163,145 +228,21 @@
            </item>
           </layout>
          </item>
-         <item row="13" column="0">
-          <widget class="QLabel" name="label_3">
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="txtName"/>
+         </item>
+         <item row="13" column="1">
+          <widget class="QTextEdit" name="txtHistory"/>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_10">
            <property name="text">
-            <string>Brief</string>
-           </property>
-          </widget>
-         </item>
-         <item row="9" column="1">
-          <widget class="QComboBox" name="comboBox_2"/>
-         </item>
-         <item row="6" column="0">
-          <widget class="QLabel" name="label_11">
-           <property name="text">
-            <string>Tel</string>
-           </property>
-          </widget>
-         </item>
-         <item row="10" column="1">
-          <widget class="QLineEdit" name="lineEdit_2"/>
-         </item>
-         <item row="12" column="1">
-          <widget class="QComboBox" name="comboBox"/>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_13">
-           <property name="text">
-            <string>Feastday</string>
-           </property>
-          </widget>
-         </item>
-         <item row="12" column="0">
-          <widget class="QLabel" name="label_5">
-           <property name="text">
-            <string>Parent</string>
-           </property>
-          </widget>
-         </item>
-         <item row="16" column="1">
-          <layout class="QVBoxLayout" name="verticalLayout_3">
-           <item>
-            <widget class="QTableView" name="tableView"/>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_7">
-             <item>
-              <widget class="QPushButton" name="pushButton_7">
-               <property name="text">
-                <string>Add</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButton_8">
-               <property name="text">
-                <string>Delete All</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </item>
-         <item row="8" column="0">
-          <widget class="QLabel" name="label_7">
-           <property name="text">
-            <string>Church</string>
-           </property>
-          </widget>
-         </item>
-         <item row="10" column="0">
-          <widget class="QLabel" name="label_2">
-           <property name="text">
-            <string>Establish date</string>
+            <string>Quốc gia</string>
            </property>
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QLineEdit" name="lineEdit_4"/>
-         </item>
-         <item row="14" column="1">
-          <widget class="QTextEdit" name="textEdit_2"/>
-         </item>
-         <item row="6" column="1">
-          <widget class="QLineEdit" name="lineEdit_3"/>
-         </item>
-         <item row="15" column="0">
-          <widget class="QLabel" name="label_17">
-           <property name="text">
-            <string>CEO</string>
-           </property>
-          </widget>
-         </item>
-         <item row="15" column="1">
-          <widget class="QComboBox" name="comboBox_6"/>
-         </item>
-         <item row="11" column="0">
-          <widget class="QLabel" name="label_14">
-           <property name="text">
-            <string>Image</string>
-           </property>
-          </widget>
-         </item>
-         <item row="13" column="1">
-          <widget class="QTextEdit" name="textEdit"/>
-         </item>
-         <item row="3" column="1">
-          <widget class="QPlainTextEdit" name="plainTextEdit_2"/>
-         </item>
-         <item row="17" column="0">
-          <widget class="QLabel" name="label_18">
-           <property name="text">
-            <string>Department</string>
-           </property>
-          </widget>
-         </item>
-         <item row="17" column="1">
-          <layout class="QVBoxLayout" name="verticalLayout_4">
-           <item>
-            <widget class="QTableView" name="tableView_2"/>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_8">
-             <item>
-              <widget class="QPushButton" name="pushButton_9">
-               <property name="text">
-                <string>Add</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButton_10">
-               <property name="text">
-                <string>Delete</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
+          <widget class="QLineEdit" name="txtFeaseDay"/>
          </item>
         </layout>
        </item>
@@ -338,9 +279,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton">
+           <widget class="QPushButton" name="btnImport">
             <property name="text">
-             <string>Import</string>
+             <string>Nhập</string>
             </property>
            </widget>
           </item>

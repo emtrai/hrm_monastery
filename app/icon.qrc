@@ -6,7 +6,6 @@
         <file>icon/icons8-church-64.png</file>
         <file>icon/icons8-nun-60.png</file>
         <file>icon/icons8-nun-64.png</file>
-        <file>icon/icons8-community-64 (1).png</file>
         <file>icon/icons8-saint-64.png</file>
         <file>icon/icons8-join-96.png</file>
         <file>icon/icons8-delete-64.png</file>
@@ -32,5 +31,6 @@
         <file>icon/icons8-export-100.png</file>
         <file>icon/icons8-catholic-64.png</file>
         <file>icon/icons8-back-arrow-64.png</file>
+        <file>icon/icons8-community-64.png</file>
     </qresource>
 </RCC>

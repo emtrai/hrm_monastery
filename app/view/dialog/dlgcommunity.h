@@ -24,24 +24,31 @@
 
 #include <QDialog>
 #include "errcode.h"
-#include "dlgcommonmodel.h"
+#include "dlgcommoneditmodel.h"
+#include <QAbstractButton>
 
 namespace Ui {
 class DlgCommunity;
 }
 
 class Community;
-class DlgCommunity : public QDialog, public DlgCommonModel
+class DlgCommunity : public DlgCommonEditModel
 {
     Q_OBJECT
     DLG_BUILDER(DlgCommunity)
 public:
                  explicit DlgCommunity(QWidget *parent = nullptr);
     ~DlgCommunity();
-    virtual DbModel *buildModel();
+    virtual ErrCode buildModel(DbModel* model, QString errMsg);
 protected:
     virtual DbModel* newModel();
+    virtual bool onValidateData(QString& msg);
+    void loadData();
+    void loadStatus();
 public:
+
+private slots:
+    void on_btnSearchCEO_clicked();
 
 private:
     Ui::DlgCommunity *ui;

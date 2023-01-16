@@ -56,6 +56,7 @@ public:
     virtual QList<DbModel*> getItemFromDb();
     virtual DbModelHandler* getModelHandler();
     virtual ErrCode addPerson(Community* comm, Person* per);
+    virtual QHash<int, QString> getStatusIdNameMap();
 private:
     CommunityCtl();
 

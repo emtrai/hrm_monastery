@@ -84,6 +84,7 @@
    <addaction name="actionBack"/>
    <addaction name="separator"/>
    <addaction name="action_New"/>
+   <addaction name="actionDummyAdd"/>
    <addaction name="separator"/>
    <addaction name="actionSearch"/>
    <addaction name="separator"/>
@@ -181,9 +182,9 @@
   </action>
   <action name="actionCommunity">
    <property name="icon">
-    <iconset>
-     <normalon>:/icon/icon/icons8-community-64 (1).png</normalon>
-    </iconset>
+    <iconset resource="icon.qrc">
+     <normaloff>:/icon/icon/icons8-community-64.png</normaloff>
+     <normalon>:/icon/icon/icons8-community-64 (1).png</normalon>:/icon/icon/icons8-community-64.png</iconset>
    </property>
    <property name="text">
     <string>Cộng đoàn</string>
@@ -344,6 +345,14 @@
    </property>
    <property name="text">
     <string>Quay lại</string>
+   </property>
+  </action>
+  <action name="actionDummyAdd">
+   <property name="text">
+    <string>Dummy</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
  </widget>

@@ -155,6 +155,7 @@ const char* const KFieldSaintDbId = "saint_dbid";
 const char* const KFieldPersonUid = "person_uid";
 const char* const KFieldPersonDbId = "person_dbid";
 const char* const KFieldPersonName = "person_name";
+const char* const KFieldRoleDbId = "role_dbid";
 const char* const KFieldRoleUid = "role_uid";
 const char* const KFieldRoleName = "role_name";
 const char* const KFieldTermUid = "term_uid";

@@ -107,6 +107,7 @@ SOURCES += \
     db/sqlite/table/dbsqliteareamgrtbl.cpp \
     db/sqlite/table/dbsqliteareatbl.cpp \
     db/sqlite/table/dbsqlitecommunitydeptmaptbl.cpp \
+    db/sqlite/table/dbsqlitecommunitymgrtbl.cpp \
     db/sqlite/table/dbsqlitecommunitypersontbl.cpp \
     db/sqlite/table/dbsqlitecommunitytbl.cpp \
     db/sqlite/table/dbsqlitecountrytbl.cpp \
@@ -179,7 +180,7 @@ SOURCES += \
     view/dialog/dlgaddcommunityhistory.cpp \
     view/dialog/dlgaddevent.cpp \
     view/dialog/dlgaddpersonevent.cpp \
-    view/dialog/dlgcommonmodel.cpp \
+    view/dialog/dlgcommoneditmodel.cpp \
     view/dialog/dlgcommunity.cpp \
     view/dialog/dlgcountry.cpp \
     view/dialog/dlgcourse.cpp \
@@ -275,6 +276,7 @@ HEADERS += \
     db/sqlite/table/dbsqliteareamgrtbl.h \
     db/sqlite/table/dbsqliteareatbl.h \
     db/sqlite/table/dbsqlitecommunitydeptmaptbl.h \
+    db/sqlite/table/dbsqlitecommunitymgrtbl.h \
     db/sqlite/table/dbsqlitecommunitypersontbl.h \
     db/sqlite/table/dbsqlitecommunitytbl.h \
     db/sqlite/table/dbsqlitecountrytbl.h \
@@ -349,7 +351,7 @@ HEADERS += \
     view/dialog/dlgaddcommunityhistory.h \
     view/dialog/dlgaddevent.h \
     view/dialog/dlgaddpersonevent.h \
-    view/dialog/dlgcommonmodel.h \
+    view/dialog/dlgcommoneditmodel.h \
     view/dialog/dlgcommunity.h \
     view/dialog/dlgcountry.h \
     view/dialog/dlgcourse.h \

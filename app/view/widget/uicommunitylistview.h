@@ -23,8 +23,9 @@
 #define UICOMMUNITYLISTVIEW_H
 
 #include "uicommonlistview.h"
+#include "dlgcommoneditmodel.h"
 
-class UICommunityListView : public UICommonListView
+class UICommunityListView : public UICommonListView, public CommonEditModelListener
 {
 public:
     explicit UICommunityListView(QWidget *parent = nullptr);
@@ -37,15 +38,20 @@ protected:
     virtual ErrCode onMenuActionListPerson(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionListPersonHistory(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionListDepartment(QMenu* menu, UITableMenuAction* act);
+    virtual ErrCode onMenuActionListManagers(QMenu* menu, UITableMenuAction* act);
 //    virtual ErrCode onMenuAction(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionDelete(QMenu* menu, UITableMenuAction* act);
+    virtual ErrCode onMenuActionAddPerson(QMenu* menu, UITableMenuAction* act);
+    virtual ErrCode onMenuActionAddDepart(QMenu* menu, UITableMenuAction* act);
 //    virtual ErrCode onMenuActionView(QMenu* menu, UITableMenuAction* act);
     virtual void onViewItem(UITableWidgetItem *item);
         virtual QString getTitle();
 protected:
     virtual ErrCode onLoad();
     virtual ErrCode onReload();
+    virtual void onDbModelReady(ErrCode ret, DbModel* model, DlgCommonEditModel* dlg);
 };
+
 
 #endif // UICOMMUNITYLISTVIEW_H
