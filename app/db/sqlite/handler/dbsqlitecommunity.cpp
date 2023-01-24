@@ -51,7 +51,7 @@ DbSqliteTbl *DbSqliteCommunity::getTable(const QString &modelName)
     logd("modelname '%s'", modelName.toStdString().c_str());
     if (modelName == KModelNameCommPerson) {
         tbl = DbSqlite::table(KTableCommPerson);
-    } else {
+    } else { // TODO: check & implement more??
         tbl = getMainTbl();
     }
     tracede;

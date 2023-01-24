@@ -37,6 +37,7 @@
 #include <QThread>
 
 #include "view/dialog/dlgimportpersonlistresult.h"
+#include "view/dialog/dlgimportcommunitylistresult.h"
 #include "personctl.h"
 #include "dialog/dlgabout.h"
 #include "dlgwait.h"
@@ -165,10 +166,20 @@ void MainWindow::showAddEditCommunity(bool isSelfUpdate, Community *com, CommonE
     tracede;
 }
 
-void MainWindow::showImportDlg()
+void MainWindow::showImportDlg(ImportTarget target)
 {
     traced;
-    getInstance()->doShowImportPerson();
+    logd("import target %d", target);
+    switch (target) {
+    case IMPORT_TARGET_PERSON:
+        getInstance()->doShowImportPerson();
+        break;
+    case IMPORT_TARGET_COMMUNITY:
+        getInstance()->doShowImportCommunity();
+        break;
+    }
+    // TODO: return value to handle error case???
+    // TODO: use function pointer instead?
     tracede;
 }
 
@@ -287,6 +298,32 @@ void MainWindow::doShowImportPerson()
         logd("Import result %d", ret);
         logd("No of import item %d", list.count());
         DlgImportPersonListResult* dlg = new DlgImportPersonListResult();
+        dlg->setup(list);
+        dlg->exec();
+        delete dlg;
+    }
+    tracede;
+}
+
+void MainWindow::doShowImportCommunity()
+{
+    traced;
+    ErrCode err = ErrNone;
+    // TODO: show dialog to select which type of file to be imported???
+    QString fname = QFileDialog::getOpenFileName(
+        this,
+        tr("Open file"),
+        FileCtl::getAppDataDir(),
+        tr("CSV Files (*.csv);;Excel (*.xls *.xlsx)"));
+    // TODO: this is duplicate code, make it common please
+    if (!fname.isEmpty()){
+        logd("File %s is selected", fname.toStdString().c_str());
+        QList<DbModel*> list;
+        logd("Import from file %s", fname.toStdString().c_str());
+        ErrCode ret = COMMUNITYCTL->importFromFile(nullptr, ImportType::IMPORT_CSV, fname, &list);
+        logd("Import result %d", ret);
+        logd("No of import item %d", list.count());
+        DlgImportCommunityListResult* dlg = new DlgImportCommunityListResult();
         dlg->setup(list);
         dlg->exec();
         delete dlg;
@@ -537,6 +574,17 @@ void MainWindow::setAppState(AppState newAppState)
 {
     logd("set app state %d --> %d", mAppState, newAppState);
     mAppState = newAppState;
+}
+
+bool MainWindow::popViewFromStackAndShow()
+{
+    // TODO: implement his
+}
+
+void MainWindow::pushViewToStack(ViewType type)
+{
+    // TODO: implement this
+    // TODO: should limit max view, auto clean up old view
 }
 
 void MainWindow::onLoad()
@@ -829,6 +877,9 @@ void MainWindow::on_actionCountry_triggered()
 void MainWindow::on_actionBack_triggered()
 {
     traced;
+    // TODO: implemen this
+    // TODO: how about forward/redo???? show we support it?
+    popViewFromStackAndShow();
     UNDER_DEV(tr("Quay lại màn hình trước"));
 }
 

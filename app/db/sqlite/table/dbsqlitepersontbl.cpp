@@ -152,6 +152,8 @@ void DbSqlitePersonTbl::addTableField(DbSqliteTableBuilder *builder)
 
     // current work
     builder->addField(KFieldWorkUid, TEXT);
+    // THIS IS IMPORTANT NOTE, DON'T REMOVE IT
+    // - ANY UPDATE ON THIS, MUST UPDATE Person::clone() as well
 }
 
 ErrCode DbSqlitePersonTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)

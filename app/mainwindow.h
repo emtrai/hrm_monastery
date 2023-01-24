@@ -32,6 +32,8 @@
 #include "loader/loaderctl.h"
 #include "view/widget/baseview.h"
 #include "view/dialog/dlgcommoneditmodel.h"
+#include "importfactory.h"
+#include <QStack>
 
 QT_BEGIN_NAMESPACE
     namespace Ui { class MainWindow; }
@@ -65,7 +67,7 @@ class Community;
             static void showAddEditPerson(bool isSelfUpdate = true, Person* per = nullptr);
             static void showAddEditCommunity(bool isSelfUpdate = true, Community* com = nullptr,
                                              CommonEditModelListener* listener = nullptr);
-            static void showImportDlg();
+            static void showImportDlg(ImportTarget target);
         protected:
      void showEvent(QShowEvent *ev);
  public:
@@ -75,6 +77,13 @@ class Community;
      AppState appState() const;
      void setAppState(AppState newAppState);
 
+     /**
+      * @brief Pop view from stack and show
+      * @return true if there is still view exist in stack, false if no more view from stack
+      */
+     bool popViewFromStackAndShow();
+     void pushViewToStack(ViewType type);
+
  protected:
 
      virtual void onLoadController (Controller* ctl);
@@ -82,6 +91,7 @@ class Community;
      void doShowAddEditCommunity(bool isSelfUpdate = true, Community* com = nullptr,
                                  CommonEditModelListener* listener = nullptr);
      void doShowImportPerson();
+     void doShowImportCommunity();
  private:
      void loadHomePageFile();
      void loadOtherMenu();
@@ -111,6 +121,26 @@ class Community;
     QAction* mActionExportPersonList;
     DlgWait* mWaitDlg;
     AppState mAppState;
+
+    /* stack of table view
+     * it just used for view created at run time,
+     * not fix view which can be shown by toolbar
+     * I don't use QStackedWidget here, because we have same panel, but display
+     * 2 kinds of table view:
+     * - fix one (can open/show via button on toolbar, like community, etc.)
+     * - dynamic one, open/create in sub-menu item, etc...
+     * We can not push fix one to stack, to avoid case that user click/toggle to change
+     * view continuously, causing stack overflow
+     * Or another consider point is that: it can include all type of tablve view, including fix and dynamic
+     * mainapp will have a hash map, which containt list of view type + its pointer
+     * when thereis request to show view, get it from this hash map, if not exist, create new one, else
+     * get one from hash map, then update data (or override value).
+     * ViewStack will contain a vie type only, not pointer to widget, pointer point to widget is just contain in hash map
+     * it seems better one, consider it again....
+     * Re-design is not good, but follow Agile, we need to make it run first, then improve later,
+     * so accept re-design risk
+     */
+    QStack<QWidget*> mViewStack;
 
  signals:
     void load();

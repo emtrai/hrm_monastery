@@ -564,7 +564,7 @@ QList<DbModel *> DbSqliteTbl::getAll(const DbModelBuilder& builder)
     traced;
     QSqlQuery* qry = getAllQuery();
     QList<DbModel*>list;
-
+    // TODO: check status (delete or not, etc.0
     if( qry->exec() )
     {
         logd("Get all number of item %d", qry->size());

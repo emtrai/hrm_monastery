@@ -100,7 +100,7 @@ QList<DbModel *> PersonCtl::getPersonInCommunity(const QString &communityUid)
 {
     traced;
     logd("get person in community uid %s", STR2CHA(communityUid));
-    QList<DbModel*> list = modelHdl()->getListPersonInCommunity(communityUid);
+    QList<DbModel*> list = personModelHdl()->getListPersonInCommunity(communityUid);
     logd("found %d item", list.count());
     tracede;
     return list;
@@ -250,12 +250,14 @@ QList<Person *> PersonCtl::searchPerson(const QString &keyword)
     return listret;
 }
 
-DbPersonModelHandler *PersonCtl::modelHdl()
+DbModelHandler *PersonCtl::modelHdl()
 {
-    if (mModelHdl == nullptr) {
-        mModelHdl = dynamic_cast<DbPersonModelHandler*>(DB->getModelHandler(KModelHdlPerson));
-    }
-    return mModelHdl;
+    return dynamic_cast<DbModelHandler*>(DB->getModelHandler(KModelHdlPerson));;
+}
+
+DbPersonModelHandler *PersonCtl::personModelHdl()
+{
+    return dynamic_cast<DbPersonModelHandler*>(DB->getModelHandler(KModelHdlPerson));
 }
 
 DbModelHandler *PersonCtl::getModelHandler()
@@ -266,4 +268,5 @@ DbModelHandler *PersonCtl::getModelHandler()
 void PersonCtl::onLoad()
 {
     traced;
+    // TODO: caching management people, which can be used many times, for fast query
 }

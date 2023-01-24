@@ -59,7 +59,7 @@ QList<DbModel *> DbSqliteCommunityPersonTbl::getListPerson(const QString &commun
         return QList<DbModel*>();
     }
     logi("CommunityUid '%s'", communityUid.toStdString().c_str());
-    QString queryString = QString("SELECT * FROM %1 JOIN %2 ON %1.%3 = %2.%4 WHERE %1.%5 = :uid")
+    QString queryString = QString("SELECT * FROM %1 LEFT JOIN %2 ON %1.%3 = %2.%4 WHERE %1.%5 = :uid")
                               .arg(KTableCommPerson, KTablePerson)
                               .arg(KFieldPersonUid, KFieldUid, KFieldCommunityUid);
 

@@ -205,7 +205,7 @@ void Person::clone(const DbModel *model)
 //    foreach (QString key, per.exportFields().keys()) {
 //        mExportFields.insert(key, per.exportFields()[key]); // TODO: use iterator ??
 //    }
-
+    tracede;
 }
 
 void Person::buildUidIfNotSet()
@@ -236,16 +236,9 @@ QString Person::modelName() const
 }
 
 DbModel* Person::build(){
-    return new Person();
-}
-
-
-void Person::init()
-{
-    traced;
-    initExportFields();
-    initImportFields();
-
+    Person* item = new Person();
+    item->init();
+    return item;
 }
 
 void Person::initExportFields()
@@ -488,7 +481,7 @@ void Person::initImportFields()
     mImportFields.insert(KItemCommunity, [this](const QString& value){
         this->setCommunityName(value);
     }); //"community"; // TODO
-    mImportFields.insert(KItemCommunityId, [this](const QString& value){
+    mImportFields.insert(KItemCommunityCode, [this](const QString& value){
         this->setCommunityUid(value);
     }); //"community"; // TODO
     mImportFields.insert(KItemCommunityHistory, nullptr); //"community_history"; // TODO

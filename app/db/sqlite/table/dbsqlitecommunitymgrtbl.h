@@ -24,6 +24,10 @@
 
 #include "dbsqlitemaptbl.h"
 
+// TODO: delete it!!!!
+// We don't need this, use Depart instead
+// for manager, we can create depart of Management Board and assign members to that dept
+#if 0
 class DbSqliteCommunityMgrTbl : public DbSqliteMapTbl
 {
 public:
@@ -35,5 +39,5 @@ protected:
 private:
     static const qint32 KVersionCode;
 };
-
+#endif
 #endif // DBSQLITECOMMUNITYMGRTBL_H

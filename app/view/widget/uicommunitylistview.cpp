@@ -48,7 +48,12 @@ void UICommunityListView::initHeader()
 {
     traced;
     UICommonListView::initHeader();
+    mHeader.append(tr("Trạng thái hoạt động"));
     mHeader.append(tr("Vùng"));
+    mHeader.append(tr("Địa chỉ"));
+    mHeader.append(tr("Tổng phụ trách"));
+    mHeader.append(tr("Điện thoại"));
+    mHeader.append(tr("Email"));
 }
 
 void UICommunityListView::updateItem(DbModel *item, UITableItem *tblItem)
@@ -57,7 +62,12 @@ void UICommunityListView::updateItem(DbModel *item, UITableItem *tblItem)
 
     UICommonListView::updateItem(item, tblItem);
     Community* model = (Community*) item;
+    tblItem->addValue(COMMUNITYCTL->status2Name(model->getStatus()));
     tblItem->addValue(model->areaName());
+    tblItem->addValue(model->addr());
+    tblItem->addValue(model->currentCEO());
+    tblItem->addValue(model->tel());
+    tblItem->addValue(model->email());
 }
 
 
@@ -65,14 +75,24 @@ ErrCode UICommunityListView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act
 {
     traced;
     // TODO: handle it
-    MainWindow::showAddEditCommunity(false, nullptr, this);
+    MainWindow::showAddEditCommunity(true, nullptr, this);
     return ErrNone;
+}
+
+ErrCode UICommunityListView::onMenuActionImport(QMenu *menu, UITableMenuAction *act)
+{
+    traced;
+    ErrCode ret = ErrNone;
+    MainWindow::showImportDlg(IMPORT_TARGET_COMMUNITY);
+    tracedr(ret);
+    return ret;
 }
 
 ErrCode UICommunityListView::onMenuActionDelete(QMenu *menu, UITableMenuAction *act)
 {
     traced;
     // TODO: handle it
+    // TODO: don't delete root community
     return ErrNone;
 }
 
@@ -125,32 +145,40 @@ ErrCode UICommunityListView::onMenuActionAddDepart(QMenu *menu, UITableMenuActio
 //}
 void UICommunityListView::onViewItem(UITableWidgetItem *item)
 {
-    traced;
-    int idx = item->idx();
-    logd("idx=%d",idx);
-    if (idx < mItemList.length()){
-        Community* model = (Community*)mItemList.value(idx);
-        if (model == nullptr) {
-            loge("no data");
-            return;
-        }
-        model->dump();
-        QString uid = model->uid();
-        if (uid.isEmpty()) {
-            loge("no uid");
-            return;
-        }
-        UICommunityPersonListView* view = (UICommunityPersonListView*)UITableViewFactory::getView(ViewType::COMMUNITY_PERSON);
+//    traced;
+//    int idx = item->idx();
+//    logd("idx=%d",idx);
+//    if (idx < mItemList.length()){
+//        Community* model = (Community*)mItemList.value(idx);
+//        if (model == nullptr) {
+//            loge("no data");
+//            return;
+//        }
+//        model->dump();
+//        QString uid = model->uid();
+//        if (uid.isEmpty()) {
+//            loge("no uid");
+//            return;
+//        }
+//        UICommunityPersonListView* view = (UICommunityPersonListView*)UITableViewFactory::getView(ViewType::COMMUNITY_PERSON);
 
-        logd("community uid %s", uid.toStdString().c_str());
-//        view->setCommunityUid(uid);
-        view->setCommunity(model);
-        view->setTitle(model->name());
-        MainWindow::getInstance()->switchView(view);
-    } else {
-        loge("Invalid idx");
-        // TODO: popup message???
-    }
+//        logd("community uid %s", uid.toStdString().c_str());
+////        view->setCommunityUid(uid);
+//        view->setCommunity(model);
+//        view->setTitle(model->name());
+//        MainWindow::getInstance()->switchView(view);
+//    } else {
+//        loge("Invalid idx");
+//        // TODO: popup message???
+//    }
+}
+
+void UICommunityListView::onEditItem(UITableWidgetItem *item)
+{
+    traced;
+    DbModel* comm = item->itemData();
+    MainWindow::showAddEditCommunity(false, dynamic_cast<Community*>(comm), this);
+    tracede;
 }
 
 QString UICommunityListView::getTitle()
@@ -252,6 +280,10 @@ QList<UITableMenuAction *> UICommunityListView::getMenuItemActions(const QMenu* 
 //    logd("idx %d", idx);
     QList<UITableMenuAction*> actionList = UITableView::getMenuItemActions(menu, item);
 
+    actionList.append(UITableMenuAction::build(tr("Xuất danh sách nữ tu hiện tại"), this, item)
+                                                                                   ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                                                                       return this->onMenuActionExportListPerson(m, a);
+                                                                                   }));
     actionList.append(UITableMenuAction::build(tr("Danh sách nữ tu hiện tại"), this, item)
                                               ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                return this->onMenuActionListPerson(m, a);
@@ -280,6 +312,27 @@ QList<UITableMenuAction *> UICommunityListView::getMenuItemActions(const QMenu* 
 
 }
 
+QList<UITableMenuAction *> UICommunityListView::getMenuCommonActions(const QMenu *menu)
+{
+    traced;
+    QList<UITableMenuAction*> actionList = UITableView::getMenuCommonActions(menu);
+    actionList.append(UITableMenuAction::build(tr("Nhập từ tập tin"), this)
+                                                   ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                                       return this->onMenuActionImport(m, a);
+                                                   }));
+                      tracede;
+                      return actionList;
+}
+
+ErrCode UICommunityListView::onMenuActionExportListPerson(QMenu *menu, UITableMenuAction *act)
+{
+    traced;
+    ErrCode err = ErrNotImpl;
+    UNDER_DEV("Xuất danh sách thành viên hiện tại");
+    tracedr(err);
+    return err;
+}
+
 ErrCode UICommunityListView::onLoad()
 {
 //    QList<Community*> items = COMMUNITYCTL->getAllItems();
@@ -306,8 +359,12 @@ ErrCode UICommunityListView::onReload()
 void UICommunityListView::onDbModelReady(ErrCode ret, DbModel *model, DlgCommonEditModel *dlg)
 {
     traced;
-    if (model){
-        model->dump();
+    if (ret == ErrNone) {
+        if (model){
+            model->dump();
+        }
+        onReload();
     }
+
     tracede;
 }

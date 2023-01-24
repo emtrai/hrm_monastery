@@ -29,6 +29,7 @@
 #include "address.h"
 #include "person.h"
 #include "department.h"
+#include "iexporter.h"
 
 class Area;
 // BE WARE, ANY CHANGE TO THIS STATUS WILL IMPACT TO DB
@@ -43,7 +44,7 @@ enum CommunityStatus {
     COMMUNITY_STATUS_MAX
 };
 
-class Community: public QObject, public DbModel
+class Community: public QObject, public DbModel, public IExporter
 {
     Q_OBJECT
 public:
@@ -53,6 +54,9 @@ public:
     Community(const Community& obj);
     ~Community();
 
+    virtual void clone(const DbModel* per);
+    virtual void initExportFields();
+    virtual void initImportFields();
 
     qint32 level() const;
 
@@ -131,6 +135,24 @@ public:
     const QString &currentCEOUid() const;
     void setCurrentCEOUid(const QString &newCurrentCEOUid);
 
+    const QString &intro() const;
+    void setIntro(const QString &newIntro);
+
+    const QString &contact() const;
+    void setContact(const QString &newContact);
+
+    const QString &remark() const;
+    void setRemark(const QString &newRemark);
+
+    const QString &areaCode() const;
+    void setAreaCode(const QString &newAreaCode);
+
+    const QString &parentCode() const;
+    void setParentCode(const QString &newParentCode);
+
+    const QString &currentCEOCode() const;
+    void setCurrentCEOCode(const QString &newCurrentCEOCode);
+
 protected:
     virtual DbModelHandler* getDbModelHandler();
 private:
@@ -147,6 +169,7 @@ private:
     Community* mParent;
     QString mParentName;
     QString mParentUid;
+    QString mParentCode;
 
     qint64 mCreateDate;
     qint64 mCloseDate;
@@ -166,9 +189,15 @@ private:
     QString mAreaUid;
     qint64 mAreaDbId;
     QString mAreaName; // just for display, not store in db of community
+    QString mAreaCode; // Area code
 
-    QString mCurrentCEO;
-    QString mCurrentCEOUid;
+    QString mCurrentCEO; // full name
+    QString mCurrentCEOUid; // uid
+    QString mCurrentCEOCode; // code
+
+    QString mIntro;
+    QString mContact; // Other detail contact
+    QString mRemark;
 };
 
 #endif // COMMUNITY_H

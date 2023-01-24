@@ -71,7 +71,8 @@ public:
      */
     QList<Person*> searchPerson(const QString& keyword);
 
-    DbPersonModelHandler *modelHdl();
+    DbModelHandler *modelHdl();
+    DbPersonModelHandler *personModelHdl();
 
 protected:
     virtual DbModelHandler* getModelHandler();

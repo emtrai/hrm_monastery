@@ -27,6 +27,7 @@
 #include "exportfactory.h"
 #include <QList>
 #include "utils.h"
+#include "iimporter.h"
 
 // if (markModified()) logd("value is different '%s'", QString("'%1' vs '%2'").arg(cur, next).toStdString().c_str());
 #define CHECK_MODIFIED_THEN_SET(cur, next, itemName) \
@@ -58,19 +59,38 @@ enum DB_RECORD_STATUS {
     DB_RECORD_MAX
 };
 
-class DbModel
+class DbModel: public IImporter
 {
 public:
     DbModel();
     DbModel(const DbModel& model);
     DbModel(const DbModel* model);
     virtual ~DbModel();
+    virtual void init();
     // TODO: override operation ==?
 
     virtual void clone(const DbModel* per);
 
     virtual QString modelName() const;
     virtual int modelType() const;
+
+
+    virtual void initExportFields();
+    virtual void initImportFields();
+    /**
+     * @brief Import item (key:value)
+     * @param importFileType
+     * @param keyword
+     * @param value
+     * @param idx
+     * @param tag
+     * @return
+     */
+    virtual ErrCode onImportItem(int importFileType,
+                                 const QString& keyword,
+                                 const QString& value,
+                                 quint32 idx = 0,
+                                 void* tag = nullptr);
 
     virtual const QString &name() const;
     virtual void setName(const QString &newName);
@@ -150,6 +170,8 @@ public:
     bool markModified() const;
     void setMarkModified(bool newMarkModified);
 
+
+
 protected:
     virtual DbModelHandler* getDbModelHandler() = 0;
     virtual ErrCode prepare2Save();
@@ -158,6 +180,8 @@ protected:
     virtual void checkModifiedThenSet(qint32& cur, qint32 next, const QString& itemName);
     virtual void checkModifiedThenSet(qint64& cur, qint64 next, const QString& itemName);
 protected:
+    QHash<QString, std::function<QString(const QString&)>> mExportFields;
+    QHash<QString, std::function<void(const QString&)>> mImportFields;
     QHash<QString, ErrCode>* mValidateResult;
     QString mValidateMsg;
     QList<QString> mUpdatedField; // List of fields/info were changed its value

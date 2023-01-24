@@ -22,56 +22,58 @@
 #include "dbsqlitecommunitymgrtbl.h"
 
 
-#include "dbsqlitedefs.h"
-#include "defs.h"
-#include "logger.h"
-#include "dbsqlitetablebuilder.h"
-#include "model/saintperson.h"
-#include "dbsqliteinsertbuilder.h"
-#include <QSqlQuery>
-#include <QSqlRecord>
-#include <QHash>
-#include "table/dbsqlitepersontbl.h"
-#include "dbctl.h"
-#include "dbsqlite.h"
+// TODO: delete it!!!!
+// We don't need this, use Depart instead
+// for manager, we can create depart of Management Board and assign members to that dept
 
-const qint32 DbSqliteCommunityMgrTbl::KVersionCode = VERSION_CODE(0,0,1);
+//#include "dbsqlitedefs.h"
+//#include "defs.h"
+//#include "logger.h"
+//#include "dbsqlitetablebuilder.h"
+//#include "model/saintperson.h"
+//#include "dbsqliteinsertbuilder.h"
+//#include <QSqlQuery>
+//#include <QSqlRecord>
+//#include <QHash>
+//#include "table/dbsqlitepersontbl.h"
+//#include "dbctl.h"
+//#include "dbsqlite.h"
 
-DbSqliteCommunityMgrTbl::DbSqliteCommunityMgrTbl(DbSqlite *db):
-    DbSqliteMapTbl(db, KTableCommPerson, KTableCommPerson, KVersionCode)
-{
-    traced;
+//const qint32 DbSqliteCommunityMgrTbl::KVersionCode = VERSION_CODE(0,0,1);
 
-    mFieldNameUid1 = KFieldCommunityUid;
-    mFieldNameDbId1 = KFieldCommunityDbId;
-    mFieldNameUid2 = KFieldRoleUid;
-    mFieldNameDbId2 = KFieldRoleDbId;
-}
+//DbSqliteCommunityMgrTbl::DbSqliteCommunityMgrTbl(DbSqlite *db):
+//    DbSqliteMapTbl(db, KTableCommPerson, KTableCommPerson, KVersionCode)
+//{
+//    traced;
 
-void DbSqliteCommunityMgrTbl::addTableField(DbSqliteTableBuilder *builder)
-{
-    traced;
-    DbSqliteMapTbl::addTableField(builder);
-    builder->addField(KFieldPersonUid, TEXT);// Person plays in this role
-    builder->addField(KFieldCourseUid, TEXT);//Course of person
-    tracede;
-}
+//    mFieldNameUid1 = KFieldCommunityUid;
+//    mFieldNameDbId1 = KFieldCommunityDbId;
+//    mFieldNameUid2 = KFieldRoleUid;
+//    mFieldNameDbId2 = KFieldRoleDbId;
+//}
 
-void DbSqliteCommunityMgrTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
-{
-    traced;
-    DbSqliteMapTbl::updateModelFromQuery(item, qry);
-    QString modelName = item->modelName();
-    logd("update for map model '%s'", modelName.toStdString().c_str());
-    if (modelName == KModelNamePerson)
-    {
-        logd("update for person model");
-        DbSqlitePersonTbl* tbl = dynamic_cast<DbSqlitePersonTbl*>(DbSqlite::table(KTablePerson));
-        tbl->updateModelFromQuery(item, qry);
+//void DbSqliteCommunityMgrTbl::addTableField(DbSqliteTableBuilder *builder)
+//{
+//    traced;
+//    DbSqliteMapTbl::addTableField(builder);
+//    builder->addField(KFieldPersonUid, TEXT);// Person plays in this role
+//    builder->addField(KFieldCourseUid, TEXT);//Course of person
+//    tracede;
+//}
 
-
-    } else {
-        loge("Invalid mapp model '%s', do nothing", modelName.toStdString().c_str());
-    }
-    tracede;
-}
+//void DbSqliteCommunityMgrTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+//{
+//    traced;
+//    DbSqliteMapTbl::updateModelFromQuery(item, qry);
+//    QString modelName = item->modelName();
+//    logd("update for map model '%s'", modelName.toStdString().c_str());
+//    if (modelName == KModelNamePerson)
+//    {
+//        logd("update for person model");
+//        DbSqlitePersonTbl* tbl = dynamic_cast<DbSqlitePersonTbl*>(DbSqlite::table(KTablePerson));
+//        tbl->updateModelFromQuery(item, qry);
+//    } else {
+//        loge("Invalid mapp model '%s', do nothing", modelName.toStdString().c_str());
+//    }
+//    tracede;
+//}

@@ -35,6 +35,7 @@
 
 // TODO: make it as library????
 class DbSqliteTbl;
+class DbSqlitePerson;
 
 // https://lnj.gitlab.io/post/multithreaded-databases-with-qtsql/
 class DatabaseConnection
@@ -86,6 +87,7 @@ public:
     virtual DbModelHandler *getSaintModelHandler();
     virtual DbModelHandler* getSpecialistModelHandler();
     virtual DbModelHandler* getCommunityModelHandler();
+    virtual DbSqlitePerson* getPersonModelHandler();
     virtual DbModelHandler* getModelHandler(const QString& name);
 
     static DbSqliteTbl* table(const QString& tblName);

@@ -239,6 +239,7 @@ QMenu* UITableView::buildPopupMenu(UITableWidgetItem* item, const QList<UITableI
 
             actions.append(UITableMenuAction::buildSeparateAction());
             QList<UITableMenuAction*> itemActions = getMenuItemActions(mMenu, item);
+            // add one more callback/lister to call to derived class, if item action should be in disable state or not???
             if (!itemActions.empty()) {
                 actions.append(itemActions);
             }
@@ -289,6 +290,9 @@ QList<UITableMenuAction *> UITableView::getMenuItemActions(const QMenu* menu,
 {
     traced;
     QList<UITableMenuAction*> actionList;
+
+    // TODO: some item not allow some action, show consider this?
+    // i.e. add listener/callback to judge menu item exist, but in disable state
     actionList.append(UITableMenuAction::build(tr("Xem"), this, item)
                                           ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                               return this->onMenuActionView(m, a);
@@ -697,6 +701,7 @@ UITableMenuAction *UITableMenuAction::build(const QString &text, QObject *parent
                                             UITableWidgetItem *item, qint32 idx)
 {
     traced;
+    // TODO: should has ID for menu/action? so that other can judge state of action/menu, i.e. should in disable state or not
     UITableMenuAction* menu = new UITableMenuAction(text, parent);
     if (item)
         menu->addItemList(item->item());

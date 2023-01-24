@@ -30,6 +30,9 @@
 #include <QSqlQuery>
 #include "logger.h"
 #include "errcode.h"
+#include "dbpersonmodelhandler.h"
+#include "dbsqlite.h"
+#include "dbsqliteperson.h"
 
 const qint32 DbSqliteCommunityTbl::KVersionCode = VERSION_CODE(0,0,1);
 
@@ -59,6 +62,7 @@ ErrCode DbSqliteCommunityTbl::insertTableField(DbSqliteInsertBuilder *builder, c
     DbSqliteTbl::insertTableField(builder, item); // TODO: handle error code
     Community* cmm = (Community*) item;
     // TODO: community code: to be use later???
+    // TODO: check if root community exist (via level value), there is only one root community
     builder->addValue(KFieldCommunityCode, cmm->communityCode());
     builder->addValue(KFieldAddr, cmm->addr());
     builder->addValue(KFieldTel, cmm->tel());
@@ -73,6 +77,25 @@ ErrCode DbSqliteCommunityTbl::insertTableField(DbSqliteInsertBuilder *builder, c
     builder->addValue(KFieldChurchAddr, cmm->church());
     builder->addValue(KFieldImgPath, cmm->imgPath());
     builder->addValue(KFieldCEOUid, cmm->currentCEOUid());
+    builder->addValue(KFieldIntro, cmm->intro());
+    builder->addValue(KFieldContact, cmm->contact());
+    // TODO: calculate level basing on parent uid chain
+    // Level should be auto-updated, not set by user, which may cause mistake
+    builder->addValue(KFieldLevel, cmm->level());
+    builder->addValue(KFieldRemark, cmm->remark());
+
+    // TODO: need to search Area Uid basing on Area Code
+    // as there is no field of Area Code in community table, just Area UID
+    // because code can be changed/update, so should not be used as key
+
+    // TODO: need to search parent community Uid basing on Community Code
+    // as there is no field of Parent Community Code in table, just Community UID
+    // because code can be changed/update, so should not be used as key
+
+    // TODO: need to search CEO Uid basing on CEO Code
+    // as there is no field of CEO Code in table, just UID
+    // because code can be changed/update, so should not be used as key
+
     return ErrNone;
 }
 
@@ -84,6 +107,7 @@ void DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
     cmm->setCommunityCode(qry.value(KFieldCommunityCode).toString());
     cmm->setCreateDate(qry.value(KFieldCreateDate).toInt());
     cmm->setImgPath(qry.value(KFieldImgPath).toString());
+    cmm->setLevel(qry.value(KFieldLevel).toInt());
     cmm->setParentUid(qry.value(KFieldParentUid).toString());
     cmm->setAreaUid(qry.value(KFieldAreaUid).toString());
     cmm->setAreaDbId(qry.value(KFieldAreaDbId).toInt());
@@ -98,16 +122,28 @@ void DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
     cmm->setCreateDate(qry.value(KFieldCreateDate).toInt());
     cmm->setStatus((CommunityStatus)qry.value(KFieldStatus).toInt());
     cmm->setCurrentCEOUid(qry.value(KFieldCEOUid).toString()); // TODO: check and set name as well
+    if (!cmm->currentCEOUid().isEmpty()) {
+        // TODO: caching data (i.e. list of person in management board) for fast accessing?
+        // TODO: is it ok to call here? does it break any design?
+        // as table calls directly to model handler
+        Person* per = (Person*)SQLITE->getPersonModelHandler()->getByUid(cmm->currentCEOUid());
+        if (per) {
+            cmm->setCurrentCEO(per->getFullName());
+        }
+    }
+    cmm->setIntro(qry.value(KFieldIntro).toString());
+    cmm->setContact(qry.value(KFieldContact).toString());
+    cmm->setRemark(qry.value(KFieldRemark).toString());
 }
 
 QString DbSqliteCommunityTbl::getSearchQueryString(const QString &cond)
 {
     traced;
-    QString queryString = QString("SELECT *, %2.%4 AS %7, %2.%5 AS %6 FROM %1 JOIN %2 ON %1.%3 = %2.%4")
-                              .arg(name(), KTableArea)
-                              .arg(KFieldAreaUid, KFieldUid)
-                              .arg(KFieldName, KFieldAreaName)
-                              .arg(KFieldAreaUid)
+    QString queryString = QString("SELECT *, %2.%4 AS %7, %2.%5 AS %6 FROM %1 LEFT JOIN %2 ON %1.%3 = %2.%4")
+                              .arg(name(), KTableArea) // 1 & 2
+                              .arg(KFieldAreaUid, KFieldUid) // 3 & 4
+                              .arg(KFieldName, KFieldAreaName) // 5 & 6
+                              .arg(KFieldAreaUid) // 7
         ;
     if (!cond.isEmpty()) {
         queryString += QString(" WHERE %1").arg(cond);
@@ -132,7 +168,9 @@ void DbSqliteCommunityTbl::addTableField(DbSqliteTableBuilder *builder)
     // UID: need to fix, must not changed, as it'll impact to many table/field
     builder->addField(KFieldCommunityCode, TEXT);
     builder->addField(KFieldImgPath, TEXT);
+    builder->addField(KFieldIntro, TEXT); // TODO:translation????
     builder->addField(KFieldAddr, TEXT);
+    builder->addField(KFieldContact, TEXT);
     builder->addField(KFieldCountryUid, TEXT);
     builder->addField(KFieldTel, TEXT);
     builder->addField(KFieldEmail, TEXT);
@@ -140,11 +178,15 @@ void DbSqliteCommunityTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldChurchAddr, TEXT);
     builder->addField(KFieldAreaUid, TEXT);
     builder->addField(KFieldAreaDbId, TEXT);
-    builder->addField(KFieldLevel, INT32);
+    builder->addField(KFieldLevel, INT32); // TODO: do we need level here????
     builder->addField(KFieldParentUid, TEXT);
     builder->addField(KFieldCreateDate, INT64);
     builder->addField(KFieldFeastDay, INT64);
     builder->addField(KFieldDateFormat, TEXT);
     builder->addField(KFieldStatus, INT32); // stop, alive, etc.
     builder->addField(KFieldPreset, INT32); // 0: custom, 1: preset (from json)
+    builder->addField(KFieldRemark, TEXT); // 0: custom, 1: preset (from json)
+
+    // THIS IS IMPORTANT NOTE, DON'T REMOVE IT
+    // - ANY UPDATE ON THIS, MUST UPDATE Community::clone() as well
 }

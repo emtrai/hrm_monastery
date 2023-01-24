@@ -34,6 +34,12 @@ enum ImportType {
     IMPORT_MAX
 };
 
+enum ImportTarget {
+    IMPORT_TARGET_PERSON = 0,
+    IMPORT_TARGET_COMMUNITY,
+
+    IMPORT_TARGET_MAX
+};
 
 class ImportFactory
 {

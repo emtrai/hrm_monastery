@@ -74,6 +74,9 @@ ErrCode DlgCommunity::buildModel(DbModel *model, QString errMsg)
         }
     }
     if (err == ErrNone){
+        comm->setCommunityCode(ui->txtCode->text().trimmed());
+    }
+    if (err == ErrNone){
         SET_VAL_FROM_CBOX(ui->cbArea, comm->setAreaUid, comm->setAreaName);
     }
     if (err == ErrNone){
@@ -106,6 +109,47 @@ ErrCode DlgCommunity::buildModel(DbModel *model, QString errMsg)
     if (err == ErrNone){
         SET_VAL_FROM_TEXTBOX(ui->txtCEO, KItemUid, comm->setCurrentCEOUid, comm->setCurrentCEO);
     }
+    if (err == ErrNone){
+        comm->setContact(ui->txtContact->toPlainText().trimmed());
+    }
+    if (err == ErrNone){
+        comm->setIntro(ui->txtIntro->toPlainText().trimmed());
+    }
+    if (err == ErrNone){
+        comm->setRemark(ui->txtNote->toPlainText().trimmed());
+    }
+    tracedr(err);
+    return err;
+}
+
+ErrCode DlgCommunity::fromModel(const DbModel *item)
+{
+    traced;
+    ErrCode err = ErrNone;
+    err = DlgCommonEditModel::fromModel(item);
+    Community* comm = (Community*)model();
+    if (err == ErrNone) {
+        ui->txtName->setText(comm->name());
+        ui->txtCode->setText(comm->communityCode()); // TODO: auto generate???
+        Utils::setSelectItemComboxByData(ui->cbArea, comm->areaUid());
+        ui->txtEstablishDate->setText(Utils::date2String(comm->createDate()));
+        ui->txtFeaseDay->setText(Utils::date2String(comm->feastDate(), DATE_FORMAT_MD));
+        ui->txtAddr->setPlainText(comm->addr());
+        Utils::setSelectItemComboxByData(ui->cbCountry, comm->countryUid());
+        ui->txtTel->setText(comm->tel());
+        ui->txtEmail->setPlainText(comm->email());
+        ui->txtChurch->setPlainText(comm->church());
+        Utils::setSelectItemComboxByData(ui->cbStatus, comm->getStatus());
+        // TODO: image???
+        Utils::setSelectItemComboxByData(ui->cbParentCommunity, comm->parentUid());
+        SET_TEXTBOX_FROM_VALUE(ui->txtCEO, KItemUid,
+                               comm->currentCEOUid(), comm->currentCEO());
+
+
+        ui->txtIntro->setPlainText(comm->intro());
+        ui->txtContact->setPlainText(comm->contact());
+        ui->txtNote->setPlainText(comm->remark());
+    }
     tracedr(err);
     return err;
 }
@@ -137,10 +181,10 @@ void DlgCommunity::loadStatus()
 {
     traced;
     ui->cbStatus->clear();
-    QHash<int, QString> statuses = COMMUNITYCTL->getStatusIdNameMap();
-    logd("the number of status %d", statuses.count());
-    foreach (int key, statuses.keys()) {
-        ui->cbStatus->addItem(statuses[key], key);
+    QHash<int, QString>* statuses = COMMUNITYCTL->getStatusIdNameMap();
+    logd("the number of status %d", statuses->count());
+    foreach (int key, statuses->keys()) {
+        ui->cbStatus->addItem(statuses->value(key), key);
     }
     tracede;
 }

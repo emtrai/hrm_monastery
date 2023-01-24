@@ -40,6 +40,7 @@ public:
                  explicit DlgCommunity(QWidget *parent = nullptr);
     ~DlgCommunity();
     virtual ErrCode buildModel(DbModel* model, QString errMsg);
+    virtual ErrCode fromModel(const DbModel* model);
 protected:
     virtual DbModel* newModel();
     virtual bool onValidateData(QString& msg);

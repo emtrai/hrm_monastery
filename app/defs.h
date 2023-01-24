@@ -121,6 +121,7 @@ const char* const KItemHollyName = "TEN_THANH";
 const char* const KItemHolly = "THANH";
 const char* const KItemFeastDay = "NGAY_BON_MANG";
 const char* const KItemArea = "KHU_VUC";
+const char* const KItemAreaCode = "MA_KHU_VUC";
 const char* const KItemNationality = "QUOC_TICH";
 const char* const KItemNationalityUid = "nationality_uid";
 const char* const KItemEthnicUID = "MA_DAN_TOC";
@@ -151,7 +152,8 @@ const char* const KItemWorkId = "MA_CONG_VIEC";
 const char* const KItemWorkHistory = "LICH_SU_CONG_TAC";
 const char* const KItemDepartment = "PHONG_BAN";
 const char* const KItemCommunity = "CONG_DOAN";
-const char* const KItemCommunityId = "MA_CONG_DOAN";
+const char* const KItemCommunityCode = "MA_CONG_DOAN";
+const char* const KItemParentCommunityCode = "MA_CONG_DOAN_CHA";
 const char* const KItemCommunityHistory = "LICH_SU_CONG_DOAN";
 const char* const KItemDad = "TEN_CHA"; // TODO: holly name of dad?
 const char* const KItemDadBirthday = "NGAY_SINH_CHA";
@@ -190,6 +192,10 @@ const char* const KItemHistory = "LICH_SU";
 const char* const KItemEducation = "HOC_VAN";
 const char* const KItemEvent = "SU_KIEN";
 const char* const KItemImg = "HINH_ANH";
+const char* const KItemEstablishDate = "NGAY_THANH_LAP";
+const char* const KItemIntro = "GIO_THIEU";
+const char* const KItemCEOCode = "MA_TONG_PHU_TRACH";
+
 
 // Special item name
 const char* const KItemDbStatus = "DB_STATUS";

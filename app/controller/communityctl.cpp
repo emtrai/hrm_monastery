@@ -172,6 +172,14 @@ ErrCode CommunityCtl::parsePrebuiltFile(const QString &fpath, const QString &fty
 //    tracede;
 //}
 
+ErrCode CommunityCtl::addNew(DbModel *model)
+{
+    traced;
+    // TODO: auto add management board department, to contain list of managmenet member and role
+    // at least, we need to have CEO for community
+    return Controller::addNew(model);
+}
+
 ErrCode CommunityCtl::loadFromFile(const QString &path)
 {
     traced;
@@ -266,15 +274,98 @@ ErrCode CommunityCtl::addPerson(Community* comm, Person *per)
     return ret;
 }
 
-QHash<int, QString> CommunityCtl::getStatusIdNameMap()
+QHash<int, QString>* CommunityCtl::getStatusIdNameMap()
 {
     traced;
-    QHash<int, QString> map;
-    map.insert(INACTIVE, "Không hoạt động");
-    map.insert(ACTIVE, "Đang hoạt động");
-    map.insert(BUILDING, "Đang xây dựng");
+    static bool isInitiedStatusNameMap = false;
+    static QHash<int, QString> map;
+    if (!isInitiedStatusNameMap) {
+        map.insert(INACTIVE, "Không hoạt động");
+        map.insert(ACTIVE, "Đang hoạt động");
+        map.insert(BUILDING, "Đang xây dựng");
+        isInitiedStatusNameMap = true;
+    }
     // TODO: make it as static to load once only???
     tracede;
-    return map;
+    return &map;
+}
+
+QString CommunityCtl::status2Name(CommunityStatus status)
+{
+    QHash<int, QString>* statuses = getStatusIdNameMap();
+    QString ret;
+    traced;
+    logd("Status to get name %d", status);
+    if (statuses->contains(status)){
+        ret = statuses->value(status);
+    } else {
+        loge("invalid status %d", status);
+        ret = "Không rõ"; // TODO: translate???
+    }
+    tracede;
+    return ret;
+}
+
+ErrCode CommunityCtl::markModelDelete(DbModel *model)
+{
+    traced;
+    // TODO: implement delete
+    // TODO: don't delete root community
+    ASSERT(false, "implement markModelDelete");
+    return ErrNotImpl;
+}
+
+ErrCode CommunityCtl::deleteModel(DbModel *model)
+{
+    traced;
+    // TODO: implement delete
+    // TODO: don't delete root community, judge basing on level
+    ASSERT(false, "implement deleteModel");
+    return ErrNotImpl;
+}
+
+DbModel *CommunityCtl::doImportOneItem(int importFileType, const QStringList &items, quint32 idx)
+{
+    ErrCode ret = ErrNone;
+    Community* comm = nullptr;
+    int i = 0;
+    logd("idx = %d", idx);
+    logd("no items %lld", items.count());
+    if (idx == 0) {
+        logd("HEADER, save it");
+        foreach (QString item, items) {
+            logd("Header %s", item.toStdString().c_str());
+            mImportFields.append(item.trimmed());
+        }
+    } else {
+
+        comm = (Community*)Community::builder();
+        foreach (QString item, items) {
+            QString field = mImportFields[i++];
+            logd("Import field %s", field.toStdString().c_str());
+            ret = comm->onImportItem(importFileType, field, item, idx);
+        }
+    }
+
+    tracedr(ret);
+    return comm;
+}
+
+DbModel *CommunityCtl::doImportOneItem(int importFileType, const QHash<QString, QString> &items, quint32 idx)
+{
+    ErrCode ret = ErrNone;
+    Community* comm = nullptr;
+    int i = 0;
+    logd("idx = %d", idx);
+    comm = (Community*)Community::builder();
+    foreach (QString field, items.keys()) {
+        QString value = items.value(field);
+        logd("Import field %s", field.toStdString().c_str());
+        logd("Import value %s", value.toStdString().c_str());
+        ret = comm->onImportItem(importFileType, field, value, idx);
+    }
+
+    tracedr(ret);
+    return comm;
 }
 

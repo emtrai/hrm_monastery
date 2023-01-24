@@ -62,6 +62,9 @@ public:
     QString personName() const;
     void setPersonName(QString newPersonName);
 
+    const QString &areaCode() const;
+    void setAreaCode(const QString &newAreaCode);
+
 protected:
     virtual DbModelHandler* getDbModelHandler();
 private:
@@ -75,6 +78,7 @@ private:
     QString mPersonName; // just for display, not store to db
     QString mRemark;
     QString mCountryUid;
+    QString mAreaCode;
 
 };
 

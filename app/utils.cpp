@@ -610,6 +610,7 @@ ErrCode Utils::setSelectItemComboxByData(QComboBox *cb, const QVariant &data)
     traced;
     int cnt = cb->count();
     logd ("no. item %d", cnt);
+    logd("data %s", STR2CHA(data.toString()));
     ErrCode ret = ErrNotFound;
     for (int i = 0; i < cnt; i++) {
         QVariant val = cb->itemData(i);

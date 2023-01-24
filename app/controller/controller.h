@@ -30,7 +30,9 @@ public:
     virtual ErrCode importFromFile(IImporter *importer, ImportType type, const QString& fpath, QList<DbModel*>*outList = nullptr);
     virtual ErrCode onImportItem(int importFileType, const QStringList& items, quint32 idx = 0, void* tag = nullptr);
     virtual ErrCode onImportItem(int importFileType, const QHash<QString, QString>& items, quint32 idx = 0, void* tag = nullptr);
+    // in list, with header
     virtual DbModel* doImportOneItem(int importFileType, const QStringList& items, quint32 idx);
+    // hash map, in key:value style
     virtual DbModel* doImportOneItem(int importFileType, const QHash<QString, QString>& items, quint32 idx);
 
     virtual int search(const QString& keyword, QList<DbModel*>* outList = nullptr);
@@ -43,9 +45,13 @@ public:
                        QList<DbModel*>* outList = nullptr);
 
     virtual ErrCode loadFromDb();
-    ErrCode getUidListFromName(const QString& name, QHash<QString, QString>* uidList = nullptr, const char* hdlName = nullptr);
-    QString getNameFromUidList(const QStringList& uidList, const char* hdlName = nullptr);
-    QString getNameFromUidList(const QString& uidList, const char* hdlName = nullptr);
+    virtual ErrCode getUidListFromName(const QString& name, QHash<QString, QString>* uidList = nullptr, const char* hdlName = nullptr);
+    virtual QString getNameFromUidList(const QStringList& uidList, const char* hdlName = nullptr);
+    virtual QString getNameFromUidList(const QString& uidList, const char* hdlName = nullptr);
+
+    virtual ErrCode markModelDelete(DbModel* model);
+    virtual ErrCode deleteModel(DbModel* model);
+
 protected:
     virtual DbModel *buildModel(void* items, const QString& fmt);
 

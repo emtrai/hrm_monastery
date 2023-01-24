@@ -378,3 +378,22 @@ DbSqliteTbl *DbSqlitePerson::getMainTbl()
 {
     return (DbSqliteTbl*)DbSqlite::getInstance()->getTable(KTablePerson);
 }
+
+DbModelBuilder DbSqlitePerson::getMainBuilder()
+{
+    return Person::build;
+}
+
+DbSqliteTbl *DbSqlitePerson::getTable(const QString &modelName)
+{
+    traced;
+    DbSqliteTbl* tbl = nullptr;
+    logd("modelname '%s'", modelName.toStdString().c_str());
+    if (modelName == KModelNamePerson) {
+        tbl = DbSqlite::table(KTablePerson);
+    } else { // TODO: check & implement more??
+        tbl = getMainTbl();
+    }
+    tracede;
+    return tbl;
+}

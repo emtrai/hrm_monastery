@@ -37,10 +37,10 @@ DbModel::DbModel():
 
 {
     traced;
-
+//    init(); // TODO: should call init here?
 }
 
-DbModel::DbModel(const DbModel &model)
+DbModel::DbModel(const DbModel &model):DbModel()
 {
     traced;
     mDbId = model.dbId();
@@ -64,6 +64,14 @@ DbModel::~DbModel()
     traced;
 }
 
+void DbModel::init()
+{
+    traced;
+    initExportFields();
+    initImportFields();
+    tracede;
+}
+
 void DbModel::clone(const DbModel *model)
 {
     traced;
@@ -85,6 +93,16 @@ QString DbModel::modelName() const
 int DbModel::modelType() const
 {
     return MODEL_UNKNOWN;
+}
+
+void DbModel::initExportFields()
+{
+    traced;
+}
+
+void DbModel::initImportFields()
+{
+    traced;
 }
 
 
@@ -195,6 +213,22 @@ void DbModel::setMarkModified(bool newMarkModified)
         resetAllModifiedMark();
     }
     mMarkModified = newMarkModified;
+}
+
+ErrCode DbModel::onImportItem(int importFileType, const QString &keyword, const QString &value, quint32 idx, void *tag)
+{
+    traced;
+    ErrCode ret = ErrNone;
+    logd("importFileType %d", importFileType);
+
+    // TODO: raise exception when error occur???
+    logd("keyword %s", keyword.toStdString().c_str());
+    if (mImportFields.contains(keyword)){
+        std::function<void(const QString& value)> func = mImportFields.value(keyword);
+        if (func != nullptr) func(value);
+    }
+    tracedr(ret);
+    return ret;
 }
 
 const QList<QString> &DbModel::updatedField() const

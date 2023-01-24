@@ -46,13 +46,12 @@ class Controller;
 
 typedef QString *GET_DATA_FUNC();
 
-class Person: public DbModel, public IExporter, public IImporter
+class Person: public DbModel, public IExporter
 {
 public:
     static DbModel* build();
-    void init();
-    void initExportFields();
-    void initImportFields();
+    virtual void initExportFields();
+    virtual void initImportFields();
     /**
      * @brief validate if data is all valid
      * @param result of validate for each field Field:ErrCode
@@ -427,8 +426,6 @@ protected:
     virtual ErrCode prepare2Save();
 
 protected:
-    QHash<QString, std::function<QString(const QString&)>> mExportFields;
-    QHash<QString, std::function<void(const QString&)>> mImportFields;
     QString mPersonCode;
 
     QString mFirstName;

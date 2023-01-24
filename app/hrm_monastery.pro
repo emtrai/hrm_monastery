@@ -188,6 +188,7 @@ SOURCES += \
     view/dialog/dlgdeptmgr.cpp \
     view/dialog/dlgethnic.cpp \
     view/dialog/dlghtmlviewer.cpp \
+    view/dialog/dlgimportcommunitylistresult.cpp \
     view/dialog/dlgimportlistresult.cpp \
     view/dialog/dlgimportpersonlistresult.cpp \
     view/dialog/dlgperson.cpp \
@@ -359,6 +360,7 @@ HEADERS += \
     view/dialog/dlgdeptmgr.h \
     view/dialog/dlgethnic.h \
     view/dialog/dlghtmlviewer.h \
+    view/dialog/dlgimportcommunitylistresult.h \
     view/dialog/dlgimportlistresult.h \
     view/dialog/dlgimportpersonlistresult.h \
     view/dialog/dlgperson.h \

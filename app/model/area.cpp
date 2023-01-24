@@ -27,16 +27,18 @@
 #include "dbmodel.h"
 
 
-Area::Area():
+Area::Area():DbModel(),
       mCountryDbId(0)
     , mPersonDbId(0)
 {
-
+    traced;
 }
 
 DbModel *Area::builder()
 {
-    return new Area();
+    Area* item = new Area();
+    item->init();
+    return item;
 }
 
 QString Area::modelName() const
@@ -89,6 +91,16 @@ DbModelHandler *Area::getDbModelHandler()
 {
 
     return DB->getModelHandler(KModelHdlArea);
+}
+
+const QString &Area::areaCode() const
+{
+    return mAreaCode;
+}
+
+void Area::setAreaCode(const QString &newAreaCode)
+{
+    mAreaCode = newAreaCode;
 }
 
 QString Area::personName() const

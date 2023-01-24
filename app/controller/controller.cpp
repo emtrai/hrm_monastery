@@ -332,6 +332,21 @@ QString Controller::getNameFromUidList(const QString &uidList, const char *hdlNa
     return getNameFromUidList(uidList.split(NAME_SPLIT), hdlName);
 
 }
+
+ErrCode Controller::markModelDelete(DbModel *model)
+{
+    traced;
+    ASSERT(false, "Derived class must implement markModelDelete");
+    return ErrNotImpl;
+}
+
+ErrCode Controller::deleteModel(DbModel *model)
+{
+    traced;
+    ASSERT(false, "Derived class must implement deleteModel");
+    return ErrNotImpl;
+
+}
 DbModel *Controller::buildModel(void *items, const QString &fmt)
 {
     traced;

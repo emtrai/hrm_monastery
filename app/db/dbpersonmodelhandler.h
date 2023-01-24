@@ -28,10 +28,9 @@
 
 class Specialist;
 
-class DbPersonModelHandler : public virtual DbModelHandler
+class DbPersonModelHandler
 {
 public:
-    DbPersonModelHandler();
     virtual ErrCode addEvent(const QString& personUid, const QString& eventUid,
                      qint64 date, const QString& title, const QString& remark) = 0;
     virtual QList<PersonEvent*>* getListEvents( const QString& personUid,

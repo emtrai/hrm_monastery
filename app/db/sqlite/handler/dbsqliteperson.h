@@ -30,7 +30,7 @@
 #include "errcode.h"
 
 class DbSqlitePersonTbl;
-class DbSqlitePerson : public DbPersonModelHandler
+class DbSqlitePerson : public DbSqliteModelHandler, public DbPersonModelHandler
 {
     GET_INSTALCE_DECL(DbSqlitePerson);
 public:
@@ -93,6 +93,8 @@ public:
     virtual QList<DbModel*> getListPersonInCommunity(const QString& communityUid);
 protected:
     virtual DbSqliteTbl* getMainTbl();
+    virtual DbModelBuilder getMainBuilder();
+    virtual DbSqliteTbl* getTable(const QString& modelName);
 private:
 
 };

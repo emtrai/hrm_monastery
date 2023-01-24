@@ -46,6 +46,7 @@ void DbSqliteAreaTbl::addTableField(DbSqliteTableBuilder *builder)
 {
     traced;
     DbSqliteTbl::addTableField(builder);
+    builder->addField(KFieldAreaCode, TEXT); // DB ID
     builder->addField(KFieldCountryUid, TEXT); // DB ID
     builder->addField(KFieldCountryDbId, INT64); // DB ID
     builder->addField(KFieldPersonDbId, INT64); // DB ID
@@ -61,6 +62,7 @@ ErrCode DbSqliteAreaTbl::insertTableField(DbSqliteInsertBuilder *builder,
     DbSqliteTbl::insertTableField(builder, item); // TODO: handle error code
 
     Area* model = (Area*) item;
+    builder->addValue(KFieldAreaCode, model->areaCode());
     builder->addValue(KFieldCountryUid, model->countryUid());
     builder->addValue(KFieldCountryDbId, model->countryDbId());
     builder->addValue(KFieldPersonDbId, model->personDbId());
@@ -75,6 +77,7 @@ void DbSqliteAreaTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
     traced;
     DbSqliteTbl::updateModelFromQuery(item, qry);
     Area* model = (Area*) item;
+    model->setAreaCode(qry.value(KFieldAreaCode).toString());
     model->setCountryUid(qry.value(KFieldCountryUid).toString());//TODO: load country obj
     model->setCountryDbId(qry.value(KFieldCountryDbId).toInt());//TODO: load country obj
     model->setPersonDbId(qry.value(KFieldPersonDbId).toInt());

@@ -27,16 +27,17 @@
 #include "errcode.h"
 #include "controller.h"
 #include "commonctl.h"
+#include "community.h"
 
 #define COMMUNITYCTL (CommunityCtl::getInstance())
 
-class Community;
 class Person;
 
 class CommunityCtl: public CommonCtl
 {
 
 public:
+    virtual ErrCode addNew(DbModel* model);
     // Load Community from file
     ErrCode loadFromFile(const QString& path);
 
@@ -56,7 +57,13 @@ public:
     virtual QList<DbModel*> getItemFromDb();
     virtual DbModelHandler* getModelHandler();
     virtual ErrCode addPerson(Community* comm, Person* per);
-    virtual QHash<int, QString> getStatusIdNameMap();
+    virtual QHash<int, QString>* getStatusIdNameMap();
+    QString status2Name(CommunityStatus status);
+    virtual ErrCode markModelDelete(DbModel* model);
+    virtual ErrCode deleteModel(DbModel* model);
+
+    virtual DbModel* doImportOneItem(int importFileType, const QStringList& items, quint32 idx);
+    virtual DbModel* doImportOneItem(int importFileType, const QHash<QString, QString>& items, quint32 idx);
 private:
     CommunityCtl();
 
@@ -68,7 +75,9 @@ protected:
 
 private:
     static CommunityCtl* gInstance;
+protected:
 
+    QList<QString> mImportFields;
 //    QList<Community*> mListCommunity;
 
 //public slots:

@@ -163,7 +163,7 @@ void DbSqlite::setupTables()
     appendTable(new DbSqliteEventTbl(this));
     appendTable(new DbSqliteSaintPersonMapTbl(this));
     appendTable(new DbSqliteCommunityPersonTbl(this));
-    appendTable(new DbSqliteCommunityMgrTbl(this));
+//    appendTable(new DbSqliteCommunityMgrTbl(this));
     appendTable(new DbSqliteCommunityDeptMapTbl(this));
     appendTable(new DbSqliteDepartmentPersonTbl(this));
     appendTable(new DbSqliteAreaMgrTbl(this));
@@ -293,6 +293,12 @@ DbModelHandler *DbSqlite::getSpecialistModelHandler()
 DbModelHandler *DbSqlite::getCommunityModelHandler()
 {
     return getModelHandler(KModelHdlCommunity);
+}
+
+DbSqlitePerson *DbSqlite::getPersonModelHandler()
+{
+    return dynamic_cast<DbSqlitePerson*>(getModelHandler(KModelHdlPerson));
+
 }
 
 DbModelHandler *DbSqlite::getModelHandler(const QString &name)

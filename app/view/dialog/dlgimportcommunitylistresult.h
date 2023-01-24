@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Ngo Huy Anh
+ * Copyright (C) 2023 Ngo Huy Anh
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,23 @@
  * limitations under the License.
  *
  *
- * Filename: dbpersonmodelhandler.cpp
+ * Filename: dlgimportcommunitylistresult.h
  * Author: Anh, Ngo Huy
- * Created date:9/10/2022
+ * Created date:1/24/2023
  * Brief:
  */
-#include "dbpersonmodelhandler.h"
-#include "logger.h"
-#include "errcode.h"
+#ifndef DLGIMPORTCOMMUNITYLISTRESULT_H
+#define DLGIMPORTCOMMUNITYLISTRESULT_H
 
-//DbPersonModelHandler::DbPersonModelHandler()
-//{
-//    traced;
-//}
+#include "dlgimportlistresult.h"
 
+class DlgImportCommunityListResult : public DlgImportListResult
+{
+public:
+    DlgImportCommunityListResult(QWidget *parent = nullptr);
+protected:
+    virtual void initHeader();
+    virtual QList<UIImportItem*>* getItems();
+};
 
+#endif // DLGIMPORTCOMMUNITYLISTRESULT_H

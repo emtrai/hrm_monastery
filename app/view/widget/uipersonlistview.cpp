@@ -187,7 +187,7 @@ ErrCode UIPersonListView::onMenuActionImport(QMenu *menu, UITableMenuAction *act
 {
     traced;
     ErrCode ret = ErrNone;
-    MainWindow::showImportDlg();
+    MainWindow::showImportDlg(IMPORT_TARGET_PERSON);
     tracedr(ret);
     return ret;
 }
@@ -219,6 +219,8 @@ ErrCode UIPersonListView::onChangeCommunity(QMenu *menu, UITableMenuAction *act)
     } else {
         logd("not accept???");
     }
+    // TODO: update history of person/community??
+    // TODO: update event of person???
     delete dlg;
     tracedr(ret);
     return ret;
