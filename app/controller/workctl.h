@@ -33,7 +33,7 @@ class Work;
 class WorkCtl : public Controller
 {
 
-    GET_INSTALCE_DECL(WorkCtl);
+    GET_INSTANCE_DECL(WorkCtl);
 public:
     WorkCtl();
     virtual ~WorkCtl();

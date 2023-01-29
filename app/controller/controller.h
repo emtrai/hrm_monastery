@@ -9,11 +9,12 @@
 #include "exportfactory.h"
 #include "importfactory.h"
 #include "iimporter.h"
+#include "iexporter.h"
 
 class DbModel;
 class DbModelHandler;
 
-class Controller: public QObject, public IImporter
+class Controller: public QObject, public IImporter, public IExporter
 {
     Q_OBJECT
 

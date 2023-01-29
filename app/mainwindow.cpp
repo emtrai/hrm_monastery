@@ -38,6 +38,7 @@
 
 #include "view/dialog/dlgimportpersonlistresult.h"
 #include "view/dialog/dlgimportcommunitylistresult.h"
+#include "view/dialog/dlghtmlviewer.h"
 #include "personctl.h"
 #include "dialog/dlgabout.h"
 #include "dlgwait.h"
@@ -181,6 +182,18 @@ void MainWindow::showImportDlg(ImportTarget target)
     // TODO: return value to handle error case???
     // TODO: use function pointer instead?
     tracede;
+}
+
+void MainWindow::showOnHtmlViewer(DbModel *model, const QString& subject)
+{
+    QString fpath;
+    ErrCode ret = model->exportToFile(ExportType::EXPORT_HTML, &fpath);
+    if (QFile::exists(fpath)){
+        dlgHtmlViewer* viewer = new dlgHtmlViewer();
+        viewer->setHtmlPath(fpath);
+        viewer->setSubject(subject);
+        viewer->exec();
+    }
 }
 
 void MainWindow::switchView(ViewType type)
@@ -656,8 +669,9 @@ void MainWindow::on_action_ImportCommunityList_triggered()
 void MainWindow::on_action_ImportCommunity_triggered()
 {
     traced;
-    UNDER_DEV(tr("Nhập Cộng Đoàn từ tập tin"));
-    // TODO: implement it
+//    UNDER_DEV(tr("Nhập Cộng Đoàn từ tập tin"));
+    MainWindow::showImportDlg(ImportTarget::IMPORT_TARGET_COMMUNITY);
+    // TODO: handle error case??
 
 }
 

@@ -26,6 +26,8 @@
 #include "errcode.h"
 #include "controller.h"
 #include <QHash>
+#include "exporttype.h"
+
 class Person;
 class Event;
 class DbPersonModelHandler;
@@ -57,6 +59,10 @@ public:
 
     // TODO: consider this in specialist or in person????
     QList<DbModel *> getSpecialistList(const QString &personUid);
+
+    virtual const QString exportTemplatePath(Exporter* exporter) const;
+    virtual ErrCode getExportDataString(const QString& keyword, const DbModel* data, QString* exportData) const;
+    ErrCode exportListPersonInCommunity(const QString& communityUid, ExportType exportType, const QString& fpath);
 private:
     PersonCtl();
 

@@ -33,6 +33,7 @@
 #include <QComboBox>
 #include <QObject>
 #include <QDateTime>
+#include <QFileDialog>
 // yymd
 #define YMD_TO_INT(y,m,d) (((y) << 16) | ((m) << 8) | (d))
 
@@ -210,7 +211,8 @@ ErrCode Utils::parseCSVFile(const QString &filePath,
     std::function<ErrCode(const QStringList& items, void* caller, void* param, quint32 idx)> cb,
     void *caller,
     void *paramCb, QChar splitBy,
-    qint32* cnt)
+    qint32* cnt,
+    QStringList* outItems) // TODO: therewill be the case that outIttem.length > 0 but cnt == 0
 {
     traced;
     ErrCode ret = ErrNone;
@@ -235,6 +237,9 @@ ErrCode Utils::parseCSVFile(const QString &filePath,
                         logd("split int to %lld items", items.length());
                         if (!items.empty())
                         {
+                            if (outItems != nullptr) {
+                                outItems->append(items);
+                            }
                             if (cb != nullptr){
                                 ret = cb(items, caller, paramCb, count);
                             }
@@ -242,7 +247,7 @@ ErrCode Utils::parseCSVFile(const QString &filePath,
                                 count ++;
                             } else {
                                 // TODO: check this case again, should continue or break/stop??
-                                loge("Line %d is invali", cnt);
+                                loge("Line %d is invalid? ret = %d", cnt, ret);
                                 break;
                             }
                         }
@@ -505,14 +510,24 @@ QString Utils::readAll(const QString &fpath)
     return in.readAll();
 }
 
-void Utils::showErrorBox(const QString &msg)
+void Utils::showMsgBox(const QString &msg)
 {
     QMessageBox msgBox;
     traced;
-    logd("Error box %s", msg.toStdString().c_str());
-    msgBox.setText(msg);
+    logd("Msg box %s", msg.toStdString().c_str());
+    // TODO: title???
+    msgBox.setInformativeText(msg);
     msgBox.setStandardButtons(QMessageBox::Close);
     msgBox.exec();
+    tracede;
+}
+
+void Utils::showErrorBox(const QString &msg)
+{
+    traced;
+    logd("Error box %s", msg.toStdString().c_str());
+    QMessageBox::critical(nullptr, "Lỗi", msg, QMessageBox::Close);
+    tracede;
 }
 
 void Utils::showErrorBox(int ret, const QString *msg)
@@ -641,5 +656,29 @@ void Utils::showDlgUnderDev(const QString &info)
     msgBox.setStandardButtons(QMessageBox::Close);
     msgBox.exec();
     tracede;
+}
+
+QString Utils::saveFileDialog(QWidget *parent,
+                              const QString& title,
+                              const QString& initFileName,
+                              const QString& filter,
+                              const QString& initDir)
+{
+    traced;
+    QString dir = !(initDir.isEmpty())?initDir:QDir::homePath();
+    QString name = !(initFileName.isEmpty())?initFileName:"";
+    QString fileFilter = !(filter.isEmpty())?filter:"Tất cả loại tập tin (*.*)";
+    QString dlgTitle = !(title.isEmpty())?title:"Lưu tập tin";
+    logd("dir %s", STR2CHA(dir));
+    logd("name %s", STR2CHA(name));
+    logd("filter %s", STR2CHA(fileFilter));
+    logd("title %s", STR2CHA(dlgTitle));
+    QString fpath = QFileDialog::getSaveFileName(parent,
+                                                 dlgTitle,
+                                                 dir + "/" + name,
+                                                 fileFilter);
+    logd("save to file '%s'", STR2CHA(fpath));
+    tracede;
+    return fpath;
 }
 

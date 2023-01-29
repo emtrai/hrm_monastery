@@ -26,6 +26,7 @@
 #include "utils.h"
 #include "iexporter.h"
 #include "dbdefs.h"
+#include "filectl.h"
 
 DbModel::DbModel():
       mDbId(0)
@@ -213,6 +214,45 @@ void DbModel::setMarkModified(bool newMarkModified)
         resetAllModifiedMark();
     }
     mMarkModified = newMarkModified;
+}
+
+ErrCode DbModel::exportToFile(ExportType type, QString *fpath)
+{
+    traced;
+    ErrCode ret = ErrNone;
+    QString fname = QString("%1.html").arg(uid());
+    *fpath = FileCtl::getTmpDataDir(fname);
+    ret = ExportFactory::exportTo(getExporter(),
+                                  *fpath, type);
+    // TODO: how about exportTo() method??
+    return ret;
+}
+
+const QString DbModel::exportTemplatePath(Exporter* exporter) const
+{
+    ASSERT(false, "derived DbModel class must implement exportTemplatePath");
+    return QString();
+}
+
+const QStringList DbModel::getListExportKeyWord() const
+{
+    traced;
+
+    return mExportFields.keys();
+}
+
+ErrCode DbModel::getExportDataString(const QString &keyword, QString *data) const
+{
+    ErrCode ret = ErrNone;
+    traced;
+    logd("keyword %s", keyword.toStdString().c_str());
+    if (mExportFields.contains(keyword)){
+        std::function<QString(const QString&)> func = mExportFields.value(keyword);
+        if (func != nullptr) *data = func(keyword);
+    }
+    // TODO: raise exception when error occur???
+
+    return ret;
 }
 
 ErrCode DbModel::onImportItem(int importFileType, const QString &keyword, const QString &value, quint32 idx, void *tag)
@@ -406,7 +446,7 @@ void DbModel::setNameId(const QString &newNameId)
 
 IExporter *DbModel::getExporter()
 {
-    return nullptr;
+    return this;
 }
 
 ErrCode DbModel::validate()

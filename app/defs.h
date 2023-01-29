@@ -57,6 +57,8 @@ const char* const KPrebuiltCommunityJsonFileName = "community";
 const char* const KPrebuiltHomeHtmlFileName = "home";
 const char* const KPrebuiltLogoFileName = "logo.png"; // special case, need file extenstion
 const char* const KPrebuiltPersonInfoTemplateFileName = "person_info_template";
+const char* const KPrebuiltPersonListCSVTemplateFileName = "person_list_export_template";
+const char* const KPrebuiltCommunityInfoTemplateFileName = "community_info_template";
 const char* const KPrebuiltCourseCSVFileName = "course";
 const char* const KPrebuiltWorkCSVFileName = "work";
 const char* const KPrebuiltStatusCSVFileName = "status";
@@ -193,7 +195,7 @@ const char* const KItemEducation = "HOC_VAN";
 const char* const KItemEvent = "SU_KIEN";
 const char* const KItemImg = "HINH_ANH";
 const char* const KItemEstablishDate = "NGAY_THANH_LAP";
-const char* const KItemIntro = "GIO_THIEU";
+const char* const KItemIntro = "GIOI_THIEU";
 const char* const KItemCEOCode = "MA_TONG_PHU_TRACH";
 
 

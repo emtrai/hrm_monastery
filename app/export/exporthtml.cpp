@@ -38,7 +38,7 @@ ErrCode ExportHtml::saveTo(const IExporter *item, const QString &fpath)
 {
     traced;
     ErrCode ret = ErrNone;
-    const QString templatePath = item->exportTemplatePath();
+    const QString templatePath = item->exportTemplatePath(this);
     QStringList keywords = item->getListExportKeyWord();
     QString templateData;
 
@@ -47,47 +47,62 @@ ErrCode ExportHtml::saveTo(const IExporter *item, const QString &fpath)
 
     if (!templatePath.isEmpty()) {
         templateData = Utils::readAll(templatePath);
+    } else {
+        ret = ErrInvalidData;
+        loge("Export HTML failed, not template found");
     }
 
     logd("number of keyword: %d", (int)keywords.length());
     logd("templateData len %d", (int)templateData.length());
 
-//    QRegularExpression re("{{(.*)}}");
-    QRegularExpression re("\\{\\{([^\\}\\}\\{\\{]*)\\}\\}");
-    QRegularExpressionMatchIterator i = re.globalMatch(templateData);
-    QHash<QString, bool> keywordStatus;
-
-    // TODO: something a stupid searching and replacement, but it works.
-    // TODO: find another way to improve it.
-    while (i.hasNext()) {
-        QRegularExpressionMatch match = i.next();
-        QString word = match.captured(1);
-        logd("word: %s", word.toStdString().c_str());
-        if (keywords.contains(word)){
-            logd("keywords list has this one");
-            keywordStatus.insert(word, true);
-        } else {
-            keywordStatus.insert(word, false);
-            logd("keywords list DO NOT has this one");
-        }
-    }
-    QString finadata = templateData;
-    foreach(QString word, keywordStatus.keys()){
-        QString data;
-
-        if (keywordStatus.value(word)){
-            ret = item->getExportDataString(word, &data);
-        } else {
-            data = "";
-        }
-        finadata = finadata.replace(QRegularExpression(QString("{{%1}}").arg(word)), data);
+    if (ret == ErrNone && templateData.isEmpty()) {
+        ret = ErrNoData;
+        loge("Export HTML failed, no template data");
     }
 
-    logd("Write %d finadata to file %s", finadata.length(), fpath.toStdString().c_str());
-    ret = FileCtl::writeStringToFile(finadata, fpath);
+    if (ret == ErrNone) {
+    //    QRegularExpression re("{{(.*)}}");
+        QRegularExpression re("\\{\\{([^\\}\\}\\{\\{]*)\\}\\}");
+        QRegularExpressionMatchIterator i = re.globalMatch(templateData);
+        QHash<QString, bool> keywordStatus;
 
+        // TODO: something a stupid searching and replacement, but it works.
+        // TODO: find another way to improve it.
+        while (i.hasNext()) {
+            QRegularExpressionMatch match = i.next();
+            QString word = match.captured(1);
+            logd("word: %s", word.toStdString().c_str());
+            if (keywords.contains(word)){
+                logd("keywords list has this one");
+                keywordStatus.insert(word, true);
+            } else {
+                keywordStatus.insert(word, false);
+                logd("keywords list DO NOT has this one");
+            }
+        }
+        QString finadata = templateData;
+        foreach(QString word, keywordStatus.keys()){
+            QString data;
+
+            if (keywordStatus.value(word)){
+                ret = item->getExportDataString(word, &data);
+            } else {
+                data = "";
+            }
+            finadata = finadata.replace(QRegularExpression(QString("{{%1}}").arg(word)), data);
+        }
+
+        logd("Write %d finadata to file %s", finadata.length(), fpath.toStdString().c_str());
+        ret = FileCtl::writeStringToFile(finadata, fpath);
+
+    }
     tracedr(ret);
     return ret;
+}
+
+ExportType ExportHtml::getExportType()
+{
+    return EXPORT_HTML;
 }
 
 

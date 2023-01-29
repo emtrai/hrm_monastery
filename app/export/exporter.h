@@ -24,15 +24,22 @@
 
 #include "errcode.h"
 #include <QString>
+#include "exporttype.h"
+#include <QList>
 
 class IExporter;
+class DbModel;
 
 class Exporter
 {
 public:
     Exporter();
 
+    // Exporter may contains data for export, or get data from list of data to export
+    // TODO: is there any better way????
     virtual ErrCode saveTo(const IExporter* exporter, const QString& fpath);
+    virtual ErrCode saveTo(const IExporter* exporter, const QList<DbModel*> data, const QString& fpath);
+    virtual ExportType getExportType() = 0;
 };
 
 #endif // EXPORTER_H

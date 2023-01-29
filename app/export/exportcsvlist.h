@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Ngo Huy Anh
+ * Copyright (C) 2023 Ngo Huy Anh
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,34 +14,28 @@
  * limitations under the License.
  *
  *
- * Filename: exporter.cpp
+ * Filename: exportcsvlist.h
  * Author: Anh, Ngo Huy
- * Created date:8/20/2022
+ * Created date:1/27/2023
  * Brief:
  */
+#ifndef EXPORTCSVLIST_H
+#define EXPORTCSVLIST_H
+
 #include "exporter.h"
-#include "logger.h"
+#include "errcode.h"
+#include <QString>
 #include "iexporter.h"
 #include "utils.h"
-#include "dbmodel.h"
 
-Exporter::Exporter()
+class ExportCSVList : public Exporter
 {
-    traced;
-}
+    GET_INSTANCE_DECL(ExportCSVList)
+public:
+    ExportCSVList();
+//    virtual ErrCode saveTo(const IExporter* item, const QString& fpath);
+    virtual ErrCode saveTo(const IExporter* exporter, const QList<DbModel*> data, const QString& fpath);
+    virtual ExportType getExportType();
+};
 
-ErrCode Exporter::saveTo(const IExporter* exporter, const QString &fpath)
-{
-    traced;
-    loge("Not support export here");
-    ASSERT(false, "CAN NOT EXPORT HERE, MUST BE IMPLEMENTED BY DERIVED CLASS");
-    return ErrNotSupport;
-}
-
-ErrCode Exporter::saveTo(const IExporter* exporter, const QList<DbModel*> data, const QString &fpath)
-{
-    traced;
-    loge("Not support export list here");
-    ASSERT(false, "CAN NOT EXPORT LIST HERE, MUST BE IMPLEMENTED BY DERIVED CLASS");
-    return ErrNotSupport;
-}
+#endif // EXPORTCSVLIST_H

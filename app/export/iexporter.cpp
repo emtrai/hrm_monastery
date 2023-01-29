@@ -23,16 +23,14 @@
 #include "logger.h"
 #include "defs.h"
 #include "exportfactory.h"
+#include "utils.h"
 
 IExporter::IExporter()
 {
     traced;
 }
 
-
-
-
-const QString IExporter::exportTemplatePath() const
+const QString IExporter::exportTemplatePath(Exporter* exporter) const
 {
     traced;
     return QString();
@@ -48,5 +46,13 @@ ErrCode IExporter::getExportDataString(const QString &keyword, QString* data) co
 {
     traced;
     loge("Not support here");
+    return ErrNotSupport;
+}
+
+ErrCode IExporter::getExportDataString(const QString &keyword, const DbModel *data, QString *exportData) const
+{
+    traced;
+    loge("Not support here");
+    ASSERT(false, "CAN NOT GET EXPORT DATA HERE, MUST BE IMPLEMENTED BY DERIVED CLASS");
     return ErrNotSupport;
 }

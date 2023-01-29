@@ -24,15 +24,19 @@
 #include "errcode.h"
 #include "exportfactory.h"
 
+class Exporter;
+class DbModel;
+// TODO: name should be IDataExporter???
 class IExporter
 {
 public:
     IExporter();
 
-    virtual const QString exportTemplatePath() const;
+    virtual const QString exportTemplatePath(Exporter* exporter) const;
 
     virtual const QStringList getListExportKeyWord() const;
     virtual ErrCode getExportDataString(const QString& keyword, QString* data) const;
+    virtual ErrCode getExportDataString(const QString& keyword, const DbModel* data, QString* exportData) const;
 };
 
 #endif // IEXPORTER_H

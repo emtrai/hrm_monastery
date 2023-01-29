@@ -28,6 +28,7 @@
 #include <QList>
 #include "utils.h"
 #include "iimporter.h"
+#include "iexporter.h"
 
 // if (markModified()) logd("value is different '%s'", QString("'%1' vs '%2'").arg(cur, next).toStdString().c_str());
 #define CHECK_MODIFIED_THEN_SET(cur, next, itemName) \
@@ -59,7 +60,7 @@ enum DB_RECORD_STATUS {
     DB_RECORD_MAX
 };
 
-class DbModel: public IImporter
+class DbModel: public IImporter, public IExporter
 {
 public:
     DbModel();
@@ -171,7 +172,11 @@ public:
     void setMarkModified(bool newMarkModified);
 
 
+    virtual ErrCode exportToFile(ExportType type, QString* fpath);
+    virtual const QString exportTemplatePath(Exporter* exporter) const;
 
+    virtual const QStringList getListExportKeyWord() const;
+    virtual ErrCode getExportDataString(const QString& keyword, QString* data) const;
 protected:
     virtual DbModelHandler* getDbModelHandler() = 0;
     virtual ErrCode prepare2Save();

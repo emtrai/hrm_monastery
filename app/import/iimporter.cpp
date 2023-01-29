@@ -22,11 +22,13 @@
 #include "iimporter.h"
 #include "logger.h"
 #include "errcode.h"
+#include "utils.h"
 
 ErrCode IImporter::onImportItem(int importFileType, const QString &keyword, const QString &value, quint32 idx, void* tag)
 {
     traced;
     loge("DEFAULT onImportItem, MUST BE IMPLEMENTED IN DERIVED CLASS");
+    ASSERT(false, "DEFAULT onImportItem, MUST BE IMPLEMENTED IN DERIVED CLASS");
     // TODO: make it abstract????
     return ErrNotSupport;
 }
@@ -34,6 +36,7 @@ ErrCode IImporter::onImportItem(int importFileType, const QString &keyword, cons
 ErrCode IImporter::onImportItem(int importFileType, const QStringList &items, quint32 idx, void* tag) {
     traced;
     loge("DEFAULT onImportItem, MUST BE IMPLEMENTED IN DERIVED CLASS");
+    ASSERT(false, "DEFAULT onImportItem, MUST BE IMPLEMENTED IN DERIVED CLASS");
     // TODO: make it abstract????
     return ErrNotSupport;
 }
@@ -42,6 +45,7 @@ ErrCode IImporter::onImportItem(int importFileType, const QHash<QString, QString
 {
     traced;
     loge("DEFAULT onImportItem, MUST BE IMPLEMENTED IN DERIVED CLASS");
+    ASSERT(false, "DEFAULT onImportItem, MUST BE IMPLEMENTED IN DERIVED CLASS");
     // TODO: make it abstract????
     return ErrNotSupport;
 }

@@ -68,6 +68,7 @@ class Community;
             static void showAddEditCommunity(bool isSelfUpdate = true, Community* com = nullptr,
                                              CommonEditModelListener* listener = nullptr);
             static void showImportDlg(ImportTarget target);
+            static void showOnHtmlViewer(DbModel* model, const QString& subject);
         protected:
      void showEvent(QShowEvent *ev);
  public:

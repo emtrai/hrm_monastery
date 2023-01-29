@@ -18,7 +18,8 @@
         <file alias="event_vi">res/event_vi.csv</file>
         <file alias="work_vi">res/work_vi.csv</file>
         <file alias="role_vi">res/role_vi.csv</file>
-        <file>res/community_info_template.html</file>
+        <file alias="community_info_template">res/community_info_template.html</file>
+        <file alias="person_list_export_template">res/person_list_export_template.csv</file>
     </qresource>
     <qresource prefix="/template"/>
 </RCC>

@@ -27,15 +27,16 @@
 #include <QString>
 #include "iexporter.h"
 #include "utils.h"
-
+#include "exporttype.h"
 class ExportHtml : public Exporter
 {
+    GET_INSTANCE_DECL(ExportHtml)
 public:
     ExportHtml();
     virtual ErrCode saveTo(const IExporter* item, const QString& fpath);
+    virtual ExportType getExportType();
 
 
-    GET_INSTALCE_DECL(ExportHtml)
 };
 
 #endif // EXPORTHTML_H

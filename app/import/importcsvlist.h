@@ -31,7 +31,7 @@
 
 class ImportCSVList : public Importer
 {
-    GET_INSTALCE_DECL(ImportCSVList)
+    GET_INSTANCE_DECL(ImportCSVList)
 public:
     ImportCSVList();
     virtual ErrCode importFrom(int importFileType, IImporter* importer, const QString& fpath, void* tag = nullptr);

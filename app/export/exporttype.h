@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Ngo Huy Anh
+ * Copyright (C) 2023 Ngo Huy Anh
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,23 @@
  * limitations under the License.
  *
  *
- * Filename: exportfactory.h
+ * Filename: exporttype.h
  * Author: Anh, Ngo Huy
- * Created date:8/20/2022
+ * Created date:1/27/2023
  * Brief:
  */
-#ifndef EXPORTFACTORY_H
-#define EXPORTFACTORY_H
+#ifndef EXPORTTYPE_H
+#define EXPORTTYPE_H
 
-#include "exporter.h"
-#include "exporttype.h"
-
-class ExportFactory
-{
-public:
-    ExportFactory();
-
-    static Exporter* getExporter(ExportType type);
-
-    static ErrCode exportTo(const IExporter* item, const QString& fpath, ExportType type);
-    static ErrCode exportTo(const IExporter* item, QList<DbModel*> data, const QString& fpath, ExportType type);
-
+// TODO: should we separate into Export format (csv, xlsx, etc.) and export type (list, item, etc.)?
+enum ExportType {
+    EXPORT_NONE = 0,
+    EXPORT_HTML,
+    EXPORT_CSV,
+    EXPORT_CSV_LIST,
+    EXPORT_DOCX,
+    EXPORT_XLSX,
+    EXPORT_MAX
 };
 
-#endif // EXPORTFACTORY_H
+#endif // EXPORTTYPE_H

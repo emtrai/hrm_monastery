@@ -31,7 +31,7 @@ class Event;
 
 class EventCtl : public Controller
 {
-    GET_INSTALCE_DECL(EventCtl);
+    GET_INSTANCE_DECL(EventCtl);
 public:
     EventCtl();
     virtual ~EventCtl();

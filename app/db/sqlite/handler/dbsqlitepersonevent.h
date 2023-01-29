@@ -27,7 +27,7 @@
 #include "utils.h"
 class DbSqlitePersonEvent : public DbSqliteModelHandler
 {
-    GET_INSTALCE_DECL(DbSqlitePersonEvent);
+    GET_INSTANCE_DECL(DbSqlitePersonEvent);
 public:
     DbSqlitePersonEvent();
 

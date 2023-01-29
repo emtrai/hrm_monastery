@@ -73,6 +73,7 @@ ErrCode DbSqliteCommunityTbl::insertTableField(DbSqliteInsertBuilder *builder, c
     builder->addValue(KFieldAreaUid, cmm->areaUid());
     builder->addValue(KFieldAreaDbId, cmm->areaDbId());
     builder->addValue(KFieldStatus, (qint32) cmm->getStatus());
+    // TODO: update status accordingly???
     builder->addValue(KFieldCountryUid, cmm->countryUid());
     builder->addValue(KFieldChurchAddr, cmm->church());
     builder->addValue(KFieldImgPath, cmm->imgPath());

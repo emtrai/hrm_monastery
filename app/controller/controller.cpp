@@ -69,6 +69,7 @@ ErrCode Controller::exportToFile(DbModel *model, ExportType type, QString *fpath
     *fpath = FileCtl::getTmpDataDir(fname);
     ret = ExportFactory::exportTo(model->getExporter(),
                                   *fpath, type);
+    // TODO: DbModel also has this function, redundant?????
     return ret;
 }
 

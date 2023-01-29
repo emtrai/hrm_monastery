@@ -27,7 +27,7 @@
 
 class DbSqliteWork : public DbSqliteModelHandler
 {
-    GET_INSTALCE_DECL(DbSqliteWork)
+    GET_INSTANCE_DECL(DbSqliteWork)
 public:
     DbSqliteWork();
     virtual const QString getName();

@@ -24,6 +24,8 @@
 #include "dbctl.h"
 #include "logger.h"
 #include "utils.h"
+#include "filectl.h"
+#include "communityctl.h"
 
 DbModel *Community::builder()
 {
@@ -116,6 +118,46 @@ void Community::initExportFields()
         return this->name();
 
     });
+    mExportFields.insert(KItemCommunityCode, [this](const QString& item){
+        return this->communityCode();
+
+    });
+    mExportFields.insert(KItemCountry, [this](const QString& item){
+        return this->country(); // TODO: get country id from country name???
+    });
+    mExportFields.insert(KItemAddress, [this](const QString& item){
+        return this->addr();
+    });
+    mExportFields.insert(KItemEmail, [this](const QString& item){
+        return this->email();
+    });
+    mExportFields.insert(KItemTel, [this](const QString& item){
+        return this->tel();
+    });
+    mExportFields.insert(KItemEstablishDate, [this](const QString& item){
+        return Utils::date2String(this->createDate(), DATE_FORMAT_YMD);
+    });
+    mExportFields.insert(KItemFeastDay, [this](const QString& item){
+        return Utils::date2String(this->feastDate(), DATE_FORMAT_MD);
+    });
+    mExportFields.insert(KItemOtherContact, [this](const QString& item){
+        return this->contact();
+    });
+    mExportFields.insert(KItemAreaCode, [this](const QString& item){
+        return this->areaName();// TODO: need to search Area Uid from Area Code
+    });
+    mExportFields.insert(KItemParentCommunityCode, [this](const QString& item){
+        return this->parentName();// TODO: need to search  Uid from  Code
+    });
+    mExportFields.insert(KItemIntro, [this](const QString& item){
+        return this->intro();
+    });
+    mExportFields.insert(KItemRemark, [this](const QString& item){
+        return this->remark();
+    });
+    mExportFields.insert(KItemCEOCode, [this](const QString& item){
+        return this->currentCEO();
+    });
     // TODO: implement more
     tracede;
 }
@@ -128,6 +170,9 @@ void Community::initImportFields()
     });
     mImportFields.insert(KItemCommunityCode, [this](const QString& value){
         this->setCommunityCode(value);
+    });
+    mImportFields.insert(KItemStatus, [this](const QString& value){
+        this->setStatus(value.toInt()); // TODO: handle error case when convert to Int
     });
     mImportFields.insert(KItemCountry, [this](const QString& value){
         this->setCountry(value); // TODO: get country id from country name???
@@ -224,6 +269,7 @@ void Community::setStatus(int newStatus)
 {
     if (newStatus < COMMUNITY_STATUS_MAX) {
         status = (CommunityStatus)newStatus;
+        mStatusName = COMMUNITYCTL->status2Name(status);
     }
 }
 
@@ -266,6 +312,17 @@ void Community::setCurrentCEOCode(const QString &newCurrentCEOCode)
 {
     mCurrentCEOCode = newCurrentCEOCode;
     // TODO: query uid from code
+}
+
+const QString Community::exportTemplatePath(Exporter* exporter) const
+{
+    if (exporter) {
+        switch (exporter->getExportType()) {
+        case EXPORT_HTML:
+            return FileCtl::getPrebuiltDataFilePath(KPrebuiltCommunityInfoTemplateFileName);
+        };
+    }
+    return QString();
 }
 
 const QString &Community::parentCode() const

@@ -30,7 +30,7 @@
 
 class ImportCSV : public Importer
 {
-    GET_INSTALCE_DECL(ImportCSV)
+    GET_INSTANCE_DECL(ImportCSV)
 public:
     ImportCSV();
 

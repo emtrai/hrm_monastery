@@ -31,7 +31,7 @@ class Role;
 
 class RoleCtl : public Controller
 {
-    GET_INSTALCE_DECL(RoleCtl);
+    GET_INSTANCE_DECL(RoleCtl);
 public:
     RoleCtl();
 protected:

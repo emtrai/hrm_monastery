@@ -44,7 +44,7 @@ enum CommunityStatus {
     COMMUNITY_STATUS_MAX
 };
 
-class Community: public QObject, public DbModel, public IExporter
+class Community: public QObject, public DbModel
 {
     Q_OBJECT
 public:
@@ -152,7 +152,7 @@ public:
 
     const QString &currentCEOCode() const;
     void setCurrentCEOCode(const QString &newCurrentCEOCode);
-
+    virtual const QString exportTemplatePath(Exporter* exporter) const;
 protected:
     virtual DbModelHandler* getDbModelHandler();
 private:

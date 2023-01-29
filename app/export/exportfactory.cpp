@@ -24,6 +24,7 @@
 #include "errcode.h"
 #include "utils.h"
 #include "exporthtml.h"
+#include "exportcsvlist.h"
 
 ExportFactory::ExportFactory()
 {
@@ -38,6 +39,9 @@ Exporter *ExportFactory::getExporter(ExportType type)
     switch (type) {
     case EXPORT_HTML:
         ret = INSTANCE(ExportHtml);
+        break;
+    case EXPORT_CSV_LIST:
+        ret = INSTANCE(ExportCSVList);
         break;
     default:
         loge("Export type %d not support", type);
@@ -55,6 +59,24 @@ ErrCode ExportFactory::exportTo(const IExporter *item, const QString &fpath, Exp
     Exporter* exporter = getExporter(type);
     if (exporter != nullptr)
         ret = exporter->saveTo(item, fpath);
+    else {
+        ret = ErrNotSupport;
+        loge("Exporter %d not support", type);
+    }
+    return ret;
+}
+
+ErrCode ExportFactory::exportTo(const IExporter* item, QList<DbModel*> data, const QString &fpath, ExportType type)
+{
+    traced;
+    // TODO: add "tag" parameter here to input to getExporter/saveTo???
+    // so that derived class can have more information to judge which data should be used.
+    // TODO: add title? (title for export info)
+    ErrCode ret = ErrNone;
+    logi("Export to %d", type);
+    Exporter* exporter = getExporter(type);
+    if (exporter != nullptr)
+        ret = exporter->saveTo(item, data, fpath);
     else {
         ret = ErrNotSupport;
         loge("Exporter %d not support", type);

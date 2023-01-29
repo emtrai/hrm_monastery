@@ -111,6 +111,15 @@ Community* CommunityCtl::parseOneItem(const QJsonObject& jobj)
             ret->setAreaUid(tmp);
     }
 
+    if (jobj.contains(JSON_STATUS)){
+        QString tmp = jobj[JSON_STATUS].toString().trimmed();
+        if (!tmp.isEmpty()) {
+            int status = QString(tmp).toInt();
+            // TODO: handle return value
+            ret->setStatus(status);
+        }
+    }
+
     return ret;
 
 }

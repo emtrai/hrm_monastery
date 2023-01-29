@@ -849,31 +849,31 @@ DbModelHandler *Person::getDbModelHandler()
     return DB->getModelHandler(KModelHdlPerson);
 }
 
-const QString Person::exportTemplatePath() const
+const QString Person::exportTemplatePath(Exporter* exporter) const
 {
     return FileCtl::getPrebuiltDataFilePath(KPrebuiltPersonInfoTemplateFileName);
 }
 
-const QStringList Person::getListExportKeyWord() const
-{
-    traced;
+//const QStringList Person::getListExportKeyWord() const
+//{
+//    traced;
 
-    return mExportFields.keys();
-}
+//    return mExportFields.keys();
+//}
 
-ErrCode Person::getExportDataString(const QString &keyword, QString *data) const
-{
-    ErrCode ret = ErrNone;
-    traced;
-    logd("keyword %s", keyword.toStdString().c_str());
-    if (mExportFields.contains(keyword)){
-        std::function<QString(const QString&)> func = mExportFields.value(keyword);
-        if (func != nullptr) *data = func(keyword);
-    }
-    // TODO: raise exception when error occur???
+//ErrCode Person::getExportDataString(const QString &keyword, QString *data) const
+//{
+//    ErrCode ret = ErrNone;
+//    traced;
+//    logd("keyword %s", keyword.toStdString().c_str());
+//    if (mExportFields.contains(keyword)){
+//        std::function<QString(const QString&)> func = mExportFields.value(keyword);
+//        if (func != nullptr) *data = func(keyword);
+//    }
+//    // TODO: raise exception when error occur???
 
-    return ret;
-}
+//    return ret;
+//}
 
 ErrCode Person::prepare2Save()
 {

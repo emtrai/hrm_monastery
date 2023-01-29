@@ -32,7 +32,7 @@
 class DbSqlitePersonTbl;
 class DbSqlitePerson : public DbSqliteModelHandler, public DbPersonModelHandler
 {
-    GET_INSTALCE_DECL(DbSqlitePerson);
+    GET_INSTANCE_DECL(DbSqlitePerson);
 public:
     DbSqlitePerson();
     virtual const QString getName();

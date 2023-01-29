@@ -46,7 +46,7 @@ class Controller;
 
 typedef QString *GET_DATA_FUNC();
 
-class Person: public DbModel, public IExporter
+class Person: public DbModel
 {
 public:
     static DbModel* build();
@@ -419,10 +419,10 @@ public:
 
 protected:
     virtual DbModelHandler *getDbModelHandler();
-    virtual const QString exportTemplatePath() const;
+    virtual const QString exportTemplatePath(Exporter* exporter) const;
 
-    virtual const QStringList getListExportKeyWord() const;
-    virtual ErrCode getExportDataString(const QString& keyword, QString* data) const;
+//    virtual const QStringList getListExportKeyWord() const;
+//    virtual ErrCode getExportDataString(const QString& keyword, QString* data) const;
     virtual ErrCode prepare2Save();
 
 protected:

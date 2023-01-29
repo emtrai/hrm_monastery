@@ -32,7 +32,7 @@ class Course;
 
 class CourseCtl : public Controller
 {
-    GET_INSTALCE_DECL(CourseCtl);
+    GET_INSTANCE_DECL(CourseCtl);
 public:
     CourseCtl();
 protected:

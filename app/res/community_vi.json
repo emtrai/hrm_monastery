@@ -12,7 +12,7 @@
         "tel":"02583881736;0799725895",
         "feastday":"01.09",
         "establishday":"",
-        "status":"active",
+        "status":"1",
         "mission":"Education",
         "email":"terkimsac@yahoo.com",
         "level":0
@@ -29,7 +29,7 @@
         "tel":"02583881736;0799725895",
         "feastday":"01.09",
         "establishday":"",
-        "status":"active",
+        "status":"1",
         "mission":"Education",
         "email":"terkimsac@yahoo.com",
         "level":1
@@ -46,7 +46,7 @@
         "tel":"02583870267",
         "feastday":"15.07",
         "establishday":"",
-        "status":"active",
+        "status":"1",
         "mission":"Health",
         "email":"mnttanhdao@yahoo.com.vn",
         "level":1

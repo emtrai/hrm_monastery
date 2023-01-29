@@ -30,7 +30,7 @@ class Status;
 
 class StatusCtl : public Controller
 {
-    GET_INSTALCE_DECL(StatusCtl);
+    GET_INSTANCE_DECL(StatusCtl);
 public:
     StatusCtl();
 protected:

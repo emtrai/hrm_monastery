@@ -33,6 +33,7 @@
 #include "dbpersonmodelhandler.h"
 #include "filter.h"
 #include "dbspecialistmodelhandler.h"
+#include "exportfactory.h"
 
 PersonCtl* PersonCtl::gInstance = nullptr;
 
@@ -203,6 +204,58 @@ QList<DbModel *> PersonCtl::getSpecialistList(const QString &personUid)
     QList<DbModel*> list = hdl->getSpecialistList(personUid);
     logd("No. item: %d", list.count());
     return list;
+}
+
+const QString PersonCtl::exportTemplatePath(Exporter *exporter) const
+{
+    QString ret;
+    traced;
+    if (exporter) {
+        logd("exporter type %d", exporter->getExportType());
+        switch (exporter->getExportType()) {
+        case EXPORT_CSV_LIST:
+            ret = FileCtl::getPrebuiltDataFilePath(KPrebuiltPersonListCSVTemplateFileName);
+            break;
+        default:
+            loge("unsupported export type %d", exporter->getExportType());
+            break;
+        }
+    } else {
+        loge("empty exporter");
+    }
+    return ret;
+}
+
+ErrCode PersonCtl::getExportDataString(const QString &keyword, const DbModel *data, QString *exportData) const
+{
+    traced;
+    ErrCode err = ErrNone;
+    logd("export data keyword '%s'", STR2CHA(keyword));
+    if (data){
+        err = data->getExportDataString(keyword, exportData);
+    } else {
+        err = ErrInvalidData;
+        loge("No dbmodel data to get export data");
+    }
+    tracedr(err);
+    return err;
+}
+
+ErrCode PersonCtl::exportListPersonInCommunity(const QString &communityUid, ExportType exportType, const QString &fpath)
+{
+    traced;
+    ErrCode err = ErrNone;
+    logd("Community uid '%s'", STR2CHA(communityUid));
+    QList<DbModel*> items = getPersonInCommunity(communityUid);
+    if (items.length() > 0) {
+        logd("found %d person", items.length());
+        err = ExportFactory::exportTo(this, items, fpath, exportType);
+    } else {
+        err = ErrNoData;
+        loge("nothing to export, no person in specified community uid '%s'", STR2CHA(communityUid));
+    }
+    tracedr(err);
+    return err;
 }
 
 PersonCtl::PersonCtl():

@@ -40,7 +40,12 @@
 #define CSV_LIST_ITEM_SPLIT '|'
 #define NAME_ITEM_SPLIT ','
 
-#define GET_INSTALCE_DECL(className) \
+// TODO: just create empty object, is there any other better way???
+#define EMPTY_QSTRING QString()
+// TODO: is there any better way???
+#define QSTRING_EMPTY(str) str.isEmpty()
+
+#define GET_INSTANCE_DECL(className) \
     public:\
         static className* getInstance(); \
     private: \
@@ -242,7 +247,8 @@ public:
                                 void* caller = nullptr,
                                 void* paramCb = nullptr,
                                 QChar splitBy = DEFAULT_CSV_ITEM_SPLIT,
-                                qint32* cnt = nullptr
+                                qint32* cnt = nullptr,
+                                QStringList* outItems = nullptr
                                 );
     static ErrCode parseDataFromCSVFile(const QString& filePath,
                                         QList<QHash<QString, QString>>* items = nullptr,
@@ -257,6 +263,7 @@ public:
     static QString removeVietnameseSign(const QString& vietnameseString);
     static QString readAll(const QString& fpath);
 
+    static void showMsgBox(const QString& msg);
     static void showErrorBox(const QString& msg);
     static void showErrorBox(int ret, const QString* msg = nullptr);
     static ErrCode screenSize(int* w=nullptr, int* h=nullptr);
@@ -269,6 +276,12 @@ public:
 
     template<class T>
     static bool isSameList(const QList<T>& l1, const QList<T>& l2);
+
+    static QString saveFileDialog(QWidget *parent = nullptr,
+                                  const QString& title = QString(),
+                                  const QString& initFileName = QString(),
+                                  const QString& filter = QString(),
+                                  const QString& initDir = QString());
 };
 
 

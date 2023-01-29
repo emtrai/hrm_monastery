@@ -29,7 +29,7 @@ class DbSqliteTbl;
 
 class DbSqliteCourse : public DbSqliteModelHandler
 {
-    GET_INSTALCE_DECL(DbSqliteCourse)
+    GET_INSTANCE_DECL(DbSqliteCourse)
 public:
     DbSqliteCourse();
     virtual const QString getName();

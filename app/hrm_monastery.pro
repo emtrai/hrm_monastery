@@ -132,6 +132,7 @@ SOURCES += \
     db/sqlite/table/dbsqlitetbl.cpp \
     db/sqlite/table/dbsqliteworktbl.cpp \
     controller/eductl.cpp \
+    export/exportcsvlist.cpp \
     export/exporter.cpp \
     export/exportfactory.cpp \
     export/exporthtml.cpp \
@@ -304,9 +305,11 @@ HEADERS += \
     defs.h \
     controller/eductl.h \
     errcode.h \
+    export/exportcsvlist.h \
     export/exporter.h \
     export/exportfactory.h \
     export/exporthtml.h \
+    export/exporttype.h \
     export/iexporter.h \
     file/filectl.h \
     filter.h \
@@ -434,6 +437,7 @@ DISTFILES += \
     res/event_category_vi.csv \
     res/home.html \
     res/person_info_template.html \
+    res/person_list_export_template.csv \
     res/role_vi.csv \
     res/status_vi.csv \
     res/work_vi.csv
