@@ -1,0 +1,43 @@
+
+# Dùng Dùng'==' để tách thông tin giữa
+# Thêm '\' vào cuối trong trường hợp trường thông tin nằm trên nhiều dòng
+# Dùng '#' đầu hàng để ghi chú 
+
+TEN: Cộng đoàn Bùi Đình Túy
+MA_CONG_DOAN: BUI_DINH_TUY
+# Tình trạng/Trạng thái: 0: không hoạt động, 1: đang hoạt động
+TINH_TRANG:1
+QUOC_GIA: Vietnam
+DIA_CHI: Bui Dinh Tuy, TpHCM
+EMAIL:
+DIEN_THOAI: 123456
+NGAY_THANH_LAP:
+NGAY_BON_MANG:
+LIEN_LAC_KHAC:
+MA_KHU_VUC:
+GIAO_XU:
+#Mã cộng đoàn quản lý (cộng đoàn cha)
+MA_CONG_DOAN_CHA:
+GIOI_THIEU:
+# Mã NV sơ phụ trách
+MA_TONG_PHU_TRACH:
+GHI_CHU: Mau giao Hong Nhi
+==
+TEN: Cộng đoàn Phan Thiet
+MA_CONG_DOAN: PHAN_THIET
+# Tình trạng/Trạng thái: 0: không hoạt động, 1: đang hoạt động
+TINH_TRANG:0
+QUOC_GIA: Vietnam
+DIA_CHI: TP.Phan Thiết
+EMAIL:
+DIEN_THOAI: 789456
+NGAY_THANH_LAP:
+NGAY_BON_MANG:
+LIEN_LAC_KHAC:
+MA_KHU_VUC:
+GIAO_XU:
+MA_CONG_DOAN_CHA:
+GIOI_THIEU:
+# Mã NV sơ phụ trách
+MA_TONG_PHU_TRACH:
+GHI_CHU:

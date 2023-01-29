@@ -592,6 +592,7 @@ void MainWindow::setAppState(AppState newAppState)
 bool MainWindow::popViewFromStackAndShow()
 {
     // TODO: implement his
+    traced;
 }
 
 void MainWindow::pushViewToStack(ViewType type)
@@ -893,7 +894,7 @@ void MainWindow::on_actionBack_triggered()
     traced;
     // TODO: implemen this
     // TODO: how about forward/redo???? show we support it?
-    popViewFromStackAndShow();
+//    popViewFromStackAndShow();
     UNDER_DEV(tr("Quay lại màn hình trước"));
 }
 

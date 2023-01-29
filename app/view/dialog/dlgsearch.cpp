@@ -268,6 +268,7 @@ int DlgSearch::query(std::function<int ()> queryfunc)
     } else {
         logi("no data");
     }
+    return cnt;
 }
 
 

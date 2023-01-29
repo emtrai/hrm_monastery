@@ -357,6 +357,7 @@ ErrCode UITableView::onMenuActionReload(QMenu *menu, UITableMenuAction *act)
     traced;
     reload();
     tracede;
+    return ErrNone;
 }
 
 int UITableView::onFilter(int catetoryid, const QString &catetory, qint64 opFlags, const QString &keywords, const QVariant *value)

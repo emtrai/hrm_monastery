@@ -60,6 +60,12 @@ Community* CommunityCtl::parseOneItem(const QJsonObject& jobj)
             ret->setUid(tmp);
     }
 
+    if (jobj.contains(JSON_CODE)){
+        QString tmp = jobj[JSON_CODE].toString().trimmed();
+        if (!tmp.isEmpty())
+            ret->setCommunityCode(tmp);
+    }
+
     if (jobj.contains(JSON_NAME)){
         QString tmp = jobj[JSON_NAME].toString().trimmed();
         if (!tmp.isEmpty())

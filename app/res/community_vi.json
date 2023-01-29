@@ -2,6 +2,7 @@
     [
     {
         "id":"MAIN",
+        "code":"HOI_DONG",
         "parentid":"",
         "areaid":"VN_NT",
         "name":"Hội dòng",
@@ -19,6 +20,7 @@
         },
         {
         "id":"MTGNG",
+        "code":"CD_THANH_GIA",
         "parentid":"MAIN",
         "areaid":"VN_BMT",
         "name":"CĐ. THÁNH GIA",
@@ -36,6 +38,7 @@
         },
         {
         "id":"BONAVENTURA",
+        "code":"CD_BONAVENTURA",
         "parentid":"MAIN",
         "areaid":"VN_BMT",
         "name":"CĐ. BONAVENTURA",

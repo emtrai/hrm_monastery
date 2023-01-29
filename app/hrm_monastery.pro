@@ -15,9 +15,10 @@ DEFINES += TEST_ENABLE
 DEFINES += LOG_LEVEL=4
 DEFINES += DEBUG_TRACE
 DEFINES += DEBUG_LOG
+
 DEFINES += VER_MAJOR=0
 DEFINES += VER_MINOR=1
-DEFINES += VER_PATCH=0
+DEFINES += VER_PATCH=1
 
 # Supporting provine for person is quite complicated
 # as it need to sync up with country

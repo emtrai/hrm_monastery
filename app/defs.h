@@ -216,6 +216,7 @@ const char* const KCsvItemHollyName = "TEN_THANH";
 const char* const JSON_COMMUNITYLIST = "communities";
 const char* const JSON_DEPARTMENTS = "departments";
 const char* const JSON_ID = "id";
+const char* const JSON_CODE = "code";
 const char* const JSON_NAME = "name";
 const char* const JSON_CHURCH = "church";
 const char* const JSON_ADDR = "addr";

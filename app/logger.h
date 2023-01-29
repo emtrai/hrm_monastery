@@ -35,7 +35,7 @@
 // TODO: add process id???
 #define logd(fmt,...) \
     do{ \
-        qDebug("D %ld %s %s[%d] " fmt, (long)QThread::currentThreadId(), THIS_FILE, __func__, __LINE__,##__VA_ARGS__); \
+        qDebug("D %lld %s %s[%d] " fmt, static_cast<long>(reinterpret_cast<intptr_t>(QThread::currentThreadId())), THIS_FILE, __func__, __LINE__,##__VA_ARGS__); \
     }\
     while(0)
 
@@ -62,13 +62,13 @@
 // TODO: Show crash/critical error on dialog
 #define loge(fmt, ...) \
     do{ \
-            qDebug("E %ld %s %s[%d] " fmt, (long)QThread::currentThreadId(), THIS_FILE, __func__, __LINE__,##__VA_ARGS__); \
+            qDebug("E %ld %s %s[%d] " fmt, static_cast<long>(reinterpret_cast<intptr_t>(QThread::currentThreadId())), THIS_FILE, __func__, __LINE__,##__VA_ARGS__); \
     }\
     while(0)
 
 #define logi(fmt, ...) \
 do{ \
-        qDebug("I %ld %s %s[%d] " fmt, (long)QThread::currentThreadId(), THIS_FILE, __func__, __LINE__,##__VA_ARGS__); \
+        qDebug("I %ld %s %s[%d] " fmt, static_cast<long>(reinterpret_cast<intptr_t>(QThread::currentThreadId())), THIS_FILE, __func__, __LINE__,##__VA_ARGS__); \
 }\
     while(0)
 
