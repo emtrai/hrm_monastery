@@ -35,6 +35,7 @@ class Area;
 // BE WARE, ANY CHANGE TO THIS STATUS WILL IMPACT TO DB
 // THIS VALUE IS WRITTEN DIRECTLY TO DB
 // TODO: to do what to improve this???
+// TODO: change to StatusModel?????
 enum CommunityStatus {
     INACTIVE = 0, // inactive, not operating
     ACTIVE, // active, operating

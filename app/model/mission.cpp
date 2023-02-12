@@ -46,3 +46,13 @@ DbModelHandler *Mission::getDbModelHandler()
 {
     return DB->getModelHandler(KModelHdlMission);
 }
+
+const QString &Mission::remark() const
+{
+    return mRemark;
+}
+
+void Mission::setRemark(const QString &newRemark)
+{
+    mRemark = newRemark;
+}

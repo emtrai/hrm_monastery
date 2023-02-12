@@ -1,0 +1,192 @@
+/*
+ * Copyright (C) 2022 Ngo Huy Anh
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ *
+ * Filename: uidepartmentlistview.cpp
+ * Author: Anh, Ngo Huy
+ * Created date:10/17/2022
+ * Brief:
+ */
+#include "uicommdeptlistview.h"
+
+#include "departctl.h"
+#include "logger.h"
+#include <QList>
+#include "dbmodel.h"
+#include "community.h"
+#include "utils.h"
+#include "mainwindow.h"
+#include "uitableviewfactory.h"
+#include "uidepartmentpersonlistview.h"
+#include "communitydeptctl.h"
+#include "communitydept.h"
+
+UICommDeptListView::UICommDeptListView(QWidget *parent):
+    UICommonListView(parent),
+    mCommunity(nullptr)
+{
+    traced;
+}
+
+UICommDeptListView::~UICommDeptListView()
+{
+    traced;
+}
+ErrCode UICommDeptListView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act)
+{
+    traced;
+    // TODO: handle it
+    return ErrNone;
+}
+
+ErrCode UICommDeptListView::onMenuActionDelete(QMenu *menu, UITableMenuAction *act)
+{
+    traced;
+    // TODO: handle it
+    return ErrNone;
+}
+
+void UICommDeptListView::onViewItem(UITableWidgetItem *item)
+{
+    traced;
+//    int idx = item->idx();
+//    logd("idx=%d",idx);
+//    if (idx < mItemList.length()){
+//        Community* model = (Community*)mItemList.value(idx);
+//        if (model == nullptr) {
+//            loge("no data");
+//            return;
+//        }
+//        model->dump();
+//        QString uid = model->uid();
+//        if (uid.isEmpty()) {
+//            loge("no uid");
+//            return;
+//        }
+//        UICommunityPersonListView* view = (UICommunityPersonListView*)UITableViewFactory::getView(ViewType::COMMUNITY_PERSON);
+
+//        logd("community uid %s", uid.toStdString().c_str());
+////        view->setCommunityUid(uid);
+//        view->setCommunity(model);
+//        view->setTitle(model->name());
+//        MainWindow::getInstance()->switchView(view);
+//    } else {
+//        loge("Invalid idx");
+//        // TODO: popup message???
+    //    }
+}
+
+QString UICommDeptListView::getTitle()
+{
+    traced;
+    QString title;
+    title = QString(tr("Phòng ban của cộng đoàn: %1")).arg(mCommunity->name());
+
+    return title;
+}
+
+void UICommDeptListView::initHeader()
+{
+    traced;
+    UICommonListView::initHeader();
+//    mHeader.append(tr("Cộng đoàn"));
+    tracede;
+}
+
+void UICommDeptListView::updateItem(DbModel *item, UITableItem *tblItem)
+{
+    traced;
+    UICommonListView::updateItem(item, tblItem);
+//    CommunityDept* dept = (CommunityDept*)item;
+
+//    tblItem->addValue(dept->communityUid());
+    tracede;
+}
+
+
+
+ErrCode UICommDeptListView::onMenuActionListPerson(QMenu *menu, UITableMenuAction *act)
+{
+    traced;
+    ErrCode ret = ErrNone;
+    CommunityDept* item = dynamic_cast<CommunityDept*>(act->getData());
+    if (item != nullptr) {
+        item->dump();
+        UIDepartmentPersonListView* view = (UIDepartmentPersonListView*)
+            UITableViewFactory::getView(ViewType::VIEW_DEPARTMENT_PERSON);
+
+        view->setCommDept(item);
+        MainWindow::getInstance()->switchView(view);
+    } else {
+        loge("no department info");
+        ret = ErrNoData;
+    }
+
+    tracedr(ret);
+    return ret;
+
+}
+
+ErrCode UICommDeptListView::onMenuActionListDepartment(QMenu *menu, UITableMenuAction *act)
+{
+    traced;
+    ErrCode ret = ErrNone;
+    DbModel* data = (DbModel*)(act->getData());
+    if (data != nullptr) {
+        data->dump();
+    }
+
+    return ret;
+}
+
+QList<UITableMenuAction *> UICommDeptListView::getMenuItemActions(const QMenu* menu,
+                                            UITableWidgetItem *item)
+{
+    traced;
+//    logd("idx %d", idx);
+    QList<UITableMenuAction*> actionList = UITableView::getMenuItemActions(menu, item);
+
+    actionList.append(UITableMenuAction::build(tr("Danh sách thành viên"), this, item)
+                                              ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                               return this->onMenuActionListPerson(m, a);
+                                           }));
+    return actionList;
+
+}
+
+ErrCode UICommDeptListView::onLoad()
+{
+    QList<DbModel*> items;
+    ErrCode ret = ErrNone;
+    traced;
+    items = COMMUNITYDEPTCTL->getDepartList(mCommunity->uid());
+    mItemList.clear(); // TODO: clean up item data
+    // TODO: loop to much, redundant, do something better?
+    foreach (DbModel* item, items) {
+        mItemList.append(static_cast<DbModel*>(item));
+    }
+    tracedr(ret);
+    return ret;
+}
+
+Community *UICommDeptListView::community() const
+{
+    return mCommunity;
+}
+
+void UICommDeptListView::setCommunity(Community *newCommunity)
+{
+    mCommunity = newCommunity;
+}

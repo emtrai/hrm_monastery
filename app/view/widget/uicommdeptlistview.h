@@ -14,44 +14,42 @@
  * limitations under the License.
  *
  *
- * Filename: uidepartmentpersonlistview.h
+ * Filename: uidepartmentlistview.h
  * Author: Anh, Ngo Huy
  * Created date:10/17/2022
  * Brief:
  */
-#ifndef UIDEPARTMENTPERSONLISTVIEW_H
-#define UIDEPARTMENTPERSONLISTVIEW_H
+#ifndef UICOMMDEPTLISTVIEW_H
+#define UICOMMDEPTLISTVIEW_H
 
 #include "uicommonlistview.h"
 
-class CommunityDept;
+class Community;
 
-class UIDepartmentPersonListView : public UICommonListView
+class UICommDeptListView : public UICommonListView
 {
 public:
-    explicit UIDepartmentPersonListView(QWidget *parent = nullptr);
-    virtual ~UIDepartmentPersonListView();
-
-
-    void setCommDept(CommunityDept *commDept);
+    explicit UICommDeptListView(QWidget *parent = nullptr);
+    virtual ~UICommDeptListView();
+    Community *community() const;
+    void setCommunity(Community *newCommunity);
 
 protected:
-    virtual void initHeader();
-    virtual void updateItem(DbModel* item, UITableItem* tblItem);
-
-    virtual QList<UITableMenuAction*> getMenuMultiItemActions(const QMenu *menu,
-                                                               const QList<UITableItem *>& items);
+    virtual QList<UITableMenuAction*> getMenuItemActions(const QMenu* menu,
+                                                          UITableWidgetItem* item);
     virtual ErrCode onMenuActionListPerson(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionListDepartment(QMenu* menu, UITableMenuAction* act);
-    //    virtual ErrCode onMenuAction(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionDelete(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onMenuActionView(QMenu* menu, UITableMenuAction* act);
+    virtual void onViewItem(UITableWidgetItem *item);
+    virtual QString getTitle();
+    virtual void initHeader();
+    virtual void updateItem(DbModel* item, UITableItem* tblItem);
 
 protected:
     virtual ErrCode onLoad();
 private:
-    CommunityDept* mCommDept;
+    Community* mCommunity;
 };
 
-#endif // UIDEPARTMENTPERSONLISTVIEW_H
+#endif // UICOMMDEPTLISTVIEW_H

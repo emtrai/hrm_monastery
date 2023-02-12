@@ -139,7 +139,7 @@ QList<PersonEvent *> *DbSqlitePersonEventTbl::getListEvents(const QString &perso
             while (qry.next()) {
                 PersonEvent* item = (PersonEvent*)PersonEvent::build();
                 item->setDbId(qry.value(KFieldId).toInt());
-                item->setDbStatus(qry.value(KFieldRecordStatus).toInt());
+                item->setDbStatus(qry.value(KFieldDbStatus).toInt());
                 item->setName(qry.value(KFieldName).toString());
                 item->setUid(qry.value(KFieldUid).toString());
                 item->setPersonUid(qry.value(KFieldPersonId).toString());

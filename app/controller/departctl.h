@@ -34,12 +34,12 @@ class DepartCtl : public Controller
 {
 public:
     DepartCtl();
+public:
+    const QList<DbModel*> getAllDepartment();
 protected:
     DbModel *buildModel(void *items, const QString &fmt);
 public:
     static DepartCtl* getInstance();
-    const QList<Department*> getDeptList(const QString& communityUid = nullptr);
-    const QList<DbModel*> getPersonList(const QString& deptUid);
 protected:
     virtual ErrCode parsePrebuiltFile(const QString &fpath, const QString &ftype);
 private:
@@ -48,7 +48,7 @@ public slots:
     virtual void onLoad();
 private:
     static DepartCtl* gInstance;
-    QList<Department*> mDeptList;
+    QList<DbModel*> mDeptList;
 };
 
 #endif // DEPARTCTL_H

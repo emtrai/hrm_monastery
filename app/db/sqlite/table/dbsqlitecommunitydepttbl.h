@@ -19,19 +19,26 @@
  * Created date:10/8/2022
  * Brief:
  */
-#ifndef DBSQLITECOMMUNITYDEPTMAPTBL_H
-#define DBSQLITECOMMUNITYDEPTMAPTBL_H
+#ifndef DBSQLITECOMMUNITYDEPTTBL_H
+#define DBSQLITECOMMUNITYDEPTTBL_H
 
 #include "dbsqlitetbl.h"
-#include "table/dbsqlitemaptbl.h"
+#include "statusmodel.h"
 
-class DbSqliteCommunityDeptMapTbl : public DbSqliteMapTbl
+class DbSqliteCommunityDeptTbl : public DbSqliteTbl
 {
 public:
-    DbSqliteCommunityDeptMapTbl(DbSqlite* db);
+    DbSqliteCommunityDeptTbl(DbSqlite* db);
+    QList<DbModel *> getListDepart(const QString &commUid, int status = STATUS_ACTIVE);
+protected:
+    virtual void addTableField(DbSqliteTableBuilder* builder);
+    virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
+    virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
+    virtual QString getSearchQueryStringWithTag(const QString& cond = nullptr, const QString& condTag = nullptr);
 
+    virtual DbModelBuilder mainModelBuilder();
 private:
     static const qint32 KVersionCode;
 };
 
-#endif // DBSQLITECOMMUNITYDEPTMAPTBL_H
+#endif // DBSQLITECOMMUNITYDEPTTBL_H

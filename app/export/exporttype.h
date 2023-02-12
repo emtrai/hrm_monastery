@@ -21,16 +21,19 @@
  */
 #ifndef EXPORTTYPE_H
 #define EXPORTTYPE_H
+#include "errcode.h"
 
 // TODO: should we separate into Export format (csv, xlsx, etc.) and export type (list, item, etc.)?
 enum ExportType {
-    EXPORT_NONE = 0,
-    EXPORT_HTML,
-    EXPORT_CSV,
-    EXPORT_CSV_LIST,
-    EXPORT_DOCX,
-    EXPORT_XLSX,
+    EXPORT_NONE         = 0,
+    EXPORT_HTML         = (1 << 0),
+    EXPORT_CSV          = (1 << 1),
+    EXPORT_CSV_LIST     = (1 << 2),
+    EXPORT_DOCX         = (1 << 3),
+    EXPORT_XLSX         = (1 << 4),
     EXPORT_MAX
 };
+
+ErrCode getExportTypeName(uint32_t exportTypes, QHash<int, QString>& exportTypeName);
 
 #endif // EXPORTTYPE_H

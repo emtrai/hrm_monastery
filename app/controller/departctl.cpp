@@ -23,7 +23,7 @@
 
 #include "logger.h"
 #include "department.h"
-#include "dbdepartmentmodelhandler.h"
+#include "dbcommdepatmodelhandler.h"
 #include "defs.h"
 #include "dbctl.h"
 #include "utils.h"
@@ -41,7 +41,13 @@ DepartCtl::DepartCtl():Controller(KModelHdlDept)
     traced;
 }
 
-// Format: Country short name, Province name[, <parent province if any>]
+const QList<DbModel *> DepartCtl::getAllDepartment()
+{
+    traced;
+    return DB->getModelHandler(KModelHdlDept)->getAll(&Department::builder);
+}
+
+// Format: Nameid, Name, remark
 DbModel *DepartCtl::buildModel(void *items, const QString &fmt)
 {
     traced;
@@ -50,9 +56,7 @@ DbModel *DepartCtl::buildModel(void *items, const QString &fmt)
     qint32 idx = 0;
     qint32 sz = itemList->length();
     logd("sz %d", sz);
-    item->setShortName(itemList->at(idx++));
-    QString nameid = itemList->at(idx++);
-    item->setNameId(nameid + item->shortName());
+    item->setNameId(itemList->at(idx++));// TODO: should auto generate?
     item->setName(itemList->at(idx++));
     if (sz > idx) {
         QString remark = itemList->at(idx++);
@@ -64,35 +68,6 @@ DbModel *DepartCtl::buildModel(void *items, const QString &fmt)
 }
 
 
-const QList<Department *> DepartCtl::getDeptList(const QString& communityUid)
-{
-    traced;
-    if (communityUid.isEmpty()) {
-        logd("empty community uid, return all");
-        return mDeptList;
-    } else {
-        logd("community uid '%s'", communityUid.toStdString().c_str());
-        QList<Department*> dept;
-        foreach(Department* item, mDeptList) {
-            if (item->communityUid() == communityUid) {
-                dept.append(item);
-            }
-        }
-        logd("found %d", dept.count());
-        return dept;
-    }
-}
-
-const QList<DbModel *> DepartCtl::getPersonList(const QString &deptUid)
-{
-    traced;
-    DbDepartmentModelHandler* model =  dynamic_cast<DbDepartmentModelHandler*>(DB->getModelHandler(KModelHdlDept));
-    QList<DbModel *> items = model->getListPerson(deptUid);
-
-    tracede;
-    return items;
-}
-
 Department* DepartCtl::parseOneItem(const QJsonObject& jobj)
 {
     Department* ret = new Department();
@@ -102,6 +77,11 @@ Department* DepartCtl::parseOneItem(const QJsonObject& jobj)
         if (!tmp.isEmpty())
             ret->setUid(tmp);
     }
+    if (jobj.contains(JSON_NAME_ID)){
+        QString tmp = jobj[JSON_NAME_ID].toString().trimmed();
+        if (!tmp.isEmpty())
+            ret->setNameId(tmp);
+    }
 
     if (jobj.contains(JSON_NAME)){
         QString tmp = jobj[JSON_NAME].toString().trimmed();
@@ -110,49 +90,11 @@ Department* DepartCtl::parseOneItem(const QJsonObject& jobj)
 
     }
 
-    if (jobj.contains(JSON_COMMUNITY_UID)){
-        QString tmp = jobj[JSON_COMMUNITY_UID].toString().trimmed();
-        if (!tmp.isEmpty())
-            ret->setCommunityUid(tmp);
-    }
-
-    if (jobj.contains(JSON_ADDR)){
-        QString tmp = jobj[JSON_ADDR].toString().trimmed();
-        if (!tmp.isEmpty())
-            ret->setAddr(tmp);
-    }
-
-    if (jobj.contains(JSON_TEL)){
-        QString tmp = jobj[JSON_TEL].toString().trimmed();
-        if (!tmp.isEmpty())
-            ret->setTel(tmp);
-    }
-
-    if (jobj.contains(JSON_EMAIL)){
-        QString tmp = jobj[JSON_EMAIL].toString().trimmed();
-        if (!tmp.isEmpty())
-            ret->setEmail(tmp);
-
-    }
-
-    if (jobj.contains(JSON_EMAIL)){
-        QString tmp = jobj[JSON_EMAIL].toString().trimmed();
-        if (!tmp.isEmpty())
-            ret->setBrief(tmp);
-
-    }
 
     if (jobj.contains(JSON_REMARK)){
         QString tmp = jobj[JSON_REMARK].toString().trimmed();
         if (!tmp.isEmpty())
             ret->setRemark(tmp);
-    }
-    // TODO: set status
-
-    if (jobj.contains(JSON_ESTABLISH)){
-        QString tmp = jobj[JSON_ESTABLISH].toString().trimmed();
-        if (!tmp.isEmpty())
-            ret->setEstablishDateFromString(tmp);
     }
 
     return ret;
@@ -214,12 +156,13 @@ void DepartCtl::onLoad()
     traced;
     ErrCode ret = ErrNone;
     ret = check2UpdateDbFromPrebuiltFile(KPrebuiltDeptJsonFileName, KFileTypeJson);
+    logd("update db ret=%d", ret);
     // TODO: should do lazy load??? load all consume much memory
-    QList items = DB->getModelHandler(KModelHdlDept)->getAll(&Department::builder);
+//    mDeptList = DB->getModelHandler(KModelHdlDept)->getAll(&Department::builder);
     //    mItemList.append();
-    foreach (DbModel* model, items){
-        Department* item = (Department*)model;
-        mDeptList.append(item);
-    }
+//    foreach (DbModel* model, items){
+//        Department* item = (Department*)model;
+//        mDeptList.append(item);
+//    }
     tracede;
 }

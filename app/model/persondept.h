@@ -41,23 +41,14 @@ public:
     const QString &roleName() const;
     void setRoleName(const QString &newRoleName);
 
-    Department *department() const;
-    void setDepartment(Department *newDepartment);
-
     virtual QString modelName() const;
 
-
-    const QString &departUid() const;
-    void setDepartUid(const QString &newDepartUid);
 
     const QString &courseUid() const;
     void setCourseUid(const QString &newCourseUid);
 
     const QString &courseName() const;
     void setCourseName(const QString &newCourseName);
-
-    Person *person() const;
-    void setPerson(Person *newPerson);
 
     virtual void dump();
 
@@ -77,6 +68,18 @@ public:
     const QString &remark() const;
     void setRemark(const QString &newRemark);
 
+    const QString &commDeptUid() const;
+    void setCommDeptUid(const QString &newCommDeptUid);
+
+    const QString &personUid() const;
+    void setPersonUid(const QString &newPersonUid);
+
+    const QString &changeHistory() const;
+    void setChangeHistory(const QString &newChangeHistory);
+
+    const QString &personName() const;
+    void setPersonName(const QString &newPersonName);
+
 protected:
     virtual DbModelHandler *getDbModelHandler();
 protected:
@@ -84,13 +87,15 @@ protected:
     QString mRoleName;
     QString mCourseUid;
     QString mCourseName;
-    QString mDepartUid;
     qint64 mStartDate;
     qint64 mEndDate;
-    Department* mDepartment;
-    Person* mPerson;
     int mStatus;
     QString mRemark;
+    QString mCommDeptUid;
+    QString mPersonUid;
+    QString mPersonName;
+    QString mChangeHistory;
+
 };
 
 #endif // PERSONDEPT_H

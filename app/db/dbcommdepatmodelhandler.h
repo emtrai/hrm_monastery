@@ -14,25 +14,24 @@
  * limitations under the License.
  *
  *
- * Filename: communitydept.h
+ * Filename: dbdepartmentmodelhandler.h
  * Author: Anh, Ngo Huy
- * Created date:10/8/2022
+ * Created date:10/24/2022
  * Brief:
  */
-#ifndef COMMUNITYDEPT_H
-#define COMMUNITYDEPT_H
+#ifndef DBCOMMDEPATMODELHANDLER_H
+#define DBCOMMDEPATMODELHANDLER_H
 
-#include <dbmodel.h>
-#include "model/mapdbmodel.h"
-
-class CommunityDept : public MapDbModel
+#include "dbmodelhandler.h"
+#include <QList>
+class CommunityDept;
+class PersonDept;
+class DbCommDeptModelHandler
 {
 public:
-    CommunityDept();
-    static DbModel* build();
-    virtual QString modelName() const;
-protected:
-    virtual DbModelHandler *getDbModelHandler();
+    virtual QList<DbModel*> getListPerson(const QString& deptUid) = 0;
+    virtual QList<DbModel*> getListDept(const QString& communityUid) = 0;
+    virtual ErrCode addPerson2Department(PersonDept* perDept) = 0;
 };
 
-#endif // COMMUNITYDEPT_H
+#endif // DBCOMMDEPATMODELHANDLER_H

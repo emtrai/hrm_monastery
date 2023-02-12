@@ -810,7 +810,7 @@ ErrCode Person::setNameFromFullName(const QString &name)
 
 QString Person::getFullName() const{
     //TODO:check localization
-    return mLastName + " " + mFirstName;
+    return FULLNAME(firstName(), lastName());
 }
 
 

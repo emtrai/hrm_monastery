@@ -56,7 +56,7 @@ typedef DbModel*(*DbModelBuilder)(void);
 enum DB_RECORD_STATUS {
     DB_RECORD_NOT_READY = 0, // record not ready
     DB_RECORD_ACTIVE, // record ready to use
-    DB_RECORD_DElETED, // record already deleted
+    DB_RECORD_DElETED, // record already deleted (soft delete)
     DB_RECORD_MAX
 };
 
@@ -177,6 +177,8 @@ public:
 
     virtual const QStringList getListExportKeyWord() const;
     virtual ErrCode getExportDataString(const QString& keyword, QString* data) const;
+    const QString &nameId() const;
+
 protected:
     virtual DbModelHandler* getDbModelHandler() = 0;
     virtual ErrCode prepare2Save();
@@ -193,6 +195,9 @@ protected:
     bool mMarkModified; // true: check & mark item as modified when it's changed. false: not mark anything
 
     qint64 mDbId;
+    QString mNameId; // Code/Name id, human readable, for easy searching, unquide.
+                     // Name id is unique, but changable, Should not use for mapping, mapping use uid, can be null
+                     // TODO: this is newly add from Feb 12, let search and check whole
     QString mName;// TODO: support multi languate???
     QString mUid;
     QString mHistory; // History on DB

@@ -143,6 +143,7 @@ void DbModel::setUid(const QString &newUid)
 void DbModel::buildUidIfNotSet()
 {
     traced;
+    // TODO: is this this function neccessary anymore?
     if (uid().isEmpty()){
         setUid(buildUid());
     }
@@ -151,10 +152,12 @@ void DbModel::buildUidIfNotSet()
 QString DbModel::buildUid(const QString* seed)
 {
     traced;
-    QString uid = Utils::UidFromName(name(), UidNameConvertType::NO_VN_MARK_UPPER);
+    QString value = QString("%1%2%3").arg(nameId(), name()).arg(Utils::currentTimeMs());
     if (seed != nullptr) {
-        uid += "_" + *seed;
+        value += "_" + *seed;
     }
+    logd("value for uid calc: %s", STR2CHA(value));
+    QString uid = Utils::UidFromName(value, UidNameConvertType::HASH_NAME);
     logd("uid: %s", uid.toStdString().c_str());
     return uid;
 }
@@ -162,7 +165,8 @@ QString DbModel::buildUid(const QString* seed)
 ErrCode DbModel::prepare2Save()
 {
     traced;
-    buildUidIfNotSet();
+//    buildUidIfNotSet();
+    // TODO: consider again should build uid here? by default, uid will be calc later after inserting to db successfull
     return ErrNone;
 }
 
@@ -199,6 +203,11 @@ void DbModel::checkModifiedThenSet(qint32 &cur, qint32 next, const QString &item
 void DbModel::checkModifiedThenSet(qint64 &cur, qint64 next, const QString &itemName)
 {
     CHECK_MODIFIED_THEN_SET(cur, next, itemName);
+}
+
+const QString &DbModel::nameId() const
+{
+    return mNameId;
 }
 
 bool DbModel::markModified() const
@@ -441,7 +450,8 @@ void DbModel::setNameId(const QString &newNameId)
     logd("Set name id %s", newNameId.toStdString().c_str());
 //    mUid = Utils::UidFromName(newNameId);
     // TODO: should hash or use original value???
-    mUid = newNameId;
+//    mUid = newNameId;
+    mNameId = newNameId;
 }
 
 IExporter *DbModel::getExporter()

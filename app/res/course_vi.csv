@@ -1,4 +1,4 @@
-#name, period,startdate,enddate,coursetype,remark
-1990,1990-2000,,,0,
-2000,2000-2010,,,0,
-2000-2005,2000-2005,,,1,
+#nameid, name, period,startdate,enddate,coursetype,remark
+1990,Khóa 1990, 1990-2000,,,0,
+2000,Khóa 2000, 2000-2010,,,0,
+2000,Khóa 2005, 2005-2010,,,1,

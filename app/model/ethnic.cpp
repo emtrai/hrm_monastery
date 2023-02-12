@@ -78,6 +78,7 @@ const QString &Ethnic::countryShortName() const
 void Ethnic::setCountryShortName(const QString &newCountryShortName)
 {
     mCountryShortName = newCountryShortName;
+    // TODO: change to contry name id? or remove it?
 }
 
 

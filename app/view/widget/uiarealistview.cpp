@@ -28,7 +28,7 @@
 #include "area.h"
 #include "utils.h"
 #include "mainwindow.h"
-#include "uidepartmentlistview.h"
+#include "uicommdeptlistview.h"
 #include "uitableviewfactory.h"
 
 UIAreaListView::UIAreaListView(QWidget *parent):

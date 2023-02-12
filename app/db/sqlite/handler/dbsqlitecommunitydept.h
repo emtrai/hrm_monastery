@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Ngo Huy Anh
+ * Copyright (C) 2023 Ngo Huy Anh
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,34 @@
  * limitations under the License.
  *
  *
- * Filename: dbsqlitedept.h
+ * Filename: dbsqlitecommunitydept.h
  * Author: Anh, Ngo Huy
- * Created date:8/19/2022
+ * Created date:2/1/2023
  * Brief:
  */
-#ifndef DBSQLITEDEPT_H
-#define DBSQLITEDEPT_H
+#ifndef DBSQLITECOMMUNITYDEPT_H
+#define DBSQLITECOMMUNITYDEPT_H
 
 #include "dbsqlitemodelhandler.h"
-class DbSqliteTbl;
+#include "dbcommdepatmodelhandler.h"
 
-class DbSqliteDept : public DbSqliteModelHandler
+class PersonDept;
+
+class DbSqliteCommunityDept : public DbSqliteModelHandler, public DbCommDeptModelHandler
 {
-    GET_INSTANCE_DECL(DbSqliteDept);
+    GET_INSTANCE_DECL(DbSqliteCommunityDept);
 public:
-    DbSqliteDept();
+    DbSqliteCommunityDept();
     virtual const QString getName();
+    virtual QList<DbModel*> getListPerson(const QString& deptUid);
+    virtual QList<DbModel*> getListDept(const QString& communityUid);
+    virtual ErrCode addPerson2Department(PersonDept* perdept);
 protected:
     virtual DbSqliteTbl* getMainTbl();
+    virtual DbSqliteTbl* getTable(const QString& modelName);
+    virtual DbModelBuilder getMainBuilder();
+private:
 
 };
 
-#endif // DBSQLITEDEPT_H
+#endif // DBSQLITECOMMUNITYDEPT_H

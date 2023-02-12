@@ -205,6 +205,8 @@ do { \
             } \
         } while(0)
 
+#define FULLNAME(firstName, lastName) QString("%1 %2").arg(lastName, firstName)
+
 typedef ErrCode (*func_one_csv_item_t)(const QStringList& items, void* caller, void* param);
 typedef ErrCode (*func_one_csv_item_complete_t)(const QHash<QString, QString>& items, void* caller, void* param);
 typedef ErrCode (*func_one_csv_field_t)(const QString& key, const QString& value, void* caller, void* param);

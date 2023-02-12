@@ -26,7 +26,9 @@ const QString &Controller::getName()
 DbModelHandler *Controller::getModelHandler()
 {
     traced;
-    return nullptr;
+    logd("Get model handler for controller using name: %s", STR2CHA(mName));
+    // TODO: fix me if this is not suitble
+    return DB->getModelHandler(getName());
 }
 
 ErrCode Controller::addNew(DbModel *model)

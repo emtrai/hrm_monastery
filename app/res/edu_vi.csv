@@ -1,4 +1,4 @@
-#id, name[, remark if any]
+#name id, name[, remark if any]
 KHONG_RO,Không rõ
 TIEU_HOC,Tiểu học
 THCS,Trung học cơ sở

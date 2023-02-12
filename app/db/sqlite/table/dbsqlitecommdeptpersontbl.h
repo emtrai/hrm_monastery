@@ -19,27 +19,26 @@
  * Created date:10/17/2022
  * Brief:
  */
-#ifndef DBSQLITEDEPARTMENTPERSONTBL_H
-#define DBSQLITEDEPARTMENTPERSONTBL_H
+#ifndef DBSQLITECOMMDEPTPERSONTBL_H
+#define DBSQLITECOMMDEPTPERSONTBL_H
 
 #include "dbsqlitemaptbl.h"
 
-class DbSqliteDepartmentPersonTbl : public DbSqliteMapTbl
+class DbSqliteCommDeptPersonTbl : public DbSqliteTbl
 {
 public:
-    DbSqliteDepartmentPersonTbl(DbSqlite* db);
-    DbSqliteDepartmentPersonTbl(DbSqlite* db, const QString& baseName, const QString& name, qint32 versionCode);
+    DbSqliteCommDeptPersonTbl(DbSqlite* db);
     QList<DbModel*> getListPerson(const QString& communityUid, int status = ITEM_MAP_STATUS_ACTIVE);
 protected:
+    virtual QString getSearchQueryStringWithTag(const QString& cond = nullptr, const QString& condTag = nullptr);
     virtual void addTableField(DbSqliteTableBuilder* builder);
     virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
-    virtual QHash<QString, QString> getFieldsCheckExists(const DbModel* item);
-
 
     virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
+
 
 private:
     static const qint32 KVersionCode;
 };
 
-#endif // DBSQLITEDEPARTMENTPERSONTBL_H
+#endif // DBSQLITECOMMDEPTPERSONTBL_H

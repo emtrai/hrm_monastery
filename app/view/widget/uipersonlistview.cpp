@@ -255,7 +255,7 @@ void UIPersonListView::onEditItem(UITableWidgetItem *item)
 //    logd("idx=%d",idx);
     if (model){
         Person* per = (Person*)model;
-        DlgPerson* dlg = DlgPerson::buildDlg(this, per);
+        DlgPerson* dlg = DlgPerson::buildDlg(this, per, (per == nullptr));
         dlg->exec();
         delete dlg;
 

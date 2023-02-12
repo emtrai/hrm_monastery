@@ -108,7 +108,10 @@ void DlgDeptMgr::accept()
             // TODO: validate value
             Person* per =  mListPerson.at(index.row());
             PersonDept* perdep = (PersonDept*)PersonDept::build();
-            perdep->setPerson(per);
+            perdep->setPersonUid(per->uid());
+            perdep->setPersonName(per->getFullName());
+//            perdep->setPerson(per);
+            // TODO: implement t
 //            perdep->setCourseUid()
             mSelectedPersons.append(perdep);
             SET_VAL_FROM_CBOX(ui->cbRole, perdep->setRoleUid, perdep->setRoleName);

@@ -25,10 +25,12 @@
 #include "view/widget/uisaintlistview.h"
 #include "view/widget/uicommunitylistview.h"
 #include "view/widget/uicommunitypersonlistview.h"
-#include "view/widget/uidepartmentlistview.h"
+#include "view/widget/uicommdeptlistview.h"
 #include "view/widget/uidepartmentpersonlistview.h"
 #include "view/widget/uirolelistview.h"
 #include "view/widget/uiarealistview.h"
+#include "view/widget/uidepartmentlistview.h"
+#include "view/widget/uimissionlistview.h"
 
 UITableView *UITableViewFactory::getView(ViewType type, QWidget *parent )
 {
@@ -54,9 +56,15 @@ UITableView *UITableViewFactory::getView(ViewType type, QWidget *parent )
     case VIEW_DEPARTMENT:
         view = new UIDepartmentListView(parent);
         break;
+    case VIEW_COMMUNITY_DEPT:
+        view = new UICommDeptListView(parent);
+        break;
     case VIEW_DEPARTMENT_PERSON:
         view = new UIDepartmentPersonListView(parent);
         break;
+    case VIEW_MISSION:
+        view = new UIMissionListView(parent);
+            break;
     case VIEW_ROLE:
         view = new UIRoleListView(parent);
         break;

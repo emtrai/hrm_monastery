@@ -46,14 +46,15 @@ class DlgPerson : public QDialog, public UIMultiComboxViewListener
         MAX
     };
 
-        public:
+        protected:
                  explicit DlgPerson(QWidget *parent = nullptr);
+        public:
                     ~DlgPerson();
 
                     Person *person(bool newone=false);
 
                 public:
-                    static DlgPerson* buildDlg(QWidget *parent = nullptr, Person* per = nullptr);
+                    static DlgPerson* buildDlg(QWidget *parent = nullptr, Person* per = nullptr, bool isNew = true);
 
              private:
                 Ui::DlgPerson *ui;
@@ -147,6 +148,7 @@ private:
     QList<PersonEvent*> mListPersonEvent;
     bool mIsNew; // true: add new, false: edit/update
     bool mIsSelfSave; //true: auto save on accept, false: not save
+    bool mInitDone;
 };
 
 #endif // DLGPERSON_H

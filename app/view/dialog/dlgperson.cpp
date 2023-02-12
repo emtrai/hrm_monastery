@@ -91,7 +91,8 @@ DlgPerson::DlgPerson(QWidget *parent) :
     cbSpecialist(nullptr),
     mEditMode(Mode::NEW),
     mIsNew(true),
-    mIsSelfSave(true)
+    mIsSelfSave(true),
+    mInitDone(false)
 {
     traced;
     setupUI();
@@ -217,7 +218,7 @@ void DlgPerson::setupUI()
     // load Event
     loadEvent(true);
 
-
+    mInitDone = true;
 }
 
 Person *DlgPerson::buildPerson()
@@ -370,6 +371,8 @@ ErrCode DlgPerson::fromPerson(const Person *model)
 {
     traced;
     ErrCode ret = ErrNone;
+
+    mInitDone = false;
     if (model == nullptr) {
         loge("Invalid person info to clone");
         return ErrInvalidData;
@@ -395,6 +398,7 @@ ErrCode DlgPerson::fromPerson(const Person *model)
     // cbSaints
     // TODO: fix issue of show saint adding dialog if name is not exist in list
     foreach (QString saintName, per->hollyNameInList()) {
+        logd("saintName %s", STR2CHA(saintName));
         cbSaints->addSelectedItemByName(saintName);
     }
     ui->txtSaint->setText(per->hollyName());
@@ -512,9 +516,12 @@ ErrCode DlgPerson::fromPerson(const Person *model)
     Utils::setSelectItemComboxByData(ui->cbWork, per->currentWorkUid());
 
     logd("load community");
+    // TODO: handle the case that adding community dialog is shown when no community found
+    // before showing person add dialog
     Utils::setSelectItemComboxByData(ui->cbCommunity, per->communityUid());
 
     tracedr(ret);
+    mInitDone = true; // TODO: check setting mInitDone again, should offer api to mark init done?
     return ret;
 }
 
@@ -526,6 +533,8 @@ ErrCode DlgPerson::onComboxNewItem(UIMultiComboxView *ui, const QString &value, 
     logd("do silent %d", silent);
     logd("name %s", ui->name().toStdString().c_str());
 
+    if (!mInitDone)
+        return ErrNone; // not finish init yet, out;
 
     // TODO: separate processing to multi functions????
     if (ui->name() == KUiMultiComboxNameSaint) {
@@ -1012,17 +1021,17 @@ Person *DlgPerson::person(bool newone)
     return mPerson;
 }
 
-DlgPerson *DlgPerson::buildDlg(QWidget *parent, Person *per)
+DlgPerson *DlgPerson::buildDlg(QWidget *parent, Person *per, bool isNew)
 {
     traced;
     DlgPerson* dlg = nullptr;
     dlg = new DlgPerson(parent);
     dlg->setIsSelfSave(true);
+    dlg->setIsNew(isNew);
+    logd("isNew %d", isNew);
     if (per != nullptr) {
+        logd("setup person");
         dlg->fromPerson(per);
-        dlg->setIsNew(false);
-    } else {
-        dlg->setIsNew(true);
     }
 
     tracede;

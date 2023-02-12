@@ -22,28 +22,35 @@
 #ifndef MISSIONCTL_H
 #define MISSIONCTL_H
 
-#include "controller.h"
+#include "commonctl.h"
 
 #include "dbmodel.h"
 #include "mission.h"
 
+#define MISSIONCTL MissionCtl::getInstance()
 
-class MissionCtl : public Controller
+class MissionCtl : public CommonCtl
 {
+    GET_INSTANCE_DECL(MissionCtl);
 public:
     MissionCtl();
 protected:
+    // COMMON FUNCTIONS
+    virtual DbModelHandler* getModelHandler();
     DbModel *buildModel(void *items, const QString &fmt);
+    virtual const char *getPrebuiltFileName();
+    virtual const char* getPrebuiltFileType();
+
+    // TODO: how about import/export? do we need to import for mission???
+
 public:
-    QList<Mission*> getCountryList();
-    static MissionCtl* getInstance();
+    // COMMON FUNCTIONS
+    virtual QList<DbModel*> getItemFromDb();
 
 public slots:
-    virtual void onLoad();
-private:
-    static MissionCtl* gInstance;
-    bool mLoaded;
-    QList<Mission*> mMissionList;
+//    virtual void onLoad();
+//    bool mLoaded;
+//    QList<Mission*> mMissionList;
 };
 
 #endif // MISSIONCTL_H

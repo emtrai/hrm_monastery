@@ -25,7 +25,9 @@
 
 #include "dbsqlitedefs.h"
 #include "dbsqlite.h"
-#include "table/dbsqlitedepartmentpersontbl.h"
+
+GET_INSTANCE_IMPL(DbSqliteDept);
+
 
 DbSqliteDept::DbSqliteDept()
 {
@@ -37,31 +39,9 @@ const QString DbSqliteDept::getName()
     return KModelHdlDept;
 }
 
-QList<DbModel *> DbSqliteDept::getListPerson(const QString &deptUid)
-{
-    traced;
-    DbSqliteDepartmentPersonTbl* tbl = (DbSqliteDepartmentPersonTbl*)DbSqlite::getInstance()
-                                          ->getTable(KTableDepartPerson);
-    return tbl->getListPerson(deptUid);
-}
 
 DbSqliteTbl *DbSqliteDept::getMainTbl()
 {
     return (DbSqliteTbl*)DbSqlite::getInstance()->getTable(KTableDepartment);
 }
 
-DbSqliteTbl *DbSqliteDept::getTable(const QString &modelName)
-{
-    traced;
-    DbSqliteTbl* tbl = nullptr;
-    logd("Get model modelName %s", modelName.toStdString().c_str());
-    if (modelName == KModelNamePersonDept) {
-        logd("get table '%s'", KTableDepartPerson);
-        tbl = (DbSqliteTbl*)DbSqlite::getInstance()->getTable(KTableDepartPerson);
-    } else {
-        logd("get main table");
-        tbl = getMainTbl();
-    }
-    tracede;
-    return tbl;
-}

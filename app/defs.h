@@ -54,6 +54,7 @@ const char* const KPrebuiltMissionCSVFileName = "mission";
 const char* const KPrebuiltAreaCSVFileName = "area";
 const char* const KPrebuiltDeptJsonFileName = "department";
 const char* const KPrebuiltCommunityJsonFileName = "community";
+const char* const KPrebuiltCommunityDeptJsonFileName = "comm_dept";
 const char* const KPrebuiltHomeHtmlFileName = "home";
 const char* const KPrebuiltLogoFileName = "logo.png"; // special case, need file extenstion
 const char* const KPrebuiltPersonInfoTemplateFileName = "person_info_template";
@@ -76,6 +77,7 @@ const char* const KModelHdlEthnic = "ethnic";
 const char* const KModelHdlMission = "mission";
 const char* const KModelHdlArea = "area";
 const char* const KModelHdlDept = "department";
+const char* const KModelHdlCommDept = "community_dept";
 const char* const KModelHdlCourse = "course";
 const char* const KModelHdlWork = "work";
 const char* const KModelHdlStatus = "status";
@@ -197,6 +199,7 @@ const char* const KItemImg = "HINH_ANH";
 const char* const KItemEstablishDate = "NGAY_THANH_LAP";
 const char* const KItemIntro = "GIOI_THIEU";
 const char* const KItemCEOCode = "MA_TONG_PHU_TRACH";
+const char* const KItemNameId = "TEN_DINH_DAN";
 
 
 // Special item name
@@ -216,6 +219,7 @@ const char* const KCsvItemHollyName = "TEN_THANH";
 const char* const JSON_COMMUNITYLIST = "communities";
 const char* const JSON_DEPARTMENTS = "departments";
 const char* const JSON_ID = "id";
+const char* const JSON_NAME_ID = "nameid";
 const char* const JSON_CODE = "code";
 const char* const JSON_NAME = "name";
 const char* const JSON_CHURCH = "church";

@@ -15,3 +15,6 @@ DEFINES += VER_PATCH=1
 # DEFINES += DEBUG_TRACE
 # DEFINES += DEBUG_LOG
 ```
+7. Build > Deploy
+8. Copy file Quanlyhoidong.exe in dir build-xxx/release for release
+9. Update release note, usermanual document if need

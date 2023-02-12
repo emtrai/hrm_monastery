@@ -80,6 +80,7 @@ void LoaderCtl::registerAll()
     add2Loader(SAINTCTL);
     add2Loader(EduCtl::getInstance());
     add2Loader(SpecialistCtl::getInstance());
+    add2Loader(MISSIONCTL);
     add2Loader(CountryCtl::getInstance());
 #ifndef SKIP_PERSON_PROVINE
     add2Loader(ProvinceCtl::getInstance());

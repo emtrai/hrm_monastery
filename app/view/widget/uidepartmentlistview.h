@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Ngo Huy Anh
+ * Copyright (C) 2023 Ngo Huy Anh
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  *
  * Filename: uidepartmentlistview.h
  * Author: Anh, Ngo Huy
- * Created date:10/17/2022
+ * Created date:2/12/2023
  * Brief:
  */
 #ifndef UIDEPARTMENTLISTVIEW_H
@@ -24,32 +24,23 @@
 
 #include "uicommonlistview.h"
 
-class Community;
-
 class UIDepartmentListView : public UICommonListView
 {
 public:
     explicit UIDepartmentListView(QWidget *parent = nullptr);
     virtual ~UIDepartmentListView();
-    Community *community() const;
-    void setCommunity(Community *newCommunity);
-
 protected:
-    virtual QList<UITableMenuAction*> getMenuItemActions(const QMenu* menu,
-                                                          UITableWidgetItem* item);
-    virtual ErrCode onMenuActionListPerson(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onMenuActionListDepartment(QMenu* menu, UITableMenuAction* act);
+    void initHeader();
+    void updateItem(DbModel *item, UITableItem *tblItem);
+    virtual QList<UITableMenuAction*> getMenuMultiItemActions(const QMenu *menu,
+                                                               const QList<UITableItem *>& items);
     virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionDelete(QMenu* menu, UITableMenuAction* act);
+    //    virtual ErrCode onMenuActionView(QMenu* menu, UITableMenuAction* act);
     virtual void onViewItem(UITableWidgetItem *item);
-    virtual QString getTitle();
-    virtual void initHeader();
-    virtual void updateItem(DbModel* item, UITableItem* tblItem);
+    virtual Controller* getController();
 
-protected:
-    virtual ErrCode onLoad();
-private:
-    Community* mCommunity;
+    virtual QList<DbModel*> getListItem();
 };
 
 #endif // UIDEPARTMENTLISTVIEW_H

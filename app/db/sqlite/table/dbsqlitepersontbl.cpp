@@ -390,6 +390,9 @@ ErrCode DbSqlitePersonTbl::updateTableField(DbSqliteUpdateBuilder *builder,
             builder->addValue(KFieldLastName, per->lastName());
         } else if (field == KItemCommunity) {
             builder->addValue(KFieldCommunityUid, per->communityUid());
+        } else if (field == KItemHolly) {
+            builder->addValue(KFieldHollyName, per->hollyName());
+            builder->addValue(KFieldSaintUid, per->saintUidListInString());
         }
     }
     tracedr(err);

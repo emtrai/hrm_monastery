@@ -36,7 +36,6 @@ typedef enum TableFieldDatatype {
 const char* const KFieldUid = "uid";
 const char* const KFieldNameId = "nameid";
 const char* const KFieldName = "name";
-const char* const KFieldRecordStatus = "record_status";
 const char* const KFieldFirstName = "first_name";
 const char* const KFieldLastName = "lastname";
 const char* const KFieldFullName = "fullname";
@@ -89,6 +88,7 @@ const char* const KFieldParentDbId = "parent_dbid";
 const char* const KFieldCommunityDbId = "community_dbid";
 const char* const KFieldCommunityUid = "community_uid";
 const char* const KFieldCommunityCode = "community_code";
+const char* const KFieldCommunityDeptCode = "communitydept_code";
 const char* const KFieldIntro = "intro";
 const char* const KFieldAddr = "addr";
 const char* const KFieldTel = "tel";
@@ -171,6 +171,8 @@ const char* const KFieldSpecialistDbId = "specialist_dbid";
 const char* const KFieldSpecialistUid = "specialist_uid";
 const char* const KFieldExperienceHistory = "experience_history";
 const char* const KFieldChangeHistory = "change_history";
+const char* const KFieldCommDeptUid = "comm_dept_uid";
+const char* const KFieldCommDeptDbId = "comm_dept_dbid";
 
 
 // TABLES NAME
@@ -197,7 +199,7 @@ const char* const KTableCommDept = "comm_dept";
 const char* const KTableDeptMgr = "dept_mgr";
 const char* const KTableCommPerson = "comm_person";
 const char* const KTableAreaPerson = "area_person";
-const char* const KTableDepartPerson = "depart_person";
+const char* const KTableCommDepartPerson = "com_depart_person";
 const char* const KTableAreaCommunity = "area_community";
 const char* const KTableSpecialistPerson = "specialist_person";
 

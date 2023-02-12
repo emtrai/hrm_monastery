@@ -34,7 +34,7 @@ CourseCtl::CourseCtl():Controller(KModelHdlCourse)
     traced;
 }
 
-// Format: Name,period,startdate,enddate,remark
+// Format: Name id, Name,period,startdate,enddate,remark
 DbModel *CourseCtl::buildModel(void *items, const QString &fmt)
 {
     traced;
@@ -43,8 +43,8 @@ DbModel *CourseCtl::buildModel(void *items, const QString &fmt)
     qint32 idx = 0;
     qint32 sz = itemList->length();
     logd("sz %d", sz);
+    item->setNameId(itemList->at(idx++));
     item->setName(itemList->at(idx++));
-    item->setNameId(item->name());
     item->setPeriod(itemList->at(idx++));
 
     QString startDate = itemList->at(idx++).trimmed();

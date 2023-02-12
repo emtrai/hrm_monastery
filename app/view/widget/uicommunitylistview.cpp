@@ -28,12 +28,13 @@
 #include "utils.h"
 #include "mainwindow.h"
 #include "uicommunitypersonlistview.h"
-#include "uidepartmentlistview.h"
+#include "uicommdeptlistview.h"
 #include "uitableviewfactory.h"
 #include "uipersonlistview.h"
 #include "uitableview.h"
 #include <QFileDialog>
 #include "personctl.h"
+#include "person.h"
 
 UICommunityListView::UICommunityListView(QWidget *parent):
     UICommonListView(parent)
@@ -103,9 +104,31 @@ ErrCode UICommunityListView::onMenuActionDelete(QMenu *menu, UITableMenuAction *
 ErrCode UICommunityListView::onMenuActionAddPerson(QMenu *menu, UITableMenuAction *act)
 {
     traced;
-    ErrCode err = ErrNotImpl;
-    Utils::showDlgUnderDev();
-    // TODO: implement it
+    ErrCode err = ErrNone;
+    QString fpath;
+    if (!act){
+        err = ErrInvalidArg;
+        loge("add person failed, Empty menu action");
+    }
+    if (err == ErrNone && !act->getData()) {
+        err = ErrInvalidArg;
+        loge("add person failed, action no data");
+    }
+    if (err == ErrNone) {
+        Community* community = dynamic_cast<Community*>(act->getData());
+        community->dump();
+
+        Person* per = (Person*) Person::build();
+        per->setCommunityUid(community->uid());
+        per->setCommunityName(community->name());
+        logd("set community uid %s", STR2CHA(community->uid()));
+        logd("set community name %s", STR2CHA(community->name()));
+        MainWindow::showAddEditPerson(true, per, true);
+    }
+    if (err != ErrNone){
+        loge("add person failed, error code %d",err);
+        Utils::showErrorBox(QString("Thêm nữ tu lỗi, mã lỗi: %1").arg(err));
+    }
     tracedr(err);
     return err;
 }
@@ -239,7 +262,7 @@ ErrCode UICommunityListView::onMenuActionListDepartment(QMenu *menu, UITableMenu
     Community* community = dynamic_cast<Community*>(act->getData());
     if (community != nullptr) {
         community->dump();
-        UIDepartmentListView* view = (UIDepartmentListView*)UITableViewFactory::getView(ViewType::VIEW_DEPARTMENT);
+        UICommDeptListView* view = (UICommDeptListView*)UITableViewFactory::getView(ViewType::VIEW_DEPARTMENT);
 
         view->setCommunity(community);
         MainWindow::getInstance()->switchView(view);
@@ -316,11 +339,11 @@ QList<UITableMenuAction *> UICommunityListView::getMenuItemActions(const QMenu* 
                                           }));
     actionList.append(UITableMenuAction::build(tr("Thêm nữ tu"), this, item)
                                                 ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
-                                                    return this->onMenuActionListDepartment(m, a);
+                                                    return this->onMenuActionAddPerson(m, a);
                                                 }));
     actionList.append(UITableMenuAction::build(tr("Thêm ban"), this, item)
                                                    ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
-                                                       return this->onMenuActionListDepartment(m, a);
+                                                       return this->onMenuActionAddDepart(m, a);
                                                    }));
     return actionList;
 

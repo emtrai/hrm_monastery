@@ -64,7 +64,7 @@ class Community;
             ~MainWindow();
             static MainWindow *getInstance();
 
-            static void showAddEditPerson(bool isSelfUpdate = true, Person* per = nullptr);
+            static void showAddEditPerson(bool isSelfUpdate = true, Person* per = nullptr, bool isNew = true);
             static void showAddEditCommunity(bool isSelfUpdate = true, Community* com = nullptr,
                                              CommonEditModelListener* listener = nullptr);
             static void showImportDlg(ImportTarget target);
@@ -88,7 +88,7 @@ class Community;
  protected:
 
      virtual void onLoadController (Controller* ctl);
-     void doShowAddEditPerson(bool isSelfUpdate = true, Person* per = nullptr);
+     void doShowAddEditPerson(bool isSelfUpdate = true, Person* per = nullptr, bool isNew = true);
      void doShowAddEditCommunity(bool isSelfUpdate = true, Community* com = nullptr,
                                  CommonEditModelListener* listener = nullptr);
      void doShowImportPerson();

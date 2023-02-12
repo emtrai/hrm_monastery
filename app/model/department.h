@@ -26,76 +26,21 @@
 #include <QString>
 #include "dbmodel.h"
 
-class Department:public QObject, public DbModel
+class Department:public DbModel
 {
-    Q_OBJECT
-        public:
-                 Department();
+public:
+     Department();
 
-            static DbModel *builder();
-                 virtual QString modelName() const;
+    static DbModel *builder();
+     virtual QString modelName() const;
 
-                 qint64 parentDbId() const;
-                 void setParentDbId(qint64 newParentDbId);
+    const QString &remark() const;
+    void setRemark(const QString &newRemark);
 
-                 const QString &parentUid() const;
-                 void setParentUid(const QString &newParentUid);
-
-                 qint64 communityDbId() const;
-                 void setCommunityDbId(qint64 newCommunityDbId);
-
-                 const QString &remark() const;
-                 void setRemark(const QString &newRemark);
-
-                 qint64 hoDPersonId() const;
-                 void setHoDPersonId(qint64 newHoDPersonId);
-
-                 qint64 establishDate() const;
-                 void setEstablishDate(qint64 newEstablishDate);
-                 void setEstablishDateFromString(const QString &date, const QString &format="D.M.Y");
-
-                 const QString &email() const;
-                 void setEmail(const QString &newEmail);
-
-                 const QString &addr() const;
-                 void setAddr(const QString &newAddr);
-
-                 const QString &tel() const;
-                 void setTel(const QString &newTel);
-
-                 const QString &brief() const;
-                 void setBrief(const QString &newBrief);
-
-                 qint64 status() const;
-                 void setStatus(qint64 newStatus);
-
-                 const QString &shortName() const;
-                 void setShortName(const QString &newShortName);
-
-                 const QString &communityUid() const;
-                 void setCommunityUid(const QString &newCommunityUid);
-
-                 const QString &communityName() const;
-                 void setCommunityName(const QString &newCommunityName);
-
-             protected:
-                 virtual DbModelHandler* getDbModelHandler();
-             private:
-
-            QString mShortName;
-            qint64 mParentDbId;
-            QString mParentUid;
-            qint64 mCommunityDbId;
-            QString mCommunityUid;
-            QString mCommunityName;
-            QString mRemark;
-            qint64 mHoDPersonId;
-            qint64 mEstablishDate;
-            QString mEmail;
-            QString mAddr;
-            QString mTel;
-            QString mBrief;
-            qint64 mStatus;
+protected:
+     virtual DbModelHandler* getDbModelHandler();
+private:
+    QString mRemark;
 };
 
 #endif // DEPARTMENT_H

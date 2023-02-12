@@ -26,8 +26,8 @@
 #include <QList>
 #include "dbmodel.h"
 #include "dbcommunitymodelhandler.h"
-#include "department.h"
-#include "departctl.h"
+#include "communitydept.h"
+#include "communitydeptctl.h"
 #include "utils.h"
 #include "dialog/dlgdeptmgr.h"
 #include "person.h"
@@ -35,7 +35,7 @@
 
 UIDepartmentPersonListView::UIDepartmentPersonListView(QWidget *parent):
     UICommonListView(parent),
-    mDepartment(nullptr)
+    mCommDept(nullptr)
 {
     traced;
 }
@@ -63,7 +63,7 @@ ErrCode UIDepartmentPersonListView::onMenuActionAdd(QMenu *menu, UITableMenuActi
         if (list.count() > 0) {
             foreach (PersonDept* item, list) {
                 if (item != nullptr) {
-                    item->setDepartment(department());
+                    item->setCommDeptUid(mCommDept->uid());
                     item->dump();
                     logd("Save item to db");
                     ret = item->save();
@@ -71,7 +71,7 @@ ErrCode UIDepartmentPersonListView::onMenuActionAdd(QMenu *menu, UITableMenuActi
                     if (ret == ErrNone){
                         cnt ++;
                     } else {
-                        loge("Add per %s to dep %s failed %d", item->person()->getFullName().toStdString().c_str(),
+                        loge("Add per %s to dep %s failed %d", item->personName().toStdString().c_str(),
                              item->uid().toStdString().c_str(), ret);
                     }
                 }
@@ -166,11 +166,11 @@ ErrCode UIDepartmentPersonListView::onLoad()
 {
     //    QList<Community*> items = COMMUNITYCTL->getCommunityList();
     traced;
-    if (mDepartment != nullptr) {
+    if (mCommDept != nullptr) {
         logd("Load person list of department");
-        mDepartment->dump();
+        mCommDept->dump();
 
-        QList<DbModel*> items = DEPART->getPersonList(mDepartment->uid());
+        QList<DbModel*> items = COMMUNITYDEPTCTL->getPersonList(mCommDept->uid());
         mItemList.clear(); // TODO: clean up item data
         mItemList.append(items);
     } else {
@@ -184,14 +184,10 @@ ErrCode UIDepartmentPersonListView::onLoad()
     return ErrNone;
 }
 
-Department *UIDepartmentPersonListView::department() const
-{
-    return mDepartment;
-}
 
-void UIDepartmentPersonListView::setDepartment(Department *newDepartment)
+void UIDepartmentPersonListView::setCommDept(CommunityDept *commDept)
 {
-    mDepartment = newDepartment;
+    mCommDept = commDept;
 }
 
 
@@ -208,10 +204,8 @@ void UIDepartmentPersonListView::updateItem(DbModel *item, UITableItem *tblItem)
 {
     traced;
     PersonDept* model = (PersonDept*) item;
-    Person* per = model->person();
-    model->dump();
     tblItem->addValue(QString("%1").arg(item->dbId()));
-    tblItem->addValue(per->getFullName());
+    tblItem->addValue(model->personName());
     tblItem->addValue(model->roleName());
     tblItem->addValue(model->courseName());
     tracede;

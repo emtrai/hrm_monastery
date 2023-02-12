@@ -22,7 +22,7 @@
 #ifndef DBSQLITEAREAMGRTBL_H
 #define DBSQLITEAREAMGRTBL_H
 
-#include "dbsqlitedepartmentpersontbl.h"
+#include "dbsqlitecommdeptpersontbl.h"
 
 class DbSqliteAreaMgrTbl : public DbSqliteMapTbl
 {

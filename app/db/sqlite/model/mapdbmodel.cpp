@@ -39,6 +39,10 @@ QString MapDbModel::buildUid(const QString *seed)
     tmp += QString("%1").arg(startDate());
     tmp += QString("%1").arg(endDate());
     tmp += QString("%1").arg(status());
+    if (seed) {
+        tmp += *seed;
+    }
+    logd("value to cal uid %s", STR2CHA(tmp));
     QString uid = Utils::UidFromName(tmp,
                                      UidNameConvertType::HASH_NAME);
     logd("uid '%s'", uid.toStdString().c_str());

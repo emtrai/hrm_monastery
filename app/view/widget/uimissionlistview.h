@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Ngo Huy Anh
+ * Copyright (C) 2023 Ngo Huy Anh
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,34 +14,29 @@
  * limitations under the License.
  *
  *
- * Filename: deptmgr.h
+ * Filename: uimissionlistview.h
  * Author: Anh, Ngo Huy
- * Created date:10/8/2022
+ * Created date:2/12/2023
  * Brief:
  */
-#ifndef DEPTMGR_H
-#define DEPTMGR_H
+#ifndef UIMISSIONLISTVIEW_H
+#define UIMISSIONLISTVIEW_H
 
-#include "mapdbmodel.h"
+#include "uicommonlistview.h"
 
-// Department managers
-class DeptMgr : public MapDbModel
+class UIMissionListView : public UICommonListView
 {
 public:
-    DeptMgr();
-    static DbModel* build();
-    virtual QString modelName() const;
-    const QString &roleUid() const;
-    void setRoleUid(const QString &newRoleUid);
-
-    const QString &courseUid() const;
-    void setCourseUid(const QString &newCourseUid);
-
+    explicit UIMissionListView(QWidget *parent = nullptr);
+    virtual ~UIMissionListView();
 protected:
-    virtual DbModelHandler *getDbModelHandler();
+    virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
+    virtual ErrCode onMenuActionDelete(QMenu* menu, UITableMenuAction* act);
+    virtual void onViewItem(UITableWidgetItem *item);
+
+    virtual QString getTitle();
 protected:
-    QString mRoleUid;
-    QString mCourseUid; // Term
+    virtual ErrCode onLoad();
 };
 
-#endif // DEPTMGR_H
+#endif // UIMISSIONLISTVIEW_H

@@ -33,11 +33,9 @@
 #include "person.h"
 #include "department.h"
 
-PersonDept::PersonDept():
-    mDepartment(nullptr),
-    mPerson(nullptr)
+PersonDept::PersonDept()
 {
-
+    traced;
 }
 
 DbModel *PersonDept::build()
@@ -65,33 +63,11 @@ void PersonDept::setRoleName(const QString &newRoleName)
     mRoleName = newRoleName;
 }
 
-Department *PersonDept::department() const
-{
-    return mDepartment;
-}
-
-void PersonDept::setDepartment(Department *newDepartment)
-{
-    mDepartment = newDepartment;
-}
-
 QString PersonDept::modelName() const
 {
     return KModelNamePersonDept;
 }
 
-const QString &PersonDept::departUid() const
-{
-    if (mDepartment != nullptr)
-        return mDepartment->uid();
-    else
-        return mDepartUid;
-}
-
-void PersonDept::setDepartUid(const QString &newDepartUid)
-{
-    mDepartUid = newDepartUid;
-}
 
 const QString &PersonDept::courseUid() const
 {
@@ -113,36 +89,63 @@ void PersonDept::setCourseName(const QString &newCourseName)
     mCourseName = newCourseName;
 }
 
-Person *PersonDept::person() const
-{
-    return mPerson;
-}
-
-void PersonDept::setPerson(Person *newPerson)
-{
-    mPerson = newPerson;
-}
 
 void PersonDept::dump()
 {
     traced;
     DbModel::dump();
-    if (mPerson != nullptr) {
-        mPerson->dump();
-    }
+    logd("- Comm Dept Uid %s", mCommDeptUid.toStdString().c_str());
+    logd("- Person Uid %s", mPersonUid.toStdString().c_str());
     logd("- CourseUid %s", courseUid().toStdString().c_str());
     logd("- CourseName %s", courseName().toStdString().c_str());
     logd("- RoleUid %s", roleUid().toStdString().c_str());
     logd("- RoleName %s", roleName().toStdString().c_str());
-    logd("- departUid %s", departUid().toStdString().c_str());
-    if (mDepartment != nullptr) {
-        mDepartment->dump();
-    }
+
 }
 
 DbModelHandler *PersonDept::getDbModelHandler()
 {
     return DB->getModelHandler(KModelHdlDept); // TODO: suitable???
+}
+
+const QString &PersonDept::personName() const
+{
+    return mPersonName;
+}
+
+void PersonDept::setPersonName(const QString &newPersonName)
+{
+    mPersonName = newPersonName;
+}
+
+const QString &PersonDept::changeHistory() const
+{
+    return mChangeHistory;
+}
+
+void PersonDept::setChangeHistory(const QString &newChangeHistory)
+{
+    mChangeHistory = newChangeHistory;
+}
+
+const QString &PersonDept::personUid() const
+{
+    return mPersonUid;
+}
+
+void PersonDept::setPersonUid(const QString &newPersonUid)
+{
+    mPersonUid = newPersonUid;
+}
+
+const QString &PersonDept::commDeptUid() const
+{
+    return mCommDeptUid;
+}
+
+void PersonDept::setCommDeptUid(const QString &newCommDeptUid)
+{
+    mCommDeptUid = newCommDeptUid;
 }
 
 const QString &PersonDept::remark() const

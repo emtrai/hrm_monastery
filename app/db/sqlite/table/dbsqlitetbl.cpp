@@ -49,6 +49,7 @@ DbSqliteTbl::DbSqliteTbl(DbSqlite* db)
     mFieldDataTypeMap[KFieldId] = INT64;
     mFieldDataTypeMap[KFieldUid] = TEXT;
     mFieldDataTypeMap[KFieldName] = TEXT;
+    mFieldDataTypeMap[KFieldNameId] = TEXT;
 }
 
 DbSqliteTbl::DbSqliteTbl(DbSqlite* db, const QString& baseName, const QString& name, qint32 versionCode)
@@ -129,6 +130,9 @@ ErrCode_t DbSqliteTbl::add(DbModel *item)
                 updateBuilder = DbSqliteUpdateBuilder::build(name());
                 updateBuilder->addCond(KFieldId, dbIdStr, INT64);
                 updateBuilder->addValue(KFieldUid, uid);
+                // insert ok, set record as active
+                updateBuilder->addValue(KFieldDbStatus, DB_RECORD_ACTIVE);
+//                updateBuilder->addValue(KFieldNameId, item->nameId());
                 QSqlQuery* updateQry = updateBuilder->buildSqlQuery();
                 err = db()->execQuery(updateQry);
                 if (err == ErrNone) {
@@ -176,6 +180,8 @@ ErrCode DbSqliteTbl::updateTableField(DbSqliteUpdateBuilder *builder,
             builder->addValue(KFieldUid, item->uid());
         } else if (field == KItemName){
             builder->addValue(KFieldName, item->name());
+        } else if (field == KItemNameId){
+            builder->addValue(KFieldNameId, item->nameId());
         }
     }
     tracedr(err);
@@ -300,7 +306,7 @@ ErrCode DbSqliteTbl::deleteSoft(DbModel *item)
 //        update(item->uid(), )
 //    }
     QHash<QString, FieldValue> fields;
-    fields.insert(KFieldRecordStatus, FieldValue(QString::number(DB_RECORD_DElETED), INT32));
+    fields.insert(KFieldDbStatus, FieldValue(QString::number(DB_RECORD_DElETED), INT32));
     err = update(item->uid(), fields);
     tracedr(err);
     return err;
@@ -426,11 +432,12 @@ QHash<QString, QString> DbSqliteTbl::getFieldsCheckExists(const DbModel* item)
 void DbSqliteTbl::updateModelFromQuery(DbModel* item, const QSqlQuery& qry)
 {
     traced;
+    item->setNameId(qry.value(KFieldNameId).toString());
     item->setDbId(qry.value(KFieldId).toInt());
     item->setName(qry.value(KFieldName).toString());
     item->setUid(qry.value(KFieldUid).toString());
     item->setHistory(qry.value(KFieldHistory).toString());
-    item->setDbStatus(qry.value(KFieldRecordStatus).toInt());
+    item->setDbStatus(qry.value(KFieldDbStatus).toInt());
     item->setCreatedTime(qry.value(KFieldCreateTime).toInt());
     item->setLastUpdatedTime(qry.value(KFieldLastUpdateItme).toInt());
     tracede;
@@ -570,8 +577,9 @@ QList<DbModel *> DbSqliteTbl::getAll(const DbModelBuilder& builder)
         logd("Get all number of item %d", qry->size());
         while (qry->next()) {
             DbModel* item = builder();
+            item->setNameId(qry->value(KFieldNameId).toString());
             item->setDbId(qry->value(KFieldId).toInt());
-            item->setDbStatus(qry->value(KFieldRecordStatus).toInt());
+            item->setDbStatus(qry->value(KFieldDbStatus).toInt());
             item->setName(qry->value(KFieldName).toString());
             item->setUid(qry->value(KFieldUid).toString());
             item->setCreatedTime(qry->value(KFieldCreateTime).toInt());
@@ -616,8 +624,9 @@ DbModel *DbSqliteTbl::getModel(qint64 dbId, const DbModelBuilder& builder)
 
     if (err == ErrNone){
         item = builder();
+        item->setNameId(qry.value(KFieldNameId).toString());
         item->setDbId(qry.value(KFieldId).toInt());
-        item->setDbStatus(qry.value(KFieldRecordStatus).toInt());
+        item->setDbStatus(qry.value(KFieldDbStatus).toInt());
         item->setName(qry.value(KFieldName).toString());
         item->setUid(qry.value(KFieldUid).toString());
         item->setCreatedTime(qry.value(KFieldCreateTime).toInt());
@@ -758,12 +767,19 @@ int DbSqliteTbl::search(const QString &keyword, const DbModelBuilder &builder, Q
 QString DbSqliteTbl::getSearchQueryString(const QString& cond)
 {
     traced;
+    return getSearchQueryStringWithTag(cond, nullptr);
+}
+
+QString DbSqliteTbl::getSearchQueryStringWithTag(const QString &cond, const QString &tag)
+{
+    traced;
     QString queryString = QString("SELECT * FROM %2")
                               .arg(name());
     if (!cond.isEmpty()) {
         queryString += QString(" WHERE %1").arg(cond);
     }
     logd("queryString: %s", queryString.toStdString().c_str());
+    tracede;
     return queryString;
 }
 
@@ -785,6 +801,7 @@ int DbSqliteTbl::search(const QString& keyword, const QHash<QString, int>& inFie
 //    DB->openDb();
     // TODO: implement it
     // TODO: exact and not exact match???
+
     QSqlQuery qry(SQLITE->currentDb());
     qint32 cnt = 0;
     logi("Search keyword '%s'", keyword.toStdString().c_str());
@@ -837,6 +854,77 @@ int DbSqliteTbl::search(const QString& keyword, const QHash<QString, int>& inFie
     return cnt;
 }
 
+int DbSqliteTbl::search(const QHash<QString, FieldValue> &searchCond,
+                        bool isAndCond, const QString& condTag,
+                        const DbModelBuilder &builder,
+                        QList<DbModel *> *outList, bool isExact)
+{
+    traced;
+    //    DB->openDb();
+    // TODO: implement it
+    // TODO: exact and not exact match???
+
+    QSqlQuery qry(SQLITE->currentDb());
+    qint32 cnt = 0;
+    QString cond;
+    foreach (QString field, searchCond.keys()) {
+        if (!cond.isEmpty()) {
+            if (isAndCond)
+                cond += " AND ";
+            else
+                cond += " OR ";
+        }
+        logd("field %s", field.toStdString().c_str());
+        if (searchCond.value(field).dataType == TEXT){
+            if (isExact) {
+                cond += QString("lower(%1) = :keyword_%1").arg(field);
+            } else {
+                cond += QString("lower(%1) like :keyword_%1").arg(field);
+            }
+        } else {
+            // TODO: assump on INT32/64
+            cond += QString("%1 = :keyword_%1").arg(field);
+        }
+    }
+
+    //    QString queryString = QString("SELECT * FROM %1 WHERE %2")
+    //                              .arg(name(), cond);
+    logd("Query cond '%s'", cond.toStdString().c_str());
+    QString queryString = getSearchQueryStringWithTag(cond, condTag);
+
+    qry.prepare(queryString);
+    logd("Query String '%s'", queryString.toStdString().c_str());
+
+    // TODO: check sql injection issue
+    foreach (QString field, searchCond.keys()) {
+        if (searchCond.value(field).dataType == TEXT){
+            qry.bindValue( QString(":keyword_%1").arg(field),
+                          QString("%%1%").arg(searchCond.value(field).valueString().trimmed().toLower()) );
+        } else {
+            qry.bindValue( QString(":keyword_%1").arg(field),
+                          QString("%1").arg(searchCond.value(field).valueInt()) );
+        }
+    }
+
+    try {
+        cnt = runQuery(qry, builder, outList);
+    } catch(const std::runtime_error& ex) {
+        loge("Runtime Exception! %s", ex.what());
+        cnt = 0;
+    } catch (const std::exception& ex) {
+        loge("Exception! %s", ex.what());
+        cnt = 0;
+    } catch (...) {
+        loge("Exception! Unknown");
+        cnt = 0;
+    }
+
+
+    logi("Found %d", cnt);
+
+    return cnt;
+}
+
 QString DbSqliteTbl::getSqlCmdCreateTable()
 {
     traced;
@@ -844,7 +932,9 @@ QString DbSqliteTbl::getSqlCmdCreateTable()
     // Common table, with name and history field, together with default one is id, uid, status, history
     DbSqliteTableBuilder* builder = DbSqliteTableBuilder::build(name());
     // common field
-    builder->addField(KFieldRecordStatus, INT32);
+    builder->addField(KFieldDbStatus, INT32); // this is important field, to judge if record is delete or not
+                                              // not allow derived class to ignore it by overriding addTableField
+                                              // TODO: make common function to put all mandatory record???
     // specific field
     addTableField(builder);
     QString sql = builder->buildSqlStatement();
@@ -859,8 +949,9 @@ void DbSqliteTbl::addTableField(DbSqliteTableBuilder *builder)
     // TODO: consider to make Uid as common field???
     // i.e. uid can be hash of name, hash of 2 id in different table, etc.
     builder->addField(KFieldUid, TEXT);
+    builder->addField(KFieldNameId, TEXT);
     builder->addField(KFieldName, TEXT);
-    builder->addField(KFieldHistory, TEXT);
+    builder->addField(KFieldHistory, TEXT); // history of this field in db
     builder->addField(KFieldCreateTime, INT64);
     builder->addField(KFieldLastUpdateItme, INT64);
 }
@@ -870,16 +961,20 @@ ErrCode DbSqliteTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbMo
     traced;
     if (!item->uid().isEmpty())
         builder->addValue(KFieldUid, item->uid());
+    if (!item->nameId().isEmpty())
+        builder->addValue(KFieldNameId, item->nameId());
     if (!item->name().isEmpty())
         builder->addValue(KFieldName, item->name());
     if (!item->history().isEmpty())
         builder->addValue(KFieldHistory, item->history());
-//    builder->addValue(KFieldRecordStatus, item->dbStatus());
+//    builder->addValue(KFieldDbStatus, item->dbStatus());
     // TODO: timezone issue?
     // TODO: time of computer suddenly not correct/change???,
     // should store last open time than compare???
     builder->addValue(KFieldCreateTime, Utils::currentTimeMs());
     builder->addValue(KFieldLastUpdateItme, Utils::currentTimeMs());
+    builder->addValue(KFieldDbStatus, DB_RECORD_NOT_READY); // NOT ready, until we update uid
+                                                            // TODO: Fix me if this is neccessary or correct
     tracede;
     return ErrNone;
 }

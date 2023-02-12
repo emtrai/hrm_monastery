@@ -110,6 +110,25 @@ public:
                        QList<DbModel*>* outList = nullptr,
                        bool isExact = false);
 
+    /**
+     * @brief Search with with custom condition
+     * @param searchCond hashmap, with key is field to search, value is value to search (FieldValue)
+     * @param isAndCond
+     * @param condTag information passed to getSearchQueryStringWithTag,
+     *                which may be used for checking by derived class
+     * @param builder
+     * @param outList
+     * @param isExact
+     * @return
+     */
+    virtual int search(const QHash<QString, FieldValue>& searchCond,
+                       bool isAndCond = true,
+                       const QString& condTag = nullptr,
+                       const DbModelBuilder& builder = nullptr,
+                       QList<DbModel*>* outList = nullptr,
+                       bool isExact = false);
+
+
 
     // TODO: separate it into 2 info: detail and brief????
     // as some model has a lots of information, such as person, community
@@ -142,6 +161,7 @@ protected:
     virtual int runQuery(QSqlQuery& qry, const DbModelBuilder& builder,
                       QList<DbModel *> *outList = nullptr);
     virtual QString getSearchQueryString(const QString& cond = nullptr);
+    virtual QString getSearchQueryStringWithTag(const QString& cond = nullptr, const QString& tag = nullptr);
     virtual QString getFilterQueryString(int fieldId, const QString& cond = nullptr);
     virtual QSqlQuery *getAllQuery();
     virtual QString getAllQueryString();

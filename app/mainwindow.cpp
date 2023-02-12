@@ -43,6 +43,7 @@
 #include "dialog/dlgabout.h"
 #include "dlgwait.h"
 #include "dialog/dlgcommunity.h"
+#include "view/widget/uitableviewfactory.h"
 
 #define ADD_MENU_ITEM(menu, func, name, iconPath) \
 do { \
@@ -153,10 +154,10 @@ MainWindow::~MainWindow()
 }
 
 
-void MainWindow::showAddEditPerson(bool isSelfUpdate, Person *per)
+void MainWindow::showAddEditPerson(bool isSelfUpdate, Person *per, bool isNew)
 {
     traced;
-    getInstance()->doShowAddEditPerson(isSelfUpdate, per);
+    getInstance()->doShowAddEditPerson(isSelfUpdate, per, isNew);
     tracede;
 }
 
@@ -218,9 +219,9 @@ void MainWindow::switchView(QWidget *nextView)
         if (!mMainViews.contains(mCurrentView)) {
             logd("Not in cached view, remove");
 //            delete mCurrentView;
-            // TODO: delete here cause something terrible, i.e UIDepartmentListView --> uidepartmentpersonlistview.cpp
-            // UIDepartmentListView is deleted, but its function is still called, because
-            // uidepartmentpersonlistview is created in menu UIDepartmentListView::onMenuActionListPerson
+            // TODO: delete here cause something terrible, i.e UICommDeptListView --> uidepartmentpersonlistview.cpp
+            // UICommDeptListView is deleted, but its function is still called, because
+            // uidepartmentpersonlistview is created in menu UICommDeptListView::onMenuActionListPerson
             // cause use-after-free issue
             // Need to rethink this again!!!!!
             mCurrentView = nullptr;
@@ -252,7 +253,14 @@ QWidget *MainWindow::getView(ViewType type)
         nextView = mPersonView;
         break;
     default:
-        loge("Unknown type %d", type);
+        {
+            UITableView* view = UITableViewFactory::getView(type);
+            if (view) {
+                nextView = (QWidget*) view;
+            } else {
+                loge("Unknown type %d", type);
+            }
+        }
         break;
     }
     tracede;
@@ -270,11 +278,11 @@ void MainWindow::onLoadController (Controller* ctl)
     tracede;
 }
 
-void MainWindow::doShowAddEditPerson(bool isSelfUpdate, Person *per)
+void MainWindow::doShowAddEditPerson(bool isSelfUpdate, Person *per, bool isNew)
 {
     traced;
     logd("isSelfUpdate %d", isSelfUpdate);
-    DlgPerson* dlg = DlgPerson::buildDlg(this, per);
+    DlgPerson* dlg = DlgPerson::buildDlg(this, per, isNew);
     dlg->setIsSelfSave(isSelfUpdate);
     dlg->exec();
     delete dlg;
@@ -683,9 +691,10 @@ void MainWindow::on_action_New_triggered()
 //    person->save();
 
 //    delete person;
-    DlgPerson w;
+    DlgPerson *dlg = DlgPerson::buildDlg(this);
     //    w.setWindowState(Qt::WindowState::WindowMaximized);
-    w.exec();
+    dlg->exec();
+    delete dlg;
 }
 
 
@@ -870,8 +879,10 @@ void MainWindow::on_actionSpeclialist_triggered()
 void MainWindow::on_actionMisson_triggered()
 {
     traced;
-    UNDER_DEV(tr("Nhiệm vụ"));
+//    UNDER_DEV(tr("Nhiệm vụ"));
     // TODO: implement it
+    switchView(VIEW_MISSION);
+    tracede;
 }
 
 void MainWindow::on_actionProvince_triggered()

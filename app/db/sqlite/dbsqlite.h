@@ -57,8 +57,12 @@ struct FieldValue
     FieldValue();
     FieldValue(const FieldValue& item);
     FieldValue(const QString& value, int dataType = TEXT);
+    FieldValue(qint64 value);
+    qint64 valueInt();
+    const QString& valueString();
     QString value;
-    int dataType;
+    qint64 mIntValue;
+    int dataType; // TODO: make it private?
 };
 
 // THIS IS ONE INTERFACE FOR ALL OPERATION RELATING TO DB

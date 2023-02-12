@@ -34,7 +34,7 @@ ProvinceCtl::ProvinceCtl():
     traced;
 }
 
-// Format: Country short name, Province name[, <parent province if any>]
+// Format: Country name id, Name id, Province name[, <parent province if any>]
 DbModel *ProvinceCtl::buildModel(void *items, const QString &fmt)
 {
     traced;
@@ -43,20 +43,27 @@ DbModel *ProvinceCtl::buildModel(void *items, const QString &fmt)
     qint32 idx = 0;
     qint32 sz = itemList->length();
     logd("sz %d", sz);
-    QString countryId = itemList->at(idx++).trimmed();
-    item->setCountryUid(countryId); // TODO: check if country id is valid or not
-    QString nameid = itemList->at(idx++).trimmed();
+//    QString countryId = itemList->at(idx++).trimmed();
+//    item->setCountryUid(countryId); // TODO: check if country id is valid or not
+//    QString nameid = itemList->at(idx++).trimmed();
+//    QString name = itemList->at(idx++).trimmed();
+//    if (nameid.isEmpty()){
+//        nameid = Utils::UidFromName(name, UidNameConvertType::NO_VN_MARK_UPPER);
+//    }
+//    // TODO: check/validate if name/nameid is valid
+//    item->setNameId(NAMEID(item->countryUid(), nameid));
+    QString countryNameId = itemList->at(idx++).trimmed();
+    QString nameId = itemList->at(idx++).trimmed();
     QString name = itemList->at(idx++).trimmed();
-    if (nameid.isEmpty()){
-        nameid = Utils::UidFromName(name, UidNameConvertType::NO_VN_MARK_UPPER);
-    }
-    // TODO: check/validate if name/nameid is valid
-    item->setNameId(NAMEID(item->countryUid(), nameid));
+    item->setNameId(name);
+    // TODO: search country name id then search country uid???
+//    item->setName(name);
     item->setName(name);
     if (sz > idx) {
-        QString parentid = itemList->at(idx++).trimmed();
-        if (!parentid.isEmpty())
-            item->setParentUid(NAMEID(item->countryUid(), parentid));
+        // TODO: search parent name id the put parent uid???
+        QString parentNameId = itemList->at(idx++).trimmed();
+//        if (!parentid.isEmpty())
+//            item->setParentUid(NAMEID(item->countryUid(), parentid));
     }
     if (sz > idx) {
         QString remark = itemList->at(idx++);

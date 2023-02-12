@@ -24,14 +24,18 @@
 #include "mission.h"
 #include "defs.h"
 #include "dbctl.h"
+#include "utils.h"
 
+GET_INSTANCE_IMPL(MissionCtl);
 
-MissionCtl* MissionCtl::gInstance = nullptr;
-
-
-MissionCtl::MissionCtl():Controller(KModelHdlMission)
+MissionCtl::MissionCtl():CommonCtl(KModelHdlMission)
 {
     traced;
+}
+
+DbModelHandler *MissionCtl::getModelHandler()
+{
+    return DB->getModelHandler(KModelHdlMission);
 }
 
 // Format: vn, Vietname,Asian, Asia,
@@ -45,36 +49,48 @@ DbModel *MissionCtl::buildModel(void *items, const QString &fmt)
     logd("sz %d", sz);
     item->setNameId(itemList->at(idx++));
     item->setName(itemList->at(idx++));
+    if (sz > idx) { // TODO: make it commont function/macro??
+        QString remark; // last item is remark, so merge all items as remark
+        for (; idx < sz; idx++){
+            if (!remark.isEmpty()){
+                remark += ",";
+            }
+            remark += itemList->at(idx);
+        }
+
+        if (!remark.isEmpty())
+            item->setRemark(remark);
+    }
     tracede;
     return item;
 }
 
-QList<Mission *> MissionCtl::getCountryList()
+const char *MissionCtl::getPrebuiltFileName()
 {
-    traced;
-    // TODO: check if file update then reload??
-    return mMissionList;
+    return KPrebuiltMissionCSVFileName;
+}
+
+const char *MissionCtl::getPrebuiltFileType()
+{
+    return KFileTypeCSV;
+}
+
+QList<DbModel *> MissionCtl::getItemFromDb()
+{
+    return getModelHandler()->getAll(&Mission::builder);
 }
 
 
-MissionCtl *MissionCtl::getInstance()
-{
-    if (gInstance == nullptr){
-        gInstance = new MissionCtl();
-    }
-    return gInstance;
-}
+//void MissionCtl::onLoad()
+//{
 
-void MissionCtl::onLoad()
-{
+//    traced;
+//    ErrCode ret = ErrNone;
+//    ret = check2UpdateDbFromPrebuiltFile(KPrebuiltMissionCSVFileName, KFileTypeCSV);
 
-    traced;
-    ErrCode ret = ErrNone;
-    ret = check2UpdateDbFromPrebuiltFile(KPrebuiltMissionCSVFileName, KFileTypeCSV);
-
-    QList items = DB->getModelHandler(KModelHdlMission)->getAll(&Mission::builder);
-    //    mItemList.append();
-    foreach (DbModel* model, items){
-        mMissionList.append((Mission*)model);
-    }
-}
+//    QList items = DB->getModelHandler(KModelHdlMission)->getAll(&Mission::builder);
+//    //    mItemList.append();
+//    foreach (DbModel* model, items){
+//        mMissionList.append((Mission*)model);
+//    }
+//}

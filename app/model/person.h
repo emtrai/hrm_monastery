@@ -426,7 +426,7 @@ protected:
     virtual ErrCode prepare2Save();
 
 protected:
-    QString mPersonCode;
+    QString mPersonCode; // TODO: reconsider again if we need this, as we have common "nameid"
 
     QString mFirstName;
     QString mLastName;

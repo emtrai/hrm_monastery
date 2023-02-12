@@ -53,6 +53,7 @@ SOURCES += \
     controller/commonctl.cpp \
     controller/communityctl.cpp \
     config/config.cpp \
+    controller/communitydeptctl.cpp \
     controller/controller.cpp \
     controller/countryctl.cpp \
     controller/coursectl.cpp \
@@ -66,9 +67,9 @@ SOURCES += \
     controller/workctl.cpp \
     crypto/crypto.cpp \
     db/dbareamodelhandler.cpp \
+    db/dbcommdepatmodelhandler.cpp \
     db/dbcommunitymodelhandler.cpp \
     db/dbctl.cpp \
-    db/dbdepartmentmodelhandler.cpp \
     db/dbinfo.cpp \
     db/dbmodel.cpp \
     db/dbmodelhandler.cpp \
@@ -80,6 +81,7 @@ SOURCES += \
     db/sqlite/dbsqlitedeletebuilder.cpp \
     db/sqlite/dbsqliteinsertbuilder.cpp \
     db/sqlite/dbsqliteupdatebuilder.cpp \
+    db/sqlite/handler/dbsqlitecommunitydept.cpp \
     db/sqlite/handler/dbsqlitemission.cpp \
     db/sqlite/handler/dbsqlitemodelhandler.cpp \
     db/sqlite/handler/dbsqliteperson.cpp \
@@ -100,20 +102,18 @@ SOURCES += \
     db/sqlite/handler/dbsqliteevent.cpp \
     db/sqlite/model/areacommunity.cpp \
     db/sqlite/model/areaperson.cpp \
-    db/sqlite/model/communitydept.cpp \
     db/sqlite/model/communityperson.cpp \
-    db/sqlite/model/deptmgr.cpp \
     db/sqlite/model/mapdbmodel.cpp \
     db/sqlite/model/specialistperson.cpp \
     db/sqlite/table/dbsqliteareamgrtbl.cpp \
     db/sqlite/table/dbsqliteareatbl.cpp \
-    db/sqlite/table/dbsqlitecommunitydeptmaptbl.cpp \
+    db/sqlite/table/dbsqlitecommdeptpersontbl.cpp \
+    db/sqlite/table/dbsqlitecommunitydepttbl.cpp \
     db/sqlite/table/dbsqlitecommunitymgrtbl.cpp \
     db/sqlite/table/dbsqlitecommunitypersontbl.cpp \
     db/sqlite/table/dbsqlitecommunitytbl.cpp \
     db/sqlite/table/dbsqlitecountrytbl.cpp \
     db/sqlite/table/dbsqlitecoursetbl.cpp \
-    db/sqlite/table/dbsqlitedepartmentpersontbl.cpp \
     db/sqlite/table/dbsqlitedeparttbl.cpp \
     db/sqlite/table/dbsqliteedutbl.cpp \
     db/sqlite/table/dbsqliteethnictbl.cpp \
@@ -137,6 +137,7 @@ SOURCES += \
     export/exporter.cpp \
     export/exportfactory.cpp \
     export/exporthtml.cpp \
+    export/exporttype.cpp \
     export/iexporter.cpp \
     file/filectl.cpp \
     filter.cpp \
@@ -153,6 +154,7 @@ SOURCES += \
     model/area.cpp \
     model/church.cpp \
     model/community.cpp \
+    model/communitydept.cpp \
     model/country.cpp \
     model/course.cpp \
     model/department.cpp \
@@ -169,6 +171,7 @@ SOURCES += \
     db/sqlite/model/saintperson.cpp \
     model/specialist.cpp \
     model/status.cpp \
+    model/statusmodel.cpp \
     model/work.cpp \
     controller/personctl.cpp \
     report/reportctl.cpp \
@@ -202,12 +205,14 @@ SOURCES += \
     view/dialog/dlgwait.cpp \
     view/widget/baseview.cpp \
     view/widget/uiarealistview.cpp \
+    view/widget/uicommdeptlistview.cpp \
     view/widget/uicommonlistview.cpp \
     view/widget/uicommunitylistview.cpp \
     view/widget/uicommunitypersonlistview.cpp \
     view/widget/uidepartmentlistview.cpp \
     view/widget/uidepartmentpersonlistview.cpp \
     view/widget/uiitembutton.cpp \
+    view/widget/uimissionlistview.cpp \
     view/widget/uimulticomboxview.cpp \
     view/widget/uipersonlistview.cpp \
     view/widget/uirolelistview.cpp \
@@ -223,6 +228,7 @@ HEADERS += \
     controller/commonctl.h \
     controller/communityctl.h \
     config/config.h \
+    controller/communitydeptctl.h \
     controller/controller.h \
     controller/countryctl.h \
     controller/coursectl.h \
@@ -236,10 +242,10 @@ HEADERS += \
     controller/workctl.h \
     crypto/crypto.h \
     db/dbareamodelhandler.h \
+    db/dbcommdepatmodelhandler.h \
     db/dbcommunitymodelhandler.h \
     db/dbctl.h \
     db/dbdefs.h \
-    db/dbdepartmentmodelhandler.h \
     db/dbinfo.h \
     db/dbmodel.h \
     db/dbmodelhandler.h \
@@ -253,6 +259,7 @@ HEADERS += \
     db/sqlite/dbsqliteupdatebuilder.h \
     db/sqlite/handler/dbsqlitearea.h \
     db/sqlite/handler/dbsqlitecommunity.h \
+    db/sqlite/handler/dbsqlitecommunitydept.h \
     db/sqlite/handler/dbsqlitecountry.h \
     db/sqlite/handler/dbsqlitecourse.h \
     db/sqlite/handler/dbsqlitedept.h \
@@ -271,20 +278,18 @@ HEADERS += \
     db/sqlite/handler/dbsqlitework.h \
     db/sqlite/model/areacommunity.h \
     db/sqlite/model/areaperson.h \
-    db/sqlite/model/communitydept.h \
     db/sqlite/model/communityperson.h \
-    db/sqlite/model/deptmgr.h \
     db/sqlite/model/mapdbmodel.h \
     db/sqlite/model/specialistperson.h \
     db/sqlite/table/dbsqliteareamgrtbl.h \
     db/sqlite/table/dbsqliteareatbl.h \
-    db/sqlite/table/dbsqlitecommunitydeptmaptbl.h \
+    db/sqlite/table/dbsqlitecommdeptpersontbl.h \
+    db/sqlite/table/dbsqlitecommunitydepttbl.h \
     db/sqlite/table/dbsqlitecommunitymgrtbl.h \
     db/sqlite/table/dbsqlitecommunitypersontbl.h \
     db/sqlite/table/dbsqlitecommunitytbl.h \
     db/sqlite/table/dbsqlitecountrytbl.h \
     db/sqlite/table/dbsqlitecoursetbl.h \
-    db/sqlite/table/dbsqlitedepartmentpersontbl.h \
     db/sqlite/table/dbsqlitedeparttbl.h \
     db/sqlite/table/dbsqliteedutbl.h \
     db/sqlite/table/dbsqliteethnictbl.h \
@@ -326,6 +331,7 @@ HEADERS += \
     model/area.h \
     model/church.h \
     model/community.h \
+    model/communitydept.h \
     model/country.h \
     model/course.h \
     model/department.h \
@@ -342,6 +348,7 @@ HEADERS += \
     db/sqlite/model/saintperson.h \
     model/specialist.h \
     model/status.h \
+    model/statusmodel.h \
     model/work.h \
     controller/personctl.h \
     report/reportctl.h \
@@ -376,12 +383,14 @@ HEADERS += \
     view/dialog/dlgwait.h \
     view/widget/baseview.h \
     view/widget/uiarealistview.h \
+    view/widget/uicommdeptlistview.h \
     view/widget/uicommonlistview.h \
     view/widget/uicommunitylistview.h \
     view/widget/uicommunitypersonlistview.h \
     view/widget/uidepartmentlistview.h \
     view/widget/uidepartmentpersonlistview.h \
     view/widget/uiitembutton.h \
+    view/widget/uimissionlistview.h \
     view/widget/uimulticomboxview.h \
     view/widget/uipersonlistview.h \
     view/widget/uirolelistview.h \
@@ -432,6 +441,7 @@ DISTFILES += \
     license.template \
     res/Saints.csv \
     res/area_vi.csv \
+    res/comm_dept_vi.json \
     res/course_vi.csv \
     res/department_vi.json \
     res/edu_vi.csv \
