@@ -22,36 +22,30 @@
 #ifndef EDUCTL_H
 #define EDUCTL_H
 
-#include <controller.h>
+#include <commonctl.h>
 #include "errcode.h"
 #include <QStringList>
 #include "education.h"
 
 #define EDUCTL EduCtl::getInstance()
 
-class EduCtl : public Controller
+class EduCtl : public CommonCtl
 {
+    GET_INSTANCE_DECL(EduCtl);
 private:
     EduCtl();
 
-//    ErrCode doOneCSVItemCallback(const QStringList& items, void* param);
-//private:
-//    static ErrCode oneCSVItemCallback(const QStringList& items, void* param);
-
 protected:
     DbModel *buildModel(void *items, const QString &fmt);
-public:
     virtual DbModelHandler* getModelHandler();
-    QList<Education*> getListEdu();
-    static EduCtl* getInstance();
-
+    virtual const char *getPrebuiltFileName();
+    virtual const char* getPrebuiltFileType();
+public:
+    // COMMON FUNCTIONS
+    virtual QList<DbModel*> getItemFromDb();
 private:
-    static EduCtl* gInstance;
-    bool mLoaded;
-    QList<Education*> mItemList;
 
-public slots:
-    virtual void onLoad();
 };
+
 
 #endif // EDUCTL_H

@@ -31,11 +31,11 @@
 
 #define SPLIT ','
 
-SpecialistCtl* SpecialistCtl::gInstance = nullptr;
+GET_INSTANCE_IMPL(SpecialistCtl);
+
 
 SpecialistCtl::SpecialistCtl():
-    Controller(KModelHdlSpecialist),
-    mLoaded(false)
+    Controller(KModelHdlSpecialist)
 {
 
 }
@@ -59,47 +59,20 @@ DbModelHandler *SpecialistCtl::getModelHandler()
 
 }
 
-//ErrCode SpecialistCtl::doOneCSVItemCallback(const QStringList &items, void *param)
-//{
-//    traced;
-//    ErrCode ret = ErrNone;
-//    (void) param;
-//    if (!items.empty()) {
-//        Specialist* specialist = new Specialist();
-//        QString item = items.join(SPLIT);
-//        logd("Add item %s to list", item.toStdString().c_str());
-//        specialist->setName(item);
-//        specialist->save();// TODO handle error
-//        //        mItemList.append(item);
-//    }
-//    else {
-//        loge("Invalid data");
-//        // TODO: should break or continue???
-//        ret = ErrInvalidData;
-//    }
-//    logd("ret %d", ret);
-//    return ret;
-//}
-
-//ErrCode SpecialistCtl::oneCSVItemCallback(const QStringList &items, void* caller, void *param)
-//{
-//    return getInstance()->doOneCSVItemCallback(items, param);
-//}
-
-QList<Specialist*> SpecialistCtl::getAll()
+const char *SpecialistCtl::getPrebuiltFileName()
 {
-    traced;
-    // TODO: check if file update then reload??
-    return mItemList;
+    return KPrebuiltSpecialistCSVFileName;
 }
 
-SpecialistCtl *SpecialistCtl::getInstance()
+const char *SpecialistCtl::getPrebuiltFileType()
 {
-    if (gInstance == nullptr){
-        gInstance = new SpecialistCtl();
-    }
+    return KFileTypeCSV;
+}
 
-    return gInstance;
+QList<DbModel *> SpecialistCtl::getItemFromDb()
+{
+    return getModelHandler()->getAll(&Specialist::builder);
+
 }
 
 QList<DbModel *> SpecialistCtl::getListPerson(const QString &specialistUid)
@@ -109,33 +82,5 @@ QList<DbModel *> SpecialistCtl::getListPerson(const QString &specialistUid)
     QList<DbModel*> list =  hdl->getListPerson(specialistUid);
     logd("No. item: %d", list.count());
     return list;
-}
-
-
-void SpecialistCtl::onLoad()
-{
-    traced;
-    ErrCode ret = ErrNone;
-    ret = check2UpdateDbFromPrebuiltFile(KPrebuiltSpecialistCSVFileName, KFileTypeCSV);
-//    // TODO: file should be from installed dir, rather than embedded inside bin??
-//    QString fname = Utils::getPrebuiltFileByLang(KPrebuiltSpecialistCSVFileName);
-//    if (!FileCtl::checkPrebuiltDataFileHash(fname)){
-//        ret = Utils::parseCSVFile(FileCtl::getPrebuiltDataFilePath(fname),
-//                                  &SpecialistCtl::oneCSVItemCallback, this);
-//        if (ret == ErrNone){
-//            mLoaded = true;
-//            FileCtl::updatePrebuiltDataFileHash(fname);
-//        }
-//        else{
-//            logi("Check to update db from file failed %d", ret);
-//        }
-//    }
-//    else {
-//        logi("Prebuilt saint file up-to-date");
-//    }
-    QList<DbModel*> items = DB->getSpecialistModelHandler()->getAll(&Specialist::builder);
-    foreach (DbModel* item, items)
-        mItemList.append((Specialist*)item);
-
 }
 

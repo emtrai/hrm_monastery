@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Ngo Huy Anh
+ * Copyright (C) 2023 Ngo Huy Anh
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,40 +14,26 @@
  * limitations under the License.
  *
  *
- * Filename: uitableviewfactory.h
+ * Filename: uispecialistlistview.h
  * Author: Anh, Ngo Huy
- * Created date:8/11/2022
+ * Created date:2/12/2023
  * Brief:
  */
-#ifndef UITABLEVIEWFACTORY_H
-#define UITABLEVIEWFACTORY_H
+#ifndef UISPECIALISTLISTVIEW_H
+#define UISPECIALISTLISTVIEW_H
 
-#include <QWidget>
+#include "uicommonlistview.h"
 
-enum ViewType {
-    NONE = 0,
-    PERSON,
-    SAINT,
-    COMMUNITY,
-    AREA,
-    COMMUNITY_PERSON,
-    VIEW_COMMUNITY_DEPT,
-    VIEW_DEPARTMENT,
-    VIEW_DEPARTMENT_PERSON,
-    VIEW_ROLE,
-    VIEW_MISSION,
-    VIEW_SPECIALIST,
-    VIEW_EDUCATION,
-    VIEW_WORK,
-    VIEW_MAX,
-};
-
-class UITableView;
-
-class UITableViewFactory
+class UISpecialistListView : public UICommonListView
 {
 public:
-    static UITableView* getView(ViewType type, QWidget *parent = nullptr);
+    explicit UISpecialistListView(QWidget *parent = nullptr);
+    virtual ~UISpecialistListView();
+protected:
+    virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
+    virtual ErrCode onMenuActionDelete(QMenu* menu, UITableMenuAction* act);
+    virtual QString getTitle();
+    virtual Controller* getController();
 };
 
-#endif // UITABLEVIEWFACTORY_H
+#endif // UISPECIALISTLISTVIEW_H

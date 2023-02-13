@@ -80,17 +80,3 @@ QList<DbModel *> MissionCtl::getItemFromDb()
     return getModelHandler()->getAll(&Mission::builder);
 }
 
-
-//void MissionCtl::onLoad()
-//{
-
-//    traced;
-//    ErrCode ret = ErrNone;
-//    ret = check2UpdateDbFromPrebuiltFile(KPrebuiltMissionCSVFileName, KFileTypeCSV);
-
-//    QList items = DB->getModelHandler(KModelHdlMission)->getAll(&Mission::builder);
-//    //    mItemList.append();
-//    foreach (DbModel* model, items){
-//        mMissionList.append((Mission*)model);
-//    }
-//}

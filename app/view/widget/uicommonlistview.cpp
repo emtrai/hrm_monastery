@@ -51,7 +51,7 @@ void UICommonListView::updateItem(DbModel *item, UITableItem *tblItem)
 {
     traced;
     tblItem->addValue(QString("%1").arg(item->dbId()));
-    tblItem->addValue(item->uid());
+    tblItem->addValue(item->nameId());
     tblItem->addValue(item->name());
     tracede;
 }
@@ -64,7 +64,7 @@ qint32 UICommonListView::getTotalItems()
 
 QList<DbModel *> UICommonListView::getListItem()
 {
-    return QList<DbModel*>();
+    return getController()->getItemFromDb();
 }
 
 Controller *UICommonListView::getController()
@@ -134,4 +134,24 @@ QHash<QString, QString> UICommonListView::getFilterKeywords(int fieldId, const Q
     logd("found %d keywords", (int)keywords.count());
     tracede;
     return keywords;
+}
+
+
+void UICommonListView::onViewItem(UITableWidgetItem *item)
+{
+    traced;
+    int idx = item->idx();
+    logd("idx=%d",idx);
+    if (idx < mItemList.length()){
+        DbModel* model = mItemList.value(idx);
+        if (model == nullptr) {
+            loge("no data");
+            return;
+        }
+        model->dump();
+        // TODO: show information
+    } else {
+        loge("Invalid idx");
+        // TODO: popup message???
+    }
 }

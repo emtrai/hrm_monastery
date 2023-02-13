@@ -44,7 +44,7 @@ DbModel *RoleCtl::buildModel(void *items, const QString &fmt)
     qint32 idx = 0;
     qint32 sz = itemList->length();
     logd("sz %d", sz);
-    item->setUid(itemList->at(idx++));
+    item->setNameId(itemList->at(idx++));
     item->setName(itemList->at(idx++));
 
     if (sz > idx) {

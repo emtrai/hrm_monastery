@@ -57,6 +57,11 @@ ErrCode Controller::addNew(DbModel *model)
     return ret;
 }
 
+QList<DbModel *> Controller::getItemFromDb()
+{
+    return QList<DbModel *>();
+}
+
 ErrCode Controller::reloadDb()
 {
     traced; // TODO: implement observer to call all reload db when any changes in model

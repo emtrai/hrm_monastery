@@ -44,6 +44,8 @@ protected:
     virtual void initHeader();
     virtual void initFilterFields();
     virtual QHash<QString, QString> getFilterKeywords(int fieldId, const QString& fieldText);
+    virtual void onViewItem(UITableWidgetItem *item);
+
 
 protected:
     QList<DbModel*> mItemList;

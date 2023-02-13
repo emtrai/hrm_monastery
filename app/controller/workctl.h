@@ -22,7 +22,7 @@
 #ifndef WORKCTL_H
 #define WORKCTL_H
 
-#include "controller.h"
+#include "commonctl.h"
 #include "utils.h"
 #include <QList>
 
@@ -30,26 +30,21 @@
 
 class Work;
 
-class WorkCtl : public Controller
+class WorkCtl : public CommonCtl
 {
 
     GET_INSTANCE_DECL(WorkCtl);
 public:
     WorkCtl();
     virtual ~WorkCtl();
-    virtual DbModelHandler* getModelHandler();
 protected:
     DbModel *buildModel(void *items, const QString &fmt);
+    virtual DbModelHandler* getModelHandler();
+    virtual const char *getPrebuiltFileName();
+    virtual const char* getPrebuiltFileType();
 public:
-    const QList<Work*> getWorkList();
-
-public:
-    virtual ErrCode reloadDb();
-
-public slots:
-    virtual void onLoad();
-private:
-    QList<Work*> mWorkList;
+    // COMMON FUNCTIONS
+    virtual QList<DbModel*> getItemFromDb();
 };
 
 #endif // WORKCTL_H

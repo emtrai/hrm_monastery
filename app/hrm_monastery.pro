@@ -211,15 +211,18 @@ SOURCES += \
     view/widget/uicommunitypersonlistview.cpp \
     view/widget/uidepartmentlistview.cpp \
     view/widget/uidepartmentpersonlistview.cpp \
+    view/widget/uieducationlistview.cpp \
     view/widget/uiitembutton.cpp \
     view/widget/uimissionlistview.cpp \
     view/widget/uimulticomboxview.cpp \
     view/widget/uipersonlistview.cpp \
     view/widget/uirolelistview.cpp \
     view/widget/uisaintlistview.cpp \
+    view/widget/uispecialistlistview.cpp \
     view/widget/uisummarizeview.cpp \
     view/widget/uitableview.cpp \
-    view/widget/uitableviewfactory.cpp
+    view/widget/uitableviewfactory.cpp \
+    view/widget/uiworklistview.cpp
 
 HEADERS += \
     address.h \
@@ -389,15 +392,18 @@ HEADERS += \
     view/widget/uicommunitypersonlistview.h \
     view/widget/uidepartmentlistview.h \
     view/widget/uidepartmentpersonlistview.h \
+    view/widget/uieducationlistview.h \
     view/widget/uiitembutton.h \
     view/widget/uimissionlistview.h \
     view/widget/uimulticomboxview.h \
     view/widget/uipersonlistview.h \
     view/widget/uirolelistview.h \
     view/widget/uisaintlistview.h \
+    view/widget/uispecialistlistview.h \
     view/widget/uisummarizeview.h \
     view/widget/uitableview.h \
-    view/widget/uitableviewfactory.h
+    view/widget/uitableviewfactory.h \
+    view/widget/uiworklistview.h
 
 FORMS += \
     mainwindow.ui \

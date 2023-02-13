@@ -30,12 +30,14 @@
 
 #define SPLIT ','
 
-EduCtl* EduCtl::gInstance = nullptr;
 
-EduCtl::EduCtl():Controller(KModelHdlEdu), mLoaded(false)
+GET_INSTANCE_IMPL(EduCtl);
+
+EduCtl::EduCtl():CommonCtl(KModelHdlEdu)
 {
-
+    traced;
 }
+
 DbModel *EduCtl::buildModel(void *items, const QString &fmt)
 {
     traced;
@@ -53,75 +55,18 @@ DbModelHandler *EduCtl::getModelHandler()
 {
     return DB->getModelHandler(KModelHdlEdu);
 }
-//ErrCode EduCtl::doOneCSVItemCallback(const QStringList &items, void *param)
-//{
-//    traced;
-//    ErrCode ret = ErrNone;
-//    (void) param;
-//    if (!items.empty()) {
-//        Education* edu = new Education();
-//        QString item = items.join(SPLIT);
-//        logd("Add item %s to list", item.toStdString().c_str());
-//        edu->setName(item);
-//        edu->save();// TODO handle error
-////        mItemList.append(item);
-//    }
-//    else {
-//        loge("Invalid data");
-//        // TODO: should break or continue???
-//        ret = ErrInvalidData;
-//    }
-//    logd("ret %d", ret);
-//    return ret;
-//}
 
-//ErrCode EduCtl::oneCSVItemCallback(const QStringList &items, void *param)
-//{
-//    return getInstance()->doOneCSVItemCallback(items, param);
-//}
-
-QList<Education*> EduCtl::getListEdu()
+const char *EduCtl::getPrebuiltFileName()
 {
-    traced;
-    // TODO: check if file update then reload??
-    return mItemList;
+    return KPrebuiltEduCSVFileName;
 }
 
-EduCtl *EduCtl::getInstance()
+const char *EduCtl::getPrebuiltFileType()
 {
-    if (gInstance == nullptr){
-        gInstance = new EduCtl();
-    }
-
-    return gInstance;
+    return KFileTypeCSV;
 }
 
-void EduCtl::onLoad()
+QList<DbModel *> EduCtl::getItemFromDb()
 {
-    traced;
-    ErrCode ret = ErrNone;
-    ret = check2UpdateDbFromPrebuiltFile(KPrebuiltEduCSVFileName, KFileTypeCSV);
-    // TODO: file should be from installed dir, rather than embedded inside bin??
-//    QString fname = Utils::getPrebuiltFileByLang(KPrebuiltEduCSVFileName);
-//    if (!FileCtl::checkPrebuiltDataFileHash(fname)){
-//        ret = Utils::parseCSVFile(FileCtl::getPrebuiltDataFilePath(fname),
-//                                  &EduCtl::oneCSVItemCallback);
-//        if (ret == ErrNone){
-//            mLoaded = true;
-//            FileCtl::updatePrebuiltDataFileHash(fname);
-//        }
-//        else{
-//            logi("Check to update db from file failed %d", ret);
-//        }
-//    }
-//    else {
-//        logi("Prebuilt saint file up-to-date");
-//    }
-
-    QList items = DB->getEduModelHandler()->getAll(&Education::builder);
-//    mItemList.append();
-    foreach (DbModel* model, items){
-        mItemList.append((Education*)model);
-    }
-
+    return getModelHandler()->getAll(&Education::builder);
 }

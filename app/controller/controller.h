@@ -25,6 +25,11 @@ public:
 
     virtual DbModelHandler* getModelHandler();
     virtual ErrCode addNew(DbModel* model);
+    /**
+     * @brief Get list of item all items from db, must be implemented by derived class
+     * @return
+     */
+    virtual QList<DbModel*> getItemFromDb();
 
     virtual ErrCode reloadDb();
     virtual ErrCode exportToFile(DbModel* model, ExportType type, QString* fpath);

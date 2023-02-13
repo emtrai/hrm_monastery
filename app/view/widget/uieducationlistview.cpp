@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Ngo Huy Anh
+ * Copyright (C) 2023 Ngo Huy Anh
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,43 +14,44 @@
  * limitations under the License.
  *
  *
- * Filename: education.cpp
+ * Filename: uieducationlistview.cpp
  * Author: Anh, Ngo Huy
- * Created date:7/24/2022
+ * Created date:2/13/2023
  * Brief:
  */
-#include "education.h"
-
-#include "crypto.h"
-
-
-#include "dbctl.h"
+#include "uieducationlistview.h"
+#include "eductl.h"
 #include "logger.h"
+#include <QList>
+#include "dbmodel.h"
+#include "education.h"
+#include "utils.h"
+#include "mainwindow.h"
+#include "uitableviewfactory.h"
 
-
-Education::Education()
+UIEducationListView::UIEducationListView(QWidget *parent):
+    UICommonListView(parent)
 {
     traced;
 }
 
-DbModel *Education::builder()
+UIEducationListView::~UIEducationListView()
 {
-    return new Education();
+    traced;
 }
 
-DbModelHandler *Education::getDbModelHandler()
+void UIEducationListView::onViewItem(UITableWidgetItem *item)
 {
-    return DbCtl::getInstance()->getDb()->getEduModelHandler();
+
 }
 
-const QString &Education::remark() const
+Controller *UIEducationListView::getController()
 {
-    return mRemark;
+    return EDUCTL;
 }
 
-void Education::setRemark(const QString &newRemark)
+QString UIEducationListView::getTitle()
 {
-    mRemark = newRemark;
+    return tr("Trình độ học vấn");
 }
-
 

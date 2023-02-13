@@ -37,5 +37,7 @@ DbSqliteEduTbl::DbSqliteEduTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableEdu, KTableEdu, KVersionCode)
 {
     traced;
+
+    // TODO: remark field???
 }
 

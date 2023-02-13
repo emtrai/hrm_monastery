@@ -856,7 +856,7 @@ void MainWindow::on_actionWork_triggered()
 {
 
     traced;
-    UNDER_DEV(tr("Công việc"));
+    switchView(VIEW_WORK);
     // TODO: implement it
 
 }
@@ -865,15 +865,17 @@ void MainWindow::on_actionEducation_triggered()
 {
 
     traced;
-    UNDER_DEV(tr("Giáo dục"));
+//    UNDER_DEV(tr("Giáo dục"));
     // TODO: implement it
+    switchView(VIEW_EDUCATION);
 }
 
 void MainWindow::on_actionSpeclialist_triggered()
 {
     traced;
-    UNDER_DEV(tr("Chuyên môn"));
-    // TODO: implement it
+//    UNDER_DEV(tr("Chuyên môn"));
+
+    switchView(VIEW_SPECIALIST);
 }
 
 void MainWindow::on_actionMisson_triggered()

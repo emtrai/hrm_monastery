@@ -30,6 +30,7 @@
 #define SPECIALISTCTL SpecialistCtl::getInstance()
 class SpecialistCtl : public Controller
 {
+    GET_INSTANCE_DECL(SpecialistCtl);
 public:
     SpecialistCtl();
 //    ErrCode doOneCSVItemCallback(const QStringList& items, void* param);
@@ -39,18 +40,15 @@ public:
 protected:
     DbModel *buildModel(void *items, const QString &fmt);
     virtual DbModelHandler* getModelHandler();
+    virtual const char* getPrebuiltFileName();
+    virtual const char* getPrebuiltFileType();
 public:
-    QList<Specialist*> getAll();
-    static SpecialistCtl* getInstance();
+    // COMMON FUNCTIONS
+    virtual QList<DbModel*> getItemFromDb();
+
+
     virtual QList<DbModel*> getListPerson(const QString& specialistUid);
 
-private:
-    static SpecialistCtl* gInstance;
-    bool mLoaded;
-    QList<Specialist*> mItemList;
-
-public slots:
-    virtual void onLoad();
 };
 
 #endif // SPECIALISTCTL_H

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Ngo Huy Anh
+ * Copyright (C) 2023 Ngo Huy Anh
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,40 +14,26 @@
  * limitations under the License.
  *
  *
- * Filename: uitableviewfactory.h
+ * Filename: uieducationlistview.h
  * Author: Anh, Ngo Huy
- * Created date:8/11/2022
+ * Created date:2/13/2023
  * Brief:
  */
-#ifndef UITABLEVIEWFACTORY_H
-#define UITABLEVIEWFACTORY_H
+#ifndef UIEDUCATIONLISTVIEW_H
+#define UIEDUCATIONLISTVIEW_H
 
-#include <QWidget>
+#include "uicommonlistview.h"
 
-enum ViewType {
-    NONE = 0,
-    PERSON,
-    SAINT,
-    COMMUNITY,
-    AREA,
-    COMMUNITY_PERSON,
-    VIEW_COMMUNITY_DEPT,
-    VIEW_DEPARTMENT,
-    VIEW_DEPARTMENT_PERSON,
-    VIEW_ROLE,
-    VIEW_MISSION,
-    VIEW_SPECIALIST,
-    VIEW_EDUCATION,
-    VIEW_WORK,
-    VIEW_MAX,
-};
-
-class UITableView;
-
-class UITableViewFactory
+class UIEducationListView : public UICommonListView
 {
 public:
-    static UITableView* getView(ViewType type, QWidget *parent = nullptr);
+    explicit UIEducationListView(QWidget *parent = nullptr);
+    virtual ~UIEducationListView();
+protected:
+    virtual void onViewItem(UITableWidgetItem *item);
+
+    virtual Controller* getController();
+    virtual QString getTitle();
 };
 
-#endif // UITABLEVIEWFACTORY_H
+#endif // UIEDUCATIONLISTVIEW_H

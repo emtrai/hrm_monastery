@@ -30,7 +30,7 @@
 GET_INSTANCE_IMPL(WorkCtl)
 
 WorkCtl::WorkCtl():
-    Controller(KModelHdlWork)
+    CommonCtl(KModelHdlWork)
 {
     traced;
 }
@@ -43,6 +43,22 @@ WorkCtl::~WorkCtl()
 DbModelHandler *WorkCtl::getModelHandler()
 {
     return DB->getModelHandler(KModelHdlWork);
+}
+
+const char *WorkCtl::getPrebuiltFileName()
+{
+    return KPrebuiltWorkCSVFileName;
+}
+
+const char *WorkCtl::getPrebuiltFileType()
+{
+    return KFileTypeCSV;
+}
+
+QList<DbModel *> WorkCtl::getItemFromDb()
+{
+    return getModelHandler()->getAll(&Work::builder);
+
 }
 
 // Format: id,name,remark
@@ -74,37 +90,4 @@ DbModel *WorkCtl::buildModel(void *items, const QString &fmt)
     }
     tracede;
     return item;
-}
-
-
-const QList<Work *> WorkCtl::getWorkList()
-{
-    traced;
-
-    return mWorkList;
-}
-
-ErrCode WorkCtl::reloadDb()
-{
-    traced;
-    mWorkList.clear();
-    // TODO: loop to delete each element????
-
-    QList items = DB->getModelHandler(KModelHdlWork)->getAll(&Work::builder);
-    //    mItemList.append();
-    foreach (DbModel* model, items){
-        Work* item = (Work*)model;
-        mWorkList.append(item);
-    }
-    return ErrNone;
-}
-
-void WorkCtl::onLoad()
-{
-    traced;
-    ErrCode ret = ErrNone;
-    ret = check2UpdateDbFromPrebuiltFile(KPrebuiltWorkCSVFileName, KFileTypeCSV);
-    // TODO: should do lazy load??? load all consume much memory
-    reloadDb();
-    tracede;
 }

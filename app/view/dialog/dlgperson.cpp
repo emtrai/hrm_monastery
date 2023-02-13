@@ -636,9 +636,9 @@ void DlgPerson::loadEdu()
 {
     traced;
     logd("Load Education");
-    QList<Education*> list = EduCtl::getInstance()->getListEdu();
+    QList<DbModel*> list = EduCtl::getInstance()->getItemFromDb();
     ui->cbEdu->clear();
-    foreach(Education* edu, list){
+    foreach(DbModel* edu, list){
 
         ui->cbEdu->addItem(edu->name());
     }
@@ -675,8 +675,8 @@ void DlgPerson::loadSpecialist()
         ui->wgSpecialist->layout()->addWidget(cbSpecialist);
     }
     cbSpecialist->clearAll();
-    QList<Specialist*> specialists = SpecialistCtl::getInstance()->getAll();
-    foreach (Specialist* specialist, specialists) {
+    QList<DbModel*> specialists = SPECIALISTCTL->getItemFromDb();
+    foreach (DbModel* specialist, specialists) {
         //        logd(">> specialist %s", name.toStdString().c_str());
         cbSpecialist->addItem(specialist->name(), specialist->uid());
     }
@@ -732,9 +732,9 @@ void DlgPerson::loadWork()
 {
     traced;
     ui->cbWork->clear();
-    QList<Work*> list = INSTANCE(WorkCtl)->getWorkList();
+    QList<DbModel*> list = INSTANCE(WorkCtl)->getItemFromDb();
     ui->cbWork->addItem(tr("Không xác đinh"), KUidNone);
-    foreach(Work* item, list){
+    foreach(DbModel* item, list){
         ui->cbWork->addItem(item->name(), item->uid());
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Ngo Huy Anh
+ * Copyright (C) 2023 Ngo Huy Anh
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,33 +14,43 @@
  * limitations under the License.
  *
  *
- * Filename: education.h
+ * Filename: uiworklistview.cpp
  * Author: Anh, Ngo Huy
- * Created date:7/24/2022
+ * Created date:2/13/2023
  * Brief:
  */
-#ifndef EDUCATION_H
-#define EDUCATION_H
-
-#include <QObject>
+#include "uiworklistview.h"
+#include "workctl.h"
+#include "logger.h"
+#include <QList>
 #include "dbmodel.h"
+#include "work.h"
+#include "utils.h"
+#include "mainwindow.h"
+#include "uitableviewfactory.h"
 
-/**
- * @brief Education level - Trinh do hoc van
- */
-class Education: public DbModel
+UIWorkListView::UIWorkListView(QWidget *parent):
+    UICommonListView(parent)
 {
-public:
-    Education();
-public:
-    static DbModel *builder();
-    const QString &remark() const;
-    void setRemark(const QString &newRemark);
+    traced;
+}
 
-protected:
-    virtual DbModelHandler *getDbModelHandler();
-private:
-    QString mRemark;
-};
+UIWorkListView::~UIWorkListView()
+{
+    traced;
+}
 
-#endif // EDUCATION_H
+void UIWorkListView::onViewItem(UITableWidgetItem *item)
+{
+
+}
+
+Controller *UIWorkListView::getController()
+{
+    return WORKCTL;
+}
+
+QString UIWorkListView::getTitle()
+{
+    return tr("Trình độ học vấn");
+}

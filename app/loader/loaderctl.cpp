@@ -79,7 +79,7 @@ void LoaderCtl::registerAll()
     add2Loader(Location::getInstance());
     add2Loader(SAINTCTL);
     add2Loader(EduCtl::getInstance());
-    add2Loader(SpecialistCtl::getInstance());
+    add2Loader(SPECIALISTCTL);
     add2Loader(MISSIONCTL);
     add2Loader(CountryCtl::getInstance());
 #ifndef SKIP_PERSON_PROVINE

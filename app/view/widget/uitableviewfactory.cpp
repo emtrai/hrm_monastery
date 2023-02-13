@@ -31,6 +31,9 @@
 #include "view/widget/uiarealistview.h"
 #include "view/widget/uidepartmentlistview.h"
 #include "view/widget/uimissionlistview.h"
+#include "view/widget/uispecialistlistview.h"
+#include "view/widget/uieducationlistview.h"
+#include "view/widget/uiworklistview.h"
 
 UITableView *UITableViewFactory::getView(ViewType type, QWidget *parent )
 {
@@ -64,7 +67,16 @@ UITableView *UITableViewFactory::getView(ViewType type, QWidget *parent )
         break;
     case VIEW_MISSION:
         view = new UIMissionListView(parent);
-            break;
+        break;
+    case VIEW_SPECIALIST:
+        view = new UISpecialistListView(parent);
+        break;
+    case VIEW_EDUCATION:
+        view = new UIEducationListView(parent);
+        break;
+    case VIEW_WORK:
+        view = new UIWorkListView(parent);
+        break;
     case VIEW_ROLE:
         view = new UIRoleListView(parent);
         break;
