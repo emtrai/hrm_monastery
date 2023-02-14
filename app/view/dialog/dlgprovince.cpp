@@ -58,9 +58,9 @@ void DlgProvince::loadCountry()
 {
     traced;
     logd("Load country");
-    QList<Country*> listCountry = CountryCtl::getInstance()->getCountryList();
+    QList<DbModel*> listCountry = COUNTRYCTL->getItemFromDb();
     ui->cbCountry->clear();
-    foreach(Country* item, listCountry){
+    foreach(DbModel* item, listCountry){
         ui->cbCountry->addItem(item->name(), item->uid());
     }
 }

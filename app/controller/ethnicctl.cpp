@@ -21,15 +21,21 @@
  */
 #include "ethnicctl.h"
 #include "logger.h"
-#include "country.h"
 #include "ethnic.h"
 #include "defs.h"
 #include "dbctl.h"
-EthnicCtl* EthnicCtl::gInstance = nullptr;
 
-EthnicCtl::EthnicCtl():Controller(KModelHdlEthnic)
+
+GET_INSTANCE_IMPL(EthnicCtl)
+
+EthnicCtl::EthnicCtl():CommonCtl(KModelHdlEthnic)
 {
     traced;
+}
+
+QList<DbModel *> EthnicCtl::getItemFromDb()
+{
+    return getModelHandler()->getAll(&Ethnic::builder);
 }
 // Format: country short name, name[, remark]
 DbModel *EthnicCtl::buildModel(void *items, const QString &fmt)
@@ -52,57 +58,19 @@ DbModel *EthnicCtl::buildModel(void *items, const QString &fmt)
     return item;
 }
 
+const char *EthnicCtl::getPrebuiltFileName()
+{
+    return KPrebuiltEthnicCSVFileName;
+}
+
+const char *EthnicCtl::getPrebuiltFileType()
+{
+    return KFileTypeCSV;
+}
+
 DbModelHandler *EthnicCtl::getModelHandler()
 {
     return DB->getModelHandler(KModelHdlEthnic);
 }
 
-const QList<Ethnic *>* EthnicCtl::getEthnicList(const QString &country)
-{
-    traced;
-    if (mEthnicList.contains(country))
-        return mEthnicList[country];
-    return nullptr;
-}
-
-const QList<Ethnic *> EthnicCtl::getAllEthnics()
-{
-    QList<Ethnic *>listAll;
-    foreach (QList<Ethnic*>* list,  mEthnicList.values()){
-        listAll.append(*list);
-    }
-    return listAll;
-}
-
-const QHash<QString, QList<Ethnic*>*> EthnicCtl::getEthnicList()
-{
-    traced;
-    return mEthnicList;
-}
-
-EthnicCtl *EthnicCtl::getInstance()
-{
-    if (gInstance == nullptr){
-        gInstance = new EthnicCtl();
-    }
-    return gInstance;
-}
-
-void EthnicCtl::onLoad()
-{
-
-    traced;
-    ErrCode ret = ErrNone;
-    ret = check2UpdateDbFromPrebuiltFile(KPrebuiltEthnicCSVFileName, KFileTypeCSV);
-    // TODO: should do lazyload???
-    QList items = DB->getModelHandler(KModelHdlEthnic)->getAll(&Ethnic::builder);
-    //    mItemList.append();
-    foreach (DbModel* model, items){
-        Ethnic* ethnic = (Ethnic*)model;
-        if (!mEthnicList.contains(ethnic->countryShortName()))
-            mEthnicList[ethnic->countryShortName()] = new QList<Ethnic*>();
-        mEthnicList[ethnic->countryShortName()]->append(ethnic);
-    }
-    tracede;
-}
 

@@ -24,7 +24,8 @@
 #include "country.h"
 #include "defs.h"
 #include "dbctl.h"
-CountryCtl* CountryCtl::gInstance = nullptr;
+
+GET_INSTANCE_IMPL(CountryCtl)
 
 CountryCtl::CountryCtl():CommonCtl(KModelHdlCountry)
 {
@@ -34,14 +35,6 @@ CountryCtl::CountryCtl():CommonCtl(KModelHdlCountry)
 CountryCtl::~CountryCtl()
 {
     traced;
-
-    // TODO: is it safe??? (delete data before clear queue)
-    foreach (Country* item, mCountryList.values()) {
-        if (item != nullptr) {
-            delete item;
-        }
-    }
-    mCountryList.clear();
 }
 
 DbModelHandler *CountryCtl::getModelHandler()
@@ -81,53 +74,3 @@ QList<DbModel *> CountryCtl::getItemFromDb()
     return getModelHandler()->getAll(&Country::builder);
 }
 
-QList<Country *> CountryCtl::getCountryList()
-{
-    traced;
-    // TODO: check if file update then reload??
-    return mCountryList.values();
-}
-
-QStringList CountryCtl::getRegionList()
-{
-    traced;
-    QStringList list;
-    list.append(tr("Dong Nam A"));
-    // TODO: Read from file
-    return list;
-}
-
-QStringList CountryCtl::getContinentList()
-{
-    traced;
-    QStringList list;
-    list.append(tr("Chau A"));
-    list.append(tr("Chau My"));
-    list.append(tr("Chau Au"));
-    // TODO: Read from file
-    return list;
-}
-
-
-CountryCtl *CountryCtl::getInstance()
-{
-    if (gInstance == nullptr){
-        gInstance = new CountryCtl();
-    }
-    return gInstance;
-}
-
-void CountryCtl::onLoad()
-{
-
-    traced;
-    ErrCode ret = ErrNone;
-    ret = check2UpdateDbFromPrebuiltFile(KPrebuiltCountryCSVFileName, KFileTypeCSV);
-
-    QList items = getModelHandler()->getAll(&Country::builder);
-    //    mItemList.append();
-    mCountryList.clear();
-    foreach (DbModel* model, items){
-        mCountryList.insert(((Country*)model)->shortName(), (Country*)model);
-    }
-}

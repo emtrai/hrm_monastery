@@ -209,9 +209,11 @@ SOURCES += \
     view/widget/uicommonlistview.cpp \
     view/widget/uicommunitylistview.cpp \
     view/widget/uicommunitypersonlistview.cpp \
+    view/widget/uicountrylistview.cpp \
     view/widget/uidepartmentlistview.cpp \
     view/widget/uidepartmentpersonlistview.cpp \
     view/widget/uieducationlistview.cpp \
+    view/widget/uiethniclistview.cpp \
     view/widget/uiitembutton.cpp \
     view/widget/uimissionlistview.cpp \
     view/widget/uimulticomboxview.cpp \
@@ -390,9 +392,11 @@ HEADERS += \
     view/widget/uicommonlistview.h \
     view/widget/uicommunitylistview.h \
     view/widget/uicommunitypersonlistview.h \
+    view/widget/uicountrylistview.h \
     view/widget/uidepartmentlistview.h \
     view/widget/uidepartmentpersonlistview.h \
     view/widget/uieducationlistview.h \
+    view/widget/uiethniclistview.h \
     view/widget/uiitembutton.h \
     view/widget/uimissionlistview.h \
     view/widget/uimulticomboxview.h \

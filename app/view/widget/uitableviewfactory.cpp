@@ -34,6 +34,8 @@
 #include "view/widget/uispecialistlistview.h"
 #include "view/widget/uieducationlistview.h"
 #include "view/widget/uiworklistview.h"
+#include "view/widget/uicountrylistview.h"
+#include "view/widget/uiethniclistview.h"
 
 UITableView *UITableViewFactory::getView(ViewType type, QWidget *parent )
 {
@@ -76,6 +78,12 @@ UITableView *UITableViewFactory::getView(ViewType type, QWidget *parent )
         break;
     case VIEW_WORK:
         view = new UIWorkListView(parent);
+        break;
+    case VIEW_COUNTRY:
+        view = new UICountryListView(parent);
+        break;
+    case VIEW_ETHNIC:
+        view = new UIEthnicListView(parent);
         break;
     case VIEW_ROLE:
         view = new UIRoleListView(parent);

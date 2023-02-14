@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Ngo Huy Anh
+ * Copyright (C) 2023 Ngo Huy Anh
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,36 +14,26 @@
  * limitations under the License.
  *
  *
- * Filename: ethnicctl.h
+ * Filename: uiethniclistview.h
  * Author: Anh, Ngo Huy
- * Created date:8/14/2022
+ * Created date:2/14/2023
  * Brief:
  */
-#ifndef ETHNICCTL_H
-#define ETHNICCTL_H
+#ifndef UIETHNICLISTVIEW_H
+#define UIETHNICLISTVIEW_H
 
-#include "commonctl.h"
+#include "uicommonlistview.h"
 
-#include "dbmodel.h"
-#include "ethnic.h"
-#include <QList>
-#include <QHash>
-
-#define ETHNIC (EthnicCtl::getInstance())
-
-class EthnicCtl : public CommonCtl
+class UIEthnicListView : public UICommonListView
 {
-    GET_INSTANCE_DECL(EthnicCtl);
 public:
-    EthnicCtl();
-    virtual QList<DbModel*> getItemFromDb();
+    explicit UIEthnicListView(QWidget *parent = nullptr);
+    virtual ~UIEthnicListView();
 protected:
-    DbModel *buildModel(void *items, const QString &fmt);
-    virtual const char *getPrebuiltFileName();
-    virtual const char* getPrebuiltFileType();
-public:
-    virtual DbModelHandler* getModelHandler();
+    virtual void onViewItem(UITableWidgetItem *item);
 
+    virtual Controller* getController();
+    virtual QString getTitle();
 };
 
-#endif // ETHNICCTL_H
+#endif // UIETHNICLISTVIEW_H

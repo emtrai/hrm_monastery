@@ -34,8 +34,6 @@ DlgCountry::DlgCountry(QWidget *parent) :
 {
     traced;
     ui->setupUi(this);
-    ui->cbRegion->addItems(CountryCtl::getInstance()->getRegionList());
-    ui->cbContinent->addItems(CountryCtl::getInstance()->getContinentList());
 }
 
 DlgCountry::~DlgCountry()

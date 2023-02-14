@@ -34,8 +34,8 @@ DlgEthnic::DlgEthnic(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QList<Country *> list = CountryCtl::getInstance()->getCountryList();
-    foreach (Country* item, list) {
+    QList<DbModel *> list = COUNTRYCTL->getItemFromDb();
+    foreach (DbModel* item, list) {
         ui->cbCountry->addItem(item->name(), item->dbId());
 
     }

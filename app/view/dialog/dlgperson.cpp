@@ -691,8 +691,8 @@ void DlgPerson::loadEthnic()
     // Someone may have US nationality, but Ethic is Kinh, as their original is VN
     logd("Reload course");
     ui->cbEthic->clear();
-    QList<Ethnic*> list = ETHNIC->getAllEthnics();
-    foreach(Ethnic* item, list){
+    QList<DbModel*> list = ETHNIC->getItemFromDb();
+    foreach(DbModel* item, list){
         ui->cbEthic->addItem(item->name(), item->uid()); // TODO: name include country?
     }
 }
@@ -703,10 +703,10 @@ void DlgPerson::loadCountry()
     traced;
 
     logd("Load country");
-    QList<Country*> listCountry = CountryCtl::getInstance()->getCountryList();
+    QList<DbModel*> listCountry = COUNTRYCTL->getItemFromDb();
     ui->cbNationality->clear();
     ui->cbCountry->clear();
-    foreach(Country* item, listCountry){
+    foreach(DbModel* item, listCountry){
 
         ui->cbNationality->addItem(item->name(), item->uid());
         ui->cbCountry->addItem(item->name(), item->uid());

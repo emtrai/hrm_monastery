@@ -848,8 +848,9 @@ void MainWindow::on_action_Help_triggered()
 void MainWindow::on_actionEthnic_triggered()
 {
     traced;
-    UNDER_DEV(tr("Dân tộc"));
+//    UNDER_DEV(tr("Dân tộc"));
     // TODO: implement it
+    switchView(VIEW_ETHNIC);
 }
 
 void MainWindow::on_actionWork_triggered()
@@ -897,8 +898,10 @@ void MainWindow::on_actionProvince_triggered()
 void MainWindow::on_actionCountry_triggered()
 {
     traced;
-    UNDER_DEV(tr("Quốc gia"));
+//    UNDER_DEV(tr("Quốc gia"));
     // TODO: implement it
+
+    switchView(VIEW_COUNTRY);
 }
 
 

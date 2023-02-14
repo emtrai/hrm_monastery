@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Ngo Huy Anh
+ * Copyright (C) 2023 Ngo Huy Anh
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,34 +14,42 @@
  * limitations under the License.
  *
  *
- * Filename: countryctl.h
+ * Filename: uiethniclistview.cpp
  * Author: Anh, Ngo Huy
- * Created date:8/13/2022
+ * Created date:2/14/2023
  * Brief:
  */
-#ifndef COUNTRYCTL_H
-#define COUNTRYCTL_H
-
-#include "controller.h"
+#include "uiethniclistview.h"
+#include "ethnicctl.h"
+#include "logger.h"
+#include <QList>
 #include "dbmodel.h"
-#include "country.h"
-#include "commonctl.h"
 #include "utils.h"
+#include "mainwindow.h"
+#include "uitableviewfactory.h"
 
-#define COUNTRYCTL (CountryCtl::getInstance())
-
-class CountryCtl : public CommonCtl
+UIEthnicListView::UIEthnicListView(QWidget *parent):
+    UICommonListView(parent)
 {
-    GET_INSTANCE_DECL(CountryCtl);
-public:
-    CountryCtl();
-    virtual ~CountryCtl();
-    virtual DbModelHandler* getModelHandler();
-    virtual QList<DbModel*> getItemFromDb();
-protected:
-    DbModel *buildModel(void *items, const QString &fmt);
-    virtual const char *getPrebuiltFileName();
-    virtual const char* getPrebuiltFileType();
-};
+    traced;
+}
 
-#endif // COUNTRYCTL_H
+UIEthnicListView::~UIEthnicListView()
+{
+    traced;
+}
+
+void UIEthnicListView::onViewItem(UITableWidgetItem *item)
+{
+
+}
+
+Controller *UIEthnicListView::getController()
+{
+    return ETHNIC;
+}
+
+QString UIEthnicListView::getTitle()
+{
+    return tr("Dân tộc");
+}
