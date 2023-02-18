@@ -51,6 +51,7 @@ class CommonEditModelListener
 {
 public:
     virtual void onDbModelReady(ErrCode ret, DbModel* model, DlgCommonEditModel* dlg) = 0;
+    virtual DbModel* onNewModel() = 0;
 };
 
 class DlgCommonEditModel: public QDialog
@@ -67,7 +68,7 @@ public:
      * @brief build data for model, using dialog/wiget data
      * @return
      */
-    virtual ErrCode buildModel(DbModel* model, QString errMsg) = 0;
+    virtual ErrCode buildModel(DbModel* model, QString& errMsg) = 0;
     /**
      * @brief build model from input model object
      * @param model
@@ -78,9 +79,12 @@ public:
     CommonEditModelListener *listener() const;
     void setListener(CommonEditModelListener *newListener);
 
+    void setModel(DbModel *newModel);
+
 protected:
     /**
      * @brief Create new model object, must be implemeted by derived class
+     * @param model: if null, create new one completely, else create base on this
      * @return
      */
     virtual DbModel* newModel() = 0;

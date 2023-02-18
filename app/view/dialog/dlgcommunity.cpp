@@ -51,7 +51,7 @@ DlgCommunity::~DlgCommunity()
     tracede;
 }
 
-ErrCode DlgCommunity::buildModel(DbModel *model, QString errMsg)
+ErrCode DlgCommunity::buildModel(DbModel *model, QString& errMsg)
 {
     traced;
     ErrCode err = ErrNone;
@@ -156,7 +156,8 @@ ErrCode DlgCommunity::fromModel(const DbModel *item)
 
 DbModel *DlgCommunity::newModel()
 {
-    return Community::builder();
+    // TODO: check model parameter???
+    return Community::build();
 }
 
 bool DlgCommunity::onValidateData(QString &msg)

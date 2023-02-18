@@ -40,42 +40,15 @@ UIRoleListView::~UIRoleListView()
 {
     traced;
 }
-ErrCode UIRoleListView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act)
-{
-    traced;
-    // TODO: handle it
-    return ErrNone;
-}
-
-ErrCode UIRoleListView::onMenuActionDelete(QMenu *menu, UITableMenuAction *act)
-{
-    traced;
-    // TODO: handle it
-    return ErrNone;
-}
-
-void UIRoleListView::onViewItem(UITableWidgetItem *item)
-{
-    traced;
-    int idx = item->idx();
-    logd("idx=%d",idx);
-    if (idx < mItemList.length()){
-        Role* model = (Role*)mItemList.value(idx);
-        if (model == nullptr) {
-            loge("no data");
-            return;
-        }
-        model->dump();
-        // TODO: show information
-    } else {
-        loge("Invalid idx");
-        // TODO: popup message???
-    }
-}
 
 QString UIRoleListView::getTitle()
 {
     return tr("Vai trò/vị trí");
+}
+
+DbModel *UIRoleListView::onNewModel()
+{
+    return Role::build();
 }
 
 ErrCode UIRoleListView::onLoad()

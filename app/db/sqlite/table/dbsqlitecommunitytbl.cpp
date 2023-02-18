@@ -49,7 +49,7 @@ QList<DbModel *> DbSqliteCommunityTbl::getListCommunitiesInArea(const QString &a
     fields.insert(KFieldAreaUid, TEXT);
     // TODO: check status???
     logd("Start search area uid %s", areaUid.toStdString().c_str());
-    ret = search(areaUid, fields, &Community::builder, &olist, true);
+    ret = search(areaUid, fields, &Community::build, &olist, true);
     logd("ret=%d", ret);
     tracede;
     return olist;
@@ -83,7 +83,6 @@ ErrCode DbSqliteCommunityTbl::insertTableField(DbSqliteInsertBuilder *builder, c
     // TODO: calculate level basing on parent uid chain
     // Level should be auto-updated, not set by user, which may cause mistake
     builder->addValue(KFieldLevel, cmm->level());
-    builder->addValue(KFieldRemark, cmm->remark());
 
     // TODO: need to search Area Uid basing on Area Code
     // as there is no field of Area Code in community table, just Area UID
@@ -134,7 +133,6 @@ void DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
     }
     cmm->setIntro(qry.value(KFieldIntro).toString());
     cmm->setContact(qry.value(KFieldContact).toString());
-    cmm->setRemark(qry.value(KFieldRemark).toString());
 }
 
 QString DbSqliteCommunityTbl::getSearchQueryString(const QString &cond)
@@ -155,7 +153,7 @@ QString DbSqliteCommunityTbl::getSearchQueryString(const QString &cond)
 
 DbModelBuilder DbSqliteCommunityTbl::mainModelBuilder()
 {
-    return &Community::builder;
+    return &Community::build;
 }
 
 void DbSqliteCommunityTbl::addTableField(DbSqliteTableBuilder *builder)
@@ -186,7 +184,6 @@ void DbSqliteCommunityTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldDateFormat, TEXT);
     builder->addField(KFieldStatus, INT32); // stop, alive, etc.
     builder->addField(KFieldPreset, INT32); // 0: custom, 1: preset (from json)
-    builder->addField(KFieldRemark, TEXT); // 0: custom, 1: preset (from json)
 
     // THIS IS IMPORTANT NOTE, DON'T REMOVE IT
     // - ANY UPDATE ON THIS, MUST UPDATE Community::clone() as well

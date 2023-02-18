@@ -69,6 +69,8 @@ class Community;
                                              CommonEditModelListener* listener = nullptr);
             static void showImportDlg(ImportTarget target);
             static void showOnHtmlViewer(DbModel* model, const QString& subject);
+            static void showAddEditCommonModel(bool isSelfUpdate = true, DbModel* model = nullptr,
+                                             CommonEditModelListener* listener = nullptr);
         protected:
      void showEvent(QShowEvent *ev);
  public:
@@ -93,6 +95,8 @@ class Community;
                                  CommonEditModelListener* listener = nullptr);
      void doShowImportPerson();
      void doShowImportCommunity();
+     void doShowAddEditCommonModel(bool isSelfUpdate = true, DbModel* model = nullptr,
+                                        CommonEditModelListener* listener = nullptr);
  private:
      void loadHomePageFile();
      void loadOtherMenu();

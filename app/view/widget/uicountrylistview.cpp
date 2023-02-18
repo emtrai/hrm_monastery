@@ -40,11 +40,6 @@ UICountryListView::~UICountryListView()
     traced;
 }
 
-void UICountryListView::onViewItem(UITableWidgetItem *item)
-{
-
-}
-
 Controller *UICountryListView::getController()
 {
     return COUNTRYCTL;
@@ -53,4 +48,9 @@ Controller *UICountryListView::getController()
 QString UICountryListView::getTitle()
 {
     return tr("Quốc gia");
+}
+
+DbModel *UICountryListView::onNewModel()
+{
+    return Country::build();
 }

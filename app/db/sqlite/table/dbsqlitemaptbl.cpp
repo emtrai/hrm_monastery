@@ -108,7 +108,6 @@ void DbSqliteMapTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldStatus, INT64);
     builder->addField(KFieldStartDate, INT64);
     builder->addField(KFieldEndDate, INT64);
-    builder->addField(KFieldRemark, TEXT);
     builder->addField(KFieldChangeHistory, TEXT);
     builder->addField(KFieldParentUid, TEXT);
 }
@@ -127,7 +126,6 @@ ErrCode DbSqliteMapTbl::insertTableField(DbSqliteInsertBuilder *builder, const D
         builder->addValue(KFieldStatus, model->status());
         builder->addValue(KFieldStartDate, model->startDate());
         builder->addValue(KFieldEndDate, model->endDate());
-        builder->addValue(KFieldRemark, model->remark());
         builder->addValue(KFieldChangeHistory, model->changeHistory());
         builder->addValue(KFieldParentUid, model->parentUid());
         // TODO: implement change history by event, i.e. IN:<datetime>, OUT:<datetime.
@@ -152,7 +150,6 @@ void DbSqliteMapTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
         model->setStatus(qry.value(KFieldStatus).toInt());
         model->setStartDate(qry.value(KFieldStartDate).toInt());
         model->setEndDate(qry.value(KFieldEndDate).toInt());
-        model->setRemark(qry.value(KFieldRemark).toString());
         model->setChangeHistory(qry.value(KFieldChangeHistory).toString());
         model->setParentUid(qry.value(KFieldParentUid).toString());
     } else {

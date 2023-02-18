@@ -31,13 +31,8 @@ public:
     static DbModel *build();
 
 
-    const QString &remark() const;
-    void setRemark(const QString &newRemark);
-
 protected:
     virtual DbModelHandler *getDbModelHandler();
-private:
-    QString mRemark;
 };
 
 #endif // EVENT_H

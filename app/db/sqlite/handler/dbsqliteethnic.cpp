@@ -40,13 +40,13 @@ const QString DbSqliteEthnic::getName()
 DbModel *DbSqliteEthnic::getByName(const QString &name)
 {
     traced;
-    return DbSqliteModelHandler::getByName(name, Ethnic::builder);
+    return DbSqliteModelHandler::getByName(name, Ethnic::build);
 }
 
 DbModel *DbSqliteEthnic::getByUid(const QString &uid)
 {
     traced;
-    return DbSqliteModelHandler::getByUid(uid, Ethnic::builder);
+    return DbSqliteModelHandler::getByUid(uid, Ethnic::build);
 }
 
 DbSqliteTbl *DbSqliteEthnic::getMainTbl()

@@ -32,19 +32,11 @@ Event::Event()
 
 DbModel *Event::build()
 {
-    return new Event();
-
+    Event* model = new Event();
+    model->init();
+    return model;
 }
 
-const QString &Event::remark() const
-{
-    return mRemark;
-}
-
-void Event::setRemark(const QString &newRemark)
-{
-    mRemark = newRemark;
-}
 
 DbModelHandler *Event::getDbModelHandler()
 {

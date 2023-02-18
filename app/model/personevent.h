@@ -34,9 +34,6 @@ public:
     static DbModel *build();
     virtual QString modelName() const;
 
-    const QString &remark() const;
-    void setRemark(const QString &newRemark);
-
     virtual void buildUidIfNotSet();
 
     qint64 date() const;
@@ -62,7 +59,6 @@ private:
     QString mEventUid;
     QString mEventName;
     QString mPersonUid;
-    QString mRemark;
 };
 
 #endif // PERSONEVENT_H

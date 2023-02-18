@@ -32,9 +32,11 @@ Department::Department()
 
 }
 
-DbModel *Department::builder()
+DbModel *Department::build()
 {
-    return new Department();
+    Department* model = new Department();
+    model->init();
+    return model;
 }
 
 QString Department::modelName() const
@@ -47,14 +49,4 @@ DbModelHandler *Department::getDbModelHandler()
 {
 
     return DB->getModelHandler(KModelHdlDept);
-}
-
-const QString &Department::remark() const
-{
-    return mRemark;
-}
-
-void Department::setRemark(const QString &newRemark)
-{
-    mRemark = newRemark;
 }

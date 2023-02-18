@@ -36,23 +36,15 @@ Mission::Mission()
 }
 
 
-DbModel *Mission::builder()
+DbModel *Mission::build()
 {
     traced;
-    return new Mission();
+    Mission* model = new Mission();
+    model->init();
+    return model;
 }
 
 DbModelHandler *Mission::getDbModelHandler()
 {
     return DB->getModelHandler(KModelHdlMission);
-}
-
-const QString &Mission::remark() const
-{
-    return mRemark;
-}
-
-void Mission::setRemark(const QString &newRemark)
-{
-    mRemark = newRemark;
 }

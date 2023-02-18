@@ -30,10 +30,10 @@ public:
     explicit UIEthnicListView(QWidget *parent = nullptr);
     virtual ~UIEthnicListView();
 protected:
-    virtual void onViewItem(UITableWidgetItem *item);
 
     virtual Controller* getController();
     virtual QString getTitle();
+    virtual DbModel* onNewModel();
 };
 
 #endif // UIETHNICLISTVIEW_H

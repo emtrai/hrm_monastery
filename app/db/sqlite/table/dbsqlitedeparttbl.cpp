@@ -42,33 +42,3 @@ DbSqliteDepartTbl::DbSqliteDepartTbl(DbSqlite* db)
 {
     traced;
 }
-
-
-void DbSqliteDepartTbl::addTableField(DbSqliteTableBuilder *builder)
-{
-    traced;
-    DbSqliteTbl::addTableField(builder);
-    builder->addField(KFieldRemark, TEXT);
-    tracede;
-}
-
-ErrCode DbSqliteDepartTbl::insertTableField(DbSqliteInsertBuilder *builder,
-                                       const DbModel *item)
-{
-    traced;
-    DbSqliteTbl::insertTableField(builder, item); // TODO: handle error code
-
-    Department* model = (Department*) item;
-    builder->addValue(KFieldRemark, model->remark());
-    tracede;
-    return ErrNone;
-}
-
-void DbSqliteDepartTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
-{
-    traced;
-    DbSqliteTbl::updateModelFromQuery(item, qry);
-    Department* model = (Department*) item;
-    model->setRemark(qry.value(KFieldRemark).toString());
-    tracede;
-}

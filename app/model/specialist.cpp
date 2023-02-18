@@ -33,9 +33,11 @@ Specialist::Specialist(QObject *parent)
 
 }
 
-DbModel *Specialist::builder()
+DbModel *Specialist::build()
 {
-    return new Specialist();
+    Specialist* model = new Specialist();
+    model->init();
+    return model;
 }
 
 QString Specialist::modelName() const

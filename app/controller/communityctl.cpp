@@ -207,7 +207,7 @@ ErrCode CommunityCtl::loadFromFile(const QString &path)
 //    traced;
 //    ErrCode err = ErrNone;
 //    mListCommunity.clear(); // TODO: clear each item to avoid data leak?????
-//    QList items = DB->getModelHandler(KModelHdlCommunity)->getAll(&Community::builder);
+//    QList items = DB->getModelHandler(KModelHdlCommunity)->getAll(&Community::build);
 //    foreach (DbModel* model, items){
 //        model->dump();
 //        mListCommunity.append((Community*) model);
@@ -223,7 +223,7 @@ ErrCode CommunityCtl::loadFromFile(const QString &path)
 ////    traced;
 ////    DbModelHandler* modelHandler = DbCtl::getDb()->getCommunityModelHandler();
 ////    if (modelHandler != nullptr){
-////        QList<DbModel*> lstModel = modelHandler->getAll(&Community::builder);
+////        QList<DbModel*> lstModel = modelHandler->getAll(&Community::build);
 ////        if (!lstModel.empty()) {
 ////            foreach (DbModel* item, lstModel){
 ////                list.append((Community*)item);
@@ -270,7 +270,7 @@ const char *CommunityCtl::getPrebuiltFileType()
 
 QList<DbModel *> CommunityCtl::getItemFromDb()
 {
-    return getModelHandler()->getAll(&Community::builder);
+    return getModelHandler()->getAll(&Community::build);
 }
 
 DbModelHandler *CommunityCtl::getModelHandler()
@@ -354,7 +354,7 @@ DbModel *CommunityCtl::doImportOneItem(int importFileType, const QStringList &it
         }
     } else {
 
-        comm = (Community*)Community::builder();
+        comm = (Community*)Community::build();
         foreach (QString item, items) {
             QString field = mImportFields[i++];
             logd("Import field %s", field.toStdString().c_str());
@@ -372,7 +372,7 @@ DbModel *CommunityCtl::doImportOneItem(int importFileType, const QHash<QString, 
     Community* comm = nullptr;
     int i = 0;
     logd("idx = %d", idx);
-    comm = (Community*)Community::builder();
+    comm = (Community*)Community::build();
     foreach (QString field, items.keys()) {
         QString value = items.value(field);
         logd("Import field %s", field.toStdString().c_str());

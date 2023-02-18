@@ -216,6 +216,12 @@ void UITableView::onDeleteItem(UITableWidgetItem *item)
     logd("parent class, nothing to do");
 }
 
+void UITableView::onAddItem(UITableWidgetItem *item)
+{
+    traced;
+    logd("parent class, nothing to do");
+}
+
 
 QMenu* UITableView::buildPopupMenu(UITableWidgetItem* item, const QList<UITableItem*>& items)
 {
@@ -325,7 +331,7 @@ QList<UITableMenuAction *> UITableView::getMenuMultiItemActions(const QMenu *men
 ErrCode UITableView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act)
 {
     traced;
-    // TODO: handle it
+    onAddItem((UITableWidgetItem*)act->tblItem());
     return ErrNone;
 }
 
@@ -348,6 +354,7 @@ ErrCode UITableView::onMenuActionView(QMenu *menu, UITableMenuAction *act)
 {
     traced;
     onViewItem((UITableWidgetItem*)act->tblItem());
+    tracede;
     return ErrNone;
 
 }

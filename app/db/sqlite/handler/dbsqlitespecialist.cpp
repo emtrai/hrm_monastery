@@ -86,7 +86,7 @@ DbSqliteTbl *DbSqliteSpecialist::getTable(const QString &modelName)
 
 DbModelBuilder DbSqliteSpecialist::getMainBuilder()
 {
-    return (DbModelBuilder)Specialist::builder;
+    return (DbModelBuilder)Specialist::build;
 }
 
 

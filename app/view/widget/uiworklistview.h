@@ -31,10 +31,10 @@ public:
     explicit UIWorkListView(QWidget *parent = nullptr);
     virtual ~UIWorkListView();
 protected:
-    virtual void onViewItem(UITableWidgetItem *item);
 
     virtual Controller* getController();
     virtual QString getTitle();
+    virtual DbModel* onNewModel();
 };
 
 #endif // UIWORKLISTVIEW_H

@@ -65,9 +65,6 @@ public:
     int status() const;
     void setStatus(int newStatus);
 
-    const QString &remark() const;
-    void setRemark(const QString &newRemark);
-
     const QString &commDeptUid() const;
     void setCommDeptUid(const QString &newCommDeptUid);
 
@@ -90,7 +87,6 @@ protected:
     qint64 mStartDate;
     qint64 mEndDate;
     int mStatus;
-    QString mRemark;
     QString mCommDeptUid;
     QString mPersonUid;
     QString mPersonName;

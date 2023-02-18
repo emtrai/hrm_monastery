@@ -172,32 +172,8 @@ ErrCode UICommunityListView::onMenuActionAddDepart(QMenu *menu, UITableMenuActio
 //}
 void UICommunityListView::onViewItem(UITableWidgetItem *item)
 {
-//    traced;
-//    int idx = item->idx();
-//    logd("idx=%d",idx);
-//    if (idx < mItemList.length()){
-//        Community* model = (Community*)mItemList.value(idx);
-//        if (model == nullptr) {
-//            loge("no data");
-//            return;
-//        }
-//        model->dump();
-//        QString uid = model->uid();
-//        if (uid.isEmpty()) {
-//            loge("no uid");
-//            return;
-//        }
-//        UICommunityPersonListView* view = (UICommunityPersonListView*)UITableViewFactory::getView(ViewType::COMMUNITY_PERSON);
+    traced;
 
-//        logd("community uid %s", uid.toStdString().c_str());
-////        view->setCommunityUid(uid);
-//        view->setCommunity(model);
-//        view->setTitle(model->name());
-//        MainWindow::getInstance()->switchView(view);
-//    } else {
-//        loge("Invalid idx");
-//        // TODO: popup message???
-//    }
     traced;
     int idx = item->idx();
     DbModel* comm = item->itemData();
@@ -451,15 +427,7 @@ ErrCode UICommunityListView::onReload()
     return ErrNone;
 }
 
-void UICommunityListView::onDbModelReady(ErrCode ret, DbModel *model, DlgCommonEditModel *dlg)
+DbModel *UICommunityListView::onNewModel()
 {
-    traced;
-    if (ret == ErrNone) {
-        if (model){
-            model->dump();
-        }
-        onReload();
-    }
-
-    tracede;
+    return Community::build();
 }

@@ -27,8 +27,9 @@
 #include "dbmodel.h"
 #include "errcode.h"
 #include "controller.h"
+#include "dlgcommoneditmodel.h"
 
-class UICommonListView : public UITableView
+class UICommonListView : public UITableView, public CommonEditModelListener
 {
 public:
     explicit UICommonListView(QWidget *parent = nullptr);
@@ -45,8 +46,10 @@ protected:
     virtual void initFilterFields();
     virtual QHash<QString, QString> getFilterKeywords(int fieldId, const QString& fieldText);
     virtual void onViewItem(UITableWidgetItem *item);
+    virtual void onAddItem(UITableWidgetItem *item);
 
-
+    virtual void onDbModelReady(ErrCode ret, DbModel* model, DlgCommonEditModel* dlg);
+    virtual DbModel* onNewModel();
 protected:
     QList<DbModel*> mItemList;
 };

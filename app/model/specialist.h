@@ -31,7 +31,7 @@ class Specialist : public QObject, public DbModel
         public:
             explicit Specialist(QObject *parent = nullptr);
         public:
-            static DbModel *builder();
+            static DbModel *build();
             virtual QString modelName() const;
 
         protected:

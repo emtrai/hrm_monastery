@@ -31,9 +31,6 @@ class DbSqliteWorkTbl : public DbSqliteTbl
 {
 public:
     DbSqliteWorkTbl(DbSqlite* db);
-    virtual void addTableField(DbSqliteTableBuilder* builder);
-    virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
-    virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
 private:
     static const qint32 KVersionCode;
 };

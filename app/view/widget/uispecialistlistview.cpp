@@ -41,20 +41,6 @@ UISpecialistListView::~UISpecialistListView()
 {
     traced;
 }
-ErrCode UISpecialistListView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act)
-{
-    traced;
-    // TODO: handle it
-    return ErrNone;
-}
-
-ErrCode UISpecialistListView::onMenuActionDelete(QMenu *menu, UITableMenuAction *act)
-{
-    traced;
-    // TODO: handle it
-    return ErrNone;
-}
-
 
 QString UISpecialistListView::getTitle()
 {
@@ -64,5 +50,10 @@ QString UISpecialistListView::getTitle()
 Controller *UISpecialistListView::getController()
 {
     return SPECIALISTCTL;
+}
+
+DbModel *UISpecialistListView::onNewModel()
+{
+    return Specialist::build();
 }
 

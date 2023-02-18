@@ -47,6 +47,7 @@ protected:
     virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionDelete(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionView(QMenu* menu, UITableMenuAction* act);
+    virtual DbModel* onNewModel();
 
 protected:
     virtual ErrCode onLoad();

@@ -44,50 +44,6 @@ UICommDeptListView::~UICommDeptListView()
 {
     traced;
 }
-ErrCode UICommDeptListView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act)
-{
-    traced;
-    // TODO: handle it
-    return ErrNone;
-}
-
-ErrCode UICommDeptListView::onMenuActionDelete(QMenu *menu, UITableMenuAction *act)
-{
-    traced;
-    // TODO: handle it
-    return ErrNone;
-}
-
-void UICommDeptListView::onViewItem(UITableWidgetItem *item)
-{
-    traced;
-//    int idx = item->idx();
-//    logd("idx=%d",idx);
-//    if (idx < mItemList.length()){
-//        Community* model = (Community*)mItemList.value(idx);
-//        if (model == nullptr) {
-//            loge("no data");
-//            return;
-//        }
-//        model->dump();
-//        QString uid = model->uid();
-//        if (uid.isEmpty()) {
-//            loge("no uid");
-//            return;
-//        }
-//        UICommunityPersonListView* view = (UICommunityPersonListView*)UITableViewFactory::getView(ViewType::COMMUNITY_PERSON);
-
-//        logd("community uid %s", uid.toStdString().c_str());
-////        view->setCommunityUid(uid);
-//        view->setCommunity(model);
-//        view->setTitle(model->name());
-//        MainWindow::getInstance()->switchView(view);
-//    } else {
-//        loge("Invalid idx");
-//        // TODO: popup message???
-    //    }
-}
-
 QString UICommDeptListView::getTitle()
 {
     traced;
@@ -113,6 +69,11 @@ void UICommDeptListView::updateItem(DbModel *item, UITableItem *tblItem)
 
 //    tblItem->addValue(dept->communityUid());
     tracede;
+}
+
+DbModel *UICommDeptListView::onNewModel()
+{
+    return CommunityDept::build();
 }
 
 

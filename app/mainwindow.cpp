@@ -39,6 +39,7 @@
 #include "view/dialog/dlgimportpersonlistresult.h"
 #include "view/dialog/dlgimportcommunitylistresult.h"
 #include "view/dialog/dlghtmlviewer.h"
+#include "view/dialog/dlgeditmodel.h"
 #include "personctl.h"
 #include "dialog/dlgabout.h"
 #include "dlgwait.h"
@@ -197,6 +198,14 @@ void MainWindow::showOnHtmlViewer(DbModel *model, const QString& subject)
     }
 }
 
+void MainWindow::showAddEditCommonModel(bool isSelfUpdate, DbModel *model, CommonEditModelListener *listener)
+{
+    traced;
+    getInstance()->doShowAddEditCommonModel(isSelfUpdate, model, listener);
+    tracede;
+
+}
+
 void MainWindow::switchView(ViewType type)
 {
     traced;
@@ -349,6 +358,17 @@ void MainWindow::doShowImportCommunity()
         dlg->exec();
         delete dlg;
     }
+    tracede;
+}
+
+void MainWindow::doShowAddEditCommonModel(bool isSelfUpdate, DbModel *model, CommonEditModelListener *listener)
+{
+    traced;
+    logd("isSelfUpdate %d", isSelfUpdate);
+    DlgEditModel* dlg = DlgEditModel::build(this, isSelfUpdate, model);
+    dlg->setListener(listener);
+    dlg->exec();
+    delete dlg;
     tracede;
 }
 

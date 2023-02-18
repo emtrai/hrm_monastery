@@ -34,7 +34,7 @@ class Course : public DbModel
 public:
     Course();
     virtual ~Course();
-    static DbModel *builder();
+    static DbModel *build();
     qint64 startDate() const;
     void setStartDate(qint64 newStartDate);
 
@@ -43,9 +43,6 @@ public:
 
     const QString &period() const;
     void setPeriod(const QString &newPeriod);
-
-    const QString &remark() const;
-    void setRemark(const QString &newRemark);
 
     qint32 courseType() const;
     void setCourseType(qint32 newCourseType);
@@ -57,7 +54,6 @@ private:
     qint64 mEndDate;
     QString mPeriod;
     qint32 mCourseType;
-    QString mRemark;
 };
 
 #endif // COURSE_H

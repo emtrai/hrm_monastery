@@ -68,5 +68,5 @@ const char *EduCtl::getPrebuiltFileType()
 
 QList<DbModel *> EduCtl::getItemFromDb()
 {
-    return getModelHandler()->getAll(&Education::builder);
+    return getModelHandler()->getAll(&Education::build);
 }

@@ -31,10 +31,7 @@ class Ethnic : public DbModel
 {
 public:
     Ethnic();
-    static DbModel *builder();
-//    virtual QString nameid() const;
-    const QString &remark() const;
-    void setRemark(const QString &newRemark);
+    static DbModel *build();
 
     qint64 countryDbId() const;
     void setCountryDbId(qint64 newCountryDbId);
@@ -51,7 +48,6 @@ private:
     qint64 mCountryDbId;
     QString mCountryShortName;
     QString mCountryUid;
-    QString mRemark;
 };
 
 #endif // ETHNIC_H

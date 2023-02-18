@@ -43,32 +43,3 @@ DbSqliteStatusTbl::DbSqliteStatusTbl(DbSqlite* db)
 {
     traced;
 }
-
-void DbSqliteStatusTbl::addTableField(DbSqliteTableBuilder *builder)
-{
-    traced;
-    DbSqliteTbl::addTableField(builder);
-    builder->addField(KFieldRemark, TEXT);
-    tracede;
-}
-
-ErrCode DbSqliteStatusTbl::insertTableField(DbSqliteInsertBuilder *builder,
-                                         const DbModel *item)
-{
-    traced;
-    DbSqliteTbl::insertTableField(builder, item);
-
-    Status* model = (Status*) item;
-    builder->addValue(KFieldRemark, model->remark());
-    tracede;
-    return ErrNone;
-}
-
-void DbSqliteStatusTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
-{
-    traced;
-    DbSqliteTbl::updateModelFromQuery(item, qry);
-    Status* model = (Status*) item;
-    model->setRemark(qry.value(KFieldRemark).toString());
-    tracede;
-}

@@ -196,7 +196,7 @@ const char *CommunityDeptCtl::getPrebuiltFileType()
 
 QList<DbModel *> CommunityDeptCtl::getItemFromDb()
 {
-    return getModelHandler()->getAll(&CommunityDept::builder);
+    return getModelHandler()->getAll(&CommunityDept::build);
 }
 
 DbModelHandler *CommunityDeptCtl::getModelHandler()
@@ -237,7 +237,7 @@ DbModel *CommunityDeptCtl::doImportOneItem(int importFileType, const QStringList
         }
     } else {
 
-        comm = (CommunityDept*)CommunityDept::builder();
+        comm = (CommunityDept*)CommunityDept::build();
         foreach (QString item, items) {
             QString field = mImportFields[i++];
             logd("Import field %s", field.toStdString().c_str());
@@ -255,7 +255,7 @@ DbModel *CommunityDeptCtl::doImportOneItem(int importFileType, const QHash<QStri
     CommunityDept* comm = nullptr;
     int i = 0;
     logd("idx = %d", idx);
-    comm = (CommunityDept*)CommunityDept::builder();
+    comm = (CommunityDept*)CommunityDept::build();
     foreach (QString field, items.keys()) {
         QString value = items.value(field);
         logd("Import field %s", field.toStdString().c_str());

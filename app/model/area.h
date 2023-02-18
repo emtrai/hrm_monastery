@@ -32,7 +32,7 @@ class Area : public DbModel
 {
 public:
     Area();
-    static DbModel *builder();
+    static DbModel *build();
     virtual QString modelName() const;
 
     Country *getCountry() const;
@@ -43,10 +43,6 @@ public:
 
     qint64 personDbId() const;
     void setPersonDbId(qint64 newPersonDbId);
-
-    const QString &remark() const;
-    void setRemark(const QString &newRemark);
-
 
     const QString &countryUid() const;
     void setCountryUid(const QString &newCountryUid);
@@ -76,7 +72,6 @@ private:
     qint64 mPersonDbId;
     QString mPersonUid;
     QString mPersonName; // just for display, not store to db
-    QString mRemark;
     QString mCountryUid;
     QString mAreaCode;
 

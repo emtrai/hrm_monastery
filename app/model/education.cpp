@@ -33,24 +33,15 @@ Education::Education()
     traced;
 }
 
-DbModel *Education::builder()
+DbModel *Education::build()
 {
-    return new Education();
+    Education* model = new Education();
+    model->init();
+    return model;
 }
 
 DbModelHandler *Education::getDbModelHandler()
 {
     return DbCtl::getInstance()->getDb()->getEduModelHandler();
 }
-
-const QString &Education::remark() const
-{
-    return mRemark;
-}
-
-void Education::setRemark(const QString &newRemark)
-{
-    mRemark = newRemark;
-}
-
 

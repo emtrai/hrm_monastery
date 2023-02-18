@@ -1,7 +1,7 @@
 #id,name,remark
 NONE,Không,
 DU_TU,Dự tu,
-NGHI,Bỏ tu
+NGHI,Ngừng tu,
 KHAN_TAM,Khấn tạm
 KHAN_TRON,Khấn trọn
 NGHI_HUU,Nghỉ hưu

@@ -119,7 +119,7 @@ QList<DbModel *> DbSqliteSpecialistPersonTbl::getListSpecialist(const QString &p
                                                          KFieldSpecialistUid,/*fieldUid2Join*/
                                                          KFieldUid,/*fieldModelUid*/
                                                          KFieldPersonUid,/*fieldUid1Cond*/
-                                                         &Specialist::builder, /*builder*/
+                                                         &Specialist::build, /*builder*/
                                                          personUid, /*uid*/
                                                          status,
                                                          QString("*, %1.%2 AS %3, %1.%4 AS %5")

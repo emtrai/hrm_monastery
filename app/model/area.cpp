@@ -34,7 +34,7 @@ Area::Area():DbModel(),
     traced;
 }
 
-DbModel *Area::builder()
+DbModel *Area::build()
 {
     Area* item = new Area();
     item->init();
@@ -75,17 +75,6 @@ void Area::setPersonDbId(qint64 newPersonDbId)
 {
     mPersonDbId = newPersonDbId;
 }
-
-const QString &Area::remark() const
-{
-    return mRemark;
-}
-
-void Area::setRemark(const QString &newRemark)
-{
-    mRemark = newRemark;
-}
-
 
 DbModelHandler *Area::getDbModelHandler()
 {

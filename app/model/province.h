@@ -37,7 +37,7 @@ class Province: public QObject, public DbModel
 {
 public:
     Province();
-    static DbModel *builder();
+    static DbModel *build();
 //    virtual QString nameid() const;
 
     qint64 parentDbId() const;
@@ -47,13 +47,6 @@ public:
 
     qint64 countryDbId() const;
     void setCountryDbId(qint64 newCountryDbId);
-
-    const QString &remark() const;
-    void setRemark(const QString &newRemark);
-
-
-
-
 
     const QString &parentUid() const;
     void setParentUid(const QString &newParentUid);
@@ -69,7 +62,6 @@ private:
     qint64 mCountryDbId;
     QString mCountryUid;
     QString mParentUid;
-    QString mRemark;
     QList<Province> mChildProvince; // City belongs to Province, Province belongs to state
 };
 

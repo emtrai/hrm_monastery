@@ -70,8 +70,6 @@ public:
     qint32 status() const;
     void setStatus(qint32 newStatus);
 
-    const QString &remark() const;
-    void setRemark(const QString &newRemark);
 
     const QString &parentUid() const;
     void setParentUid(const QString &newParentUid);
@@ -90,7 +88,6 @@ protected:
     qint64 mStartDate;
     qint64 mEndDate;
     qint32 mStatus;
-    QString mRemark;
     QString mParentUid;
     QString mChangeHistory;
 };

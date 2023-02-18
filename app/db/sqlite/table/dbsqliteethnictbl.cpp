@@ -49,7 +49,6 @@ void DbSqliteEthnicTbl::addTableField(DbSqliteTableBuilder *builder)
     DbSqliteTbl::addTableField(builder);
     builder->addField(KFieldCountryShortName, TEXT);
     builder->addField(KFieldCountryDbId, INT64); // DB ID
-    builder->addField(KFieldRemark, TEXT);
     tracede;
 }
 
@@ -62,7 +61,6 @@ ErrCode DbSqliteEthnicTbl::insertTableField(DbSqliteInsertBuilder *builder,
     Ethnic* model = (Ethnic*) item;
     builder->addValue(KFieldCountryShortName, model->countryShortName());
     builder->addValue(KFieldCountryDbId, model->countryDbId());
-    builder->addValue(KFieldRemark, model->remark());
     tracede;
     return ErrNone;
 }
@@ -74,6 +72,5 @@ void DbSqliteEthnicTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry
     Ethnic* model = (Ethnic*) item;
     model->setCountryShortName(qry.value(KFieldCountryShortName).toString());
     model->setCountryDbId(qry.value(KFieldCountryDbId).toInt());
-    model->setRemark(qry.value(KFieldRemark).toString());
     tracede;
 }

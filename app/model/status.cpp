@@ -32,19 +32,11 @@ Status::Status()
 {
     traced;
 }
-DbModel *Status::builder()
+DbModel *Status::build()
 {
-    traced;
-    return new Status();
-}
-const QString &Status::remark() const
-{
-    return mRemark;
-}
-
-void Status::setRemark(const QString &newRemark)
-{
-    mRemark = newRemark;
+    Status* model = new Status();
+    model->init();
+    return model;
 }
 
 DbModelHandler *Status::getDbModelHandler()

@@ -30,10 +30,10 @@ public:
     explicit UICountryListView(QWidget *parent = nullptr);
     virtual ~UICountryListView();
 protected:
-    virtual void onViewItem(UITableWidgetItem *item);
 
     virtual Controller* getController();
     virtual QString getTitle();
+    virtual DbModel* onNewModel();
 };
 
 #endif // UICOUNTRYLISTVIEW_H

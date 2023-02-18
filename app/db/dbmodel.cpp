@@ -79,6 +79,8 @@ void DbModel::clone(const DbModel *model)
     mDbId = model->dbId();
     mUid = model->uid();
     mName = model->name();
+    mRemark = model->remark();
+    mNameId = model->nameId();
     mDbStatus = model->dbStatus();
     mHistory = model->history();
     mMarkModified = model->markModified();
@@ -99,11 +101,41 @@ int DbModel::modelType() const
 void DbModel::initExportFields()
 {
     traced;
+    mExportFields.insert(KItemName, [this](const QString& item){
+        return this->name();
+
+    });
+    mExportFields.insert(KItemNameId, [this](const QString& item){
+        return this->nameId();
+
+    });
+    mExportFields.insert(KItemUid, [this](const QString& item){
+        return this->uid();
+
+    });
+    mExportFields.insert(KItemRemark, [this](const QString& item){
+        return this->remark();
+
+    });
+    tracede;
 }
 
 void DbModel::initImportFields()
 {
     traced;
+    mImportFields.insert(KItemName, [this](const QString& value){
+        this->setName(value);
+    });
+    mImportFields.insert(KItemNameId, [this](const QString& value){
+        this->setNameId(value);
+    });
+    mImportFields.insert(KItemUid, [this](const QString& value){
+        this->setUid(value);
+    });
+    mImportFields.insert(KItemRemark, [this](const QString& value){
+        this->setRemark(value);
+    });
+    tracede;
 }
 
 
@@ -205,6 +237,16 @@ void DbModel::checkModifiedThenSet(qint64 &cur, qint64 next, const QString &item
     CHECK_MODIFIED_THEN_SET(cur, next, itemName);
 }
 
+const QString &DbModel::remark() const
+{
+    return mRemark;
+}
+
+void DbModel::setRemark(const QString &newRemark)
+{
+    mRemark = newRemark;
+}
+
 const QString &DbModel::nameId() const
 {
     return mNameId;
@@ -239,7 +281,14 @@ ErrCode DbModel::exportToFile(ExportType type, QString *fpath)
 
 const QString DbModel::exportTemplatePath(Exporter* exporter) const
 {
-    ASSERT(false, "derived DbModel class must implement exportTemplatePath");
+    traced;
+    if (exporter) {
+        switch (exporter->getExportType()) {
+        case EXPORT_HTML:
+            return FileCtl::getPrebuiltDataFilePath(KPrebuiltCommonTemplateFileName);
+        };
+    }
+    tracede;
     return QString();
 }
 

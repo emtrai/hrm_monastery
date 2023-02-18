@@ -57,7 +57,7 @@ const char *WorkCtl::getPrebuiltFileType()
 
 QList<DbModel *> WorkCtl::getItemFromDb()
 {
-    return getModelHandler()->getAll(&Work::builder);
+    return getModelHandler()->getAll(&Work::build);
 
 }
 

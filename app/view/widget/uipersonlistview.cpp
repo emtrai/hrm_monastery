@@ -315,6 +315,11 @@ int UIPersonListView::onFilter(int catetoryid,
     return ret;
 }
 
+DbModel *UIPersonListView::onNewModel()
+{
+    return Person::build();
+}
+
 
 void UIPersonListView::cleanUpItem()
 {

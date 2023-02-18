@@ -41,42 +41,16 @@ UIMissionListView::~UIMissionListView()
 {
     traced;
 }
-ErrCode UIMissionListView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act)
-{
-    traced;
-    // TODO: handle it
-    return ErrNone;
-}
 
-ErrCode UIMissionListView::onMenuActionDelete(QMenu *menu, UITableMenuAction *act)
-{
-    traced;
-    // TODO: handle it
-    return ErrNone;
-}
-
-void UIMissionListView::onViewItem(UITableWidgetItem *item)
-{
-    traced;
-    int idx = item->idx();
-    logd("idx=%d",idx);
-    if (idx < mItemList.length()){
-        Mission* model = (Mission*)mItemList.value(idx);
-        if (model == nullptr) {
-            loge("no data");
-            return;
-        }
-        model->dump();
-        // TODO: show information
-    } else {
-        loge("Invalid idx");
-        // TODO: popup message???
-    }
-}
 
 QString UIMissionListView::getTitle()
 {
     return tr("Công tác xã hội");
+}
+
+DbModel *UIMissionListView::onNewModel()
+{
+    return Mission::build();
 }
 
 ErrCode UIMissionListView::onLoad()

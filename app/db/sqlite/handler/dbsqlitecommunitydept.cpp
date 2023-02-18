@@ -91,7 +91,7 @@ DbSqliteTbl *DbSqliteCommunityDept::getTable(const QString &modelName)
 
 DbModelBuilder DbSqliteCommunityDept::getMainBuilder()
 {
-    return Community::builder;
+    return Community::build;
 }
 
 

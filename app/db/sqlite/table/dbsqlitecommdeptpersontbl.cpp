@@ -123,7 +123,6 @@ void DbSqliteCommDeptPersonTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldStatus, INT64);
     builder->addField(KFieldStartDate, INT64);
     builder->addField(KFieldEndDate, INT64);
-    builder->addField(KFieldRemark, TEXT);
     builder->addField(KFieldChangeHistory, TEXT); // history of changing role/person in dept
     tracede;
 }
@@ -146,7 +145,6 @@ ErrCode DbSqliteCommDeptPersonTbl::insertTableField(DbSqliteInsertBuilder *build
         builder->addValue(KFieldStatus, model->status());
         builder->addValue(KFieldStartDate, model->startDate());
         builder->addValue(KFieldEndDate, model->endDate());
-        builder->addValue(KFieldRemark, model->remark());
         builder->addValue(KFieldChangeHistory, model->changeHistory());
 
     } else {
@@ -179,7 +177,7 @@ void DbSqliteCommDeptPersonTbl::updateModelFromQuery(DbModel *item, const QSqlQu
                                       qry.value(KFieldLastName).toString()));
         DbModelHandler* hdl = DB->getModelHandler(KModelHdlRole);
         if (hdl != nullptr) {
-            DbModel* tmp = hdl->getItem(model->roleUid(), &Role::builder);
+            DbModel* tmp = hdl->getItem(model->roleUid(), &Role::build);
             if (tmp != nullptr) {
                 model->setRoleName(tmp->name());
             } else {
@@ -193,7 +191,7 @@ void DbSqliteCommDeptPersonTbl::updateModelFromQuery(DbModel *item, const QSqlQu
         // TODO: make below code be re-used????
         hdl = DB->getModelHandler(KModelHdlCourse);
         if (hdl != nullptr) {
-            DbModel* tmp = hdl->getItem(model->courseUid(), &Course::builder);
+            DbModel* tmp = hdl->getItem(model->courseUid(), &Course::build);
             if (tmp != nullptr) {
                 model->setCourseName(tmp->name());
             } else {
@@ -207,7 +205,6 @@ void DbSqliteCommDeptPersonTbl::updateModelFromQuery(DbModel *item, const QSqlQu
         model->setStatus(qry.value(KFieldStatus).toInt());
         model->setStartDate(qry.value(KFieldStartDate).toInt());
         model->setEndDate(qry.value(KFieldEndDate).toInt());
-        model->setRemark(qry.value(KFieldRemark).toString());
         model->setChangeHistory(qry.value(KFieldChangeHistory).toString());
 
     } else {

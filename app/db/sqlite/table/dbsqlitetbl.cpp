@@ -440,6 +440,7 @@ void DbSqliteTbl::updateModelFromQuery(DbModel* item, const QSqlQuery& qry)
     item->setDbStatus(qry.value(KFieldDbStatus).toInt());
     item->setCreatedTime(qry.value(KFieldCreateTime).toInt());
     item->setLastUpdatedTime(qry.value(KFieldLastUpdateItme).toInt());
+    item->setRemark(qry.value(KFieldRemark).toString());
     tracede;
 }
 
@@ -954,6 +955,7 @@ void DbSqliteTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldHistory, TEXT); // history of this field in db
     builder->addField(KFieldCreateTime, INT64);
     builder->addField(KFieldLastUpdateItme, INT64);
+    builder->addField(KFieldRemark, TEXT);
 }
 
 ErrCode DbSqliteTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
@@ -967,6 +969,8 @@ ErrCode DbSqliteTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbMo
         builder->addValue(KFieldName, item->name());
     if (!item->history().isEmpty())
         builder->addValue(KFieldHistory, item->history());
+    if (!item->remark().isEmpty())
+        builder->addValue(KFieldRemark, item->remark());
 //    builder->addValue(KFieldDbStatus, item->dbStatus());
     // TODO: timezone issue?
     // TODO: time of computer suddenly not correct/change???,

@@ -27,7 +27,7 @@
 #include "filectl.h"
 #include "communityctl.h"
 
-DbModel *Community::builder()
+DbModel *Community::build()
 {
     traced;
     Community* item = new Community();
@@ -114,10 +114,7 @@ void Community::clone(const DbModel *model)
 void Community::initExportFields()
 {
     traced;
-    mExportFields.insert(KItemName, [this](const QString& item){
-        return this->name();
-
-    });
+    DbModel::initExportFields();
     mExportFields.insert(KItemCommunityCode, [this](const QString& item){
         return this->communityCode();
 
@@ -152,9 +149,6 @@ void Community::initExportFields()
     mExportFields.insert(KItemIntro, [this](const QString& item){
         return this->intro();
     });
-    mExportFields.insert(KItemRemark, [this](const QString& item){
-        return this->remark();
-    });
     mExportFields.insert(KItemCEOCode, [this](const QString& item){
         return this->currentCEO();
     });
@@ -165,9 +159,7 @@ void Community::initExportFields()
 void Community::initImportFields()
 {
     traced;
-    mImportFields.insert(KItemName, [this](const QString& value){
-        this->setName(value);
-    });
+    DbModel::initImportFields();
     mImportFields.insert(KItemCommunityCode, [this](const QString& value){
         this->setCommunityCode(value);
     });
@@ -203,9 +195,6 @@ void Community::initImportFields()
     });
     mImportFields.insert(KItemIntro, [this](const QString& value){
         this->setIntro(value);
-    });
-    mImportFields.insert(KItemRemark, [this](const QString& value){
-        this->setRemark(value);
     });
     mImportFields.insert(KItemCEOCode, [this](const QString& value){
         this->setCurrentCEOCode(value);
@@ -348,17 +337,6 @@ void Community::setAreaCode(const QString &newAreaCode)
     // Community table only store Area Uid, not code, as code can be changed/update
     // so must search code to get uid
 }
-
-const QString &Community::remark() const
-{
-    return mRemark;
-}
-
-void Community::setRemark(const QString &newRemark)
-{
-    mRemark = newRemark;
-}
-
 
 const QString &Community::contact() const
 {

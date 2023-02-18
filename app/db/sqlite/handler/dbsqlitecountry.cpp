@@ -40,14 +40,14 @@ const QString DbSqliteCountry::getName()
 DbModel *DbSqliteCountry::getByName(const QString &name)
 {
     traced;
-    return DbSqliteModelHandler::getByName(name, Country::builder);
+    return DbSqliteModelHandler::getByName(name, Country::build);
     
 }
 
 DbModel *DbSqliteCountry::getByUid(const QString &uid)
 {
     traced;
-    return DbSqliteModelHandler::getByUid(uid, Country::builder);
+    return DbSqliteModelHandler::getByUid(uid, Country::build);
     
 }
 

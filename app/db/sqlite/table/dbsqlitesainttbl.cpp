@@ -49,7 +49,6 @@ void DbSqliteSaintTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldGender, INT32);
     builder->addField(KFieldFeastDay, INT64);
     builder->addField(KFieldCountry, TEXT);
-    builder->addField(KFieldRemark, TEXT);
 }
 
 ErrCode DbSqliteSaintTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
@@ -62,7 +61,6 @@ ErrCode DbSqliteSaintTbl::insertTableField(DbSqliteInsertBuilder *builder, const
     builder->addValue(KFieldGender, saint->gender());
     builder->addValue(KFieldFeastDay, saint->feastDay());
     builder->addValue(KFieldCountry, saint->country());
-    builder->addValue(KFieldRemark, saint->remark());
     tracede;
     return ErrNone;
 }
@@ -77,7 +75,6 @@ void DbSqliteSaintTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
     saint->setGender((Gender)qry.value(KFieldGender).toInt());
     saint->setFeastDay(qry.value(KFieldFeastDay).toInt());
     saint->setCountry(qry.value(KFieldCountry).toString());
-    saint->setRemark(qry.value(KFieldRemark).toString());
 }
 
 QHash<QString, int> DbSqliteSaintTbl::getSearchFields()

@@ -28,16 +28,12 @@ class Role : public DbModel
 {
 public:
     Role();
-    static DbModel *builder();
+    static DbModel *build();
     virtual QString modelName() const;
 
-    const QString &remark() const;
-    void setRemark(const QString &newRemark);
 
 protected:
     virtual DbModelHandler *getDbModelHandler();
-private:
-    QString mRemark;
 };
 
 #endif // ROLE_H

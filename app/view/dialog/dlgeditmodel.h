@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Ngo Huy Anh
+ * Copyright (C) 2023 Ngo Huy Anh
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,45 +14,51 @@
  * limitations under the License.
  *
  *
- * Filename: dlgcommunity.h
+ * Filename: dlgeditmodel.h
  * Author: Anh, Ngo Huy
- * Created date:7/24/2022
+ * Created date:2/16/2023
  * Brief:
  */
-#ifndef DLGCOMMUNITY_H
-#define DLGCOMMUNITY_H
+#ifndef DLGEDITMODEL_H
+#define DLGEDITMODEL_H
 
 #include <QDialog>
-#include "errcode.h"
 #include "dlgcommoneditmodel.h"
-#include <QAbstractButton>
 
 namespace Ui {
-class DlgCommunity;
+class DlgEditModel;
 }
 
-class Community;
-class DlgCommunity : public DlgCommonEditModel
+class DlgEditModel : public DlgCommonEditModel
 {
     Q_OBJECT
-    DLG_BUILDER(DlgCommunity)
+    DLG_BUILDER(DlgEditModel)
+
 public:
-                 explicit DlgCommunity(QWidget *parent = nullptr);
-    ~DlgCommunity();
+    explicit DlgEditModel(QWidget *parent = nullptr);
+    virtual ~DlgEditModel();
+    /**
+     * @brief build data for model, using dialog/wiget data
+     * @return
+     */
     virtual ErrCode buildModel(DbModel* model, QString& errMsg);
+    /**
+     * @brief build model from input model object
+     * @param model
+     * @return
+     */
     virtual ErrCode fromModel(const DbModel* model);
 protected:
-    virtual DbModel* newModel();
+    virtual DbModel *newModel();
+    /**
+     * @brief Validate data of dialog
+     * @param msg: output message if validate is not ok
+     * @return
+     */
     virtual bool onValidateData(QString& msg);
-    void loadData();
-    void loadStatus();
-public:
-
-private slots:
-    void on_btnSearchCEO_clicked();
 
 private:
-    Ui::DlgCommunity *ui;
+    Ui::DlgEditModel *ui;
 };
 
-#endif // DLGCOMMUNITY_H
+#endif // DLGEDITMODEL_H

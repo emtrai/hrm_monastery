@@ -91,3 +91,8 @@ int UISaintListView::onFilter(int catetoryid, const QString &catetory, qint64 op
     reload();
     return cnt;
 }
+
+DbModel *UISaintListView::onNewModel()
+{
+    return Saint::build();
+}

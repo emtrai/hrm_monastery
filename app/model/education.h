@@ -33,14 +33,10 @@ class Education: public DbModel
 public:
     Education();
 public:
-    static DbModel *builder();
-    const QString &remark() const;
-    void setRemark(const QString &newRemark);
+    static DbModel *build();
 
 protected:
     virtual DbModelHandler *getDbModelHandler();
-private:
-    QString mRemark;
 };
 
 #endif // EDUCATION_H

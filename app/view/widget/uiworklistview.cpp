@@ -40,11 +40,6 @@ UIWorkListView::~UIWorkListView()
     traced;
 }
 
-void UIWorkListView::onViewItem(UITableWidgetItem *item)
-{
-
-}
-
 Controller *UIWorkListView::getController()
 {
     return WORKCTL;
@@ -53,4 +48,9 @@ Controller *UIWorkListView::getController()
 QString UIWorkListView::getTitle()
 {
     return tr("Trình độ học vấn");
+}
+
+DbModel *UIWorkListView::onNewModel()
+{
+    return Work::build();
 }

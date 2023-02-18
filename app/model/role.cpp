@@ -33,25 +33,16 @@ Role::Role()
 {
     traced;
 }
-DbModel *Role::builder()
+DbModel *Role::build()
 {
-    traced;
-    return new Role();
+    Role* model = new Role();
+    model->init();
+    return model;
 }
 
 QString Role::modelName() const
 {
     return KModelNameRole;
-}
-
-const QString &Role::remark() const
-{
-    return mRemark;
-}
-
-void Role::setRemark(const QString &newRemark)
-{
-    mRemark = newRemark;
 }
 
 DbModelHandler *Role::getDbModelHandler()

@@ -77,6 +77,6 @@ const char *MissionCtl::getPrebuiltFileType()
 
 QList<DbModel *> MissionCtl::getItemFromDb()
 {
-    return getModelHandler()->getAll(&Mission::builder);
+    return getModelHandler()->getAll(&Mission::build);
 }
 

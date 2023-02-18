@@ -82,7 +82,7 @@ ErrCode CourseCtl::reloadDb()
     mCourseList.clear();
     // TODO: loop to delete each element????
 
-    QList items = DB->getModelHandler(KModelHdlCourse)->getAll(&Course::builder);
+    QList items = DB->getModelHandler(KModelHdlCourse)->getAll(&Course::build);
     //    mItemList.append();
     foreach (DbModel* model, items){
         Course* item = (Course*)model;

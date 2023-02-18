@@ -25,7 +25,7 @@
 #include "uicommonlistview.h"
 #include "dlgcommoneditmodel.h"
 
-class UICommunityListView : public UICommonListView, public CommonEditModelListener
+class UICommunityListView : public UICommonListView
 {
 public:
     explicit UICommunityListView(QWidget *parent = nullptr);
@@ -56,7 +56,7 @@ protected:
 protected:
     virtual ErrCode onLoad();
     virtual ErrCode onReload();
-    virtual void onDbModelReady(ErrCode ret, DbModel* model, DlgCommonEditModel* dlg);
+    virtual DbModel* onNewModel();
 };
 
 

@@ -34,24 +34,16 @@ CommunityDept::CommunityDept():DbModel()
     mStatus = 0;
 }
 
-DbModel *CommunityDept::builder()
+DbModel *CommunityDept::build()
 {
-    return new CommunityDept();
+    CommunityDept* model = new CommunityDept();
+    model->init();
+    return model;
 }
 
 QString CommunityDept::modelName() const
 {
     return KModelNameCommDept;
-}
-
-const QString &CommunityDept::remark() const
-{
-    return mRemark;
-}
-
-void CommunityDept::setRemark(const QString &newRemark)
-{
-    mRemark = newRemark;
 }
 
 qint64 CommunityDept::establishDate() const

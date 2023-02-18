@@ -65,6 +65,9 @@ private:
 };
 
 
+/**
+ * @brief Re-present for a item in table
+ */
 class UITableWidgetItem: public QTableWidgetItem
 {
 public:
@@ -80,8 +83,8 @@ public:
     void setIdx(qint32 newIdx);
 
 private:
-    UITableItem* mItem;
-    qint32 mItemIdx; // idx of field in a row
+    UITableItem* mItem; // item value
+    qint32 mItemIdx; // idx of field in a row of table
     qint32 mIdx; // idx of items (row id)
 };
 
@@ -187,6 +190,7 @@ protected:
     virtual void onViewItem(UITableWidgetItem *item);
     virtual void onEditItem(UITableWidgetItem *item);
     virtual void onDeleteItem(UITableWidgetItem *item);
+    virtual void onAddItem(UITableWidgetItem *item);
 //    virtual void onDeleteItem(UITableItem *item);
 
     // MENU

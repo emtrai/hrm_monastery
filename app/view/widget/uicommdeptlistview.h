@@ -39,12 +39,10 @@ protected:
                                                           UITableWidgetItem* item);
     virtual ErrCode onMenuActionListPerson(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionListDepartment(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onMenuActionDelete(QMenu* menu, UITableMenuAction* act);
-    virtual void onViewItem(UITableWidgetItem *item);
     virtual QString getTitle();
     virtual void initHeader();
     virtual void updateItem(DbModel* item, UITableItem* tblItem);
+    virtual DbModel* onNewModel();
 
 protected:
     virtual ErrCode onLoad();

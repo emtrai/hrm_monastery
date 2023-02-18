@@ -38,23 +38,15 @@ Work::~Work()
     traced;
 }
 
-DbModel *Work::builder()
+DbModel *Work::build()
 {
     traced;
-    return new Work();
+    Work* model = new Work();
+    model->init();
+    return model;
 }
 
 DbModelHandler *Work::getDbModelHandler()
 {
     return DB->getModelHandler(KModelHdlWork);
-}
-
-const QString &Work::remark() const
-{
-    return mRemark;
-}
-
-void Work::setRemark(const QString &newRemark)
-{
-    mRemark = newRemark;
 }

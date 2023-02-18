@@ -24,6 +24,7 @@
 #include "saintctl.h"
 #include "communityctl.h"
 #include "filter.h"
+#include "mainwindow.h"
 
 UICommonListView::UICommonListView(QWidget *parent):
     UITableView(parent)
@@ -47,12 +48,22 @@ QList<UITableItem *> UICommonListView::getListItem(qint32 page, qint32 perPage, 
     return items;
 }
 
+void UICommonListView::initHeader()
+{
+    traced;
+    mHeader.append(tr("ID"));
+    mHeader.append(tr("Tên định danh"));
+    mHeader.append(tr("Tên"));
+    mHeader.append(tr("Ghi chú"));
+    tracede;
+}
 void UICommonListView::updateItem(DbModel *item, UITableItem *tblItem)
 {
     traced;
     tblItem->addValue(QString("%1").arg(item->dbId()));
     tblItem->addValue(item->nameId());
     tblItem->addValue(item->name());
+    tblItem->addValue(item->remark());
     tracede;
 }
 
@@ -91,15 +102,6 @@ ErrCode UICommonListView::onReload()
     onLoad();
     tracede;
     return ErrNone;
-}
-
-void UICommonListView::initHeader()
-{
-    traced;
-    mHeader.append(tr("ID"));
-    mHeader.append(tr("Mã định danh"));
-    mHeader.append(tr("Tên"));
-        tracede;
 }
 
 void UICommonListView::initFilterFields()
@@ -141,17 +143,39 @@ void UICommonListView::onViewItem(UITableWidgetItem *item)
 {
     traced;
     int idx = item->idx();
-    logd("idx=%d",idx);
-    if (idx < mItemList.length()){
-        DbModel* model = mItemList.value(idx);
-        if (model == nullptr) {
-            loge("no data");
-            return;
-        }
-        model->dump();
-        // TODO: show information
+    DbModel* comm = item->itemData();
+    if (comm) {
+        MainWindow::showOnHtmlViewer(comm, getTitle());
     } else {
-        loge("Invalid idx");
-        // TODO: popup message???
+        loge("Comm obj is null");
+        Utils::showErrorBox("Không có thông tin để xem");
     }
+    tracede;
+}
+
+void UICommonListView::onAddItem(UITableWidgetItem *item)
+{
+    traced;
+    // TODO: handle it
+    MainWindow::showAddEditCommonModel(true, nullptr, this);
+    tracede;
+}
+
+void UICommonListView::onDbModelReady(ErrCode ret, DbModel *model, DlgCommonEditModel *dlg)
+{
+    traced;
+    if (ret == ErrNone) {
+        if (model){
+            model->dump();
+        }
+        onReload();
+    }
+
+    tracede;
+}
+
+DbModel *UICommonListView::onNewModel()
+{
+    traced;
+    return nullptr;
 }

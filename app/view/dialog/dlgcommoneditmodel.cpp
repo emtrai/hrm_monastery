@@ -64,6 +64,9 @@ DbModel *DlgCommonEditModel::model()
     if (!mModel) {
         mModel = newModel();
     }
+    if (!mModel && mListener) {
+        mModel = mListener->onNewModel();
+    }
     // TODO: copy or return value??? how will take over this object??? should use smart pointer????
     return mModel;
 }
@@ -140,6 +143,13 @@ ErrCode DlgCommonEditModel::loadList(QComboBox *cb, CommonCtl *ctrl)
     return err;
 }
 
+void DlgCommonEditModel::setModel(DbModel *newModel)
+{
+    // TODO: clone or assign????
+    // TODO: change to use smart pointer??????
+    mModel = newModel;
+}
+
 CommonEditModelListener *DlgCommonEditModel::listener() const
 {
     return mListener;
@@ -159,10 +169,15 @@ ErrCode DlgCommonEditModel::fromModel(const DbModel *inModel)
         return ErrInvalidData;
     }
     DbModel* item = model();
-    item->clone(inModel);
-    item->validate(); // TODO: should call validate here???
-    if (item == nullptr){
-        ret = ErrInvalidArg; // TODO: should raise assert instead???
+    if (item) {
+        item->clone(inModel);
+        item->validate(); // TODO: should call validate here???
+        if (item == nullptr){
+            ret = ErrInvalidArg; // TODO: should raise assert instead???
+        }
+    } else {
+        ret = ErrNoData;
+        loge("No db model found");
     }
     tracedr(ret);
     return ret;

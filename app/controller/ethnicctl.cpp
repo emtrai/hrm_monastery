@@ -35,7 +35,7 @@ EthnicCtl::EthnicCtl():CommonCtl(KModelHdlEthnic)
 
 QList<DbModel *> EthnicCtl::getItemFromDb()
 {
-    return getModelHandler()->getAll(&Ethnic::builder);
+    return getModelHandler()->getAll(&Ethnic::build);
 }
 // Format: country short name, name[, remark]
 DbModel *EthnicCtl::buildModel(void *items, const QString &fmt)

@@ -60,28 +60,6 @@ void UIAreaListView::updateItem(DbModel *item, UITableItem *tblItem)
     tblItem->addValue(model->personName());
 }
 
-
-ErrCode UIAreaListView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act)
-{
-    traced;
-    // TODO: handle it
-    return ErrNone;
-}
-
-ErrCode UIAreaListView::onMenuActionDelete(QMenu *menu, UITableMenuAction *act)
-{
-    traced;
-    // TODO: handle it
-    return ErrNone;
-}
-
-
-void UIAreaListView::onViewItem(UITableWidgetItem *item)
-{
-    traced;
-
-}
-
 Controller *UIAreaListView::getController()
 {
     traced;
@@ -94,15 +72,8 @@ QList<DbModel *> UIAreaListView::getListItem()
     return AREACTL->getAllItems();
 }
 
-
-QList<UITableMenuAction *> UIAreaListView::getMenuMultiItemActions(const QMenu *menu,
-                                                                   const QList<UITableItem *>& items)
+DbModel *UIAreaListView::onNewModel()
 {
-    traced;
-//    logd("idx %d", idx);
-    QList<UITableMenuAction*> actionList = UITableView::getMenuMultiItemActions(menu, items);
-
-    return actionList;
-
+    return Area::build();
 }
 

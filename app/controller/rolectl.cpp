@@ -70,7 +70,7 @@ ErrCode RoleCtl::reloadDb()
     mList.clear();
     // TODO: loop to delete each element????
 
-    QList items = DB->getModelHandler(KModelHdlRole)->getAll(&Role::builder);
+    QList items = DB->getModelHandler(KModelHdlRole)->getAll(&Role::build);
     //    mItemList.append();
     foreach (DbModel* model, items){
         Role* item = (Role*)model;

@@ -39,10 +39,6 @@ UIEthnicListView::~UIEthnicListView()
     traced;
 }
 
-void UIEthnicListView::onViewItem(UITableWidgetItem *item)
-{
-
-}
 
 Controller *UIEthnicListView::getController()
 {
@@ -52,4 +48,9 @@ Controller *UIEthnicListView::getController()
 QString UIEthnicListView::getTitle()
 {
     return tr("Dân tộc");
+}
+
+DbModel *UIEthnicListView::onNewModel()
+{
+    return Ethnic::build();
 }

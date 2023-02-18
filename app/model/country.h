@@ -46,7 +46,7 @@ public:
 
     virtual void dump();
 public:
-    static DbModel *builder();
+    static DbModel *build();
 
     const QString &shortName() const;
     void setShortName(const QString &newShortName);

@@ -41,32 +41,3 @@ DbSqliteEventTbl::DbSqliteEventTbl(DbSqlite* db)
 {
     traced;
 }
-
-void DbSqliteEventTbl::addTableField(DbSqliteTableBuilder *builder)
-{
-    traced;
-    DbSqliteTbl::addTableField(builder);
-    builder->addField(KFieldRemark, TEXT);
-    tracede;
-}
-
-ErrCode DbSqliteEventTbl::insertTableField(DbSqliteInsertBuilder *builder,
-                                         const DbModel *item)
-{
-    traced;
-    DbSqliteTbl::insertTableField(builder, item);
-
-    Event* model = (Event*) item;
-    builder->addValue(KFieldRemark, model->remark());
-    tracede;
-    return ErrNone;
-}
-
-void DbSqliteEventTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
-{
-    traced;
-    DbSqliteTbl::updateModelFromQuery(item, qry);
-    Event* model = (Event*) item;
-    model->setRemark(qry.value(KFieldRemark).toString());
-    tracede;
-}

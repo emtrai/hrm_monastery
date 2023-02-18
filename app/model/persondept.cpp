@@ -40,7 +40,9 @@ PersonDept::PersonDept()
 
 DbModel *PersonDept::build()
 {
-    return new PersonDept();
+    PersonDept* model = new PersonDept();
+    model->init();
+    return model;
 }
 
 const QString &PersonDept::roleUid() const
@@ -146,16 +148,6 @@ const QString &PersonDept::commDeptUid() const
 void PersonDept::setCommDeptUid(const QString &newCommDeptUid)
 {
     mCommDeptUid = newCommDeptUid;
-}
-
-const QString &PersonDept::remark() const
-{
-    return mRemark;
-}
-
-void PersonDept::setRemark(const QString &newRemark)
-{
-    mRemark = newRemark;
 }
 
 int PersonDept::status() const

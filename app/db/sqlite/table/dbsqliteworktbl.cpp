@@ -38,31 +38,5 @@ const qint32 DbSqliteWorkTbl::KVersionCode = VERSION_CODE(0,0,1);
 DbSqliteWorkTbl::DbSqliteWorkTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableWork, KTableWork, KVersionCode)
 {
-
-}
-
-void DbSqliteWorkTbl::addTableField(DbSqliteTableBuilder *builder)
-{
     traced;
-    DbSqliteTbl::addTableField(builder);
-    builder->addField(KFieldRemark, TEXT);
-}
-
-ErrCode DbSqliteWorkTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
-{
-    traced;
-    DbSqliteTbl::insertTableField(builder, item);
-
-    Work* model = (Work*) item;
-    builder->addValue(KFieldRemark, model->remark());
-    tracede;
-    return ErrNone;
-}
-
-void DbSqliteWorkTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
-{
-    traced;
-    DbSqliteTbl::updateModelFromQuery(item, qry);
-    Work* model = (Work*) item;
-    model->setRemark(qry.value(KFieldRemark).toString());
 }

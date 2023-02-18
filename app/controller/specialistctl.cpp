@@ -71,7 +71,7 @@ const char *SpecialistCtl::getPrebuiltFileType()
 
 QList<DbModel *> SpecialistCtl::getItemFromDb()
 {
-    return getModelHandler()->getAll(&Specialist::builder);
+    return getModelHandler()->getAll(&Specialist::build);
 
 }
 

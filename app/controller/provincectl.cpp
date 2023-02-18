@@ -96,7 +96,7 @@ void ProvinceCtl::onLoad()
     ErrCode ret = ErrNone;
     ret = check2UpdateDbFromPrebuiltFile(KPrebuiltProvinceCSVFileName, KFileTypeCSV);
     // TODO: should do lazy load??? load all consume much memory
-    QList items = DB->getModelHandler(KModelHdlProvince)->getAll(&Province::builder);
+    QList items = DB->getModelHandler(KModelHdlProvince)->getAll(&Province::build);
     //    mItemList.append();
     foreach (DbModel* model, items){
         Province* province = (Province*)model;

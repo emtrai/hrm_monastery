@@ -71,6 +71,6 @@ const char *CountryCtl::getPrebuiltFileType()
 
 QList<DbModel *> CountryCtl::getItemFromDb()
 {
-    return getModelHandler()->getAll(&Country::builder);
+    return getModelHandler()->getAll(&Country::build);
 }
 

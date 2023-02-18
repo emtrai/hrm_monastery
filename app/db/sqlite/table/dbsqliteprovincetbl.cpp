@@ -51,7 +51,6 @@ void DbSqliteProvinceTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldCountryDbId, INT64); // DB ID
     builder->addField(KFieldParentDbId, INT64); // DB ID
     builder->addField(KFieldParentUid, TEXT); // DB ID
-    builder->addField(KFieldRemark, TEXT);
     tracede;
 }
 
@@ -66,7 +65,6 @@ ErrCode DbSqliteProvinceTbl::insertTableField(DbSqliteInsertBuilder *builder,
     builder->addValue(KFieldCountryDbId, model->countryDbId());
     builder->addValue(KFieldParentDbId, model->parentDbId());
     builder->addValue(KFieldParentUid, model->parentUid());
-    builder->addValue(KFieldRemark, model->remark());
     tracede;
     return ErrNone;
 }
@@ -80,6 +78,5 @@ void DbSqliteProvinceTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &q
     model->setCountryDbId(qry.value(KFieldCountryDbId).toInt());
     model->setParentDbId(qry.value(KFieldParentDbId).toInt());
     model->setParentUid(qry.value(KFieldParentUid).toString());
-    model->setRemark(qry.value(KFieldRemark).toString());
     tracede;
 }

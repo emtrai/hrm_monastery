@@ -69,7 +69,7 @@ const char *AreaCtl::getPrebuiltFileType()
 QList<DbModel *> AreaCtl::getItemFromDb()
 {
     traced;
-    return DB->getModelHandler(KModelHdlArea)->getAll(&Area::builder);
+    return DB->getModelHandler(KModelHdlArea)->getAll(&Area::build);
 }
 
 

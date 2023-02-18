@@ -42,7 +42,7 @@ const QString DbSqliteWork::getName()
 
 DbModelBuilder DbSqliteWork::getMainBuilder()
 {
-    return (DbModelBuilder)Work::builder;
+    return (DbModelBuilder)Work::build;
 }
 
 DbSqliteTbl *DbSqliteWork::getMainTbl()

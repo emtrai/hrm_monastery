@@ -30,10 +30,9 @@ public:
     explicit UISpecialistListView(QWidget *parent = nullptr);
     virtual ~UISpecialistListView();
 protected:
-    virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onMenuActionDelete(QMenu* menu, UITableMenuAction* act);
     virtual QString getTitle();
     virtual Controller* getController();
+    virtual DbModel* onNewModel();
 };
 
 #endif // UISPECIALISTLISTVIEW_H

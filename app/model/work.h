@@ -30,15 +30,10 @@ class Work: public DbModel
 public:
     Work();
     virtual ~Work();
-    static DbModel *builder();
-    const QString &remark() const;
-    void setRemark(const QString &newRemark);
+    static DbModel *build();
 
 protected:
     virtual DbModelHandler* getDbModelHandler();
-private:
-
-    QString mRemark;
 };
 
 #endif // WORK_H

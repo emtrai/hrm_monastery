@@ -35,29 +35,12 @@ Ethnic::Ethnic()
     traced;
 }
 
-DbModel *Ethnic::builder()
+DbModel *Ethnic::build()
 {
     traced;
-    return new Ethnic();
-}
-
-//QString Ethnic::nameid() const
-//{
-//    QString hash;
-//    traced;
-//    hash = Utils::UidFromName(name()+countryShortName());
-//    logd("ethnic uuid %s", hash.toStdString().c_str());
-//    return hash;
-//}
-
-const QString &Ethnic::remark() const
-{
-    return mRemark;
-}
-
-void Ethnic::setRemark(const QString &newRemark)
-{
-    mRemark = newRemark;
+    Ethnic* model = new Ethnic();
+    model->init();
+    return model;
 }
 
 qint64 Ethnic::countryDbId() const

@@ -59,7 +59,6 @@ void DbSqlitePersonEventTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldEndDate, INT64);
     builder->addField(KFieldEventUid, TEXT);
     builder->addField(KFieldPersonId, TEXT);
-    builder->addField(KFieldRemark, TEXT);
     tracede;
 }
 
@@ -75,7 +74,6 @@ ErrCode DbSqlitePersonEventTbl::insertTableField(DbSqliteInsertBuilder *builder,
     builder->addValue(KFieldName, model->name());
     builder->addValue(KFieldEventUid, model->eventUid());
     builder->addValue(KFieldPersonId, model->personUid());
-    builder->addValue(KFieldRemark, model->remark());
     tracede;
     return ErrNone;
 }
@@ -90,7 +88,6 @@ void DbSqlitePersonEventTbl::updateModelFromQuery(DbModel *item, const QSqlQuery
     model->setEventUid(qry.value(KFieldEventUid).toString());
     model->setDate(qry.value(KFieldDate).toInt());
     model->setEndDate(qry.value(KFieldEndDate).toInt());
-    model->setRemark(qry.value(KFieldRemark).toString());
     tracede;
 }
 
@@ -144,7 +141,6 @@ QList<PersonEvent *> *DbSqlitePersonEventTbl::getListEvents(const QString &perso
                 item->setUid(qry.value(KFieldUid).toString());
                 item->setPersonUid(qry.value(KFieldPersonId).toString());
                 item->setEventUid(qry.value(KFieldEventId).toString());
-                item->setRemark(qry.value(KFieldRemark).toString());
                 item->setDate(qry.value(KFieldDate).toInt());
                 item->setEndDate(qry.value(KFieldEndDate).toInt());
                 list->append(item); // TODO: when it cleaned up?????

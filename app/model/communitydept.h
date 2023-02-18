@@ -29,11 +29,8 @@ class CommunityDept : public DbModel
 public:
     CommunityDept();
 
-    static DbModel *builder();
+    static DbModel *build();
     virtual QString modelName() const;
-
-    const QString &remark() const;
-    void setRemark(const QString &newRemark);
 
     qint64 establishDate() const;
     void setEstablishDate(qint64 newEstablishDate);
@@ -82,7 +79,6 @@ private:
     QString mDepartmentName;
     QString mCommunityUid;
     qint64 mCommunityDbId;
-    QString mRemark;
     qint64 mEstablishDate;
     QString mEmail;
     QString mAddr;

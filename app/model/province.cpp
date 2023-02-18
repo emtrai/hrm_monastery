@@ -34,9 +34,11 @@ Province::Province()
     traced;
 }
 
-DbModel *Province::builder()
+DbModel *Province::build()
 {
-    return new Province();
+    Province* model = new Province();
+    model->init();
+    return model;
 }
 
 //QString Province::nameid() const
@@ -69,17 +71,6 @@ void Province::setCountryDbId(qint64 newCountryDbId)
 {
     mCountryDbId = newCountryDbId;
 }
-
-const QString &Province::remark() const
-{
-    return mRemark;
-}
-
-void Province::setRemark(const QString &newRemark)
-{
-    mRemark = newRemark;
-}
-
 
 DbModelHandler *Province::getDbModelHandler()
 {

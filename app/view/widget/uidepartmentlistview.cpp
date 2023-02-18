@@ -57,27 +57,6 @@ void UIDepartmentListView::updateItem(DbModel *item, UITableItem *tblItem)
 }
 
 
-ErrCode UIDepartmentListView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act)
-{
-    traced;
-    // TODO: handle it
-    return ErrNone;
-}
-
-ErrCode UIDepartmentListView::onMenuActionDelete(QMenu *menu, UITableMenuAction *act)
-{
-    traced;
-    // TODO: handle it
-    return ErrNone;
-}
-
-
-void UIDepartmentListView::onViewItem(UITableWidgetItem *item)
-{
-    traced;
-
-}
-
 Controller *UIDepartmentListView::getController()
 {
     traced;
@@ -90,15 +69,8 @@ QList<DbModel *> UIDepartmentListView::getListItem()
     return DEPART->getAllDepartment();
 }
 
-
-QList<UITableMenuAction *> UIDepartmentListView::getMenuMultiItemActions(const QMenu *menu,
-                                                                   const QList<UITableItem *>& items)
+DbModel *UIDepartmentListView::onNewModel()
 {
-    traced;
-//    logd("idx %d", idx);
-    QList<UITableMenuAction*> actionList = UITableView::getMenuMultiItemActions(menu, items);
-
-    return actionList;
-
+    return Department::build();
 }
 

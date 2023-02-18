@@ -44,7 +44,7 @@ DepartCtl::DepartCtl():Controller(KModelHdlDept)
 const QList<DbModel *> DepartCtl::getAllDepartment()
 {
     traced;
-    return DB->getModelHandler(KModelHdlDept)->getAll(&Department::builder);
+    return DB->getModelHandler(KModelHdlDept)->getAll(&Department::build);
 }
 
 // Format: Nameid, Name, remark
@@ -158,7 +158,7 @@ void DepartCtl::onLoad()
     ret = check2UpdateDbFromPrebuiltFile(KPrebuiltDeptJsonFileName, KFileTypeJson);
     logd("update db ret=%d", ret);
     // TODO: should do lazy load??? load all consume much memory
-//    mDeptList = DB->getModelHandler(KModelHdlDept)->getAll(&Department::builder);
+//    mDeptList = DB->getModelHandler(KModelHdlDept)->getAll(&Department::build);
     //    mItemList.append();
 //    foreach (DbModel* model, items){
 //        Department* item = (Department*)model;

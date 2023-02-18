@@ -49,24 +49,15 @@ PersonEvent::PersonEvent(const PersonEvent *model):
 
 DbModel *PersonEvent::build()
 {
-    traced;
-    return new PersonEvent();
+    PersonEvent* model = new PersonEvent();
+    model->init();
+    return model;
 }
 
 QString PersonEvent::modelName() const
 {
     return KModelNamePersonEvent;
 }
-const QString &PersonEvent::remark() const
-{
-    return mRemark;
-}
-
-void PersonEvent::setRemark(const QString &newRemark)
-{
-    mRemark = newRemark;
-}
-
 void PersonEvent::buildUidIfNotSet()
 {
     traced;

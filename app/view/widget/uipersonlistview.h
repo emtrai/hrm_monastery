@@ -66,6 +66,7 @@ protected:
                           const QString& catetory,
                           qint64 opFlags,
                           const QString& keywords, const QVariant *value);
+    virtual DbModel* onNewModel();
 
 private:
     void cleanUpItem();

@@ -66,15 +66,12 @@ class Saint: public DbModel, public IExporter, public IImporter
         virtual void dump();
 
     public:
-        static DbModel *builder();
         const QString &countryUid() const;
         void setCountryUid(const QString &newCountryUid);
 
         const QString &originName() const;
         void setOriginName(const QString &newOriginName);
 
-        const QString &remark() const;
-        void setRemark(const QString &newRemark);
 
     protected:
         virtual DbModelHandler *getDbModelHandler();
@@ -86,8 +83,7 @@ class Saint: public DbModel, public IExporter, public IImporter
         Gender mGender;
         qint64 mFeastDay; // ngay bon mang
         QString mCountry;
-        QString mCountryUid;
-        QString mRemark;
+        QString mCountryUid;\
 };
 
 

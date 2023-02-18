@@ -49,7 +49,7 @@ class Community: public QObject, public DbModel
 {
     Q_OBJECT
 public:
-    static DbModel *builder();
+    static DbModel *build();
 public:
     Community();
     Community(const Community& obj);
@@ -142,9 +142,6 @@ public:
     const QString &contact() const;
     void setContact(const QString &newContact);
 
-    const QString &remark() const;
-    void setRemark(const QString &newRemark);
-
     const QString &areaCode() const;
     void setAreaCode(const QString &newAreaCode);
 
@@ -198,7 +195,6 @@ private:
 
     QString mIntro;
     QString mContact; // Other detail contact
-    QString mRemark;
 };
 
 #endif // COMMUNITY_H

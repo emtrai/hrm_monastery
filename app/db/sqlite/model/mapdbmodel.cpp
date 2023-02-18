@@ -121,16 +121,6 @@ void MapDbModel::setStatus(qint32 newStatus)
     mStatus = newStatus;
 }
 
-const QString &MapDbModel::remark() const
-{
-    return mRemark;
-}
-
-void MapDbModel::setRemark(const QString &newRemark)
-{
-    mRemark = newRemark;
-}
-
 const QString &MapDbModel::parentUid() const
 {
     return mParentUid;

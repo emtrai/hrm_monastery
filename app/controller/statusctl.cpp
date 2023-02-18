@@ -70,7 +70,7 @@ ErrCode StatusCtl::reloadDb()
     mStatusList.clear();
     // TODO: loop to delete each element????
 
-    QList items = DB->getModelHandler(KModelHdlStatus)->getAll(&Status::builder);
+    QList items = DB->getModelHandler(KModelHdlStatus)->getAll(&Status::build);
     //    mItemList.append();
     foreach (DbModel* model, items){
         Status* item = (Status*)model;

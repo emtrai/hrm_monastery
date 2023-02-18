@@ -33,15 +33,10 @@ class Mission : public DbModel
 {
 public:
     Mission();
-    static DbModel *builder();
-
-    const QString &remark() const;
-    void setRemark(const QString &newRemark);
+    static DbModel *build();
 
 protected:
     virtual DbModelHandler *getDbModelHandler();
-private:
-    QString mRemark;
 };
 
 #endif // MISSION_H

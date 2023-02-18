@@ -30,10 +30,10 @@ public:
     explicit UIEducationListView(QWidget *parent = nullptr);
     virtual ~UIEducationListView();
 protected:
-    virtual void onViewItem(UITableWidgetItem *item);
 
     virtual Controller* getController();
     virtual QString getTitle();
+    virtual DbModel* onNewModel();
 };
 
 #endif // UIEDUCATIONLISTVIEW_H

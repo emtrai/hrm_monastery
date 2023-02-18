@@ -31,16 +31,11 @@ class Department:public DbModel
 public:
      Department();
 
-    static DbModel *builder();
+    static DbModel *build();
      virtual QString modelName() const;
-
-    const QString &remark() const;
-    void setRemark(const QString &newRemark);
 
 protected:
      virtual DbModelHandler* getDbModelHandler();
-private:
-    QString mRemark;
 };
 
 #endif // DEPARTMENT_H

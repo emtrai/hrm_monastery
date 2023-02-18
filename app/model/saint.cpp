@@ -34,7 +34,9 @@
 
 DbModel *Saint::build()
 {
-    return new Saint();
+    Saint* model = new Saint();
+    model->init();
+    return model;
 }
 
 void Saint::init()
@@ -78,7 +80,6 @@ Saint::Saint(): DbModel()
 
 {
     mFeastDay = 0;
-    init();
 }
 
 ErrCode Saint::onImportItem(int importFileType, const QString &keyword, const QString &value, quint32 idx, void *tag)
@@ -161,25 +162,12 @@ void Saint::dump()
 #endif //DEBUG_TRACE
 }
 
-DbModel *Saint::builder()
-{
-    return new Saint();
-}
 
 DbModelHandler *Saint::getDbModelHandler()
 {
     return DbCtl::getInstance()->getDb()->getSaintModelHandler();
 }
 
-const QString &Saint::remark() const
-{
-    return mRemark;
-}
-
-void Saint::setRemark(const QString &newRemark)
-{
-    mRemark = newRemark;
-}
 
 const QString &Saint::originName() const
 {

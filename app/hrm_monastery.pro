@@ -191,6 +191,7 @@ SOURCES += \
     view/dialog/dlgcourse.cpp \
     view/dialog/dlgdepartment.cpp \
     view/dialog/dlgdeptmgr.cpp \
+    view/dialog/dlgeditmodel.cpp \
     view/dialog/dlgethnic.cpp \
     view/dialog/dlghtmlviewer.cpp \
     view/dialog/dlgimportcommunitylistresult.cpp \
@@ -374,6 +375,7 @@ HEADERS += \
     view/dialog/dlgcourse.h \
     view/dialog/dlgdepartment.h \
     view/dialog/dlgdeptmgr.h \
+    view/dialog/dlgeditmodel.h \
     view/dialog/dlgethnic.h \
     view/dialog/dlghtmlviewer.h \
     view/dialog/dlgimportcommunitylistresult.h \
@@ -420,6 +422,7 @@ FORMS += \
     view/dialog/dlgcourse.ui \
     view/dialog/dlgdepartment.ui \
     view/dialog/dlgdeptmgr.ui \
+    view/dialog/dlgeditmodel.ui \
     view/dialog/dlgethnic.ui \
     view/dialog/dlghtmlviewer.ui \
     view/dialog/dlgimportlistresult.ui \
@@ -452,6 +455,7 @@ DISTFILES += \
     res/Saints.csv \
     res/area_vi.csv \
     res/comm_dept_vi.json \
+    res/common_template.html \
     res/course_vi.csv \
     res/department_vi.json \
     res/edu_vi.csv \

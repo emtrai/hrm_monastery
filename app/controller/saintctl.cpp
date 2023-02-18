@@ -43,7 +43,7 @@ SaintCtl *SaintCtl::gInstance = nullptr;
 //    QList<Saint*> list;
 //    DbModelHandler* dbSaint = DbCtl::getDb()->getSaintModelHandler();
 //    if (dbSaint != nullptr){
-//        QList<DbModel*> lstModel = dbSaint->getAll(&Saint::builder);
+//        QList<DbModel*> lstModel = dbSaint->getAll(&Saint::build);
 //        if (!lstModel.empty()) {
 //            foreach (DbModel* item, lstModel){
 //                list.append((Saint*)item);
@@ -196,7 +196,7 @@ const char *SaintCtl::getPrebuiltFileType()
 QList<DbModel *> SaintCtl::getItemFromDb()
 {
     traced;
-    return DB->getModelHandler(KModelHdlSaint)->getAll(&Saint::builder);
+    return DB->getModelHandler(KModelHdlSaint)->getAll(&Saint::build);
 }
 
 DbModelHandler *SaintCtl::getModelHandler()

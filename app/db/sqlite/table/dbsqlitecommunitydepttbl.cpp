@@ -52,7 +52,7 @@ QList<DbModel *> DbSqliteCommunityDeptTbl::getListDepart(const QString &commUid,
     fields.insert(KFieldStatus, FieldValue(status));
     // TODO: check status???
     logd("Start search commUid %s", commUid.toStdString().c_str());
-    ret = search(fields, true, nullptr, &CommunityDept::builder, &olist, true);
+    ret = search(fields, true, nullptr, &CommunityDept::build, &olist, true);
     logd("ret=%d", ret);
     tracede;
     return olist;
@@ -73,7 +73,6 @@ ErrCode DbSqliteCommunityDeptTbl::insertTableField(DbSqliteInsertBuilder *builde
     builder->addValue(KFieldAddr, cmm->addr());
     builder->addValue(KFieldTel, cmm->tel());
     builder->addValue(KFieldEmail, cmm->email());
-    builder->addValue(KFieldRemark, cmm->remark());
     builder->addValue(KFieldStatus, cmm->status());
     builder->addValue(KFieldBrief, cmm->brief());
     tracede;
@@ -96,7 +95,6 @@ void DbSqliteCommunityDeptTbl::updateModelFromQuery(DbModel *item, const QSqlQue
     cmm->setTel(qry.value(KFieldTel).toString());
     cmm->setEmail(qry.value(KFieldEmail).toString());
     cmm->setStatus(qry.value(KFieldStatus).toInt());
-    cmm->setRemark(qry.value(KFieldRemark).toString());
     cmm->setBrief(qry.value(KFieldBrief).toString());
     tracede;
 }
@@ -120,7 +118,7 @@ QString DbSqliteCommunityDeptTbl::getSearchQueryStringWithTag(const QString &con
 
 DbModelBuilder DbSqliteCommunityDeptTbl::mainModelBuilder()
 {
-    return &CommunityDept::builder;
+    return &CommunityDept::build;
 }
 
 void DbSqliteCommunityDeptTbl::addTableField(DbSqliteTableBuilder *builder)
@@ -132,7 +130,6 @@ void DbSqliteCommunityDeptTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldCommunityDbId, INT64);
     builder->addField(KFieldDepartmentUid, TEXT);
     builder->addField(KFieldDepartmentDbId, INT64);
-    builder->addField(KFieldRemark, TEXT);
     builder->addField(KFieldCreateDate, INT64);
     builder->addField(KFieldEmail, TEXT);
     builder->addField(KFieldAddr, TEXT);

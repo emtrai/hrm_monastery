@@ -28,15 +28,11 @@ class Status : public DbModel
 {
 public:
     Status();
-    static DbModel *builder();
+    static DbModel *build();
 
-    const QString &remark() const;
-    void setRemark(const QString &newRemark);
 
 protected:
     virtual DbModelHandler *getDbModelHandler();
-private:
-    QString mRemark;
 };
 
 #endif // STATUS_H

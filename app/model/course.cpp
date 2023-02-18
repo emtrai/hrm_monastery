@@ -41,10 +41,12 @@ Course::~Course()
     traced;
 }
 
-DbModel *Course::builder()
+DbModel *Course::build()
 {
     traced;
-    return new Course();
+    Course* model = new Course();
+    model->init();
+    return model;
 
 }
 
@@ -63,15 +65,6 @@ void Course::setCourseType(qint32 newCourseType)
     mCourseType = newCourseType;
 }
 
-const QString &Course::remark() const
-{
-    return mRemark;
-}
-
-void Course::setRemark(const QString &newRemark)
-{
-    mRemark = newRemark;
-}
 
 const QString &Course::period() const
 {

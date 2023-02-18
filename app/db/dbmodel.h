@@ -179,6 +179,9 @@ public:
     virtual ErrCode getExportDataString(const QString& keyword, QString* data) const;
     const QString &nameId() const;
 
+    const QString &remark() const;
+    void setRemark(const QString &newRemark);
+
 protected:
     virtual DbModelHandler* getDbModelHandler() = 0;
     virtual ErrCode prepare2Save();
@@ -200,6 +203,7 @@ protected:
                      // TODO: this is newly add from Feb 12, let search and check whole
     QString mName;// TODO: support multi languate???
     QString mUid;
+    QString mRemark;
     QString mHistory; // History on DB
     qint32 mDbStatus;
     // TODO: time calculated from 1970 will be reset on 2038!!

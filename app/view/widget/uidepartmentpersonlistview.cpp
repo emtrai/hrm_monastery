@@ -131,6 +131,12 @@ ErrCode UIDepartmentPersonListView::onMenuActionView(QMenu *menu, UITableMenuAct
     return ErrNone;
 }
 
+DbModel *UIDepartmentPersonListView::onNewModel()
+{
+    // TODO: handle it
+    return nullptr;
+}
+
 
 ErrCode UIDepartmentPersonListView::onMenuActionListPerson(QMenu *menu, UITableMenuAction *act)
 {

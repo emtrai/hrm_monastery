@@ -85,9 +85,11 @@ void Country::dump()
 #endif //DEBUG_TRACE
 }
 
-DbModel *Country::builder()
+DbModel *Country::build()
 {
-    return new Country();
+    Country* model = new Country();
+    model->init();
+    return model;
 }
 
 const QString &Country::region() const

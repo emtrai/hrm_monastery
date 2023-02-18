@@ -40,11 +40,6 @@ UIEducationListView::~UIEducationListView()
     traced;
 }
 
-void UIEducationListView::onViewItem(UITableWidgetItem *item)
-{
-
-}
-
 Controller *UIEducationListView::getController()
 {
     return EDUCTL;
@@ -53,5 +48,10 @@ Controller *UIEducationListView::getController()
 QString UIEducationListView::getTitle()
 {
     return tr("Trình độ học vấn");
+}
+
+DbModel *UIEducationListView::onNewModel()
+{
+    return Education::build();
 }
 
