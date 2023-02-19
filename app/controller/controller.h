@@ -32,7 +32,9 @@ public:
     virtual QList<DbModel*> getItemFromDb();
 
     virtual ErrCode reloadDb();
+    virtual ErrCode getExportFileName(ExportType type, QString fnameNoExt, QString* fpath);
     virtual ErrCode exportToFile(DbModel* model, ExportType type, QString* fpath);
+    virtual ErrCode exportToFile(const QList<DbModel*>* listModel, ExportType type, QString* fpath);
     virtual ErrCode importFromFile(IImporter *importer, ImportType type, const QString& fpath, QList<DbModel*>*outList = nullptr);
     virtual ErrCode onImportItem(int importFileType, const QStringList& items, quint32 idx = 0, void* tag = nullptr);
     virtual ErrCode onImportItem(int importFileType, const QHash<QString, QString>& items, quint32 idx = 0, void* tag = nullptr);
@@ -58,6 +60,8 @@ public:
     virtual ErrCode markModelDelete(DbModel* model);
     virtual ErrCode deleteModel(DbModel* model);
 
+
+    virtual const QString exportTemplatePath(Exporter* exporter) const;
 protected:
     virtual DbModel *buildModel(void* items, const QString& fmt);
 

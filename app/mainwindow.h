@@ -54,6 +54,7 @@ enum AppState {
 class Person;
 class DlgWait;
 class Community;
+class Controller;
 
     class MainWindow : public QMainWindow, public LoaderListener
 {
@@ -71,6 +72,10 @@ class Community;
             static void showOnHtmlViewer(DbModel* model, const QString& subject);
             static void showAddEditCommonModel(bool isSelfUpdate = true, DbModel* model = nullptr,
                                              CommonEditModelListener* listener = nullptr);
+            ErrCode exportListItems(const QList<DbModel*>* items, Controller* controller,
+                                    const QString& title = nullptr,
+                                    quint64 exportTypeList = 0 // List of supported export type, bitwise
+                                    );
         protected:
      void showEvent(QShowEvent *ev);
  public:
@@ -97,6 +102,8 @@ class Community;
      void doShowImportCommunity();
      void doShowAddEditCommonModel(bool isSelfUpdate = true, DbModel* model = nullptr,
                                         CommonEditModelListener* listener = nullptr);
+     ErrCode doExportListItems(const QList<DbModel*>* items, Controller* controller,
+                               const QString& title = nullptr, quint64 exportTypeList = 0);
  private:
      void loadHomePageFile();
      void loadOtherMenu();

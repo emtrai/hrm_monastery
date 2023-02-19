@@ -27,6 +27,16 @@ DEFINES += VER_PATCH=1
 # TODO: check to support person province info
 DEFINES += SKIP_PERSON_PROVINE
 
+
+
+
+# QXlsx code for Application Qt project
+QXLSX_PARENTPATH=QXlsx/QXlsx/         # current QXlsx path is . (. means curret directory)
+QXLSX_HEADERPATH=QXlsx/QXlsx/header/  # current QXlsx header path is ./header/
+QXLSX_SOURCEPATH=QXlsx/QXlsx/source/  # current QXlsx source path is ./source/
+include(QXlsx/QXlsx/QXlsx.pri)
+
+
 INCLUDEPATH += $$PWD/db
 INCLUDEPATH += $$PWD/db/sqlite
 INCLUDEPATH += $$PWD/db/sqlite/handler
@@ -138,6 +148,7 @@ SOURCES += \
     export/exportfactory.cpp \
     export/exporthtml.cpp \
     export/exporttype.cpp \
+    export/exportxlsx.cpp \
     export/iexporter.cpp \
     file/filectl.cpp \
     filter.cpp \
@@ -195,6 +206,7 @@ SOURCES += \
     view/dialog/dlgethnic.cpp \
     view/dialog/dlghtmlviewer.cpp \
     view/dialog/dlgimportcommunitylistresult.cpp \
+    view/dialog/dlgimportexportselect.cpp \
     view/dialog/dlgimportlistresult.cpp \
     view/dialog/dlgimportpersonlistresult.cpp \
     view/dialog/dlgperson.cpp \
@@ -322,6 +334,7 @@ HEADERS += \
     export/exportfactory.h \
     export/exporthtml.h \
     export/exporttype.h \
+    export/exportxlsx.h \
     export/iexporter.h \
     file/filectl.h \
     filter.h \
@@ -379,6 +392,7 @@ HEADERS += \
     view/dialog/dlgethnic.h \
     view/dialog/dlghtmlviewer.h \
     view/dialog/dlgimportcommunitylistresult.h \
+    view/dialog/dlgimportexportselect.h \
     view/dialog/dlgimportlistresult.h \
     view/dialog/dlgimportpersonlistresult.h \
     view/dialog/dlgperson.h \
@@ -425,6 +439,7 @@ FORMS += \
     view/dialog/dlgeditmodel.ui \
     view/dialog/dlgethnic.ui \
     view/dialog/dlghtmlviewer.ui \
+    view/dialog/dlgimportexportselect.ui \
     view/dialog/dlgimportlistresult.ui \
     view/dialog/dlgperson.ui \
     view/dialog/dlgprovince.ui \

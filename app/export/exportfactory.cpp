@@ -25,6 +25,7 @@
 #include "utils.h"
 #include "exporthtml.h"
 #include "exportcsvlist.h"
+#include "exportxlsx.h"
 
 ExportFactory::ExportFactory()
 {
@@ -42,6 +43,9 @@ Exporter *ExportFactory::getExporter(ExportType type)
         break;
     case EXPORT_CSV_LIST:
         ret = INSTANCE(ExportCSVList);
+        break;
+    case EXPORT_XLSX:
+        ret = INSTANCE(ExportXlsx);
         break;
     default:
         loge("Export type %d not support", type);
@@ -83,3 +87,4 @@ ErrCode ExportFactory::exportTo(const IExporter* item, QList<DbModel*> data, con
     }
     return ret;
 }
+

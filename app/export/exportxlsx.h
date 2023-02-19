@@ -14,26 +14,25 @@
  * limitations under the License.
  *
  *
- * Filename: exporttype.h
+ * Filename: exportxlsx.h
  * Author: Anh, Ngo Huy
- * Created date:1/27/2023
+ * Created date:2/19/2023
  * Brief:
  */
-#ifndef EXPORTTYPE_H
-#define EXPORTTYPE_H
-#include "errcode.h"
+#ifndef EXPORTXLSX_H
+#define EXPORTXLSX_H
 
-// TODO: should we separate into Export format (csv, xlsx, etc.) and export type (list, item, etc.)?
-enum ExportType {
-    EXPORT_NONE         = 0,
-    EXPORT_HTML         = (1 << 0),
-    EXPORT_CSV          = (1 << 1),
-    EXPORT_CSV_LIST     = (1 << 2),
-    EXPORT_DOCX         = (1 << 3),
-    EXPORT_XLSX         = (1 << 4),
-    EXPORT_MAX
+#include "exporter.h"
+#include "utils.h"
+
+class ExportXlsx : public Exporter
+{
+    GET_INSTANCE_DECL(ExportXlsx)
+public:
+    ExportXlsx();
+    virtual ErrCode saveTo(const IExporter* item, const QString& fpath);
+    virtual ErrCode saveTo(const IExporter* exporter, const QList<DbModel*> data, const QString &fpath);
+    virtual ExportType getExportType();
 };
 
-ErrCode getExportTypeName(uint32_t exportTypes, QHash<int, QString>& exportTypeName);
-QString typeToExt(ExportType type, bool* isOk);
-#endif // EXPORTTYPE_H
+#endif // EXPORTXLSX_H

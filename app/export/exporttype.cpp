@@ -41,7 +41,7 @@ static void getListExportTypeName(QHash<int, QString>* list)
 
         initialized = true;
     }
-    list = &s_ExportTypeName;
+    *list = s_ExportTypeName;
     tracede;
 }
 
@@ -54,6 +54,7 @@ ErrCode getExportTypeName(uint32_t exportTypes, QHash<int, QString>& exportTypeN
     logd("exportTypes 0x%x", exportTypes);
     if (exportTypes) {
         foreach (int type, list.keys()) {
+            logd("type 0x%x", type);
             if (type & exportTypes) {
                 QString name = list.value(type);
                 logd("found type 0x%x=%s", type, STR2CHA(name));
@@ -66,4 +67,37 @@ ErrCode getExportTypeName(uint32_t exportTypes, QHash<int, QString>& exportTypeN
     logd("exportTypeName cnt %d", exportTypeName.count());
     tracedr(err);
     return err;
+}
+
+
+QString typeToExt(ExportType type, bool *isOk)
+{
+    static bool initialized = false;
+    static QHash<int, QString> s_type2String;
+    QString extName;
+    traced;
+    logd("initialized = %d", initialized);
+    if (!initialized) {
+        logd("not init s_type2String, init it");
+
+        s_type2String.insert(EXPORT_HTML, QObject::tr("html"));
+        s_type2String.insert(EXPORT_CSV, QObject::tr("csv"));
+        s_type2String.insert(EXPORT_CSV_LIST, QObject::tr("csv"));
+        s_type2String.insert(EXPORT_DOCX, QObject::tr("docx"));
+        s_type2String.insert(EXPORT_XLSX, QObject::tr("xlsx"));
+
+        initialized = true;
+    }
+    logd("type %d", type);
+    if (s_type2String.contains(type)) {
+        extName = s_type2String.value(type);
+        if (isOk) *isOk = true;
+
+        logd("extName %s", STR2CHA(extName));
+    } else {
+        if (isOk) *isOk = false;
+        loge("Unknown export type: %d", type);
+    }
+    tracede;
+    return extName;
 }

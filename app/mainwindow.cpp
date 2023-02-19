@@ -45,6 +45,9 @@
 #include "dlgwait.h"
 #include "dialog/dlgcommunity.h"
 #include "view/widget/uitableviewfactory.h"
+#include "controller.h"
+#include "personctl.h"
+#include "dlgimportexportselect.h"
 
 #define ADD_MENU_ITEM(menu, func, name, iconPath) \
 do { \
@@ -204,6 +207,17 @@ void MainWindow::showAddEditCommonModel(bool isSelfUpdate, DbModel *model, Commo
     getInstance()->doShowAddEditCommonModel(isSelfUpdate, model, listener);
     tracede;
 
+}
+
+ErrCode MainWindow::exportListItems(const QList<DbModel *>* items,
+                                    Controller* controller,
+                                    const QString& title, quint64 exportTypeList)
+{
+    traced;
+    ErrCode err = ErrNone;
+    err = getInstance()->doExportListItems(items, controller, title, exportTypeList);
+    tracedr(err);
+    return err;
 }
 
 void MainWindow::switchView(ViewType type)
@@ -370,6 +384,31 @@ void MainWindow::doShowAddEditCommonModel(bool isSelfUpdate, DbModel *model, Com
     dlg->exec();
     delete dlg;
     tracede;
+}
+
+ErrCode MainWindow::doExportListItems(const QList<DbModel *> *items, Controller *controller,
+                                      const QString& title, quint64 exportTypeList)
+{
+    traced;
+    ErrCode err = ErrNone;
+    QString fpath;
+    ExportType type;
+    DlgImportExportSelect* dlg = new DlgImportExportSelect(this);
+    dlg->setImportExport(true, title);
+    dlg->setExportTypes(exportTypeList);
+    dlg->exec();
+    fpath = dlg->path();
+    type = dlg->selectedExportType();
+    if (type && !fpath.isEmpty()) {
+        // TODO: show dialog???
+        // TODO: should get export type list basing on controller???
+        err = controller->exportToFile(items, type, &fpath);
+    } else {
+        loge("Not selected type nor fpath");
+    }
+    delete dlg;
+    tracedr(err);
+    return err;
 }
 
 
@@ -818,7 +857,9 @@ void MainWindow::on_actionDept_triggered()
 void MainWindow::on_action_ExportPersonList_triggered()
 {
     traced;
-    UNDER_DEV(tr("Xuất danh sách nữ tu ra tập tin"));
+    QList<DbModel*> list;
+//    UNDER_DEV(tr("Xuất danh sách nữ tu ra tập tin"));
+    doExportListItems(&list, PERSONCTL, "Danh sách nữ tu", ExportType::EXPORT_XLSX | ExportType::EXPORT_CSV_LIST);
 }
 
 

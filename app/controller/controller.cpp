@@ -68,15 +68,78 @@ ErrCode Controller::reloadDb()
     return ErrNone;
 }
 
+ErrCode Controller::getExportFileName(ExportType type, QString fnameNoExt, QString *fpath)
+{
+    traced;
+    ErrCode ret = ErrNone;
+    QString ext;
+    QString fname;
+    bool isExtOk = false;
+    if (!fpath) {
+        ret = ErrInvalidArg;
+        loge("invalid arg");
+    }
+    if (ret == ErrNone) {
+        ext = typeToExt(type, &isExtOk);
+        if (!isExtOk) {
+            ret = ErrInvalidArg;
+            loge("invalid export type %d", type);
+        }
+    }
+    if (ret == ErrNone) {
+        fname = QString("%1.%2").arg(fnameNoExt, ext);
+        if (fpath && fpath->isEmpty()) {
+            *fpath = FileCtl::getTmpDataDir(fname);
+        }
+    }
+    tracedr(ret);
+    return ret;
+}
+
 ErrCode Controller::exportToFile(DbModel *model, ExportType type, QString *fpath)
 {
     traced;
     ErrCode ret = ErrNone;
-    QString fname = QString("%1.html").arg(model->uid());
-    *fpath = FileCtl::getTmpDataDir(fname);
-    ret = ExportFactory::exportTo(model->getExporter(),
-                                  *fpath, type);
+    QString ext;
+    QString fname;
+    bool isExtOk = false;
+    if (!model) {
+        ret = ErrInvalidArg;
+        loge("export to file failed, invalid arg");
+    }
+    if (ret == ErrNone) {
+        ret = getExportFileName(type, model->uid(), fpath);
+    }
+    if (ret == ErrNone) {
+        ret = ExportFactory::exportTo(model->getExporter(),
+                                      *fpath, type);
+    }
     // TODO: DbModel also has this function, redundant?????
+    tracedr(ret);
+    return ret;
+}
+
+ErrCode Controller::exportToFile(const QList<DbModel *>* listModel, ExportType type, QString *fpath)
+{
+    traced;
+    ErrCode ret = ErrNone;
+    QString ext;
+    QString fname;
+    bool isExtOk = false;
+    if (!listModel) {
+        ret = ErrInvalidArg;
+        loge("export to file failed, invalid arg");
+    }
+    if (ret == ErrNone) {
+        ret = getExportFileName(type, getName(), fpath);
+    }
+    if (ret == ErrNone) {
+        logd("export file path %s", STR2CHA((*fpath)));
+        ret = ExportFactory::exportTo(this, *listModel,
+                                      *fpath, type);
+    }
+    // TODO: DbModel also has this function, redundant?????
+    tracedr(ret);
     return ret;
 }
 
@@ -354,6 +417,12 @@ ErrCode Controller::deleteModel(DbModel *model)
     ASSERT(false, "Derived class must implement deleteModel");
     return ErrNotImpl;
 
+}
+
+const QString Controller::exportTemplatePath(Exporter *exporter) const
+{
+    // TODO: implemen this and any other export function
+    return QString();
 }
 DbModel *Controller::buildModel(void *items, const QString &fmt)
 {
