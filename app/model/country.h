@@ -30,7 +30,7 @@
 #include <QStringList>
 class Province;
 
-class Country: public QObject, public DbModel
+class Country: public DbModel
 {
 public:
     Country();

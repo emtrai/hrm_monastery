@@ -43,6 +43,8 @@ public:
      * virtual const char* getPrebuiltFileType();
      * virtual QList<DbModel*> getItemFromDb();
      */
+
+    virtual quint64 getExportTypeList();
 protected:
     CommonCtl();
     CommonCtl(const QString& name);
@@ -54,6 +56,16 @@ protected:
     virtual QList<DbModel*> getItemFromDb();
 
     virtual void clearItemList(QList<DbModel*>* list);
+
+    /**
+     * @brief Parse template file in json to get export info, including item name + header
+     *        Currently, just make it simple
+     * @param fpath: path to template file
+     * @param ftype: File type, like json, csv, etc.
+     * @return
+     */
+    virtual ErrCode getListExportKeywords(Exporter* exporter,
+                                         QHash<QString, QString>& outMap) const;
 
 protected:
 

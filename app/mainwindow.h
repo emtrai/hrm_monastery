@@ -177,6 +177,7 @@ class Controller;
      void on_actionDept_triggered();
 
      void on_action_ExportPersonList_triggered();
+     void on_action_ExportCommunityList_triggered();
 
      void on_action_About_triggered();
 

@@ -38,7 +38,6 @@
 #include <functional>
 #include <iostream>
 
-class Church;
 class Education;
 class Work;
 class Person;

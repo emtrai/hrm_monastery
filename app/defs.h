@@ -66,6 +66,7 @@ const char* const KPrebuiltStatusCSVFileName = "status";
 const char* const KPrebuiltEventCSVFileName = "event";
 const char* const KPrebuiltRoleCSVFileName = "role";
 const char* const KPrebuiltCommonTemplateFileName = "common_template";
+const char* const KPrebuiltCommunityExportTemplateName = "community_export_template";
 
 const char* const KModelHdlCountry = "country";
 const char* const KModelHdlEdu = "education";
@@ -201,6 +202,7 @@ const char* const KItemEstablishDate = "NGAY_THANH_LAP";
 const char* const KItemIntro = "GIOI_THIEU";
 const char* const KItemCEOCode = "MA_TONG_PHU_TRACH";
 const char* const KItemNameId = "TEN_DINH_DANH";
+const char* const KItemMission = "SU_VU";
 
 
 // Special item name
@@ -218,6 +220,7 @@ const char* const KCsvItemBirthPlace = "NOI_SINH";
 const char* const KCsvItemHollyName = "TEN_THANH";
 
 const char* const JSON_COMMUNITYLIST = "communities";
+const char* const JSON_ITEMS = "items";
 const char* const JSON_DEPARTMENTS = "departments";
 const char* const JSON_ID = "id";
 const char* const JSON_NAME_ID = "nameid";

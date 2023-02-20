@@ -1,0 +1,40 @@
+{ "items":
+    [
+        {
+        "id":"TEN_DINH_DANH",
+        "name":"Tên Định Danh"
+        },
+        {
+        "id":"TEN",
+        "name":"Tên"
+        },
+        {
+        "id":"MA_TONG_PHU_TRACH",
+        "name":"Chị Tổng Phụ Trách"
+        },
+        {
+        "id":"NGAY_THANH_LAP",
+        "name":"Ngày thành lập"
+        },
+        {
+        "id":"SU_VU",
+        "name":"Sứ vụ"
+        },
+        {
+        "id":"DIA_CHI",
+        "name":"Địa chỉ"
+        },
+        {
+        "id":"GIAO_XU",
+        "name":"Giáo xứ"
+        },
+        {
+        "id":"EMAIL",
+        "name":"Email"
+        },
+        {
+        "id":"DIEN_THOAI",
+        "name":"Điện thoại"
+        }
+    ]
+}

@@ -40,6 +40,8 @@ public:
     virtual ErrCode saveTo(const IExporter* exporter, const QString& fpath);
     virtual ErrCode saveTo(const IExporter* exporter, const QList<DbModel*> data, const QString& fpath);
     virtual ExportType getExportType() = 0;
+
+
 };
 
 #endif // EXPORTER_H

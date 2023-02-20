@@ -129,6 +129,26 @@ Community* CommunityCtl::parseOneItem(const QJsonObject& jobj)
     return ret;
 
 }
+
+const QString CommunityCtl::exportTemplatePath(Exporter *exporter) const
+{
+    traced;
+    if (exporter) {
+        switch (exporter->getExportType()) {
+        case EXPORT_CSV_LIST:
+        case EXPORT_XLSX:
+            return FileCtl::getPrebuiltDataFilePath(KPrebuiltCommunityExportTemplateName);
+        };
+    }
+
+    return QString();
+}
+
+ErrCode CommunityCtl::getExportDataString(const QString &keyword, const DbModel *data, QString *exportData) const
+{
+    traced;
+    return data->getExportDataString(keyword, exportData);
+}
 ErrCode CommunityCtl::parsePrebuiltFile(const QString &fpath, const QString &ftype)
 {
     ErrCode ret = ErrNone;

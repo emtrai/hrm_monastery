@@ -37,6 +37,10 @@ public:
     virtual const QStringList getListExportKeyWord() const;
     virtual ErrCode getExportDataString(const QString& keyword, QString* data) const;
     virtual ErrCode getExportDataString(const QString& keyword, const DbModel* data, QString* exportData) const;
+
+    virtual quint64 getExportTypeList();
+    virtual ErrCode getListExportKeywords(Exporter* exporter,
+                                        QHash<QString, QString>& outMap) const;
 };
 
 #endif // IEXPORTER_H

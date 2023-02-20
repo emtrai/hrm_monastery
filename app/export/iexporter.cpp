@@ -56,3 +56,16 @@ ErrCode IExporter::getExportDataString(const QString &keyword, const DbModel *da
     ASSERT(false, "CAN NOT GET EXPORT DATA HERE, MUST BE IMPLEMENTED BY DERIVED CLASS");
     return ErrNotSupport;
 }
+
+quint64 IExporter::getExportTypeList()
+{
+    loge("get eport type list from base class, SHOULD be implemented in derived class");
+    return ExportType::EXPORT_NONE;
+}
+
+ErrCode IExporter::getListExportKeywords(Exporter *exporter, QHash<QString, QString> &outMap) const
+{
+    traced;
+    loge("MUST BE IMPLEMENTED IN DERIVED CLASS OF IExporter");
+    return ErrNotImpl;
+}

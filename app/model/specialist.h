@@ -25,9 +25,8 @@
 #include <QObject>
 #include "dbmodel.h"
 
-class Specialist : public QObject, public DbModel
+class Specialist : public DbModel
 {
-    Q_OBJECT
         public:
             explicit Specialist(QObject *parent = nullptr);
         public:

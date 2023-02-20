@@ -258,6 +258,11 @@ ErrCode PersonCtl::exportListPersonInCommunity(const QString &communityUid, Expo
     return err;
 }
 
+quint64 PersonCtl::getExportTypeList()
+{
+    return ExportType::EXPORT_CSV_LIST | ExportType::EXPORT_XLSX;
+}
+
 PersonCtl::PersonCtl():
     Controller(KModelHdlPerson),
     mModelHdl(nullptr)

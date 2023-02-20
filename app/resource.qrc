@@ -22,6 +22,7 @@
         <file alias="person_list_export_template">res/person_list_export_template.csv</file>
         <file alias="comm_dept_vi">res/comm_dept_vi.json</file>
         <file alias="common_template">res/common_template.html</file>
+        <file alias="community_export_template">res/community_export_template_vi.json</file>
     </qresource>
     <qresource prefix="/template"/>
 </RCC>

@@ -640,6 +640,11 @@ void MainWindow::loadExportMenu()
                   on_action_ExportPersonList_triggered,
                   "Danh sách Nữ tu",
                   ICON_PATH("icons8-nun-64.png"));
+    ADD_MENU_ITEM(exportMenu,
+                  on_action_ExportCommunityList_triggered,
+                  "Danh sách cộng đoàn",
+                  ICON_PATH("icons8-community-64.png"));
+
 
     tracede;
 
@@ -860,6 +865,14 @@ void MainWindow::on_action_ExportPersonList_triggered()
     QList<DbModel*> list;
 //    UNDER_DEV(tr("Xuất danh sách nữ tu ra tập tin"));
     doExportListItems(&list, PERSONCTL, "Danh sách nữ tu", ExportType::EXPORT_XLSX | ExportType::EXPORT_CSV_LIST);
+}
+
+void MainWindow::on_action_ExportCommunityList_triggered()
+{
+    traced;
+    QList<DbModel*> list = COMMUNITYCTL->getItemFromDb();
+//    UNDER_DEV(tr("Xuất danh sách nữ tu ra tập tin"));
+    doExportListItems(&list, COMMUNITYCTL, "Danh sách cộng đoàn", ExportType::EXPORT_XLSX);
 }
 
 

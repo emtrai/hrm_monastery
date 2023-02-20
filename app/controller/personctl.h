@@ -63,6 +63,7 @@ public:
     virtual const QString exportTemplatePath(Exporter* exporter) const;
     virtual ErrCode getExportDataString(const QString& keyword, const DbModel* data, QString* exportData) const;
     ErrCode exportListPersonInCommunity(const QString& communityUid, ExportType exportType, const QString& fpath);
+    virtual quint64 getExportTypeList();
 private:
     PersonCtl();
 

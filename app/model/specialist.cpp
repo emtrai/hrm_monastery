@@ -28,7 +28,6 @@
 #include "defs.h"
 
 Specialist::Specialist(QObject *parent)
-    : QObject{parent}
 {
 
 }

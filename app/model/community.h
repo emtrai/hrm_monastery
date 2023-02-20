@@ -45,9 +45,8 @@ enum CommunityStatus {
     COMMUNITY_STATUS_MAX
 };
 
-class Community: public QObject, public DbModel
+class Community: public DbModel
 {
-    Q_OBJECT
 public:
     static DbModel *build();
 public:

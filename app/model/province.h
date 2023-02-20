@@ -33,7 +33,7 @@ enum ProvinceType{
     STATE
 };
 
-class Province: public QObject, public DbModel
+class Province: public DbModel
 {
 public:
     Province();

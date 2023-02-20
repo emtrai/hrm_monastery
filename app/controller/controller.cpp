@@ -424,6 +424,13 @@ const QString Controller::exportTemplatePath(Exporter *exporter) const
     // TODO: implemen this and any other export function
     return QString();
 }
+
+quint64 Controller::getExportTypeList()
+{
+    loge("get eport type list from base class, SHOULD be implemented in derived class");
+    return ExportType::EXPORT_NONE;
+}
+
 DbModel *Controller::buildModel(void *items, const QString &fmt)
 {
     traced;

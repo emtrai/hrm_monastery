@@ -72,6 +72,8 @@ public:
 protected:
     virtual ErrCode parsePrebuiltFile(const QString &fpath, const QString &ftype);
     virtual Community* parseOneItem(const QJsonObject& jobj);
+    virtual const QString exportTemplatePath(Exporter* exporter) const;
+    virtual ErrCode getExportDataString(const QString& keyword, const DbModel* data, QString* exportData) const;
 
 private:
     static CommunityCtl* gInstance;

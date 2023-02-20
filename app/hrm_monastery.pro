@@ -163,7 +163,6 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     model/area.cpp \
-    model/church.cpp \
     model/community.cpp \
     model/communitydept.cpp \
     model/country.cpp \
@@ -348,7 +347,6 @@ HEADERS += \
     logger.h \
     mainwindow.h \
     model/area.h \
-    model/church.h \
     model/community.h \
     model/communitydept.h \
     model/country.h \
@@ -471,6 +469,7 @@ DISTFILES += \
     res/area_vi.csv \
     res/comm_dept_vi.json \
     res/common_template.html \
+    res/community_export_template_vi.json \
     res/course_vi.csv \
     res/department_vi.json \
     res/edu_vi.csv \
