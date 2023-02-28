@@ -25,7 +25,14 @@
 
 DbSqliteModelHandler::DbSqliteModelHandler()
 {
+    traced;
+}
 
+DbSqliteModelHandler::DbSqliteModelHandler(const QString &name)
+    :DbSqliteModelHandler()
+{
+    traced;
+    mName = name;
 }
 
 ErrCode DbSqliteModelHandler::add(DbModel *model)
@@ -139,16 +146,17 @@ bool DbSqliteModelHandler::exist(const DbModel *edu)
     return getMainTbl()->isExist(edu);;
 }
 
-QList<DbModel *> DbSqliteModelHandler::getAll(DbModelBuilder builder, const char* modelName)
+QList<DbModel *> DbSqliteModelHandler::getAll(DbModelBuilder builder, qint64 status,
+                                              const char* modelName, int from, int noItems, int* total)
 {
     traced;
-    return getMainTbl()->getAll(builder);
+    return getMainTbl()->getAll(builder, status, from, noItems, total);
 }
 
-QHash<QString, DbModel *> DbSqliteModelHandler::getAllInDict(DbModelBuilder builder, const char *modelName)
+QHash<QString, DbModel *> DbSqliteModelHandler::getAllInDict(DbModelBuilder builder, qint64 status, const char *modelName)
 {
     traced;
-    QList<DbModel *> list = getAll(builder, modelName);
+    QList<DbModel *> list = getAll(builder, status, modelName);
     QHash<QString, DbModel *> map;
     logd("found %lld item", list.count());
     foreach (DbModel* item, list) {
@@ -216,9 +224,20 @@ DbModel *DbSqliteModelHandler::getByUid(const QString &uid)
     return model;
 }
 
+DbModel *DbSqliteModelHandler::getByNameId(const QString &nameId, const DbModelBuilder &builder)
+{
+    traced;
+    DbSqliteTbl* tbl = getMainTbl();
+    // assume main tbl is not null, if not programming error,
+    // and require override search function
+    Q_ASSERT(tbl != nullptr);
+    return tbl->getByNameId(nameId, builder);
+}
+
+
 const QString DbSqliteModelHandler::getName()
 {
-    return "sqlite";
+    return mName;
 }
 
 int DbSqliteModelHandler::search(const QString& keyword, QList<DbModel*>* outList)
@@ -256,7 +275,7 @@ DbSqliteTbl *DbSqliteModelHandler::getTable(const QString& modelName)
     return getMainTbl();
 }
 
-DbModelBuilder *DbSqliteModelHandler::getBuilder(const QString &modelName)
+DbModelBuilder DbSqliteModelHandler::getBuilder(const QString &modelName)
 {
     loge("DEFAULT getBuilder, should not be called");
     return nullptr;
@@ -264,7 +283,6 @@ DbModelBuilder *DbSqliteModelHandler::getBuilder(const QString &modelName)
 
 DbModelBuilder DbSqliteModelHandler::getMainBuilder()
 {
-
-    loge("DEFAULT getMainBuilder, should not be called");
-    return nullptr;
+    return getBuilder();
 }
+

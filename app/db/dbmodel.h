@@ -55,22 +55,27 @@ class IExporter;
 typedef DbModel*(*DbModelBuilder)(void);
 enum DB_RECORD_STATUS {
     DB_RECORD_NOT_READY = 0, // record not ready
-    DB_RECORD_ACTIVE, // record ready to use
-    DB_RECORD_DElETED, // record already deleted (soft delete)
-    DB_RECORD_MAX
+    DB_RECORD_ACTIVE    = (1 << 1), // record ready to use
+    DB_RECORD_DElETED   = (1 << 2), // record already deleted (soft delete)
+    DB_RECORD_ALL = DB_RECORD_ACTIVE | DB_RECORD_DElETED
 };
+
+typedef std::shared_ptr<DbModel> DbModel_sp;
 
 class DbModel: public IImporter, public IExporter
 {
-public:
+protected:
     DbModel();
     DbModel(const DbModel& model);
     DbModel(const DbModel* model);
+public:
     virtual ~DbModel();
     virtual void init();
+    virtual DbModelBuilder getBuilder() = 0;
     // TODO: override operation ==?
 
-    virtual void clone(const DbModel* per);
+    virtual void clone(const DbModel* model);
+    virtual DbModel* clone();
 
     virtual QString modelName() const;
     virtual int modelType() const;

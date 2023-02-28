@@ -38,20 +38,35 @@
 #include "exporttype.h"
 
 
-QList<DbModel *> CommonCtl::getItemFromDb()
+QList<DbModel *> CommonCtl::getAllItemsFromDb(qint64 status, int from, int noItems, int* total)
 {
     traced;
-    return QList<DbModel *>();
+    DbModelHandler* hdl = getModelHandler();
+    QList<DbModel *> list;
+    if (hdl) {
+        list = hdl->getAll(getMainBuilder(), status, nullptr, from, noItems, total);
+    } else {
+        loge("not found default handler");
+    }
+    logd("item counter = %d", list.size());
+    return list;
 }
 
 
-void CommonCtl::clearItemList(QList<DbModel *> *list)
+void CommonCtl::clearCacheItemList()
 {
     traced;
-    if (list != nullptr) {
-        list->clear(); // TODO: clear each item???
+    logd("clear %ld item in cache", mCacheItemList.size());
+    foreach(DbModel* item, mCacheItemList) {
+        delete item;
     }
+    mCacheItemList.clear();
     tracede;
+}
+
+const char *CommonCtl::getPrebuiltFileType()
+{
+    return KFileTypeCSV;
 }
 
 ErrCode CommonCtl::getListExportKeywords(Exporter* exporter,
@@ -119,29 +134,31 @@ ErrCode CommonCtl::loadFromFile(const QString &path)
 }
 
 
-ErrCode CommonCtl::loadFromDb()
+ErrCode CommonCtl::reloadDb()
 {
     traced;
     ErrCode err = ErrNone;
-    clearItemList(&mItemList);
-    mItemList = getItemFromDb();
-    foreach (DbModel* model, mItemList){
-        model->dump();
-    }
-    logd("load %d item from db", mItemList.count());
     tracedr(err);
     return err;
 }
 
 
-const QList<DbModel *> CommonCtl::getAllItems(bool reload)
+QList<DbModel*> CommonCtl::getAllItems(bool reload, int from, int noItems, int* total)
 {
     traced;
     logd("reload %d", reload);
-    if (reload) {
-        loadFromDb();
+    if (reload || mCacheItemList.empty()) {
+        logd("reload from db");
+        clearCacheItemList();
+        QList<DbModel*> items = getAllItemsFromDb(DB_RECORD_ACTIVE, from, noItems, total);
+        mCacheItemList = items;
     }
-    return mItemList;
+    QList<DbModel*> list;
+    foreach (DbModel* item, mCacheItemList) {
+        list.append(item->clone());
+    }
+    tracede;
+    return list;
 }
 
 quint64 CommonCtl::getExportTypeList()
@@ -157,4 +174,85 @@ CommonCtl::CommonCtl()
 CommonCtl::CommonCtl(const QString &name):Controller(name)
 {
     traced;
+}
+
+//DbModelBuilder CommonCtl::getMainBuilder()
+//{
+//    FAIL("DEFAULT getMainBuilder, should not be called");
+//    return nullptr;
+//}
+
+DbModel *CommonCtl::buildModel(void *items, const QString &fmt)
+{
+    traced;
+    ErrCode err = ErrNone;
+    DbModel* item = nullptr;
+    QStringList* itemList = nullptr;
+    qint32 noItem = 0;
+    qint32 idx = 0;
+    QString nameId;
+    QString name;
+    QString remark;
+    if (!items) {
+        err = ErrInvalidArg;
+        loge("invalid arg");
+    }
+
+    if (err == ErrNone && fmt != KDataFormatStringList) {
+        err = ErrNotSupport;
+        loge("invalid data format '%s", STR2CHA(fmt));
+    } else {
+        itemList = (QStringList*) items;
+        noItem = itemList->length();
+        logd("noItem %d", noItem);
+    }
+
+    if (err == ErrNone && (noItem < 2)) { // require name id, name
+        err = ErrShortData;
+        loge("Not enouth field, %d < 3", noItem);
+    }
+
+    if (err == ErrNone) {
+        nameId = itemList->at(idx++);
+        name = itemList->at(idx++);
+        if (noItem > idx) {
+            remark = itemList->mid(idx).join(DEFAULT_CSV_ITEM_SPLIT);
+        }
+
+        logd("nameId '%s'", STR2CHA(nameId));
+        logd("name '%s'", STR2CHA(name));
+        if (nameId.isEmpty() || name.isEmpty()) {
+            err = ErrInvalidData;
+            loge("data is invalid, nameid/countrynameid or name is empty");
+        }
+    }
+    if (err == ErrNone) {
+        DbModelBuilder builder = getMainBuilder();
+        if (builder) {
+            item = builder();
+            if (!item) {
+                loge("No memory");
+                err = ErrNoMemory;
+            }
+        } else {
+            loge("No main builder");
+            err = ErrNotAvail;
+        }
+    }
+
+    if (err == ErrNone) {
+        item->setNameId(nameId);
+        item->setName(name);
+        if (!remark.isEmpty()) {
+            item->setRemark(remark);
+        }
+    } else {
+        loge("failed to import/build model, err=%d", err);
+        if (item) {
+            delete item;
+            item = nullptr;
+        }
+    }
+    tracede;
+    return item;
 }

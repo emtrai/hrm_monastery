@@ -94,7 +94,7 @@ ErrCode PersonCtl::AddListPersons(const QString &fname)
 QList<DbModel *> PersonCtl::getAllPerson()
 {
     traced;
-    return modelHdl()->getAll(&Person::build, KModelNamePerson);
+    return modelHdl()->getAll(&Person::build, DB_RECORD_ACTIVE, KModelNamePerson);
 }
 
 QList<DbModel *> PersonCtl::getPersonInCommunity(const QString &communityUid)
@@ -110,7 +110,7 @@ QList<DbModel *> PersonCtl::getPersonInCommunity(const QString &communityUid)
 QList<DbModel *> PersonCtl::getListEvent(const Person* person)
 {
     traced;
-    return modelHdl()->getAll(&PersonEvent::build, KModelNamePersonEvent);
+    return modelHdl()->getAll(&PersonEvent::build, DB_RECORD_ACTIVE, KModelNamePersonEvent);
 }
 
 DbModel *PersonCtl::doImportOneItem(int importFileType, const QStringList &items, quint32 idx)

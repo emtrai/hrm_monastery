@@ -50,6 +50,11 @@ DbModel *Course::build()
 
 }
 
+DbModelBuilder Course::getBuilder()
+{
+    return &Course::build;
+}
+
 DbModelHandler *Course::getDbModelHandler()
 {
     return DB->getModelHandler(KModelHdlCourse);

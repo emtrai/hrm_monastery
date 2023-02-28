@@ -54,6 +54,11 @@ DbModel *PersonEvent::build()
     return model;
 }
 
+DbModelBuilder PersonEvent::getBuilder()
+{
+    return &PersonEvent::build;
+}
+
 QString PersonEvent::modelName() const
 {
     return KModelNamePersonEvent;

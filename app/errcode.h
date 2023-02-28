@@ -49,6 +49,7 @@ typedef enum ErrCode{
     ErrNoData,
     ErrNotImpl, // not implement
     ErrBuildDataFailed,
+    ErrShortData,
 
     ErrMax
     } ErrCode_t;

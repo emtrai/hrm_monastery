@@ -26,10 +26,10 @@
 #include "dbctl.h"
 #include "utils.h"
 
-ProvinceCtl* ProvinceCtl::gInstance = nullptr;
+GET_INSTANCE_IMPL(ProvinceCtl)
 
 ProvinceCtl::ProvinceCtl():
-    Controller(KModelHdlProvince)
+    CommonCtl(KModelHdlProvince)
 {
     traced;
 }
@@ -74,36 +74,24 @@ DbModel *ProvinceCtl::buildModel(void *items, const QString &fmt)
     return item;
 }
 
-ProvinceCtl *ProvinceCtl::getInstance()
+const char *ProvinceCtl::getPrebuiltFileName()
 {
-    if (gInstance == nullptr){
-        gInstance = new ProvinceCtl();
-    }
-    return gInstance;
+    return KPrebuiltProvinceCSVFileName;
 }
+
+
+DbModelBuilder ProvinceCtl::getMainBuilder()
+{
+    return &Province::build;
+}
+
 
 const QList<Province *> *ProvinceCtl::getProvinceList(const QString &country)
 {
     traced;
-    if (mProvinceList.contains(country))
-        return mProvinceList[country];
+    // TODO: implement it?
+//    if (mProvinceList.contains(country))
+//        return mProvinceList[country];
     return nullptr;
-}
-
-void ProvinceCtl::onLoad()
-{
-    traced;
-    ErrCode ret = ErrNone;
-    ret = check2UpdateDbFromPrebuiltFile(KPrebuiltProvinceCSVFileName, KFileTypeCSV);
-    // TODO: should do lazy load??? load all consume much memory
-    QList items = DB->getModelHandler(KModelHdlProvince)->getAll(&Province::build);
-    //    mItemList.append();
-    foreach (DbModel* model, items){
-        Province* province = (Province*)model;
-        if (!mProvinceList.contains(province->countryUid()))
-            mProvinceList[province->countryUid()] = new QList<Province*>();
-        mProvinceList[province->countryUid()]->append(province);
-    }
-    tracede;
 }
 

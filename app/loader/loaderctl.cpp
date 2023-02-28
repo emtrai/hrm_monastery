@@ -76,6 +76,7 @@ void LoaderCtl::registerAll()
 {
     traced;
     add2PreLoader(DbCtl::getInstance());
+    /* Beware, order is important*/
     add2Loader(Location::getInstance());
     add2Loader(SAINTCTL);
     add2Loader(EduCtl::getInstance());

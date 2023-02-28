@@ -241,6 +241,11 @@ DbModel* Person::build(){
     return item;
 }
 
+DbModelBuilder Person::getBuilder()
+{
+    return &Person::build;
+}
+
 void Person::initExportFields()
 {
     traced;

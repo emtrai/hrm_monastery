@@ -24,9 +24,9 @@
 
 #include <QDialog>
 #include <QAbstractButton>
+#include "dbmodel.h"
 
 class Community;
-class DbModel;
 
 namespace Ui {
 class DlgAddCommunityHistory;

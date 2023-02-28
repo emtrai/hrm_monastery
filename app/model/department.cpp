@@ -39,6 +39,11 @@ DbModel *Department::build()
     return model;
 }
 
+DbModelBuilder Department::getBuilder()
+{
+    return &Department::build;
+}
+
 QString Department::modelName() const
 {
     return KModelNameDepartment;

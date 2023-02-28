@@ -636,7 +636,7 @@ void DlgPerson::loadEdu()
 {
     traced;
     logd("Load Education");
-    QList<DbModel*> list = EduCtl::getInstance()->getItemFromDb();
+    QList<DbModel*> list = EduCtl::getInstance()->getAllItemsFromDb();
     ui->cbEdu->clear();
     foreach(DbModel* edu, list){
 
@@ -675,7 +675,7 @@ void DlgPerson::loadSpecialist()
         ui->wgSpecialist->layout()->addWidget(cbSpecialist);
     }
     cbSpecialist->clearAll();
-    QList<DbModel*> specialists = SPECIALISTCTL->getItemFromDb();
+    QList<DbModel*> specialists = SPECIALISTCTL->getAllItemsFromDb();
     foreach (DbModel* specialist, specialists) {
         //        logd(">> specialist %s", name.toStdString().c_str());
         cbSpecialist->addItem(specialist->name(), specialist->uid());
@@ -691,7 +691,7 @@ void DlgPerson::loadEthnic()
     // Someone may have US nationality, but Ethic is Kinh, as their original is VN
     logd("Reload course");
     ui->cbEthic->clear();
-    QList<DbModel*> list = ETHNIC->getItemFromDb();
+    QList<DbModel*> list = ETHNIC->getAllItemsFromDb();
     foreach(DbModel* item, list){
         ui->cbEthic->addItem(item->name(), item->uid()); // TODO: name include country?
     }
@@ -703,7 +703,7 @@ void DlgPerson::loadCountry()
     traced;
 
     logd("Load country");
-    QList<DbModel*> listCountry = COUNTRYCTL->getItemFromDb();
+    QList<DbModel*> listCountry = COUNTRYCTL->getAllItemsFromDb();
     ui->cbNationality->clear();
     ui->cbCountry->clear();
     foreach(DbModel* item, listCountry){
@@ -732,7 +732,7 @@ void DlgPerson::loadWork()
 {
     traced;
     ui->cbWork->clear();
-    QList<DbModel*> list = INSTANCE(WorkCtl)->getItemFromDb();
+    QList<DbModel*> list = INSTANCE(WorkCtl)->getAllItemsFromDb();
     ui->cbWork->addItem(tr("Không xác đinh"), KUidNone);
     foreach(DbModel* item, list){
         ui->cbWork->addItem(item->name(), item->uid());
@@ -829,8 +829,8 @@ void DlgPerson::loadStatus()
 {
     traced;
     ui->cbStatus->clear();
-    QList<Status*> listItems = INSTANCE(StatusCtl)->getStatusList();
-    foreach(Status* item, listItems){
+    QList<DbModel*> listItems = INSTANCE(StatusCtl)->getAllItemsFromDb(); // TODO: getAllItem??
+    foreach(DbModel* item, listItems){
         ui->cbStatus->addItem(item->name(), item->uid());
     }
 
@@ -841,8 +841,8 @@ void DlgPerson::loadCourse()
 {
     traced;
     ui->cbCourse->clear();
-    QList<Course*> listCourse = INSTANCE(CourseCtl)->getCourseList();
-    foreach(Course* item, listCourse){
+    QList<DbModel*> listCourse = COURSECTL->getAllItemsFromDb(); // TODO: should call getAllItem???
+    foreach(DbModel* item, listCourse){
         ui->cbCourse->addItem(item->name(), item->uid());
     }
 
@@ -923,7 +923,7 @@ void DlgPerson::on_btnEditNation_clicked()
         loge("Open dlg country fail, No memory");
         return;
     }
-
+    dlg->setIsSelfSave(true);
 
     if (dlg->exec() == QDialog::Accepted){
         loadCountry();
@@ -1074,6 +1074,7 @@ void DlgPerson::on_btnAddCountry_clicked()
         loge("Open dlg country fail, No memory");
         return;
     }
+    dlg->setIsSelfSave(true);
 
     if (dlg->exec() == QDialog::Accepted){
         loadCountry();

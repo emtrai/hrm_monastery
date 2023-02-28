@@ -41,6 +41,11 @@ DbModel *Province::build()
     return model;
 }
 
+DbModelBuilder Province::getBuilder()
+{
+    return &Province::build;
+}
+
 //QString Province::nameid() const
 //{
 //    QString hash;

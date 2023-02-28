@@ -53,11 +53,11 @@ DbModel *UIRoleListView::onNewModel()
 
 ErrCode UIRoleListView::onLoad()
 {
-    QList<Role*> items = ROLECTL->getList();
+    QList<DbModel*> items = ROLECTL->getAllItems();
     traced;
     mItemList.clear(); // TODO: clean up item data
     // TODO: loop to much, redundant, do something better?
-    foreach (Role* item, items) {
+    foreach (DbModel* item, items) {
         mItemList.append(dynamic_cast<DbModel*>(item));
     }
     return ErrNone;

@@ -33,10 +33,7 @@ EthnicCtl::EthnicCtl():CommonCtl(KModelHdlEthnic)
     traced;
 }
 
-QList<DbModel *> EthnicCtl::getItemFromDb()
-{
-    return getModelHandler()->getAll(&Ethnic::build);
-}
+
 // Format: country short name, name[, remark]
 DbModel *EthnicCtl::buildModel(void *items, const QString &fmt)
 {
@@ -68,9 +65,9 @@ const char *EthnicCtl::getPrebuiltFileType()
     return KFileTypeCSV;
 }
 
-DbModelHandler *EthnicCtl::getModelHandler()
+DbModelBuilder EthnicCtl::getMainBuilder()
 {
-    return DB->getModelHandler(KModelHdlEthnic);
+    return &Ethnic::build;
 }
 
 

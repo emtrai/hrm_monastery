@@ -37,6 +37,11 @@ DbModel *Event::build()
     return model;
 }
 
+DbModelBuilder Event::getBuilder()
+{
+    return &Event::build;
+}
+
 
 DbModelHandler *Event::getDbModelHandler()
 {

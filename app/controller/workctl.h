@@ -32,19 +32,15 @@ class Work;
 
 class WorkCtl : public CommonCtl
 {
-
     GET_INSTANCE_DECL(WorkCtl);
 public:
     WorkCtl();
     virtual ~WorkCtl();
 protected:
-    DbModel *buildModel(void *items, const QString &fmt);
-    virtual DbModelHandler* getModelHandler();
+    virtual DbModelBuilder getMainBuilder();
     virtual const char *getPrebuiltFileName();
-    virtual const char* getPrebuiltFileType();
 public:
     // COMMON FUNCTIONS
-    virtual QList<DbModel*> getItemFromDb();
 };
 
 #endif // WORKCTL_H

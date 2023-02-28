@@ -29,7 +29,7 @@
 
 GET_INSTANCE_IMPL(CourseCtl)
 
-CourseCtl::CourseCtl():Controller(KModelHdlCourse)
+CourseCtl::CourseCtl():CommonCtl(KModelHdlCourse)
 {
     traced;
 }
@@ -68,36 +68,17 @@ DbModel *CourseCtl::buildModel(void *items, const QString &fmt)
     return item;
 }
 
-
-const QList<Course *> CourseCtl::getCourseList()
+const char *CourseCtl::getPrebuiltFileName()
 {
-    traced;
-
-    return mCourseList;
+    return KPrebuiltCourseCSVFileName;
 }
 
-ErrCode CourseCtl::reloadDb()
+const char *CourseCtl::getPrebuiltFileType()
 {
-    traced;
-    mCourseList.clear();
-    // TODO: loop to delete each element????
-
-    QList items = DB->getModelHandler(KModelHdlCourse)->getAll(&Course::build);
-    //    mItemList.append();
-    foreach (DbModel* model, items){
-        Course* item = (Course*)model;
-        mCourseList.append(item);
-    }
-    return ErrNone;
+    return KFileTypeCSV;
 }
 
-void CourseCtl::onLoad()
+DbModelBuilder CourseCtl::getMainBuilder()
 {
-    traced;
-    ErrCode ret = ErrNone;
-    ret = check2UpdateDbFromPrebuiltFile(KPrebuiltCourseCSVFileName, KFileTypeCSV);
-    // TODO: should do lazy load??? load all consume much memory
-    reloadDb();
-    tracede;
+    return &Course::build;
 }
-

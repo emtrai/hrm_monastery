@@ -32,7 +32,8 @@ public:
      Department();
 
     static DbModel *build();
-     virtual QString modelName() const;
+    virtual DbModelBuilder getBuilder();
+    virtual QString modelName() const;
 
 protected:
      virtual DbModelHandler* getDbModelHandler();

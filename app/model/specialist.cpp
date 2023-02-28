@@ -39,6 +39,11 @@ DbModel *Specialist::build()
     return model;
 }
 
+DbModelBuilder Specialist::getBuilder()
+{
+    return &Specialist::build;
+}
+
 QString Specialist::modelName() const
 {
     return KModelNameSpecialist;

@@ -62,7 +62,8 @@ const Community *DlgAddCommunityHistory::getCommunity()
     logd("index %d", index);
     if (index >= 0){
         // TODO: index > array, index of combo box match with index of list???
-        com = (Community*)mListCommunity.at(index);
+        Community* com = (Community*)mListCommunity.at(index);
+//         = item.get();
     }
     return com;
 }
@@ -105,19 +106,3 @@ void DlgAddCommunityHistory::accept()
     }
 }
 
-//void DlgAddCommunityHistory::on_buttonBox_clicked(QAbstractButton *button)
-//{
-//    traced;
-
-//    QDialogButtonBox::StandardButton btn = ui->buttonBox->standardButton( button );
-//    logd("btn: %d", btn);
-//    if (btn == QDialogButtonBox::StandardButton::Ok) {
-//        if (getDate() == 0) {
-//            logd("Invalid date, show warning");
-//            ui->lblWarning->setText("Invalid date");
-//            ui->lblWarning->show();
-//        } else {
-//            emit QDialog::accepted();
-//        }
-//    }
-//}

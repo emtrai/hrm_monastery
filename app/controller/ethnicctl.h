@@ -36,13 +36,12 @@ class EthnicCtl : public CommonCtl
     GET_INSTANCE_DECL(EthnicCtl);
 public:
     EthnicCtl();
-    virtual QList<DbModel*> getItemFromDb();
 protected:
     DbModel *buildModel(void *items, const QString &fmt);
     virtual const char *getPrebuiltFileName();
     virtual const char* getPrebuiltFileType();
 public:
-    virtual DbModelHandler* getModelHandler();
+    virtual DbModelBuilder getMainBuilder();
 
 };
 

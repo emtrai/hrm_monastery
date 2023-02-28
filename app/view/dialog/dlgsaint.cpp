@@ -36,7 +36,7 @@ DlgSaint::DlgSaint(QWidget *parent) :
     ui->setupUi(this);
 
     logd("Load country");
-    QList<DbModel*> listCountry = COUNTRYCTL->getItemFromDb();
+    QList<DbModel*> listCountry = COUNTRYCTL->getAllItemsFromDb();
     logd("Found %d country", listCountry.length());
     foreach(DbModel* item, listCountry){
         item->dump();

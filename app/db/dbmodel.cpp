@@ -83,8 +83,21 @@ void DbModel::clone(const DbModel *model)
     mNameId = model->nameId();
     mDbStatus = model->dbStatus();
     mHistory = model->history();
+    mCreatedTime = model->createdTime();
+    mLastUpdatedTime = model->lastUpdatedTime();
     mMarkModified = model->markModified();
+    mExportFields = model->mExportFields;
+    mImportFields = model->mImportFields;
     tracede;
+}
+
+DbModel *DbModel::clone()
+{
+    traced;
+    DbModel* model = getBuilder()(); // TODO: check builder null or not???
+    model->clone(this);
+    tracede;
+    return model;
 }
 
 

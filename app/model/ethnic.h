@@ -32,6 +32,7 @@ class Ethnic : public DbModel
 public:
     Ethnic();
     static DbModel *build();
+    virtual DbModelBuilder getBuilder();
 
     qint64 countryDbId() const;
     void setCountryDbId(qint64 newCountryDbId);

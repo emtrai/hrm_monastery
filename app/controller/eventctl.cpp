@@ -27,10 +27,9 @@
 #include "utils.h"
 #include "defs.h"
 
-
 GET_INSTANCE_IMPL(EventCtl)
 
-EventCtl::EventCtl():Controller(KModelHdlEvent)
+EventCtl::EventCtl():CommonCtl(KModelHdlEvent)
 {
     traced;
 }
@@ -41,66 +40,17 @@ EventCtl::~EventCtl()
     traced;
 }
 
-// Format: id,name,remark
-DbModel *EventCtl::buildModel(void *items, const QString &fmt)
+const char *EventCtl::getPrebuiltFileName()
 {
-    traced;
-    Event* item = new Event();
-    QStringList* itemList = (QStringList*) items;
-    qint32 idx = 0;
-    qint32 sz = itemList->length();
-    logd("sz %d", sz);
-    QString nameid = itemList->at(idx++).trimmed();
-    QString name = itemList->at(idx++).trimmed();
-    item->setName(name);
-//    if (nameid.isEmpty())
-//        nameid = Utils::UidFromName(name, UidNameConvertType::NO_VN_MARK_UPPER);
-    item->setNameId(nameid);
-    if (sz > idx) {
-        QString remark; // last item is remark, so merge all items as remark
-        for (; idx < sz; idx++){
-            if (!remark.isEmpty()){
-                remark += ",";
-            }
-            remark += itemList->at(idx);
-        }
-
-        if (!remark.isEmpty())
-            item->setRemark(remark);
-    }
-    tracede;
-    return item;
+    return KPrebuiltEventCSVFileName;
 }
 
-
-const QList<Event *> EventCtl::getEventList()
+const char *EventCtl::getPrebuiltFileType()
 {
-    traced;
-
-    return mList;
+    return KFileTypeCSV;
 }
 
-ErrCode EventCtl::reloadDb()
+DbModelBuilder EventCtl::getMainBuilder()
 {
-    traced;
-    mList.clear();
-    // TODO: loop to delete each element????
-
-    QList items = DB->getModelHandler(KModelHdlEvent)->getAll(&Event::build);
-    //    mItemList.append();
-    foreach (DbModel* model, items){
-        Event* item = (Event*)model;
-        mList.append(item);
-    }
-    return ErrNone;
-}
-
-void EventCtl::onLoad()
-{
-    traced;
-    ErrCode ret = ErrNone;
-    ret = check2UpdateDbFromPrebuiltFile(KPrebuiltEventCSVFileName, KFileTypeCSV);
-    // TODO: should do lazy load??? load all consume much memory
-    reloadDb();
-    tracede;
+    return &Event::build;
 }

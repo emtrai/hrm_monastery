@@ -41,7 +41,6 @@ public:
                                             qint64 startdate = 0,
                                             qint64 enddate = 0,
                                             const QString& remark = nullptr);
-
 protected:
     virtual DbSqliteTbl* getMainTbl();
     virtual DbSqliteTbl* getTable(const QString& modelName);

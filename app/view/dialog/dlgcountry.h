@@ -23,25 +23,23 @@
 #define DLGCOUNTRY_H
 
 #include <QDialog>
+#include "dlgeditmodel.h"
+
 class Country;
+class DlgEditModel;
 namespace Ui {
 class DlgCountry;
 }
 
-class DlgCountry : public QDialog
+class DlgCountry : public DlgEditModel
 {
-    Q_OBJECT
 
 public:
     explicit DlgCountry(QWidget *parent = nullptr);
     ~DlgCountry();
 
-    Country *country() const;
 protected:
-    void accept();
-private:
-    Ui::DlgCountry *ui;
-    Country* mCountry;
+    virtual DbModel *newModel();
 };
 
 #endif // DLGCOUNTRY_H

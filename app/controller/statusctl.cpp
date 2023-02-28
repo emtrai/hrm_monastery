@@ -30,61 +30,22 @@
 
 GET_INSTANCE_IMPL(StatusCtl)
 StatusCtl::StatusCtl():
-    Controller(KModelHdlStatus)
+    CommonCtl(KModelHdlStatus)
 {
     traced;
 }
 
-
-// Format: Name,period,startdate,enddate,remark
-DbModel *StatusCtl::buildModel(void *items, const QString &fmt)
+const char *StatusCtl::getPrebuiltFileName()
 {
-    traced;
-    Status* item = new Status();
-    QStringList* itemList = (QStringList*) items;
-    qint32 idx = 0;
-    qint32 sz = itemList->length();
-    logd("sz %d", sz);
-    item->setNameId(itemList->at(idx++));
-    item->setName(itemList->at(idx++));
-    if (sz > idx) {
-        QString remark = itemList->at(idx++);
-        if (!remark.isEmpty())
-            item->setRemark(remark);
-    }
-    tracede;
-    return item;
+    return KPrebuiltStatusCSVFileName;
 }
 
-
-const QList<Status *> StatusCtl::getStatusList()
+const char *StatusCtl::getPrebuiltFileType()
 {
-    traced;
-
-    return mStatusList;
+    return KFileTypeCSV;
 }
 
-ErrCode StatusCtl::reloadDb()
+DbModelBuilder StatusCtl::getMainBuilder()
 {
-    traced;
-    mStatusList.clear();
-    // TODO: loop to delete each element????
-
-    QList items = DB->getModelHandler(KModelHdlStatus)->getAll(&Status::build);
-    //    mItemList.append();
-    foreach (DbModel* model, items){
-        Status* item = (Status*)model;
-        mStatusList.append(item);
-    }
-    return ErrNone;
-}
-
-void StatusCtl::onLoad()
-{
-    traced;
-    ErrCode ret = ErrNone;
-    ret = check2UpdateDbFromPrebuiltFile(KPrebuiltStatusCSVFileName, KFileTypeCSV);
-    // TODO: should do lazy load??? load all consume much memory
-    reloadDb();
-    tracede;
+    return &Status::build;
 }

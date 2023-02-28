@@ -38,6 +38,11 @@ DbSqliteArea::DbSqliteArea()
     traced;
 }
 
+DbSqliteArea *DbSqliteArea::getInstance()
+{
+    
+}
+
 const QString DbSqliteArea::getName()
 {
     return KModelHdlArea;
@@ -76,7 +81,6 @@ ErrCode DbSqliteArea::addPersonInChargeOfArea(const Area *area, const Person *pe
     tracedr(err);
     return err;
 }
-
 
 DbSqliteTbl *DbSqliteArea::getMainTbl()
 {

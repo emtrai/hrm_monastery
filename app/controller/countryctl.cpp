@@ -24,6 +24,7 @@
 #include "country.h"
 #include "defs.h"
 #include "dbctl.h"
+#include "dbmodel.h"
 
 GET_INSTANCE_IMPL(CountryCtl)
 
@@ -37,26 +38,9 @@ CountryCtl::~CountryCtl()
     traced;
 }
 
-DbModelHandler *CountryCtl::getModelHandler()
+DbModelBuilder CountryCtl::getMainBuilder()
 {
-    return DB->getModelHandler(KModelHdlCountry);
-}
-// Format: vn, Vietname,Asian, Asia,
-DbModel *CountryCtl::buildModel(void *items, const QString &fmt)
-{
-    traced;
-    Country* item = new Country();
-    QStringList* itemList = (QStringList*) items;
-    qint32 idx = 0;
-    qint32 sz = itemList->length();
-    logd("sz %d", sz);
-    item->setShortName(itemList->at(idx++));
-    item->setNameId(item->shortName());
-    item->setName(itemList->at(idx++));
-    item->setRegion(itemList->at(idx++));
-    item->setContinent(itemList->at(idx++));
-
-    return item;
+    return &Country::build;
 }
 
 const char *CountryCtl::getPrebuiltFileName()
@@ -64,13 +48,4 @@ const char *CountryCtl::getPrebuiltFileName()
     return KPrebuiltCountryCSVFileName;
 }
 
-const char *CountryCtl::getPrebuiltFileType()
-{
-    return KFileTypeCSV;
-}
-
-QList<DbModel *> CountryCtl::getItemFromDb()
-{
-    return getModelHandler()->getAll(&Country::build);
-}
 

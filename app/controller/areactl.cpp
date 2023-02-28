@@ -26,6 +26,7 @@
 #include "defs.h"
 #include "dbctl.h"
 #include "utils.h"
+#include "countryctl.h"
 
 GET_INSTANCE_IMPL(AreaCtl)
 
@@ -34,23 +35,83 @@ AreaCtl::AreaCtl():CommonCtl(KModelHdlArea)
     traced;
 }
 
-// Format: Country ID, ID, Name, remark
-DbModel *AreaCtl::buildModel(void *items, const QString &fmt)
+// Format: Country name id, name id, Name, remark
+DbModel* AreaCtl::buildModel(void *items, const QString &fmt)
 {
     traced;
-    Area* item = new Area();
-    QStringList* itemList = (QStringList*) items;
+    ErrCode err = ErrNone;
+    Area* item = nullptr;
+    QStringList* itemList = nullptr;
+    qint32 noItem = 0;
     qint32 idx = 0;
-    qint32 sz = itemList->length();
-    logd("sz %d", sz);
-    item->setCountryUid(itemList->at(idx++));
-    QString nameid = itemList->at(idx++);
-    item->setNameId(nameid);
-    item->setName(itemList->at(idx++));
-    if (sz > idx) {
-        QString remark = itemList->at(idx++);
-        if (!remark.isEmpty())
+    QString countryNameId;
+    QString nameId;
+    QString name;
+    QString remark;
+    if (!items) {
+        err = ErrInvalidArg;
+        loge("invalid arg");
+    }
+
+    if (err == ErrNone && fmt != KDataFormatStringList) {
+        err = ErrNotSupport;
+        loge("invalid data format '%s", STR2CHA(fmt));
+    } else {
+        itemList = (QStringList*) items;
+        noItem = itemList->length();
+        logd("noItem %d", noItem);
+    }
+
+    if (err == ErrNone && (noItem < 3)) { // require country name id, name id, name
+        err = ErrShortData;
+        loge("Not enouth field, %d < 3", noItem);
+    }
+
+    if (err == ErrNone) {
+        countryNameId = itemList->at(idx++);
+        nameId = itemList->at(idx++);
+        name = itemList->at(idx++);
+        if (noItem > idx) {
+            remark = itemList->mid(idx).join(DEFAULT_CSV_ITEM_SPLIT);
+        }
+
+        logd("countryNameId '%s'", STR2CHA(countryNameId));
+        logd("nameId '%s'", STR2CHA(nameId));
+        logd("name '%s'", STR2CHA(name));
+        if (countryNameId.isEmpty() || nameId.isEmpty() || name.isEmpty()) {
+            err = ErrInvalidData;
+            loge("data is invalid, nameid/countrynameid or name is empty");
+        }
+    }
+    if (err == ErrNone) {
+        item = static_cast<Area*>(Area::build());
+        if (!item) {
+            loge("No memory");
+            err = ErrNoMemory;
+        }
+    }
+    if (err == ErrNone) {
+        logd("search country with nameid '%s'", STR2CHA(countryNameId));
+        DbModel* country = COUNTRYCTL->getModelByNameId(countryNameId);
+        if (country) {
+            item->setCountryUid(country->uid());
+        } else {
+            loge("Not found country with name id '%s'", STR2CHA(countryNameId));
+            err = ErrNotFound;
+        }
+    }
+    if (err == ErrNone) {
+        item->setNameId(nameId);
+        item->setName(name);
+        if (!remark.isEmpty()) {
             item->setRemark(remark);
+        }
+    } else {
+        loge("failed to import/build model for area, err=%d", err);
+        if (item) {
+            delete item;
+            item = nullptr;
+        }
     }
     tracede;
     return item;
@@ -61,15 +122,8 @@ const char *AreaCtl::getPrebuiltFileName()
     return KPrebuiltAreaCSVFileName;
 }
 
-const char *AreaCtl::getPrebuiltFileType()
+DbModelBuilder AreaCtl::getMainBuilder()
 {
-    return KFileTypeCSV;
+    return &Area::build;
 }
-
-QList<DbModel *> AreaCtl::getItemFromDb()
-{
-    traced;
-    return DB->getModelHandler(KModelHdlArea)->getAll(&Area::build);
-}
-
 

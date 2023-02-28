@@ -22,31 +22,28 @@
 #ifndef EVENTCTL_H
 #define EVENTCTL_H
 
-#include "controller.h"
+#include "commonctl.h"
 #include "utils.h"
 #include <QList>
 
+#define EVENTCTL INSTANCE(EventCtl)
 
 class Event;
 
-class EventCtl : public Controller
+class EventCtl : public CommonCtl
 {
     GET_INSTANCE_DECL(EventCtl);
 public:
     EventCtl();
     virtual ~EventCtl();
 protected:
-    DbModel *buildModel(void *items, const QString &fmt);
-public:
-    const QList<Event*> getEventList();
 
-public:
-    virtual ErrCode reloadDb();
+    // prebuilt data file name
+    virtual const char* getPrebuiltFileName();
+    // prebuilt data file type, i.e. csv
+    virtual const char* getPrebuiltFileType();
 
-public slots:
-    virtual void onLoad();
-private:
-    QList<Event*> mList;
+    virtual DbModelBuilder getMainBuilder();
 };
 
 #endif // EVENTCTL_H

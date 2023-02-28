@@ -66,7 +66,7 @@ Controller *UIDepartmentListView::getController()
 QList<DbModel *> UIDepartmentListView::getListItem()
 {
     traced;
-    return DEPART->getAllDepartment();
+    return DEPART->getAllItemsFromDb(); // TODO: getAllItem???
 }
 
 DbModel *UIDepartmentListView::onNewModel()

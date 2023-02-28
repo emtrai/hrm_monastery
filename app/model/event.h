@@ -29,6 +29,7 @@ class Event : public DbModel
 public:
     Event();
     static DbModel *build();
+    virtual DbModelBuilder getBuilder();
 
 
 protected:

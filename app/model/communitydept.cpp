@@ -41,6 +41,11 @@ DbModel *CommunityDept::build()
     return model;
 }
 
+DbModelBuilder CommunityDept::getBuilder()
+{
+    return &CommunityDept::build;
+}
+
 QString CommunityDept::modelName() const
 {
     return KModelNameCommDept;

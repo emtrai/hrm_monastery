@@ -194,14 +194,14 @@ const char *CommunityDeptCtl::getPrebuiltFileType()
     return KFileTypeJson;
 }
 
-QList<DbModel *> CommunityDeptCtl::getItemFromDb()
-{
-    return getModelHandler()->getAll(&CommunityDept::build);
-}
-
 DbModelHandler *CommunityDeptCtl::getModelHandler()
 {
     return DB->getModelHandler(KModelHdlCommDept);
+}
+
+DbModelBuilder CommunityDeptCtl::getMainBuilder()
+{
+    return &CommunityDept::build;
 }
 
 ErrCode CommunityDeptCtl::markModelDelete(DbModel *model)

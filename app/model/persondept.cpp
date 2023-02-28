@@ -45,6 +45,11 @@ DbModel *PersonDept::build()
     return model;
 }
 
+DbModelBuilder PersonDept::getBuilder()
+{
+    return &PersonDept::build;
+}
+
 const QString &PersonDept::roleUid() const
 {
     return mRoleUid;

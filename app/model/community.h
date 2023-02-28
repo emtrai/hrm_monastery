@@ -55,6 +55,7 @@ public:
     ~Community();
 
     virtual void clone(const DbModel* per);
+     virtual DbModelBuilder getBuilder();
     virtual void initExportFields();
     virtual void initImportFields();
 

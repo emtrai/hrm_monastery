@@ -22,30 +22,27 @@
 #ifndef PROVINCECTL_H
 #define PROVINCECTL_H
 
-#include "controller.h"
+#include "commonctl.h"
 #include "dbmodel.h"
 #include "province.h"
 #include <QHash>
 #include <QList>
+#include "utils.h"
 
 #define PROVINCE (ProvinceCtl::getInstance())
 
-class ProvinceCtl : public Controller
+class ProvinceCtl : public CommonCtl
 {
+    GET_INSTANCE_DECL(ProvinceCtl);
 public:
     ProvinceCtl();
+    const QList<Province *> *getProvinceList(const QString &country);
 protected:
     DbModel *buildModel(void *items, const QString &fmt);
-public:
-    static ProvinceCtl* getInstance();
-    const QList<Province*>* getProvinceList(const QString& country);
+    // prebuilt data file name
+    virtual const char* getPrebuiltFileName();
 
-
-public slots:
-    virtual void onLoad();
-private:
-    static ProvinceCtl* gInstance;
-    QHash<QString, QList<Province*>*> mProvinceList;
+    virtual DbModelBuilder getMainBuilder();
 };
 
 #endif // PROVINCECTL_H

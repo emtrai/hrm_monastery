@@ -40,6 +40,11 @@ DbModel *Role::build()
     return model;
 }
 
+DbModelBuilder Role::getBuilder()
+{
+    return &Role::build;
+}
+
 QString Role::modelName() const
 {
     return KModelNameRole;

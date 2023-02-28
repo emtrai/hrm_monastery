@@ -40,6 +40,11 @@ DbModel *Education::build()
     return model;
 }
 
+DbModelBuilder Education::getBuilder()
+{
+    return &Education::build;
+}
+
 DbModelHandler *Education::getDbModelHandler()
 {
     return DbCtl::getInstance()->getDb()->getEduModelHandler();

@@ -36,7 +36,7 @@
 
 GET_INSTANCE_IMPL(DepartCtl)
 
-DepartCtl::DepartCtl():Controller(KModelHdlDept)
+DepartCtl::DepartCtl():CommonCtl(KModelHdlDept)
 {
     traced;
 }
@@ -47,24 +47,20 @@ const QList<DbModel *> DepartCtl::getAllDepartment()
     return DB->getModelHandler(KModelHdlDept)->getAll(&Department::build);
 }
 
-// Format: Nameid, Name, remark
-DbModel *DepartCtl::buildModel(void *items, const QString &fmt)
+
+DbModelBuilder DepartCtl::getMainBuilder()
 {
-    traced;
-    Department* item = new Department();
-    QStringList* itemList = (QStringList*) items;
-    qint32 idx = 0;
-    qint32 sz = itemList->length();
-    logd("sz %d", sz);
-    item->setNameId(itemList->at(idx++));// TODO: should auto generate?
-    item->setName(itemList->at(idx++));
-    if (sz > idx) {
-        QString remark = itemList->at(idx++);
-        if (!remark.isEmpty())
-            item->setRemark(remark);
-    }
-    tracede;
-    return item;
+    return &Department::build;
+}
+
+const char *DepartCtl::getPrebuiltFileName()
+{
+    return KPrebuiltDeptJsonFileName;
+}
+
+const char *DepartCtl::getPrebuiltFileType()
+{
+    return KFileTypeJson;
 }
 
 
@@ -89,7 +85,6 @@ Department* DepartCtl::parseOneItem(const QJsonObject& jobj)
             ret->setName(tmp);
 
     }
-
 
     if (jobj.contains(JSON_REMARK)){
         QString tmp = jobj[JSON_REMARK].toString().trimmed();
@@ -149,20 +144,4 @@ ErrCode DepartCtl::parsePrebuiltFile(const QString &fpath, const QString &ftype)
     }
     tracedr(ret);
     return ret;
-}
-
-void DepartCtl::onLoad()
-{
-    traced;
-    ErrCode ret = ErrNone;
-    ret = check2UpdateDbFromPrebuiltFile(KPrebuiltDeptJsonFileName, KFileTypeJson);
-    logd("update db ret=%d", ret);
-    // TODO: should do lazy load??? load all consume much memory
-//    mDeptList = DB->getModelHandler(KModelHdlDept)->getAll(&Department::build);
-    //    mItemList.append();
-//    foreach (DbModel* model, items){
-//        Department* item = (Department*)model;
-//        mDeptList.append(item);
-//    }
-    tracede;
 }

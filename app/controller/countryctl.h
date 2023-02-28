@@ -33,15 +33,12 @@
 class CountryCtl : public CommonCtl
 {
     GET_INSTANCE_DECL(CountryCtl);
-public:
+protected:
     CountryCtl();
     virtual ~CountryCtl();
-    virtual DbModelHandler* getModelHandler();
-    virtual QList<DbModel*> getItemFromDb();
+    virtual DbModelBuilder getMainBuilder();
 protected:
-    DbModel *buildModel(void *items, const QString &fmt);
     virtual const char *getPrebuiltFileName();
-    virtual const char* getPrebuiltFileType();
 };
 
 #endif // COUNTRYCTL_H

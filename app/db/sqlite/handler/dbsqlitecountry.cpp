@@ -27,31 +27,17 @@
 #include "dbsqlite.h"
 #include "country.h"
 
-DbSqliteCountry::DbSqliteCountry()
+DbSqliteCountry::DbSqliteCountry():DbSqliteModelHandler(KModelHdlCountry)
 {
     traced;
-}
-
-const QString DbSqliteCountry::getName()
-{
-    return KModelHdlCountry;
-}
-
-DbModel *DbSqliteCountry::getByName(const QString &name)
-{
-    traced;
-    return DbSqliteModelHandler::getByName(name, Country::build);
-    
-}
-
-DbModel *DbSqliteCountry::getByUid(const QString &uid)
-{
-    traced;
-    return DbSqliteModelHandler::getByUid(uid, Country::build);
-    
 }
 
 DbSqliteTbl *DbSqliteCountry::getMainTbl()
 {
     return (DbSqliteTbl*)DbSqlite::getInstance()->getTable(KTableCountry);
+}
+
+DbModelBuilder DbSqliteCountry::getBuilder(const QString &modelName)
+{
+    return &Country::build;
 }

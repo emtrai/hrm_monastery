@@ -38,10 +38,10 @@ DlgAddPersonEvent::DlgAddPersonEvent(QWidget *parent) :
     traced;
     ui->setupUi(this);
 
-    QList<Event*> eventList = INSTANCE(EventCtl)->getEventList();
+    QList<DbModel*> eventList = INSTANCE(EventCtl)->getAllItemsFromDb(); // TODO: getAllItem???
 
     ui->cbEvent->clear();
-    foreach(Event* item, eventList){
+    foreach(DbModel* item, eventList){
         ui->cbEvent->addItem(item->name(), item->uid());
     }
 

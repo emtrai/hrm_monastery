@@ -84,6 +84,8 @@ int UISaintListView::onFilter(int catetoryid, const QString &catetory, qint64 op
     if (cnt > 0) {
         foreach (DbModel* item, list) {
             mItemList.append(static_cast<DbModel*>(item));
+            // TODO: should it be shared pointer or not???
+//            mItemList.append(std::shared_ptr<DbModel>(item));
         }
     } else {
         logi("Nothing to add");

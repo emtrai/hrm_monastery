@@ -25,6 +25,7 @@
 #include <dbmodelhandler.h>
 #include "table/dbsqlitetbl.h"
 #include "errcode.h"
+#include "dbmodel.h"
 
 class DbSqlitePerson;
 
@@ -32,6 +33,7 @@ class DbSqliteModelHandler : public virtual DbModelHandler
 {
 public:
     DbSqliteModelHandler();
+    DbSqliteModelHandler(const QString& name);
 
     /* Those are very generic functions */
 
@@ -64,14 +66,16 @@ public:
      * @return true if exist, false otherwise
      */
     virtual bool exist(const DbModel* edu);
-    virtual QList<DbModel*> getAll(DbModelBuilder builder, const char* modelName = nullptr);
+    virtual QList<DbModel*> getAll(DbModelBuilder builder, qint64 status = DB_RECORD_ACTIVE,
+                                    const char* modelName = nullptr, int from = 0,
+                                    int noItems = 0, int* total = nullptr);
     /**
      * @brief Get All, return as dictionary, map b/w uid and model
      * @param builder
      * @param modelName
      * @return
      */
-    virtual QHash<QString, DbModel*> getAllInDict(DbModelBuilder builder, const char* modelName = nullptr);
+    virtual QHash<QString, DbModel*> getAllInDict(DbModelBuilder builder, qint64 status = DB_RECORD_ACTIVE, const char* modelName = nullptr);
 
     virtual DbModel* getModel(qint64 dbId);
 
@@ -79,6 +83,7 @@ public:
     virtual DbModel *getByName(const QString& name);
     virtual DbModel *getByUid(const QString& uid, const DbModelBuilder& builder);
     virtual DbModel *getByUid(const QString& uid);
+    virtual DbModel *getByNameId(const QString& nameId, const DbModelBuilder& builder);
     /**
      * @brief getName
      * @return Model Handler name
@@ -101,8 +106,10 @@ public:
 protected:
     virtual DbSqliteTbl* getMainTbl() = 0;
     virtual DbSqliteTbl* getTable(const QString& modelName);
-    virtual DbModelBuilder* getBuilder(const QString& modelName);
+    virtual DbModelBuilder getBuilder(const QString& modelName = nullptr);
     virtual DbModelBuilder getMainBuilder();
+protected:
+    QString mName;
 };
 
 #endif // DBSQLITEMODELHANDLER_H

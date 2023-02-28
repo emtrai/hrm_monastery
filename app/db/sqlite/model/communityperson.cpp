@@ -38,6 +38,11 @@ DbModel *CommunityPerson::build()
     return new CommunityPerson();
 }
 
+DbModelBuilder CommunityPerson::getBuilder()
+{
+    return &CommunityPerson::build;
+}
+
 
 QString CommunityPerson::modelName() const
 {

@@ -44,6 +44,11 @@ DbModel *Mission::build()
     return model;
 }
 
+DbModelBuilder Mission::getBuilder()
+{
+    return &Mission::build;
+}
+
 DbModelHandler *Mission::getDbModelHandler()
 {
     return DB->getModelHandler(KModelHdlMission);

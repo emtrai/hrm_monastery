@@ -39,6 +39,11 @@ DbModel *AreaPerson::build()
     return new AreaPerson();
 }
 
+DbModelBuilder AreaPerson::getBuilder()
+{
+    return &AreaPerson::build;
+}
+
 
 QString AreaPerson::modelName() const
 {

@@ -28,62 +28,19 @@
 #include "countryctl.h"
 
 DlgCountry::DlgCountry(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::DlgCountry),
-    mCountry(nullptr)
+    DlgEditModel(parent)
 {
     traced;
-    ui->setupUi(this);
 }
 
 DlgCountry::~DlgCountry()
 {
     traced;
-    if (mCountry != nullptr) {
-        delete mCountry;
-        mCountry = nullptr;
-    }
-    delete ui;
 }
 
-void DlgCountry::accept()
+DbModel *DlgCountry::newModel()
 {
-    traced;
-    ErrCode ret = ErrNone;
-    QString name = ui->txtName->text().trimmed();
-    QString shortname = ui->txtShortName->text().trimmed();
-    if (!name.isEmpty() && !shortname.isEmpty()){
-        if (mCountry == nullptr)
-            mCountry = new Country();
-        if (mCountry != nullptr){
-            mCountry->setName(name);
-            mCountry->setShortName(shortname);
-            mCountry->setUid(Utils::UidFromName(name));
-            // TODO: short name????
-            mCountry->setRegion(ui->cbRegion->currentText().trimmed());
-            mCountry->setContinent(ui->cbContinent->currentText().trimmed());
-            mCountry->dump();
-            logi("Save new country to db");
-            ret = mCountry->save();
-        } else {
-            ret = ErrNoMemory;
-            loge("No memory");
-        }
-    } else {
-        ret = ErrInvalidData;
-        loge("Name field is empty");
-    }
-
-    logi("Add Country, ret %d", ret);
-    if (ret == ErrNone)
-        QDialog::accept();
-    else
-        Utils::showErrorBox(QString(tr("Lỗi ! Mã lỗi %1").arg(ret)));
-}
-
-Country *DlgCountry::country() const
-{
-    return mCountry;
+    return Country::build();
 }
 
 

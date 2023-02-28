@@ -36,16 +36,12 @@ public:
     MissionCtl();
 protected:
     // COMMON FUNCTIONS
-    virtual DbModelHandler* getModelHandler();
+    virtual DbModelBuilder getMainBuilder();
     DbModel *buildModel(void *items, const QString &fmt);
     virtual const char *getPrebuiltFileName();
     virtual const char* getPrebuiltFileType();
 
     // TODO: how about import/export? do we need to import for mission???
-
-public:
-    // COMMON FUNCTIONS
-    virtual QList<DbModel*> getItemFromDb();
 
 public slots:
 //    virtual void onLoad();

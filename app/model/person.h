@@ -49,6 +49,7 @@ class Person: public DbModel
 {
 public:
     static DbModel* build();
+    virtual DbModelBuilder getBuilder();
     virtual void initExportFields();
     virtual void initImportFields();
     /**

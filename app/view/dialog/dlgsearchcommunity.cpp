@@ -67,7 +67,7 @@ int DlgSearchCommunity::onGetAll()
 {
     traced;
     clearAll();
-    mListItems = COMMUNITYCTL->getItemFromDb();
+    mListItems = COMMUNITYCTL->getAllItemsFromDb();
     logd("get all cnt=%d", mListItems.count());
     tracede;
     return mListItems.count();

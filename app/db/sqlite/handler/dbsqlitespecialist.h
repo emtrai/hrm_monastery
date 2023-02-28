@@ -45,18 +45,6 @@ private:
 private:
     static DbSqliteSpecialist* gInstance;
 
-//public:
-//    DbSqliteSpecialist();
-
-//    virtual ErrCode addSpecialist(const Specialist* edu);
-//    virtual bool exist(const Specialist* edu);
-//    virtual QList<Specialist*> getAll();
-
-//private:
-//    DbSqliteSpecialistTbl *specialistTbl();
-
-//private:
-//    DbSqliteSpecialistTbl* mSpecilistTbl;
 
 };
 

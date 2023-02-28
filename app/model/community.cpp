@@ -111,6 +111,11 @@ void Community::clone(const DbModel *model)
     tracede;
 }
 
+DbModelBuilder Community::getBuilder()
+{
+    return &Community::build;
+}
+
 void Community::initExportFields()
 {
     traced;

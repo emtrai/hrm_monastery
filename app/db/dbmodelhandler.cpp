@@ -31,7 +31,7 @@ DbModel *DbModelHandler::getItem(const QString &uid, DbModelBuilder builder, con
 {
     traced;
     logd("uid %s", uid.toStdString().c_str());
-    QHash<QString, DbModel*> list = getAllInDict(builder, modelName);
+    QHash<QString, DbModel*> list = getAllInDict(builder, DB_RECORD_ALL, modelName); // TODO: all status or action one only???
     DbModel* model = nullptr;
     if (list.count() > 0) {
         if (list.contains(uid)){
@@ -68,6 +68,12 @@ int DbModelHandler::filter(int fieldId, int operatorId, const QString &keyword, 
 
 }
 
+DbModelBuilder DbModelHandler::getMainBuilder()
+{
+    FAIL("DEFAULT getMainBuilder, should not be called");
+    return nullptr;
+}
+
 DbModel *DbModelHandler::getByName(const QString &name, const DbModelBuilder &builder)
 {
     traced;
@@ -95,5 +101,27 @@ DbModel *DbModelHandler::getByUid(const QString &uid)
     traced;
     loge("Default one, do nothing");
     return nullptr; // TODO: throw exception????
+}
+
+DbModel *DbModelHandler::getByNameId(const QString &nameId, const DbModelBuilder &builder)
+{
+    traced;
+    loge("Default one, do nothing");
+    return nullptr; // TODO: throw exception????
+}
+
+DbModel *DbModelHandler::getByNameId(const QString &nameId)
+{
+    traced;
+    DbModel *model = nullptr;
+    DbModelBuilder builder = getMainBuilder();
+    if (builder) {
+        model = getByNameId(nameId, builder);
+    } else {
+        loge("NO BUILDER, SHOULD NOT BE CALLED, MUST BE IMPLEMENTED BY DERIVED CLASS");
+    }
+    // TODO: throw exception???
+    tracede;
+    return model;
 }
 

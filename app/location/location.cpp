@@ -70,7 +70,7 @@ ErrCode Location::doOneCSVItemCallback(const QStringList &items, void *param)
     ErrCode ret = ErrNone;
     (void) param;
     if (!items.empty() && items.length() >= MAX_SPLIT_ITEMS) {
-        Country *country = new Country();
+        Country *country = (Country*)Country::build();
 
         qint32 idx = 0;
         //id

@@ -54,14 +54,16 @@ public:
     virtual ErrCode deleteHard(DbModel* model);
 
     virtual bool exist(const DbModel* edu);
-    virtual QList<DbModel*> getAll(DbModelBuilder builder, const char* modelName = nullptr);
+    virtual QList<DbModel*> getAll(DbModelBuilder builder, qint64 status = DB_RECORD_ACTIVE,
+                                    const char* modelName = nullptr, int from = 0,
+                                    int noItems = 0, int* total = nullptr);
     /**
      * @brief Get All, return as dictionary, map b/w uid and model
      * @param builder
      * @param modelName
      * @return
      */
-    virtual QHash<QString, DbModel*> getAllInDict(DbModelBuilder builder, const char* modelName = nullptr);
+    virtual QHash<QString, DbModel*> getAllInDict(DbModelBuilder builder, qint64 status = DB_RECORD_ACTIVE, const char* modelName = nullptr);
 
     virtual DbModel* getModel(qint64 dbId);
 

@@ -30,61 +30,27 @@
 GET_INSTANCE_IMPL(RoleCtl)
 
 RoleCtl::RoleCtl():
-    Controller(KModelHdlRole)
+    CommonCtl(KModelHdlRole)
 {
     traced;
 }
 
-// Format: Name,period,startdate,enddate,remark
-DbModel *RoleCtl::buildModel(void *items, const QString &fmt)
+RoleCtl::~RoleCtl()
 {
     traced;
-    Role* item = new Role();
-    QStringList* itemList = (QStringList*) items;
-    qint32 idx = 0;
-    qint32 sz = itemList->length();
-    logd("sz %d", sz);
-    item->setNameId(itemList->at(idx++));
-    item->setName(itemList->at(idx++));
-
-    if (sz > idx) {
-        QString remark = itemList->at(idx++);
-        if (!remark.isEmpty())
-            item->setRemark(remark);
-    }
-    tracede;
-    return item;
 }
 
-
-const QList<Role *> RoleCtl::getList()
+const char *RoleCtl::getPrebuiltFileName()
 {
-    traced;
-
-    return mList;
+    return KPrebuiltRoleCSVFileName;
 }
 
-ErrCode RoleCtl::reloadDb()
+const char *RoleCtl::getPrebuiltFileType()
 {
-    traced;
-    mList.clear();
-    // TODO: loop to delete each element????
-
-    QList items = DB->getModelHandler(KModelHdlRole)->getAll(&Role::build);
-    //    mItemList.append();
-    foreach (DbModel* model, items){
-        Role* item = (Role*)model;
-        mList.append(item);
-    }
-    return ErrNone;
+    return KFileTypeCSV;
 }
 
-void RoleCtl::onLoad()
+DbModelBuilder RoleCtl::getMainBuilder()
 {
-    traced;
-    ErrCode ret = ErrNone;
-    ret = check2UpdateDbFromPrebuiltFile(KPrebuiltRoleCSVFileName, KFileTypeCSV);
-    // TODO: should do lazy load??? load all consume much memory
-    reloadDb();
-    tracede;
+    return &Role::build;
 }

@@ -32,6 +32,7 @@ public:
     PersonEvent();
     PersonEvent(const PersonEvent* model);
     static DbModel *build();
+    virtual DbModelBuilder getBuilder();
     virtual QString modelName() const;
 
     virtual void buildUidIfNotSet();

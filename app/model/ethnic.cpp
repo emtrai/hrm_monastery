@@ -43,6 +43,11 @@ DbModel *Ethnic::build()
     return model;
 }
 
+DbModelBuilder Ethnic::getBuilder()
+{
+    return &Ethnic::build;
+}
+
 qint64 Ethnic::countryDbId() const
 {
     return mCountryDbId;

@@ -10,6 +10,8 @@
 #include "importfactory.h"
 #include "iimporter.h"
 #include "iexporter.h"
+#include "defs.h"
+#include "dbmodel.h"
 
 class DbModel;
 class DbModelHandler;
@@ -25,11 +27,14 @@ public:
 
     virtual DbModelHandler* getModelHandler();
     virtual ErrCode addNew(DbModel* model);
+
     /**
      * @brief Get list of item all items from db, must be implemented by derived class
-     * @return
+     *        Caller must free resource after usage
+     * @return List of items. Caller must free resource after usage
      */
-    virtual QList<DbModel*> getItemFromDb();
+    virtual QList<DbModel*> getAllItemsFromDb(qint64 status = DB_RECORD_ACTIVE, int from = 0, int noItems = 0, int* total = nullptr);
+
 
     virtual ErrCode reloadDb();
 
@@ -48,13 +53,13 @@ public:
     virtual int search(const QString& keyword, QList<DbModel*>* outList = nullptr);
     virtual DbModel* getModelByName(const QString& name);
     virtual DbModel* getModelByUid(const QString& uid);
+    virtual DbModel* getModelByNameId(const QString& nameId);
     virtual int filter(int catetoryid,
                        const QString& catetory,
                        qint64 opFlags,
                        const QString& keywords,
                        QList<DbModel*>* outList = nullptr);
 
-    virtual ErrCode loadFromDb();
     virtual ErrCode getUidListFromName(const QString& name, QHash<QString, QString>* uidList = nullptr, const char* hdlName = nullptr);
     virtual QString getNameFromUidList(const QStringList& uidList, const char* hdlName = nullptr);
     virtual QString getNameFromUidList(const QString& uidList, const char* hdlName = nullptr);
@@ -66,13 +71,25 @@ public:
     virtual const QString exportTemplatePath(Exporter* exporter) const;
     virtual quint64 getExportTypeList(); // overide from IExporter
 protected:
-    virtual DbModel *buildModel(void* items, const QString& fmt);
+    /**
+     * @brief Build model from items/data
+     * @param items data to be parsed
+     * @param fmt data format, i.e. QStringList
+     * @return
+     */
+    virtual DbModel *buildModel(void* items, const QString& fmt = KDataFormatStringList);
 
+    /**
+     * @brief get file name of prebuilt data, used to load prebuilt data and update to DB
+     * @return
+     */
     virtual const char* getPrebuiltFileName();
     virtual const char* getPrebuiltFileType();
 
     virtual ErrCode check2UpdateDbFromPrebuiltFile(const QString& fname,
                                                    const QString& ftype);
+    virtual ErrCode check2UpdateDbFromPrebuiltFile();
+
     virtual ErrCode doOneCSVItemCallback(const QStringList& items, void* param);
 
     virtual ErrCode parsePrebuiltFile(const QString &fpath, const QString &ftype);

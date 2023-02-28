@@ -35,6 +35,7 @@ public:
     Course();
     virtual ~Course();
     static DbModel *build();
+    virtual DbModelBuilder getBuilder();
     qint64 startDate() const;
     void setStartDate(qint64 newStartDate);
 

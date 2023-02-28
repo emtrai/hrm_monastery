@@ -870,7 +870,7 @@ void MainWindow::on_action_ExportPersonList_triggered()
 void MainWindow::on_action_ExportCommunityList_triggered()
 {
     traced;
-    QList<DbModel*> list = COMMUNITYCTL->getItemFromDb();
+    QList<DbModel*> list = COMMUNITYCTL->getAllItemsFromDb();
 //    UNDER_DEV(tr("Xuất danh sách nữ tu ra tập tin"));
     doExportListItems(&list, COMMUNITYCTL, "Danh sách cộng đoàn", ExportType::EXPORT_XLSX);
 }

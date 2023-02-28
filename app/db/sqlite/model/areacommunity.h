@@ -31,6 +31,7 @@ class AreaCommunity : public MapDbModel
 public:
     AreaCommunity();
     static DbModel* build();
+    virtual DbModelBuilder getBuilder();
     virtual QString modelName() const;
 protected:
     virtual DbModelHandler *getDbModelHandler();

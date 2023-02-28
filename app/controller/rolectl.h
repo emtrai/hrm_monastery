@@ -22,30 +22,26 @@
 #ifndef ROLECTL_H
 #define ROLECTL_H
 
-#include "controller.h"
+#include "commonctl.h"
 #include "utils.h"
 
 #define ROLECTL INSTANCE(RoleCtl)
 
 class Role;
 
-class RoleCtl : public Controller
+class RoleCtl : public CommonCtl
 {
     GET_INSTANCE_DECL(RoleCtl);
 public:
     RoleCtl();
+    virtual ~RoleCtl();
 protected:
-    DbModel *buildModel(void *items, const QString &fmt);
-public:
-    const QList<Role*> getList();
+    // prebuilt data file name
+    virtual const char* getPrebuiltFileName();
+    // prebuilt data file type, i.e. csv
+    virtual const char* getPrebuiltFileType();
 
-public:
-    virtual ErrCode reloadDb();
-
-public slots:
-    virtual void onLoad();
-private:
-    QList<Role*> mList;
+    virtual DbModelBuilder getMainBuilder();
 };
 
 #endif // ROLECTL_H

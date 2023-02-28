@@ -22,35 +22,29 @@
 #ifndef AREACTL_H
 #define AREACTL_H
 
-#include "controller.h"
 #include "commonctl.h"
-#include "dbmodel.h"
-#include "area.h"
-#include <QHash>
+#include "utils.h"
 #include <QList>
+#include "dbmodel.h"
 
 #define AREACTL (AreaCtl::getInstance())
 
+class DbModel;
+
 class AreaCtl : public CommonCtl
 {
-public:
+    GET_INSTANCE_DECL(AreaCtl);
+private:
     AreaCtl();
 protected:
-    DbModel *buildModel(void *items, const QString &fmt);
 
+    // build model from data
+    virtual DbModel *buildModel(void *items, const QString &fmt);
+
+    // prebuilt data file name
     virtual const char* getPrebuiltFileName();
-    virtual const char* getPrebuiltFileType();
 
-    virtual QList<DbModel*> getItemFromDb();
-public:
-    static AreaCtl* getInstance();
-
-
-//public slots:
-//    virtual void onLoad();
-private:
-    static AreaCtl* gInstance;
-//    QList<Area*> mAreaList;
+    virtual DbModelBuilder getMainBuilder();
 
 };
 

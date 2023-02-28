@@ -51,9 +51,9 @@ DbModel *EduCtl::buildModel(void *items, const QString &fmt)
     return edu;
 }
 
-DbModelHandler *EduCtl::getModelHandler()
+DbModelBuilder EduCtl::getMainBuilder()
 {
-    return DB->getModelHandler(KModelHdlEdu);
+    return &Education::build;
 }
 
 const char *EduCtl::getPrebuiltFileName()
@@ -66,7 +66,3 @@ const char *EduCtl::getPrebuiltFileType()
     return KFileTypeCSV;
 }
 
-QList<DbModel *> EduCtl::getItemFromDb()
-{
-    return getModelHandler()->getAll(&Education::build);
-}

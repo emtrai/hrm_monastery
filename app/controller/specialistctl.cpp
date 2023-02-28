@@ -53,10 +53,10 @@ DbModel *SpecialistCtl::buildModel(void *items, const QString &fmt)
     return specialist;
 }
 
-DbModelHandler *SpecialistCtl::getModelHandler()
-{
-    return DB->getModelHandler(KModelHdlSpecialist);
 
+DbModelBuilder SpecialistCtl::getMainBuilder()
+{
+    return &Specialist::build;
 }
 
 const char *SpecialistCtl::getPrebuiltFileName()
@@ -69,11 +69,6 @@ const char *SpecialistCtl::getPrebuiltFileType()
     return KFileTypeCSV;
 }
 
-QList<DbModel *> SpecialistCtl::getItemFromDb()
-{
-    return getModelHandler()->getAll(&Specialist::build);
-
-}
 
 QList<DbModel *> SpecialistCtl::getListPerson(const QString &specialistUid)
 {

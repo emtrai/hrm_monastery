@@ -37,12 +37,9 @@ private:
 
 protected:
     DbModel *buildModel(void *items, const QString &fmt);
-    virtual DbModelHandler* getModelHandler();
+    virtual DbModelBuilder getMainBuilder();
     virtual const char *getPrebuiltFileName();
     virtual const char* getPrebuiltFileType();
-public:
-    // COMMON FUNCTIONS
-    virtual QList<DbModel*> getItemFromDb();
 private:
 
 };

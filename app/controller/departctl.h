@@ -22,33 +22,32 @@
 #ifndef DEPARTCTL_H
 #define DEPARTCTL_H
 
-#include "controller.h"
+#include "commonctl.h"
 #include "dbmodel.h"
 #include "department.h"
 #include <QHash>
 #include <QList>
+#include "util.h"
 
 #define DEPART (DepartCtl::getInstance())
 
-class DepartCtl : public Controller
+class DepartCtl : public CommonCtl
 {
+    GET_INSTANCE_DECL(DepartCtl);
 public:
     DepartCtl();
 public:
     const QList<DbModel*> getAllDepartment();
 protected:
-    DbModel *buildModel(void *items, const QString &fmt);
-public:
-    static DepartCtl* getInstance();
-protected:
+    // prebuilt data file name
+    virtual const char* getPrebuiltFileName();
+    // prebuilt data file type, i.e. csv
+    virtual const char* getPrebuiltFileType();
+
+    virtual DbModelBuilder getMainBuilder();
     virtual ErrCode parsePrebuiltFile(const QString &fpath, const QString &ftype);
 private:
     Department* parseOneItem(const QJsonObject& jobj);
-public slots:
-    virtual void onLoad();
-private:
-    static DepartCtl* gInstance;
-    QList<DbModel*> mDeptList;
 };
 
 #endif // DEPARTCTL_H

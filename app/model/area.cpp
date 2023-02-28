@@ -34,11 +34,31 @@ Area::Area():DbModel(),
     traced;
 }
 
+Area::~Area()
+{
+    traced;
+}
+
 DbModel *Area::build()
 {
     Area* item = new Area();
     item->init();
     return item;
+}
+
+void Area::clone(const DbModel *model)
+{
+    traced;
+    DbModel::clone(model);
+    Area* area = (Area*)model;
+    this->mCountryDbId = area->countryDbId();
+    this->mCountryName = area->countryName();
+    this->mPersonDbId = area->personDbId();
+    this->mPersonUid = area->personUid();
+    this->mPersonName = area->personName();
+    this->mCountryUid = area->countryUid();
+    this->mAreaCode = area->areaCode();
+    tracede;
 }
 
 QString Area::modelName() const
@@ -80,6 +100,11 @@ DbModelHandler *Area::getDbModelHandler()
 {
 
     return DB->getModelHandler(KModelHdlArea);
+}
+
+DbModelBuilder Area::getBuilder()
+{
+    return &Area::build;
 }
 
 const QString &Area::areaCode() const

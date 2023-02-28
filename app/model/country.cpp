@@ -33,56 +33,27 @@
 
 Country::Country()
 {
-
+    traced;
 }
 
 Country::Country(const Country &country):DbModel(country)
 {
-    setShortName(country.shortName());
-    setRegion(country.region());
-    setContinent(country.continent());
+    traced;
 }
-
-
-const QList<Province *>* Country::getListProvince()
+Country::~Country()
 {
     traced;
-    return PROVINCE->getProvinceList(shortName());
 }
+
+DbModelBuilder Country::getBuilder()
+{
+    return &Country::build;
+}
+
 
 DbModelHandler *Country::getDbModelHandler()
 {
     return DB->getModelHandler(KModelHdlCountry);
-}
-
-const QString &Country::shortName() const
-{
-    return mShortName;
-}
-
-void Country::setShortName(const QString &newShortName)
-{
-    mShortName = newShortName;
-}
-
-
-const QString &Country::continent() const
-{
-    return mContinent;
-}
-
-void Country::setContinent(const QString &newContinent)
-{
-    mContinent = newContinent;
-}
-
-void Country::dump()
-{
-    traced;
-    DbModel::dump();
-#ifdef DEBUG_TRACE
-    logd("- Short name %s", shortName().toStdString().c_str());
-#endif //DEBUG_TRACE
 }
 
 DbModel *Country::build()
@@ -90,15 +61,5 @@ DbModel *Country::build()
     Country* model = new Country();
     model->init();
     return model;
-}
-
-const QString &Country::region() const
-{
-    return mRegion;
-}
-
-void Country::setRegion(const QString &newRegion)
-{
-    mRegion = newRegion;
 }
 

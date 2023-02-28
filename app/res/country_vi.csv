@@ -1,5 +1,4 @@
-#id, Name, Region,Continent
-#WARNING: any change in id must be updated on db
+#id, Name, remark
 GBR,United Kingdom,,
 USA,United States,,
 VNM,Vietnam,,

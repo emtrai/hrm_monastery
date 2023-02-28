@@ -219,7 +219,9 @@ bool DbSqlitePerson::exist(const DbModel *edu)
     return getMainTbl()->isExist(edu);;
 }
 
-QList<DbModel *> DbSqlitePerson::getAll(DbModelBuilder builder, const char* modelName)
+QList<DbModel *> DbSqlitePerson::getAll(DbModelBuilder builder, qint64 status,
+                                        const char* modelName, int from,
+                                        int noItems, int* total)
 {
     traced;
 
@@ -235,7 +237,7 @@ QList<DbModel *> DbSqlitePerson::getAll(DbModelBuilder builder, const char* mode
         loge("Unknow model name %s", name.toStdString().c_str());
     }
     if (tbl != nullptr){
-        return tbl->getAll(builder);
+        return tbl->getAll(builder, status, from, noItems, total);
     } else {
         loge("Not found corresponding table");
         return QList<DbModel *>();
@@ -243,10 +245,10 @@ QList<DbModel *> DbSqlitePerson::getAll(DbModelBuilder builder, const char* mode
 
 }
 
-QHash<QString, DbModel *> DbSqlitePerson::getAllInDict(DbModelBuilder builder, const char *modelName)
+QHash<QString, DbModel *> DbSqlitePerson::getAllInDict(DbModelBuilder builder, qint64 status, const char *modelName)
 {
     traced;
-    QList<DbModel *> list = getAll(builder, modelName);
+    QList<DbModel *> list = getAll(builder, status, modelName);
     QHash<QString, DbModel *> map;
     logd("found %lld item", list.count());
     foreach (DbModel* item, list) {

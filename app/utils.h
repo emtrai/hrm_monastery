@@ -205,6 +205,8 @@ do { \
             } \
         } while(0)
 
+#define FAIL(msg) ASSERT(false, msg)
+
 #define FULLNAME(firstName, lastName) QString("%1 %2").arg(lastName, firstName)
 
 typedef ErrCode (*func_one_csv_item_t)(const QStringList& items, void* caller, void* param);

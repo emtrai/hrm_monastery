@@ -42,7 +42,7 @@ ErrCode Controller::addNew(DbModel *model)
             ret = model->save();
             if (ret == ErrNone) {
                 logi("Save ok, let's reload");
-                onLoad();
+                reloadDb(); // TODO: overhead, when add new is called multiple time!!! (i.e. when import data)
                 // TODO: should emit???? if emit load, loader will catch and reload all
 //                emit load();
             }
@@ -57,7 +57,7 @@ ErrCode Controller::addNew(DbModel *model)
     return ret;
 }
 
-QList<DbModel *> Controller::getItemFromDb()
+QList<DbModel *> Controller::getAllItemsFromDb(qint64 status, int from, int noItems, int* total)
 {
     return QList<DbModel *>();
 }
@@ -237,7 +237,6 @@ DbModel *Controller::getModelByName(const QString &name)
 {
     traced;
     DbModel* model = nullptr;
-    traced;
     DbModelHandler *hdl = getModelHandler();
     logd("name %s", name.toStdString().c_str());
     if (hdl != nullptr) {
@@ -256,7 +255,6 @@ DbModel *Controller::getModelByUid(const QString &uid)
 {
     traced;
     DbModel* model = nullptr;
-    traced;
     DbModelHandler *hdl = getModelHandler();
     logd("uid %s", uid.toStdString().c_str());
     if (hdl != nullptr) {
@@ -270,6 +268,27 @@ DbModel *Controller::getModelByUid(const QString &uid)
     tracede;
     return model;
 }
+
+DbModel *Controller::getModelByNameId(const QString &nameId)
+{
+    traced;
+    logd("get model from name id '%s", STR2CHA(nameId));
+    DbModel* model = nullptr;
+    DbModelHandler *hdl = getModelHandler();
+    logd("uid %s", nameId.toStdString().c_str());
+    if (hdl != nullptr) {
+        model = hdl->getByNameId(nameId);
+    } else {
+        loge("Unknown handler, DERIVED class should implement this");
+        model = nullptr;
+        // TODO: should throw exception???
+    }
+
+    tracede;
+    return model;
+
+}
+
 
 int Controller::filter(int catetoryid,
                        const QString &catetory,
@@ -290,12 +309,6 @@ int Controller::filter(int catetoryid,
 
     tracedr(ret);
     return ret;
-}
-
-ErrCode Controller::loadFromDb()
-{
-    traced;
-    return ErrNotSupport;
 }
 
 
@@ -490,6 +503,25 @@ ErrCode Controller::check2UpdateDbFromPrebuiltFile(const QString &name, const QS
     else {
         logi("Prebuilt saint file up-to-date");
     }
+    tracedr(ret);
+    return ret;
+}
+
+ErrCode Controller::check2UpdateDbFromPrebuiltFile()
+{
+    traced;
+    logd("check 2 update for controller %s", mName.toStdString().c_str());
+    ErrCode ret = ErrNone;
+    QString fname = getPrebuiltFileName();
+    if (!fname.isEmpty()) {
+        logi("Check & load from prebuilt file");
+        ret = check2UpdateDbFromPrebuiltFile(fname, getPrebuiltFileType());
+        logd("check2UpdateDbFromPrebuiltFile ret=%d", ret);
+        // TODO: should do lazyload???
+    } else {
+        logi("Not load from prebuilt file, no prebuilt filename");
+    }
+    tracedr(ret);
     return ret;
 }
 
@@ -509,7 +541,7 @@ ErrCode Controller::doOneCSVItemCallback(const QStringList &items, void *param)
             ret = ErrInvalidData;
             loge("Model data is invalid");
         }
-
+        if (model) delete model;
     }
     else {
         loge("Invalid data");
@@ -534,17 +566,12 @@ void Controller::onLoad(){
     traced;
     logd("Onload %s", mName.toStdString().c_str());
     ErrCode ret = ErrNone;
-    QString fname = getPrebuiltFileName();
-    if (!fname.isEmpty()) {
-        logi("Check & load from prebuilt file");
-        ret = check2UpdateDbFromPrebuiltFile(fname, getPrebuiltFileType());
-        logd("check2UpdateDbFromPrebuiltFile ret=%d", ret);
-        // TODO: should do lazyload???
-    } else {
-        logi("Not load from prebuilt file");
+    ret = check2UpdateDbFromPrebuiltFile();
+    if (ret != ErrNone) {
+        // TODO: report error/issue???
+        loge("Check & updaet db from prebuild failed, ret=%d", ret);
     }
-
-    ret = loadFromDb(); // TODO: handle error case????
+    ret = reloadDb(); // TODO: handle error case????
     logd("load from db ret=%d", ret);
     tracede;
 

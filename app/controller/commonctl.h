@@ -23,10 +23,8 @@
 #define COMMONCTL_H
 
 #include "controller.h"
+#include "dbmodel.h"
 #include <QList>
-
-class DbModel;
-
 
 class CommonCtl : public Controller
 {
@@ -35,13 +33,19 @@ public:
     // Load Community from file
     ErrCode loadFromFile(const QString& path);
 
-    virtual ErrCode loadFromDb();
-    const QList<DbModel*> getAllItems(bool reload = false);
+    virtual ErrCode reloadDb();
+    virtual QList<DbModel*> getAllItems(bool reloadDb = false, int from = 0, int noItems = 0, int* total = nullptr);
+    /**
+     * @brief Get list of item all items from db, must be implemented by derived class
+     *        Caller must free resource after usage
+     * @return List of items. Caller must free resource after usage
+     */
+    virtual QList<DbModel*> getAllItemsFromDb(qint64 status = DB_RECORD_ACTIVE, int from = 0, int noItems = 0, int* total = nullptr);
 
     /* Derived class should implement below functions
      * virtual const char* getPrebuiltFileName();
      * virtual const char* getPrebuiltFileType();
-     * virtual QList<DbModel*> getItemFromDb();
+     * virtual QList<DbModel*> getAllItemsFromDb(qint64 status = DB_RECORD_ACTIVE, int from, int noItems, int* total);
      */
 
     virtual quint64 getExportTypeList();
@@ -49,14 +53,12 @@ protected:
     CommonCtl();
     CommonCtl(const QString& name);
 
-    /**
-     * @brief Get list of item all items from db, must be implemented by derived class
-     * @return
-     */
-    virtual QList<DbModel*> getItemFromDb();
+    virtual DbModelBuilder getMainBuilder() = 0;
+    // build model from data
+    virtual DbModel *buildModel(void *items, const QString &fmt);
 
-    virtual void clearItemList(QList<DbModel*>* list);
-
+    virtual void clearCacheItemList();
+    const char* getPrebuiltFileType();
     /**
      * @brief Parse template file in json to get export info, including item name + header
      *        Currently, just make it simple
@@ -69,7 +71,7 @@ protected:
 
 protected:
 
-    QList<DbModel*> mItemList;
+    QList<DbModel*> mCacheItemList;
 
 };
 

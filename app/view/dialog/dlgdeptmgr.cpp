@@ -69,8 +69,8 @@ void DlgDeptMgr::loadCourse()
 {
     traced;
     ui->cbTerm->clear();
-    QList<Course*> listCourse = INSTANCE(CourseCtl)->getCourseList();
-    foreach(Course* item, listCourse){
+    QList<DbModel*> listCourse = COURSECTL->getAllItemsFromDb(); // TODO: should call getAllItem???
+    foreach(DbModel* item, listCourse){
         ui->cbTerm->addItem(item->name(), item->uid());
     }
 
@@ -79,8 +79,8 @@ void DlgDeptMgr::loadCourse()
 void DlgDeptMgr::loadRole()
 {
     ui->cbRole->clear();
-    QList<Role*> list = INSTANCE(RoleCtl)->getList();
-    foreach(Role* item, list){
+    QList<DbModel*> list = INSTANCE(RoleCtl)->getAllItemsFromDb(); // TODO: getAllItem???
+    foreach(DbModel* item, list){
         ui->cbRole->addItem(item->name(), item->uid());
     }
 }

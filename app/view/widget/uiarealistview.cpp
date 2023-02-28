@@ -69,7 +69,9 @@ Controller *UIAreaListView::getController()
 QList<DbModel *> UIAreaListView::getListItem()
 {
     traced;
-    return AREACTL->getAllItems();
+//    return AREACTL->getAllItems();
+    // TODO: temporary change to this api, should use getAllItems
+    return AREACTL->getAllItemsFromDb();
 }
 
 DbModel *UIAreaListView::onNewModel()

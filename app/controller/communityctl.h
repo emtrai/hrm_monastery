@@ -28,6 +28,7 @@
 #include "controller.h"
 #include "commonctl.h"
 #include "community.h"
+#include "dbmodel.h"
 
 #define COMMUNITYCTL (CommunityCtl::getInstance())
 
@@ -41,9 +42,7 @@ public:
     // Load Community from file
     ErrCode loadFromFile(const QString& path);
 
-//    ErrCode loadFromDb();
 
-//    const QList<Community*> getCommunityList(bool reload = false);
     const QList<DbModel*> getPersonList(const QString& communityUid);
     ErrCode addPerson2Community(const Community* comm,
                       const Person* per,
@@ -54,8 +53,8 @@ public:
 
     virtual const char* getPrebuiltFileName();
     virtual const char* getPrebuiltFileType();
-    virtual QList<DbModel*> getItemFromDb();
     virtual DbModelHandler* getModelHandler();
+    virtual DbModelBuilder getMainBuilder();
     virtual ErrCode addPerson(Community* comm, Person* per);
     virtual QHash<int, QString>* getStatusIdNameMap();
     QString status2Name(CommunityStatus status);

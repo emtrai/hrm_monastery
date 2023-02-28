@@ -75,7 +75,7 @@ qint32 UICommonListView::getTotalItems()
 
 QList<DbModel *> UICommonListView::getListItem()
 {
-    return getController()->getItemFromDb();
+    return getController()->getAllItemsFromDb();
 }
 
 Controller *UICommonListView::getController()
@@ -98,7 +98,7 @@ ErrCode UICommonListView::onReload()
     traced;
     Controller* ctl = getController();
     if (ctl != nullptr)
-        ctl->loadFromDb();
+        ctl->reloadDb();
     onLoad();
     tracede;
     return ErrNone;

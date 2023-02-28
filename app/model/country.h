@@ -32,33 +32,18 @@ class Province;
 
 class Country: public DbModel
 {
-public:
+protected:
     Country();
     Country(const Country& country);
 
-    const QList<Province*>* getListProvince();
-
-    const QString &region() const;
-    void setRegion(const QString &newRegion);
-
-    const QString &continent() const;
-    void setContinent(const QString &newContinent);
-
-    virtual void dump();
 public:
+    virtual ~Country();
     static DbModel *build();
-
-    const QString &shortName() const;
-    void setShortName(const QString &newShortName);
-
+    virtual DbModelBuilder getBuilder();
 
 protected:
     virtual DbModelHandler* getDbModelHandler();
 
-private:
-    QString mShortName;
-    QString mRegion;
-    QString mContinent;
 };
 
 #endif // COUNTRY_H

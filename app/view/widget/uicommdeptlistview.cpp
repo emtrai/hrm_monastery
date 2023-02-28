@@ -137,6 +137,7 @@ ErrCode UICommDeptListView::onLoad()
     // TODO: loop to much, redundant, do something better?
     foreach (DbModel* item, items) {
         mItemList.append(static_cast<DbModel*>(item));
+//        mItemList.append(std::shared_ptr<DbModel>(item));
     }
     tracedr(ret);
     return ret;

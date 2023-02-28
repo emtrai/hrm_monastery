@@ -43,6 +43,7 @@ class Saint: public DbModel, public IExporter, public IImporter
 {
     public:
         static DbModel* build();
+        virtual DbModelBuilder getBuilder();
         void init();
         void initImportFields();
         Saint();

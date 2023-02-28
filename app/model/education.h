@@ -34,6 +34,7 @@ public:
     Education();
 public:
     static DbModel *build();
+    virtual DbModelBuilder getBuilder();
 
 protected:
     virtual DbModelHandler *getDbModelHandler();

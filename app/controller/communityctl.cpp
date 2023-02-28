@@ -197,16 +197,6 @@ ErrCode CommunityCtl::parsePrebuiltFile(const QString &fpath, const QString &fty
     return ret;
 }
 
-//void CommunityCtl::onLoad()
-//{
-//    traced;
-//    ErrCode ret = ErrNone;
-//    ret = check2UpdateDbFromPrebuiltFile(KPrebuiltCommunityJsonFileName, KFileTypeJson);
-//    // TODO: should do lazyload???
-//    loadFromDb();
-//    tracede;
-//}
-
 ErrCode CommunityCtl::addNew(DbModel *model)
 {
     traced;
@@ -221,47 +211,6 @@ ErrCode CommunityCtl::loadFromFile(const QString &path)
     logd("load config from file %s", path.toStdString().c_str());
     return ErrNone;
 }
-
-//ErrCode CommunityCtl::loadFromDb()
-//{
-//    traced;
-//    ErrCode err = ErrNone;
-//    mListCommunity.clear(); // TODO: clear each item to avoid data leak?????
-//    QList items = DB->getModelHandler(KModelHdlCommunity)->getAll(&Community::build);
-//    foreach (DbModel* model, items){
-//        model->dump();
-//        mListCommunity.append((Community*) model);
-//    }
-//    logd("load %d item from db", mListCommunity.count());
-//    tracedr(err);
-//    return err;
-//}
-
-//const QList<Community *> CommunityCtl::getCommunityList(bool reload)
-//{
-////    QList<Community*> list;
-////    traced;
-////    DbModelHandler* modelHandler = DbCtl::getDb()->getCommunityModelHandler();
-////    if (modelHandler != nullptr){
-////        QList<DbModel*> lstModel = modelHandler->getAll(&Community::build);
-////        if (!lstModel.empty()) {
-////            foreach (DbModel* item, lstModel){
-////                list.append((Community*)item);
-////            }
-////        }
-
-////    }
-////    else{
-////        loge("DbSaint not ready");
-////    }
-////    return list;
-//    traced;
-//    logd("reload %d", reload);
-//    if (reload) {
-//        loadFromDb();
-//    }
-//    return mListCommunity;
-//}
 
 const QList<DbModel *> CommunityCtl::getPersonList(const QString &communityUid)
 {
@@ -288,14 +237,14 @@ const char *CommunityCtl::getPrebuiltFileType()
     return KFileTypeJson;
 }
 
-QList<DbModel *> CommunityCtl::getItemFromDb()
-{
-    return getModelHandler()->getAll(&Community::build);
-}
-
 DbModelHandler *CommunityCtl::getModelHandler()
 {
     return DB->getModelHandler(KModelHdlCommunity);
+}
+
+DbModelBuilder CommunityCtl::getMainBuilder()
+{
+    return &Community::build;
 }
 
 ErrCode CommunityCtl::addPerson(Community* comm, Person *per)

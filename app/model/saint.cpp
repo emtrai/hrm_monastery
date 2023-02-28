@@ -39,6 +39,11 @@ DbModel *Saint::build()
     return model;
 }
 
+DbModelBuilder Saint::getBuilder()
+{
+    return &Saint::build;
+}
+
 void Saint::init()
 {
     traced;

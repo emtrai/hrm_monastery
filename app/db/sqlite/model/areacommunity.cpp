@@ -39,6 +39,11 @@ DbModel *AreaCommunity::build()
     return new AreaCommunity();
 }
 
+DbModelBuilder AreaCommunity::getBuilder()
+{
+    return &AreaCommunity::build;
+}
+
 
 QString AreaCommunity::modelName() const
 {

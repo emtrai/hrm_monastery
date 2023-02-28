@@ -55,14 +55,16 @@ public:
      */
     virtual bool exist(const DbModel* model) = 0;
 
-    virtual QList<DbModel*> getAll(DbModelBuilder builder, const char* modelName = nullptr) = 0;
+    virtual QList<DbModel*> getAll(DbModelBuilder builder, qint64 status = DB_RECORD_ACTIVE,
+                                    const char* modelName = nullptr, int from = 0,
+                                    int noItems = 0, int* total = nullptr) = 0;
     /**
      * @brief Get All, return as dictionary, map b/w uid and model
      * @param builder
      * @param modelName
      * @return
      */
-    virtual QHash<QString, DbModel*> getAllInDict(DbModelBuilder builder, const char* modelName = nullptr) = 0;
+    virtual QHash<QString, DbModel*> getAllInDict(DbModelBuilder builder, qint64 status = DB_RECORD_ACTIVE, const char* modelName = nullptr) = 0;
     virtual DbModel* getItem(const QString& uid, DbModelBuilder builder, const char* modelName = nullptr);
     virtual const QString getName() = 0;
 
@@ -89,10 +91,13 @@ public:
 
     // TODO: implement filter with operator (equal, greater, in range, etc.)
 
+    virtual DbModelBuilder getMainBuilder();
     virtual DbModel *getByName(const QString& name, const DbModelBuilder& builder);
     virtual DbModel *getByName(const QString& name);
     virtual DbModel *getByUid(const QString& uid, const DbModelBuilder& builder);
     virtual DbModel *getByUid(const QString& uid);
+    virtual DbModel *getByNameId(const QString& nameId, const DbModelBuilder& builder);
+    virtual DbModel *getByNameId(const QString& nameId);
 };
 
 #endif // DBMODELHANDLER_H

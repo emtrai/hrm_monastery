@@ -45,8 +45,8 @@ public:
 
     virtual const char* getPrebuiltFileName();
     virtual const char* getPrebuiltFileType();
-    virtual QList<DbModel*> getItemFromDb();
     virtual DbModelHandler* getModelHandler();
+    virtual DbModelBuilder getMainBuilder();
     virtual ErrCode markModelDelete(DbModel* model);
     virtual ErrCode deleteModel(DbModel* model);
 

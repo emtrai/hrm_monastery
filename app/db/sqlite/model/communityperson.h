@@ -29,6 +29,7 @@ class CommunityPerson : public MapDbModel
 public:
     CommunityPerson();
     static DbModel* build();
+    virtual DbModelBuilder getBuilder();
     virtual QString modelName() const;
 protected:
     virtual DbModelHandler *getDbModelHandler();

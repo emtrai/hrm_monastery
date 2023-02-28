@@ -26,18 +26,11 @@
 #include "errcode.h"
 
 class DbSqlite;
-class DbSqliteTableBuilder;
-class DbSqliteInsertBuilder;
-class DbModel;
-class QSqlQuery;
 
 class DbSqliteCountryTbl : public DbSqliteTbl
 {
 public:
     DbSqliteCountryTbl(DbSqlite *db);
-    virtual void addTableField(DbSqliteTableBuilder* builder);
-    virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
-    virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
 
 private:
     static const qint32 KVersionCode;

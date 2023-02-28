@@ -58,7 +58,7 @@ void DlgProvince::loadCountry()
 {
     traced;
     logd("Load country");
-    QList<DbModel*> listCountry = COUNTRYCTL->getItemFromDb();
+    QList<DbModel*> listCountry = COUNTRYCTL->getAllItemsFromDb();
     ui->cbCountry->clear();
     foreach(DbModel* item, listCountry){
         ui->cbCountry->addItem(item->name(), item->uid());
@@ -121,6 +121,7 @@ void DlgProvince::on_btnAddCountry_clicked()
         loge("Open dlg country fail, No memory");
         return;
     }
+    dlg->setIsSelfSave(true);
 
     if (dlg->exec() == QDialog::Accepted){
         loadCountry();

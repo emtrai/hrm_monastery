@@ -33,9 +33,9 @@ MissionCtl::MissionCtl():CommonCtl(KModelHdlMission)
     traced;
 }
 
-DbModelHandler *MissionCtl::getModelHandler()
+DbModelBuilder MissionCtl::getMainBuilder()
 {
-    return DB->getModelHandler(KModelHdlMission);
+    return &Mission::build;
 }
 
 // Format: vn, Vietname,Asian, Asia,
@@ -73,10 +73,5 @@ const char *MissionCtl::getPrebuiltFileName()
 const char *MissionCtl::getPrebuiltFileType()
 {
     return KFileTypeCSV;
-}
-
-QList<DbModel *> MissionCtl::getItemFromDb()
-{
-    return getModelHandler()->getAll(&Mission::build);
 }
 

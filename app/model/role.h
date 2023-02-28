@@ -26,11 +26,12 @@
 
 class Role : public DbModel
 {
-public:
+protected:
     Role();
+public:
     static DbModel *build();
+    virtual DbModelBuilder getBuilder();
     virtual QString modelName() const;
-
 
 protected:
     virtual DbModelHandler *getDbModelHandler();

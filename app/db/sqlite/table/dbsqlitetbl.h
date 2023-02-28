@@ -74,7 +74,8 @@ public:
 
     virtual bool isExist(const DbModel* item);
     virtual QHash<QString, QString> getFieldsCheckExists(const DbModel* item);
-    virtual QList<DbModel*> getAll(const DbModelBuilder& builder);
+    virtual QList<DbModel*> getAll(const DbModelBuilder& builder, qint64 status = DB_RECORD_ACTIVE,
+                                    int from = 0, int noItems = 0, int* total = nullptr);
     virtual DbModel* getModel(qint64 dbId, const DbModelBuilder& builder);
 
 
@@ -85,6 +86,7 @@ public:
     virtual QList<QString> getNameFields();
     virtual DbModel *getByName(const QString& keyword, const DbModelBuilder& builder);
     virtual DbModel *getByUid(const QString& uid, const DbModelBuilder& builder);
+    virtual DbModel *getByNameId(const QString& nameId, const DbModelBuilder& builder);
 
     /**
      * @brief Search item by keywords
@@ -163,8 +165,8 @@ protected:
     virtual QString getSearchQueryString(const QString& cond = nullptr);
     virtual QString getSearchQueryStringWithTag(const QString& cond = nullptr, const QString& tag = nullptr);
     virtual QString getFilterQueryString(int fieldId, const QString& cond = nullptr);
-    virtual QSqlQuery *getAllQuery();
-    virtual QString getAllQueryString();
+    virtual QSqlQuery *getAllQuery(qint64 status = DB_RECORD_ACTIVE);
+    virtual QString getAllQueryString(qint64 status = DB_RECORD_ACTIVE);
     virtual DbModelBuilder mainModelBuilder();
 public:
 

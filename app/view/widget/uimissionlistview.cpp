@@ -55,7 +55,7 @@ DbModel *UIMissionListView::onNewModel()
 
 ErrCode UIMissionListView::onLoad()
 {
-    QList<DbModel*> items = MISSIONCTL->getItemFromDb();
+    QList<DbModel*> items = MISSIONCTL->getAllItemsFromDb();
     traced;
     mItemList.clear(); // TODO: clean up item data
     // TODO: loop to much, redundant, do something better?

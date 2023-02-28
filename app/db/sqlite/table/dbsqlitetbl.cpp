@@ -539,7 +539,7 @@ int DbSqliteTbl::runQuery(QSqlQuery &qry, const DbModelBuilder& builder,
     return cnt;
 }
 
-QSqlQuery *DbSqliteTbl::getAllQuery()
+QSqlQuery *DbSqliteTbl::getAllQuery(qint64 status)
 {
     traced;
 //    DB->openDb();
@@ -547,16 +547,27 @@ QSqlQuery *DbSqliteTbl::getAllQuery()
     QSqlQuery* qry = new QSqlQuery(SQLITE->currentDb());
     traced;
     // TODO: check record status????
-    QString queryString = getAllQueryString();
+    QString queryString = getAllQueryString(status);
     qry->prepare(queryString);
     logd("Query String '%s'", queryString.toStdString().c_str());
     return qry;
 }
 
-QString DbSqliteTbl::getAllQueryString()
+QString DbSqliteTbl::getAllQueryString(qint64 status)
 {
     traced;
-    return getSearchQueryString();
+    QString cond;
+    logd("status to get all query string 0x%08x", status);
+    if (status & DB_RECORD_ACTIVE) {
+        cond = QString("%1.%2=%3").arg(name(), KFieldDbStatus).arg(DB_RECORD_ACTIVE);
+    }
+    if (status & DB_RECORD_DElETED) {
+        if (!cond.isEmpty()) {
+            cond += " OR ";
+        }
+        cond = QString("%1.%2=%3").arg(name(), KFieldDbStatus).arg(DB_RECORD_DElETED);
+    }
+    return getSearchQueryString(cond.isEmpty()?nullptr:cond);
 }
 
 DbModelBuilder DbSqliteTbl::mainModelBuilder()
@@ -566,11 +577,12 @@ DbModelBuilder DbSqliteTbl::mainModelBuilder()
 
 
 
-QList<DbModel *> DbSqliteTbl::getAll(const DbModelBuilder& builder)
+QList<DbModel *> DbSqliteTbl::getAll(const DbModelBuilder& builder, qint64 status,
+                                     int from, int noItems, int* total)
 {
 
     traced;
-    QSqlQuery* qry = getAllQuery();
+    QSqlQuery* qry = getAllQuery(status);
     QList<DbModel*>list;
     // TODO: check status (delete or not, etc.0
     if( qry->exec() )
@@ -728,6 +740,30 @@ DbModel *DbSqliteTbl::getByUid(const QString &uid, const DbModelBuilder &builder
     }
 
     return retDb;
+}
+
+DbModel *DbSqliteTbl::getByNameId(const QString &nameId, const DbModelBuilder &builder)
+{
+    traced;
+    QHash<QString, int> inFields;
+    QList<DbModel*> outList;
+    DbModel* retDb = nullptr;
+    inFields.insert(QString("%1.%2").arg(name(), KFieldNameId), TEXT); // TODO: make this common with name field above???
+    logi("Search by nameid '%s'", nameId.toStdString().c_str());
+    qint32 cnt = 0;
+    cnt = DbSqliteTbl::search (nameId, inFields, builder, &outList, true);
+
+    logi("Found %d", cnt);
+    if (cnt > 0 && outList.count() > 0){
+        logd("Found, return 1st element");
+        retDb = outList[0];
+    } else {
+        logi("Not found nameId '%s'", nameId.toStdString().c_str());
+        // TODO: safe to print unicode log????
+    }
+
+    return retDb;
+
 }
 
 int DbSqliteTbl::search(const QString &keyword, QList<DbModel *> *outList)

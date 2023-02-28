@@ -38,6 +38,11 @@ DbModel *SaintPerson::build()
     return new SaintPerson();
 }
 
+DbModelBuilder SaintPerson::getBuilder()
+{
+    return &SaintPerson::build;
+}
+
 QString SaintPerson::buildUid(const QString *seed)
 {
     traced;

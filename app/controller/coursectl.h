@@ -22,7 +22,7 @@
 #ifndef COURSECTL_H
 #define COURSECTL_H
 
-#include "controller.h"
+#include "commonctl.h"
 #include "utils.h"
 #include <QList>
 
@@ -30,23 +30,21 @@ class Course;
 
 #define COURSECTL INSTANCE(CourseCtl)
 
-class CourseCtl : public Controller
+class CourseCtl : public CommonCtl
 {
     GET_INSTANCE_DECL(CourseCtl);
 public:
     CourseCtl();
 protected:
-    DbModel *buildModel(void *items, const QString &fmt);
-public:
-    const QList<Course*> getCourseList();
+    // build model from data
+    virtual DbModel *buildModel(void *items, const QString &fmt);
 
-public:
-    virtual ErrCode reloadDb();
+    // prebuilt data file name
+    virtual const char* getPrebuiltFileName();
+    // prebuilt data file type, i.e. csv
+    virtual const char* getPrebuiltFileType();
 
-public slots:
-    virtual void onLoad();
-private:
-    QList<Course*> mCourseList;
+    virtual DbModelBuilder getMainBuilder();
 };
 
 #endif // COURSECTL_H

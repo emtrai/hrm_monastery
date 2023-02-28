@@ -29,6 +29,7 @@ class AreaPerson : public MapDbModel
 public:
     AreaPerson();
     static DbModel* build();
+    virtual DbModelBuilder getBuilder();
     virtual QString modelName() const;
 protected:
     virtual DbModelHandler *getDbModelHandler();

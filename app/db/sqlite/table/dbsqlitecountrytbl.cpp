@@ -24,14 +24,9 @@
 
 #include "dbsqlitedefs.h"
 #include "errcode.h"
-#include <QSqlQuery>
-#include <QSqlRecord>
 #include <QHash>
 #include "defs.h"
 #include "logger.h"
-#include "country.h"
-#include "dbsqlitetablebuilder.h"
-#include "dbsqliteinsertbuilder.h"
 
 const qint32 DbSqliteCountryTbl::KVersionCode = VERSION_CODE(0,0,1);
 
@@ -39,37 +34,5 @@ DbSqliteCountryTbl::DbSqliteCountryTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableCountry, KTableCountry, KVersionCode)
 {
     traced;
-}
-
-void DbSqliteCountryTbl::addTableField(DbSqliteTableBuilder *builder)
-{
-    traced;
-    DbSqliteTbl::addTableField(builder);
-    builder->addField(KFieldRegion, TEXT);
-    builder->addField(KFieldShortName, TEXT);
-    builder->addField(KFieldContinent, TEXT);
-}
-
-ErrCode DbSqliteCountryTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
-{
-    traced;
-    DbSqliteTbl::insertTableField(builder, item); // TODO: handle error code
-
-    Country* model = (Country*) item;
-    // TODO: check if shortname exist???
-    builder->addValue(KFieldRegion, model->region());
-    builder->addValue(KFieldShortName, model->shortName());
-    builder->addValue(KFieldContinent, model->continent());
-    return ErrNone;
-}
-
-void DbSqliteCountryTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
-{
-    traced;
-    DbSqliteTbl::updateModelFromQuery(item, qry);
-    Country* model = (Country*) item;
-    model->setRegion(qry.value(KFieldRegion).toString());
-    model->setShortName(qry.value(KFieldShortName).toString());
-    model->setContinent(qry.value(KFieldContinent).toString());
 }
 

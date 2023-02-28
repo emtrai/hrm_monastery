@@ -46,6 +46,11 @@ DbModel *Work::build()
     return model;
 }
 
+DbModelBuilder Work::getBuilder()
+{
+    return &Work::build;
+}
+
 DbModelHandler *Work::getDbModelHandler()
 {
     return DB->getModelHandler(KModelHdlWork);

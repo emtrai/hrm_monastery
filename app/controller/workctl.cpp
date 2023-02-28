@@ -40,54 +40,12 @@ WorkCtl::~WorkCtl()
     traced;
 }
 
-DbModelHandler *WorkCtl::getModelHandler()
+DbModelBuilder WorkCtl::getMainBuilder()
 {
-    return DB->getModelHandler(KModelHdlWork);
+    return &Work::build;
 }
 
 const char *WorkCtl::getPrebuiltFileName()
 {
     return KPrebuiltWorkCSVFileName;
-}
-
-const char *WorkCtl::getPrebuiltFileType()
-{
-    return KFileTypeCSV;
-}
-
-QList<DbModel *> WorkCtl::getItemFromDb()
-{
-    return getModelHandler()->getAll(&Work::build);
-
-}
-
-// Format: id,name,remark
-DbModel *WorkCtl::buildModel(void *items, const QString &fmt)
-{
-    traced;
-    Work* item = new Work();
-    QStringList* itemList = (QStringList*) items;
-    qint32 idx = 0;
-    qint32 sz = itemList->length();
-    logd("sz %d", sz);
-    QString nameid = itemList->at(idx++).trimmed();
-    QString name = itemList->at(idx++).trimmed();
-    item->setName(name);
-//    if (nameid.isEmpty())
-//        nameid = Utils::UidFromName(name, UidNameConvertType::NO_VN_MARK_UPPER);
-    item->setNameId(nameid);
-    if (sz > idx) {
-        QString remark; // last item is remark, so merge all items as remark
-        for (; idx < sz; idx++){
-            if (!remark.isEmpty()){
-                remark += ",";
-            }
-            remark += itemList->at(idx);
-        }
-
-        if (!remark.isEmpty())
-            item->setRemark(remark);
-    }
-    tracede;
-    return item;
 }

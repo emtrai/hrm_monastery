@@ -30,9 +30,13 @@
 
 class Area : public DbModel
 {
-public:
+protected:
     Area();
+public:
+    virtual ~Area();
     static DbModel *build();
+
+    virtual void clone(const DbModel* model);
     virtual QString modelName() const;
 
     Country *getCountry() const;
@@ -63,6 +67,7 @@ public:
 
 protected:
     virtual DbModelHandler* getDbModelHandler();
+    virtual DbModelBuilder getBuilder();
 private:
     Person* mManager;
     QHash<qint32, QList<Person*>> mMember; // role, list of member

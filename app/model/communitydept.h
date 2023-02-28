@@ -30,6 +30,7 @@ public:
     CommunityDept();
 
     static DbModel *build();
+    virtual DbModelBuilder getBuilder();
     virtual QString modelName() const;
 
     qint64 establishDate() const;

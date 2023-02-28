@@ -22,29 +22,24 @@
 #ifndef STATUSCTL_H
 #define STATUSCTL_H
 
-#include "controller.h"
+#include "commonctl.h"
 #include "utils.h"
 #include <QList>
 
 class Status;
 
-class StatusCtl : public Controller
+class StatusCtl : public CommonCtl
 {
     GET_INSTANCE_DECL(StatusCtl);
 public:
     StatusCtl();
 protected:
-    DbModel *buildModel(void *items, const QString &fmt);
-public:
-    const QList<Status*> getStatusList();
+    // prebuilt data file name
+    virtual const char* getPrebuiltFileName();
+    // prebuilt data file type, i.e. csv
+    virtual const char* getPrebuiltFileType();
 
-public:
-    virtual ErrCode reloadDb();
-
-public slots:
-    virtual void onLoad();
-private:
-    QList<Status*> mStatusList;
+    virtual DbModelBuilder getMainBuilder();
 };
 
 #endif // STATUSCTL_H
