@@ -66,8 +66,8 @@ void UICommunityListView::updateItem(DbModel *item, UITableItem *tblItem)
 
     UICommonListView::updateItem(item, tblItem);
     Community* model = (Community*) item;
-    tblItem->addValue(model->communityCode());
-    tblItem->addValue(COMMUNITYCTL->status2Name(model->getStatus()));
+    tblItem->addValue(model->nameId());
+    tblItem->addValue(DbModel::status2Name(model->getStatus()));
     tblItem->addValue(model->areaName());
     tblItem->addValue(model->addr());
     tblItem->addValue(model->currentCEO());

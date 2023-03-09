@@ -34,7 +34,7 @@ ExportCSVList::ExportCSVList()
     traced;
 }
 
-ErrCode ExportCSVList::saveTo(const IExporter* exporter, const QList<DbModel*> listData, const QString &fpath)
+ErrCode ExportCSVList::saveTo(const IDataExporter* exporter, const QList<DbModel*> listData, const QString &fpath)
 {
     traced;
     ErrCode ret = ErrNone;

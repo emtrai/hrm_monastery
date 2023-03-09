@@ -22,7 +22,7 @@
 #include "dbsqliteevent.h"
 #include "logger.h"
 #include "defs.h"
-
+#include "event.h"
 #include "dbsqlitedefs.h"
 #include "dbsqlite.h"
 
@@ -40,4 +40,9 @@ const QString DbSqliteEvent::getName()
 DbSqliteTbl *DbSqliteEvent::getMainTbl()
 {
     return (DbSqliteTbl*)DbSqlite::getInstance()->getTable(KTableEvent);
+}
+
+DbModelBuilder DbSqliteEvent::getMainBuilder()
+{
+    return &Event::build;
 }

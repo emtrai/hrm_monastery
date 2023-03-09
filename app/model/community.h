@@ -29,17 +29,21 @@
 #include "address.h"
 #include "person.h"
 #include "department.h"
-#include "iexporter.h"
+#include "idataexporter.h"
+#include "dbmodel.h"
+
+#define MISSION_DELIM ","
 
 class Area;
+
 // BE WARE, ANY CHANGE TO THIS STATUS WILL IMPACT TO DB
 // THIS VALUE IS WRITTEN DIRECTLY TO DB
 // TODO: to do what to improve this???
-// TODO: change to StatusModel?????
+// TODO: change to DbModelStatus?????
 enum CommunityStatus {
-    INACTIVE = 0, // inactive, not operating
-    ACTIVE, // active, operating
-    BUILDING, // building phase, not ready
+    COMMUNITY_INACTIVE = 0, // inactive, not operating
+    COMMUNITY_ACTIVE, // active, operating
+    COMMUNITY_BUILDING, // building phase, not ready
 
 
     COMMUNITY_STATUS_MAX
@@ -49,15 +53,18 @@ class Community: public DbModel
 {
 public:
     static DbModel *build();
-public:
+protected:
     Community();
     Community(const Community& obj);
-    ~Community();
-
+public:
+    virtual ~Community();
     virtual void clone(const DbModel* per);
-     virtual DbModelBuilder getBuilder();
+    virtual DbModelBuilder getBuilder();
     virtual void initExportFields();
     virtual void initImportFields();
+
+    virtual QString modelName() const;
+
 
     qint32 level() const;
 
@@ -70,8 +77,8 @@ public:
     const QString &parentUid() const;
     void setParentUid(const QString &newParentUid);
 
-    CommunityStatus getStatus() const;
-    void setStatus(CommunityStatus newStatus);
+    DbModelStatus getStatus() const;
+    void setStatus(DbModelStatus newStatus);
     void setStatus(int newStatus);
 
 //    ErrCode save();
@@ -79,6 +86,7 @@ public:
 
     qint64 closeDate() const;
     void setCloseDate(qint64 newCloseDate);
+    void setCloseDateFromString(const QString& date, const QString& format="D.M.Y");
 
     const QString &church() const;
     void setChurch(const QString &newChurch);
@@ -117,9 +125,6 @@ public:
     const QString &areaName() const;
     void setAreaName(const QString &newAreaName);
 
-    const QString &communityCode() const;
-    void setCommunityCode(const QString &newCommunityCode);
-
     const QString &countryUid() const;
     void setCountryUid(const QString &newCountryUid);
 
@@ -145,21 +150,45 @@ public:
     const QString &areaCode() const;
     void setAreaCode(const QString &newAreaCode);
 
-    const QString &parentCode() const;
-    void setParentCode(const QString &newParentCode);
+    const QString &parentNameId() const;
+    void setParentNameId(const QString &newParentNameId);
 
     const QString &currentCEOCode() const;
     void setCurrentCEOCode(const QString &newCurrentCEOCode);
     virtual const QString exportTemplatePath(Exporter* exporter) const;
+    const QString &brief() const;
+    void setBrief(const QString &newBrief);
+
+    const QStringList &missionUid() const;
+    QString missionUidString() const;
+    void setMissionUid(const QStringList &newMissionUid);
+    void setMissionUid(const QString &newMissionUid);
+    void addMissionUid(const QString &newMissionUid);
+
+    const QStringList &missionName() const;
+    QString missionNameString() const;
+    void setMissionName(const QStringList &newMissionName);
+    void addMissionName(const QString &newMissionName);
+
+    const QString &countryName() const;
+    void setCountryName(const QString &newCountryName);
+
 protected:
     virtual DbModelHandler* getDbModelHandler();
+
+    /**
+     * @brief return if model is deleted or not
+     * @param msg: informative message
+     * @return true: allow to delete, false otherwise
+     */
+    virtual bool allowRemove(QString* msg = nullptr);
 private:
     QString mImgPath;
-    QString mCommunityCode;    // TODO: community code: to be use later???
     QString mAddr;
     QString mProvince;
     QString mCountry;
     QString mCountryUid;
+    QString mCountryName;
     QString mChurch;
     QString mTel;
     QString mEmail;
@@ -167,12 +196,12 @@ private:
     Community* mParent;
     QString mParentName;
     QString mParentUid;
-    QString mParentCode;
+    QString mParentNameId;
 
     qint64 mCreateDate;
     qint64 mCloseDate;
     qint64 mFeastDate;
-    CommunityStatus status;
+    DbModelStatus status;
     QString mStatusName;
 
     QString mBrief;
@@ -195,6 +224,9 @@ private:
 
     QString mIntro;
     QString mContact; // Other detail contact
+
+    QStringList mMissionUid;
+    QStringList mMissionName;
 };
 
 #endif // COMMUNITY_H

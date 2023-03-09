@@ -14,17 +14,24 @@
  * limitations under the License.
  *
  *
- * Filename: iimporter.cpp
+ * Filename: idataimporter.cpp
  * Author: Anh, Ngo Huy
  * Created date:8/27/2022
  * Brief:
  */
-#include "iimporter.h"
+#include "idataimporter.h"
 #include "logger.h"
 #include "errcode.h"
 #include "utils.h"
 
-ErrCode IImporter::onImportItem(int importFileType, const QString &keyword, const QString &value, quint32 idx, void* tag)
+ErrCode IDataImporter::onImportStart(const QString &importName, int importFileType, const QString &fname)
+{
+    traced;
+    logw("DEFAULT onImportStart, SHOULD BE IMPLEMENTED IN DERIVED CLASS");
+    return ErrNone;
+}
+
+ErrCode IDataImporter::onImportItem(const QString& importName, int importFileType, const QString &keyword, const QString &value, quint32 idx, void* tag)
 {
     traced;
     loge("DEFAULT onImportItem, MUST BE IMPLEMENTED IN DERIVED CLASS");
@@ -33,7 +40,7 @@ ErrCode IImporter::onImportItem(int importFileType, const QString &keyword, cons
     return ErrNotSupport;
 }
 
-ErrCode IImporter::onImportItem(int importFileType, const QStringList &items, quint32 idx, void* tag) {
+ErrCode IDataImporter::onImportItem(const QString& importName, int importFileType, const QStringList &items, quint32 idx, void* tag) {
     traced;
     loge("DEFAULT onImportItem, MUST BE IMPLEMENTED IN DERIVED CLASS");
     ASSERT(false, "DEFAULT onImportItem, MUST BE IMPLEMENTED IN DERIVED CLASS");
@@ -41,11 +48,17 @@ ErrCode IImporter::onImportItem(int importFileType, const QStringList &items, qu
     return ErrNotSupport;
 }
 
-ErrCode IImporter::onImportItem(int importFileType, const QHash<QString, QString> &items, quint32 idx, void *tag)
+ErrCode IDataImporter::onImportItem(const QString& importName, int importFileType, const QHash<QString, QString> &items, quint32 idx, void *tag)
 {
     traced;
     loge("DEFAULT onImportItem, MUST BE IMPLEMENTED IN DERIVED CLASS");
     ASSERT(false, "DEFAULT onImportItem, MUST BE IMPLEMENTED IN DERIVED CLASS");
     // TODO: make it abstract????
     return ErrNotSupport;
+}
+
+void IDataImporter::onImportEnd(const QString &importName, int importFileType, const QString &fname, ErrCode result)
+{
+    traced;
+    logw("DEFAULT onImportEnd, SHOULD BE IMPLEMENTED IN DERIVED CLASS, result=%d", result);
 }

@@ -88,3 +88,4 @@ DbModelBuilder DbSqliteSpecialist::getMainBuilder()
 {
     return (DbModelBuilder)Specialist::build;
 }
+

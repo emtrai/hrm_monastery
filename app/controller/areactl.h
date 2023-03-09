@@ -22,7 +22,7 @@
 #ifndef AREACTL_H
 #define AREACTL_H
 
-#include "commonctl.h"
+#include "modelcontroller.h"
 #include "utils.h"
 #include <QList>
 #include "dbmodel.h"
@@ -31,11 +31,12 @@
 
 class DbModel;
 
-class AreaCtl : public CommonCtl
+class AreaCtl : public ModelController
 {
     GET_INSTANCE_DECL(AreaCtl);
 private:
     AreaCtl();
+    virtual ~AreaCtl();
 protected:
 
     // build model from data

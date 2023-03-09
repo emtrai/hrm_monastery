@@ -132,7 +132,7 @@ ErrCode UICommDeptListView::onLoad()
     QList<DbModel*> items;
     ErrCode ret = ErrNone;
     traced;
-    items = COMMUNITYDEPTCTL->getDepartList(mCommunity->uid());
+    items = COMMUNITYDEPTCTL->getListDept(mCommunity->uid());
     mItemList.clear(); // TODO: clean up item data
     // TODO: loop to much, redundant, do something better?
     foreach (DbModel* item, items) {

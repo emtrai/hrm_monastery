@@ -29,7 +29,7 @@
 GET_INSTANCE_IMPL(ProvinceCtl)
 
 ProvinceCtl::ProvinceCtl():
-    CommonCtl(KModelHdlProvince)
+    ModelController(KModelHdlProvince)
 {
     traced;
 }

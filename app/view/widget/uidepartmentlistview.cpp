@@ -57,7 +57,7 @@ void UIDepartmentListView::updateItem(DbModel *item, UITableItem *tblItem)
 }
 
 
-Controller *UIDepartmentListView::getController()
+ModelController *UIDepartmentListView::getController()
 {
     traced;
     return DEPART;

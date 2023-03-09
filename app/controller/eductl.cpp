@@ -33,7 +33,7 @@
 
 GET_INSTANCE_IMPL(EduCtl);
 
-EduCtl::EduCtl():CommonCtl(KModelHdlEdu)
+EduCtl::EduCtl():ModelController(KModelHdlEdu)
 {
     traced;
 }

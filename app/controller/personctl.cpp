@@ -113,7 +113,7 @@ QList<DbModel *> PersonCtl::getListEvent(const Person* person)
     return modelHdl()->getAll(&PersonEvent::build, DB_RECORD_ACTIVE, KModelNamePersonEvent);
 }
 
-DbModel *PersonCtl::doImportOneItem(int importFileType, const QStringList &items, quint32 idx)
+DbModel *PersonCtl::doImportOneItem(const QString& importName, int importFileType, const QStringList &items, quint32 idx)
 {
     ErrCode ret = ErrNone;
     Person* person = nullptr;
@@ -132,7 +132,7 @@ DbModel *PersonCtl::doImportOneItem(int importFileType, const QStringList &items
         foreach (QString item, items) {
             QString field = mImportFields[i++];
             logd("Import field %s", field.toStdString().c_str());
-            ret = person->onImportItem(importFileType, field, item, idx);
+            ret = person->onImportItem(importName, importFileType, field, item, idx);
         }
     }
 
@@ -140,7 +140,7 @@ DbModel *PersonCtl::doImportOneItem(int importFileType, const QStringList &items
     return person;
 }
 
-DbModel *PersonCtl::doImportOneItem(int importFileType, const QHash<QString, QString> &items, quint32 idx)
+DbModel *PersonCtl::doImportOneItem(const QString& importName, int importFileType, const QHash<QString, QString> &items, quint32 idx)
 {
     ErrCode ret = ErrNone;
     Person* person = nullptr;
@@ -151,7 +151,7 @@ DbModel *PersonCtl::doImportOneItem(int importFileType, const QHash<QString, QSt
         QString value = items.value(field);
         logd("Import field %s", field.toStdString().c_str());
         logd("Import value %s", value.toStdString().c_str());
-        ret = person->onImportItem(importFileType, field, value, idx);
+        ret = person->onImportItem(importName, importFileType, field, value, idx);
     }
 
     tracedr(ret);
@@ -189,7 +189,7 @@ int PersonCtl::filter(int catetoryid, const QString &catetory, qint64 opFlags, c
         }
     } else {
         logd("generic filter");
-        ret = Controller::filter(catetoryid, catetory, opFlags, keywords, outList);
+        ret = ModelController::filter(catetoryid, catetory, opFlags, keywords, outList);
     }
     tracedr(ret);
     return ret;
@@ -264,7 +264,7 @@ quint64 PersonCtl::getExportTypeList()
 }
 
 PersonCtl::PersonCtl():
-    Controller(KModelHdlPerson),
+    ModelController(KModelHdlPerson),
     mModelHdl(nullptr)
 {
 }
@@ -323,7 +323,12 @@ DbModelHandler *PersonCtl::getModelHandler()
     return modelHdl();
 }
 
-void PersonCtl::onLoad()
+DbModelBuilder PersonCtl::getMainBuilder()
+{
+    return &Person::build;
+}
+
+ErrCode PersonCtl::onLoad()
 {
     traced;
     // TODO: caching management people, which can be used many times, for fast query

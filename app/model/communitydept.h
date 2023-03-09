@@ -33,6 +33,8 @@ public:
     virtual DbModelBuilder getBuilder();
     virtual QString modelName() const;
 
+    virtual const QString &name() const;
+
     qint64 establishDate() const;
     void setEstablishDate(qint64 newEstablishDate);
     void setEstablishDateFromString(const QString &date, const QString &format="D.M.Y");
@@ -55,9 +57,6 @@ public:
     const QString &communityUid() const;
     void setCommunityUid(const QString &newCommunityUid);
 
-    const QString &code() const;
-    void setCode(const QString &newCode);
-
     const QString &departmentUid() const;
     void setDepartmentUid(const QString &newDepartmentUid);
 
@@ -70,17 +69,25 @@ public:
     const QString &departmentName() const;
     void setDepartmentName(const QString &newDepartmentName);
 
+    const QString & communityName() const;
+    void setCommunityName(const QString & newCommunityName);
+
+    qint64 closedDate() const;
+    void setClosedDate(qint64 newClosedDate);
+    void setClosedDateFromString(const QString &date, const QString &format="D.M.Y");
+
 protected:
     virtual DbModelHandler* getDbModelHandler();
 private:
 
-    QString mCode;
     QString mDepartmentUid;
     qint64 mDepartmentDbId;
-    QString mDepartmentName;
+    QString mDepartmentName; // just for caching
     QString mCommunityUid;
     qint64 mCommunityDbId;
+    QString mCommunityName; // just for caching
     qint64 mEstablishDate;
+    qint64 mClosedDate;
     QString mEmail;
     QString mAddr;
     QString mTel;

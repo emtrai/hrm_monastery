@@ -29,6 +29,37 @@
 #include "defs.h"
 #include "dbmodel.h"
 
+const QHash<int, QString> *Course::getCourseTypeNameMap()
+{
+    traced;
+    static bool isInited = false;
+    static QHash<int, QString> map;
+    if (!isInited) {
+        map.insert(COURSE_TYPE_COURSE, QObject::tr("Khóa tu"));
+        map.insert(COURSE_TYPE_TERM, QObject::tr("Nhiệm kỳ quản lý"));
+        map.insert(COURSE_TYPE_OTHERS, QObject::tr("Khác"));
+        isInited = true;
+    }
+    tracede;
+    return &map;
+}
+
+QString Course::courseType2Name(DbModelStatus type)
+{
+    const QHash<int, QString>* courseMap = getCourseTypeNameMap();
+    QString ret;
+    traced;
+    logd("type %d", type);
+    if (courseMap->contains(type)){
+        ret = courseMap->value(type);
+    } else {
+        loge("invalid type %d", type);
+        ret = "Không rõ"; // TODO: translate???
+    }
+    tracede;
+    return ret;
+}
+
 Course::Course():
     mStartDate(0),
     mEndDate(0)

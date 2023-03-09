@@ -53,3 +53,8 @@ DbSqliteTbl *DbSqliteEthnic::getMainTbl()
 {
     return (DbSqliteTbl*)DbSqlite::getInstance()->getTable(KTableEthnic);
 }
+
+DbModelBuilder DbSqliteEthnic::getMainBuilder()
+{
+    return &Ethnic::build;
+}

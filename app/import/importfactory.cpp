@@ -51,14 +51,14 @@ Importer *ImportFactory::getImporter(ImportType type)
     return ret;
 }
 
-ErrCode ImportFactory::importFrom(IImporter *item, const QString &fpath, ImportType type, void* tag)
+ErrCode ImportFactory::importFrom(const QString& importName, IDataImporter *item, const QString &fpath, ImportType type, void* tag)
 {
     traced;
     ErrCode ret = ErrNone;
     logi("Import from %d", type);
     Importer* importer = getImporter(type);
     if (importer != nullptr)
-        ret = importer->importFrom((int) type, item, fpath, tag);
+        ret = importer->importFrom(importName, (int) type, item, fpath, tag);
     else {
         ret = ErrNotSupport;
         loge("Importer %d not support", type);

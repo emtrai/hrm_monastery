@@ -28,6 +28,7 @@
 #include <QDateTime>
 
 #include "community.h"
+#include "dbmodel.h"
 
 QString TestCtl::GetRandomString(qint32 length)
 {
@@ -69,10 +70,10 @@ Person *TestCtl::genRandomPerson()
 Community* TestCtl::genRandomCommunity(){
 
     traced;
-    Community* commObj = new Community();
+    Community* commObj = (Community*)Community::build();
 
     commObj->setName(GetRandomName(2));
-    commObj->setStatus(CommunityStatus::ACTIVE);
+    commObj->setStatus(DbModelStatus::MODEL_ACTIVE);
     commObj->setCreateDate(QDateTime::currentMSecsSinceEpoch());
     commObj->dump();
 

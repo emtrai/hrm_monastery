@@ -40,7 +40,7 @@ UICountryListView::~UICountryListView()
     traced;
 }
 
-Controller *UICountryListView::getController()
+ModelController *UICountryListView::getController()
 {
     return COUNTRYCTL;
 }

@@ -34,6 +34,12 @@ class DbSqliteCommunity : public DbSqliteModelHandler, public DbCommunityModelHa
 public:
     DbSqliteCommunity();
     static DbSqliteCommunity* getInstance();
+    /**
+     * @brief add model to db
+     * @param model
+     * @return ErrNone on success, error code otherwise
+     */
+    virtual ErrCode add(DbModel* model);
     virtual const QString getName();
     // TODO: mapping community & person stored in person tbl and community&person mapping table
     // risk of inconsistant data

@@ -22,14 +22,14 @@
 #ifndef EDUCTL_H
 #define EDUCTL_H
 
-#include <commonctl.h>
+#include "modelcontroller.h"
 #include "errcode.h"
 #include <QStringList>
 #include "education.h"
 
 #define EDUCTL EduCtl::getInstance()
 
-class EduCtl : public CommonCtl
+class EduCtl : public ModelController
 {
     GET_INSTANCE_DECL(EduCtl);
 private:

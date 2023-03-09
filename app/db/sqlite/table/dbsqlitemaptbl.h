@@ -23,14 +23,7 @@
 #define DBSQLITEMAPTBL_H
 
 #include "dbsqlitetbl.h"
-
-enum ItemMapStatus{
-    ITEM_MAP_STATUS_NOT_READY = (1 << 0),
-    ITEM_MAP_STATUS_INACTIVE = (1 << 1), // Map is inactive
-    ITEM_MAP_STATUS_ACTIVE = (1 << 2), // Map is active
-
-    ITEM_MAP_STATUS_UNKNOWN = (0),
-};
+#include "dbmodel.h"
 
 class MapDbModel;
 
@@ -46,7 +39,7 @@ public:
                                   const QString &fieldUid1Cond,
                                   const DbModelBuilder &builder,
                                   const QString &uid,
-                                  int status = ITEM_MAP_STATUS_ACTIVE,
+                                  int status = MODEL_ACTIVE,
                                   const QString& selectedField = "*");
 
 protected:

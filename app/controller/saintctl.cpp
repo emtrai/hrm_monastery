@@ -57,7 +57,7 @@ SaintCtl *SaintCtl::gInstance = nullptr;
 //    return list;
 //}
 
-DbModel *SaintCtl::doImportOneItem(int importFileType, const QStringList &items, quint32 idx)
+DbModel *SaintCtl::doImportOneItem(const QString& importName, int importFileType, const QStringList &items, quint32 idx)
 {
     ErrCode ret = ErrNone;
     Saint* saint = nullptr;
@@ -73,7 +73,7 @@ DbModel *SaintCtl::doImportOneItem(int importFileType, const QStringList &items,
 
         saint = (Saint*)Saint::build();
         foreach (QString item, items) {
-            ret = saint->onImportItem(importFileType, mImportFields[i++], item, idx);
+            ret = saint->onImportItem(importName, importFileType, mImportFields[i++], item, idx);
         }
     }
 
@@ -82,7 +82,7 @@ DbModel *SaintCtl::doImportOneItem(int importFileType, const QStringList &items,
 }
 
 SaintCtl::SaintCtl():
-    CommonCtl(KModelHdlSaint)
+    ModelController(KModelHdlSaint)
 {
 
 }
@@ -163,7 +163,7 @@ ErrCode SaintCtl::parsePrebuiltFile(const QString &fpath, const QString &ftype)
 
         QList<DbModel*> list;
         logd("Import saint file %s", fpath.toStdString().c_str());
-        ret = importFromFile(nullptr, ImportType::IMPORT_CSV_LIST, fpath, &list);
+        ret = importFromFile(KModelHdlSaint, ImportType::IMPORT_CSV_LIST, fpath, &list);
         logd("Import result %d", ret);
         logd("No of import item %d", list.count());
         if (ret == ErrNone) {
@@ -218,13 +218,6 @@ QString SaintCtl::getHollyNameFromSaintUidList(const QString &uidList)
     traced;
     return getNameFromUidList(uidList);
 }
-//void SaintCtl::onLoad()
-//{
-//    traced;
-//    ErrCode ret = ErrNone;
-//    ret = check2UpdateDbFromPrebuiltFile(KPrebuiltSaintCSVFileName, KFileTypeCSV);
-
-//}
 
 SaintCtl *SaintCtl::getInstance()
 {

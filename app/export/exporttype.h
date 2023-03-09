@@ -35,5 +35,8 @@ enum ExportType {
 };
 
 ErrCode getExportTypeName(uint32_t exportTypes, QHash<int, QString>& exportTypeName);
-QString typeToExt(ExportType type, bool* isOk);
+QString typeToExt(ExportType type, bool* isOk = nullptr);
+
+QString exportItem2Name(const QString& item, bool* isOk = nullptr);
+
 #endif // EXPORTTYPE_H

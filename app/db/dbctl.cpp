@@ -33,7 +33,7 @@
 
 DbCtl* DbCtl::gInstance = nullptr;
 
-DbCtl::DbCtl():Controller("DbCtl")
+DbCtl::DbCtl()
 {
     traced;
     mDatabase = DbSqlite::getInstance();
@@ -64,6 +64,11 @@ IDatabase *DbCtl::database() const
     return mDatabase;
 }
 
+QString DbCtl::getName()
+{
+    return "DbCtl";
+}
+
 
 DbCtl* DbCtl::getInstance(){
     traced;
@@ -78,8 +83,9 @@ IDatabase* DbCtl::getDb(){
     return getInstance()->database();
 }
 
-void DbCtl::onLoad(){
+ErrCode DbCtl::onLoad(){
     traced;
     mDatabase->loadDb(dbInfo);
     tracede;
+    return ErrNone;
 }

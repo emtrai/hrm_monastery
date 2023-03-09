@@ -25,7 +25,7 @@
 #include "importer.h"
 #include "errcode.h"
 #include <QString>
-#include "iimporter.h"
+#include "idataimporter.h"
 #include "utils.h"
 
 class ImportCSV : public Importer
@@ -35,7 +35,8 @@ public:
     ImportCSV();
 
 
-    virtual ErrCode importFrom(int importFileType, IImporter* importer, const QString& fpath, void* tag = nullptr);
+    virtual ErrCode importFrom(const QString& importName, int importFileType,
+                               IDataImporter* importer, const QString& fpath, void* tag = nullptr);
 };
 
 #endif // IMPORTCSV_H

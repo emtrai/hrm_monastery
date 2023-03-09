@@ -147,7 +147,7 @@ ErrCode UICommunityPersonListView::onLoad()
     if (mCommunity != nullptr) {
         logd("Load person list of ocmmunity");
         mCommunity->dump();
-        QList<DbModel*> items = COMMUNITYCTL->getPersonList(mCommunity->uid());
+        QList<DbModel*> items = COMMUNITYCTL->getActivePersonList(mCommunity->uid());
         mItemList.clear(); // TODO: clean up item data
         mItemList.append(items);
     } else {

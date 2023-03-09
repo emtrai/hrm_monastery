@@ -194,7 +194,7 @@ do { \
 
 #define UNUSED(param) (void)param
 
-#define STR2CHA(val) val.toStdString().c_str()
+#define STR2CHA(val) (!(val).isEmpty()?(val).toStdString().c_str():"(empty)")
 
 // TODO: re-implement this one!!!!!
 #define ASSERT(cond, msg) \
@@ -208,6 +208,19 @@ do { \
 #define FAIL(msg) ASSERT(false, msg)
 
 #define FULLNAME(firstName, lastName) QString("%1 %2").arg(lastName, firstName)
+
+#define JSON_GET_TO_SET_STR(json, key ,func) \
+do { \
+        if (jobj.contains(key)){ \
+            QString tmp = jobj[key].toString().trimmed(); \
+            if (!tmp.isEmpty()) { \
+                logd("Set %s", key);\
+                func(tmp); \
+        } else {\
+                logw("%s defined but no data", key);\
+        } \
+    } \
+} while (0)
 
 typedef ErrCode (*func_one_csv_item_t)(const QStringList& items, void* caller, void* param);
 typedef ErrCode (*func_one_csv_item_complete_t)(const QHash<QString, QString>& items, void* caller, void* param);

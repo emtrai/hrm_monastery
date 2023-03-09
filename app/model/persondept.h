@@ -36,6 +36,8 @@ public:
     static DbModel* build();
     virtual DbModelBuilder getBuilder();
 
+    virtual QString toString();
+
     const QString &roleUid() const;
     void setRoleUid(const QString &newRoleUid);
 

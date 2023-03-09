@@ -25,7 +25,7 @@
 #include "dbctl.h"
 #include "utils.h"
 #include "filectl.h"
-#include "iexporter.h"
+#include "idataexporter.h"
 #include "exportfactory.h"
 #include "defs.h"
 #include <QMap>
@@ -48,6 +48,14 @@ DbModel *PersonDept::build()
 DbModelBuilder PersonDept::getBuilder()
 {
     return &PersonDept::build;
+}
+
+QString PersonDept::toString()
+{
+    QString name = DbModel::toString();
+    name.append(":" + personUid());
+    name.append(":" + commDeptUid());
+    return name;
 }
 
 const QString &PersonDept::roleUid() const
@@ -112,7 +120,7 @@ void PersonDept::dump()
 
 DbModelHandler *PersonDept::getDbModelHandler()
 {
-    return DB->getModelHandler(KModelHdlDept); // TODO: suitable???
+    return DB->getModelHandler(KModelHdlCommDept); // TODO: suitable???
 }
 
 const QString &PersonDept::personName() const

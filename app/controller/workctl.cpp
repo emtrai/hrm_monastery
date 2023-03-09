@@ -30,7 +30,7 @@
 GET_INSTANCE_IMPL(WorkCtl)
 
 WorkCtl::WorkCtl():
-    CommonCtl(KModelHdlWork)
+    ModelController(KModelHdlWork)
 {
     traced;
 }

@@ -22,7 +22,7 @@
 #include "dbsqlitedept.h"
 #include "logger.h"
 #include "defs.h"
-
+#include "department.h"
 #include "dbsqlitedefs.h"
 #include "dbsqlite.h"
 
@@ -43,5 +43,10 @@ const QString DbSqliteDept::getName()
 DbSqliteTbl *DbSqliteDept::getMainTbl()
 {
     return (DbSqliteTbl*)DbSqlite::getInstance()->getTable(KTableDepartment);
+}
+
+DbModelBuilder DbSqliteDept::getMainBuilder()
+{
+    return &Department::build;
 }
 

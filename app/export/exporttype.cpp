@@ -101,3 +101,50 @@ QString typeToExt(ExportType type, bool *isOk)
     tracede;
     return extName;
 }
+
+QString exportItem2Name(const QString &item, bool* isOk)
+{
+    static bool initialized = false;
+    static QHash<QString, QString> s_item2Name;
+    QString name;
+    traced;
+    logd("initialized = %d", initialized);
+    if (!initialized) {
+        logd("not init s_type2String, init it");
+
+        s_item2Name.insert(KItemNameId, QObject::tr("Mã định danh"));
+        s_item2Name.insert(KItemName, QObject::tr("Tên"));
+        s_item2Name.insert(KItemCountry, QObject::tr("Quốc gia"));
+        s_item2Name.insert(KItemTel, QObject::tr("Điện thoại"));
+        s_item2Name.insert(KItemParentCommunityName, QObject::tr("Cộng đoàn chủ quản"));
+        s_item2Name.insert(KItemParentCommunityNameId, QObject::tr("Mã Cộng đoàn chủ quản"));
+        s_item2Name.insert(KItemEstablishDate, QObject::tr("Ngày thành lập"));
+        s_item2Name.insert(KItemCloseDate, QObject::tr("Ngày dừng hoạt động"));
+        s_item2Name.insert(KItemFeastDay, QObject::tr("Ngày bổn mạng"));
+        s_item2Name.insert(KItemStatus, QObject::tr("Tình trạng"));
+        s_item2Name.insert(KItemBrief, QObject::tr("Tóm tắt"));
+        s_item2Name.insert(KItemArea, QObject::tr("Khu vực"));
+        s_item2Name.insert(KItemAreaNameId, QObject::tr("Mã khu vực"));
+        s_item2Name.insert(KItemIntro, QObject::tr("Giới thiệu"));
+        s_item2Name.insert(KItemOtherContact, QObject::tr("Liên lạc khác"));
+        s_item2Name.insert(KItemMission, QObject::tr("Sứ vụ"));
+        s_item2Name.insert(KItemMissionNameId, QObject::tr("Mã sứ vụ"));
+        s_item2Name.insert(KItemCEONameId, QObject::tr("Mã Tổng Phụ Trách"));
+        s_item2Name.insert(KItemCEO, QObject::tr("Tổng Phụ Trách"));
+        s_item2Name.insert(KItemRemark, QObject::tr("Ghi chú"));
+
+        initialized = true;
+    }
+    logd("item %s", STR2CHA(item));
+    if (s_item2Name.contains(item)) {
+        name = s_item2Name.value(item);
+        if (isOk) *isOk = true;
+
+        logd("name %s", STR2CHA(name));
+    } else {
+        if (isOk) *isOk = false;
+        loge("Unknown export item: %s", STR2CHA(item));
+    }
+    tracede;
+    return name;
+}

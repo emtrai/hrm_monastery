@@ -27,7 +27,7 @@
 #include "exporttype.h"
 #include <QList>
 
-class IExporter;
+class IDataExporter;
 class DbModel;
 
 class Exporter
@@ -37,8 +37,8 @@ public:
 
     // Exporter may contains data for export, or get data from list of data to export
     // TODO: is there any better way????
-    virtual ErrCode saveTo(const IExporter* exporter, const QString& fpath);
-    virtual ErrCode saveTo(const IExporter* exporter, const QList<DbModel*> data, const QString& fpath);
+    virtual ErrCode saveTo(const IDataExporter* exporter, const QString& fpath);
+    virtual ErrCode saveTo(const IDataExporter* exporter, const QList<DbModel*> data, const QString& fpath);
     virtual ExportType getExportType() = 0;
 
 

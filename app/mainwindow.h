@@ -54,7 +54,7 @@ enum AppState {
 class Person;
 class DlgWait;
 class Community;
-class Controller;
+class ModelController;
 
     class MainWindow : public QMainWindow, public LoaderListener
 {
@@ -72,7 +72,7 @@ class Controller;
             static void showOnHtmlViewer(DbModel* model, const QString& subject);
             static void showAddEditCommonModel(bool isSelfUpdate = true, DbModel* model = nullptr,
                                              CommonEditModelListener* listener = nullptr);
-            ErrCode exportListItems(const QList<DbModel*>* items, Controller* controller,
+            ErrCode exportListItems(const QList<DbModel*>* items, ModelController* controller,
                                     const QString& title = nullptr,
                                     quint64 exportTypeList = 0 // List of supported export type, bitwise
                                     );
@@ -102,7 +102,7 @@ class Controller;
      void doShowImportCommunity();
      void doShowAddEditCommonModel(bool isSelfUpdate = true, DbModel* model = nullptr,
                                         CommonEditModelListener* listener = nullptr);
-     ErrCode doExportListItems(const QList<DbModel*>* items, Controller* controller,
+     ErrCode doExportListItems(const QList<DbModel*>* items, ModelController* controller,
                                const QString& title = nullptr, quint64 exportTypeList = 0);
  private:
      void loadHomePageFile();
@@ -165,7 +165,6 @@ class Controller;
      void on_action_ImportCommunity_triggered();
      void on_action_New_triggered();
      void on_actionNew_Community_triggered();
-     void on_actionImportComm_triggered();
      void on_actionCommunity_triggered();
      void on_actionSummarize_triggered();
      void on_actionSaints_2_triggered();

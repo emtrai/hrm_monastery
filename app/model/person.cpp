@@ -25,7 +25,7 @@
 #include "dbctl.h"
 #include "utils.h"
 #include "filectl.h"
-#include "iexporter.h"
+#include "idataexporter.h"
 #include "exportfactory.h"
 #include "defs.h"
 #include <QMap>
@@ -486,8 +486,8 @@ void Person::initImportFields()
     mImportFields.insert(KItemCommunity, [this](const QString& value){
         this->setCommunityName(value);
     }); //"community"; // TODO
-    mImportFields.insert(KItemCommunityCode, [this](const QString& value){
-        this->setCommunityUid(value);
+    mImportFields.insert(KItemCommunityNameId, [this](const QString& value){
+        this->setCommunityUid(value); // TODO: search community base on name id then set uid
     }); //"community"; // TODO
     mImportFields.insert(KItemCommunityHistory, nullptr); //"community_history"; // TODO
     mImportFields.insert(KItemDad, [this](const QString& value){
@@ -578,7 +578,7 @@ void Person::initImportFields()
 
 ErrCode Person::commonCheckField(QString& name,
                                  QString& uid,
-                                 Controller* controller,
+                                 ModelController* controller,
                                  const char* const itemName,
                                  int& invalidField)
 {
@@ -713,7 +713,7 @@ ErrCode Person::fromCSVFile(const QString &fname)
 
 }
 
-IExporter *Person::getExporter()
+IDataExporter *Person::getExporter()
 {
     return this;
 }
@@ -1050,7 +1050,7 @@ void Person::dump()
     logd("- JoinPIC Name %s", joinPICName().toStdString().c_str());
     logd("- JoinPIC Uid %s", joinPICUid().toStdString().c_str());
 }
-ErrCode Person::onImportItem(int importFileType, const QString &keyword, const QString &value, quint32 idx, void* tag)
+ErrCode Person::onImportItem(const QString& importName, int importFileType, const QString &keyword, const QString &value, quint32 idx, void* tag)
 {
     traced;
     ErrCode ret = ErrNone;

@@ -22,7 +22,7 @@
 #ifndef COURSECTL_H
 #define COURSECTL_H
 
-#include "commonctl.h"
+#include "modelcontroller.h"
 #include "utils.h"
 #include <QList>
 
@@ -30,7 +30,7 @@ class Course;
 
 #define COURSECTL INSTANCE(CourseCtl)
 
-class CourseCtl : public CommonCtl
+class CourseCtl : public ModelController
 {
     GET_INSTANCE_DECL(CourseCtl);
 public:
@@ -41,8 +41,6 @@ protected:
 
     // prebuilt data file name
     virtual const char* getPrebuiltFileName();
-    // prebuilt data file type, i.e. csv
-    virtual const char* getPrebuiltFileType();
 
     virtual DbModelBuilder getMainBuilder();
 };

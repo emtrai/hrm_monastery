@@ -47,29 +47,19 @@ DbSqliteTbl *DbSqliteCommunityDept::getMainTbl()
 }
 
 
-QList<DbModel *> DbSqliteCommunityDept::getListPerson(const QString &deptUid)
+QList<DbModel *> DbSqliteCommunityDept::getListPerson(const QString &commDeptUid, int status, bool* ok)
 {
     traced;
     DbSqliteCommDeptPersonTbl* tbl = (DbSqliteCommDeptPersonTbl*)DbSqlite::getInstance()
                                            ->getTable(KTableCommDepartPerson);
-    return tbl->getListPerson(deptUid);
+    return tbl->getListPerson(commDeptUid, status);
 }
 
-QList<DbModel *> DbSqliteCommunityDept::getListDept(const QString &communityUid)
+QList<DbModel *> DbSqliteCommunityDept::getListDept(const QString &communityUid, int status, bool* ok)
 {
     DbSqliteCommunityDeptTbl* tbl = (DbSqliteCommunityDeptTbl*)DbSqlite::getInstance()
                                            ->getTable(KTableCommDept);
-    return tbl->getListDepart(communityUid);
-}
-
-ErrCode DbSqliteCommunityDept::addPerson2Department(PersonDept* perdept)
-{
-    traced;
-    ErrCode err = ErrNone;
-    DbSqliteCommDeptPersonTbl* tbl = dynamic_cast<DbSqliteCommDeptPersonTbl*>(getTable(KModelNamePersonDept));
-    err = tbl->add((DbModel*)perdept);
-    tracedr(err);
-    return err;
+    return tbl->getListDept(communityUid, status);
 }
 
 DbSqliteTbl *DbSqliteCommunityDept::getTable(const QString &modelName)
@@ -91,9 +81,8 @@ DbSqliteTbl *DbSqliteCommunityDept::getTable(const QString &modelName)
 
 DbModelBuilder DbSqliteCommunityDept::getMainBuilder()
 {
-    return Community::build;
+    return &CommunityDept::build;
 }
-
 
 const QString DbSqliteCommunityDept::getName()
 {

@@ -102,3 +102,9 @@ DbSqliteTbl *DbSqliteArea::getTable(const QString &modelName)
     tracede;
     return tbl;
 }
+
+DbModelBuilder DbSqliteArea::getMainBuilder()
+{
+    return &Area::build;
+}
+

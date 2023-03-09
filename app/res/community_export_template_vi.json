@@ -1,40 +1,66 @@
 { "items":
     [
         {
-        "id":"TEN_DINH_DANH",
-        "name":"Tên Định Danh"
+        "id":"MA_DINH_DANH",
         },
         {
-        "id":"TEN",
-        "name":"Tên"
+        "id":"TEN"
         },
         {
         "id":"MA_TONG_PHU_TRACH",
+        "name":"Mã Định Danh Chị Tổng Phụ Trách"
+        },,
+        {
+        "id":"TONG_PHU_TRACH",
         "name":"Chị Tổng Phụ Trách"
         },
         {
-        "id":"NGAY_THANH_LAP",
-        "name":"Ngày thành lập"
+        "id":"NGAY_BON_MANG"
+        },,
+        {
+        "id":"MA_SU_VU"
         },
         {
-        "id":"SU_VU",
-        "name":"Sứ vụ"
+        "id":"SU_VU"
         },
         {
-        "id":"DIA_CHI",
-        "name":"Địa chỉ"
+        "id":"DIA_CHI"
         },
         {
-        "id":"GIAO_XU",
-        "name":"Giáo xứ"
+        "id":"GIAO_XU"
         },
         {
-        "id":"EMAIL",
-        "name":"Email"
+        "id":"EMAIL"
         },
         {
-        "id":"DIEN_THOAI",
-        "name":"Điện thoại"
+        "id":"DIEN_THOAI"
+        },
+        {
+        "id":"QUOC_GIA"
+        },
+        {
+        "id":"DIEN_THOAI"
+        },
+        {
+        "id":"MA_CONG_DOAN_CHA"
+        },
+        {
+        "id":"CONG_DOAN_CHA"
+        },
+        {
+        "id":"NGAY_THANH_LAP"
+        },
+        {
+        "id":"NGAY_DUNG_HOAT_DONG"
+        },
+        {
+        "id":"TINH_TRANG"
+        },
+        {
+        "id":"TOM_TAT"
+        },
+        {
+        "id":"GIOI_THIEU"
         }
     ]
 }

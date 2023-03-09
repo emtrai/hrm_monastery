@@ -52,3 +52,8 @@ DbSqliteTbl *DbSqliteEdu::getMainTbl()
     return (DbSqliteEduTbl*)DbSqlite::getInstance()->getTable(KTableEdu);
 }
 
+DbModelBuilder DbSqliteEdu::getMainBuilder()
+{
+    return &Education::build;
+}
+

@@ -22,7 +22,7 @@
 #ifndef EVENTCTL_H
 #define EVENTCTL_H
 
-#include "commonctl.h"
+#include "modelcontroller.h"
 #include "utils.h"
 #include <QList>
 
@@ -30,7 +30,7 @@
 
 class Event;
 
-class EventCtl : public CommonCtl
+class EventCtl : public ModelController
 {
     GET_INSTANCE_DECL(EventCtl);
 public:

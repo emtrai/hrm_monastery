@@ -25,6 +25,7 @@
 
 #include "dbsqlitedefs.h"
 #include "dbsqlite.h"
+#include "personevent.h"
 
 GET_INSTANCE_IMPL(DbSqlitePersonEvent)
 
@@ -43,4 +44,9 @@ const QString DbSqlitePersonEvent::getName()
 DbSqliteTbl *DbSqlitePersonEvent::getMainTbl()
 {
     return (DbSqliteTbl*)DbSqlite::getInstance()->getTable(KTablePersonEvent);
+}
+
+DbModelBuilder DbSqlitePersonEvent::getMainBuilder()
+{
+    return &PersonEvent::build;
 }

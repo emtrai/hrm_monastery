@@ -26,7 +26,7 @@
 #include <QMessageBox>
 #include "utils.h"
 #include <QString>
-#include "commonctl.h"
+#include "modelcontroller.h"
 
 DlgCommonEditModel::DlgCommonEditModel(QWidget *parent): QDialog(parent),
     mModel(nullptr), mIsNew(false), mIsSelfSave(false)
@@ -130,7 +130,7 @@ void DlgCommonEditModel::accept()
     tracedr(ret);
 }
 
-ErrCode DlgCommonEditModel::loadList(QComboBox *cb, CommonCtl *ctrl)
+ErrCode DlgCommonEditModel::loadList(QComboBox *cb, ModelController *ctrl)
 {
     traced;
     ErrCode err = ErrNone;

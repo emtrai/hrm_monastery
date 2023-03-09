@@ -87,7 +87,8 @@ Saint::Saint(): DbModel()
     mFeastDay = 0;
 }
 
-ErrCode Saint::onImportItem(int importFileType, const QString &keyword, const QString &value, quint32 idx, void *tag)
+ErrCode Saint::onImportItem(const QString& importName, int importFileType,
+                            const QString &keyword, const QString &value, quint32 idx, void *tag)
 {
     traced;
     ErrCode ret = ErrNone;

@@ -1,26 +1,27 @@
-{ "departments":
+{ "items":
     [
         {
-        "id":"LH",
-        "nameid":"LH",
+        "nameid":"QUAN_LY",
+        "name":"Quan ly",
+        "remark":""
+        },
+        {
+        "nameid":"LINH_HUONG",
         "name":"Linh hướng",
         "remark":""
         },
         {
-        "id":"BTG",
-        "nameid":"BTG",
+        "nameid":"TRUYEN_GIAO",
         "name":"Ban Truyền giáo",
         "remark":""
         },
         {
-        "id":"BXD",
-        "nameid":"BXD",
+        "nameid":"XAY_DUNG",
         "name":"Ban Xây dựng",
         "remark":""
         },
         {
-        "id":"BOG",
-        "nameid":"BOG",
+        "nameid":"ON_GOI",
         "name":"Ban Ơn gọi",
         "remark":""
         }

@@ -26,7 +26,7 @@
 
 #include "errcode.h"
 #include <QString>
-#include "iimporter.h"
+#include "idataimporter.h"
 #include "utils.h"
 
 class ImportCSVList : public Importer
@@ -34,7 +34,8 @@ class ImportCSVList : public Importer
     GET_INSTANCE_DECL(ImportCSVList)
 public:
     ImportCSVList();
-    virtual ErrCode importFrom(int importFileType, IImporter* importer, const QString& fpath, void* tag = nullptr);
+    virtual ErrCode importFrom(const QString& importName, int importFileType,
+                               IDataImporter* importer, const QString& fpath, void* tag = nullptr);
 };
 
 #endif // IMPORTCSVLIST_H

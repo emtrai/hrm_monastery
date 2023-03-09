@@ -277,12 +277,6 @@ DbSqliteTbl *DbSqliteModelHandler::getTable(const QString& modelName)
 
 DbModelBuilder DbSqliteModelHandler::getBuilder(const QString &modelName)
 {
-    loge("DEFAULT getBuilder, should not be called");
-    return nullptr;
-}
-
-DbModelBuilder DbSqliteModelHandler::getMainBuilder()
-{
-    return getBuilder();
+    return getMainBuilder();
 }
 

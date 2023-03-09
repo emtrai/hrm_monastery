@@ -22,14 +22,14 @@
 #ifndef ROLECTL_H
 #define ROLECTL_H
 
-#include "commonctl.h"
+#include "modelcontroller.h"
 #include "utils.h"
 
 #define ROLECTL INSTANCE(RoleCtl)
 
 class Role;
 
-class RoleCtl : public CommonCtl
+class RoleCtl : public ModelController
 {
     GET_INSTANCE_DECL(RoleCtl);
 public:

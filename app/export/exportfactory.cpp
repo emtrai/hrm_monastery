@@ -55,7 +55,7 @@ Exporter *ExportFactory::getExporter(ExportType type)
     return ret;
 }
 
-ErrCode ExportFactory::exportTo(const IExporter *item, const QString &fpath, ExportType type)
+ErrCode ExportFactory::exportTo(const IDataExporter *item, const QString &fpath, ExportType type)
 {
     traced;
     ErrCode ret = ErrNone;
@@ -70,7 +70,7 @@ ErrCode ExportFactory::exportTo(const IExporter *item, const QString &fpath, Exp
     return ret;
 }
 
-ErrCode ExportFactory::exportTo(const IExporter* item, QList<DbModel*> data, const QString &fpath, ExportType type)
+ErrCode ExportFactory::exportTo(const IDataExporter* item, QList<DbModel*> data, const QString &fpath, ExportType type)
 {
     traced;
     // TODO: add "tag" parameter here to input to getExporter/saveTo???

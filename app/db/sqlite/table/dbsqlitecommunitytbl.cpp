@@ -63,11 +63,13 @@ ErrCode DbSqliteCommunityTbl::insertTableField(DbSqliteInsertBuilder *builder, c
     Community* cmm = (Community*) item;
     // TODO: community code: to be use later???
     // TODO: check if root community exist (via level value), there is only one root community
-    builder->addValue(KFieldCommunityCode, cmm->communityCode());
+    builder->addValue(KFieldBrief, cmm->brief());
+    builder->addValue(KFieldMissionUid, cmm->missionNameString());
     builder->addValue(KFieldAddr, cmm->addr());
     builder->addValue(KFieldTel, cmm->tel());
     builder->addValue(KFieldEmail, cmm->email());
     builder->addValue(KFieldCreateDate, cmm->createDate());
+    builder->addValue(KFieldCloseDate, cmm->closeDate());
     builder->addValue(KFieldFeastDay, cmm->feastDate());
     builder->addValue(KFieldParentUid, cmm->parentUid());
     builder->addValue(KFieldAreaUid, cmm->areaUid());
@@ -104,11 +106,13 @@ void DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
     traced;
     DbSqliteTbl::updateModelFromQuery(item, qry);
     Community* cmm = (Community*) item;
-    cmm->setCommunityCode(qry.value(KFieldCommunityCode).toString());
+    cmm->setBrief(qry.value(KFieldBrief).toString());
     cmm->setCreateDate(qry.value(KFieldCreateDate).toInt());
+    cmm->setCloseDate(qry.value(KFieldCloseDate).toInt());
     cmm->setImgPath(qry.value(KFieldImgPath).toString());
     cmm->setLevel(qry.value(KFieldLevel).toInt());
     cmm->setParentUid(qry.value(KFieldParentUid).toString());
+    // TODO: parent nameid, parent name???
     cmm->setAreaUid(qry.value(KFieldAreaUid).toString());
     cmm->setAreaDbId(qry.value(KFieldAreaDbId).toInt());
     cmm->setCountryUid(qry.value(KFieldCountryUid).toString());
@@ -119,8 +123,7 @@ void DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
     cmm->setTel(qry.value(KFieldTel).toString());
     cmm->setEmail(qry.value(KFieldEmail).toString());
     cmm->setFeastDate(qry.value(KFieldFeastDay).toInt());
-    cmm->setCreateDate(qry.value(KFieldCreateDate).toInt());
-    cmm->setStatus((CommunityStatus)qry.value(KFieldStatus).toInt());
+    cmm->setStatus((DbModelStatus)qry.value(KFieldStatus).toInt());
     cmm->setCurrentCEOUid(qry.value(KFieldCEOUid).toString()); // TODO: check and set name as well
     if (!cmm->currentCEOUid().isEmpty()) {
         // TODO: caching data (i.e. list of person in management board) for fast accessing?
@@ -133,6 +136,7 @@ void DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
     }
     cmm->setIntro(qry.value(KFieldIntro).toString());
     cmm->setContact(qry.value(KFieldContact).toString());
+    cmm->setMissionUid(qry.value(KFieldMissionUid).toString());
 }
 
 QString DbSqliteCommunityTbl::getSearchQueryString(const QString &cond)
@@ -165,12 +169,13 @@ void DbSqliteCommunityTbl::addTableField(DbSqliteTableBuilder *builder)
     // can be changed/updated later
     // can be used as identification which is more dynamic than UID
     // UID: need to fix, must not changed, as it'll impact to many table/field
-    builder->addField(KFieldCommunityCode, TEXT);
     builder->addField(KFieldImgPath, TEXT);
     builder->addField(KFieldIntro, TEXT); // TODO:translation????
+    builder->addField(KFieldBrief, TEXT);
     builder->addField(KFieldAddr, TEXT);
     builder->addField(KFieldContact, TEXT);
     builder->addField(KFieldCountryUid, TEXT);
+    builder->addField(KFieldMissionUid, TEXT);
     builder->addField(KFieldTel, TEXT);
     builder->addField(KFieldEmail, TEXT);
     builder->addField(KFieldCEOUid, TEXT);
@@ -180,6 +185,7 @@ void DbSqliteCommunityTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldLevel, INT32); // TODO: do we need level here????
     builder->addField(KFieldParentUid, TEXT);
     builder->addField(KFieldCreateDate, INT64);
+    builder->addField(KFieldCloseDate, INT64);
     builder->addField(KFieldFeastDay, INT64);
     builder->addField(KFieldDateFormat, TEXT);
     builder->addField(KFieldStatus, INT32); // stop, alive, etc.

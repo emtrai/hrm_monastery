@@ -22,7 +22,7 @@
 #ifndef ETHNICCTL_H
 #define ETHNICCTL_H
 
-#include "commonctl.h"
+#include "modelcontroller.h"
 
 #include "dbmodel.h"
 #include "ethnic.h"
@@ -31,7 +31,7 @@
 
 #define ETHNIC (EthnicCtl::getInstance())
 
-class EthnicCtl : public CommonCtl
+class EthnicCtl : public ModelController
 {
     GET_INSTANCE_DECL(EthnicCtl);
 public:

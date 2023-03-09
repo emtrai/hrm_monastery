@@ -42,7 +42,7 @@ DbSqliteCommunityDeptTbl::DbSqliteCommunityDeptTbl(DbSqlite* db)
     traced;
 }
 
-QList<DbModel *> DbSqliteCommunityDeptTbl::getListDepart(const QString &commUid, int status)
+QList<DbModel *> DbSqliteCommunityDeptTbl::getListDept(const QString &commUid, int status)
 {
     traced;
     QList<DbModel *> olist;
@@ -64,12 +64,12 @@ ErrCode DbSqliteCommunityDeptTbl::insertTableField(DbSqliteInsertBuilder *builde
     traced;
     DbSqliteTbl::insertTableField(builder, item); // TODO: handle error code
     CommunityDept* cmm = (CommunityDept*) item;
-    builder->addValue(KFieldCommunityDeptCode, cmm->code());
     builder->addValue(KFieldCommunityUid, cmm->communityUid());
     builder->addValue(KFieldCommunityDbId, cmm->communityDbId());
     builder->addValue(KFieldDepartmentUid, cmm->departmentUid());
     builder->addValue(KFieldDepartmentDbId, cmm->departmentDbId());
     builder->addValue(KFieldCreateDate, cmm->establishDate());
+    builder->addValue(KFieldCloseDate, cmm->closedDate());
     builder->addValue(KFieldAddr, cmm->addr());
     builder->addValue(KFieldTel, cmm->tel());
     builder->addValue(KFieldEmail, cmm->email());
@@ -84,13 +84,13 @@ void DbSqliteCommunityDeptTbl::updateModelFromQuery(DbModel *item, const QSqlQue
     traced;
     DbSqliteTbl::updateModelFromQuery(item, qry);
     CommunityDept* cmm = (CommunityDept*) item;
-    cmm->setCode(qry.value(KFieldCommunityDeptCode).toString());
     cmm->setCommunityUid(qry.value(KFieldCommunityUid).toString());
     cmm->setCommunityDbId(qry.value(KFieldCommunityDbId).toInt());
     cmm->setDepartmentUid(qry.value(KFieldDepartmentUid).toString());
     cmm->setDepartmentDbId(qry.value(KFieldDepartmentDbId).toInt());
     cmm->setDepartmentName(qry.value(KFieldDepartmentName).toString());
     cmm->setEstablishDate(qry.value(KFieldCreateDate).toInt());
+    cmm->setClosedDate(qry.value(KFieldCloseDate).toInt());
     cmm->setAddr(qry.value(KFieldAddr).toString());
     cmm->setTel(qry.value(KFieldTel).toString());
     cmm->setEmail(qry.value(KFieldEmail).toString());
@@ -125,12 +125,12 @@ void DbSqliteCommunityDeptTbl::addTableField(DbSqliteTableBuilder *builder)
 {
     traced;
     DbSqliteTbl::addTableField(builder);
-    builder->addField(KFieldCommunityDeptCode, TEXT);
     builder->addField(KFieldCommunityUid, TEXT);
     builder->addField(KFieldCommunityDbId, INT64);
     builder->addField(KFieldDepartmentUid, TEXT);
     builder->addField(KFieldDepartmentDbId, INT64);
     builder->addField(KFieldCreateDate, INT64);
+    builder->addField(KFieldCloseDate, INT64);
     builder->addField(KFieldEmail, TEXT);
     builder->addField(KFieldAddr, TEXT);
     builder->addField(KFieldTel, TEXT);

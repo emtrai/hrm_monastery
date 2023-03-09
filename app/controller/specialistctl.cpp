@@ -35,7 +35,7 @@ GET_INSTANCE_IMPL(SpecialistCtl);
 
 
 SpecialistCtl::SpecialistCtl():
-    Controller(KModelHdlSpecialist)
+    ModelController(KModelHdlSpecialist)
 {
 
 }

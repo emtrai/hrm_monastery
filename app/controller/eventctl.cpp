@@ -29,7 +29,7 @@
 
 GET_INSTANCE_IMPL(EventCtl)
 
-EventCtl::EventCtl():CommonCtl(KModelHdlEvent)
+EventCtl::EventCtl():ModelController(KModelHdlEvent)
 {
     traced;
 }

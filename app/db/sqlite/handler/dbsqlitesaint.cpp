@@ -66,3 +66,8 @@ DbSqliteTbl *DbSqliteSaint::getMainTbl()
     return (DbSqliteSaintTbl*)DbSqlite::getInstance()->getTable(KTableSaint);
 }
 
+DbModelBuilder DbSqliteSaint::getMainBuilder()
+{
+    return &Saint::build;
+}
+

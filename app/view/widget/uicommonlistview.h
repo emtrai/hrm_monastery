@@ -26,7 +26,7 @@
 
 #include "dbmodel.h"
 #include "errcode.h"
-#include "controller.h"
+#include "modelcontroller.h"
 #include "dlgcommoneditmodel.h"
 
 class UICommonListView : public UITableView, public CommonEditModelListener
@@ -39,7 +39,7 @@ protected:
     virtual void updateItem(DbModel* item, UITableItem* tblItem);
     virtual qint32 getTotalItems();
     virtual QList<DbModel*> getListItem();
-    virtual Controller* getController();
+    virtual ModelController* getController();
     virtual ErrCode onLoad();
     virtual ErrCode onReload();
     virtual void initHeader();

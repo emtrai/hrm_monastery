@@ -107,7 +107,7 @@ protected:
     virtual DbSqliteTbl* getMainTbl() = 0;
     virtual DbSqliteTbl* getTable(const QString& modelName);
     virtual DbModelBuilder getBuilder(const QString& modelName = nullptr);
-    virtual DbModelBuilder getMainBuilder();
+    virtual DbModelBuilder getMainBuilder() = 0;
 protected:
     QString mName;
 };

@@ -78,7 +78,7 @@ QList<DbModel *> UICommonListView::getListItem()
     return getController()->getAllItemsFromDb();
 }
 
-Controller *UICommonListView::getController()
+ModelController *UICommonListView::getController()
 {
     return nullptr;
 }
@@ -96,7 +96,7 @@ ErrCode UICommonListView::onLoad()
 ErrCode UICommonListView::onReload()
 {
     traced;
-    Controller* ctl = getController();
+    ModelController* ctl = getController();
     if (ctl != nullptr)
         ctl->reloadDb();
     onLoad();

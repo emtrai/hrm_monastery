@@ -30,7 +30,7 @@
 GET_INSTANCE_IMPL(RoleCtl)
 
 RoleCtl::RoleCtl():
-    CommonCtl(KModelHdlRole)
+    ModelController(KModelHdlRole)
 {
     traced;
 }

@@ -24,10 +24,10 @@
 
 #include <QObject>
 #include "errcode.h"
-#include "controller.h"
+#include "modelcontroller.h"
 #include <QHash>
 #include "exporttype.h"
-
+#include "modelcontroller.h"
 class Person;
 class Event;
 class DbPersonModelHandler;
@@ -35,7 +35,7 @@ class DbPersonModelHandler;
 #define PERSONCTL PersonCtl::getInstance()
 
 // TODO: observer Person change?
-class PersonCtl: public Controller
+class PersonCtl: public ModelController
 {
 public:
     virtual ~PersonCtl();
@@ -48,8 +48,8 @@ public:
     QList<DbModel*> getPersonInCommunity(const QString& communityUid);
     QList<DbModel*> getListEvent(const Person* person); // TODO: should move to separate event controller?
 
-    virtual DbModel* doImportOneItem(int importFileType, const QStringList& items, quint32 idx);
-    virtual DbModel* doImportOneItem(int importFileType, const QHash<QString, QString>& items, quint32 idx);
+    virtual DbModel* doImportOneItem(const QString& importName, int importFileType, const QStringList& items, quint32 idx);
+    virtual DbModel* doImportOneItem(const QString& importName, int importFileType, const QHash<QString, QString>& items, quint32 idx);
 
     virtual int filter(int catetoryid,
                        const QString& catetory,
@@ -83,13 +83,14 @@ public:
 
 protected:
     virtual DbModelHandler* getModelHandler();
+    virtual DbModelBuilder getMainBuilder();
 private:
     static PersonCtl* gInstance;
     QList<QString> mImportFields;
     DbPersonModelHandler* mModelHdl;
 //    QHash<QString, std::function<QString (Person::*())>> mExportFields;
-public slots:
-    virtual void onLoad();
+public :
+    virtual ErrCode onLoad();
 };
 
 #endif // PersonCTL_H

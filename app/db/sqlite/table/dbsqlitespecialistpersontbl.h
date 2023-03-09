@@ -29,8 +29,8 @@ class DbSqliteSpecialistPersonTbl : public DbSqliteMapTbl
 public:
     DbSqliteSpecialistPersonTbl(DbSqlite* db);
     DbSqliteSpecialistPersonTbl(DbSqlite* db, const QString& baseName, const QString& name, qint32 versionCode);
-    QList<DbModel*> getListPerson(const QString& specialistUid, int status = ITEM_MAP_STATUS_ACTIVE);
-    QList<DbModel*> getListSpecialist(const QString& personUid, int status = ITEM_MAP_STATUS_ACTIVE);
+    QList<DbModel*> getListPerson(const QString& specialistUid, int status = MODEL_ACTIVE);
+    QList<DbModel*> getListSpecialist(const QString& personUid, int status = MODEL_ACTIVE);
 protected:
     virtual void addTableField(DbSqliteTableBuilder* builder);
     virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);

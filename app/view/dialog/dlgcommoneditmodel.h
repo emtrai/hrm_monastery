@@ -24,7 +24,7 @@
 #include "errcode.h"
 #include "logger.h"
 #include <QDialog>
-#include "commonctl.h"
+#include "modelcontroller.h"
 #include <QComboBox>
 
 #define DLG_BUILDER(className) \
@@ -102,7 +102,7 @@ protected:
      */
     virtual bool onValidateData(QString& msg) = 0;
 
-    virtual ErrCode loadList(QComboBox* cb, CommonCtl* ctrl);
+    virtual ErrCode loadList(QComboBox* cb, ModelController* ctrl);
 protected:
 
     DbModel* mModel;

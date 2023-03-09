@@ -40,7 +40,7 @@ UIEthnicListView::~UIEthnicListView()
 }
 
 
-Controller *UIEthnicListView::getController()
+ModelController *UIEthnicListView::getController()
 {
     return ETHNIC;
 }

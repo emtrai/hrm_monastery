@@ -24,7 +24,7 @@
 
 #include <QString>
 
-typedef enum ErrCode{
+typedef enum ErrCode {
     ErrNone = 0,
     ErrFailed,
     ErrNoMemory,
@@ -50,6 +50,7 @@ typedef enum ErrCode{
     ErrNotImpl, // not implement
     ErrBuildDataFailed,
     ErrShortData,
+    ErrDenied,
 
     ErrMax
     } ErrCode_t;

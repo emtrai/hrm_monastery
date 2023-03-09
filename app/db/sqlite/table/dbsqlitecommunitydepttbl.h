@@ -23,13 +23,13 @@
 #define DBSQLITECOMMUNITYDEPTTBL_H
 
 #include "dbsqlitetbl.h"
-#include "statusmodel.h"
+#include "dbmodel.h"
 
 class DbSqliteCommunityDeptTbl : public DbSqliteTbl
 {
 public:
     DbSqliteCommunityDeptTbl(DbSqlite* db);
-    QList<DbModel *> getListDepart(const QString &commUid, int status = STATUS_ACTIVE);
+    QList<DbModel *> getListDept(const QString &commUid, int status = MODEL_ACTIVE);
 protected:
     virtual void addTableField(DbSqliteTableBuilder* builder);
     virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);

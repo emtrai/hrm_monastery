@@ -22,7 +22,7 @@
 #include "dbsqlitestatus.h"
 #include "logger.h"
 #include "defs.h"
-
+#include "status.h"
 #include "dbsqlitedefs.h"
 #include "dbsqlite.h"
 
@@ -41,4 +41,9 @@ const QString DbSqliteStatus::getName()
 DbSqliteTbl *DbSqliteStatus::getMainTbl()
 {
     return (DbSqliteTbl*)DbSqlite::getInstance()->getTable(KTableStatus);
+}
+
+DbModelBuilder DbSqliteStatus::getMainBuilder()
+{
+    return &Status::build;
 }

@@ -37,7 +37,7 @@ public:
     static DbCtl* getInstance();
     static IDatabase* getDb();
     IDatabase *database() const;
-
+    virtual QString getName();
 
 private:
     DbCtl();
@@ -48,8 +48,8 @@ private:
     DbInfo* dbInfo;
 
     // event
-public slots:
-    virtual void onLoad();
+public:
+    virtual ErrCode onLoad();
 };
 
 #endif // DBCTL_H

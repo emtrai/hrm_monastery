@@ -50,6 +50,7 @@ INCLUDEPATH += $$PWD/crypto
 INCLUDEPATH += $$PWD/location
 INCLUDEPATH += $$PWD/export
 INCLUDEPATH += $$PWD/import
+INCLUDEPATH += $$PWD/report
 #QT_NO_DEBUG_OUTPUT
 
 # You can make your code fail to compile if it uses deprecated APIs.
@@ -60,11 +61,11 @@ SOURCES += \
     address.cpp \
     cache/cachectl.cpp \
     controller/areactl.cpp \
-    controller/commonctl.cpp \
     controller/communityctl.cpp \
     config/config.cpp \
     controller/communitydeptctl.cpp \
     controller/controller.cpp \
+    controller/modelcontroller.cpp \
     controller/countryctl.cpp \
     controller/coursectl.cpp \
     controller/departctl.cpp \
@@ -149,10 +150,10 @@ SOURCES += \
     export/exporthtml.cpp \
     export/exporttype.cpp \
     export/exportxlsx.cpp \
-    export/iexporter.cpp \
+    export/idataexporter.cpp \
     file/filectl.cpp \
     filter.cpp \
-    import/iimporter.cpp \
+    import/idataimporter.cpp \
     import/importcsv.cpp \
     import/importcsvlist.cpp \
     import/importer.cpp \
@@ -181,9 +182,9 @@ SOURCES += \
     db/sqlite/model/saintperson.cpp \
     model/specialist.cpp \
     model/status.cpp \
-    model/statusmodel.cpp \
     model/work.cpp \
     controller/personctl.cpp \
+    report/errreporterctl.cpp \
     report/reportctl.cpp \
     controller/saintctl.cpp \
     search/searchctl.cpp \
@@ -242,11 +243,11 @@ HEADERS += \
     address.h \
     cache/cachectl.h \
     controller/areactl.h \
-    controller/commonctl.h \
     controller/communityctl.h \
     config/config.h \
     controller/communitydeptctl.h \
     controller/controller.h \
+    controller/modelcontroller.h \
     controller/countryctl.h \
     controller/coursectl.h \
     controller/departctl.h \
@@ -334,10 +335,10 @@ HEADERS += \
     export/exporthtml.h \
     export/exporttype.h \
     export/exportxlsx.h \
-    export/iexporter.h \
+    export/idataexporter.h \
     file/filectl.h \
     filter.h \
-    import/iimporter.h \
+    import/idataimporter.h \
     import/importcsv.h \
     import/importcsvlist.h \
     import/importer.h \
@@ -365,9 +366,9 @@ HEADERS += \
     db/sqlite/model/saintperson.h \
     model/specialist.h \
     model/status.h \
-    model/statusmodel.h \
     model/work.h \
     controller/personctl.h \
+    report/errreporterctl.h \
     report/reportctl.h \
     controller/saintctl.h \
     search/searchctl.h \
@@ -471,6 +472,7 @@ DISTFILES += \
     res/common_template.html \
     res/community_export_template_vi.json \
     res/course_vi.csv \
+    res/default_export_template_vi.json \
     res/department_vi.json \
     res/edu_vi.csv \
     res/event_category_vi.csv \

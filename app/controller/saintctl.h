@@ -22,20 +22,20 @@
 #ifndef SAINTCTL_H
 #define SAINTCTL_H
 
-#include <controller.h>
+#include <modelcontroller.h>
 #include "errcode.h"
 #include <QStringList>
 #include <QHash>
 #include "saint.h"
-#include "commonctl.h"
+#include "modelcontroller.h"
 
 #define SAINTCTL SaintCtl::getInstance()
 
-class SaintCtl : public CommonCtl
+class SaintCtl : public ModelController
 {
 public:
 //    QList<Saint*> getListSaints();
-    virtual DbModel* doImportOneItem(int importFileType, const QStringList& items, quint32 idx);
+    virtual DbModel* doImportOneItem(const QString& importName, int importFileType, const QStringList& items, quint32 idx);
     virtual DbModelBuilder getMainBuilder();
     ErrCode getSaintUidListFromName(const QString& name, QHash<QString, QString>* uidList = nullptr);
     QString getHollyNameFromSaintUidList(const QStringList& uidList);
@@ -57,8 +57,6 @@ private:
     static SaintCtl* gInstance;
     QList<QString> mImportFields;
 
-//public slots:
-//    virtual void onLoad();
 };
 
 #endif // SAINTCTL_H

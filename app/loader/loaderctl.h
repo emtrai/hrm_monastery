@@ -49,15 +49,15 @@ public:
     void setOnFinishLoadListener(LoaderListener* listener, void* data = nullptr);
 private:
 
-    void add2Loader( Controller* ctl);
-    void add2PreLoader( Controller* ctl);
+    void add2Loader(Controller* ctl);
+    void add2PreLoader(Controller* ctl);
     void registerAll();
-    void runLoader(QList< Controller*>& list);
+    void runLoader(QList<Controller*>& list);
 private:
     static LoaderCtl* gInstance;
 
-    QList< Controller*> mListCtl;
-    QList< Controller*> mPreLoadListCtl;
+    QList<Controller*> mListCtl;
+    QList<Controller*> mPreLoadListCtl;
 
 //    OnFinishLoadListener_t mListener;
     LoaderListener* mListener;

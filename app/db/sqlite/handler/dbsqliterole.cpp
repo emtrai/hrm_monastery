@@ -26,7 +26,7 @@
 
 #include "dbsqlitedefs.h"
 #include "dbsqlite.h"
-
+#include "role.h"
 
 DbSqliteRole::DbSqliteRole()
 {
@@ -42,4 +42,9 @@ const QString DbSqliteRole::getName()
 DbSqliteTbl *DbSqliteRole::getMainTbl()
 {
     return (DbSqliteTbl*)DbSqlite::getInstance()->getTable(KTableRole);
+}
+
+DbModelBuilder DbSqliteRole::getMainBuilder()
+{
+    return &Role::build;
 }

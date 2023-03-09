@@ -27,7 +27,8 @@ Importer::Importer()
 
 }
 
-ErrCode Importer::importFrom(int importFileType, IImporter *importer, const QString &fpath, void* tag)
+ErrCode Importer::importFrom(const QString& importName, int importFileType,
+                             IDataImporter *importer, const QString &fpath, void* tag)
 {
     traced;
     logd("Not support here");

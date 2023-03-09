@@ -22,7 +22,7 @@
 #ifndef WORKCTL_H
 #define WORKCTL_H
 
-#include "commonctl.h"
+#include "modelcontroller.h"
 #include "utils.h"
 #include <QList>
 
@@ -30,7 +30,7 @@
 
 class Work;
 
-class WorkCtl : public CommonCtl
+class WorkCtl : public ModelController
 {
     GET_INSTANCE_DECL(WorkCtl);
 public:

@@ -176,7 +176,7 @@ ErrCode UIDepartmentPersonListView::onLoad()
         logd("Load person list of department");
         mCommDept->dump();
 
-        QList<DbModel*> items = COMMUNITYDEPTCTL->getPersonList(mCommDept->uid());
+        QList<DbModel*> items = COMMUNITYDEPTCTL->getListPerson(mCommDept->uid());
         mItemList.clear(); // TODO: clean up item data
         mItemList.append(items);
     } else {

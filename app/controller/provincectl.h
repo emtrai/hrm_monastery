@@ -22,7 +22,7 @@
 #ifndef PROVINCECTL_H
 #define PROVINCECTL_H
 
-#include "commonctl.h"
+#include "modelcontroller.h"
 #include "dbmodel.h"
 #include "province.h"
 #include <QHash>
@@ -31,7 +31,7 @@
 
 #define PROVINCE (ProvinceCtl::getInstance())
 
-class ProvinceCtl : public CommonCtl
+class ProvinceCtl : public ModelController
 {
     GET_INSTANCE_DECL(ProvinceCtl);
 public:

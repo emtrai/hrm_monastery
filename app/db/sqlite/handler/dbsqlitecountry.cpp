@@ -37,7 +37,8 @@ DbSqliteTbl *DbSqliteCountry::getMainTbl()
     return (DbSqliteTbl*)DbSqlite::getInstance()->getTable(KTableCountry);
 }
 
-DbModelBuilder DbSqliteCountry::getBuilder(const QString &modelName)
+DbModelBuilder DbSqliteCountry::getMainBuilder()
 {
     return &Country::build;
+
 }

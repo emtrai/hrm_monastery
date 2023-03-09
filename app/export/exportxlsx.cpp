@@ -23,7 +23,7 @@
 #include "logger.h"
 #include "defs.h"
 #include "utils.h"
-#include "iexporter.h"
+#include "idataexporter.h"
 
 #include "xlsxdocument.h"
 #include "xlsxchartsheet.h"
@@ -42,7 +42,7 @@ ExportXlsx::ExportXlsx()
 
 }
 
-ErrCode ExportXlsx::saveTo(const IExporter *item, const QString &fpath)
+ErrCode ExportXlsx::saveTo(const IDataExporter *item, const QString &fpath)
 {
     traced;
     QXlsx::Document xlsx;
@@ -53,7 +53,7 @@ ErrCode ExportXlsx::saveTo(const IExporter *item, const QString &fpath)
     return ErrNone;
 }
 
-ErrCode ExportXlsx::saveTo(const IExporter *exporter, const QList<DbModel *> listData, const QString &fpath)
+ErrCode ExportXlsx::saveTo(const IDataExporter *exporter, const QList<DbModel *> listData, const QString &fpath)
 {
 //    traced;
 //    QXlsx::Document xlsx;

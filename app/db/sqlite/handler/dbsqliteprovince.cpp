@@ -22,7 +22,7 @@
 #include "dbsqliteprovince.h"
 #include "logger.h"
 #include "defs.h"
-
+#include "province.h"
 #include "dbsqlitedefs.h"
 #include "dbsqlite.h"
 
@@ -39,4 +39,9 @@ const QString DbSqliteProvince::getName()
 DbSqliteTbl *DbSqliteProvince::getMainTbl()
 {
     return (DbSqliteTbl*)DbSqlite::getInstance()->getTable(KTableProvince);
+}
+
+DbModelBuilder DbSqliteProvince::getMainBuilder()
+{
+    return &Province::build;
 }

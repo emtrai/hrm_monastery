@@ -34,7 +34,7 @@ ExportHtml::ExportHtml()
     traced;
 }
 
-ErrCode ExportHtml::saveTo(const IExporter *item, const QString &fpath)
+ErrCode ExportHtml::saveTo(const IDataExporter *item, const QString &fpath)
 {
     traced;
     ErrCode ret = ErrNone;

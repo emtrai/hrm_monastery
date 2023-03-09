@@ -24,9 +24,10 @@
 #include "crypto.h"
 #include "dbmodelhandler.h"
 #include "utils.h"
-#include "iexporter.h"
+#include "idataexporter.h"
 #include "dbdefs.h"
 #include "filectl.h"
+
 
 DbModel::DbModel():
       mDbId(0)
@@ -46,6 +47,7 @@ DbModel::DbModel(const DbModel &model):DbModel()
     traced;
     mDbId = model.dbId();
     mName = model.name();
+    mNameId = model.nameId();
     mUid = model.uid();
     mDbStatus = model.dbStatus();
     mHistory = model.history();
@@ -151,10 +153,43 @@ void DbModel::initImportFields()
     tracede;
 }
 
+const QHash<int, QString> *DbModel::getStatusIdNameMap()
+{
+    traced;
+    static bool isInitiedStatusNameMap = false;
+    static QHash<int, QString> map;
+    if (!isInitiedStatusNameMap) {
+        map.insert(MODEL_NOT_READY, QObject::tr("Không rõ"));
+        map.insert(MODEL_INACTIVE, QObject::tr("Không hoạt động"));
+        map.insert(MODEL_ACTIVE, QObject::tr("Đang hoạt động"));
+        map.insert(MODEL_BUILDING, QObject::tr("Đang xây dựng"));
+        isInitiedStatusNameMap = true;
+    }
+    // TODO: make it as static to load once only???
+    tracede;
+    return &map;
+}
+
+QString DbModel::status2Name(DbModelStatus status)
+{
+    const QHash<int, QString>* statuses = getStatusIdNameMap();
+    QString ret;
+    traced;
+    logd("Status to get name %d", status);
+    if (statuses->contains(status)){
+        ret = statuses->value(status);
+    } else {
+        loge("invalid status %d", status);
+        ret = "Không rõ"; // TODO: translate???
+    }
+    tracede;
+    return ret;
+}
+
 
 const QString &DbModel::name() const
 {
-    return mName;
+    return mName.isEmpty()?mNameId:mName;
 }
 
 void DbModel::setName(const QString &newName)
@@ -326,7 +361,9 @@ ErrCode DbModel::getExportDataString(const QString &keyword, QString *data) cons
     return ret;
 }
 
-ErrCode DbModel::onImportItem(int importFileType, const QString &keyword, const QString &value, quint32 idx, void *tag)
+ErrCode DbModel::onImportItem(const QString& importName, int importFileType,
+                              const QString &keyword, const QString &value,
+                              quint32 idx, void *tag)
 {
     traced;
     ErrCode ret = ErrNone;
@@ -415,17 +452,28 @@ ErrCode DbModel::update()
     return ret;
 }
 
+bool DbModel::allowRemove(QString* msg)
+{
+    return true;
+}
+
 ErrCode DbModel::remove()
 {
     traced;
     ErrCode ret = ErrNone;
-    DbModelHandler* dbModelHdl = getDbModelHandler();
-    if (dbModelHdl != nullptr){
-        ret = dbModelHdl->deleteHard(this);
+    if (!allowRemove()) {
+        ret = ErrDenied;
+        loge("No allow delete?");
     }
-    else{
-        ret = ErrDbNotReady;
-        loge("db not ready");
+    if (ret == ErrNone) {
+        DbModelHandler* dbModelHdl = getDbModelHandler();
+        if (dbModelHdl != nullptr){
+            ret = dbModelHdl->deleteHard(this);
+        }
+        else{
+            ret = ErrDbNotReady;
+            loge("db not ready");
+        }
     }
     tracedr(ret);
     return ret;
@@ -435,13 +483,19 @@ ErrCode DbModel::markRemove()
 {
     traced;
     ErrCode ret = ErrNone;
-    DbModelHandler* dbModelHdl = getDbModelHandler();
-    if (dbModelHdl != nullptr){
-        ret = dbModelHdl->deleteSoft(this);
+    if (!allowRemove()) {
+        ret = ErrDenied;
+        loge("No allow delete?");
     }
-    else{
-        ret = ErrDbNotReady;
-        loge("db not ready");
+    if (ret == ErrNone) {
+        DbModelHandler* dbModelHdl = getDbModelHandler();
+        if (dbModelHdl != nullptr){
+            ret = dbModelHdl->deleteSoft(this);
+        }
+        else{
+            ret = ErrDbNotReady;
+            loge("db not ready");
+        }
     }
     tracedr(ret);
     return ret;
@@ -484,7 +538,11 @@ void DbModel::setHistory(const QString &newHistory)
 bool DbModel::isValid()
 {
     // TODO: add more checking for valid info
-    return !name().isEmpty();
+    traced;
+    bool isValid = !nameId().isEmpty();
+    logd("isValid = %d", isValid);
+    tracede;
+    return isValid;
 }
 
 void DbModel::dump()
@@ -503,7 +561,7 @@ void DbModel::dump()
 
 QString DbModel::toString()
 {
-    return QString("%1,%2").arg(uid(), name());
+    return QString("%1:%2:%3:%4").arg(modelName(), uid(), nameId(),name());
 }
 
 void DbModel::setNameId(const QString &newNameId)
@@ -516,7 +574,7 @@ void DbModel::setNameId(const QString &newNameId)
     mNameId = newNameId;
 }
 
-IExporter *DbModel::getExporter()
+IDataExporter *DbModel::getExporter()
 {
     return this;
 }

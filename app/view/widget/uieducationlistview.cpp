@@ -40,7 +40,7 @@ UIEducationListView::~UIEducationListView()
     traced;
 }
 
-Controller *UIEducationListView::getController()
+ModelController *UIEducationListView::getController()
 {
     return EDUCTL;
 }

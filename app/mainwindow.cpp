@@ -45,7 +45,7 @@
 #include "dlgwait.h"
 #include "dialog/dlgcommunity.h"
 #include "view/widget/uitableviewfactory.h"
-#include "controller.h"
+#include "modelcontroller.h"
 #include "personctl.h"
 #include "dlgimportexportselect.h"
 
@@ -210,7 +210,7 @@ void MainWindow::showAddEditCommonModel(bool isSelfUpdate, DbModel *model, Commo
 }
 
 ErrCode MainWindow::exportListItems(const QList<DbModel *>* items,
-                                    Controller* controller,
+                                    ModelController* controller,
                                     const QString& title, quint64 exportTypeList)
 {
     traced;
@@ -338,7 +338,7 @@ void MainWindow::doShowImportPerson()
         logd("File %s is selected", fname.toStdString().c_str());
         QList<DbModel*> list;
         logd("Import from file %s", fname.toStdString().c_str());
-        ErrCode ret = INSTANCE(PersonCtl)->importFromFile(nullptr, ImportType::IMPORT_CSV, fname, &list);
+        ErrCode ret = INSTANCE(PersonCtl)->importFromFile(KModelHdlPerson, ImportType::IMPORT_CSV, fname, &list);
         logd("Import result %d", ret);
         logd("No of import item %d", list.count());
         DlgImportPersonListResult* dlg = new DlgImportPersonListResult();
@@ -364,7 +364,7 @@ void MainWindow::doShowImportCommunity()
         logd("File %s is selected", fname.toStdString().c_str());
         QList<DbModel*> list;
         logd("Import from file %s", fname.toStdString().c_str());
-        ErrCode ret = COMMUNITYCTL->importFromFile(nullptr, ImportType::IMPORT_CSV, fname, &list);
+        ErrCode ret = COMMUNITYCTL->importFromFile(KModelHdlCommunity, ImportType::IMPORT_CSV, fname, &list);
         logd("Import result %d", ret);
         logd("No of import item %d", list.count());
         DlgImportCommunityListResult* dlg = new DlgImportCommunityListResult();
@@ -386,7 +386,7 @@ void MainWindow::doShowAddEditCommonModel(bool isSelfUpdate, DbModel *model, Com
     tracede;
 }
 
-ErrCode MainWindow::doExportListItems(const QList<DbModel *> *items, Controller *controller,
+ErrCode MainWindow::doExportListItems(const QList<DbModel *> *items, ModelController *controller,
                                       const QString& title, quint64 exportTypeList)
 {
     traced;
@@ -721,7 +721,7 @@ void MainWindow::on_action_ImportPersonList_triggered()
         logd("File %s is selected", fname.toStdString().c_str());
         QList<DbModel*> list;
         logd("Import from file %s", fname.toStdString().c_str());
-        ErrCode ret = INSTANCE(PersonCtl)->importFromFile(nullptr, ImportType::IMPORT_CSV_LIST, fname, &list);
+        ErrCode ret = INSTANCE(PersonCtl)->importFromFile(KModelHdlPerson, ImportType::IMPORT_CSV_LIST, fname, &list);
         logd("Import result %d", ret);
         logd("No of import item %d", list.count());
         DlgImportPersonListResult* dlg = new DlgImportPersonListResult();
@@ -772,14 +772,6 @@ void MainWindow::on_actionNew_Community_triggered()
     DlgCommunity w;
 //    w.setWindowState(Qt::WindowState::WindowMaximized);
     w.exec();
-}
-
-
-void MainWindow::on_actionImportComm_triggered()
-{
-    traced;
-    CommunityCtl::getInstance()->loadFromFile(FileCtl::getFullFilePath("config"));
-
 }
 
 

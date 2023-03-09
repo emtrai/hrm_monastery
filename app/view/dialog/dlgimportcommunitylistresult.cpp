@@ -46,7 +46,7 @@ QList<UIImportItem *> *DlgImportCommunityListResult::getItems()
         Community* comm = (Community*)item;
         comm->dump();
         UIImportItem* wgitem = UIImportItem::build(item);
-        wgitem->addValue(comm->communityCode());
+        wgitem->addValue(comm->nameId());
         wgitem->addValue(comm->name());
         wgitem->addValue(comm->addr());
         wgitem->addValue(comm->tel());

@@ -25,7 +25,7 @@
 #include "exporter.h"
 #include "errcode.h"
 #include <QString>
-#include "iexporter.h"
+#include "idataexporter.h"
 #include "utils.h"
 
 class ExportCSVList : public Exporter
@@ -33,8 +33,8 @@ class ExportCSVList : public Exporter
     GET_INSTANCE_DECL(ExportCSVList)
 public:
     ExportCSVList();
-//    virtual ErrCode saveTo(const IExporter* item, const QString& fpath);
-    virtual ErrCode saveTo(const IExporter* exporter, const QList<DbModel*> data, const QString& fpath);
+//    virtual ErrCode saveTo(const IDataExporter* item, const QString& fpath);
+    virtual ErrCode saveTo(const IDataExporter* exporter, const QList<DbModel*> data, const QString& fpath);
     virtual ExportType getExportType();
 };
 

@@ -60,7 +60,7 @@ void UIAreaListView::updateItem(DbModel *item, UITableItem *tblItem)
     tblItem->addValue(model->personName());
 }
 
-Controller *UIAreaListView::getController()
+ModelController *UIAreaListView::getController()
 {
     traced;
     return AREACTL;

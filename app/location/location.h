@@ -29,6 +29,8 @@
 #include "errcode.h"
 #include <QList>
 
+// TODO: remove location?
+
 class Location: public Controller
 {
 public:
@@ -41,15 +43,16 @@ private:
     ErrCode loadCountryFromFiles();
     QList<Country*> getListCountry();
 
-    ErrCode doOneCSVItemCallback(const QStringList& items, void* param);
+    ErrCode doCsvParseOneItem(const QStringList& items, void* param);
 private:
-    static ErrCode oneCSVItemCallback(const QStringList& items, void* caller, void* param, quint32 idx);
+    static ErrCode onCsvParseOneItemCallback(const QStringList& items, void* caller, void* param, quint32 idx);
 private:
     static Location* gInstance;
     QHash<QString, Country*> mListCountry;
 
-public slots:
-    virtual void onLoad();
+public:
+    virtual QString getName();
+    virtual ErrCode onLoad();
 };
 
 #endif // LOCATION_H

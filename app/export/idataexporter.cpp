@@ -14,42 +14,42 @@
  * limitations under the License.
  *
  *
- * Filename: iexporter.cpp
+ * Filename: idataexporter.cpp
  * Author: Anh, Ngo Huy
  * Created date:8/20/2022
  * Brief:
  */
-#include "iexporter.h"
+#include "idataexporter.h"
 #include "logger.h"
 #include "defs.h"
 #include "exportfactory.h"
 #include "utils.h"
 
-IExporter::IExporter()
+IDataExporter::IDataExporter()
 {
     traced;
 }
 
-const QString IExporter::exportTemplatePath(Exporter* exporter) const
+const QString IDataExporter::exportTemplatePath(Exporter* exporter) const
 {
     traced;
     return QString();
 }
 
-const QStringList IExporter::getListExportKeyWord() const
+const QStringList IDataExporter::getListExportKeyWord() const
 {
     traced;
     return QStringList();
 }
 
-ErrCode IExporter::getExportDataString(const QString &keyword, QString* data) const
+ErrCode IDataExporter::getExportDataString(const QString &keyword, QString* data) const
 {
     traced;
     loge("Not support here");
     return ErrNotSupport;
 }
 
-ErrCode IExporter::getExportDataString(const QString &keyword, const DbModel *data, QString *exportData) const
+ErrCode IDataExporter::getExportDataString(const QString &keyword, const DbModel *data, QString *exportData) const
 {
     traced;
     loge("Not support here");
@@ -57,15 +57,15 @@ ErrCode IExporter::getExportDataString(const QString &keyword, const DbModel *da
     return ErrNotSupport;
 }
 
-quint64 IExporter::getExportTypeList()
+quint64 IDataExporter::getExportTypeList()
 {
     loge("get eport type list from base class, SHOULD be implemented in derived class");
     return ExportType::EXPORT_NONE;
 }
 
-ErrCode IExporter::getListExportKeywords(Exporter *exporter, QHash<QString, QString> &outMap) const
+ErrCode IDataExporter::getListExportKeywords(Exporter *exporter, QHash<QString, QString> &outMap) const
 {
     traced;
-    loge("MUST BE IMPLEMENTED IN DERIVED CLASS OF IExporter");
+    loge("MUST BE IMPLEMENTED IN DERIVED CLASS OF IDataExporter");
     return ErrNotImpl;
 }

@@ -28,7 +28,7 @@
 
 GET_INSTANCE_IMPL(MissionCtl);
 
-MissionCtl::MissionCtl():CommonCtl(KModelHdlMission)
+MissionCtl::MissionCtl():ModelController(KModelHdlMission)
 {
     traced;
 }

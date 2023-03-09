@@ -31,7 +31,7 @@ public:
     virtual ~UICountryListView();
 protected:
 
-    virtual Controller* getController();
+    virtual ModelController* getController();
     virtual QString getTitle();
     virtual DbModel* onNewModel();
 };

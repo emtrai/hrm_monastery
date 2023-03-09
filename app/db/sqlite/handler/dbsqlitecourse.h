@@ -35,6 +35,7 @@ public:
     virtual const QString getName();
 protected:
     virtual DbSqliteTbl* getMainTbl();
+    virtual DbModelBuilder getMainBuilder();
 
 };
 

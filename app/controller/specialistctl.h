@@ -22,20 +22,21 @@
 #ifndef SPECIALISTCTL_H
 #define SPECIALISTCTL_H
 
-#include <controller.h>
+#include <modelcontroller.h>
 #include "errcode.h"
 #include <QStringList>
 #include "specialist.h"
+#include "modelcontroller.h"
 
 #define SPECIALISTCTL SpecialistCtl::getInstance()
-class SpecialistCtl : public Controller
+class SpecialistCtl : public ModelController
 {
     GET_INSTANCE_DECL(SpecialistCtl);
 public:
     SpecialistCtl();
-//    ErrCode doOneCSVItemCallback(const QStringList& items, void* param);
+//    ErrCode doCsvParseOneItem(const QStringList& items, void* param);
 //private:
-//    static ErrCode oneCSVItemCallback(const QStringList& items, void* caller,
+//    static ErrCode onCsvParseOneItemCallback(const QStringList& items, void* caller,
 //                                      void* param);
 protected:
     DbModel *buildModel(void *items, const QString &fmt);

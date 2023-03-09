@@ -28,7 +28,7 @@ class DbSqliteAreaMgrTbl : public DbSqliteMapTbl
 {
 public:
     DbSqliteAreaMgrTbl(DbSqlite* db);
-    QList<DbModel*> getListPerson(const QString& areaUid, int status = ITEM_MAP_STATUS_ACTIVE);
+    QList<DbModel*> getListPerson(const QString& areaUid, int status = MODEL_ACTIVE);
 
 protected:
     virtual void addTableField(DbSqliteTableBuilder* builder);

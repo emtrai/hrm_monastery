@@ -77,7 +77,7 @@ void LoaderCtl::registerAll()
     traced;
     add2PreLoader(DbCtl::getInstance());
     /* Beware, order is important*/
-    add2Loader(Location::getInstance());
+//    add2Loader(Location::getInstance());
     add2Loader(SAINTCTL);
     add2Loader(EduCtl::getInstance());
     add2Loader(SPECIALISTCTL);
@@ -92,10 +92,9 @@ void LoaderCtl::registerAll()
     add2Loader(INSTANCE(CourseCtl));
     add2Loader(INSTANCE(WorkCtl));
     add2Loader(INSTANCE(StatusCtl));
-    add2Loader(INSTANCE(StatusCtl));
     add2Loader(INSTANCE(EventCtl));
-    add2Loader(CommunityCtl::getInstance());
     add2Loader(AreaCtl::getInstance());
+    add2Loader(CommunityCtl::getInstance());
     add2Loader(DepartCtl::getInstance());
     add2Loader(RoleCtl::getInstance());
 }

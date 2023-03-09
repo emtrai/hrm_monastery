@@ -40,7 +40,6 @@ Location *Location::getInstance()
 
 Location::Location()
 {
-
 }
 
 ErrCode Location::loadCountryFromFiles()
@@ -52,7 +51,7 @@ ErrCode Location::loadCountryFromFiles()
 QString path = FileCtl::getPrebuiltDataFilePath(Utils::getPrebuiltFileByLang(KPrebuiltCountryCSVFileName));
     logd("Country file path %s", path.toStdString().c_str());
 
-    ErrCode ret = Utils::parseCSVFile(path, &Location::oneCSVItemCallback, this);
+    ErrCode ret = Utils::parseCSVFile(path, &Location::onCsvParseOneItemCallback, this);
     logd("ret %d", ret);
 
     return ret;
@@ -64,7 +63,7 @@ QList<Country*> Location::getListCountry()
 }
 
 #define MAX_SPLIT_ITEMS (3)
-ErrCode Location::doOneCSVItemCallback(const QStringList &items, void *param)
+ErrCode Location::doCsvParseOneItem(const QStringList &items, void *param)
 {
     traced;
     ErrCode ret = ErrNone;
@@ -105,11 +104,16 @@ ErrCode Location::doOneCSVItemCallback(const QStringList &items, void *param)
     return ret;
 }
 
-ErrCode Location::oneCSVItemCallback(const QStringList &items, void* caller, void *param, quint32 idx)
+ErrCode Location::onCsvParseOneItemCallback(const QStringList &items, void* caller, void *param, quint32 idx)
 {
 
     traced;
-    return getInstance()->doOneCSVItemCallback(items, param);
+    return getInstance()->doCsvParseOneItem(items, param);
+}
+
+QString Location::getName()
+{
+    return "Location";
 }
 
 
@@ -119,11 +123,12 @@ void Location::addCountry(QString id, const Country &country)
     traced;
 }
 
-void Location::onLoad()
+ErrCode Location::onLoad()
 {
     traced;
     loadCountryFromFiles();
     foreach (Country* country, getListCountry()) {
         country->dump();
     }
+    return ErrNone;
 }

@@ -31,7 +31,7 @@ public:
 
 protected:
     virtual DbSqliteTbl *getMainTbl();
-    virtual DbModelBuilder getBuilder(const QString& modelName = nullptr);
+    virtual DbModelBuilder getMainBuilder();
 };
 
 #endif // DBSQLITECOUNTRY_H

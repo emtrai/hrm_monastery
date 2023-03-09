@@ -29,9 +29,8 @@ class PersonDept;
 class DbCommDeptModelHandler
 {
 public:
-    virtual QList<DbModel*> getListPerson(const QString& deptUid) = 0;
-    virtual QList<DbModel*> getListDept(const QString& communityUid) = 0;
-    virtual ErrCode addPerson2Department(PersonDept* perDept) = 0;
+    virtual QList<DbModel*> getListPerson(const QString& commDeptUid, int status = MODEL_ACTIVE, bool* ok = nullptr) = 0;
+    virtual QList<DbModel*> getListDept(const QString& communityUid, int status = MODEL_ACTIVE, bool* ok = nullptr) = 0;
 };
 
 #endif // DBCOMMDEPATMODELHANDLER_H

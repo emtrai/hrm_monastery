@@ -28,7 +28,7 @@
 
 GET_INSTANCE_IMPL(EthnicCtl)
 
-EthnicCtl::EthnicCtl():CommonCtl(KModelHdlEthnic)
+EthnicCtl::EthnicCtl():ModelController(KModelHdlEthnic)
 {
     traced;
 }

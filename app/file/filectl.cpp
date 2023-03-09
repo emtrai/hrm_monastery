@@ -302,3 +302,14 @@ void FileCtl::cleanUpData()
     traced;
     // TODO: implement it, clean up all data, i.e data in temp storage
 }
+
+QString FileCtl::getName()
+{
+    return "FileCtl";
+}
+
+ErrCode FileCtl::onLoad()
+{
+    traced;
+    return ErrNone;
+}

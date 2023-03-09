@@ -32,8 +32,8 @@
 #include <QHash>
 #include <QMap>
 #include "dbmodel.h"
-#include "iexporter.h"
-#include "iimporter.h"
+#include "idataexporter.h"
+#include "idataimporter.h"
 #include "utils.h"
 #include <functional>
 #include <iostream>
@@ -41,7 +41,7 @@
 class Education;
 class Work;
 class Person;
-class Controller;
+class ModelController;
 
 typedef QString *GET_DATA_FUNC();
 
@@ -61,7 +61,7 @@ public:
 private:
     ErrCode commonCheckField(QString& name,
                              QString& uid,
-                             Controller* controller,
+                             ModelController* controller,
                              const char* const itemName,
                              int& invalidField);
 public:
@@ -90,7 +90,7 @@ public:
     QString getFullName() const;
     ErrCode fromCSVFile(const QString& fname);
 
-    virtual IExporter* getExporter();
+    virtual IDataExporter* getExporter();
     const QString &personCode() const;
     void setPersonCode(const QString &newPersonCode);
 
@@ -375,7 +375,8 @@ public:
     void setFeastDay(const QString& newFeastDay,
                      const QString& format = DATE_FORMAT_MD);
 
-    virtual ErrCode onImportItem(int importFileType,
+    virtual ErrCode onImportItem(const QString& importName,
+                                 int importFileType,
                                  const QString& keyword,
                                  const QString& value,
                                  quint32 idx = 0,

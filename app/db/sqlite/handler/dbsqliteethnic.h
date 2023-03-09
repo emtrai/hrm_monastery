@@ -34,6 +34,7 @@ public:
     virtual DbModel *getByUid(const QString& uid);
 protected:
     virtual DbSqliteTbl *getMainTbl();
+    virtual DbModelBuilder getMainBuilder();
 };
 
 #endif // DBSQLITEETHNIC_H

@@ -51,6 +51,11 @@ QString CommunityDept::modelName() const
     return KModelNameCommDept;
 }
 
+const QString &CommunityDept::name() const
+{
+    return mName.isEmpty()?mDepartmentName:mName;
+}
+
 qint64 CommunityDept::establishDate() const
 {
     return mEstablishDate;
@@ -125,6 +130,35 @@ DbModelHandler *CommunityDept::getDbModelHandler()
     return DB->getModelHandler(KModelHdlCommDept);
 }
 
+qint64 CommunityDept::closedDate() const
+{
+    return mClosedDate;
+}
+
+void CommunityDept::setClosedDate(qint64 newClosedDate)
+{
+    mClosedDate = newClosedDate;
+}
+
+void CommunityDept::setClosedDateFromString(const QString &date, const QString &format)
+{
+    traced;
+    logd("close date string '%s'", date.toStdString().c_str());
+    mClosedDate = Utils::dateFromString(date, format);
+    logd("mClosedDate %ll", mClosedDate);
+}
+
+
+const QString & CommunityDept::communityName() const
+{
+    return mCommunityName;
+}
+
+void CommunityDept::setCommunityName(const QString & newCommunityName)
+{
+    mCommunityName = newCommunityName;
+}
+
 const QString &CommunityDept::departmentName() const
 {
     return mDepartmentName;
@@ -164,17 +198,6 @@ void CommunityDept::setDepartmentUid(const QString &newDepartmentUid)
 {
     mDepartmentUid = newDepartmentUid;
 }
-
-const QString &CommunityDept::code() const
-{
-    return mCode;
-}
-
-void CommunityDept::setCode(const QString &newCode)
-{
-    mCode = newCode;
-}
-
 
 const QString &CommunityDept::communityUid() const
 {

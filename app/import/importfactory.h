@@ -47,7 +47,7 @@ public:
     ImportFactory();
     static Importer* getImporter(ImportType type);
 
-    static ErrCode importFrom(IImporter* item, const QString& fpath, ImportType type, void* tag = nullptr);
+    static ErrCode importFrom(const QString& importName, IDataImporter* item, const QString& fpath, ImportType type, void* tag = nullptr);
 
 };
 

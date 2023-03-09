@@ -27,8 +27,8 @@
 #include "exportfactory.h"
 #include <QList>
 #include "utils.h"
-#include "iimporter.h"
-#include "iexporter.h"
+#include "idataimporter.h"
+#include "idataexporter.h"
 
 // if (markModified()) logd("value is different '%s'", QString("'%1' vs '%2'").arg(cur, next).toStdString().c_str());
 #define CHECK_MODIFIED_THEN_SET(cur, next, itemName) \
@@ -50,9 +50,13 @@
 
 class DbModel;
 class DbModelHandler;
-class IExporter;
+class IDataExporter;
 
 typedef DbModel*(*DbModelBuilder)(void);
+
+/**
+ * @brief status of record in db
+ */
 enum DB_RECORD_STATUS {
     DB_RECORD_NOT_READY = 0, // record not ready
     DB_RECORD_ACTIVE    = (1 << 1), // record ready to use
@@ -60,10 +64,29 @@ enum DB_RECORD_STATUS {
     DB_RECORD_ALL = DB_RECORD_ACTIVE | DB_RECORD_DElETED
 };
 
+// BE WARE, ANY CHANGE TO THIS STATUS WILL IMPACT TO DB
+// THIS VALUE IS WRITTEN DIRECTLY TO DB
+// TODO: to do what to improve this???
+/**
+ * @brief Status of a dbmodel
+ *        It's different from record status. Record status is checked first,
+ *        then check status of db model
+ */
+enum DbModelStatus{
+    MODEL_NOT_READY     = (0),
+    MODEL_INACTIVE      = (1 << 0), // Map is inactive/closed/stoped
+    MODEL_ACTIVE        = (1 << 1), // Map is active
+    MODEL_BUILDING      = (1 << 2), // building phase, not ready
+    MODEL_STATUS_MAX    = MODEL_INACTIVE | MODEL_ACTIVE | MODEL_BUILDING
+};
+
 typedef std::shared_ptr<DbModel> DbModel_sp;
 
-class DbModel: public IImporter, public IExporter
+class DbModel: public IDataImporter, public IDataExporter
 {
+public:
+    static const QHash<int, QString>* getStatusIdNameMap();
+    static QString status2Name(DbModelStatus status);
 protected:
     DbModel();
     DbModel(const DbModel& model);
@@ -92,7 +115,8 @@ public:
      * @param tag
      * @return
      */
-    virtual ErrCode onImportItem(int importFileType,
+    virtual ErrCode onImportItem(const QString& importName,
+                                 int importFileType,
                                  const QString& keyword,
                                  const QString& value,
                                  quint32 idx = 0,
@@ -121,6 +145,7 @@ public:
      * @return Error code
      */
     virtual ErrCode update();
+
     /**
      * @brief remove data from db
      * @return
@@ -142,7 +167,7 @@ public:
 
 
     void setNameId(const QString &newNameId);
-    virtual IExporter* getExporter();
+    virtual IDataExporter* getExporter();
 
     /**
      * @brief validate if data is all valid
@@ -194,6 +219,13 @@ protected:
     virtual void checkModifiedThenSet(QString& cur, const QString& next, const QString& itemName);
     virtual void checkModifiedThenSet(qint32& cur, qint32 next, const QString& itemName);
     virtual void checkModifiedThenSet(qint64& cur, qint64 next, const QString& itemName);
+
+    /**
+     * @brief return if model is deleted or not
+     * @param msg: informative message
+     * @return true: allow to delete, false otherwise
+     */
+    virtual bool allowRemove(QString* msg = nullptr);
 protected:
     QHash<QString, std::function<QString(const QString&)>> mExportFields;
     QHash<QString, std::function<void(const QString&)>> mImportFields;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Ngo Huy Anh
+ * Copyright (C) 2023 Ngo Huy Anh
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,30 @@
  * limitations under the License.
  *
  *
- * Filename: countryctl.h
+ * Filename: errreporterctl.h
  * Author: Anh, Ngo Huy
- * Created date:8/13/2022
+ * Created date:3/4/2023
  * Brief:
  */
-#ifndef COUNTRYCTL_H
-#define COUNTRYCTL_H
+#ifndef ERRREPORTERCTL_H
+#define ERRREPORTERCTL_H
 
-#include "modelcontroller.h"
-#include "dbmodel.h"
-#include "country.h"
 #include "utils.h"
+#include "errcode.h"
 
-#define COUNTRYCTL (CountryCtl::getInstance())
+#define REPORTERRCTL ErrReporterCtl::getInstance()
 
-class CountryCtl : public ModelController
+class ErrReporterCtl
 {
-    GET_INSTANCE_DECL(CountryCtl);
-protected:
-    CountryCtl();
-    virtual ~CountryCtl();
-    virtual DbModelBuilder getMainBuilder();
-    virtual const char *getPrebuiltFileName();
+    GET_INSTANCE_DECL(ErrReporterCtl);
+private:
+    ErrReporterCtl();
+    virtual ~ErrReporterCtl();
+public:
+    void reportErr(const QString& errMsg, ErrCode err,
+                  bool showErrDlg = false, // show show error dialog
+                  bool delay = false // delay true: not show dialog right now until delay = false
+                  );
 };
 
-#endif // COUNTRYCTL_H
+#endif // ERRREPORTERCTL_H

@@ -22,54 +22,87 @@
 #ifndef COMMUNITYDEPTCTL_H
 #define COMMUNITYDEPTCTL_H
 #include <QString>
-#include "logger.h"
 #include "errcode.h"
-#include "controller.h"
-#include "commonctl.h"
+#include "modelcontroller.h"
+#include "modelcontroller.h"
 #include "communitydept.h"
+#include "utils.h"
 
 #define COMMUNITYDEPTCTL (CommunityDeptCtl::getInstance())
 
 class Person;
 class PersonDept;
 
-class CommunityDeptCtl:public CommonCtl
+class CommunityDeptCtl:public ModelController
 {
-
+    GET_INSTANCE_DECL(CommunityDeptCtl);
+private:
+    CommunityDeptCtl(); // not allow to allocate outside of this class
+    virtual ~CommunityDeptCtl();
 public:
-    virtual ErrCode addNew(DbModel* model);
-    ErrCode loadFromFile(const QString& path);
 
-    QList<DbModel*> getDepartList(const QString& communityUid);
-    ErrCode addPerson2CommunityDept(PersonDept* perdept);
+    /**
+     * @brief get list of active departments in community, \ref CommunityDept
+     * @param communityUid
+     * @param ok true if success, false otherwise
+     * @return list of department, model CommunityDept. Caller must free after use
+     */
+    QList<DbModel*> getListDept(const QString& communityUid, bool* ok = nullptr);
 
+    /**
+     * @brief Get list of people in department of a community \ref PersonDept
+     * @param commDeptUid uid of community/dept
+     * @param ok true if success, false otherwise
+     * @return list of department, model PersonDept. Caller must free after use
+     */
+    const QList<DbModel*> getListPerson(const QString& commDeptUid, bool* ok = nullptr);
+
+protected:
     virtual const char* getPrebuiltFileName();
     virtual const char* getPrebuiltFileType();
+
     virtual DbModelHandler* getModelHandler();
     virtual DbModelBuilder getMainBuilder();
-    virtual ErrCode markModelDelete(DbModel* model);
-    virtual ErrCode deleteModel(DbModel* model);
 
-    virtual DbModel* doImportOneItem(int importFileType, const QStringList& items, quint32 idx);
-    virtual DbModel* doImportOneItem(int importFileType, const QHash<QString, QString>& items, quint32 idx);
-
-    const QList<DbModel*> getPersonList(const QString& deptUid);
-    const QList<DbModel*> getDeptList(const QString& communityUid = nullptr);
-private:
-    CommunityDeptCtl();
-
-public:
-    static CommunityDeptCtl* getInstance();
-protected:
+    /**
+     * @brief parse prebuilt file
+     * @param fpath path to prebuilt file
+     * @param ftype file type, i.e json
+     * @return
+     */
     virtual ErrCode parsePrebuiltFile(const QString &fpath, const QString &ftype);
-    virtual CommunityDept* parseOneItem(const QJsonObject& jobj);
+
+    /**
+     * @brief parse one item of prebuilt file
+     *        Called when parse prebuilt file
+     * @param jobj
+     * @param ok true if parsed ok, false otherwise
+     * @return
+     */
+    virtual CommunityDept* onJsonParseOneItem(const QJsonObject& jobj, bool* ok = nullptr);
+
+    /**
+     * @brief before import flow
+     * @param importName
+     * @param importFileType
+     * @param fname
+     * @return
+     */
+    virtual ErrCode onImportStart(const QString& importName, int importFileType, const QString& fname);
+
+    /**
+     * @brief import one item, this called by IDataImport callback when import, mainly when import csv
+     * @param importFileType
+     * @param items imported data in list, must be in order with headers
+     * @param idx data idx, idx 0 is header
+     * @return db model, caller must free it after use
+     */
+    virtual DbModel* doImportOneItem(const QString& importName, int importFileType, const QStringList& items, quint32 idx);
+    virtual DbModel* doImportOneItem(const QString& importName, int importFileType, const QHash<QString, QString>& items, quint32 idx);
 
 protected:
 
     QList<QString> mImportFields;
-private:
-    static CommunityDeptCtl* gInstance;
-protected:
 
 };
 

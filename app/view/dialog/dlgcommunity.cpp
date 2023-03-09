@@ -30,6 +30,8 @@
 #include "countryctl.h"
 #include "communityctl.h"
 #include "dialog/dlgsearchperson.h"
+#include "dbmodel.h"
+
 
 DlgCommunity::DlgCommunity(QWidget *parent) :
     DlgCommonEditModel(parent),
@@ -74,7 +76,7 @@ ErrCode DlgCommunity::buildModel(DbModel *model, QString& errMsg)
         }
     }
     if (err == ErrNone){
-        comm->setCommunityCode(ui->txtCode->text().trimmed());
+        comm->setNameId(ui->txtCode->text().trimmed());
     }
     if (err == ErrNone){
         SET_VAL_FROM_CBOX(ui->cbArea, comm->setAreaUid, comm->setAreaName);
@@ -130,7 +132,7 @@ ErrCode DlgCommunity::fromModel(const DbModel *item)
     Community* comm = (Community*)model();
     if (err == ErrNone) {
         ui->txtName->setText(comm->name());
-        ui->txtCode->setText(comm->communityCode()); // TODO: auto generate???
+        ui->txtCode->setText(comm->nameId()); // TODO: auto generate???
         Utils::setSelectItemComboxByData(ui->cbArea, comm->areaUid());
         ui->txtEstablishDate->setText(Utils::date2String(comm->createDate()));
         ui->txtFeaseDay->setText(Utils::date2String(comm->feastDate(), DATE_FORMAT_MD));
@@ -182,7 +184,7 @@ void DlgCommunity::loadStatus()
 {
     traced;
     ui->cbStatus->clear();
-    QHash<int, QString>* statuses = COMMUNITYCTL->getStatusIdNameMap();
+    const QHash<int, QString>* statuses = DbModel::getStatusIdNameMap();
     logd("the number of status %d", statuses->count());
     foreach (int key, statuses->keys()) {
         ui->cbStatus->addItem(statuses->value(key), key);

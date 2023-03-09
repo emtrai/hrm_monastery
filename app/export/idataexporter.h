@@ -14,23 +14,23 @@
  * limitations under the License.
  *
  *
- * Filename: iexporter.h
+ * Filename: idataexporter.h
  * Author: Anh, Ngo Huy
  * Created date:8/20/2022
  * Brief:
  */
-#ifndef IEXPORTER_H
-#define IEXPORTER_H
+#ifndef IDATAEXPORTER_H
+#define IDATAEXPORTER_H
 #include "errcode.h"
 #include "exportfactory.h"
 
 class Exporter;
 class DbModel;
 // TODO: name should be IDataExporter???
-class IExporter
+class IDataExporter
 {
 public:
-    IExporter();
+    IDataExporter();
 
     virtual const QString exportTemplatePath(Exporter* exporter) const;
 
@@ -43,4 +43,4 @@ public:
                                         QHash<QString, QString>& outMap) const;
 };
 
-#endif // IEXPORTER_H
+#endif // IDATAEXPORTER_H

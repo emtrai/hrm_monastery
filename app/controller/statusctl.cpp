@@ -30,7 +30,7 @@
 
 GET_INSTANCE_IMPL(StatusCtl)
 StatusCtl::StatusCtl():
-    CommonCtl(KModelHdlStatus)
+    ModelController(KModelHdlStatus)
 {
     traced;
 }

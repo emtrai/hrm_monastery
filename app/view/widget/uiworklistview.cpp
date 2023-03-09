@@ -40,7 +40,7 @@ UIWorkListView::~UIWorkListView()
     traced;
 }
 
-Controller *UIWorkListView::getController()
+ModelController *UIWorkListView::getController()
 {
     return WORKCTL;
 }

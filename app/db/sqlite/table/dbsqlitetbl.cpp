@@ -516,6 +516,8 @@ int DbSqliteTbl::runQuery(QSqlQuery &qry, const DbModelBuilder& builder,
     int cnt = 0;
     if( qry.exec() )
     {
+        logd("get next, isvalid=%d", qry.isValid());
+        logd("Get all number of item %d", qry.size());
         while (qry.next()) {
             // qry.size may not support, so cannot use here
             // TODO: check if any better way to get the number of items;
@@ -839,7 +841,8 @@ int DbSqliteTbl::search(const QString& keyword, const QHash<QString, int>& inFie
     // TODO: implement it
     // TODO: exact and not exact match???
 
-    QSqlQuery qry(SQLITE->currentDb());
+//    QSqlQuery qry(SQLITE->currentDb());
+    QSqlQuery* qry = new QSqlQuery(SQLITE->currentDb());
     qint32 cnt = 0;
     logi("Search keyword '%s'", keyword.toStdString().c_str());
     QString cond;
@@ -865,15 +868,16 @@ int DbSqliteTbl::search(const QString& keyword, const QHash<QString, int>& inFie
     logd("Query cond '%s'", cond.toStdString().c_str());
     QString queryString = getSearchQueryString(cond);
 
-    qry.prepare(queryString);
+    qry->prepare(queryString);
     logd("Query String '%s'", queryString.toStdString().c_str());
+    logd("Bind value '%s'", STR2CHA(keyword.trimmed().toLower()));
 
     // TODO: check sql injection issue
-    qry.bindValue( ":keyword", QString("%%1%").arg(keyword.trimmed().toLower()) );
-    qry.bindValue( ":keywordexact", QString("%1").arg(keyword.trimmed().toLower()) );
-    qry.bindValue( ":value", QString("%1").arg(keyword.trimmed().toLower()) );
+    qry->bindValue( ":keyword", QString("%%1%").arg(keyword.trimmed().toLower()) );
+    qry->bindValue( ":keywordexact", QString("%1").arg(keyword.trimmed().toLower()) );
+    qry->bindValue( ":value", QString("%1").arg(keyword.trimmed().toLower()) );
     try {
-        cnt = runQuery(qry, builder, outList);
+        cnt = runQuery(*qry, builder, outList);
     } catch(const std::runtime_error& ex) {
         loge("Runtime Exception! %s", ex.what());
         cnt = 0;
@@ -887,7 +891,7 @@ int DbSqliteTbl::search(const QString& keyword, const QHash<QString, int>& inFie
 
 
     logi("Found %d", cnt);
-
+    delete qry;
     return cnt;
 }
 

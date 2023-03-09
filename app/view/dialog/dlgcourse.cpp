@@ -50,7 +50,7 @@ void DlgCourse::accept()
 
     if (!name.isEmpty()){
         if (mCourse == nullptr)
-            mCourse = new Course();
+            mCourse = (Course*)Course::build();
         if (mCourse != nullptr){
             mCourse->setName(name);
 

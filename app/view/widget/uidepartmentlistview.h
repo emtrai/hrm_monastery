@@ -32,7 +32,7 @@ public:
 protected:
     void initHeader();
     void updateItem(DbModel *item, UITableItem *tblItem);
-    virtual Controller* getController();
+    virtual ModelController* getController();
 
     virtual QList<DbModel*> getListItem();
     virtual DbModel* onNewModel();

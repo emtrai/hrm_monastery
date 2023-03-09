@@ -47,7 +47,7 @@ QString UISpecialistListView::getTitle()
     return tr("Chuyên môn");
 }
 
-Controller *UISpecialistListView::getController()
+ModelController *UISpecialistListView::getController()
 {
     return SPECIALISTCTL;
 }

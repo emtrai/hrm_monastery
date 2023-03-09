@@ -129,7 +129,7 @@ void UIPersonListView::importRequested(const QString &fpath)
     traced;
     QList<DbModel*> list;
     logd("Import from file %s", fpath.toStdString().c_str());
-    ErrCode ret = INSTANCE(PersonCtl)->importFromFile(nullptr, ImportType::IMPORT_CSV_LIST, fpath, &list);
+    ErrCode ret = INSTANCE(PersonCtl)->importFromFile(KModelHdlPerson, ImportType::IMPORT_CSV_LIST, fpath, &list);
     logd("Import result %d", ret);
     logd("No of import item %d", list.count());
     DlgImportPersonListResult* dlg = new DlgImportPersonListResult();
@@ -210,7 +210,7 @@ ErrCode UIPersonListView::onChangeCommunity(QMenu *menu, UITableMenuAction *act)
             foreach (DbModel* item, items){
                 logd("Add person to community");
                 item->dump();
-                COMMUNITYCTL->addPerson(comm, (Person*) item);
+                COMMUNITYCTL->addPerson2Community(comm, (Person*) item);
             }
             // TODO: implement this
         } else {

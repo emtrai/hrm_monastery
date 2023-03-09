@@ -28,7 +28,7 @@
 
 GET_INSTANCE_IMPL(CountryCtl)
 
-CountryCtl::CountryCtl():CommonCtl(KModelHdlCountry)
+CountryCtl::CountryCtl():ModelController(KModelHdlCountry)
 {
     traced;
 }

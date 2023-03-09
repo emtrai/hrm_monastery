@@ -35,7 +35,8 @@ ImportCSVList::ImportCSVList()
     traced;
 }
 
-ErrCode ImportCSVList::importFrom(int importFileType, IImporter *importer, const QString &fpath, void* tag)
+ErrCode ImportCSVList::importFrom(const QString& importName, int importFileType,
+                                  IDataImporter *importer, const QString &fpath, void* tag)
 {
     traced;
 //    QHash<QString, QString> item;
@@ -48,25 +49,29 @@ ErrCode ImportCSVList::importFrom(int importFileType, IImporter *importer, const
     }
 
     if (ret == ErrNone) {
+        ret = importer->onImportStart(importName, importFileType, fpath);
+    }
+    if (ret == ErrNone) {
         logd("parse csv file %s", fpath.toStdString().c_str());
         // TODO: parse and put all item in hash, consume memory, should use callback?
         // Intend to use callback, but considering the case that error happend when
         // parsing --> date stored by callback may invalid
         // parse and check whole will ensure parsing finished ok
         ret = Utils::parseCSVFile(fpath,
-                [importer, importFileType](const QStringList& items, void* caller, void* param, quint32 idx){
+                [importer, importFileType, importName](const QStringList& items, void* caller, void* param, quint32 idx){
                 traced;
                 logd("called from lambda of importFrom");
-//                IImporter* importer = (IImporter)*param;
+//                IDataImporter* importer = (IDataImporter)*param;
                 ErrCode ret2 = ErrNone;
                 if (importer != nullptr){
-                    ret2 = importer->onImportItem(importFileType, items, idx, param);
+                    ret2 = importer->onImportItem(importName, importFileType, items, idx, param);
                 }
                 tracedr(ret2);
                 return ret2;
                 },
             this, tag, CSV_LIST_ITEM_SPLIT, &cnt);
     }
+    importer->onImportEnd(importName, importFileType, fpath, ret);
     logi("Parsed %d item", cnt);
     logd("Parse result %d", ret);
     // TODO: handle error case, some items may added to system, some error, should continue???

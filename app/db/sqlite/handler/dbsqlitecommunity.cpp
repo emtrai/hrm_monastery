@@ -60,7 +60,7 @@ DbSqliteTbl *DbSqliteCommunity::getTable(const QString &modelName)
 
 DbModelBuilder DbSqliteCommunity::getMainBuilder()
 {
-    return Community::build;
+    return &Community::build;
 }
 
 DbSqliteCommunity *DbSqliteCommunity::getInstance()
@@ -70,6 +70,16 @@ DbSqliteCommunity *DbSqliteCommunity::getInstance()
     }
 
     return gInstance;
+}
+
+ErrCode DbSqliteCommunity::add(DbModel *model)
+{
+    traced;
+    // TODO: auto add management board department, to contain list of managmenet member and role
+    // at least, we need to have CEO for community
+    // We put here, as in here, we can check & update status
+    // adding only ok, and status change to active, when every required actions succeed
+    return DbSqliteModelHandler::add(model);
 }
 
 const QString DbSqliteCommunity::getName()

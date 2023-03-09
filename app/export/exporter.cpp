@@ -21,7 +21,7 @@
  */
 #include "exporter.h"
 #include "logger.h"
-#include "iexporter.h"
+#include "idataexporter.h"
 #include "utils.h"
 #include "dbmodel.h"
 
@@ -30,7 +30,7 @@ Exporter::Exporter()
     traced;
 }
 
-ErrCode Exporter::saveTo(const IExporter* exporter, const QString &fpath)
+ErrCode Exporter::saveTo(const IDataExporter* exporter, const QString &fpath)
 {
     traced;
     loge("Not support export here");
@@ -38,7 +38,7 @@ ErrCode Exporter::saveTo(const IExporter* exporter, const QString &fpath)
     return ErrNotSupport;
 }
 
-ErrCode Exporter::saveTo(const IExporter* exporter, const QList<DbModel*> data, const QString &fpath)
+ErrCode Exporter::saveTo(const IDataExporter* exporter, const QList<DbModel*> data, const QString &fpath)
 {
     traced;
     loge("Not support export list here");

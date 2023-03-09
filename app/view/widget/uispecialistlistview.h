@@ -31,7 +31,7 @@ public:
     virtual ~UISpecialistListView();
 protected:
     virtual QString getTitle();
-    virtual Controller* getController();
+    virtual ModelController* getController();
     virtual DbModel* onNewModel();
 };
 

@@ -56,6 +56,8 @@ public:
     const QString &tmpDirPath() const;
 
     static void cleanUpData();
+    virtual QString getName();
+    virtual ErrCode onLoad();
 
 private:
     FileCtl();

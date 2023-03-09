@@ -30,8 +30,8 @@ class ExportXlsx : public Exporter
     GET_INSTANCE_DECL(ExportXlsx)
 public:
     ExportXlsx();
-    virtual ErrCode saveTo(const IExporter* item, const QString& fpath);
-    virtual ErrCode saveTo(const IExporter* exporter, const QList<DbModel*> data, const QString &fpath);
+    virtual ErrCode saveTo(const IDataExporter* item, const QString& fpath);
+    virtual ErrCode saveTo(const IDataExporter* exporter, const QList<DbModel*> data, const QString &fpath);
     virtual ExportType getExportType();
 };
 

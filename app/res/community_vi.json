@@ -1,11 +1,11 @@
-{ "communities":
+{ "items":
     [
-    {
-        "id":"MAIN",
-        "code":"HOI_DONG",
-        "parentid":"",
-        "areaid":"VN_NT",
+        {
+        "nameid":"HOI_DONG",
+        "parent":"",
+        "area":"VN_NT",
         "name":"Hội dòng",
+        "brief":"",
         "church":"",
         "addr":"",
         "province":"",
@@ -13,17 +13,18 @@
         "tel":"02583881736;0799725895",
         "feastday":"01.09",
         "establishday":"",
+        "closeday":"",
         "status":"1",
-        "mission":"Education",
+        "mission":"GIAO_DUC",
         "email":"terkimsac@yahoo.com",
-        "level":0
+        "remark":""
         },
         {
-        "id":"MTGNG",
-        "code":"CD_THANH_GIA",
-        "parentid":"MAIN",
-        "areaid":"VN_BMT",
+        "nameid":"CD_THANH_GIA",
+        "parent":"HOI_DONG",
+        "area":"VN_BMT",
         "name":"CĐ. THÁNH GIA",
+        "brief":"",
         "church":"GX. THÁNH GIA",
         "addr":"Số 10 Đông Phước, P. Phước Long, Bình Tân, NT",
         "province":"",
@@ -31,17 +32,18 @@
         "tel":"02583881736;0799725895",
         "feastday":"01.09",
         "establishday":"",
+        "closeday":"",
         "status":"1",
-        "mission":"Education",
+        "mission":"GIAO_DUC",
         "email":"terkimsac@yahoo.com",
-        "level":1
+        "remark":""
         },
         {
-        "id":"BONAVENTURA",
-        "code":"CD_BONAVENTURA",
-        "parentid":"MAIN",
-        "areaid":"VN_BMT",
+        "nameid":"CD_BONAVENTURA",
+        "parent":"HOI_DONG",
+        "area":"VN_BMT",
         "name":"CĐ. BONAVENTURA",
+        "brief":"",
         "church":"GX. PHƯỚC HÒA",
         "addr":"Lô  5 + 7 + 9, Đường A6, Khu tái Định Cư VCN",
         "province":"",
@@ -49,10 +51,10 @@
         "tel":"02583870267",
         "feastday":"15.07",
         "establishday":"",
+        "closeday":"",
         "status":"1",
-        "mission":"Health",
-        "email":"mnttanhdao@yahoo.com.vn",
-        "level":1
+        "mission":"SUC_KHOE",
+        "email":"mnttanhdao@yahoo.com.vn"
         }
     ]
 }

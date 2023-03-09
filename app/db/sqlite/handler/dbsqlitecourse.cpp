@@ -22,7 +22,7 @@
 #include "dbsqlitecourse.h"
 #include "logger.h"
 #include "defs.h"
-
+#include "course.h"
 #include "dbsqlitedefs.h"
 #include "dbsqlite.h"
 
@@ -42,4 +42,9 @@ const QString DbSqliteCourse::getName()
 DbSqliteTbl *DbSqliteCourse::getMainTbl()
 {
     return (DbSqliteTbl*)DbSqlite::getInstance()->getTable(KTableCourse);
+}
+
+DbModelBuilder DbSqliteCourse::getMainBuilder()
+{
+    return &Course::build;
 }

@@ -123,7 +123,7 @@ void DlgPerson::on_btnImport_clicked()
     if (!fname.isEmpty()){
         logd("File %s is selected", fname.toStdString().c_str());
         per = person(true);
-        ret = ImportFactory::importFrom(per, fname, IMPORT_CSV);
+        ret = ImportFactory::importFrom(KModelHdlPerson, per, fname, IMPORT_CSV);
     } else {
         logd("Nothing be selected");
         ret = ErrCancelled;

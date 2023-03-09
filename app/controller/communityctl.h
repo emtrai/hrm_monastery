@@ -23,10 +23,9 @@
 #define COMMUNITYCTL_H
 
 #include <QString>
-#include "logger.h"
 #include "errcode.h"
-#include "controller.h"
-#include "commonctl.h"
+#include "modelcontroller.h"
+#include "modelcontroller.h"
 #include "community.h"
 #include "dbmodel.h"
 
@@ -34,55 +33,110 @@
 
 class Person;
 
-class CommunityCtl: public CommonCtl
+class CommunityCtl: public ModelController
 {
-
+    GET_INSTANCE_DECL(CommunityCtl);
+private:
+    CommunityCtl(); // not allow to allocate outside of this class
+    virtual ~CommunityCtl();
 public:
-    virtual ErrCode addNew(DbModel* model);
-    // Load Community from file
-    ErrCode loadFromFile(const QString& path);
 
+    /**
+     * @brief get list of active people with communityUid
+     *        Caller must free resource after use
+     * @param communityUid
+     * @return List of items
+     */
+    const QList<DbModel*> getActivePersonList(const QString& communityUid);
 
-    const QList<DbModel*> getPersonList(const QString& communityUid);
+    /**
+     * @brief Add person to community
+     * @param comm community
+     * @param per person to be added
+     * @param status status of person in community \ref DbModelStatus
+     * @param startdate start date of person in community, in format of YYYYMMDD
+     * @param enddate end date of person in community if any, in format of YYYYMMDD
+     * @param remark
+     * @return error code
+     */
     ErrCode addPerson2Community(const Community* comm,
                       const Person* per,
-                      int status = 0,
+                      int status = 0, // it's DbModelStatus
                       qint64 startdate = 0,
                       qint64 enddate = 0,
                       const QString& remark = nullptr);
 
+protected:
+
     virtual const char* getPrebuiltFileName();
     virtual const char* getPrebuiltFileType();
+
+    /**
+     * @brief Default model handler
+     * @return
+     */
     virtual DbModelHandler* getModelHandler();
+
+    /**
+     * @brief default/main builder
+     * @return
+     */
     virtual DbModelBuilder getMainBuilder();
-    virtual ErrCode addPerson(Community* comm, Person* per);
-    virtual QHash<int, QString>* getStatusIdNameMap();
-    QString status2Name(CommunityStatus status);
-    virtual ErrCode markModelDelete(DbModel* model);
-    virtual ErrCode deleteModel(DbModel* model);
 
-    virtual DbModel* doImportOneItem(int importFileType, const QStringList& items, quint32 idx);
-    virtual DbModel* doImportOneItem(int importFileType, const QHash<QString, QString>& items, quint32 idx);
-private:
-    CommunityCtl();
+    /**
+     * @brief parse one item of prebuilt file
+     *        Called when parse prebuilt file
+     * @param jobj
+     * @param ok true if parsed ok, false otherwise
+     * @return
+     */
+    virtual DbModel* onJsonParseOneItem(const QJsonObject& jobj, bool* ok = nullptr);
 
-public:
-    static CommunityCtl* getInstance();
-protected:
-    virtual ErrCode parsePrebuiltFile(const QString &fpath, const QString &ftype);
-    virtual Community* parseOneItem(const QJsonObject& jobj);
+    /**
+     * @brief get path to export template
+     * @param exporter
+     * @return
+     */
     virtual const QString exportTemplatePath(Exporter* exporter) const;
+
+    /**
+     * @brief get export data string
+     * @param keyword
+     * @param data
+     * @param exportData
+     * @return
+     */
     virtual ErrCode getExportDataString(const QString& keyword, const DbModel* data, QString* exportData) const;
 
-private:
-    static CommunityCtl* gInstance;
+    /**
+     * @brief before import flow
+     * @param importName
+     * @param importFileType
+     * @param fname
+     * @return
+     */
+    virtual ErrCode onImportStart(const QString& importName, int importFileType, const QString& fname);
+    /**
+     * @brief import one item, this called by IDataImport callback when import, mainly when import csv
+     * @param importFileType
+     * @param items imported data in list, must be in order with headers
+     * @param idx data idx, idx 0 is header
+     * @return db model, caller must free it after use
+     */
+    virtual DbModel* doImportOneItem(const QString& importName, int importFileType, const QStringList& items, quint32 idx);
+
+    /**
+     * @brief import one item, this called by IDataImport callback when import
+     * @param importName
+     * @param importFileType
+     * @param items hash/map, key is field name, value is value...
+     * @param idx
+     * @return
+     */
+    virtual DbModel* doImportOneItem(const QString& importName, int importFileType, const QHash<QString, QString>& items, quint32 idx);
+
 protected:
-
-    QList<QString> mImportFields;
-//    QList<Community*> mListCommunity;
-
-//public slots:
-//    virtual void onLoad();
+    QList<QString> mImportFields;// import fields/headers, main used in CSV importing
 };
 
 #endif // COMMUNITYCTL_H

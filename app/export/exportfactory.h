@@ -32,8 +32,8 @@ public:
 
     static Exporter* getExporter(ExportType type);
 
-    static ErrCode exportTo(const IExporter* item, const QString& fpath, ExportType type);
-    static ErrCode exportTo(const IExporter* item, QList<DbModel*> data, const QString& fpath, ExportType type);
+    static ErrCode exportTo(const IDataExporter* item, const QString& fpath, ExportType type);
+    static ErrCode exportTo(const IDataExporter* item, QList<DbModel*> data, const QString& fpath, ExportType type);
 
 };
 

@@ -26,13 +26,14 @@
 #include <QString>
 #include "errcode.h"
 
-class IImporter;
+class IDataImporter;
 class Importer
 {
 public:
     Importer();
 
-    virtual ErrCode importFrom (int importFileType, IImporter* importer, const QString& fpath, void* tag = nullptr);
+    virtual ErrCode importFrom (const QString& importName, int importFileType,
+                               IDataImporter* importer, const QString& fpath, void* tag = nullptr);
 };
 
 #endif // IMPORTER_H

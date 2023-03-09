@@ -26,15 +26,21 @@
 typedef enum CourseType {
     COURSE_TYPE_COURSE = 0, // khoa hoc
     COURSE_TYPE_TERM, // nhiem ki
+    COURSE_TYPE_OTHERS, // Khác
     COURSE_TYPE_MAX
 };
 
 class Course : public DbModel
 {
 public:
+    static const QHash<int, QString>* getCourseTypeNameMap();
+    static QString courseType2Name(DbModelStatus type);
+protected:
     Course();
+public:
     virtual ~Course();
     static DbModel *build();
+
     virtual DbModelBuilder getBuilder();
     qint64 startDate() const;
     void setStartDate(qint64 newStartDate);

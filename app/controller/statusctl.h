@@ -22,13 +22,13 @@
 #ifndef STATUSCTL_H
 #define STATUSCTL_H
 
-#include "commonctl.h"
+#include "modelcontroller.h"
 #include "utils.h"
 #include <QList>
 
 class Status;
 
-class StatusCtl : public CommonCtl
+class StatusCtl : public ModelController
 {
     GET_INSTANCE_DECL(StatusCtl);
 public:

@@ -25,6 +25,7 @@
 #include "table/dbsqlitemissiontbl.h"
 #include "logger.h"
 #include "defs.h"
+#include "mission.h"
 
 DbSqliteMission::DbSqliteMission()
 {
@@ -39,5 +40,10 @@ const QString DbSqliteMission::getName()
 DbSqliteTbl *DbSqliteMission::getMainTbl()
 {
     return (DbSqliteMissionTbl*)SQLITE->getTable(KTableMission);
+}
+
+DbModelBuilder DbSqliteMission::getMainBuilder()
+{
+    return &Mission::build;
 }
 

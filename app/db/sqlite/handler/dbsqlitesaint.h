@@ -38,6 +38,7 @@ public:
 
 protected:
     virtual DbSqliteTbl* getMainTbl();
+    virtual DbModelBuilder getMainBuilder();
 private:
 
 private:
