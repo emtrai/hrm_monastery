@@ -31,13 +31,11 @@ class Status;
 class StatusCtl : public ModelController
 {
     GET_INSTANCE_DECL(StatusCtl);
-public:
+private:
     StatusCtl();
 protected:
     // prebuilt data file name
     virtual const char* getPrebuiltFileName();
-    // prebuilt data file type, i.e. csv
-    virtual const char* getPrebuiltFileType();
 
     virtual DbModelBuilder getMainBuilder();
 };

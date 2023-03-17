@@ -28,49 +28,91 @@
 #include <QHash>
 #include "exporttype.h"
 #include "modelcontroller.h"
+#include "utils.h"
+
 class Person;
 class Event;
 class DbPersonModelHandler;
+class PersonEvent;
 
 #define PERSONCTL PersonCtl::getInstance()
 
 // TODO: observer Person change?
 class PersonCtl: public ModelController
 {
+    GET_INSTANCE_DECL(PersonCtl);
 public:
-    virtual ~PersonCtl();
-    ErrCode addPerson(Person* person);
-    ErrCode addPerson (const QString& fname);
-    ErrCode markPersonDelete(Person* person);
-    ErrCode deletePerson(Person* person);
-    ErrCode AddListPersons(const QString& fname);
-    QList<DbModel*> getAllPerson();
-    QList<DbModel*> getPersonInCommunity(const QString& communityUid);
-    QList<DbModel*> getListEvent(const Person* person); // TODO: should move to separate event controller?
+    /**
+     * @brief Get person in community
+     *        Caller must free data after use
+     * @param communityUid
+     * @param list outlist, DbModel:Person
+     * @param status status of person in community, i.e. active, etc.
+     * @return err code
+     */
+    ErrCode getListPersonInCommunity(const QString& communityUid, QList<DbModel *>& list, qint32 status = MODEL_ACTIVE);
+
+    /**
+     * @brief get list event of person
+     * @param personUid
+     * @param list list of event, DbModel:PersonEvent
+     * @return
+     */
+    ErrCode getListEvents(const QString& personUid, QList<DbModel*>& list); // TODO: should move to separate event controller?
+
 
     virtual DbModel* doImportOneItem(const QString& importName, int importFileType, const QStringList& items, quint32 idx);
     virtual DbModel* doImportOneItem(const QString& importName, int importFileType, const QHash<QString, QString>& items, quint32 idx);
 
-    virtual int filter(int catetoryid,
-                       const QString& catetory,
+    /**
+     * @brief Filter items, only filter active model
+     * @param[in] fieldId Field id to be filter, \ref FilterField
+     * @param[in] opFlags Operators, \ref FilterOperation
+     * @param[in] keyword
+     * @param[in] targetModelName name of target model of output list
+     * @param[in] outList output list
+     * @param[in] from from item idx
+     * @param[in] noItems the number of items needs
+     * @param[out] total Total found items
+     * @return ErrNone if succeed
+     */
+    virtual ErrCode filter(int catetoryid,
                        qint64 opFlags,
                        const QString& keywords,
-                       QList<DbModel*>* outList = nullptr);
+                       const char* targetModelName = nullptr,
+                       QList<DbModel*>* outList = nullptr,
+                       int from = 0,
+                       int noItems = 0,
+                       int* total = nullptr);
 
-    // TODO: consider this in specialist or in person????
-    QList<DbModel *> getSpecialistList(const QString &personUid);
+    /**
+     * @brief get full path to template file for export data
+     * @param[in] exporter exporter like csv, xlsx
+     * @param[out] ftype template file format
+     * @return path to template file
+     */
+    virtual const QString exportTemplatePath(FileExporter* exporter, QString* ftype = nullptr) const;
 
-    virtual const QString exportTemplatePath(Exporter* exporter) const;
-    virtual ErrCode getExportDataString(const QString& keyword, const DbModel* data, QString* exportData) const;
+    /**
+     * @brief Export list of person in community
+     * @param communityUid community Uid
+     * @param exportType Export format, i.e. xlsx, etc.
+     * @param fpath
+     * @return
+     */
     ErrCode exportListPersonInCommunity(const QString& communityUid, ExportType exportType, const QString& fpath);
+
+    /**
+     * @brief get List of supported export type
+     * @return
+     */
     virtual quint64 getExportTypeList();
 private:
     PersonCtl();
+    virtual ~PersonCtl();
 
 
 public:
-    static PersonCtl* getInstance();
-
     const QList<QString> &importFields() const;
 
     /**
@@ -85,7 +127,6 @@ protected:
     virtual DbModelHandler* getModelHandler();
     virtual DbModelBuilder getMainBuilder();
 private:
-    static PersonCtl* gInstance;
     QList<QString> mImportFields;
     DbPersonModelHandler* mModelHdl;
 //    QHash<QString, std::function<QString (Person::*())>> mExportFields;

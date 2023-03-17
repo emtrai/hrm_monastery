@@ -23,6 +23,8 @@
 #include "logger.h"
 #include "errcode.h"
 #include "utils.h"
+#include "dbmodel.h"
+
 
 ErrCode IDataImporter::onImportStart(const QString &importName, int importFileType, const QString &fname)
 {
@@ -31,7 +33,9 @@ ErrCode IDataImporter::onImportStart(const QString &importName, int importFileTy
     return ErrNone;
 }
 
-ErrCode IDataImporter::onImportItem(const QString& importName, int importFileType, const QString &keyword, const QString &value, quint32 idx, void* tag)
+ErrCode IDataImporter::onImportItem(const QString& importName, int importFileType,
+                                    const QString &keyword, const QString &value,
+                                    quint32 idx, QList<DbModel *>* outList)
 {
     traced;
     loge("DEFAULT onImportItem, MUST BE IMPLEMENTED IN DERIVED CLASS");
@@ -40,7 +44,9 @@ ErrCode IDataImporter::onImportItem(const QString& importName, int importFileTyp
     return ErrNotSupport;
 }
 
-ErrCode IDataImporter::onImportItem(const QString& importName, int importFileType, const QStringList &items, quint32 idx, void* tag) {
+ErrCode IDataImporter::onImportItem(const QString& importName, int importFileType,
+                                    const QStringList &items, quint32 idx,
+                                    QList<DbModel *>* outList) {
     traced;
     loge("DEFAULT onImportItem, MUST BE IMPLEMENTED IN DERIVED CLASS");
     ASSERT(false, "DEFAULT onImportItem, MUST BE IMPLEMENTED IN DERIVED CLASS");
@@ -48,7 +54,9 @@ ErrCode IDataImporter::onImportItem(const QString& importName, int importFileTyp
     return ErrNotSupport;
 }
 
-ErrCode IDataImporter::onImportItem(const QString& importName, int importFileType, const QHash<QString, QString> &items, quint32 idx, void *tag)
+ErrCode IDataImporter::onImportItem(const QString& importName, int importFileType,
+                                    const QHash<QString, QString> &items, quint32 idx,
+                                    QList<DbModel *>* outList)
 {
     traced;
     loge("DEFAULT onImportItem, MUST BE IMPLEMENTED IN DERIVED CLASS");

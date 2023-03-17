@@ -91,7 +91,8 @@ void DbSqlitePersonEventTbl::updateModelFromQuery(DbModel *item, const QSqlQuery
     tracede;
 }
 
-QList<PersonEvent *> *DbSqlitePersonEventTbl::getListEvents(const QString &personUid,
+ErrCode DbSqlitePersonEventTbl::getListEvents(const QString &personUid,
+                                                           QList<DbModel*>& list,
                                                             const QString *eventUid,
                                                             qint64 date)
 {
@@ -104,7 +105,6 @@ QList<PersonEvent *> *DbSqlitePersonEventTbl::getListEvents(const QString &perso
                                   "FROM %1").arg(name());
     bool hasEid = false;
     bool hasDate = false;
-    QList<PersonEvent*>* list = nullptr;
 
     QString condString;
     if (!personUid.isEmpty()) {
@@ -132,7 +132,6 @@ QList<PersonEvent *> *DbSqlitePersonEventTbl::getListEvents(const QString &perso
 
         if( qry.exec() )
         {
-            list = new QList<PersonEvent*>();
             while (qry.next()) {
                 PersonEvent* item = (PersonEvent*)PersonEvent::build();
                 item->setDbId(qry.value(KFieldId).toInt());
@@ -143,7 +142,7 @@ QList<PersonEvent *> *DbSqlitePersonEventTbl::getListEvents(const QString &perso
                 item->setEventUid(qry.value(KFieldEventId).toString());
                 item->setDate(qry.value(KFieldDate).toInt());
                 item->setEndDate(qry.value(KFieldEndDate).toInt());
-                list->append(item); // TODO: when it cleaned up?????
+                list.append(item); // TODO: when it cleaned up?????
             }
         }
         else {
@@ -153,9 +152,11 @@ QList<PersonEvent *> *DbSqlitePersonEventTbl::getListEvents(const QString &perso
 
     } else {
         ret = ErrInvalidArg;
+        loge("invalid argument");
     }
 
 
     logd("ret %d", ret);
-    return list;
+    tracedr(ret);
+    return ret;
 }

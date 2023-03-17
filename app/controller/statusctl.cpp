@@ -28,7 +28,7 @@
 #include "defs.h"
 
 
-GET_INSTANCE_IMPL(StatusCtl)
+GET_INSTANCE_CONTROLLER_IMPL(StatusCtl)
 StatusCtl::StatusCtl():
     ModelController(KModelHdlStatus)
 {
@@ -40,10 +40,6 @@ const char *StatusCtl::getPrebuiltFileName()
     return KPrebuiltStatusCSVFileName;
 }
 
-const char *StatusCtl::getPrebuiltFileType()
-{
-    return KFileTypeCSV;
-}
 
 DbModelBuilder StatusCtl::getMainBuilder()
 {

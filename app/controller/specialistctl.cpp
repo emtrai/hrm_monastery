@@ -31,28 +31,19 @@
 
 #define SPLIT ','
 
-GET_INSTANCE_IMPL(SpecialistCtl);
+GET_INSTANCE_CONTROLLER_IMPL(SpecialistCtl);
 
 
 SpecialistCtl::SpecialistCtl():
     ModelController(KModelHdlSpecialist)
 {
-
+    traced;
 }
 
-DbModel *SpecialistCtl::buildModel(void *items, const QString &fmt)
+SpecialistCtl::~SpecialistCtl()
 {
-    Specialist* specialist = new Specialist();
-    QStringList* itemList = (QStringList*) items;
-    QString item = itemList->join(SPLIT);
-    qint32 idx = 0;
-    logd("Add item %s to list", item.toStdString().c_str());
-    specialist->setNameId(itemList->at(idx++));
-    specialist->setName(itemList->at(idx++));
-    tracede;
-    return specialist;
+    traced;
 }
-
 
 DbModelBuilder SpecialistCtl::getMainBuilder()
 {
@@ -64,18 +55,24 @@ const char *SpecialistCtl::getPrebuiltFileName()
     return KPrebuiltSpecialistCSVFileName;
 }
 
-const char *SpecialistCtl::getPrebuiltFileType()
-{
-    return KFileTypeCSV;
-}
-
 
 QList<DbModel *> SpecialistCtl::getListPerson(const QString &specialistUid)
 {
-    logd("get list person of specialist uid %s", specialistUid.toStdString().c_str());
-    DbSpecialistModelHandler* hdl = dynamic_cast<DbSpecialistModelHandler*>(DB->getSpecialistModelHandler());
-    QList<DbModel*> list =  hdl->getListPerson(specialistUid);
-    logd("No. item: %d", list.count());
+    traced;
+    QList<DbModel*> list;
+    logd("get list person of specialist uid '%s'", STR2CHA(specialistUid));
+    if (!specialistUid.isEmpty()) {
+        DbSpecialistModelHandler* hdl = dynamic_cast<DbSpecialistModelHandler*>(DB->getSpecialistModelHandler());
+        if (hdl) {
+            list =  hdl->getListPerson(specialistUid);
+        } else {
+            loge("Not found handler");
+        }
+    } else {
+        loge("Invalid arg");
+    }
+    logd("No. item: %lld", list.count());
+    tracede;
     return list;
 }
 

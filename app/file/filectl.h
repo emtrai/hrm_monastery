@@ -30,7 +30,7 @@ class FileCtl:public Controller
 public:
     virtual ~FileCtl();
     static FileCtl* getInstance();
-    static void init();
+    virtual void init();
 
     static QString getAppDataDir(const QString& subDir);
     static QString getAppDataDir();

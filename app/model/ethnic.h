@@ -37,18 +37,18 @@ public:
     qint64 countryDbId() const;
     void setCountryDbId(qint64 newCountryDbId);
 
-    const QString &countryShortName() const;
-    void setCountryShortName(const QString &newCountryShortName);
-
     const QString &countryUid() const;
     void setCountryUid(const QString &newCountryUid);
+
+    const QString &countryName() const;
+    void setCountryName(const QString &newCountryName);
 
 protected:
     virtual DbModelHandler *getDbModelHandler();
 private:
     qint64 mCountryDbId;
-    QString mCountryShortName;
     QString mCountryUid;
+    QString mCountryName; // just for informative only, not save to db
 };
 
 #endif // ETHNIC_H

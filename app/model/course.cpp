@@ -44,7 +44,7 @@ const QHash<int, QString> *Course::getCourseTypeNameMap()
     return &map;
 }
 
-QString Course::courseType2Name(DbModelStatus type)
+QString Course::courseType2Name(CourseType type)
 {
     const QHash<int, QString>* courseMap = getCourseTypeNameMap();
     QString ret;
@@ -54,7 +54,7 @@ QString Course::courseType2Name(DbModelStatus type)
         ret = courseMap->value(type);
     } else {
         loge("invalid type %d", type);
-        ret = "Không rõ"; // TODO: translate???
+        ret = QObject::tr("Không rõ"); // TODO: translate???
     }
     tracede;
     return ret;
@@ -62,7 +62,8 @@ QString Course::courseType2Name(DbModelStatus type)
 
 Course::Course():
     mStartDate(0),
-    mEndDate(0)
+    mEndDate(0),
+    mCourseType(COURSE_TYPE_MAX)
 {
     traced;
 }
@@ -81,6 +82,15 @@ DbModel *Course::build()
 
 }
 
+void Course::clone(const DbModel *model)
+{
+    traced;
+    DbModel::clone(model);
+    Course* course = (Course*)model;
+    setCourseType(course->courseType());
+    tracede;
+}
+
 DbModelBuilder Course::getBuilder()
 {
     return &Course::build;
@@ -94,6 +104,11 @@ DbModelHandler *Course::getDbModelHandler()
 qint32 Course::courseType() const
 {
     return mCourseType;
+}
+
+QString Course::courseTypeName()
+{
+    return courseType2Name((CourseType)mCourseType);
 }
 
 void Course::setCourseType(qint32 newCourseType)

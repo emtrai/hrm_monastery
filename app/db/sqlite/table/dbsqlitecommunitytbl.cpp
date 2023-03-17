@@ -44,7 +44,7 @@ QList<DbModel *> DbSqliteCommunityTbl::getListCommunitiesInArea(const QString &a
 {
     traced;
     QList<DbModel *> olist;
-    int ret = 0;
+    ErrCode ret = ErrNone;
     QHash<QString, int> fields;
     fields.insert(KFieldAreaUid, TEXT);
     // TODO: check status???

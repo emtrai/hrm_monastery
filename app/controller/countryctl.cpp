@@ -26,7 +26,7 @@
 #include "dbctl.h"
 #include "dbmodel.h"
 
-GET_INSTANCE_IMPL(CountryCtl)
+GET_INSTANCE_CONTROLLER_IMPL(CountryCtl)
 
 CountryCtl::CountryCtl():ModelController(KModelHdlCountry)
 {

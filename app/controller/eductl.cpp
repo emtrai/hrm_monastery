@@ -31,24 +31,11 @@
 #define SPLIT ','
 
 
-GET_INSTANCE_IMPL(EduCtl);
+GET_INSTANCE_CONTROLLER_IMPL(EduCtl);
 
 EduCtl::EduCtl():ModelController(KModelHdlEdu)
 {
     traced;
-}
-
-DbModel *EduCtl::buildModel(void *items, const QString &fmt)
-{
-    traced;
-    Education* edu = new Education();
-    QStringList* itemList = (QStringList*) items;
-    qint32 idx = 0;
-    qint32 sz = itemList->length();
-    logd("sz %d", sz);
-    edu->setNameId(itemList->at(idx++));
-    edu->setName(itemList->at(idx++));
-    return edu;
 }
 
 DbModelBuilder EduCtl::getMainBuilder()
@@ -59,10 +46,5 @@ DbModelBuilder EduCtl::getMainBuilder()
 const char *EduCtl::getPrebuiltFileName()
 {
     return KPrebuiltEduCSVFileName;
-}
-
-const char *EduCtl::getPrebuiltFileType()
-{
-    return KFileTypeCSV;
 }
 

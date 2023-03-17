@@ -27,6 +27,7 @@
 #include <QRegularExpressionMatchIterator>
 #include "filectl.h"
 #include <QHash>
+#include "dbmodel.h"
 
 GET_INSTANCE_IMPL(ImportCSV)
 
@@ -36,7 +37,8 @@ ImportCSV::ImportCSV()
 }
 
 ErrCode ImportCSV::importFrom(const QString& importName, int importFileType,
-                              IDataImporter *importer, const QString &fpath, void* tag)
+                              IDataImporter *importer, const QString &fpath,
+                              QList<DbModel *>* outList)
 {
     traced;
     QList<QHash<QString, QString>> items;
@@ -70,7 +72,7 @@ ErrCode ImportCSV::importFrom(const QString& importName, int importFileType,
                 logd("Parsed %d key", cnt);
                 int idx = 0;
                 if (cnt > 0) {
-                    importer->onImportItem(importName, importFileType, item, idx++, tag);
+                    importer->onImportItem(importName, importFileType, item, idx++, outList);
 
 //                    foreach (QString key, item.keys()) {
 //                        logd("key %s", key.toStdString().c_str());

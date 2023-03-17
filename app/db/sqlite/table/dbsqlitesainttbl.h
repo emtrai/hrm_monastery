@@ -48,7 +48,11 @@ public:
      * @param outList
      * @return the number of found items
      */
-    virtual int search(const QString& keyword, QList<DbModel*>* outList = nullptr);
+    virtual ErrCode search(const QString& keyword, QList<DbModel*>* outList = nullptr,
+                       qint64 dbStatus = DB_RECORD_ACTIVE,
+                       int from = 0,
+                       int noItems = 0,
+                       int* total = nullptr);
 
 
 private:

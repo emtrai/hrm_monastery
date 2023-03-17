@@ -33,15 +33,13 @@ class Event;
 class EventCtl : public ModelController
 {
     GET_INSTANCE_DECL(EventCtl);
-public:
+private:
     EventCtl();
     virtual ~EventCtl();
 protected:
 
     // prebuilt data file name
     virtual const char* getPrebuiltFileName();
-    // prebuilt data file type, i.e. csv
-    virtual const char* getPrebuiltFileType();
 
     virtual DbModelBuilder getMainBuilder();
 };

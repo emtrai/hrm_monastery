@@ -96,9 +96,13 @@ QList<QString> DbSqliteSaintTbl::getNameFields()
     return list;
 }
 
-int DbSqliteSaintTbl::search(const QString &keyword, QList<DbModel *> *outList)
+ErrCode DbSqliteSaintTbl::search(const QString &keyword, QList<DbModel *> *outList,
+                             qint64 dbStatus,
+                             int from,
+                             int noItems,
+                             int* total)
 {
     traced;
-    return DbSqliteTbl::search (keyword, &Saint::build, outList);
+    return DbSqliteTbl::search(keyword, &Saint::build, outList, dbStatus, from, noItems, total);
 }
 

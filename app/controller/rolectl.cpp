@@ -27,7 +27,7 @@
 #include "utils.h"
 #include "defs.h"
 
-GET_INSTANCE_IMPL(RoleCtl)
+GET_INSTANCE_CONTROLLER_IMPL(RoleCtl)
 
 RoleCtl::RoleCtl():
     ModelController(KModelHdlRole)
@@ -43,11 +43,6 @@ RoleCtl::~RoleCtl()
 const char *RoleCtl::getPrebuiltFileName()
 {
     return KPrebuiltRoleCSVFileName;
-}
-
-const char *RoleCtl::getPrebuiltFileType()
-{
-    return KFileTypeCSV;
 }
 
 DbModelBuilder RoleCtl::getMainBuilder()

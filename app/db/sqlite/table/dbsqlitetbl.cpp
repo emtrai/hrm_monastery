@@ -444,11 +444,15 @@ void DbSqliteTbl::updateModelFromQuery(DbModel* item, const QSqlQuery& qry)
     tracede;
 }
 
-int DbSqliteTbl::filter(int fieldId,
+ErrCode DbSqliteTbl::filter(int fieldId,
                         int operatorId,
                         const QString& keyword,
                         const DbModelBuilder& builder,
-                        QList<DbModel*>* outList)
+                        QList<DbModel*>* outList,
+                        qint64 dbStatus,
+                        int from,
+                        int noItems,
+                        int* total)
 {
     traced;
     // TODO: implement it
@@ -456,6 +460,7 @@ int DbSqliteTbl::filter(int fieldId,
 //    DB->openDb();
     QSqlQuery qry(SQLITE->currentDb());
     qint32 cnt = 0;
+    ErrCode err = ErrNone;
     logi("Filter keyword '%s'", keyword.toStdString().c_str());
     QString cond;
     bool isOk = false;
@@ -492,6 +497,7 @@ int DbSqliteTbl::filter(int fieldId,
             break;
         }
     }
+    appendDbStatusCond(cond, dbStatus);
     logd("Query cond '%s'", cond.toStdString().c_str());
     QString queryString = getFilterQueryString(fieldId, cond);
 
@@ -505,8 +511,8 @@ int DbSqliteTbl::filter(int fieldId,
     cnt = runQuery(qry, builder, outList);
 
     logi("Found %d", cnt);
-
-    return cnt;
+    tracede;
+    return err;
 }
 
 int DbSqliteTbl::runQuery(QSqlQuery &qry, const DbModelBuilder& builder,
@@ -695,32 +701,6 @@ QList<QString> DbSqliteTbl::getNameFields()
     return list;
 }
 
-DbModel *DbSqliteTbl::getByName(const QString &keyword, const DbModelBuilder &builder)
-{
-    traced;
-    QHash<QString, int> inFields;
-    QList<DbModel*> outList;
-    DbModel* retDb = nullptr;
-    QList<QString> nameFields = getNameFields();
-    foreach (QString name, nameFields) {
-        inFields[name] = TEXT;
-    }
-    logi("Search by name '%s'", keyword.toStdString().c_str());
-    qint32 cnt = 0;
-    cnt = DbSqliteTbl::search (keyword, inFields, builder, &outList, true);
-
-    logi("Found %d", cnt);
-    if (cnt > 0 && outList.count() > 0){
-        logd("Found, return 1st element");
-        retDb = outList[0];
-    } else {
-        logi("Not found name '%s'", keyword.toStdString().c_str());
-        // TODO: safe to print unicode log????
-    }
-
-    return retDb;
-}
-
 DbModel *DbSqliteTbl::getByUid(const QString &uid, const DbModelBuilder &builder)
 {
     traced;
@@ -729,18 +709,18 @@ DbModel *DbSqliteTbl::getByUid(const QString &uid, const DbModelBuilder &builder
     DbModel* retDb = nullptr;
     inFields.insert(QString("%1.%2").arg(name(), KFieldUid), TEXT); // TODO: make this common with name field above???
     logi("Search by uid '%s'", uid.toStdString().c_str());
-    qint32 cnt = 0;
-    cnt = DbSqliteTbl::search (uid, inFields, builder, &outList, true);
+    ErrCode err = ErrNone;
+    err = DbSqliteTbl::search(uid, inFields, builder, &outList, true);
 
-    logi("Found %d", cnt);
-    if (cnt > 0 && outList.count() > 0){
+    logi("Search err=%d", err);
+    if (err == ErrNone && outList.count() > 0){
         logd("Found, return 1st element");
         retDb = outList[0];
     } else {
         logi("Not found uid '%s'", uid.toStdString().c_str());
         // TODO: safe to print unicode log????
     }
-
+    tracede;
     return retDb;
 }
 
@@ -752,32 +732,36 @@ DbModel *DbSqliteTbl::getByNameId(const QString &nameId, const DbModelBuilder &b
     DbModel* retDb = nullptr;
     inFields.insert(QString("%1.%2").arg(name(), KFieldNameId), TEXT); // TODO: make this common with name field above???
     logi("Search by nameid '%s'", nameId.toStdString().c_str());
-    qint32 cnt = 0;
-    cnt = DbSqliteTbl::search (nameId, inFields, builder, &outList, true);
+    ErrCode err = ErrNone;
+    err = DbSqliteTbl::search(nameId, inFields, builder, &outList, true);
 
-    logi("Found %d", cnt);
-    if (cnt > 0 && outList.count() > 0){
+    logi("Search err=%d", err);
+    if (err == ErrNone && outList.count() > 0){
         logd("Found, return 1st element");
         retDb = outList[0];
     } else {
         logi("Not found nameId '%s'", nameId.toStdString().c_str());
         // TODO: safe to print unicode log????
     }
-
+    tracede;
     return retDb;
 
 }
 
-int DbSqliteTbl::search(const QString &keyword, QList<DbModel *> *outList)
+ErrCode DbSqliteTbl::search(const QString &keyword, QList<DbModel *> *outList,
+                        qint64 dbStatus,
+                        int from,
+                        int noItems,
+                        int* total)
 {
     traced;
-    int ret = 0;
+    ErrCode ret = ErrNone;
     DbModelBuilder builder = mainModelBuilder();
     if (builder != nullptr) {
-        ret = search(keyword, builder, outList);
+        ret = search(keyword, builder, outList, dbStatus, from, noItems, total);
     } else {
         logi("No buider, Default search one, DO NOTHING, derived class must implement this or implement mainModelBuilder");
-        ret = 0;
+        ret = ErrNoBuilder;
     }
     return ret;
 }
@@ -790,17 +774,58 @@ QHash<QString, int> DbSqliteTbl::getSearchFields()
     return list;
 }
 
-int DbSqliteTbl::search(const QString &keyword, const DbModelBuilder &builder, QList<DbModel *> *outList)
+ErrCode DbSqliteTbl::search(const QString &keyword, const DbModelBuilder &builder, QList<DbModel *> *outList,
+                        qint64 dbStatus,
+                        int from,
+                        int noItems,
+                        int* total)
 {
     traced;
     QHash<QString, int> inFields = getSearchFields();
-    logi("Search '%s'", keyword.toStdString().c_str());
-    qint32 cnt = 0;
-    cnt = search (keyword, inFields, builder, outList);
+    logi("Search '%s', status=%d", keyword.toStdString().c_str(), dbStatus);
+    logd("from %d noItems %d", from, noItems);
+    ErrCode err = ErrNone;
+    err = search(keyword, inFields, builder, outList, dbStatus, from, noItems);
+    if (err == ErrNone && outList) {
+        logd("found %d item, total %d", outList->size(), total?*total:0);
+    }
+    logi("search err=%d", err);
+    tracedr(err);
+    return err;
+}
 
-    logi("Found %d", cnt);
+QString DbSqliteTbl::toDbStatusCond(qint64 dbStatus)
+{
+    traced;
+    logd("status=0x%llx", dbStatus);
+    QString condStatus;
+    QList<int> statusList = DbModel::getStatusList();
+    foreach (int status, statusList) {
+        if ((status & dbStatus) != 0) {
+            if (!condStatus.isEmpty()) {
+                condStatus += " OR ";
+            }
+            condStatus += QString("%1.%2=%3").arg(name(), KFieldDbStatus).arg(status);
+        }
+    }
+    logd("Status cond string=%s", STR2CHA(condStatus));
+    tracede;
+    return condStatus;
+}
 
-    return cnt;
+void DbSqliteTbl::appendDbStatusCond(QString& cond, qint64 dbStatus)
+{
+    traced;
+    QString condStatus = toDbStatusCond(dbStatus);
+    if (!condStatus.isEmpty()) {
+        if (cond.isEmpty()) {
+            cond = condStatus;
+        } else {
+            cond = QString("(%1) AND (%2)").arg(cond, condStatus);
+        }
+    }
+    logd("cond with dbstatus='%s'", STR2CHA(cond));
+    tracede;
 }
 
 QString DbSqliteTbl::getSearchQueryString(const QString& cond)
@@ -831,10 +856,14 @@ QString DbSqliteTbl::getFilterQueryString(int fieldId, const QString &cond)
     return queryString;
 }
 
-int DbSqliteTbl::search(const QString& keyword, const QHash<QString, int>& inFields,
+ErrCode DbSqliteTbl::search(const QString& keyword, const QHash<QString, int>& inFields,
                         const DbModelBuilder& builder,
                         QList<DbModel*>* outList,
-                        bool isExact)
+                        bool isExact,
+                        qint64 dbStatus,
+                        int from,
+                        int noItems,
+                        int* total)
 {
     traced;
 //    DB->openDb();
@@ -843,8 +872,9 @@ int DbSqliteTbl::search(const QString& keyword, const QHash<QString, int>& inFie
 
 //    QSqlQuery qry(SQLITE->currentDb());
     QSqlQuery* qry = new QSqlQuery(SQLITE->currentDb());
-    qint32 cnt = 0;
-    logi("Search keyword '%s'", keyword.toStdString().c_str());
+    ErrCode err = ErrNone;
+    int cnt = 0;
+    logi("Search keyword '%s', dbStatus=0x%x", keyword.toStdString().c_str(), dbStatus);
     QString cond;
     foreach (QString field, inFields.keys()) {
         if (!cond.isEmpty()) {
@@ -862,6 +892,7 @@ int DbSqliteTbl::search(const QString& keyword, const QHash<QString, int>& inFie
             cond += QString("%1 = :value").arg(field);
         }
     }
+    appendDbStatusCond(cond, dbStatus);
 
 //    QString queryString = QString("SELECT * FROM %1 WHERE %2")
 //                              .arg(name(), cond);
@@ -881,24 +912,32 @@ int DbSqliteTbl::search(const QString& keyword, const QHash<QString, int>& inFie
     } catch(const std::runtime_error& ex) {
         loge("Runtime Exception! %s", ex.what());
         cnt = 0;
+        err = ErrException;
     } catch (const std::exception& ex) {
         loge("Exception! %s", ex.what());
         cnt = 0;
+        err = ErrException;
     } catch (...) {
         loge("Exception! Unknown");
         cnt = 0;
+        err = ErrException;
     }
 
 
     logi("Found %d", cnt);
     delete qry;
-    return cnt;
+    tracedr(err);
+    return err;
 }
 
-int DbSqliteTbl::search(const QHash<QString, FieldValue> &searchCond,
+ErrCode DbSqliteTbl::search(const QHash<QString, FieldValue> &searchCond,
                         bool isAndCond, const QString& condTag,
                         const DbModelBuilder &builder,
-                        QList<DbModel *> *outList, bool isExact)
+                        QList<DbModel *> *outList, bool isExact,
+                        qint64 dbStatus,
+                        int from,
+                        int noItems,
+                        int* total)
 {
     traced;
     //    DB->openDb();
@@ -908,6 +947,7 @@ int DbSqliteTbl::search(const QHash<QString, FieldValue> &searchCond,
     QSqlQuery qry(SQLITE->currentDb());
     qint32 cnt = 0;
     QString cond;
+    ErrCode err = ErrNone;
     foreach (QString field, searchCond.keys()) {
         if (!cond.isEmpty()) {
             if (isAndCond)
@@ -927,7 +967,7 @@ int DbSqliteTbl::search(const QHash<QString, FieldValue> &searchCond,
             cond += QString("%1 = :keyword_%1").arg(field);
         }
     }
-
+    appendDbStatusCond(cond, dbStatus);
     //    QString queryString = QString("SELECT * FROM %1 WHERE %2")
     //                              .arg(name(), cond);
     logd("Query cond '%s'", cond.toStdString().c_str());
@@ -952,18 +992,21 @@ int DbSqliteTbl::search(const QHash<QString, FieldValue> &searchCond,
     } catch(const std::runtime_error& ex) {
         loge("Runtime Exception! %s", ex.what());
         cnt = 0;
+        err = ErrException;
     } catch (const std::exception& ex) {
         loge("Exception! %s", ex.what());
         cnt = 0;
+        err = ErrException;
     } catch (...) {
         loge("Exception! Unknown");
         cnt = 0;
+        err = ErrException;
     }
 
 
     logi("Found %d", cnt);
-
-    return cnt;
+    tracedr(err);
+    return err;
 }
 
 QString DbSqliteTbl::getSqlCmdCreateTable()

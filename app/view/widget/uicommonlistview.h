@@ -36,13 +36,13 @@ public:
     virtual ~UICommonListView();
 protected:
     virtual QList<UITableItem*> getListItem(qint32 page, qint32 perPage, qint32 totalPages);
-    virtual void updateItem(DbModel* item, UITableItem* tblItem);
     virtual qint32 getTotalItems();
     virtual QList<DbModel*> getListItem();
     virtual ModelController* getController();
     virtual ErrCode onLoad();
     virtual ErrCode onReload();
     virtual void initHeader();
+    virtual void updateItem(DbModel* item, UITableItem* tblItem);
     virtual void initFilterFields();
     virtual QHash<QString, QString> getFilterKeywords(int fieldId, const QString& fieldText);
     virtual void onViewItem(UITableWidgetItem *item);

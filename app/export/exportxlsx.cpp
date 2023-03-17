@@ -23,7 +23,7 @@
 #include "logger.h"
 #include "defs.h"
 #include "utils.h"
-#include "idataexporter.h"
+#include "dataexporter.h"
 
 #include "xlsxdocument.h"
 #include "xlsxchartsheet.h"
@@ -42,7 +42,7 @@ ExportXlsx::ExportXlsx()
 
 }
 
-ErrCode ExportXlsx::saveTo(const IDataExporter *item, const QString &fpath)
+ErrCode ExportXlsx::saveTo(const DataExporter *item, const QString &fpath)
 {
     traced;
     QXlsx::Document xlsx;
@@ -53,7 +53,7 @@ ErrCode ExportXlsx::saveTo(const IDataExporter *item, const QString &fpath)
     return ErrNone;
 }
 
-ErrCode ExportXlsx::saveTo(const IDataExporter *exporter, const QList<DbModel *> listData, const QString &fpath)
+ErrCode ExportXlsx::saveTo(const DataExporter *exporter, const QList<DbModel *> listData, const QString &fpath)
 {
 //    traced;
 //    QXlsx::Document xlsx;
@@ -64,12 +64,12 @@ ErrCode ExportXlsx::saveTo(const IDataExporter *exporter, const QList<DbModel *>
 //    return ErrNone;
     traced;
     ErrCode ret = ErrNone;
-    QHash<QString, QString> keywordMap;
+    QList<QPair<QString,QString>> keywordMap;
     qint32 cnt = 0;
     QStringList items;
     QString finalData;
     QXlsx::Document xlsx;
-    ret = exporter->getListExportKeywords(this, keywordMap);
+    ret = exporter->getListTemplateExportKeywords(this, keywordMap);
     if (keywordMap.isEmpty()) {
         ret = ErrInvalidData;
         loge("Export HTML failed, not template found");
@@ -79,21 +79,28 @@ ErrCode ExportXlsx::saveTo(const IDataExporter *exporter, const QList<DbModel *>
         logd("get header");
         int col = 1;
         int row = 1;
-        foreach (QString item, keywordMap.values()) {
-            xlsx.write(row, col++, item);
+        foreach (auto item, keywordMap) {
+            col++;
+            xlsx.write(row, col, item.second);
+            xlsx.write(row+1, col, item.first);
         }
+        row++;
+        int idx = 0;
+
         logd("get data, no item: %lld", listData.length());
         foreach (DbModel* dataExport, listData) {
             col = 1;
             row++;
-            foreach (QString item, keywordMap.keys()) {
+            idx++;
+            xlsx.write(row, col++, QString("%1").arg(idx));
+            foreach (auto item, keywordMap) {
                 QString data;
-                logd("keyword '%s'", STR2CHA(item));
-                ret = exporter->getExportDataString(item.trimmed(), dataExport, &data);
+                logd("keyword '%s'", STR2CHA(item.first));
+                ret = exporter->getExportDataString(item.first, dataExport, &data);
                 if (ret == ErrNone) {
                     xlsx.write(row, col++, data);
                 } else {
-                    loge("get export data string for item '%s' failed", STR2CHA(item));
+                    loge("get export data string for item '%s' failed", STR2CHA(item.first));
                     break;
                 }
             }
@@ -104,7 +111,7 @@ ErrCode ExportXlsx::saveTo(const IDataExporter *exporter, const QList<DbModel *>
         }
     }
     if (ret == ErrNone) {
-        logd("Write %d finadata to file %s", finalData.length(), fpath.toStdString().c_str());
+        logd("Write to file %s", fpath.toStdString().c_str());
         xlsx.saveAs(fpath);
     }
     tracedr(ret);

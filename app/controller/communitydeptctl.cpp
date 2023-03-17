@@ -40,7 +40,7 @@
 #include "communityctl.h"
 #include "departctl.h"
 
-GET_INSTANCE_IMPL(CommunityDeptCtl)
+GET_INSTANCE_CONTROLLER_IMPL(CommunityDeptCtl)
 
 CommunityDeptCtl::CommunityDeptCtl():ModelController(KModelHdlCommDept)
 {

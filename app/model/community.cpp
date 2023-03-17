@@ -405,7 +405,7 @@ void Community::setCurrentCEOCode(const QString &newCurrentCEOCode)
     // TODO: query uid from code
 }
 
-const QString Community::exportTemplatePath(Exporter* exporter) const
+const QString Community::exportTemplatePath(FileExporter* exporter, QString* ftype) const
 {
     if (exporter) {
         switch (exporter->getExportType()) {

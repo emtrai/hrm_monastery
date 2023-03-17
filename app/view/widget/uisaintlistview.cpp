@@ -77,11 +77,11 @@ int UISaintListView::onFilter(int catetoryid, const QString &catetory, qint64 op
     traced;
     QList<DbModel*> list;
     logd("Search %s", keywords.toStdString().c_str());
-    int cnt = SAINTCTL->search(keywords, &list);
-    logd("Search ret %d", cnt);
+    ErrCode ret = SAINTCTL->search(keywords, &list);
+    logd("Search ret %d", ret);
     mItemList.clear(); // TODO: clean up item data
     // TODO: loop to much, redundant, do something better?
-    if (cnt > 0) {
+    if (ret == ErrNone) {
         foreach (DbModel* item, list) {
             mItemList.append(static_cast<DbModel*>(item));
             // TODO: should it be shared pointer or not???
@@ -91,7 +91,7 @@ int UISaintListView::onFilter(int catetoryid, const QString &catetory, qint64 op
         logi("Nothing to add");
     }
     reload();
-    return cnt;
+    return mItemList.size();
 }
 
 DbModel *UISaintListView::onNewModel()

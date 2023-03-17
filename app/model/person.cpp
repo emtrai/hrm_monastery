@@ -25,7 +25,7 @@
 #include "dbctl.h"
 #include "utils.h"
 #include "filectl.h"
-#include "idataexporter.h"
+#include "dataexporter.h"
 #include "exportfactory.h"
 #include "defs.h"
 #include <QMap>
@@ -316,13 +316,21 @@ void Person::initExportFields()
     }); //"email";
     mExportFields.insert(KItemOtherContact, nullptr); //"othercontact";
     mExportFields.insert(KItemEdu, nullptr); //"education";
-    mExportFields.insert(KItemEduUid, [this](const QString& item){
-        return this->eduUid();
+    mExportFields.insert(KItemEduNameId, [this](const QString& item){
+        DbModel* model = EDUCTL->getModelByUid(this->eduUid());
+        QString nameid;
+        if (model) {
+            nameid = model->nameId();
+            delete model;
+        } else {
+            loge("Not found edu uid %s", STR2CHA(this->eduUid()));
+        }
+        return nameid;
+//        return this->eduUid();
     }); //"edu uid";
     mExportFields.insert(KItemSpeciaist,  [this](const QString& item){
         logd("get specialist info to export");
-        DbPersonModelHandler* hdl = dynamic_cast<DbPersonModelHandler*>(getDbModelHandler());
-        QList<DbModel*> list = hdl->getSpecialistList(this->uid());
+        QList<DbModel*> list = this->getSpecialistList();
         QString specialist;
         if (list.count() > 0) {
             foreach (DbModel* item, list) {
@@ -467,8 +475,16 @@ void Person::initImportFields()
     mImportFields.insert(KItemEdu, [this](const QString& value){
         this->setEduName(value);
     }); //"education";
-    mImportFields.insert(KItemEduUid, [this](const QString& value){
-        this->setEduUid(value);
+    mImportFields.insert(KItemEduNameId, [this](const QString& value){
+        logd("Import edu name id %s", STR2CHA(value));
+        DbModel* model = EDUCTL->getModelByNameId(value);
+        if (model) {
+            this->setEduUid(model->uid());
+            delete model;
+        } else {
+            loge("Not found edu nameid %s", STR2CHA(value));
+        }
+//        this->setEduUid(value);
     }); //"education";
     mImportFields.insert(KItemSpeciaist, [this](const QString& value){
         this->setSpecialistNames(value, true);
@@ -595,11 +611,8 @@ ErrCode Person::commonCheckField(QString& name,
         if (!uid.isEmpty()) {
             logd("get model by uid '%s'", uid.toStdString().c_str());
             model = controller->getModelByUid(uid);
-        } else if (!name.isEmpty()) {
-            logd("get model by name '%s'", name.toStdString().c_str());
-            model = controller->getModelByName(name);
         } else {
-            logd("name & id is empty");
+            logd("uid is empty");
             ret = ErrInvalidData;
         }
         // TODO: something stupid check here ^^
@@ -713,7 +726,7 @@ ErrCode Person::fromCSVFile(const QString &fname)
 
 }
 
-IDataExporter *Person::getExporter()
+DataExporter *Person::getExporter()
 {
     return this;
 }
@@ -854,31 +867,10 @@ DbModelHandler *Person::getDbModelHandler()
     return DB->getModelHandler(KModelHdlPerson);
 }
 
-const QString Person::exportTemplatePath(Exporter* exporter) const
+const QString Person::exportTemplatePath(FileExporter* exporter, QString* ftype) const
 {
     return FileCtl::getPrebuiltDataFilePath(KPrebuiltPersonInfoTemplateFileName);
 }
-
-//const QStringList Person::getListExportKeyWord() const
-//{
-//    traced;
-
-//    return mExportFields.keys();
-//}
-
-//ErrCode Person::getExportDataString(const QString &keyword, QString *data) const
-//{
-//    ErrCode ret = ErrNone;
-//    traced;
-//    logd("keyword %s", keyword.toStdString().c_str());
-//    if (mExportFields.contains(keyword)){
-//        std::function<QString(const QString&)> func = mExportFields.value(keyword);
-//        if (func != nullptr) *data = func(keyword);
-//    }
-//    // TODO: raise exception when error occur???
-
-//    return ret;
-//}
 
 ErrCode Person::prepare2Save()
 {
@@ -1050,7 +1042,9 @@ void Person::dump()
     logd("- JoinPIC Name %s", joinPICName().toStdString().c_str());
     logd("- JoinPIC Uid %s", joinPICUid().toStdString().c_str());
 }
-ErrCode Person::onImportItem(const QString& importName, int importFileType, const QString &keyword, const QString &value, quint32 idx, void* tag)
+ErrCode Person::onImportItem(const QString& importName, int importFileType,
+                             const QString &keyword, const QString &value,
+                             quint32 idx, QList<DbModel *>* outList)
 {
     traced;
     ErrCode ret = ErrNone;
@@ -1877,6 +1871,20 @@ void Person::addSpecialistUid(const QString &uid)
     }
 }
 
+QList<DbModel *> Person::getSpecialistList()
+{
+    traced;
+    QList<DbModel*> list;
+    DbPersonModelHandler* hdl = dynamic_cast<DbPersonModelHandler*>(getDbModelHandler());
+    if (hdl && !uid().isEmpty()) {
+        list = hdl->getSpecialistList(uid());
+    } else {
+        loge("no DbPersonModelHandler or uid to get");
+    }
+    tracede;
+    return list;
+}
+
 const QStringList &Person::specialistNameList() const
 {
     return mSpecialistNameList;
@@ -2014,39 +2022,6 @@ void Person::setHollyName(const QString &newHollyName, bool parseUid)
         logd("Skip parsing holly name to uid");
     }
 }
-
-//ErrCode Person::checkAndUpdateSaintListFromHollyName()
-//{
-//    traced;
-//    DbModelHandler* saintHdlr = nullptr;
-//    ErrCode ret = ErrNone;
-//    saintHdlr = dynamic_cast<DbModelHandler*>(DB->getModelHandler(KModelHdlSaint));
-//    if (saintHdlr == nullptr) {
-//        loge("Invalid Saint handler");
-//        ret = ErrFailed;
-//    }
-//    if (ret == ErrNone) {
-//        if (mSaintUidList.empty() && !mHollyName.isEmpty()) {
-//            QStringList names = mHollyName.split(",");
-//            DbModel* model = nullptr;
-//            QString hollyNotFound;
-//            foreach (QString name, names) {
-//                logd("Check saint name '%s'", name.toStdString().c_str());
-//                model = saintHdlr->getByName(name.trimmed());
-//                if (model) {
-//                    logd("update saint uid %s", model->uid().toStdString().c_str());
-//                    addSaintUid(model->uid());
-//                } else {
-//                    loge("Saint '%s' not found in db", name.toStdString().c_str());
-//                    ret = ErrNotFound;
-//                    break;
-//                }
-//            }
-//        }
-//    }
-//    tracedr(ret);
-//    return ret;
-//}
 
 const QStringList &Person::saintUidList() const
 {

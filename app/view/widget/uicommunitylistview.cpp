@@ -421,7 +421,6 @@ ErrCode UICommunityListView::onLoad()
 ErrCode UICommunityListView::onReload()
 {
     traced;
-    COMMUNITYCTL->reloadDb();
     onLoad();
     tracede;
     return ErrNone;

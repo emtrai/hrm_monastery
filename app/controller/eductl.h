@@ -36,10 +36,8 @@ private:
     EduCtl();
 
 protected:
-    DbModel *buildModel(void *items, const QString &fmt);
     virtual DbModelBuilder getMainBuilder();
     virtual const char *getPrebuiltFileName();
-    virtual const char* getPrebuiltFileType();
 private:
 
 };

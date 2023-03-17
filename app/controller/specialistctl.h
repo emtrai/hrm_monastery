@@ -32,20 +32,13 @@
 class SpecialistCtl : public ModelController
 {
     GET_INSTANCE_DECL(SpecialistCtl);
-public:
+private:
     SpecialistCtl();
-//    ErrCode doCsvParseOneItem(const QStringList& items, void* param);
-//private:
-//    static ErrCode onCsvParseOneItemCallback(const QStringList& items, void* caller,
-//                                      void* param);
+    virtual ~SpecialistCtl();
 protected:
-    DbModel *buildModel(void *items, const QString &fmt);
     virtual DbModelBuilder getMainBuilder();
     virtual const char* getPrebuiltFileName();
-    virtual const char* getPrebuiltFileType();
 public:
-    // COMMON FUNCTIONS
-
     virtual QList<DbModel*> getListPerson(const QString& specialistUid);
 
 };

@@ -20,4 +20,9 @@
  * Brief:
  */
 #include "controller.h"
+#include "logger.h"
 
+void Controller::init()
+{
+    logi("Controller::init .. do nothing");
+}

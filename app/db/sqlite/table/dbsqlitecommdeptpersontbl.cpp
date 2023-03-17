@@ -85,7 +85,7 @@ QList<DbModel *> DbSqliteCommDeptPersonTbl::getListPerson(const QString &commDep
 {
     traced;
     QList<DbModel *> olist;
-    int ret = 0;
+    ErrCode ret = ErrNone;
     QHash<QString, FieldValue> fields;
     fields.insert(KFieldCommDeptUid, FieldValue(commDeptUid));
     fields.insert(KFieldStatus, FieldValue(status));

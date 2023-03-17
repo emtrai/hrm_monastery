@@ -28,7 +28,7 @@
 #include "utils.h"
 #include "countryctl.h"
 
-GET_INSTANCE_IMPL(AreaCtl)
+GET_INSTANCE_CONTROLLER_IMPL(AreaCtl)
 
 AreaCtl::AreaCtl():ModelController(KModelHdlArea)
 {

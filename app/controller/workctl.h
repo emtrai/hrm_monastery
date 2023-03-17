@@ -33,14 +33,12 @@ class Work;
 class WorkCtl : public ModelController
 {
     GET_INSTANCE_DECL(WorkCtl);
-public:
+private:
     WorkCtl();
     virtual ~WorkCtl();
 protected:
     virtual DbModelBuilder getMainBuilder();
     virtual const char *getPrebuiltFileName();
-public:
-    // COMMON FUNCTIONS
 };
 
 #endif // WORKCTL_H

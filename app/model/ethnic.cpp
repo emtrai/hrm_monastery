@@ -58,21 +58,19 @@ void Ethnic::setCountryDbId(qint64 newCountryDbId)
     mCountryDbId = newCountryDbId;
 }
 
-const QString &Ethnic::countryShortName() const
-{
-    return mCountryShortName;
-}
-
-void Ethnic::setCountryShortName(const QString &newCountryShortName)
-{
-    mCountryShortName = newCountryShortName;
-    // TODO: change to contry name id? or remove it?
-}
-
-
 DbModelHandler *Ethnic::getDbModelHandler()
 {
     return DB->getModelHandler(KModelHdlEthnic);
+}
+
+const QString &Ethnic::countryName() const
+{
+    return mCountryName;
+}
+
+void Ethnic::setCountryName(const QString &newCountryName)
+{
+    mCountryName = newCountryName;
 }
 
 const QString &Ethnic::countryUid() const

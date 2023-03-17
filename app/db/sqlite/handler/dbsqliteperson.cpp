@@ -281,40 +281,40 @@ ErrCode DbSqlitePerson::addEvent(const QString &personUid, const QString &eventU
     return ret;
 }
 
-QList<PersonEvent *> *DbSqlitePerson::getListEvents(const QString& personUid,
+ErrCode DbSqlitePerson::getListEvents(const QString& personUid,
+                                                   QList<DbModel*>& list,
                                                     const QString* eventUid,
                                                     qint64 date)
 {
     traced;
     DbSqlitePersonEventTbl* tbl = (DbSqlitePersonEventTbl*)DbSqlite::table(KTablePersonEvent);
-    return tbl->getListEvents(personUid, eventUid, date);
+    return tbl->getListEvents(personUid, list, eventUid, date);
 }
 
-DbModel *DbSqlitePerson::getByName(const QString &name, const DbModelBuilder &builder)
-{
-    traced;
-    // TODO: implement it
-    logd("NOT IMPLEMENT YET");
-    return nullptr;
-}
 
-DbModel *DbSqlitePerson::getByName(const QString &name)
-{
-    traced;
-    return getByName(name, &Person::build);
-}
-
-int DbSqlitePerson::search(const QString &keyword, QList<DbModel *> *outList)
+ErrCode DbSqlitePerson::search(const QString &keyword,
+                           QList<DbModel *> *outList,
+                           qint64 dbStatus,
+                           int from,
+                           int noItems,
+                           int* total)
 {
     traced;
     DbSqliteTbl* tbl = getMainTbl();
     // assume main tbl is not null, if not programming error,
     // and require override search function
     Q_ASSERT(tbl != nullptr);
-    return tbl->search(keyword, &Person::build, outList);
+    return tbl->search(keyword, &Person::build, outList, dbStatus, from, noItems, total);
 }
 
-int DbSqlitePerson::filter(int fieldId, int operatorId, const QString &keyword, QList<DbModel *> *outList)
+ErrCode DbSqlitePerson::filter(int fieldId, int operatorId,
+                               const QString &keyword,
+                               const char* targetModelName,
+                               QList<DbModel *> *outList,
+                               qint64 dbStatus,
+                               int from,
+                               int noItems,
+                               int* total)
 {
     traced;
     DbSqliteTbl* tbl = getMainTbl();
@@ -322,7 +322,8 @@ int DbSqlitePerson::filter(int fieldId, int operatorId, const QString &keyword, 
     // and require override search function
     Q_ASSERT(tbl != nullptr);
 
-    int ret = tbl->filter(fieldId, operatorId, keyword,  &Person::build, outList);
+    ErrCode ret = tbl->filter(fieldId, operatorId, keyword,  &Person::build, outList,
+                              dbStatus, from, noItems, total);
     tracedr(ret);
     return ret;
 }
@@ -355,19 +356,18 @@ ErrCode DbSqlitePerson::updateCommunity(const QString &personUid, const QString 
     return ret;
 }
 
-QList<DbModel *> DbSqlitePerson::getListPersonInCommunity(const QString &communityUid)
+ErrCode DbSqlitePerson::getListPersonInCommunity(const QString &communityUid, qint32 status, QList<DbModel*>& list)
 {
     traced;
-    int cnt = 0;
+    ErrCode err = ErrNone;
     DbSqlitePersonTbl* tbl = (DbSqlitePersonTbl*)DbSqlite::getInstance()->getTable(KTablePerson);
     QHash<QString, int> inFields;
     inFields[KFieldCommunityUid] = TEXT;
-    QList<DbModel*> outList;
     logd("Search wit community uid %s", STR2CHA(communityUid));
-    cnt = tbl->search(communityUid, inFields, &Person::build, &outList, true);
-    logd("Search community found %d", cnt);
+    err = tbl->search(communityUid, inFields, &Person::build, &list, true);
+    logd("Search community err=%d", err);
     tracede;
-    return outList;
+    return err;
 }
 
 

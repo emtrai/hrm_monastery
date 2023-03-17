@@ -77,6 +77,8 @@ MainWindow::MainWindow(QWidget *parent)
     , mWaitDlg(nullptr)
     , mAppState(APP_STATE_NOT_READY)
 {
+
+    Logger::init();
     mAppState = APP_STATE_INITING;
     gInstance = this;
     ui->setupUi(this);
@@ -110,6 +112,7 @@ MainWindow::MainWindow(QWidget *parent)
     mAreaView = UITableViewFactory::getView(ViewType::AREA);
     mDepartView = UITableViewFactory::getView(ViewType::VIEW_DEPARTMENT);
     mRoleView = UITableViewFactory::getView(ViewType::VIEW_ROLE);
+    mCourseView = UITableViewFactory::getView(ViewType::VIEW_COURSE);
 
     mHomeView = new QTextBrowser(this);
     mHomeView->clearHistory();
@@ -130,6 +133,7 @@ MainWindow::MainWindow(QWidget *parent)
     mMainViews.append((QWidget*)mCommunityView);
     mMainViews.append((QWidget*)mDepartView);
     mMainViews.append((QWidget*)mRoleView);
+    mMainViews.append((QWidget*)mCourseView);
 
     switchView(mHomeView);
 
@@ -535,6 +539,12 @@ void MainWindow::loadOtherMenu()
                     on_actionEthnic_triggered,
                     "Dân tộc",
                     ICON_PATH("icons8-catholic-64"));
+
+    ADD_ACTION_ITEM(otherMenu,
+                    on_actionCourse_triggered,
+                    "Khóa",
+                    ICON_PATH("icons8-unit-80"));
+
     //    QAction* act = nullptr;
 
     //    act = otherMenu->addAction(QIcon(QString::fromUtf8(":/icon/icon/icons8-earth-planet-80")),
@@ -836,6 +846,14 @@ void MainWindow::on_actionRole_triggered()
     switchView(mRoleView);
     tracede;
 }
+
+void MainWindow::on_actionCourse_triggered()
+{
+    traced;
+    switchView(mCourseView);
+    tracede;
+}
+
 
 MainWindow *MainWindow::getInstance()
 {

@@ -52,9 +52,10 @@ public:
 
     //protected:
     //    virtual QString getSqlCmdCreateTable();
-    virtual QList<PersonEvent*>* getListEvents(const QString& personUid,
-                                                const QString* eventUid = nullptr,
-                                                qint64 date = 0); // TODO; should support enddate???
+    virtual ErrCode getListEvents(const QString& personUid,
+                                QList<DbModel*>& list,
+                                const QString* eventUid = nullptr,
+                                qint64 date = 0); // TODO; should support enddate???
 public:
     static const qint32 KVersionCode;
 };

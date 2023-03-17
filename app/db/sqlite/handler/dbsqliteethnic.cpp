@@ -37,12 +37,6 @@ const QString DbSqliteEthnic::getName()
     return KModelHdlEthnic;
 }
 
-DbModel *DbSqliteEthnic::getByName(const QString &name)
-{
-    traced;
-    return DbSqliteModelHandler::getByName(name, Ethnic::build);
-}
-
 DbModel *DbSqliteEthnic::getByUid(const QString &uid)
 {
     traced;

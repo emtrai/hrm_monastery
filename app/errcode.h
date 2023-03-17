@@ -51,6 +51,9 @@ typedef enum ErrCode {
     ErrBuildDataFailed,
     ErrShortData,
     ErrDenied,
+    ErrException,
+    ErrNoHandler,
+    ErrNoBuilder,
 
     ErrMax
     } ErrCode_t;

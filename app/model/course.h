@@ -34,12 +34,13 @@ class Course : public DbModel
 {
 public:
     static const QHash<int, QString>* getCourseTypeNameMap();
-    static QString courseType2Name(DbModelStatus type);
+    static QString courseType2Name(CourseType type);
 protected:
     Course();
 public:
     virtual ~Course();
     static DbModel *build();
+    virtual void clone(const DbModel* model);
 
     virtual DbModelBuilder getBuilder();
     qint64 startDate() const;
@@ -52,6 +53,7 @@ public:
     void setPeriod(const QString &newPeriod);
 
     qint32 courseType() const;
+    QString courseTypeName();
     void setCourseType(qint32 newCourseType);
 
 protected:

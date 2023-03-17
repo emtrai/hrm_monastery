@@ -88,7 +88,8 @@ Saint::Saint(): DbModel()
 }
 
 ErrCode Saint::onImportItem(const QString& importName, int importFileType,
-                            const QString &keyword, const QString &value, quint32 idx, void *tag)
+                            const QString &keyword, const QString &value, quint32 idx,
+                            QList<DbModel *>* outList)
 {
     traced;
     ErrCode ret = ErrNone;

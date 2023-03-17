@@ -21,6 +21,7 @@
  */
 #include "importer.h"
 #include "logger.h"
+#include "dbmodel.h"
 
 Importer::Importer()
 {
@@ -28,7 +29,7 @@ Importer::Importer()
 }
 
 ErrCode Importer::importFrom(const QString& importName, int importFileType,
-                             IDataImporter *importer, const QString &fpath, void* tag)
+                             IDataImporter *importer, const QString &fpath, QList<DbModel *>* outList)
 {
     traced;
     logd("Not support here");

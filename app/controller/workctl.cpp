@@ -27,7 +27,7 @@
 #include "utils.h"
 #include "defs.h"
 
-GET_INSTANCE_IMPL(WorkCtl)
+GET_INSTANCE_CONTROLLER_IMPL(WorkCtl)
 
 WorkCtl::WorkCtl():
     ModelController(KModelHdlWork)

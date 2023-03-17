@@ -22,7 +22,7 @@
 #ifndef EXPORTFACTORY_H
 #define EXPORTFACTORY_H
 
-#include "exporter.h"
+#include "fileexporter.h"
 #include "exporttype.h"
 
 class ExportFactory
@@ -30,10 +30,10 @@ class ExportFactory
 public:
     ExportFactory();
 
-    static Exporter* getExporter(ExportType type);
+    static FileExporter* getExporter(ExportType type);
 
-    static ErrCode exportTo(const IDataExporter* item, const QString& fpath, ExportType type);
-    static ErrCode exportTo(const IDataExporter* item, QList<DbModel*> data, const QString& fpath, ExportType type);
+    static ErrCode exportTo(const DataExporter* item, const QString& fpath, ExportType type);
+    static ErrCode exportTo(const DataExporter* item, QList<DbModel*> data, const QString& fpath, ExportType type);
 
 };
 

@@ -89,7 +89,9 @@ class DlgPerson : public QDialog, public UIMultiComboxViewListener
                 void loadEthnic();
                 void loadCourse();
                 void loadCountry();
+#ifndef SKIP_PERSON_PROVINE
                 void loadProvince();
+#endif
                 void loadWork();
                 void loadCommunity();
                 void loadStatus();

@@ -28,8 +28,29 @@
 
 class DbModel;
 
+enum DbModelChangeType {
+    DBMODEL_CHANGE_ADD = 0,
+    DBMODEL_CHANGE_UPDATE,
+    DBMODEL_CHANGE_DELETE,
+    DBMODEL_CHANGE_MAX
+};
+
+class onDbModelHandlerListener {
+public:
+    virtual QString getName() = 0;
+    /**
+     * @brief onDbModelHandlerDataUpdate
+     * @param model
+     * @param type type of change, i.e. update, delete, add \ref DbModelChangeType
+     * @param err
+     */
+    virtual void onDbModelHandlerDataUpdate(DbModel* model, int type, ErrCode err) = 0;
+};
+
 class DbModelHandler
 {
+public:
+    static void cleanUpModelList(QList<DbModel*>& list);
 public:
     DbModelHandler();
 
@@ -55,6 +76,10 @@ public:
      */
     virtual bool exist(const DbModel* model) = 0;
 
+    virtual QList<DbModel*> getAll(const char* modelName = nullptr,
+                                    qint64 status = DB_RECORD_ACTIVE,
+                                    int from = 0,
+                                    int noItems = 0, int* total = nullptr);
     virtual QList<DbModel*> getAll(DbModelBuilder builder, qint64 status = DB_RECORD_ACTIVE,
                                     const char* modelName = nullptr, int from = 0,
                                     int noItems = 0, int* total = nullptr) = 0;
@@ -69,35 +94,57 @@ public:
     virtual const QString getName() = 0;
 
     /**
-     * @brief Search item by keywords
+     * @brief Search item by keywords, search everything
      * @param keyword
-     * @param outList
-     * @return the number of found items
+     * @param dbStatus
+     * @param from
+     * @param noItems The number of items
+     * @param[out] total Total found items
+     * @param[out] outList
+     * @return Error Code
      */
-    virtual int search(const QString& keyword, QList<DbModel*>* outList = nullptr);
-
+    virtual ErrCode search(const QString& keyword,
+                           QList<DbModel*>* outList = nullptr,
+                           qint64 dbStatus = DB_RECORD_ACTIVE,
+                           int from = 0,
+                           int noItems = 0,
+                           int* total = nullptr) = 0;
     /**
-     * @brief search EVERYTHING by keywords
-     * @param keyword
-     * @param outList
-     * @return the number of found items
+     * @brief Filter items, only filter active model
+     * @param[in] fieldId Field id to be filter, \ref FilterField
+     * @param[in] opFlags Operators, \ref FilterOperation
+     * @param[in] keyword
+     * @param[in] from from item idx
+     * @param[in] noItems the number of items needs
+     * @param[out] total Total found items
+     * @return ErrNone if succeed
      */
-    virtual int searchAll(const QString& keyword, QList<DbModel*>* outList = nullptr);
-
-    virtual int filter(int fieldId,
+    virtual ErrCode filter(int fieldId,
                        int operatorId,
                        const QString& keyword,
-                       QList<DbModel*>* outList = nullptr);
+                       const char* targetModelName = nullptr,
+                       QList<DbModel*>* outList = nullptr,
+                       qint64 dbStatus = DB_RECORD_ACTIVE,
+                       int from = 0,
+                       int noItems = 0,
+                       int* total = nullptr) = 0;
 
     // TODO: implement filter with operator (equal, greater, in range, etc.)
 
     virtual DbModelBuilder getMainBuilder();
-    virtual DbModel *getByName(const QString& name, const DbModelBuilder& builder);
-    virtual DbModel *getByName(const QString& name);
+
     virtual DbModel *getByUid(const QString& uid, const DbModelBuilder& builder);
     virtual DbModel *getByUid(const QString& uid);
     virtual DbModel *getByNameId(const QString& nameId, const DbModelBuilder& builder);
     virtual DbModel *getByNameId(const QString& nameId);
+
+    void addListener(onDbModelHandlerListener* listener);
+    void delListener(onDbModelHandlerListener* listener);
+protected:
+    void notifyDataChange(DbModel* model, int type, ErrCode err);
+protected:
+
+    QList<onDbModelHandlerListener*> mListeners;
 };
 
 #endif // DBMODELHANDLER_H

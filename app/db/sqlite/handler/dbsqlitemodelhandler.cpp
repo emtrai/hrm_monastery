@@ -58,9 +58,9 @@ ErrCode DbSqliteModelHandler::add(DbModel *model)
         err = ErrInvalidArg;
         loge("invalid argument");
     }
-
-
-
+    if (err == ErrNone) {
+        notifyDataChange(model, DBMODEL_CHANGE_ADD, err);
+    }
     return err;
 }
 
@@ -86,6 +86,9 @@ ErrCode DbSqliteModelHandler::update(DbModel *model)
         loge("invalid argument");
     }
 
+    if (err == ErrNone) {
+        notifyDataChange(model, DBMODEL_CHANGE_UPDATE, err);
+    }
     return err;
 }
 
@@ -109,7 +112,9 @@ ErrCode DbSqliteModelHandler::deleteSoft(DbModel *model)
         err = ErrInvalidArg;
         loge("invalid argument");
     }
-
+    if (err == ErrNone) {
+        notifyDataChange(model, DBMODEL_CHANGE_DELETE, err);
+    }
     tracedr(err);
     return err;
 }
@@ -134,7 +139,9 @@ ErrCode DbSqliteModelHandler::deleteHard(DbModel *model)
         err = ErrInvalidArg;
         loge("invalid argument");
     }
-
+    if (err == ErrNone) {
+        notifyDataChange(model, DBMODEL_CHANGE_DELETE, err);
+    }
     tracedr(err);
     return err;
 }
@@ -171,32 +178,6 @@ DbModel *DbSqliteModelHandler::getModel(qint64 dbId)
 {
     traced;
     return nullptr;
-}
-
-DbModel *DbSqliteModelHandler::getByName(const QString &name, const DbModelBuilder &builder)
-{
-    traced;
-    DbSqliteTbl* tbl = getMainTbl();
-    // assume main tbl is not null, if not programming error,
-    // and require override search function
-    Q_ASSERT(tbl != nullptr);
-    return tbl->getByName(name, builder);
-
-}
-
-DbModel *DbSqliteModelHandler::getByName(const QString &name)
-{
-    traced;
-    DbModel *model = nullptr;
-    DbModelBuilder builder = getMainBuilder();
-    if (builder) {
-        model = getByName(name, builder);
-    } else {
-        loge("NO BUILDER, SHOULD NOT BE CALLED, MUST BE IMPLEMENTED BY DERIVED CLASS");
-    }
-    // TODO: throw exception???
-    tracede;
-    return model;
 }
 
 DbModel *DbSqliteModelHandler::getByUid(const QString &uid, const DbModelBuilder &builder)
@@ -240,31 +221,49 @@ const QString DbSqliteModelHandler::getName()
     return mName;
 }
 
-int DbSqliteModelHandler::search(const QString& keyword, QList<DbModel*>* outList)
+ErrCode DbSqliteModelHandler::search(const QString& keyword,
+                                 QList<DbModel*>* outList,
+                                 qint64 dbStatus,
+                                 int from,
+                                 int noItems,
+                                 int* total)
 {
     traced;
     DbSqliteTbl* tbl = getMainTbl();
     // assume main tbl is not null, if not programming error,
     // and require override search function
     Q_ASSERT(tbl != nullptr);
-    return tbl->search(keyword, outList);
+    return tbl->search(keyword, outList, dbStatus, from, noItems, total);
 
 }
 
-int DbSqliteModelHandler::filter(int fieldId,
+ErrCode DbSqliteModelHandler::filter(int fieldId,
                                  int operatorId,
                                  const QString &keyword,
-                                 QList<DbModel *> *outList)
+                                 const char* targetModelName,
+                                 QList<DbModel *> *outList,
+                                 qint64 dbStatus,
+                                 int from,
+                                 int noItems,
+                                 int* total)
 {
     traced;
-    DbSqliteTbl* tbl = getMainTbl();
-    DbModelBuilder builder = getMainBuilder();
+    DbSqliteTbl* tbl = nullptr;
+    DbModelBuilder builder = nullptr;
+    if (targetModelName) {
+        builder = getBuilder(targetModelName);
+        tbl = getTable(targetModelName);
+    } else {
+        builder = getMainBuilder();
+        tbl = getMainTbl();
+    }
     // assume main tbl is not null, if not programming error,
     // and require override search function
     Q_ASSERT(tbl != nullptr);
     Q_ASSERT(builder != nullptr);
 
-    int ret = tbl->filter(fieldId, operatorId, keyword, builder, outList);
+    ErrCode ret = tbl->filter(fieldId, operatorId, keyword, builder, outList,
+                              dbStatus, from, noItems, total);
     tracedr(ret);
     return ret;
 }
@@ -277,6 +276,16 @@ DbSqliteTbl *DbSqliteModelHandler::getTable(const QString& modelName)
 
 DbModelBuilder DbSqliteModelHandler::getBuilder(const QString &modelName)
 {
-    return getMainBuilder();
+    traced;
+    logd("get builder for model '%s'", STR2CHA(modelName));
+    DbModelBuilder builder = nullptr;
+    if (!modelName.isEmpty()) {
+        builder = DbModel::getBuilderByModelName(modelName);
+    } else {
+        logd("null modelName, try to get defaule onle");
+        builder = getMainBuilder();
+    }
+    tracede;
+    return builder;
 }
 

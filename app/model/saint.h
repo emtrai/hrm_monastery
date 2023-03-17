@@ -34,12 +34,12 @@
 #include "defs.h"
 #include "errcode.h"
 #include "dbmodel.h"
-#include "idataexporter.h"
+#include "dataexporter.h"
 #include "idataimporter.h"
 
 
 
-class Saint: public DbModel, public IDataExporter, public IDataImporter
+class Saint: public DbModel, public DataExporter, public IDataImporter
 {
     public:
         static DbModel* build();
@@ -49,7 +49,7 @@ class Saint: public DbModel, public IDataExporter, public IDataImporter
         Saint();
         virtual ErrCode onImportItem(const QString& importName, int importFileType,
                                      const QString& keyword, const QString& value,
-                                     quint32 idx = 0, void* tag = nullptr);
+                                     quint32 idx = 0, QList<DbModel *>* outList = nullptr);
 
 
         qint64 feastDay() const;

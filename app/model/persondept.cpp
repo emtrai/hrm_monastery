@@ -25,7 +25,7 @@
 #include "dbctl.h"
 #include "utils.h"
 #include "filectl.h"
-#include "idataexporter.h"
+#include "dataexporter.h"
 #include "exportfactory.h"
 #include "defs.h"
 #include <QMap>

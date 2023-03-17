@@ -33,7 +33,7 @@ class Course;
 class CourseCtl : public ModelController
 {
     GET_INSTANCE_DECL(CourseCtl);
-public:
+private:
     CourseCtl();
 protected:
     // build model from data

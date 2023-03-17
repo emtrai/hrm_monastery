@@ -27,6 +27,8 @@
 #include <QRegularExpressionMatchIterator>
 #include "filectl.h"
 #include <QHash>
+#include "dbmodel.h"
+
 
 GET_INSTANCE_IMPL(ImportCSVList)
 
@@ -36,7 +38,8 @@ ImportCSVList::ImportCSVList()
 }
 
 ErrCode ImportCSVList::importFrom(const QString& importName, int importFileType,
-                                  IDataImporter *importer, const QString &fpath, void* tag)
+                                  IDataImporter *importer, const QString &fpath,
+                                  QList<DbModel *>* outList)
 {
     traced;
 //    QHash<QString, QString> item;
@@ -64,12 +67,12 @@ ErrCode ImportCSVList::importFrom(const QString& importName, int importFileType,
 //                IDataImporter* importer = (IDataImporter)*param;
                 ErrCode ret2 = ErrNone;
                 if (importer != nullptr){
-                    ret2 = importer->onImportItem(importName, importFileType, items, idx, param);
+                    ret2 = importer->onImportItem(importName, importFileType, items, idx, (QList<DbModel *>*)param);
                 }
                 tracedr(ret2);
                 return ret2;
                 },
-            this, tag, CSV_LIST_ITEM_SPLIT, &cnt);
+            this, outList, CSV_LIST_ITEM_SPLIT, &cnt);
     }
     importer->onImportEnd(importName, importFileType, fpath, ret);
     logi("Parsed %d item", cnt);

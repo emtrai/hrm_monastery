@@ -26,9 +26,14 @@
 #include "dbctl.h"
 #include "utils.h"
 
-GET_INSTANCE_IMPL(MissionCtl);
+GET_INSTANCE_CONTROLLER_IMPL(MissionCtl);
 
 MissionCtl::MissionCtl():ModelController(KModelHdlMission)
+{
+    traced;
+}
+
+MissionCtl::~MissionCtl()
 {
     traced;
 }
@@ -38,40 +43,9 @@ DbModelBuilder MissionCtl::getMainBuilder()
     return &Mission::build;
 }
 
-// Format: vn, Vietname,Asian, Asia,
-DbModel *MissionCtl::buildModel(void *items, const QString &fmt)
-{
-    traced;
-    Mission* item = new Mission();
-    QStringList* itemList = (QStringList*) items;
-    qint32 idx = 0;
-    qint32 sz = itemList->length();
-    logd("sz %d", sz);
-    item->setNameId(itemList->at(idx++));
-    item->setName(itemList->at(idx++));
-    if (sz > idx) { // TODO: make it commont function/macro??
-        QString remark; // last item is remark, so merge all items as remark
-        for (; idx < sz; idx++){
-            if (!remark.isEmpty()){
-                remark += ",";
-            }
-            remark += itemList->at(idx);
-        }
-
-        if (!remark.isEmpty())
-            item->setRemark(remark);
-    }
-    tracede;
-    return item;
-}
-
 const char *MissionCtl::getPrebuiltFileName()
 {
     return KPrebuiltMissionCSVFileName;
 }
 
-const char *MissionCtl::getPrebuiltFileType()
-{
-    return KFileTypeCSV;
-}
 

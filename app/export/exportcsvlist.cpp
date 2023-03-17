@@ -34,55 +34,32 @@ ExportCSVList::ExportCSVList()
     traced;
 }
 
-ErrCode ExportCSVList::saveTo(const IDataExporter* exporter, const QList<DbModel*> listData, const QString &fpath)
+ErrCode ExportCSVList::saveTo(const DataExporter* exporter, const QList<DbModel*> listData, const QString &fpath)
 {
     traced;
     ErrCode ret = ErrNone;
-    const QString templatePath = exporter->exportTemplatePath(this);
     qint32 cnt = 0;
     QStringList items;
     QString finalData;
-    logd("templatePath %s", templatePath.toStdString().c_str());
+    QList<QPair<QString,QString>> keywordMap;
 
-    if (templatePath.isEmpty()) {
-        ret = ErrInvalidData;
-        loge("Export HTML failed, not template found");
-    }
+    ret = exporter->getListTemplateExportKeywords(this, keywordMap);
 
-
-    if (ret == ErrNone) {
-        logd("parse csv file %s", templatePath.toStdString().c_str());
-        ret = Utils::parseCSVFile(templatePath,
-            [this](const QStringList& items, void* caller, void* param, quint32 idx){
-                traced;
-                logd("callback from lamda when parse csv file for export csv list, idx=%d", idx);
-                return ErrCancelled; // we assume 1st line is headers, so don't need to read more
-            },
-            this, nullptr, CSV_LIST_ITEM_SPLIT, &cnt, &items);
-    }
-    if (ret == ErrNone || ret == ErrCancelled) {
-        if (items.length() == 0) {
-            ret = ErrNoData;
-            loge("No header found");
-        } else {
-            ret = ErrNone; // if ErrCancelled is intended, to stop reading, focus on 1st line only
-        }
-    }
     if (ret == ErrNone) {
         logd("get header");
-        foreach (QString item, items) {
+        foreach (auto item, keywordMap) {
             if (finalData.length() > 0) {
                 finalData += CSV_LIST_ITEM_SPLIT;
             }
-            finalData += item.trimmed();
+            finalData += item.first;
         }
-        finalData += "\n";
+        finalData = "#" + finalData + "\n";
         logd("get data, no item: %lld", listData.length());
         foreach (DbModel* dataExport, listData) {
             QString dataLine;
             foreach (QString item, items) {
                 QString data;
-                logd("keyword '%s'", STR2CHA(item));
+                logd("item '%s'", STR2CHA(item));
                 ret = exporter->getExportDataString(item.trimmed(), dataExport, &data);
                 if (ret == ErrNone) {
                     logd("data '%s'", STR2CHA(data));

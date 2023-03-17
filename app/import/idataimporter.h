@@ -25,6 +25,7 @@
 #include <QString>
 #include "errcode.h"
 
+class DbModel;
 
 class IDataImporter
 {
@@ -41,13 +42,13 @@ public:
      */
     virtual ErrCode onImportItem(const QString& importName, int importFileType,
                                  const QString& keyword, const QString& value,
-                                 quint32 idx = 0, void* tag = nullptr);
+                                 quint32 idx = 0, QList<DbModel *>* outList = nullptr);
     virtual ErrCode onImportItem(const QString& importName, int importFileType,
                                  const QStringList& items, quint32 idx = 0,
-                                 void* tag = nullptr);
+                                 QList<DbModel *>* outList = nullptr);
     virtual ErrCode onImportItem(const QString& importName, int importFileType,
                                  const QHash<QString, QString>& items, quint32 idx = 0,
-                                 void* tag = nullptr);
+                                 QList<DbModel *>* outList = nullptr);
     virtual void onImportEnd(const QString& importName, int importFileType,
                                 const QString& fname, ErrCode result);
 };

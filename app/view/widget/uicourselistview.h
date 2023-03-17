@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Ngo Huy Anh
+ * Copyright (C) 2023 Ngo Huy Anh
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,34 +14,30 @@
  * limitations under the License.
  *
  *
- * Filename: dbsqlitesaint.h
+ * Filename: uicourselistview.h
  * Author: Anh, Ngo Huy
- * Created date:7/31/2022
+ * Created date:3/9/2023
  * Brief:
  */
-#ifndef DBSQLITESAINT_H
-#define DBSQLITESAINT_H
+#ifndef UICOURSELISTVIEW_H
+#define UICOURSELISTVIEW_H
 
-#include <QHash>
-#include "dbsqlitemodelhandler.h"
+#include "uicommonlistview.h"
 
-class DbSqliteSaintTbl;
-
-class DbSqliteSaint : public DbSqliteModelHandler
+class UICourseListView : public UICommonListView
 {
 public:
-    DbSqliteSaint();
-    static DbSqliteSaint* getInstance();
-    virtual const QString getName();
-    virtual DbModel *getByUid(const QString& name);
-
+    explicit UICourseListView(QWidget *parent = nullptr);
+    virtual ~UICourseListView();
 protected:
-    virtual DbSqliteTbl* getMainTbl();
-    virtual DbModelBuilder getMainBuilder();
-private:
 
-private:
-    static DbSqliteSaint* gInstance;
+    virtual QString getTitle();
+    virtual DbModel* onNewModel();
+protected:
+
+    virtual QList<DbModel*> getListItem();
+    virtual void initHeader();
+    virtual void updateItem(DbModel* item, UITableItem* tblItem);
 };
 
-#endif // DBSQLITESAINT_H
+#endif // UICOURSELISTVIEW_H

@@ -40,7 +40,7 @@
 #include "countryctl.h"
 #include "missionctl.h"
 
-GET_INSTANCE_IMPL(CommunityCtl)
+GET_INSTANCE_CONTROLLER_IMPL(CommunityCtl)
 
 CommunityCtl::CommunityCtl():ModelController(KModelHdlCommunity)
 {
@@ -188,47 +188,9 @@ DbModel* CommunityCtl::onJsonParseOneItem(const QJsonObject& jobj, bool* ok )
 
 }
 
-const QString CommunityCtl::exportTemplatePath(Exporter *exporter) const
+const QString CommunityCtl::exportListPrebuiltTemplateName() const
 {
-    traced;
-    QString fpath;
-    if (exporter) {
-        logd("export type %d", exporter->getExportType());
-        switch (exporter->getExportType()) {
-        case EXPORT_CSV_LIST:
-        case EXPORT_XLSX:
-            // TODO: docx, text???
-            fpath = FileCtl::getPrebuiltDataFilePath(KPrebuiltCommunityExportTemplateName);
-            break;
-        default:
-            loge("invalid export type %d", exporter->getExportType());
-            break;
-        };
-    } else {
-        loge("invalid exporter");
-        // TODO: report or raise exception???
-    }
-    logd("fpath '%s'", STR2CHA(fpath));
-    tracede;
-    return fpath;
-}
-
-ErrCode CommunityCtl::getExportDataString(const QString &keyword, const DbModel *data, QString *exportData) const
-{
-    traced;
-    ErrCode err = ErrNone;
-    logd("keyword '%s'", STR2CHA(keyword));
-    if (!data || !exportData || keyword.isEmpty()) {
-        err = ErrInvalidArg;
-        loge("Invalid argument");
-    }
-
-    if (err == ErrNone) {
-        err = data->getExportDataString(keyword, exportData);
-    }
-    logd("Expoted data '%s", exportData?STR2CHA((*exportData)):"(null)");
-    tracedr(err);
-    return err;
+    return KPrebuiltCommunityExportTemplateName;
 }
 
 ErrCode CommunityCtl::onImportStart(const QString &importName, int importFileType, const QString &fname)

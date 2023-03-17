@@ -32,14 +32,12 @@ class Role;
 class RoleCtl : public ModelController
 {
     GET_INSTANCE_DECL(RoleCtl);
-public:
+private:
     RoleCtl();
     virtual ~RoleCtl();
 protected:
     // prebuilt data file name
     virtual const char* getPrebuiltFileName();
-    // prebuilt data file type, i.e. csv
-    virtual const char* getPrebuiltFileType();
 
     virtual DbModelBuilder getMainBuilder();
 };

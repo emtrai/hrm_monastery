@@ -60,9 +60,15 @@ ErrCode UIPersonListView::onLoad()
             logd("filter item %s", STR2CHA(item->item()));
             if (item->item() == KItemCommunity) {
                 // TODO: how about keyword? assume value only?????
-                QList<DbModel*> list = PERSONCTL->getPersonInCommunity(item->value().toString());
-                if (list.count() > 0) {
-                    items.append(list);
+                QList<DbModel*> list;
+                ErrCode err = PERSONCTL->getListPersonInCommunity(item->value().toString(), list);
+                if (err == ErrNone) {
+                    if (list.count() > 0) {
+                        items.append(list);
+                    }
+                } else {
+                    loge("Get list person in community uid '%s' failed, err=%d",
+                         STR2CHA(item->value().toString()), err);
                 }
             } else {
                 ASSERT(0, "not this filter item!!!");
@@ -70,7 +76,7 @@ ErrCode UIPersonListView::onLoad()
         }
     } else {
         logd("get all person");
-        items = PersonCtl::getInstance()->getAllPerson();
+        items = PERSONCTL->getAllItems();
     }
     mItemList.clear(); // TODO: clean up item data
     // TODO: loop to much, redundant, do something better?
@@ -308,11 +314,11 @@ int UIPersonListView::onFilter(int catetoryid,
 {
     traced;
     mItemList.clear(); // TODO: clean up item data
-    int ret = PERSONCTL->filter(catetoryid, catetory, opFlags, keywords, &mItemList);
+    ErrCode ret = PERSONCTL->filter(catetoryid, opFlags, keywords, KModelNamePerson, &mItemList);
     logd("filter ret %d", ret);
     logd("mItemList cnt %d", mItemList.count());
     tracede;
-    return ret;
+    return mItemList.count();
 }
 
 DbModel *UIPersonListView::onNewModel()

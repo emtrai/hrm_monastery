@@ -34,8 +34,18 @@
 #include <QObject>
 #include <QDateTime>
 #include <QFileDialog>
+#include "dbmodel.h"
+
 // yymd
 #define YMD_TO_INT(y,m,d) (((y) << 16) | ((m) << 8) | (d))
+
+void Utils::clearListModel(QList<DbModel *>& list)
+{
+    foreach (DbModel* model, list) {
+        if  (model) delete model;
+    }
+    list.clear();
+}
 
 qint64 Utils::currentTimeMs()
 {

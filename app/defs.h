@@ -44,6 +44,7 @@ enum Gender{
 const char* const KLanguage = "vi";
 
 const char* const KPrebuiltDirName = "prebuilt";
+const char* const KLogDirName = "log";
 const char* const KPrebuiltSaintCSVFileName = "saints";
 const char* const KPrebuiltCountryCSVFileName = "country";
 const char* const KPrebuiltEduCSVFileName = "edu";
@@ -59,6 +60,7 @@ const char* const KPrebuiltHomeHtmlFileName = "home";
 const char* const KPrebuiltLogoFileName = "logo.png"; // special case, need file extenstion
 const char* const KPrebuiltPersonInfoTemplateFileName = "person_info_template";
 const char* const KPrebuiltPersonListCSVTemplateFileName = "person_list_export_template";
+const char* const KPrebuiltPersonListJSONTemplateFileName = "person_list_export_template_json";
 const char* const KPrebuiltCommunityInfoTemplateFileName = "community_info_template";
 const char* const KPrebuiltCourseCSVFileName = "course";
 const char* const KPrebuiltWorkCSVFileName = "work";
@@ -112,6 +114,7 @@ const char* const KDataFormatJson = "QJson";
 const char* const KFileTypeCSV = "csv";
 const char* const KFileTypeJson = "json";
 const char* const KFileTypeExcelX = "xlsx";
+const char* const KFileTypeHtml = "xlsx";
 
 const char* const KItemImgPath = "img_path";
 const char* const KItemUid = "UID";
@@ -151,7 +154,7 @@ const char* const KItemEmail = "EMAIL";
 const char* const KItemOtherContact = "LIEN_LAC_KHAC";
 const char* const KItemEdu = "HOC_VAN";
 const char* const KItemEduDetail = "CHI_TIET_HOC_VAN";
-const char* const KItemEduUid = "MA_HOC_VAN";
+const char* const KItemEduNameId = "MA_HOC_VAN";
 const char* const KItemSpeciaist = "CHUYEN_MON";
 const char* const KItemSpeciaistInfo = "CHI_TIET_CHUYEN_MON";
 const char* const KItemSpeciaistUid = "MA_CHUYEN_MON";

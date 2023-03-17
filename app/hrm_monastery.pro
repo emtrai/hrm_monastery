@@ -25,9 +25,7 @@ DEFINES += VER_PATCH=1
 # Need to re-check login before enable it again
 # don't want to clean up code, just keep it for later use if have time
 # TODO: check to support person province info
-DEFINES += SKIP_PERSON_PROVINE
-
-
+SUPPORT_PROVINE = OFF
 
 
 # QXlsx code for Application Qt project
@@ -144,13 +142,13 @@ SOURCES += \
     db/sqlite/table/dbsqlitetbl.cpp \
     db/sqlite/table/dbsqliteworktbl.cpp \
     controller/eductl.cpp \
+    export/dataexporter.cpp \
     export/exportcsvlist.cpp \
-    export/exporter.cpp \
     export/exportfactory.cpp \
     export/exporthtml.cpp \
     export/exporttype.cpp \
     export/exportxlsx.cpp \
-    export/idataexporter.cpp \
+    export/fileexporter.cpp \
     file/filectl.cpp \
     filter.cpp \
     import/idataimporter.cpp \
@@ -223,6 +221,7 @@ SOURCES += \
     view/widget/uicommunitylistview.cpp \
     view/widget/uicommunitypersonlistview.cpp \
     view/widget/uicountrylistview.cpp \
+    view/widget/uicourselistview.cpp \
     view/widget/uidepartmentlistview.cpp \
     view/widget/uidepartmentpersonlistview.cpp \
     view/widget/uieducationlistview.cpp \
@@ -329,13 +328,13 @@ HEADERS += \
     defs.h \
     controller/eductl.h \
     errcode.h \
+    export/dataexporter.h \
     export/exportcsvlist.h \
-    export/exporter.h \
     export/exportfactory.h \
     export/exporthtml.h \
     export/exporttype.h \
     export/exportxlsx.h \
-    export/idataexporter.h \
+    export/fileexporter.h \
     file/filectl.h \
     filter.h \
     import/idataimporter.h \
@@ -408,6 +407,7 @@ HEADERS += \
     view/widget/uicommunitylistview.h \
     view/widget/uicommunitypersonlistview.h \
     view/widget/uicountrylistview.h \
+    view/widget/uicourselistview.h \
     view/widget/uidepartmentlistview.h \
     view/widget/uidepartmentpersonlistview.h \
     view/widget/uieducationlistview.h \
@@ -479,6 +479,7 @@ DISTFILES += \
     res/home.html \
     res/person_info_template.html \
     res/person_list_export_template.csv \
+    res/person_list_export_template_vi.json \
     res/role_vi.csv \
     res/status_vi.csv \
     res/work_vi.csv
@@ -486,3 +487,18 @@ DISTFILES += \
 RESOURCES += \
     icon.qrc \
     resource.qrc
+
+equals(SUPPORT_PROVINE, OFF) {
+DEFINES += SKIP_PERSON_PROVINE
+#SOURCES -= \
+#    controller/provincectl.cpp \
+#    db/sqlite/handler/dbsqliteprovince.cpp \
+#    db/sqlite/table/dbsqliteprovincetbl.cpp \
+#    model/province.cpp \
+#    view/dialog/dlgprovince.cpp \
+
+#FORMS -= \
+#    view/dialog/dlgprovince.ui \
+
+
+}

@@ -22,19 +22,19 @@
 #ifndef EXPORTCSVLIST_H
 #define EXPORTCSVLIST_H
 
-#include "exporter.h"
+#include "fileexporter.h"
 #include "errcode.h"
 #include <QString>
-#include "idataexporter.h"
+#include "dataexporter.h"
 #include "utils.h"
 
-class ExportCSVList : public Exporter
+class ExportCSVList : public FileExporter
 {
     GET_INSTANCE_DECL(ExportCSVList)
 public:
     ExportCSVList();
-//    virtual ErrCode saveTo(const IDataExporter* item, const QString& fpath);
-    virtual ErrCode saveTo(const IDataExporter* exporter, const QList<DbModel*> data, const QString& fpath);
+//    virtual ErrCode saveTo(const DataExporter* item, const QString& fpath);
+    virtual ErrCode saveTo(const DataExporter* exporter, const QList<DbModel*> data, const QString& fpath);
     virtual ExportType getExportType();
 };
 

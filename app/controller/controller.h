@@ -25,9 +25,20 @@
 #include <QString>
 #include "errcode.h"
 
+#define GET_INSTANCE_CONTROLLER_IMPL(className) \
+className* className::gInstance = nullptr;\
+    className* className::getInstance() { \
+        if (gInstance == nullptr){ \
+            gInstance = new className(); \
+            gInstance->init();\
+    } \
+        return gInstance; \
+}
+
 class Controller
 {
 public:
+    virtual void init();
     /**
      * @brief on load controller
      * @return

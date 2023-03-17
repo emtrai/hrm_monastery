@@ -41,6 +41,7 @@ enum ViewType {
     VIEW_WORK,
     VIEW_COUNTRY,
     VIEW_ETHNIC,
+    VIEW_COURSE,
     VIEW_MAX,
 };
 

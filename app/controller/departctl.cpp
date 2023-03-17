@@ -34,7 +34,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-GET_INSTANCE_IMPL(DepartCtl)
+GET_INSTANCE_CONTROLLER_IMPL(DepartCtl)
 
 DepartCtl::DepartCtl():ModelController(KModelHdlDept)
 {

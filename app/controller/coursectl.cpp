@@ -27,7 +27,7 @@
 #include "utils.h"
 #include "defs.h"
 
-GET_INSTANCE_IMPL(CourseCtl)
+GET_INSTANCE_CONTROLLER_IMPL(CourseCtl)
 
 CourseCtl::CourseCtl():ModelController(KModelHdlCourse)
 {

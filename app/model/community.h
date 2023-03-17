@@ -29,7 +29,7 @@
 #include "address.h"
 #include "person.h"
 #include "department.h"
-#include "idataexporter.h"
+#include "dataexporter.h"
 #include "dbmodel.h"
 
 #define MISSION_DELIM ","
@@ -155,7 +155,7 @@ public:
 
     const QString &currentCEOCode() const;
     void setCurrentCEOCode(const QString &newCurrentCEOCode);
-    virtual const QString exportTemplatePath(Exporter* exporter) const;
+    virtual const QString exportTemplatePath(FileExporter* exporter, QString* ftype = nullptr) const;
     const QString &brief() const;
     void setBrief(const QString &newBrief);
 

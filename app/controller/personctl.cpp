@@ -35,83 +35,47 @@
 #include "dbspecialistmodelhandler.h"
 #include "exportfactory.h"
 
-PersonCtl* PersonCtl::gInstance = nullptr;
+#include "communityctl.h"
+#include "eductl.h""
+#include "coursectl.h"
+#include "workctl.h"
 
-ErrCode PersonCtl::addPerson(Person *person)
+GET_INSTANCE_CONTROLLER_IMPL(PersonCtl)
+
+ErrCode PersonCtl::getListPersonInCommunity(const QString &communityUid, QList<DbModel *>& list, qint32 status)
 {
     traced;
-    ErrCode_t err = ErrNone;
-    // TODO: check null
-    err = person->save();
-
-    return err;
-}
-
-ErrCode PersonCtl::addPerson(const QString &fname)
-{
-    traced;
-    Person *person = new Person();
-    ErrCode ret = person->fromCSVFile(fname);
-    // TODO: should call Config to update next person code in case of saving new person
-    // succeed??
-    // reason: when import, imported person will have code, but it may not be saved to db
-
-    if (ret == ErrNone){
-        ret = person->save();
+    ErrCode err = ErrNone;
+    if (!communityUid.isEmpty()) {
+        logi("get person in community uid '%s'", STR2CHA(communityUid));
+        err = personModelHdl()->getListPersonInCommunity(communityUid, status, list);
+        logd("found %lld item", list.size());
+    } else {
+        loge("Invalid community Uid");
     }
-
-    delete person;
-    tracedr(ret);
-    return ret;
-}
-
-ErrCode PersonCtl::markPersonDelete(Person *person)
-{
-    traced;
-    ErrCode_t err = ErrNone;
-    // TODO: check null
-    err = person->markRemove();
-
+    tracedr(err);
     return err;
 }
 
-ErrCode PersonCtl::deletePerson(Person *person)
+ErrCode PersonCtl::getListEvents(const QString &personUid, QList<DbModel*>& list)
 {
     traced;
-    ErrCode_t err = ErrNone;
-    // TODO: check null
-    err = person->remove();
-
-    return err;
-}
-
-ErrCode PersonCtl::AddListPersons(const QString &fname)
-{
-    traced;
-    return ErrNone;
-}
-
-QList<DbModel *> PersonCtl::getAllPerson()
-{
-    traced;
-    return modelHdl()->getAll(&Person::build, DB_RECORD_ACTIVE, KModelNamePerson);
-}
-
-QList<DbModel *> PersonCtl::getPersonInCommunity(const QString &communityUid)
-{
-    traced;
-    logd("get person in community uid %s", STR2CHA(communityUid));
-    QList<DbModel*> list = personModelHdl()->getListPersonInCommunity(communityUid);
-    logd("found %d item", list.count());
+    ErrCode err = ErrNone;
+    if (!personUid.isEmpty()) {
+        logd("get person event of uid '%s'", STR2CHA(personUid));
+        err = personModelHdl()->getListEvents(personUid, list);
+        logd("found %lld item", list.size());
+        if (err != ErrNone) {
+            loge("get List person event failed, err=%d", err);
+        }
+    } else {
+        loge("Invalid person Uid");
+        err = ErrInvalidArg;
+    }
     tracede;
-    return list;
+    return err;
 }
 
-QList<DbModel *> PersonCtl::getListEvent(const Person* person)
-{
-    traced;
-    return modelHdl()->getAll(&PersonEvent::build, DB_RECORD_ACTIVE, KModelNamePersonEvent);
-}
 
 DbModel *PersonCtl::doImportOneItem(const QString& importName, int importFileType, const QStringList &items, quint32 idx)
 {
@@ -129,11 +93,19 @@ DbModel *PersonCtl::doImportOneItem(const QString& importName, int importFileTyp
     } else {
 
         person = (Person*)Person::build();
-        foreach (QString item, items) {
-            QString field = mImportFields[i++];
-            logd("Import field %s", field.toStdString().c_str());
-            ret = person->onImportItem(importName, importFileType, field, item, idx);
+        if (person) {
+            foreach (QString item, items) {
+                QString field = mImportFields[i++];
+                logd("Import field %s", field.toStdString().c_str());
+                ret = person->onImportItem(importName, importFileType, field, item, idx);
+            }
+        } else {
+            ret = ErrNoMemory;
+            loge("Faild to allocate person, no memory");
         }
+    }
+    if (ret != ErrNone && person) {
+        delete person;
     }
 
     tracedr(ret);
@@ -144,69 +116,161 @@ DbModel *PersonCtl::doImportOneItem(const QString& importName, int importFileTyp
 {
     ErrCode ret = ErrNone;
     Person* person = nullptr;
-    int i = 0;
     logd("idx = %d", idx);
     person = (Person*)Person::build();
-    foreach (QString field, items.keys()) {
-        QString value = items.value(field);
-        logd("Import field %s", field.toStdString().c_str());
-        logd("Import value %s", value.toStdString().c_str());
-        ret = person->onImportItem(importName, importFileType, field, value, idx);
+    if (person) {
+        foreach (QString field, items.keys()) {
+            QString value = items.value(field);
+            logd("Import field %s", field.toStdString().c_str());
+            logd("Import value %s", value.toStdString().c_str());
+            ret = person->onImportItem(importName, importFileType, field, value, idx);
+        }
+    } else {
+        ret = ErrNoMemory;
+        loge("Faild to allocate person, no memory");
     }
 
+    if (ret != ErrNone && person) {
+        delete person;
+    }
     tracedr(ret);
     return person;
 }
 
-int PersonCtl::filter(int catetoryid, const QString &catetory, qint64 opFlags, const QString &keywords, QList<DbModel *> *outList)
+ErrCode PersonCtl::filter(int catetoryid, qint64 opFlags,
+                      const QString &keywords,
+                      const char* targetModelName,
+                      QList<DbModel *> *outList,
+                      int from,
+                      int noItems,
+                      int* total)
 {
     traced;
-    int ret = 0;
+    ErrCode err = ErrNone;
     logd("category id %d", catetoryid);
-    if (catetoryid == FILTER_FIELD_SPECIALIST) {
-        logd("filder by specialist");
-        QList<DbModel *> specialistList;
-        ret = SPECIALISTCTL->filter(catetoryid, catetory, opFlags, keywords, &specialistList);
-        logd("Found %d specialist", ret);
-        DbSpecialistModelHandler* specialistHdl = dynamic_cast<DbSpecialistModelHandler*>(DB->getModelHandler(KModelHdlSpecialist));
-        if (ret > 0){
-            logd("search person for each specialist");
-            foreach (DbModel* item, specialistList) {
+    logd("opFlags id %lld", opFlags);
+    logd("keywords %s", STR2CHA(keywords));
+    logd("targetModelName %s", targetModelName?targetModelName:"(null)");
+    ModelController* controller = nullptr;
+    DbModelHandler* modelHdl = nullptr;
+    bool directFilter = false;
 
-                logd("specialist uid %s, name %s",
-                     item->uid().toStdString().c_str(),
-                     item->name().toStdString().c_str());
-                QList<DbModel *> perList = specialistHdl->getListPerson(item->uid());
-                if (perList.count() > 0) {
-                    logd("found %d person", perList.count());
-                    outList->append(perList);
+    if (!outList) {
+        err = ErrInvalidArg;
+        loge("Invalid argument");
+    }
+
+    /* There are 2 filter cases:
+     * - Filter directly with fields of model, i.e. name, etc.
+     * - Filter via other fields like community, specialist
+     */
+    if (err == ErrNone) {
+        switch (catetoryid) {
+        case FILTER_FIELD_SPECIALIST:
+            controller = SPECIALISTCTL;
+            modelHdl = DB->getModelHandler(KModelHdlSpecialist);
+            break;
+        case FILTER_FIELD_COMMUNITY:
+            controller = COMMUNITYCTL;
+            modelHdl = DB->getModelHandler(KModelHdlCommunity);
+            break;
+        case FILTER_FIELD_EDUCATION:
+            controller = EDUCTL;
+            modelHdl = DB->getModelHandler(KModelHdlEdu);
+            break;
+        case FILTER_FIELD_COURSE:
+            controller = COURSECTL;
+            modelHdl = DB->getModelHandler(KModelHdlCourse);
+            break;
+        case FILTER_FIELD_WORK:
+            controller = WORKCTL;
+            modelHdl = DB->getModelHandler(KModelHdlWork);
+            break;
+        case FILTER_FIELD_NAME:
+        case FILTER_FIELD_FULL_NAME:
+        case FILTER_FIELD_ADDRESS:
+        case FILTER_FIELD_BIRTHDAY:
+            directFilter = true;
+            err = ModelController::filter(catetoryid, opFlags, keywords, targetModelName, outList, from, noItems, total);
+            break;
+        default:
+            err = ErrNotSupport;
+            loge("filter id %d not support", catetoryid);
+            break;
+        }
+    }
+    logd("directFilter=%d", directFilter);
+    if (!directFilter) {
+        QList<DbModel *> models;
+        if (err == ErrNone) {
+            logd("Get list of target category, via name");
+            err = controller->filter(FILTER_FIELD_NAME, FILTER_OP_CONTAIN, keywords,
+                                     nullptr, /* use main/default target model name*/
+                                     &models, from, noItems, total);
+            logd("Search ret=%d, found=%lld models", err, models.size());
+        }
+        if (err == ErrNone) {
+            logd("search model for each models");
+            foreach (DbModel* item, models) {
+                if (item) {
+                    logd("uid %s, name %s",
+                         item->uid().toStdString().c_str(),
+                         item->name().toStdString().c_str());
+                    QList<DbModel *> perList = modelHdl->getAll(KModelHdlPerson);
+                    if (perList.count() > 0) {
+                        logd("found %lld person", perList.count());
+                        outList->append(perList);
+                    } else {
+                        logd("not found any person");
+                    }
+                    delete item;
                 } else {
-                    logd("not found any person");
+                    // just debug log for check, ignore error
+                    logd("Error: something wrong, empty model in list");
                 }
             }
-        } else {
-            logi("No specialist found");
         }
-    } else {
-        logd("generic filter");
-        ret = ModelController::filter(catetoryid, catetory, opFlags, keywords, outList);
     }
-    tracedr(ret);
-    return ret;
+    if (err != ErrNone && outList) {
+        loge("Error err=%d, cleanup model resources", err);
+        DbModelHandler::cleanUpModelList(*outList);
+    }
+
+//    if (catetoryid == FILTER_FIELD_SPECIALIST) {
+//        logd("filder by specialist");
+//        QList<DbModel *> specialistList;
+//        ret = SPECIALISTCTL->filter(catetoryid, opFlags, keywords,
+//                                    &specialistList, from, noItems, total);
+//        logd("Search ret=%d, found=%ld specialist", ret, specialistList.size());
+//        DbSpecialistModelHandler* specialistHdl = dynamic_cast<DbSpecialistModelHandler*>(DB->getModelHandler(KModelHdlSpecialist));
+//        if (ret == ErrNone){
+//            logd("search person for each specialist");
+//            foreach (DbModel* item, specialistList) {
+
+//                logd("specialist uid %s, name %s",
+//                     item->uid().toStdString().c_str(),
+//                     item->name().toStdString().c_str());
+//                QList<DbModel *> perList = specialistHdl->getListPerson(item->uid());
+//                if (perList.count() > 0) {
+//                    logd("found %d person", perList.count());
+//                    outList->append(perList);
+//                } else {
+//                    logd("not found any person");
+//                }
+//            }
+//        } else {
+//            logi("No specialist found");
+//        }
+//    } else {
+//        logd("generic filter");
+//        ret = ModelController::filter(catetoryid, opFlags, keywords, outList,
+//                                      from, noItems, total);
+//    }
+    tracedr(err);
+    return err;
 }
 
-
-QList<DbModel *> PersonCtl::getSpecialistList(const QString &personUid)
-{
-    traced;
-    DbPersonModelHandler* hdl = dynamic_cast<DbPersonModelHandler*>(getModelHandler());
-    logd("get specialist list of person uid %s", personUid.toStdString().c_str());
-    QList<DbModel*> list = hdl->getSpecialistList(personUid);
-    logd("No. item: %d", list.count());
-    return list;
-}
-
-const QString PersonCtl::exportTemplatePath(Exporter *exporter) const
+const QString PersonCtl::exportTemplatePath(FileExporter *exporter, QString* ftype) const
 {
     QString ret;
     traced;
@@ -214,7 +278,9 @@ const QString PersonCtl::exportTemplatePath(Exporter *exporter) const
         logd("exporter type %d", exporter->getExportType());
         switch (exporter->getExportType()) {
         case EXPORT_CSV_LIST:
-            ret = FileCtl::getPrebuiltDataFilePath(KPrebuiltPersonListCSVTemplateFileName);
+        case EXPORT_XLSX:
+            ret = FileCtl::getPrebuiltDataFilePath(KPrebuiltPersonListJSONTemplateFileName);
+            if (ftype) *ftype = KFileTypeJson;
             break;
         default:
             loge("unsupported export type %d", exporter->getExportType());
@@ -226,34 +292,32 @@ const QString PersonCtl::exportTemplatePath(Exporter *exporter) const
     return ret;
 }
 
-ErrCode PersonCtl::getExportDataString(const QString &keyword, const DbModel *data, QString *exportData) const
-{
-    traced;
-    ErrCode err = ErrNone;
-    logd("export data keyword '%s'", STR2CHA(keyword));
-    if (data){
-        err = data->getExportDataString(keyword, exportData);
-    } else {
-        err = ErrInvalidData;
-        loge("No dbmodel data to get export data");
-    }
-    tracedr(err);
-    return err;
-}
-
 ErrCode PersonCtl::exportListPersonInCommunity(const QString &communityUid, ExportType exportType, const QString &fpath)
 {
     traced;
     ErrCode err = ErrNone;
-    logd("Community uid '%s'", STR2CHA(communityUid));
-    QList<DbModel*> items = getPersonInCommunity(communityUid);
-    if (items.length() > 0) {
-        logd("found %d person", items.length());
-        err = ExportFactory::exportTo(this, items, fpath, exportType);
-    } else {
-        err = ErrNoData;
-        loge("nothing to export, no person in specified community uid '%s'", STR2CHA(communityUid));
+    QList<DbModel*> items;
+    if (communityUid.isEmpty() || fpath.isEmpty()) {
+        err = ErrInvalidArg;
+        loge("invalid argument");
     }
+
+    if (err == ErrNone) {
+        logd("Community uid '%s'", STR2CHA(communityUid));
+        err = getListPersonInCommunity(communityUid, items);
+    }
+
+    if (err == ErrNone) {
+        if (items.length() > 0) {
+            logi("found %ld person in community uid '%s', start export to '%s'",
+                 items.length(), STR2CHA(communityUid), STR2CHA(fpath));
+            err = ExportFactory::exportTo(this, items, fpath, exportType);
+        } else {
+            err = ErrNoData;
+            loge("nothing to export, no person in specified community uid '%s'", STR2CHA(communityUid));
+        }
+    }
+    RELEASE_LIST_DBMODEL(items);
     tracedr(err);
     return err;
 }
@@ -267,22 +331,13 @@ PersonCtl::PersonCtl():
     ModelController(KModelHdlPerson),
     mModelHdl(nullptr)
 {
+    mEnableCache = false;
 }
 
 
 PersonCtl::~PersonCtl()
 {
     traced;
-}
-
-
-PersonCtl *PersonCtl::getInstance()
-{
-    if (gInstance == nullptr){
-        gInstance = new PersonCtl();
-    }
-
-    return gInstance;
 }
 
 const QList<QString> &PersonCtl::importFields() const
@@ -297,10 +352,10 @@ QList<Person *> PersonCtl::searchPerson(const QString &keyword)
     // TODO:
     QList<DbModel*> list;
     QList<Person*> listret;
-    int ret = modelHdl()->search(keyword, &list);
+    ErrCode ret = modelHdl()->search(keyword, &list);
     logd("Search result %d", ret);
-    logd("no item %d", list.count());
-    if (ret > 0) {
+    logd("no item %ld", list.count());
+    if (ret == ErrNone) {
         foreach(DbModel* item, list) {
             listret.append(dynamic_cast<Person*>(item));
         }

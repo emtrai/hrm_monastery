@@ -79,8 +79,6 @@ public:
 
     virtual DbModel* getModel(qint64 dbId);
 
-    virtual DbModel *getByName(const QString& name, const DbModelBuilder& builder);
-    virtual DbModel *getByName(const QString& name);
     virtual DbModel *getByUid(const QString& uid, const DbModelBuilder& builder);
     virtual DbModel *getByUid(const QString& uid);
     virtual DbModel *getByNameId(const QString& nameId, const DbModelBuilder& builder);
@@ -96,12 +94,22 @@ public:
      * @param outList
      * @return the number of found items
      */
-    virtual int search(const QString& keyword, QList<DbModel*>* outList = nullptr);
+    virtual ErrCode search(const QString& keyword,
+                       QList<DbModel*>* outList = nullptr,
+                       qint64 dbStatus = DB_RECORD_ACTIVE,
+                       int from = 0,
+                       int noItems = 0,
+                       int* total = nullptr);
 
-    virtual int filter(int fieldId,
+    virtual ErrCode filter(int fieldId,
                        int operatorId,
                        const QString& keyword,
-                       QList<DbModel*>* outList = nullptr);
+                        const char* targetModelName = nullptr,
+                       QList<DbModel*>* outList = nullptr,
+                       qint64 dbStatus = DB_RECORD_ACTIVE,
+                       int from = 0,
+                       int noItems = 0,
+                       int* total = nullptr);
 
 protected:
     virtual DbSqliteTbl* getMainTbl() = 0;

@@ -33,16 +33,25 @@ class DbPersonModelHandler
 public:
     virtual ErrCode addEvent(const QString& personUid, const QString& eventUid,
                      qint64 date, const QString& title, const QString& remark) = 0;
-    virtual QList<PersonEvent*>* getListEvents( const QString& personUid,
-                                                const QString* eventUid = nullptr,
-                                                qint64 date = 0) = 0;
+    /**
+     * @brief getListEvents
+     * @param personUid
+     * @param list Output list of evemt, DbModel is PersonEvent
+     * @param eventUid
+     * @param date
+     * @return
+     */
+    virtual ErrCode getListEvents( const QString& personUid,
+                                   QList<DbModel*>& list,
+                                    const QString* eventUid = nullptr,
+                                    qint64 date = 0) = 0;
     virtual QList<DbModel*> getSpecialistList(const QString& personUid) = 0;
     virtual ErrCode updateCommunity(const QString& personUid, const QString& communityUid) = 0;
 
     // TODO: mapping community & person stored in person tbl and community&person mapping table
     // risk of inconsistant data
     // this function will try to get list of person in community using data (communityuid) in person table
-    virtual QList<DbModel*> getListPersonInCommunity(const QString& communityUid) = 0;
+    virtual ErrCode getListPersonInCommunity(const QString& communityUid, qint32 status, QList<DbModel*>& list) = 0;
 };
 
 #endif // DBPERSONMODELHANDLER_H

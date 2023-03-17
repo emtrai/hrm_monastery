@@ -1,7 +1,7 @@
 { "items":
     [
         {
-        "id":"MA_DINH_DANH",
+        "id":"MA_DINH_DANH"
         },
         {
         "id":"TEN"
@@ -9,14 +9,14 @@
         {
         "id":"MA_TONG_PHU_TRACH",
         "name":"Mã Định Danh Chị Tổng Phụ Trách"
-        },,
+        },
         {
         "id":"TONG_PHU_TRACH",
         "name":"Chị Tổng Phụ Trách"
         },
         {
         "id":"NGAY_BON_MANG"
-        },,
+        },
         {
         "id":"MA_SU_VU"
         },

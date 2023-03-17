@@ -22,16 +22,16 @@
 #ifndef EXPORTXLSX_H
 #define EXPORTXLSX_H
 
-#include "exporter.h"
+#include "fileexporter.h"
 #include "utils.h"
 
-class ExportXlsx : public Exporter
+class ExportXlsx : public FileExporter
 {
     GET_INSTANCE_DECL(ExportXlsx)
 public:
     ExportXlsx();
-    virtual ErrCode saveTo(const IDataExporter* item, const QString& fpath);
-    virtual ErrCode saveTo(const IDataExporter* exporter, const QList<DbModel*> data, const QString &fpath);
+    virtual ErrCode saveTo(const DataExporter* item, const QString& fpath);
+    virtual ErrCode saveTo(const DataExporter* exporter, const QList<DbModel*> data, const QString &fpath);
     virtual ExportType getExportType();
 };
 

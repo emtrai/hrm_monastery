@@ -49,11 +49,6 @@ const QString DbSqliteSaint::getName()
     return KModelHdlSaint;
 }
 
-DbModel *DbSqliteSaint::getByName(const QString &name)
-{
-    traced;
-    return DbSqliteModelHandler::getByName(name, &Saint::build);
-}
 
 DbModel *DbSqliteSaint::getByUid(const QString &name)
 {

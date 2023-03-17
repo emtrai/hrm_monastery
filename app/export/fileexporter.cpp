@@ -19,18 +19,18 @@
  * Created date:8/20/2022
  * Brief:
  */
-#include "exporter.h"
+#include "fileexporter.h"
 #include "logger.h"
-#include "idataexporter.h"
+#include "dataexporter.h"
 #include "utils.h"
 #include "dbmodel.h"
 
-Exporter::Exporter()
+FileExporter::FileExporter()
 {
     traced;
 }
 
-ErrCode Exporter::saveTo(const IDataExporter* exporter, const QString &fpath)
+ErrCode FileExporter::saveTo(const DataExporter* exporter, const QString &fpath)
 {
     traced;
     loge("Not support export here");
@@ -38,7 +38,7 @@ ErrCode Exporter::saveTo(const IDataExporter* exporter, const QString &fpath)
     return ErrNotSupport;
 }
 
-ErrCode Exporter::saveTo(const IDataExporter* exporter, const QList<DbModel*> data, const QString &fpath)
+ErrCode FileExporter::saveTo(const DataExporter* exporter, const QList<DbModel*> data, const QString &fpath)
 {
     traced;
     loge("Not support export list here");

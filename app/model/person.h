@@ -32,7 +32,7 @@
 #include <QHash>
 #include <QMap>
 #include "dbmodel.h"
-#include "idataexporter.h"
+#include "dataexporter.h"
 #include "idataimporter.h"
 #include "utils.h"
 #include <functional>
@@ -90,7 +90,7 @@ public:
     QString getFullName() const;
     ErrCode fromCSVFile(const QString& fname);
 
-    virtual IDataExporter* getExporter();
+    virtual DataExporter* getExporter();
     const QString &personCode() const;
     void setPersonCode(const QString &newPersonCode);
 
@@ -161,6 +161,7 @@ public:
     void setSpecialistNames(const QString &newSpecialists, bool parseUid = false);
     void clearSpecialistUid();
     void addSpecialistUid(const QString& uid);
+    QList<DbModel *> getSpecialistList();
 
     const QStringList &specialistNameList() const;
     void setSpecialistNameList(const QStringList &newSpecialistNameList);
@@ -380,7 +381,7 @@ public:
                                  const QString& keyword,
                                  const QString& value,
                                  quint32 idx = 0,
-                                 void* tag = nullptr);
+                                 QList<DbModel *>* outList = nullptr);
 
     const QString &areaUid() const;
     void setAreaUid(const QString &newAreaUid);
@@ -420,10 +421,8 @@ public:
 
 protected:
     virtual DbModelHandler *getDbModelHandler();
-    virtual const QString exportTemplatePath(Exporter* exporter) const;
+    virtual const QString exportTemplatePath(FileExporter* exporter, QString* ftype = nullptr) const;
 
-//    virtual const QStringList getListExportKeyWord() const;
-//    virtual ErrCode getExportDataString(const QString& keyword, QString* data) const;
     virtual ErrCode prepare2Save();
 
 protected:

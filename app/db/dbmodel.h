@@ -28,7 +28,7 @@
 #include <QList>
 #include "utils.h"
 #include "idataimporter.h"
-#include "idataexporter.h"
+#include "dataexporter.h"
 
 // if (markModified()) logd("value is different '%s'", QString("'%1' vs '%2'").arg(cur, next).toStdString().c_str());
 #define CHECK_MODIFIED_THEN_SET(cur, next, itemName) \
@@ -50,7 +50,7 @@
 
 class DbModel;
 class DbModelHandler;
-class IDataExporter;
+class DataExporter;
 
 typedef DbModel*(*DbModelBuilder)(void);
 
@@ -59,8 +59,9 @@ typedef DbModel*(*DbModelBuilder)(void);
  */
 enum DB_RECORD_STATUS {
     DB_RECORD_NOT_READY = 0, // record not ready
-    DB_RECORD_ACTIVE    = (1 << 1), // record ready to use
-    DB_RECORD_DElETED   = (1 << 2), // record already deleted (soft delete)
+    DB_RECORD_ACTIVE    = (1 << 0), // record ready to use
+    DB_RECORD_DElETED   = (1 << 1), // record already deleted (soft delete)
+    // Add new must update DB_RECORD_ALL
     DB_RECORD_ALL = DB_RECORD_ACTIVE | DB_RECORD_DElETED
 };
 
@@ -82,11 +83,18 @@ enum DbModelStatus{
 
 typedef std::shared_ptr<DbModel> DbModel_sp;
 
-class DbModel: public IDataImporter, public IDataExporter
+class OnDBModelListener {
+public:
+    virtual void onUpdate(const DbModel* model) = 0;
+};
+
+class DbModel: public IDataImporter, public DataExporter
 {
 public:
     static const QHash<int, QString>* getStatusIdNameMap();
     static QString status2Name(DbModelStatus status);
+    static const QList<int>& getStatusList();
+    static DbModelBuilder getBuilderByModelName(const QString& modelName);
 protected:
     DbModel();
     DbModel(const DbModel& model);
@@ -120,7 +128,7 @@ public:
                                  const QString& keyword,
                                  const QString& value,
                                  quint32 idx = 0,
-                                 void* tag = nullptr);
+                                 QList<DbModel *>* outList = nullptr);
 
     virtual const QString &name() const;
     virtual void setName(const QString &newName);
@@ -167,7 +175,7 @@ public:
 
 
     void setNameId(const QString &newNameId);
-    virtual IDataExporter* getExporter();
+    virtual DataExporter* getExporter();
 
     /**
      * @brief validate if data is all valid
@@ -203,10 +211,10 @@ public:
 
 
     virtual ErrCode exportToFile(ExportType type, QString* fpath);
-    virtual const QString exportTemplatePath(Exporter* exporter) const;
+    virtual const QString exportTemplatePath(FileExporter* exporter, QString* ftype = nullptr) const;
 
     virtual const QStringList getListExportKeyWord() const;
-    virtual ErrCode getExportDataString(const QString& keyword, QString* data) const;
+    virtual ErrCode getExportDataString(const QString& item, QString* data) const;
     const QString &nameId() const;
 
     const QString &remark() const;

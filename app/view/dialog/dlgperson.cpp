@@ -420,7 +420,7 @@ ErrCode DlgPerson::fromPerson(const Person *model)
     Utils::setSelectItemComboxByData(ui->cbEdu, per->eduUid());
 
     // cbSpecialist
-    QList<DbModel*> specialistList = PERSONCTL->getSpecialistList(per->uid());
+    QList<DbModel*> specialistList = per->getSpecialistList();
     logd("set specialist, no. item %d", specialistList.count());
     foreach (DbModel* item, specialistList) {
         cbSpecialist->addSelectedItemByData(item->uid());
@@ -713,6 +713,7 @@ void DlgPerson::loadCountry()
     }
 }
 
+#ifndef SKIP_PERSON_PROVINE
 void DlgPerson::loadProvince()
 {
     traced;
@@ -727,6 +728,7 @@ void DlgPerson::loadProvince()
         }
     }
 }
+#endif
 
 void DlgPerson::loadWork()
 {
@@ -751,9 +753,15 @@ void DlgPerson::loadEvent(bool reloadAll)
         cleanEvent();
         Person* per = person();
         if (per != nullptr) {
-            QList<DbModel*> list = INSTANCE(PersonCtl)->getListEvent(per);
-            foreach(DbModel* item, list){
-                mListPersonEvent.append(new PersonEvent((PersonEvent*)item));
+            QList<DbModel*> list;
+            ErrCode err = INSTANCE(PersonCtl)->getListEvents(per->uid(), list);
+            if (err == ErrNone) {
+                foreach(DbModel* item, list){
+                    mListPersonEvent.append((PersonEvent*)item);
+                }
+            } else {
+                loge("Get list event of person uid '%s' failed, err", STR2CHA(per->uid()), err);
+                // TODO: show error dialog???
             }
         }
     }
@@ -938,8 +946,9 @@ void DlgPerson::on_cbCountry_currentIndexChanged(int index)
     traced;
     logd("Reload provine of %s", ui->cbCountry->currentText().toStdString().c_str());
     logd("index %d", index);
-
+#ifndef SKIP_PERSON_PROVINE
     loadProvince();
+#endif
 //    if (index >= 0){
 //        QString shortName = ui->cbCountry->itemData(index).toString();
 //        const QList<Province*>* listProvince = PROVINCE->getProvinceList(shortName);

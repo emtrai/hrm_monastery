@@ -24,10 +24,13 @@
 #include "crypto.h"
 #include "dbmodelhandler.h"
 #include "utils.h"
-#include "idataexporter.h"
+#include "dataexporter.h"
 #include "dbdefs.h"
 #include "filectl.h"
 
+#include "person.h"
+#include "community.h"
+#include "specialist.h"
 
 DbModel::DbModel():
       mDbId(0)
@@ -186,6 +189,43 @@ QString DbModel::status2Name(DbModelStatus status)
     return ret;
 }
 
+const QList<int>& DbModel::getStatusList()
+{
+    traced;
+    static bool isInitiedStatus = false;
+    static QList<int> statusList;
+    if (!isInitiedStatus) {
+        statusList.push_back(MODEL_NOT_READY);
+        statusList.push_back(MODEL_INACTIVE);
+        statusList.push_back(MODEL_ACTIVE);
+        statusList.push_back(MODEL_BUILDING);
+        isInitiedStatus = true;
+    }
+    // TODO: make it as static to load once only???
+    tracede;
+    return statusList;
+}
+
+DbModelBuilder DbModel::getBuilderByModelName(const QString& modelName)
+{
+    traced;
+    static bool isInited = false;
+    static QHash<QString, DbModelBuilder> map;
+    DbModelBuilder builder = nullptr;
+    if (!isInited) {
+        map[KModelNamePerson] = &Person::build;
+        map[KModelNameCommunity] = &Community::build;
+        map[KModelHdlSpecialist] = &Specialist::build;
+        isInited = true;
+    }
+    if (map.contains(modelName)) {
+        builder = map.value(modelName);
+    }
+    // TODO: make it as static to load once only???
+    tracede;
+    return builder;
+}
+
 
 const QString &DbModel::name() const
 {
@@ -327,7 +367,7 @@ ErrCode DbModel::exportToFile(ExportType type, QString *fpath)
     return ret;
 }
 
-const QString DbModel::exportTemplatePath(Exporter* exporter) const
+const QString DbModel::exportTemplatePath(FileExporter* exporter, QString* ftype) const
 {
     traced;
     if (exporter) {
@@ -347,14 +387,14 @@ const QStringList DbModel::getListExportKeyWord() const
     return mExportFields.keys();
 }
 
-ErrCode DbModel::getExportDataString(const QString &keyword, QString *data) const
+ErrCode DbModel::getExportDataString(const QString &item, QString *data) const
 {
     ErrCode ret = ErrNone;
     traced;
-    logd("keyword %s", keyword.toStdString().c_str());
-    if (mExportFields.contains(keyword)){
-        std::function<QString(const QString&)> func = mExportFields.value(keyword);
-        if (func != nullptr) *data = func(keyword);
+    logd("item %s", item.toStdString().c_str());
+    if (mExportFields.contains(item)){
+        std::function<QString(const QString&)> func = mExportFields.value(item);
+        if (func != nullptr) *data = func(item);
     }
     // TODO: raise exception when error occur???
 
@@ -363,7 +403,7 @@ ErrCode DbModel::getExportDataString(const QString &keyword, QString *data) cons
 
 ErrCode DbModel::onImportItem(const QString& importName, int importFileType,
                               const QString &keyword, const QString &value,
-                              quint32 idx, void *tag)
+                              quint32 idx, QList<DbModel *>* outList)
 {
     traced;
     ErrCode ret = ErrNone;
@@ -574,7 +614,7 @@ void DbModel::setNameId(const QString &newNameId)
     mNameId = newNameId;
 }
 
-IDataExporter *DbModel::getExporter()
+DataExporter *DbModel::getExporter()
 {
     return this;
 }

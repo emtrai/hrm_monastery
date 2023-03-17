@@ -32,9 +32,9 @@ ExportFactory::ExportFactory()
     traced;
 }
 
-Exporter *ExportFactory::getExporter(ExportType type)
+FileExporter *ExportFactory::getExporter(ExportType type)
 {
-    Exporter* ret = nullptr;
+    FileExporter* ret = nullptr;
     traced;
     logd("get export type %d", type);
     switch (type) {
@@ -55,22 +55,22 @@ Exporter *ExportFactory::getExporter(ExportType type)
     return ret;
 }
 
-ErrCode ExportFactory::exportTo(const IDataExporter *item, const QString &fpath, ExportType type)
+ErrCode ExportFactory::exportTo(const DataExporter *item, const QString &fpath, ExportType type)
 {
     traced;
     ErrCode ret = ErrNone;
     logi("Export to %d", type);
-    Exporter* exporter = getExporter(type);
+    FileExporter* exporter = getExporter(type);
     if (exporter != nullptr)
         ret = exporter->saveTo(item, fpath);
     else {
         ret = ErrNotSupport;
-        loge("Exporter %d not support", type);
+        loge("FileExporter %d not support", type);
     }
     return ret;
 }
 
-ErrCode ExportFactory::exportTo(const IDataExporter* item, QList<DbModel*> data, const QString &fpath, ExportType type)
+ErrCode ExportFactory::exportTo(const DataExporter* item, QList<DbModel*> data, const QString &fpath, ExportType type)
 {
     traced;
     // TODO: add "tag" parameter here to input to getExporter/saveTo???
@@ -78,12 +78,12 @@ ErrCode ExportFactory::exportTo(const IDataExporter* item, QList<DbModel*> data,
     // TODO: add title? (title for export info)
     ErrCode ret = ErrNone;
     logi("Export to %d", type);
-    Exporter* exporter = getExporter(type);
+    FileExporter* exporter = getExporter(type);
     if (exporter != nullptr)
         ret = exporter->saveTo(item, data, fpath);
     else {
         ret = ErrNotSupport;
-        loge("Exporter %d not support", type);
+        loge("FileExporter %d not support", type);
     }
     return ret;
 }

@@ -34,8 +34,9 @@
 class ProvinceCtl : public ModelController
 {
     GET_INSTANCE_DECL(ProvinceCtl);
-public:
+private:
     ProvinceCtl();
+public:
     const QList<Province *> *getProvinceList(const QString &country);
 protected:
     DbModel *buildModel(void *items, const QString &fmt);

@@ -27,13 +27,12 @@
 #include "utils.h"
 #include "defs.h"
 
-GET_INSTANCE_IMPL(EventCtl)
+GET_INSTANCE_CONTROLLER_IMPL(EventCtl)
 
 EventCtl::EventCtl():ModelController(KModelHdlEvent)
 {
     traced;
 }
-
 
 EventCtl::~EventCtl()
 {
@@ -43,11 +42,6 @@ EventCtl::~EventCtl()
 const char *EventCtl::getPrebuiltFileName()
 {
     return KPrebuiltEventCSVFileName;
-}
-
-const char *EventCtl::getPrebuiltFileType()
-{
-    return KFileTypeCSV;
 }
 
 DbModelBuilder EventCtl::getMainBuilder()

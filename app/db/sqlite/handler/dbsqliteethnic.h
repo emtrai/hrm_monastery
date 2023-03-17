@@ -30,7 +30,6 @@ public:
     DbSqliteEthnic();
 
     virtual const QString getName();
-    virtual DbModel *getByName(const QString& name);
     virtual DbModel *getByUid(const QString& uid);
 protected:
     virtual DbSqliteTbl *getMainTbl();

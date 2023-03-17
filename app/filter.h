@@ -53,7 +53,7 @@ enum FilterOperation {
     FILTER_OP_GREATER_EQ,
     FILTER_OP_CONTAIN,
     FILTER_OP_NOT_CONTAIN,
-    FILTER_OP_MAX, // MAX MUST BE LESS THAN 32, AS IT's BITWISE
+    FILTER_OP_MAX,
     };
 
 QHash<int, QString> getFilterOpsList(int filterField);

@@ -222,6 +222,11 @@ do { \
     } \
 } while (0)
 
+#define RELEASE_LIST_DBMODEL(list) \
+    do { \
+        Utils::clearListModel(list); \
+    } while(0)
+
 typedef ErrCode (*func_one_csv_item_t)(const QStringList& items, void* caller, void* param);
 typedef ErrCode (*func_one_csv_item_complete_t)(const QHash<QString, QString>& items, void* caller, void* param);
 typedef ErrCode (*func_one_csv_field_t)(const QString& key, const QString& value, void* caller, void* param);
@@ -235,9 +240,11 @@ enum UidNameConvertType {
 
 
 class QComboBox;
+class DbModel;
 class Utils
 {
 public:
+    static void clearListModel(QList<DbModel*>& list);
     static qint64 currentTimeMs();
     static QString timeMsToDatestring(qint64 timMs, const QString& format = "yyyy/MM/dd hh:mm:ss");
     static Gender genderFromString(const QString& gender);

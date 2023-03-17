@@ -120,6 +120,7 @@ class ModelController;
     UITableView* mAreaView;
     UITableView* mDepartView;
     UITableView* mRoleView;
+    UITableView* mCourseView;
     QList<QWidget*> mMainViews;
     QTextBrowser* mHomeView;
     QWidget* mCurrentView;
@@ -174,6 +175,7 @@ class ModelController;
      void on_actionArea_triggered();
      void on_actionRole_triggered();
      void on_actionDept_triggered();
+     void on_actionCourse_triggered();
 
      void on_action_ExportPersonList_triggered();
      void on_action_ExportCommunityList_triggered();

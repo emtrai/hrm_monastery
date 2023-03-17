@@ -96,9 +96,6 @@ ErrCode UICommonListView::onLoad()
 ErrCode UICommonListView::onReload()
 {
     traced;
-    ModelController* ctl = getController();
-    if (ctl != nullptr)
-        ctl->reloadDb();
     onLoad();
     tracede;
     return ErrNone;

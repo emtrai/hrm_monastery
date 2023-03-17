@@ -69,22 +69,31 @@ public:
 
     virtual ErrCode addEvent(const QString& personUid, const QString& eventUid,
                              qint64 date, const QString& title, const QString& remark);
-    virtual QList<PersonEvent*>* getListEvents(const QString& personUid,
+    virtual ErrCode getListEvents(const QString& personUid,
+                                               QList<DbModel*>& list,
                                                const QString* eventUid = nullptr,
                                                qint64 date = 0);
-    virtual DbModel *getByName(const QString& name, const DbModelBuilder& builder);
-    virtual DbModel *getByName(const QString& name);
     /**
      * @brief Search item by keywords
      * @param keyword
      * @param outList
      * @return the number of found items
      */
-    virtual int search(const QString& keyword, QList<DbModel*>* outList = nullptr);
-    virtual int filter(int fieldId,
+    virtual ErrCode search(const QString& keyword,
+                       QList<DbModel*>* outList = nullptr,
+                       qint64 dbStatus = DB_RECORD_ACTIVE,
+                       int from = 0,
+                       int noItems = 0,
+                       int* total = nullptr);
+    virtual ErrCode filter(int fieldId,
                        int operatorId,
                        const QString& keyword,
-                       QList<DbModel*>* outList = nullptr);
+                       const char* targetModelName = nullptr,
+                       QList<DbModel*>* outList = nullptr,
+                       qint64 dbStatus = DB_RECORD_ACTIVE,
+                       int from = 0,
+                       int noItems = 0,
+                       int* total = nullptr);
 
     virtual QList<DbModel*> getSpecialistList(const QString& personUid);
 
@@ -92,7 +101,7 @@ public:
     // TODO: mapping community & person stored in person tbl and community&person mapping table
     // risk of inconsistant data
     // this function will try to get list of person in community using data (communityuid) in person table
-    virtual QList<DbModel*> getListPersonInCommunity(const QString& communityUid);
+    virtual ErrCode getListPersonInCommunity(const QString& communityUid, qint32 status, QList<DbModel*>& list);
 protected:
     virtual DbSqliteTbl* getMainTbl();
     virtual DbModelBuilder getMainBuilder();

@@ -28,6 +28,7 @@
 #include <QString>
 #include "idataimporter.h"
 #include "utils.h"
+class DbModel;
 
 class ImportCSVList : public Importer
 {
@@ -35,7 +36,7 @@ class ImportCSVList : public Importer
 public:
     ImportCSVList();
     virtual ErrCode importFrom(const QString& importName, int importFileType,
-                               IDataImporter* importer, const QString& fpath, void* tag = nullptr);
+                               IDataImporter* importer, const QString& fpath, QList<DbModel *>* outList = nullptr);
 };
 
 #endif // IMPORTCSVLIST_H

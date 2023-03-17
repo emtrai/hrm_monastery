@@ -114,6 +114,7 @@ QString exportItem2Name(const QString &item, bool* isOk)
 
         s_item2Name.insert(KItemNameId, QObject::tr("Mã định danh"));
         s_item2Name.insert(KItemName, QObject::tr("Tên"));
+        s_item2Name.insert(KItemFullName, QObject::tr("Họ Tên"));
         s_item2Name.insert(KItemCountry, QObject::tr("Quốc gia"));
         s_item2Name.insert(KItemTel, QObject::tr("Điện thoại"));
         s_item2Name.insert(KItemParentCommunityName, QObject::tr("Cộng đoàn chủ quản"));
@@ -132,6 +133,14 @@ QString exportItem2Name(const QString &item, bool* isOk)
         s_item2Name.insert(KItemCEONameId, QObject::tr("Mã Tổng Phụ Trách"));
         s_item2Name.insert(KItemCEO, QObject::tr("Tổng Phụ Trách"));
         s_item2Name.insert(KItemRemark, QObject::tr("Ghi chú"));
+        s_item2Name.insert(KItemIDcard, QObject::tr("Căn cước công dân"));
+        s_item2Name.insert(KItemIDcardIssueDate, QObject::tr("Ngày cấp CCCD"));
+        s_item2Name.insert(KItemIDcardIssuer, QObject::tr("Nơi cấp CCCD"));
+        s_item2Name.insert(KItemCourse, QObject::tr("Khóa"));
+        s_item2Name.insert(KItemEduNameId, QObject::tr("Mã học vấn"));
+        s_item2Name.insert(KItemAddress, QObject::tr("Địa chỉ"));
+        s_item2Name.insert(KItemChurchAddress, QObject::tr("Giáo xứ"));
+        s_item2Name.insert(KItemEmail, QObject::tr("Email"));
 
         initialized = true;
     }

@@ -92,21 +92,7 @@ protected:
      */
     virtual DbModel* onJsonParseOneItem(const QJsonObject& jobj, bool* ok = nullptr);
 
-    /**
-     * @brief get path to export template
-     * @param exporter
-     * @return
-     */
-    virtual const QString exportTemplatePath(Exporter* exporter) const;
-
-    /**
-     * @brief get export data string
-     * @param keyword
-     * @param data
-     * @param exportData
-     * @return
-     */
-    virtual ErrCode getExportDataString(const QString& keyword, const DbModel* data, QString* exportData) const;
+    virtual const QString exportListPrebuiltTemplateName() const;
 
     /**
      * @brief before import flow

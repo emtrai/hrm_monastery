@@ -27,13 +27,15 @@
 #include "errcode.h"
 
 class IDataImporter;
+class DbModel;
+
 class Importer
 {
 public:
     Importer();
 
     virtual ErrCode importFrom (const QString& importName, int importFileType,
-                               IDataImporter* importer, const QString& fpath, void* tag = nullptr);
+                               IDataImporter* importer, const QString& fpath, QList<DbModel *>* outList = nullptr);
 };
 
 #endif // IMPORTER_H

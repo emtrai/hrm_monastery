@@ -19,29 +19,29 @@
  * Created date:8/20/2022
  * Brief:
  */
-#ifndef EXPORTER_H
-#define EXPORTER_H
+#ifndef FILEEXPORTER_H
+#define FILEEXPORTER_H
 
 #include "errcode.h"
 #include <QString>
 #include "exporttype.h"
 #include <QList>
 
-class IDataExporter;
+class DataExporter;
 class DbModel;
 
-class Exporter
+class FileExporter
 {
 public:
-    Exporter();
+    FileExporter();
 
-    // Exporter may contains data for export, or get data from list of data to export
+    // FileExporter may contains data for export, or get data from list of data to export
     // TODO: is there any better way????
-    virtual ErrCode saveTo(const IDataExporter* exporter, const QString& fpath);
-    virtual ErrCode saveTo(const IDataExporter* exporter, const QList<DbModel*> data, const QString& fpath);
+    virtual ErrCode saveTo(const DataExporter* exporter, const QString& fpath);
+    virtual ErrCode saveTo(const DataExporter* exporter, const QList<DbModel*> data, const QString& fpath);
     virtual ExportType getExportType() = 0;
 
 
 };
 
-#endif // EXPORTER_H
+#endif // FILEEXPORTER_H

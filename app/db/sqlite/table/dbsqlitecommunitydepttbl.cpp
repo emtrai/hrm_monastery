@@ -46,7 +46,7 @@ QList<DbModel *> DbSqliteCommunityDeptTbl::getListDept(const QString &commUid, i
 {
     traced;
     QList<DbModel *> olist;
-    int ret = 0;
+    ErrCode ret = ErrNone;
     QHash<QString, FieldValue> fields;
     fields.insert(KFieldCommunityUid, FieldValue(commUid));
     fields.insert(KFieldStatus, FieldValue(status));

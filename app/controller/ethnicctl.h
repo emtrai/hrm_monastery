@@ -34,13 +34,11 @@
 class EthnicCtl : public ModelController
 {
     GET_INSTANCE_DECL(EthnicCtl);
-public:
+private:
     EthnicCtl();
 protected:
     DbModel *buildModel(void *items, const QString &fmt);
     virtual const char *getPrebuiltFileName();
-    virtual const char* getPrebuiltFileType();
-public:
     virtual DbModelBuilder getMainBuilder();
 
 };

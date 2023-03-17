@@ -23,23 +23,20 @@
 #define MISSIONCTL_H
 
 #include "modelcontroller.h"
-
 #include "dbmodel.h"
-#include "mission.h"
 
 #define MISSIONCTL MissionCtl::getInstance()
 
 class MissionCtl : public ModelController
 {
     GET_INSTANCE_DECL(MissionCtl);
-public:
+private:
     MissionCtl();
+    virtual ~MissionCtl();
 protected:
     // COMMON FUNCTIONS
     virtual DbModelBuilder getMainBuilder();
-    DbModel *buildModel(void *items, const QString &fmt);
     virtual const char *getPrebuiltFileName();
-    virtual const char* getPrebuiltFileType();
 
     // TODO: how about import/export? do we need to import for mission???
 };

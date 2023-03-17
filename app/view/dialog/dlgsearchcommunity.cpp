@@ -57,8 +57,8 @@ int DlgSearchCommunity::onSearch(const QString &keyword)
     traced;
     clearAll();
     logd("Start search community %s", keyword.toStdString().c_str());
-    int cnt = COMMUNITYCTL->search(keyword, &mListItems);
-    logd("search cnt=%d", cnt);
+    ErrCode err = COMMUNITYCTL->search(keyword, &mListItems);
+    logd("search err=%d", err);
     tracede;
     return mListItems.count();
 }

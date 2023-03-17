@@ -22,9 +22,25 @@
 #include "dbmodelhandler.h"
 #include "logger.h"
 #include "errcode.h"
+
+void DbModelHandler::cleanUpModelList(QList<DbModel *> &list)
+{
+    traced;
+    foreach (DbModel* model, list) {
+        if (model) delete model;
+    }
+    list.clear();
+    tracede;
+}
+
 DbModelHandler::DbModelHandler()
 {
+    traced;
+}
 
+QList<DbModel *> DbModelHandler::getAll(const char *modelName, qint64 status, int from, int noItems, int *total)
+{
+    return getAll(getMainBuilder(), status, modelName, from, noItems, total);
 }
 
 DbModel *DbModelHandler::getItem(const QString &uid, DbModelBuilder builder, const char* modelName)
@@ -46,46 +62,10 @@ DbModel *DbModelHandler::getItem(const QString &uid, DbModelBuilder builder, con
     return model;
 }
 
-int DbModelHandler::search(const QString &keyword, QList<DbModel *> *outList)
-{
-    traced;
-    loge("Default search one, do nothing");
-    return 0;
-}
-
-int DbModelHandler::searchAll(const QString &keyword, QList<DbModel *> *outList)
-{
-    traced;
-    loge("Default search one, do nothing");
-    return 0;
-}
-
-int DbModelHandler::filter(int fieldId, int operatorId, const QString &keyword, QList<DbModel *> *outList)
-{
-    traced;
-    loge("Default filter one, do nothing");
-    return 0;
-
-}
-
 DbModelBuilder DbModelHandler::getMainBuilder()
 {
     FAIL("DEFAULT getMainBuilder, should not be called");
     return nullptr;
-}
-
-DbModel *DbModelHandler::getByName(const QString &name, const DbModelBuilder &builder)
-{
-    traced;
-    loge("Default one, do nothing");
-    return nullptr;// TODO: throw exception????
-}
-
-DbModel *DbModelHandler::getByName(const QString &name)
-{
-    traced;
-    loge("Default one, do nothing");
-    return nullptr;// TODO: throw exception????
 }
 
 DbModel *DbModelHandler::getByUid(const QString &uid, const DbModelBuilder &builder)
@@ -125,3 +105,43 @@ DbModel *DbModelHandler::getByNameId(const QString &nameId)
     return model;
 }
 
+
+void DbModelHandler::addListener(onDbModelHandlerListener *listener)
+{
+    traced;
+    if (listener) {
+        if (!mListeners.contains(listener)) {
+            logd("Add listener '%s'", STR2CHA(listener->getName()));
+            mListeners.append(listener);
+        } else {
+            loge("Listener '%s' already existed", STR2CHA(listener->getName()));
+        }
+    } else {
+        loge("Invalid listener");
+    }
+    tracede;
+}
+
+void DbModelHandler::delListener(onDbModelHandlerListener *listener)
+{
+    traced;
+    if (listener) {
+        logd("Remove listener '%s'", STR2CHA(listener->getName()));
+        mListeners.removeOne(listener);
+    } else {
+        loge("Invalid listener");
+    }
+    tracede;
+}
+
+void DbModelHandler::notifyDataChange(DbModel *model, int type, ErrCode err)
+{
+    traced;
+    foreach (onDbModelHandlerListener* listener, mListeners) {
+        if (listener) {
+            loge("Call listener '%s'", STR2CHA(listener->getName()));
+            listener->onDbModelHandlerDataUpdate(model, type, err);
+        }
+    }
+    tracede;
+}

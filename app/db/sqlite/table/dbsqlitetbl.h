@@ -84,7 +84,6 @@ public:
     virtual ErrCode onTblMigration(int oldVer, int newVer);
 
     virtual QList<QString> getNameFields();
-    virtual DbModel *getByName(const QString& keyword, const DbModelBuilder& builder);
     virtual DbModel *getByUid(const QString& uid, const DbModelBuilder& builder);
     virtual DbModel *getByNameId(const QString& nameId, const DbModelBuilder& builder);
 
@@ -94,27 +93,41 @@ public:
      * @param outList
      * @return the number of found items
      */
-    virtual int search(const QString& keyword, QList<DbModel*>* outList = nullptr);
+    virtual ErrCode search(const QString& keyword, QList<DbModel*>* outList = nullptr,
+                       qint64 dbStatus = DB_RECORD_ACTIVE,
+                       int from = 0,
+                       int noItems = 0,
+                       int* total = nullptr);
 
     virtual QHash<QString, int> getSearchFields();
-    virtual int search(const QString& keyword, const DbModelBuilder& builder, QList<DbModel*>* outList = nullptr);
+    virtual ErrCode search(const QString& keyword, const DbModelBuilder& builder,
+                       QList<DbModel*>* outList = nullptr,
+                       qint64 dbStatus = DB_RECORD_ACTIVE,
+                       int from = 0,
+                       int noItems = 0,
+                       int* total = nullptr);
 
-
+    virtual QString toDbStatusCond(qint64 dbStatus);
+    virtual void appendDbStatusCond(QString& cond, qint64 dbStatus);
     /**
      * @brief Search
      * @param keyword keyword
-     * @param inFields fields to search (OR condition)
+     * @param inFields fields to search(OR condition)
      * @param outList
      * @return the number of found items
      */
-    virtual int search(const QString& keyword, const QHash<QString, int>& inFields,
+    virtual ErrCode search(const QString& keyword, const QHash<QString, int>& inFields,
                        const DbModelBuilder& builder,
                        QList<DbModel*>* outList = nullptr,
-                       bool isExact = false);
+                       bool isExact = false,
+                       qint64 dbStatus = DB_RECORD_ACTIVE,
+                       int from = 0,
+                       int noItems = 0,
+                       int* total = nullptr);
 
     /**
      * @brief Search with with custom condition
-     * @param searchCond hashmap, with key is field to search, value is value to search (FieldValue)
+     * @param searchCond hashmap, with key is field to search, value is value to search(FieldValue)
      * @param isAndCond
      * @param condTag information passed to getSearchQueryStringWithTag,
      *                which may be used for checking by derived class
@@ -123,12 +136,16 @@ public:
      * @param isExact
      * @return
      */
-    virtual int search(const QHash<QString, FieldValue>& searchCond,
+    virtual ErrCode search(const QHash<QString, FieldValue>& searchCond,
                        bool isAndCond = true,
                        const QString& condTag = nullptr,
                        const DbModelBuilder& builder = nullptr,
                        QList<DbModel*>* outList = nullptr,
-                       bool isExact = false);
+                       bool isExact = false,
+                       qint64 dbStatus = DB_RECORD_ACTIVE,
+                       int from = 0,
+                       int noItems = 0,
+                       int* total = nullptr);
 
 
 
@@ -136,11 +153,15 @@ public:
     // as some model has a lots of information, such as person, community
     virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
 
-    virtual int filter(int fieldId,
+    virtual ErrCode filter(int fieldId,
                        int operatorId,
                        const QString& keyword,
                        const DbModelBuilder& builder,
-                       QList<DbModel*>* outList = nullptr);
+                       QList<DbModel*>* outList = nullptr,
+                       qint64 dbStatus = DB_RECORD_ACTIVE,
+                       int from = 0,
+                       int noItems = 0,
+                       int* total = nullptr);
 
 protected:
     virtual QString getSqlCmdCreateTable();

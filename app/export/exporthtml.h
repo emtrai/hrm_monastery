@@ -22,18 +22,18 @@
 #ifndef EXPORTHTML_H
 #define EXPORTHTML_H
 
-#include "exporter.h"
+#include "fileexporter.h"
 #include "errcode.h"
 #include <QString>
-#include "idataexporter.h"
+#include "dataexporter.h"
 #include "utils.h"
 #include "exporttype.h"
-class ExportHtml : public Exporter
+class ExportHtml : public FileExporter
 {
     GET_INSTANCE_DECL(ExportHtml)
 public:
     ExportHtml();
-    virtual ErrCode saveTo(const IDataExporter* item, const QString& fpath);
+    virtual ErrCode saveTo(const DataExporter* item, const QString& fpath);
     virtual ExportType getExportType();
 
 

@@ -24,6 +24,7 @@
 
 #include "importer.h"
 
+class DbModel;
 
 enum ImportType {
     IMPORT_NONE = 0,
@@ -47,7 +48,9 @@ public:
     ImportFactory();
     static Importer* getImporter(ImportType type);
 
-    static ErrCode importFrom(const QString& importName, IDataImporter* item, const QString& fpath, ImportType type, void* tag = nullptr);
+    static ErrCode importFrom(const QString& importName, IDataImporter* item,
+                              const QString& fpath, ImportType type,
+                              QList<DbModel *>* outList = nullptr);
 
 };
 

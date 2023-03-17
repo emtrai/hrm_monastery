@@ -23,6 +23,12 @@
 #define LOGGER_H
 #include <QDebug>
 #include <QThread>
+#include <QTime>
+#include <QFile>
+#include <QObject>
+#include <QQueue>
+#include <QMutex>
+#include <QWaitCondition>
 
 #ifndef THISFILE
 #define THIS_FILE __FILE__
@@ -31,12 +37,19 @@
 #define NO_OP do {} while (0)
 // TODO: check debug macro
 
+
+#define THREAD_ID static_cast<long>(reinterpret_cast<intptr_t>(QThread::currentThreadId()))
+#define CUR_TIME_STR QTime::currentTime().toString("hh:mm:ss.zzz").toStdString().c_str()
+
+#define logit(logger, fmt,...) \
+    do{ \
+        logger("%s %ld %s %s:%d : " fmt, CUR_TIME_STR, THREAD_ID, THIS_FILE, __func__, __LINE__, ##__VA_ARGS__); \
+    } while(0)
+
 #ifdef DEBUG_LOG
 // TODO: add process id???
-#define logd(fmt,...) \
-    do{ \
-        qDebug("DBG %ld %s %s[%d] " fmt, static_cast<long>(reinterpret_cast<intptr_t>(QThread::currentThreadId())), THIS_FILE, __func__, __LINE__,##__VA_ARGS__); \
-    } while(0)
+#define logd(fmt,...) logit(qDebug, fmt, ##__VA_ARGS__)
+
 
 #else // !DEBUG_LOG
 
@@ -56,26 +69,70 @@
 #define tracede NO_OP
 #endif // DEBUG_TRACE
 
+
 // TODO: push log to file, make separate thread to writing log, to avoid impact
 // to performance of application
 // TODO: Show crash/critical error on dialog
-#define loge(fmt, ...) \
-    do{ \
-            qDebug("ERR %ld %s %s[%d] " fmt, static_cast<long>(reinterpret_cast<intptr_t>(QThread::currentThreadId())), THIS_FILE, __func__, __LINE__,##__VA_ARGS__); \
-    }\
-    while(0)
+#define loge(fmt, ...) logit(qCritical, fmt, ##__VA_ARGS__)
 
-#define logi(fmt, ...) \
-do{ \
-        qDebug("INF %ld %s %s[%d] " fmt, static_cast<long>(reinterpret_cast<intptr_t>(QThread::currentThreadId())), THIS_FILE, __func__, __LINE__,##__VA_ARGS__); \
-}\
-    while(0)
+#define logi(fmt, ...) logit(qInfo, fmt, ##__VA_ARGS__)
 
 /* Warning something */
-#define logw(fmt,...) \
-    do{ \
-        qWarning("WRN %ld %s %s[%d] " fmt, static_cast<long>(reinterpret_cast<intptr_t>(QThread::currentThreadId())), THIS_FILE, __func__, __LINE__,##__VA_ARGS__); \
-    } while(0)
+#define logw(fmt,...) logit(qWarning, fmt, ##__VA_ARGS__)
 
+class Logger;
+
+class LogWorker : public QObject
+{
+    Q_OBJECT
+public:
+    LogWorker();
+        virtual ~LogWorker();
+public slots:
+    void doWork();
+    void printLog(QString);
+    void startRuning();
+    void stop();
+signals:
+    void resultReady(QString);
+private:
+    QQueue<QString> mQueue;
+    QMutex mMutex;
+    QWaitCondition mWait;
+    bool isRunning;
+    QThread* mThead;
+};
+
+
+class Logger: public QObject {
+    Q_OBJECT
+//    QThread mWorkerThread;
+private:
+    static Logger* getInstance();
+    static void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
+public:
+    static void init();
+    static void printLog2File(const QString& log);
+    static void reqWriteLog(const QString& log);
+private:
+    Logger();
+    ~Logger();
+    void doInit();
+    QString getLogDirPath();
+    QString getLogFilePath();
+    void doHandleMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg);
+    void doPrintLog2File(const QString& log);
+    void doReqWriteLog(const QString& log);
+public slots:
+    void handleResults(QString);
+signals:
+    void operate(QString &);
+    void log2File(QString);
+private:
+    static Logger* gInstance;
+    QString mLogFilePath;
+    QFile mLogFile;
+    LogWorker* mWorker;
+};
 
 #endif // LOGGER_H

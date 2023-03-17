@@ -26,7 +26,7 @@
 #include "dbctl.h"
 #include "utils.h"
 
-GET_INSTANCE_IMPL(ProvinceCtl)
+GET_INSTANCE_CONTROLLER_IMPL(ProvinceCtl)
 
 ProvinceCtl::ProvinceCtl():
     ModelController(KModelHdlProvince)
