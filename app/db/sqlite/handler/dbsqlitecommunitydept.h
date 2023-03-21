@@ -32,7 +32,6 @@ class DbSqliteCommunityDept : public DbSqliteModelHandler, public DbCommDeptMode
     GET_INSTANCE_DECL(DbSqliteCommunityDept);
 public:
     DbSqliteCommunityDept();
-    virtual const QString getName();
     virtual QList<DbModel*> getListPerson(const QString& commDeptUid, int status = MODEL_ACTIVE, bool* ok = nullptr);
     virtual QList<DbModel*> getListDept(const QString& communityUid, int status = MODEL_ACTIVE, bool* ok = nullptr);
 protected:

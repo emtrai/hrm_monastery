@@ -33,7 +33,7 @@ public:
 
 
 protected:
-    virtual DbModelHandler *getDbModelHandler();
+    virtual DbModelHandler *getDbModelHandler() const;
 };
 
 #endif // STATUS_H

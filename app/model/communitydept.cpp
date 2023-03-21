@@ -124,7 +124,7 @@ void CommunityDept::setStatus(qint64 newStatus)
     mStatus = newStatus;
 }
 
-DbModelHandler *CommunityDept::getDbModelHandler()
+DbModelHandler *CommunityDept::getDbModelHandler() const
 {
 
     return DB->getModelHandler(KModelHdlCommDept);

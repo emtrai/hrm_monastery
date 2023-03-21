@@ -31,28 +31,35 @@
 #include "community.h"
 #include "handler/dbsqliteperson.h"
 #include "dbpersonmodelhandler.h"
+#include "communitydept.h"
+#include "exception.h"
 
-DbSqliteCommunity* DbSqliteCommunity::gInstance = nullptr;
+GET_INSTANCE_IMPL(DbSqliteCommunity)
 
-DbSqliteCommunity::DbSqliteCommunity():DbSqliteModelHandler()
+
+DbSqliteCommunity::DbSqliteCommunity():DbSqliteModelHandler(KModelHdlCommunity)
 {
     traced;
 }
 
 DbSqliteTbl *DbSqliteCommunity::getMainTbl()
 {
-    return (DbSqliteCommunityTbl*)DbSqlite::getInstance()->getTable(KTableCommunity);
+    return (DbSqliteCommunityTbl*)DbSqlite::table(KTableCommunity);
 }
 
 DbSqliteTbl *DbSqliteCommunity::getTable(const QString &modelName)
 {
     traced;
     DbSqliteTbl* tbl = nullptr;
-    logd("modelname '%s'", modelName.toStdString().c_str());
-    if (modelName == KModelNameCommPerson) {
-        tbl = DbSqlite::table(KTableCommPerson);
-    } else { // TODO: check & implement more??
+    logd("modelname '%s'", STR2CHA(modelName));
+    if (modelName.isEmpty() || modelName == KModelNameCommunity) {
         tbl = getMainTbl();
+    } else if (modelName == KModelNameCommPerson) {
+        tbl = DbSqlite::table(KTableCommPerson);
+    } else if (modelName == KModelNameCommDept) {
+        tbl = DbSqlite::table(KTableCommDept);
+    } else { // TODO: check & implement more??
+        loge("unsupport model name '%s'", STR2CHA(modelName));
     }
     tracede;
     return tbl;
@@ -63,78 +70,178 @@ DbModelBuilder DbSqliteCommunity::getMainBuilder()
     return &Community::build;
 }
 
-DbSqliteCommunity *DbSqliteCommunity::getInstance()
-{
-    if (gInstance == nullptr){
-        gInstance = new DbSqliteCommunity();
-    }
-
-    return gInstance;
-}
-
-ErrCode DbSqliteCommunity::add(DbModel *model)
-{
-    traced;
-    // TODO: auto add management board department, to contain list of managmenet member and role
-    // at least, we need to have CEO for community
-    // We put here, as in here, we can check & update status
-    // adding only ok, and status change to active, when every required actions succeed
-    return DbSqliteModelHandler::add(model);
-}
-
-const QString DbSqliteCommunity::getName()
-{
-    return KModelHdlCommunity;
-}
-
-QList<DbModel *> DbSqliteCommunity::getListPerson(const QString &uid)
-{
-    traced;
-    // Get from commumity&person mapping table, how about community uid info in person tble??
-    // TODO: need to sync information with communityuid on person table
-    // RISK OF INCONSITANT!!!!!!!
-    DbSqliteCommunityPersonTbl* tbl = (DbSqliteCommunityPersonTbl*)DbSqlite::getInstance()
-                                          ->getTable(KTableCommPerson);
-    return tbl->getListPerson(uid);
-}
-
-ErrCode DbSqliteCommunity::addPerson2Community(const Community *comm, const Person *per, int status, qint64 startdate, qint64 enddate, const QString &remark)
+ErrCode DbSqliteCommunity::add(DbModel *model, bool notify)
 {
     traced;
     ErrCode err = ErrNone;
-//    DbSqliteCommunityPersonTbl* tbl = (DbSqliteCommunityPersonTbl*)DbSqlite::getInstance()
-//                                          ->getTable(KTableCommPerson);
-    logd("Build map object");
-//    CommunityPerson* model = new CommunityPerson();
-    // TODO: err on macro SAVE_MAP_MODEL
-    DbPersonModelHandler* hdl = dynamic_cast<DbPersonModelHandler*>(DbSqlite::handler(KModelHdlPerson));
-    if (hdl) {
-        logd("update community uid of each person first");
-        err = hdl->updateCommunity(per->uid(), comm->uid());
-    } else {
-        err = ErrInvalidData;
-        loge("not found handler %s", KModelHdlPerson);
+    DbModelHandler* hdlDept = nullptr;
+    if (!model) {
+        err = ErrInvalidArg;
+        loge("invalid argument");
     }
     if (err == ErrNone) {
-        logd("Save mapping community and person");
-        // TODO: update status of old one?
-        SAVE_MAP_MODEL(CommunityPerson, comm, per, status, startdate, enddate, remark);
+        logi("Add model '%s' to db", STR2CHA(model->toString()));
+        err = DbSqliteModelHandler::add(model, false);
+        logd("add model res=%d", err);
     }
-//    model->setDbId1(comm->dbId());
-//    model->setUid1(comm->uid());
-//    model->setDbId2(per->dbId());
-//    model->setUid2(per->uid());
-//    model->setStatus(status);
-//    model->setStartDate(startdate);
-//    model->setEndDate(enddate);
-//    if (!remark.isEmpty())
-//        model->setRemark(remark);
 
-//    logd("Add to db");
-//    err = model->save();
+    if (err == ErrNone) {
+        hdlDept = DbSqlite::handler(KModelHdlDept);
+        if (!hdlDept) {
+            err = ErrNoHandler;
+            loge("not found dept handler");
+        }
+    }
+    // Add management dept to community so that we can add comminity's manager to
+    if (err == ErrNone) {
+        logd("Check to add management dept for community");
+        // TODO: FIXME we're trying to fix management name id with this, but trouble
+        // if it's not in json prebuilt file... TAKE CARE
+        DbModel* dept = hdlDept->getByNameId(KManagementDeptNameId);
+        if (dept) {
+            CommunityDept* commdept = (CommunityDept*)CommunityDept::build();
+            if (commdept) {
+                commdept->setCommunityUid(model->uid());
+                commdept->setDepartmentUid(dept->uid());
+                commdept->setStatus(MODEL_ACTIVE);
+                logi("Add dept '%s' to community '%s'", STR2CHA(dept->toString()), STR2CHA(model->toString()));
+                err = commdept->save();
+                delete commdept;
+                logd("add result=%d", err);
+            } else {
+                err = ErrNoMemory;
+                loge("no memory");
+            }
+            delete dept;
+        } else {
+            logw("not found dept '%s' for community", KManagementDeptNameId);
+        }
+    }
+    // TODO: well, if adding comm to db ok, but update comm and management dept failed
+    // what should we do next???
+    if (err == ErrNone && notify) {
+        notifyDataChange(model, DBMODEL_CHANGE_ADD, err);
+    }
 
-//    delete model;
-//    model = nullptr;
+    tracedr(err);
+    return err;
+}
+
+ErrCode DbSqliteCommunity::deleteHard(DbModel *model, bool force, QString *msg)
+{
+    traced;
+    ErrCode err = ErrNone;
+    if (!model) {
+        err = ErrInvalidArg;
+        loge("Invalid model");
+    }
+
+    if (err == ErrNone) {
+        logd("Delete hard model '%s', force %d", STR2CHA(model->toString()), force);
+
+        if (model->modelName() == KModelNameCommunity){
+            // KFieldAreaUid delete map, community, person
+            QHash<QString, QString> itemToSearch; // for searching
+            QHash<QString, QString> itemToSet; // for update
+            QList<DbModel*> list;
+            int count = 0;
+            ErrCode tmpErr = ErrNone;
+            bool errDependency = false;
+
+            itemToSearch.insert(KFieldCommunityUid, model->uid());
+            itemToSet.insert(KFieldCommunityUid, ""); // update to null/empty
+
+            CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency, msg, force, itemToSearch, itemToSet, KTablePerson, &Person::build);
+            CHECK_REMOVE_TO_DELETE(err, errDependency, msg, force, itemToSearch, KTableCommPerson, &CommunityPerson::build);
+            CHECK_REMOVE_TO_DELETE(err, errDependency, msg, force, itemToSearch, KTableCommDept, &CommunityDept::build);
+
+            if (errDependency) {
+                err = ErrDependency;
+                loge("cannot delete, has dependency '%s'", msg?STR2CHA((*msg)):"");
+            } else {
+                err = DbSqliteModelHandler::deleteHard(model, force, msg);
+            }
+        }
+    }
+    tracede;
+    return err;
+
+}
+
+
+QList<DbModel *> DbSqliteCommunity::getListPerson(const QString &commUid)
+{
+    traced;
+    QList<DbModel *> list;
+    logd("get list person of uid '%s'", STR2CHA(commUid));
+    if(!commUid.isEmpty()) {
+        // Get from commumity&person mapping table, how about community uid info in person tble??
+        // TODO: need to sync information with communityuid on person table
+        // RISK OF INCONSITANT!!!!!!!
+        DbSqliteCommunityPersonTbl* tbl = (DbSqliteCommunityPersonTbl*)DbSqlite::table(KTableCommPerson);
+        if (tbl) {
+            list = tbl->getListPerson(commUid);
+        } else {
+            THROWEX("Not found table '%s'", KTableCommPerson);
+        }
+    } else {
+        loge("invalid commUid '%s'", STR2CHA(commUid));
+    }
+    tracede;
+    return list;
+}
+
+ErrCode DbSqliteCommunity::addPerson2Community(const Community *comm,
+                                               const Person *per, int status,
+                                               qint64 startdate, qint64 enddate,
+                                               const QString &remark,
+                                               bool notify)
+{
+    traced;
+    ErrCode err = ErrNone;
+    logd("Build map object");
+
+    if (!comm || !per) {
+        err = ErrInvalidArg;
+        loge("invalid argument");
+    }
+
+    if (err == ErrNone) {
+        DbPersonModelHandler* hdl = dynamic_cast<DbPersonModelHandler*>(DbSqlite::handler(KModelHdlPerson));
+        if (hdl) {
+            logi("update community '%s' for per '%s'",
+                 STR2CHA(comm->toString()), STR2CHA(per->toString()));
+            err = hdl->updateCommunity(per->uid(), comm->uid());
+        } else {
+            err = ErrInvalidData;
+            loge("not found handler %s", KModelHdlPerson);
+        }
+    }
+
+    if (err == ErrNone) {
+        logi("Save mapping community '%s' and person '%s'",
+             STR2CHA(comm->toString()), STR2CHA(per->toString()));
+        // TODO: update status of old one?
+        CommunityPerson* mapModel = (CommunityPerson*)MapDbModel::buildMapModel(&CommunityPerson::build,
+                                                                        comm, per,
+                                                                        status, startdate,
+                                                                        enddate, remark);
+        if (mapModel) {
+            err = mapModel->save();
+            delete mapModel;
+        } else {
+            err = ErrNoMemory;
+            loge("no memory?");
+        }
+    }
+
+    if (err == ErrNone && notify) {
+        logd("notify per '%s' for change", STR2CHA(per->toString()));
+        notifyDataChange((DbModel*)per, DBMODEL_CHANGE_UPDATE, err);
+
+        logd("notify comm '%s' for change", STR2CHA(comm->toString()));
+        notifyDataChange((DbModel*)comm, DBMODEL_CHANGE_UPDATE, err);
+    }
     tracedr(err);
     return err;
 }

@@ -78,9 +78,10 @@ QList<DbModel *> DbSqliteCommunityPersonTbl::getListPerson(const QString &commun
     return outList;
 }
 
-void DbSqliteCommunityPersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqliteCommunityPersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     traced;
+    ErrCode err = ErrNone;
     DbSqliteMapTbl::updateModelFromQuery(item, qry);
     QString modelName = item->modelName();
     logd("update for map model '%s'", modelName.toStdString().c_str());
@@ -95,4 +96,5 @@ void DbSqliteCommunityPersonTbl::updateModelFromQuery(DbModel *item, const QSqlQ
         loge("Invalid mapp model '%s', do nothing", modelName.toStdString().c_str());
     }
     tracede;
+    return err;
 }

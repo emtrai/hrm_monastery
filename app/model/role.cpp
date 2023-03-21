@@ -50,7 +50,7 @@ QString Role::modelName() const
     return KModelNameRole;
 }
 
-DbModelHandler *Role::getDbModelHandler()
+DbModelHandler *Role::getDbModelHandler() const
 {
     return DB->getModelHandler(KModelHdlRole);
 }

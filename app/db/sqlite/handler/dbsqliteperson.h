@@ -36,7 +36,7 @@ class DbSqlitePerson : public DbSqliteModelHandler, public DbPersonModelHandler
 public:
     DbSqlitePerson();
     virtual const QString getName();
-    virtual ErrCode add(DbModel* model);
+    virtual ErrCode add(DbModel* model, bool notifyDataChange = true);
     virtual ErrCode update(DbModel* model);
     virtual ErrCode add2Table(DbModel* model, DbSqliteTbl* tbl);
 
@@ -51,7 +51,7 @@ public:
      * @param model
      * @return
      */
-    virtual ErrCode deleteHard(DbModel* model);
+    virtual ErrCode deleteHard(DbModel* model, bool force = false, QString* msg = nullptr);
 
     virtual bool exist(const DbModel* edu);
     virtual QList<DbModel*> getAll(DbModelBuilder builder, qint64 status = DB_RECORD_ACTIVE,

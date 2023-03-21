@@ -53,7 +53,7 @@ public:
     void setEndDate(qint64 newEndDate);
 
 protected:
-    virtual DbModelHandler *getDbModelHandler();
+    virtual DbModelHandler *getDbModelHandler() const;
 private:
     qint64 mDate;
     qint64 mEndDate;

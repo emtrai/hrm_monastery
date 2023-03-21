@@ -14,31 +14,46 @@
  * limitations under the License.
  *
  *
- * Filename: specialistperson.h
+ * Filename: areaperson.h
  * Author: Anh, Ngo Huy
- * Created date:11/3/2022
+ * Created date:10/25/2022
  * Brief:
  */
-#ifndef SPECIALISTPERSON_H
-#define SPECIALISTPERSON_H
+#ifndef AREAPERSON_H
+#define AREAPERSON_H
 
 #include "mapdbmodel.h"
 
-class SpecialistPerson : public MapDbModel
+class AreaPerson : public MapDbModel
 {
 public:
-    SpecialistPerson();
+    virtual ~AreaPerson();
     static DbModel* build();
+
+    virtual void clone(const DbModel* model);
     virtual DbModelBuilder getBuilder();
     virtual QString modelName() const;
-    const QString &experienceHistory() const;
-    void setExperienceHistory(const QString &newExperienceHistory);
-    void setPersonUid(const QString& uid);
-    void setSpecialistUid(const QString& uid);
+    const QString &roleUid() const;
+    void setRoleUid(const QString &newRoleUid);
+
+    DbModel *person() const;
+    void setPerson(DbModel *newPerson);
+
+    DbModel *area() const;
+    void setArea(DbModel *newArea);
+
+    const QString &roleName();
+    void setRoleName(const QString &newRoleName);
+
 protected:
-    virtual DbModelHandler *getDbModelHandler();
+    AreaPerson();
+    virtual DbModelHandler *getDbModelHandler() const;
+    void copy(const AreaPerson& model);
 protected:
-    QString mExperienceHistory;
+    QString mRoleUid;
+    QString mRoleName;
+    DbModel* mPerson;
+    DbModel* mArea;
 };
 
-#endif // SPECIALISTPERSON_H
+#endif // AREAPERSON_H

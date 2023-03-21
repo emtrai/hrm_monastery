@@ -54,7 +54,7 @@ public:
 public:
     DbModelHandler();
 
-    virtual ErrCode add(DbModel* model) = 0;
+    virtual ErrCode add(DbModel* model, bool notifyDataChange = true) = 0;
     virtual ErrCode update(DbModel* model) = 0;
     /**
      * @brief delete by change status to delete
@@ -64,10 +64,12 @@ public:
     virtual ErrCode deleteSoft(DbModel* model) = 0;
     /**
      * @brief delete completely from db
-     * @param model
+     * @param[in] model
+     * @param[in] force if set true, it'll delete all dependence, else return error if found dependency
+     * @param[out] msg Message in case of error
      * @return
      */
-    virtual ErrCode deleteHard(DbModel* model) = 0;
+    virtual ErrCode deleteHard(DbModel* model, bool force = false, QString* msg = nullptr) = 0;
 
     /**
      * @brief Check if model exist in db
@@ -132,6 +134,7 @@ public:
     // TODO: implement filter with operator (equal, greater, in range, etc.)
 
     virtual DbModelBuilder getMainBuilder();
+    virtual DbModelBuilder getBuilder(const QString& modelName);
 
     virtual DbModel *getByUid(const QString& uid, const DbModelBuilder& builder);
     virtual DbModel *getByUid(const QString& uid);

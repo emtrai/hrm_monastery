@@ -57,7 +57,7 @@ public:
     void setCourseType(qint32 newCourseType);
 
 protected:
-    virtual DbModelHandler *getDbModelHandler();
+    virtual DbModelHandler *getDbModelHandler() const;
 private:
     qint64 mStartDate;
     qint64 mEndDate;

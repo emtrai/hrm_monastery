@@ -58,6 +58,7 @@ public:
     virtual ErrCode update(DbModel* item);
     virtual ErrCode updateUid(const DbModel* item, const QString& uid);
     virtual ErrCode update(const QString& uid, const QHash<QString, FieldValue>& fieldValues);
+    virtual ErrCode update(const QString& uid, const QHash<QString, QString>& fieldValues);
 
     /**
      * @brief delete by marking as delete
@@ -151,7 +152,7 @@ public:
 
     // TODO: separate it into 2 info: detail and brief????
     // as some model has a lots of information, such as person, community
-    virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
+    virtual ErrCode updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
 
     virtual ErrCode filter(int fieldId,
                        int operatorId,
@@ -162,9 +163,23 @@ public:
                        int from = 0,
                        int noItems = 0,
                        int* total = nullptr);
+    virtual ErrCode updateQueryromFields(const QHash<QString, QString>& fields,
+                                         QSqlQuery &query,
+                                         bool isMatchAllField = false,
+                                         QString initQueryString = ""
+                                         );
+    virtual ErrCode getListItems(const QHash<QString, QString>& fields,
+                               const DbModelBuilder& builder,
+                               QList<DbModel*>* outList = nullptr,
+                               bool isMatchAllField = true,
+                               qint64 dbStatus = DB_RECORD_ACTIVE,
+                               int from = 0,
+                               int noItems = 0,
+                               int* total = nullptr);
+    virtual ErrCode updateFields(QHash<QString, QString> fields);
 
 protected:
-    virtual QString getSqlCmdCreateTable();
+    virtual DbSqliteTableBuilder* getTableBuilder();
     virtual void addTableField(DbSqliteTableBuilder* builder);
     virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
 

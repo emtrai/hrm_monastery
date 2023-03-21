@@ -42,7 +42,7 @@ public:
     virtual DbModelBuilder getBuilder();
 
 protected:
-    virtual DbModelHandler* getDbModelHandler();
+    virtual DbModelHandler* getDbModelHandler() const;
 
 };
 

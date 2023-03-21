@@ -86,7 +86,7 @@ do { \
         func(0);\
         if (!val.isEmpty()){ \
             bool isOk = false;\
-            qint64 date = Utils::dateFromString(val, DATE_FORMAT_YMD, &isOk);\
+            qint64 date = Utils::dateFromString(val, format, &isOk);\
             if (isOk && date > 0){\
                 func(date);\
         }\
@@ -129,12 +129,12 @@ do { \
 // TODO: should check if value is actually integer??? exception???
 #define SET_INT_VAL_FROM_CBOX(widget,func, functxt) \
 do { \
-    int index = ui->cbStatus->currentIndex(); \
+    int index = widget->currentIndex(); \
     QString currtxt = widget->currentText().trimmed();\
     logd("index %d, name %s", index, STR2CHA(currtxt));\
     if (index >= 0){ \
         QVariant value = widget->itemData(index);\
-        if (!value.isValid()) {\
+        if (value.isValid()) {\
             func(value.toInt());\
             functxt(currtxt);\
         }\
@@ -254,7 +254,7 @@ public:
     */
     // TODO: default for const QString is ok or not??? can set it ???
     static qint64 dateFromString(const QString& date, const QString& format = "YYYY/MM/DD", bool *isOk = nullptr);
-    static QString date2String(qint64 date, const QString& format = "YYYY/MM/DD");
+    static QString date2String(qint64 date, const QString& format = "YYYY/MM/DD", bool* isOk = nullptr);
     static void date2ymd(qint64 date, int* day = nullptr,
                             int* month = nullptr, int* year = nullptr);
 
@@ -290,6 +290,7 @@ public:
     static void showMsgBox(const QString& msg);
     static void showErrorBox(const QString& msg);
     static void showErrorBox(int ret, const QString* msg = nullptr);
+    static bool showConfirmDialog(QWidget *parent, const QString& title, const QString& message, std::function<void(void)> onAccept = nullptr);
     static ErrCode screenSize(int* w=nullptr, int* h=nullptr);
     static int screenHeight();
     static int getCurrentComboxIndex(const QComboBox *cb);;

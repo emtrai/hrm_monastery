@@ -56,7 +56,7 @@ public:
     void setCountryUid(const QString &newCountryUid);
 
 protected:
-    virtual DbModelHandler *getDbModelHandler();
+    virtual DbModelHandler *getDbModelHandler() const;
 private:
     Province* parent;
     qint64 mParentDbId;

@@ -64,7 +64,9 @@ ErrCode DbSqliteCommunityTbl::insertTableField(DbSqliteInsertBuilder *builder, c
     // TODO: community code: to be use later???
     // TODO: check if root community exist (via level value), there is only one root community
     builder->addValue(KFieldBrief, cmm->brief());
-    builder->addValue(KFieldMissionUid, cmm->missionNameString());
+    builder->addValue(KFieldFullInfo, cmm->fullInfo());
+    builder->addValue(KFieldHistory, cmm->history());
+    builder->addValue(KFieldMissionUid, cmm->missionUidString());
     builder->addValue(KFieldAddr, cmm->addr());
     builder->addValue(KFieldTel, cmm->tel());
     builder->addValue(KFieldEmail, cmm->email());
@@ -80,7 +82,6 @@ ErrCode DbSqliteCommunityTbl::insertTableField(DbSqliteInsertBuilder *builder, c
     builder->addValue(KFieldChurchAddr, cmm->church());
     builder->addValue(KFieldImgPath, cmm->imgPath());
     builder->addValue(KFieldCEOUid, cmm->currentCEOUid());
-    builder->addValue(KFieldIntro, cmm->intro());
     builder->addValue(KFieldContact, cmm->contact());
     // TODO: calculate level basing on parent uid chain
     // Level should be auto-updated, not set by user, which may cause mistake
@@ -101,21 +102,64 @@ ErrCode DbSqliteCommunityTbl::insertTableField(DbSqliteInsertBuilder *builder, c
     return ErrNone;
 }
 
-void DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     traced;
+    ErrCode err = ErrNone;
     DbSqliteTbl::updateModelFromQuery(item, qry);
     Community* cmm = (Community*) item;
     cmm->setBrief(qry.value(KFieldBrief).toString());
+    cmm->setFullInfo(qry.value(KFieldFullInfo).toString());
+    cmm->setHistory(qry.value(KFieldHistory).toString());
     cmm->setCreateDate(qry.value(KFieldCreateDate).toInt());
     cmm->setCloseDate(qry.value(KFieldCloseDate).toInt());
     cmm->setImgPath(qry.value(KFieldImgPath).toString());
     cmm->setLevel(qry.value(KFieldLevel).toInt());
-    cmm->setParentUid(qry.value(KFieldParentUid).toString());
+    cmm->setParentUid(qry.value(KFieldParentUid).toString().trimmed());
+    if (!cmm->parentUid().isEmpty()) {
+        // TODO: caching data (i.e. list of person in management board) for fast accessing?
+        // TODO: is it ok to call here? does it break any design?
+        // as table calls directly to model handler
+        DbModel* model = SQLITE->getCommunityModelHandler()->getByUid(cmm->parentUid());
+        if (model) {
+            cmm->setParentNameId(model->nameId());
+            cmm->setParentName(model->name());
+            delete model;
+        } else {
+            logw("not found parent uid '%s'", STR2CHA(cmm->parentUid()));
+        }
+    }
     // TODO: parent nameid, parent name???
     cmm->setAreaUid(qry.value(KFieldAreaUid).toString());
     cmm->setAreaDbId(qry.value(KFieldAreaDbId).toInt());
+    if (!cmm->areaUid().isEmpty()) {
+        // TODO: caching data (i.e. list of person in management board) for fast accessing?
+        // TODO: is it ok to call here? does it break any design?
+        // as table calls directly to model handler
+        DbModel* model = SQLITE->getAreaModelHandler()->getByUid(cmm->areaUid());
+        if (model) {
+            cmm->setAreaNameId(model->nameId());
+            cmm->setAreaName(model->name());
+            delete model;
+        } else {
+            logw("not found area uid '%s'", STR2CHA(cmm->areaUid()));
+        }
+    }
+
     cmm->setCountryUid(qry.value(KFieldCountryUid).toString());
+    if (!cmm->countryUid().isEmpty()) {
+        // TODO: caching data (i.e. list of person in management board) for fast accessing?
+        // TODO: is it ok to call here? does it break any design?
+        // as table calls directly to model handler
+        DbModel* model = SQLITE->getCountryModelHandler()->getByUid(cmm->countryUid());
+        if (model) {
+            cmm->setCountryNameId(model->nameId());
+            cmm->setCountryName(model->name());
+            delete model;
+        } else {
+            logw("not found countryUid uid '%s'", STR2CHA(cmm->countryUid()));
+        }
+    }
     cmm->setChurch(qry.value(KFieldChurchAddr).toString());
     if (qry.value(KFieldAreaName).isValid())
         cmm->setAreaName(qry.value(KFieldAreaName).toString());
@@ -124,19 +168,37 @@ void DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
     cmm->setEmail(qry.value(KFieldEmail).toString());
     cmm->setFeastDate(qry.value(KFieldFeastDay).toInt());
     cmm->setStatus((DbModelStatus)qry.value(KFieldStatus).toInt());
-    cmm->setCurrentCEOUid(qry.value(KFieldCEOUid).toString()); // TODO: check and set name as well
+    cmm->setCurrentCEOUid(qry.value(KFieldCEOUid).toString().trimmed()); // TODO: check and set name as well
     if (!cmm->currentCEOUid().isEmpty()) {
         // TODO: caching data (i.e. list of person in management board) for fast accessing?
         // TODO: is it ok to call here? does it break any design?
         // as table calls directly to model handler
         Person* per = (Person*)SQLITE->getPersonModelHandler()->getByUid(cmm->currentCEOUid());
         if (per) {
-            cmm->setCurrentCEO(per->getFullName());
+            cmm->setCurrentCEOName(per->getFullName());
+            delete per;
         }
     }
-    cmm->setIntro(qry.value(KFieldIntro).toString());
     cmm->setContact(qry.value(KFieldContact).toString());
-    cmm->setMissionUid(qry.value(KFieldMissionUid).toString());
+    cmm->setMissionUid(qry.value(KFieldMissionUid).toString().trimmed());
+    if (!cmm->missionUid().isEmpty()) {
+        foreach (QString uid, cmm->missionUid()) {
+            DbModel* model = SQLITE->getMissionModelHandler()->getByUid(uid);
+            if (model) {
+                cmm->addMissionName(model->name());
+                cmm->addMissionNameId(model->nameId());
+                delete model;
+            } else {
+                logw("not found mission uid '%s'", STR2CHA(uid));
+            }
+        }
+        // TODO: caching data (i.e. list of person in management board) for fast accessing?
+        // TODO: is it ok to call here? does it break any design?
+        // as table calls directly to model handler
+
+    }
+    tracede;
+    return err;
 }
 
 QString DbSqliteCommunityTbl::getSearchQueryString(const QString &cond)
@@ -170,8 +232,9 @@ void DbSqliteCommunityTbl::addTableField(DbSqliteTableBuilder *builder)
     // can be used as identification which is more dynamic than UID
     // UID: need to fix, must not changed, as it'll impact to many table/field
     builder->addField(KFieldImgPath, TEXT);
-    builder->addField(KFieldIntro, TEXT); // TODO:translation????
     builder->addField(KFieldBrief, TEXT);
+    builder->addField(KFieldFullInfo, TEXT);
+    builder->addField(KFieldHistory, TEXT);
     builder->addField(KFieldAddr, TEXT);
     builder->addField(KFieldContact, TEXT);
     builder->addField(KFieldCountryUid, TEXT);

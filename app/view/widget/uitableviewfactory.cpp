@@ -44,16 +44,16 @@ UITableView *UITableViewFactory::getView(ViewType type, QWidget *parent )
     traced;
     logd("type %d", type);
     switch (type) {
-    case PERSON:
+    case VIEW_PERSON:
         view = new UIPersonListView(parent);
         break;
-    case SAINT:
+    case VIEW_SAINT:
         view = new UISaintListView(parent);
         break;
-    case COMMUNITY:
+    case VIEW_COMMUNITY:
         view = new UICommunityListView(parent);
         break;
-    case AREA:
+    case VIEW_AREA:
         view = new UIAreaListView(parent);
         break;
     case COMMUNITY_PERSON:

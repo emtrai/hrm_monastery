@@ -96,7 +96,7 @@ DbModelBuilder Course::getBuilder()
     return &Course::build;
 }
 
-DbModelHandler *Course::getDbModelHandler()
+DbModelHandler *Course::getDbModelHandler() const
 {
     return DB->getModelHandler(KModelHdlCourse);
 }

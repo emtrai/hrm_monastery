@@ -33,12 +33,14 @@
 #include "specialist.h"
 
 DbModel::DbModel():
-      mDbId(0)
-    , mDbStatus(0)
+    mDeletable(true)
+    , mDbId(0)
     , mValidateResult(nullptr)
+    , mDbStatus(0)
     , mMarkModified(false)
-    , mCreatedTime(false)
-    , mLastUpdatedTime(false)
+    , mUpdateAllFields(false)
+    , mCreatedTime(0)
+    , mLastUpdatedTime(0)
 
 {
     traced;
@@ -48,20 +50,39 @@ DbModel::DbModel():
 DbModel::DbModel(const DbModel &model):DbModel()
 {
     traced;
-    mDbId = model.dbId();
-    mName = model.name();
-    mNameId = model.nameId();
-    mUid = model.uid();
-    mDbStatus = model.dbStatus();
-    mHistory = model.history();
-    mMarkModified = model.markModified();
+    copy(model);
     // TODO: mValidateResult
     tracede;
 }
 
-DbModel::DbModel(const DbModel *model):DbModel(*model)
+DbModel::DbModel(const DbModel *model)
 {
     traced;
+    if (model) {
+        DbModel(*model);
+        copy(*model);
+    }
+    tracede;
+}
+
+void DbModel::copy(const DbModel &model)
+{
+    traced;
+    mDeletable = model.mDeletable;
+    mDbId = model.dbId();
+    mUid = model.uid();
+    mName = model.name();
+    mRemark = model.remark();
+    mNameId = model.nameId();
+    mDbStatus = model.dbStatus();
+    mDbHistory = model.dbHistory();
+    mCreatedTime = model.createdTime();
+    mLastUpdatedTime = model.lastUpdatedTime();
+    mMarkModified = model.markModified();
+    mUpdateAllFields = model.updateAllFields();
+    mExportCallbacks = model.mExportCallbacks;
+    mImportCallbacks = model.mImportCallbacks;
+    tracede;
 }
 
 
@@ -81,18 +102,11 @@ void DbModel::init()
 void DbModel::clone(const DbModel *model)
 {
     traced;
-    mDbId = model->dbId();
-    mUid = model->uid();
-    mName = model->name();
-    mRemark = model->remark();
-    mNameId = model->nameId();
-    mDbStatus = model->dbStatus();
-    mHistory = model->history();
-    mCreatedTime = model->createdTime();
-    mLastUpdatedTime = model->lastUpdatedTime();
-    mMarkModified = model->markModified();
-    mExportFields = model->mExportFields;
-    mImportFields = model->mImportFields;
+    if (model) {
+        copy(*model);
+    } else {
+        loge("clone failed, null model");
+    }
     tracede;
 }
 
@@ -119,19 +133,19 @@ int DbModel::modelType() const
 void DbModel::initExportFields()
 {
     traced;
-    mExportFields.insert(KItemName, [this](const QString& item){
+    mExportCallbacks.insert(KItemName, [this](const QString& item){
         return this->name();
 
     });
-    mExportFields.insert(KItemNameId, [this](const QString& item){
+    mExportCallbacks.insert(KItemNameId, [this](const QString& item){
         return this->nameId();
 
     });
-    mExportFields.insert(KItemUid, [this](const QString& item){
+    mExportCallbacks.insert(KItemUid, [this](const QString& item){
         return this->uid();
 
     });
-    mExportFields.insert(KItemRemark, [this](const QString& item){
+    mExportCallbacks.insert(KItemRemark, [this](const QString& item){
         return this->remark();
 
     });
@@ -141,17 +155,21 @@ void DbModel::initExportFields()
 void DbModel::initImportFields()
 {
     traced;
-    mImportFields.insert(KItemName, [this](const QString& value){
+    mImportCallbacks.insert(KItemName, [this](const QString& value){
         this->setName(value);
+        return ErrNone;
     });
-    mImportFields.insert(KItemNameId, [this](const QString& value){
+    mImportCallbacks.insert(KItemNameId, [this](const QString& value){
         this->setNameId(value);
+        return ErrNone;
     });
-    mImportFields.insert(KItemUid, [this](const QString& value){
+    mImportCallbacks.insert(KItemUid, [this](const QString& value){
         this->setUid(value);
+        return ErrNone;
     });
-    mImportFields.insert(KItemRemark, [this](const QString& value){
+    mImportCallbacks.insert(KItemRemark, [this](const QString& value){
         this->setRemark(value);
+        return ErrNone;
     });
     tracede;
 }
@@ -225,7 +243,6 @@ DbModelBuilder DbModel::getBuilderByModelName(const QString& modelName)
     tracede;
     return builder;
 }
-
 
 const QString &DbModel::name() const
 {
@@ -333,6 +350,7 @@ const QString &DbModel::remark() const
 void DbModel::setRemark(const QString &newRemark)
 {
     mRemark = newRemark;
+    markItemAsModified(KItemRemark);
 }
 
 const QString &DbModel::nameId() const
@@ -348,10 +366,8 @@ bool DbModel::markModified() const
 void DbModel::setMarkModified(bool newMarkModified)
 {
     logd("set mark modify %d, olde %d", newMarkModified, mMarkModified);
-    if (newMarkModified) {
-        // start mark modified, reset all previous info if any
-        resetAllModifiedMark();
-    }
+    // start mark modified, reset all previous info if any
+    resetAllModifiedMark();
     mMarkModified = newMarkModified;
 }
 
@@ -384,7 +400,7 @@ const QStringList DbModel::getListExportKeyWord() const
 {
     traced;
 
-    return mExportFields.keys();
+    return mExportCallbacks.keys();
 }
 
 ErrCode DbModel::getExportDataString(const QString &item, QString *data) const
@@ -392,8 +408,8 @@ ErrCode DbModel::getExportDataString(const QString &item, QString *data) const
     ErrCode ret = ErrNone;
     traced;
     logd("item %s", item.toStdString().c_str());
-    if (mExportFields.contains(item)){
-        std::function<QString(const QString&)> func = mExportFields.value(item);
+    if (mExportCallbacks.contains(item)){
+        ExportCallbackFunc func = mExportCallbacks.value(item);
         if (func != nullptr) *data = func(item);
     }
     // TODO: raise exception when error occur???
@@ -411,9 +427,9 @@ ErrCode DbModel::onImportItem(const QString& importName, int importFileType,
 
     // TODO: raise exception when error occur???
     logd("keyword %s", keyword.toStdString().c_str());
-    if (mImportFields.contains(keyword)){
-        std::function<void(const QString& value)> func = mImportFields.value(keyword);
-        if (func != nullptr) func(value);
+    if (mImportCallbacks.contains(keyword)){
+        ImportCallbackFunc func = mImportCallbacks.value(keyword);
+        if (func != nullptr) ret = func(value);
     }
     tracedr(ret);
     return ret;
@@ -441,6 +457,7 @@ qint64 DbModel::lastUpdatedTime() const
 void DbModel::setLastUpdatedTime(qint64 newLastUpdatedTime)
 {
     mLastUpdatedTime = newLastUpdatedTime;
+    markItemAsModified(KItemLastUpdateTime);
 }
 
 qint64 DbModel::createdTime() const
@@ -451,6 +468,7 @@ qint64 DbModel::createdTime() const
 void DbModel::setCreatedTime(qint64 newCreatedTime)
 {
     mCreatedTime = newCreatedTime;
+    markItemAsModified(KItemCreateTime);
 }
 
 ErrCode DbModel::save()
@@ -476,10 +494,21 @@ ErrCode DbModel::save()
     return ret;
 }
 
-ErrCode DbModel::update()
+DbModel *DbModel::addUpdate(const QString &field)
+{
+    if (!mUpdatedField.contains(field)) {
+        mUpdatedField.append(field);
+    } else {
+        logd("Item already existed");
+    }
+    return this;
+}
+
+ErrCode DbModel::update(bool allFields)
 {
     traced;
     ErrCode ret = ErrNone;
+    // TODO: support "allFields"
     DbModelHandler* dbModelHdl = getDbModelHandler();
     if (dbModelHdl != nullptr){
         ret = dbModelHdl->update(this);
@@ -494,10 +523,27 @@ ErrCode DbModel::update()
 
 bool DbModel::allowRemove(QString* msg)
 {
-    return true;
+    return mDeletable;
 }
 
-ErrCode DbModel::remove()
+bool DbModel::updateAllFields() const
+{
+    return mUpdateAllFields;
+}
+
+const QString &DbModel::dbHistory() const
+{
+    return mDbHistory;
+}
+
+void DbModel::setDbHistory(const QString &newDbHistory)
+{
+    mDbHistory = newDbHistory;
+
+    markItemAsModified(KItemDbHistory);
+}
+
+ErrCode DbModel::remove(bool force, QString* msg)
 {
     traced;
     ErrCode ret = ErrNone;
@@ -508,7 +554,7 @@ ErrCode DbModel::remove()
     if (ret == ErrNone) {
         DbModelHandler* dbModelHdl = getDbModelHandler();
         if (dbModelHdl != nullptr){
-            ret = dbModelHdl->deleteHard(this);
+            ret = dbModelHdl->deleteHard(this, force, msg);
         }
         else{
             ret = ErrDbNotReady;
@@ -563,18 +609,6 @@ void DbModel::setDbStatus(qint32 newDbStatus)
     markItemAsModified(KItemDbStatus);
 }
 
-const QString &DbModel::history() const
-{
-    return mHistory;
-}
-
-void DbModel::setHistory(const QString &newHistory)
-{
-    mHistory = newHistory;
-
-    markItemAsModified(KItemDbHistory);
-}
-
 bool DbModel::isValid()
 {
     // TODO: add more checking for valid info
@@ -599,7 +633,7 @@ void DbModel::dump()
 #endif //DEBUG_TRACE
 }
 
-QString DbModel::toString()
+QString DbModel::toString() const
 {
     return QString("%1:%2:%3:%4").arg(modelName(), uid(), nameId(),name());
 }
@@ -612,6 +646,7 @@ void DbModel::setNameId(const QString &newNameId)
     // TODO: should hash or use original value???
 //    mUid = newNameId;
     mNameId = newNameId;
+    markItemAsModified(KItemNameId);
 }
 
 DataExporter *DbModel::getExporter()
@@ -619,7 +654,7 @@ DataExporter *DbModel::getExporter()
     return this;
 }
 
-ErrCode DbModel::validate()
+ErrCode DbModel::validateAllFields()
 {
     traced;
     logi("Should be implemented by derived class");

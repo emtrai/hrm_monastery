@@ -56,28 +56,35 @@ void Saint::initImportFields()
     traced;
     // TODO: check fields like holly name, country, etc. and mark invalid field???
 
-    mImportFields.insert(KItemUid, [this](const QString& value){
+    mImportCallbacks.insert(KItemUid, [this](const QString& value){
         this->setUid(value);
+        return ErrNone;
     });
 
-    mImportFields.insert(KItemName, [this](const QString& value){
+    mImportCallbacks.insert(KItemName, [this](const QString& value){
         this->setName(value);
+        return ErrNone;
     });
 
-    mImportFields.insert(KItemFullName, [this](const QString& value){
+    mImportCallbacks.insert(KItemFullName, [this](const QString& value){
         this->setFullName(value);
+        return ErrNone;
     });
-    mImportFields.insert(KItemOriginName, [this](const QString& value){
+    mImportCallbacks.insert(KItemOriginName, [this](const QString& value){
         this->setOriginName(value);
+        return ErrNone;
     });
-    mImportFields.insert(KItemGender, [this](const QString& value){
+    mImportCallbacks.insert(KItemGender, [this](const QString& value){
         this->setGender(value);
+        return ErrNone;
     });
-    mImportFields.insert(KItemFeastDay, [this](const QString& value){
+    mImportCallbacks.insert(KItemFeastDay, [this](const QString& value){
         this->setFeastDay(value);
+        return ErrNone;
     });
-    mImportFields.insert(KItemRemark, [this](const QString& value){
+    mImportCallbacks.insert(KItemRemark, [this](const QString& value){
         this->setRemark(value);
+        return ErrNone;
     });
 }
 
@@ -97,9 +104,9 @@ ErrCode Saint::onImportItem(const QString& importName, int importFileType,
 
     // TODO: raise exception when error occur???
     logd("keyword %s", keyword.toStdString().c_str());
-    if (mImportFields.contains(keyword)){
-        std::function<void(const QString& value)> func = mImportFields.value(keyword);
-        if (func != nullptr) func(value);
+    if (mImportCallbacks.contains(keyword)){
+        ImportCallbackFunc func = mImportCallbacks.value(keyword);
+        if (func != nullptr) ret = func(value);
     }
 
     tracedr(ret);
@@ -170,7 +177,7 @@ void Saint::dump()
 }
 
 
-DbModelHandler *Saint::getDbModelHandler()
+DbModelHandler *Saint::getDbModelHandler() const
 {
     return DbCtl::getInstance()->getDb()->getSaintModelHandler();
 }

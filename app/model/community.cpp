@@ -27,7 +27,9 @@
 #include "filectl.h"
 #include "communityctl.h"
 #include "dbmodel.h"
-
+#include "areactl.h"
+#include "countryctl.h"
+#include "personctl.h"
 
 DbModel *Community::build()
 {
@@ -40,74 +42,32 @@ DbModel *Community::build()
 Community::Community():DbModel()
 {
     traced;
+    resetResource();
+    tracede;
 }
 
 Community::Community(const Community &obj):DbModel(obj)
 {
     traced;
-    setContact(obj.contact());
-
-    setImgPath(obj.imgPath());
-    setParentUid(obj.parentUid());
-    setParentName(obj.parentName());
-    setAreaName(obj.areaName());
-    setAreaUid(obj.areaUid());
-    setAreaDbId(obj.areaDbId());
-    setCountryUid(obj.countryUid());
-    setChurch(obj.church());
-    setAddr(obj.addr());
-    setTel(obj.tel());
-    setEmail(obj.email());
-    setFeastDate(obj.feastDate());
-    setCreateDate(obj.createDate());
-    setCloseDate(obj.closeDate());
-    setStatus(obj.getStatus());
-    setCurrentCEOUid(obj.currentCEOUid());
-    setCurrentCEO(obj.currentCEO());
-    setIntro(obj.intro());
-    setContact(obj.contact());
-    setLevel(obj.level());
-    setRemark(obj.remark());
-    setAreaCode(obj.areaCode());
-    setCurrentCEOCode(obj.currentCEOCode());
+    resetResource();
+    copy(obj);
     tracede;
 }
 
 Community::~Community()
 {
     traced;
+    resetResource();
+    traced;
 }
 
 void Community::clone(const DbModel *model)
 {
     traced;
-    DbModel::clone(model);
-    Community* comm = (Community*) model;
-    setContact(comm->contact());
-
-    setImgPath(comm->imgPath());
-    setParentUid(comm->parentUid());
-    setParentName(comm->parentName());
-    setAreaName(comm->areaName());
-    setAreaUid(comm->areaUid());
-    setAreaDbId(comm->areaDbId());
-    setCountryUid(comm->countryUid());
-    setChurch(comm->church());
-    setAddr(comm->addr());
-    setTel(comm->tel());
-    setEmail(comm->email());
-    setFeastDate(comm->feastDate());
-    setCreateDate(comm->createDate());
-    setCloseDate(comm->closeDate());
-    setStatus(comm->getStatus());
-    setCurrentCEOUid(comm->currentCEOUid());
-    setCurrentCEO(comm->currentCEO());
-    setIntro(comm->intro());
-    setContact(comm->contact());
-    setLevel(comm->level());
-    setRemark(comm->remark());
-    setAreaCode(comm->areaCode());
-    setCurrentCEOCode(comm->currentCEOCode());
+    if (model && model->modelName() == KModelNameCommunity) {
+        DbModel::clone(model);
+        copy(*(Community*)model);
+    }
     tracede;
 }
 
@@ -120,41 +80,71 @@ void Community::initExportFields()
 {
     traced;
     DbModel::initExportFields();
-    mExportFields.insert(KItemCountry, [this](const QString& item){
-        return this->country(); // TODO: get country id from country name???
+    mExportCallbacks.insert(KItemCountry, [this](const QString& item){
+        return this->countryName();
     });
-    mExportFields.insert(KItemAddress, [this](const QString& item){
+    mExportCallbacks.insert(KItemCountryNameId, [this](const QString& item){
+        return this->countryNameId();
+    });
+    mExportCallbacks.insert(KItemAddress, [this](const QString& item){
         return this->addr();
     });
-    mExportFields.insert(KItemEmail, [this](const QString& item){
+    mExportCallbacks.insert(KItemEmail, [this](const QString& item){
         return this->email();
     });
-    mExportFields.insert(KItemTel, [this](const QString& item){
+    mExportCallbacks.insert(KItemTel, [this](const QString& item){
         return this->tel();
     });
-    mExportFields.insert(KItemEstablishDate, [this](const QString& item){
+    mExportCallbacks.insert(KItemEstablishDate, [this](const QString& item){
         return Utils::date2String(this->createDate(), DATE_FORMAT_YMD);
     });
-    mExportFields.insert(KItemCloseDate, [this](const QString& item){
+    mExportCallbacks.insert(KItemCloseDate, [this](const QString& item){
         return Utils::date2String(this->closeDate(), DATE_FORMAT_YMD);
     });
-    mExportFields.insert(KItemFeastDay, [this](const QString& item){
+    mExportCallbacks.insert(KItemFeastDay, [this](const QString& item){
         return Utils::date2String(this->feastDate(), DATE_FORMAT_MD);
     });
-    mExportFields.insert(KItemOtherContact, [this](const QString& item){
+    mExportCallbacks.insert(KItemOtherContact, [this](const QString& item){
         return this->contact();
     });
-    mExportFields.insert(KItemAreaNameId, [this](const QString& item){
-        return this->areaName();// TODO: need to search Area Uid from Area Code
+    mExportCallbacks.insert(KItemArea, [this](const QString& item){
+        return this->areaName();
     });
-    mExportFields.insert(KItemParentCommunityName, [this](const QString& item){
-        return this->parentName();// TODO: need to search  Uid from  Code
+    mExportCallbacks.insert(KItemAreaNameId, [this](const QString& item){
+        return this->areaNameId();
     });
-    mExportFields.insert(KItemIntro, [this](const QString& item){
-        return this->intro();
+    mExportCallbacks.insert(KItemParentCommunity, [this](const QString& item){
+        return this->parentName();
     });
-    mExportFields.insert(KItemCEONameId, [this](const QString& item){
-        return this->currentCEO();
+    mExportCallbacks.insert(KItemParentCommunityNameId, [this](const QString& item){
+        return this->parentNameId();
+    });
+    mExportCallbacks.insert(KItemBrief, [this](const QString& item){
+        return this->brief();
+    });
+    mExportCallbacks.insert(KItemFullIntro, [this](const QString& item){
+        return this->fullInfo();
+    });
+    mExportCallbacks.insert(KItemCEO, [this](const QString& item){
+        return this->currentCEOName();
+    });
+    mExportCallbacks.insert(KItemCEONameId, [this](const QString& item){
+        return this->currentCEONameId();
+    });
+    mExportCallbacks.insert(KItemChurchAddress, [this](const QString& item){
+        return this->church();
+    });
+    mExportCallbacks.insert(KItemHistory, [this](const QString& item){
+        return this->history();
+    });
+    mExportCallbacks.insert(KItemStatus, [this](const QString& item){
+        return this->statusName();
+    });
+    mExportCallbacks.insert(KItemMission, [this](const QString& item){
+        return this->missionNameString();
+    });
+    mExportCallbacks.insert(KItemMissionNameId, [this](const QString& item){
+        return this->missionNameIdString();
     });
     // TODO: implement more
     tracede;
@@ -164,44 +154,75 @@ void Community::initImportFields()
 {
     traced;
     DbModel::initImportFields();
-    mImportFields.insert(KItemStatus, [this](const QString& value){
+    mImportCallbacks.insert(KItemStatus, [this](const QString& value){
         this->setStatus(value.toInt()); // TODO: handle error case when convert to Int
+        return ErrNone;
     });
-    mImportFields.insert(KItemCountry, [this](const QString& value){
-        this->setCountry(value); // TODO: get country id from country name???
+    mImportCallbacks.insert(KItemCountryNameId, [this](const QString& value){
+        ErrCode err = ErrNone;
+        if (!value.isEmpty()) {
+            DbModel* model = COUNTRYCTL->getModelByNameId(value);
+            if (model) {
+                this->setCountryName(model->name());
+                this->setCountryUid(model->uid());
+                delete model;
+            } else {
+                err = ErrNotFound;
+                loge("not found %s:'%s'", KItemCountryNameId, STR2CHA(value));
+            }
+        }
+        return err;
     });
-    mImportFields.insert(KItemAddress, [this](const QString& value){
+    mImportCallbacks.insert(KItemAddress, [this](const QString& value){
         this->setAddr(value);
+        return ErrNone;
     });
-    mImportFields.insert(KItemEmail, [this](const QString& value){
+    mImportCallbacks.insert(KItemEmail, [this](const QString& value){
         this->setEmail(value);
+        return ErrNone;
     });
-    mImportFields.insert(KItemTel, [this](const QString& value){
+    mImportCallbacks.insert(KItemTel, [this](const QString& value){
         this->setTel(value);
+        return ErrNone;
     });
-    mImportFields.insert(KItemEstablishDate, [this](const QString& value){
-        this->setCreateDateFromString(value);
+    mImportCallbacks.insert(KItemEstablishDate, [this](const QString& value){
+        if (!value.isEmpty())
+            return this->setCreateDateFromString(value);
+        return ErrNone;
     });
-    mImportFields.insert(KItemCloseDate, [this](const QString& value){
-        this->setCloseDateFromString(value);
+    mImportCallbacks.insert(KItemCloseDate, [this](const QString& value){
+        if (!value.isEmpty())
+            return this->setCloseDateFromString(value);
+        return ErrNone;
     });
-    mImportFields.insert(KItemFeastDay, [this](const QString& value){
-        this->setFeastDateFromString(value);
+    mImportCallbacks.insert(KItemFeastDay, [this](const QString& value){
+        if (!value.isEmpty())
+            return this->setFeastDateFromString(value);
+        return ErrNone;
     });
-    mImportFields.insert(KItemOtherContact, [this](const QString& value){
+    mImportCallbacks.insert(KItemOtherContact, [this](const QString& value){
         this->setContact(value);
+        return ErrNone;
     });
-    mImportFields.insert(KItemAreaNameId, [this](const QString& value){
-        this->setAreaCode(value);// TODO: need to search Area Uid from Area Code
+    mImportCallbacks.insert(KItemAreaNameId, [this](const QString& value){
+        ErrCode err = ErrNone;
+        logd("Search area nameid '%s'", STR2CHA(value));
+        CHECK_SET_IMPORT_NAME_ID(err, value, AREACTL, this->setAreaUid, this->setAreaName);
+        return err;
     });
-    mImportFields.insert(KItemParentCommunityNameId, [this](const QString& value){
-        this->setParentNameId(value);// TODO: need to search  Uid from  Code
+    mImportCallbacks.insert(KItemParentCommunityNameId, [this](const QString& value){
+        ErrCode err = ErrNone;
+        CHECK_SET_IMPORT_NAME_ID(err, value, COMMUNITYCTL, (this->setParentUid), (this->setParentName));
+        return err;
     });
-    mImportFields.insert(KItemIntro, [this](const QString& value){
-        this->setIntro(value);
+    mImportCallbacks.insert(KItemBrief, [this](const QString& value){
+        this->setBrief(value);
+        return ErrNone;
     });
-    mImportFields.insert(KItemCEONameId, [this](const QString& value){
-        this->setCurrentCEOCode(value);
+    mImportCallbacks.insert(KItemCEONameId, [this](const QString& value){
+        ErrCode err = ErrNone;
+        CHECK_SET_IMPORT_NAME_ID(err, value, PERSONCTL, (this->setCurrentCEONameId), (this->setParentName));
+        return err;
     });
     // TODO: implement more
     tracede;
@@ -220,6 +241,7 @@ qint32 Community::level() const
 void Community::setLevel(qint32 newLevel)
 {
     mLevel = newLevel;
+    markItemAsModified(KItemLevel);
     // TODO: level should be update automatically, by counting parent uid chain
     // if parent uid is null, mean root community. There must be only one community with level 0 (root community)
     // by default, all community must has root community as parent uid, until it's update
@@ -233,14 +255,23 @@ qint64 Community::createDate() const
 void Community::setCreateDate(qint64 newCreateDate)
 {
     mCreateDate = newCreateDate;
+    markItemAsModified(KItemCreateTime);
 }
 
-void Community::setCreateDateFromString(const QString &date, const QString &format)
+ErrCode Community::setCreateDateFromString(const QString &date, const QString &format)
 {
     traced;
     logd("create date string '%s'", date.toStdString().c_str());
-    mCreateDate = Utils::dateFromString(date, format);
+    bool ok = false;
+    mCreateDate = Utils::dateFromString(date, format, &ok);
     logd("mCreateDate %ll", mCreateDate);
+    if (!ok) {
+        loge("Invalid date '%s', format '%s'", STR2CHA(date), STR2CHA(format));
+    }
+
+    markItemAsModified(KItemCreateTime);
+    tracede;
+    return ok?ErrNone:ErrInvalidArg;
 }
 
 const QString &Community::parentUid() const
@@ -251,24 +282,35 @@ const QString &Community::parentUid() const
 void Community::setParentUid(const QString &newParentUid)
 {
     mParentUid = newParentUid;
+    if (mLevel < 0) {
+        logd("reset level");
+        DbModelHandler* hdl = getDbModelHandler();
+        Community* model = (Community*)hdl->getByUid(mParentUid);
+        if (model) {
+            mLevel = model->level() + 1;
+            delete model;
+        } else {
+            logw("uid '%s' not found", STR2CHA(newParentUid));
+        }
+    }
+
+    markItemAsModified(KItemParentCommunity);
 }
 
 DbModelStatus Community::getStatus() const
 {
-    return status;
-}
-
-void Community::setStatus(DbModelStatus newStatus)
-{
-    status = newStatus;
+    return mStatus;
 }
 
 void Community::setStatus(int newStatus)
 {
-    if (newStatus & MODEL_STATUS_MAX != 0) {
-        status = (DbModelStatus)newStatus;
-        mStatusName = DbModel::status2Name(status);
+    if ((newStatus & MODEL_STATUS_MAX) != 0) {
+        mStatus = (DbModelStatus)newStatus;
+        mStatusName = DbModel::status2Name(mStatus);
     }
+    logd("new status = %d", mStatus);
+    logd("new mStatusName = %s", STR2CHA(mStatusName));
+    markItemAsModified(KItemStatus);
 }
 
 //ErrCode_t Community::save()
@@ -294,18 +336,26 @@ qint64 Community::closeDate() const
 void Community::setCloseDate(qint64 newCloseDate)
 {
     mCloseDate = newCloseDate;
+    markItemAsModified(KItemCloseTime);
 }
 
-void Community::setCloseDateFromString(const QString &date, const QString &format)
+ErrCode Community::setCloseDateFromString(const QString &date, const QString &format)
 {
     traced;
+    bool ok = false;
     logd("close date string '%s'", date.toStdString().c_str());
-    mCloseDate = Utils::dateFromString(date, format);
+    mCloseDate = Utils::dateFromString(date, format, &ok);
     logd("mCloseDate %ll", mCloseDate);
+    if (!ok) {
+        loge("Invalid date '%s', format '%s'", STR2CHA(date), STR2CHA(format));
+    }
+    markItemAsModified(KItemCloseTime);
+    tracede;
+    return ok?ErrNone:ErrInvalidArg;
 }
 
 
-DbModelHandler *Community::getDbModelHandler()
+DbModelHandler *Community::getDbModelHandler() const
 {
     return DbCtl::getDb()->getCommunityModelHandler();
 }
@@ -325,8 +375,139 @@ bool Community::allowRemove(QString *msg)
     return allow; // not allow to deleve root community, only update is allowed
 }
 
-const QString &Community::countryName() const
+void Community::copy(const Community &model)
 {
+    traced;
+    mImgPath = model.mImgPath;
+    mAddr = model.mAddr;
+
+    mProvince = model.mProvince;
+
+    mCountryUid = model.mCountryUid;
+    mCountryName = model.mCountryName;
+    mCountryNameId = model.mCountryNameId;
+
+    mChurch = model.mChurch;
+
+    mTel = model.mTel;
+    mEmail = model.mEmail;
+
+    mLevel = model.mLevel;
+
+    mParentName = model.mParentName;
+    mParentUid = model.mParentUid;
+    mParentNameId = model.mParentNameId;
+
+    mCreateDate = model.mCreateDate;
+    mCloseDate = model.mCloseDate;
+    mFeastDate = model.mFeastDate;
+
+    mStatus = model.mStatus;
+    mStatusName = model.mStatusName;
+
+    mBrief = model.mBrief;
+    mFullInfo = model.mFullInfo;
+    mHistory = model.mHistory;
+
+    mAreaUid = model.mAreaUid;
+    mAreaDbId = model.mAreaDbId;
+    mAreaName = model.mAreaName;
+    mAreaNameId = model.mAreaNameId;
+
+    mCurrentCEOName = model.mCurrentCEOName;
+    mCurrentCEOUid = model.mCurrentCEOUid;
+    mCurrentCEONameId = model.mCurrentCEONameId;
+    mContact = model.mContact;
+
+    mMissionUid = model.mMissionUid;
+    mMissionName = model.mMissionName;
+    tracede;
+}
+
+void Community::resetResource()
+{
+    mLevel = -1;
+    mCreateDate = 0;
+    mCloseDate = 0;
+    mFeastDate = 0;
+    mStatus = MODEL_NOT_READY;
+    mAreaDbId = 0;
+    mMissionUid.clear();
+    mMissionName.clear();
+}
+
+const QString &Community::history() const
+{
+    return mHistory;
+}
+
+void Community::setHistory(const QString &newHistory)
+{
+    mHistory = newHistory;
+    markItemAsModified(KItemHistory);
+}
+
+const QStringList &Community::missionNameId() const
+{
+    return mMissionNameId;
+}
+
+void Community::setMissionNameId(const QStringList &newMissionNameId)
+{
+    mMissionNameId = newMissionNameId;
+    markItemAsModified(KItemMission);
+}
+
+void Community::addMissionNameId(const QString &newMissionNameId)
+{
+    mMissionNameId.push_back(newMissionNameId);
+    markItemAsModified(KItemMission);
+}
+
+QString Community::missionNameIdString() const
+{
+    return mMissionNameId.isEmpty()?"":mMissionNameId.join(MISSION_DELIM);
+
+}
+
+const QString &Community::fullInfo() const
+{
+    return mFullInfo;
+}
+
+void Community::setFullInfo(const QString &newFullInfo)
+{
+    mFullInfo = newFullInfo;
+    markItemAsModified(KItemFullIntro);
+}
+
+const QString &Community::countryNameId()
+{
+    CHECK_UID_TO_UPDATE_VALUE(mCountryUid, mCountryNameId, KModelHdlCountry, nameId);
+    return mCountryNameId;
+}
+
+void Community::setCountryNameId(const QString &newCountryNameId)
+{
+    mCountryNameId = newCountryNameId;
+    markItemAsModified(KItemCountry);
+}
+
+const QString &Community::areaNameId()
+{
+    CHECK_UID_TO_UPDATE_VALUE(mAreaUid, mAreaNameId, KModelHdlArea, nameId);
+    return mAreaNameId;
+}
+
+void Community::setAreaNameId(const QString &newAreaNameId)
+{
+    mAreaNameId = newAreaNameId;
+    markItemAsModified(KItemArea);
+}
+
+const QString &Community::countryName()
+{
+    CHECK_UID_TO_UPDATE_VALUE(mCountryUid, mCountryName, KModelHdlCountry, name);
     return mCountryName;
 }
 
@@ -370,6 +551,7 @@ QString Community::missionUidString() const
 void Community::setMissionUid(const QStringList &newMissionUid)
 {
     mMissionUid = newMissionUid;
+    markItemAsModified(KItemMission);
 }
 
 void Community::setMissionUid(const QString &newMissionUid)
@@ -377,11 +559,13 @@ void Community::setMissionUid(const QString &newMissionUid)
     if (!newMissionUid.isEmpty()) {
         mMissionUid = newMissionUid.split(MISSION_DELIM);
     }
+    markItemAsModified(KItemMission);
 }
 
 void Community::addMissionUid(const QString &newMissionUid)
 {
     mMissionUid.push_back(newMissionUid);
+    markItemAsModified(KItemMission);
 }
 
 const QString &Community::brief() const
@@ -392,17 +576,20 @@ const QString &Community::brief() const
 void Community::setBrief(const QString &newBrief)
 {
     mBrief = newBrief;
+    markItemAsModified(KItemBrief);
 }
 
-const QString &Community::currentCEOCode() const
+const QString &Community::currentCEONameId()
 {
-    return mCurrentCEOCode;
+    CHECK_UID_TO_UPDATE_VALUE(mCurrentCEOUid, mCurrentCEONameId, KModelHdlPerson, nameId);
+    return mCurrentCEONameId;
 }
 
-void Community::setCurrentCEOCode(const QString &newCurrentCEOCode)
+void Community::setCurrentCEONameId(const QString &newCurrentCEOCode)
 {
-    mCurrentCEOCode = newCurrentCEOCode;
+    mCurrentCEONameId = newCurrentCEOCode;
     // TODO: query uid from code
+    markItemAsModified(KItemCEO);
 }
 
 const QString Community::exportTemplatePath(FileExporter* exporter, QString* ftype) const
@@ -416,8 +603,9 @@ const QString Community::exportTemplatePath(FileExporter* exporter, QString* fty
     return QString();
 }
 
-const QString &Community::parentNameId() const
+const QString &Community::parentNameId()
 {
+    CHECK_UID_TO_UPDATE_VALUE(mParentUid, mParentNameId, KModelHdlCommunity, nameId);
     return mParentNameId;
 }
 
@@ -425,20 +613,9 @@ void Community::setParentNameId(const QString &newParentNameId)
 {
     mParentNameId = newParentNameId;
     // TODO: query parent community uid from parent community code
+    markItemAsModified(KItemParentCommunity);
 }
 
-const QString &Community::areaCode() const
-{
-    return mAreaCode;
-}
-
-void Community::setAreaCode(const QString &newAreaCode)
-{
-    mAreaCode = newAreaCode;
-    // TODO: query area uid from area code
-    // Community table only store Area Uid, not code, as code can be changed/update
-    // so must search code to get uid
-}
 
 const QString &Community::contact() const
 {
@@ -448,16 +625,7 @@ const QString &Community::contact() const
 void Community::setContact(const QString &newContact)
 {
     mContact = newContact;
-}
-
-const QString &Community::intro() const
-{
-    return mIntro;
-}
-
-void Community::setIntro(const QString &newIntro)
-{
-    mIntro = newIntro;
+    markItemAsModified(KItemContact);
 }
 
 const QString &Community::currentCEOUid() const
@@ -468,20 +636,23 @@ const QString &Community::currentCEOUid() const
 void Community::setCurrentCEOUid(const QString &newCurrentCEOUid)
 {
     mCurrentCEOUid = newCurrentCEOUid;
+    markItemAsModified(KItemCEO);
 }
 
-const QString &Community::currentCEO() const
+const QString &Community::currentCEOName()
 {
-    return mCurrentCEO;
+    CHECK_UID_TO_UPDATE_VALUE(mCurrentCEOUid, mCurrentCEOName, KModelHdlPerson, name);
+    return mCurrentCEOName;
 }
 
-void Community::setCurrentCEO(const QString &newCurrentCEO)
+void Community::setCurrentCEOName(const QString &newCurrentCEO)
 {
-    mCurrentCEO = newCurrentCEO;
+    mCurrentCEOName = newCurrentCEO;
 }
 
-const QString &Community::parentName() const
+const QString &Community::parentName()
 {
+    CHECK_UID_TO_UPDATE_VALUE(mParentUid, mParentName, KModelHdlCommunity, name);
     return mParentName;
 }
 
@@ -508,16 +679,19 @@ const QString &Community::countryUid() const
 void Community::setCountryUid(const QString &newCountryUid)
 {
     mCountryUid = newCountryUid;
+    markItemAsModified(KItemCountry);
 }
 
-const QString &Community::areaName() const
+const QString &Community::areaName()
 {
+    CHECK_UID_TO_UPDATE_VALUE(mAreaUid, mAreaName, KModelHdlArea, name);
     return mAreaName;
 }
 
 void Community::setAreaName(const QString &newAreaName)
 {
     mAreaName = newAreaName;
+    markItemAsModified(KItemArea);
 }
 
 qint64 Community::areaDbId() const
@@ -528,6 +702,7 @@ qint64 Community::areaDbId() const
 void Community::setAreaDbId(qint64 newAreaDbId)
 {
     mAreaDbId = newAreaDbId;
+    markItemAsModified(KItemArea);
 }
 
 const QString &Community::areaUid() const
@@ -538,6 +713,7 @@ const QString &Community::areaUid() const
 void Community::setAreaUid(const QString &newAreaUid)
 {
     mAreaUid = newAreaUid;
+    markItemAsModified(KItemArea);
 }
 
 const QString &Community::imgPath() const
@@ -558,14 +734,22 @@ qint64 Community::feastDate() const
 void Community::setFeastDate(qint64 newFeastDate)
 {
     mFeastDate = newFeastDate;
+    markItemAsModified(KItemFeastDay);
 }
 
-void Community::setFeastDateFromString(const QString &date, const QString &format)
+ErrCode Community::setFeastDateFromString(const QString &date, const QString &format)
 {
     traced;
+    bool ok = false;
     logd("mFeastDate date string '%s'", date.toStdString().c_str());
-    mFeastDate = Utils::dateFromString(date, format);
+    mFeastDate = Utils::dateFromString(date, format, &ok);
     logd("mFeastDate %ll", mFeastDate);
+    if (!ok) {
+        loge("Invalid date '%s', format '%s'", STR2CHA(date), STR2CHA(format));
+    }
+    markItemAsModified(KItemFeastDay);
+    tracede;
+    return ok?ErrNone:ErrInvalidArg;
 
 }
 
@@ -588,6 +772,7 @@ void Community::dump()
     logd("- CEO Uid %s", currentCEOUid().toStdString().c_str());
     logd("- Aread uid %s", areaUid().toStdString().c_str());
     logd("- Aread name %s", areaName().toStdString().c_str());
+    logd("- Status %d", getStatus());
 #endif //DEBUG_TRACE
 }
 
@@ -599,6 +784,7 @@ const QString &Community::email() const
 void Community::setEmail(const QString &newEmail)
 {
     mEmail = newEmail;
+    markItemAsModified(KItemEmail);
 }
 
 const QString &Community::tel() const
@@ -609,16 +795,7 @@ const QString &Community::tel() const
 void Community::setTel(const QString &newTel)
 {
     mTel = newTel;
-}
-
-const QString &Community::country() const
-{
-    return mCountry;
-}
-
-void Community::setCountry(const QString &newCountry)
-{
-    mCountry = newCountry;
+    markItemAsModified(KItemTel);
 }
 
 const QString &Community::province() const
@@ -629,6 +806,7 @@ const QString &Community::province() const
 void Community::setProvince(const QString &newProvince)
 {
     mProvince = newProvince;
+    markItemAsModified(KItemProvince);
 }
 
 const QString &Community::addr() const
@@ -639,6 +817,7 @@ const QString &Community::addr() const
 void Community::setAddr(const QString &newAddr)
 {
     mAddr = newAddr;
+    markItemAsModified(KItemAddress);
 }
 
 const QString &Community::church() const
@@ -649,4 +828,5 @@ const QString &Community::church() const
 void Community::setChurch(const QString &newChurch)
 {
     mChurch = newChurch;
+    markItemAsModified(KItemChurchAddress);
 }

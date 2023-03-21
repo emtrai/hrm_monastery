@@ -44,8 +44,18 @@ do { \
 
 class MapDbModel : public DbModel
 {
-public:
+protected:
     MapDbModel();
+public:
+    virtual ~MapDbModel();
+    MapDbModel(const MapDbModel& model);
+    MapDbModel(const MapDbModel* model);
+    virtual void clone(const DbModel* model);
+    static DbModel* buildMapModel(DbModelBuilder builder, const DbModel* item1, const DbModel* item2,
+                                  int status = MODEL_ACTIVE,
+                                  qint64 startdate = 0,
+                                  qint64 enddate = 0,
+                                  const QString& remark = nullptr);
 
     virtual QString buildUid(const QString* seed = nullptr);
 
@@ -79,7 +89,8 @@ public:
 
     const QString &changeHistory() const;
     void setChangeHistory(const QString &newChangeHistory);
-
+protected:
+    void copy(const MapDbModel& model);
 protected:
     QString mUid1;
     qint64 mDbId1;

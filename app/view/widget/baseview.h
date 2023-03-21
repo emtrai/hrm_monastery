@@ -23,6 +23,26 @@
 #define BASEVIEW_H
 #include "errcode.h"
 
+enum ViewType {
+    NONE = 0,
+    VIEW_PERSON,
+    VIEW_SAINT,
+    VIEW_COMMUNITY,
+    VIEW_AREA,
+    COMMUNITY_PERSON,
+    VIEW_COMMUNITY_DEPT,
+    VIEW_DEPARTMENT,
+    VIEW_DEPARTMENT_PERSON,
+    VIEW_ROLE,
+    VIEW_MISSION,
+    VIEW_SPECIALIST,
+    VIEW_EDUCATION,
+    VIEW_WORK,
+    VIEW_COUNTRY,
+    VIEW_ETHNIC,
+    VIEW_COURSE,
+    VIEW_MAX,
+    };
 
 typedef std::function<ErrCode(void* data)> ActionFunc_t;
 
@@ -30,9 +50,7 @@ typedef std::function<ErrCode(void* data)> ActionFunc_t;
 class BaseView
 {
 public:
-    BaseView();
     virtual int getViewType() = 0;
-//    virtual ErrCode runAction() = 0;
 protected:
     ActionFunc_t mShowActionFunc;// action to run when view show
     bool mShowActionFuncRunOnce; // TODO: support other mode? run once, run on resume, run on pause, etc.???

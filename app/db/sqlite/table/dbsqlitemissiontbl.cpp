@@ -58,10 +58,12 @@ ErrCode DbSqliteMissionTbl::insertTableField(DbSqliteInsertBuilder *builder, con
     return ErrNone;
 }
 
-void DbSqliteMissionTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqliteMissionTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     traced;
-    DbSqliteTbl::updateModelFromQuery(item, qry);
+    ErrCode err = ErrNone;
+    err = DbSqliteTbl::updateModelFromQuery(item, qry);
     tracede;
+    return err;
 }
 

@@ -44,7 +44,7 @@ protected:
     virtual DbModel* getItemAtIdx(int idx);
     virtual QString getValueOfItemAt(int idx, int col, QString header, DbModel* item);
 private:
-    QList<Person*> mListItems;
+    QList<DbModel*> mListItems;
 
 };
 

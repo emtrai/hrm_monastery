@@ -88,15 +88,15 @@ void LoaderCtl::registerAll()
 #endif
     add2Loader(EthnicCtl::getInstance());
     add2Loader(MissionCtl::getInstance());
-    add2Loader(PersonCtl::getInstance());
     add2Loader(INSTANCE(CourseCtl));
     add2Loader(INSTANCE(WorkCtl));
     add2Loader(INSTANCE(StatusCtl));
     add2Loader(INSTANCE(EventCtl));
     add2Loader(AreaCtl::getInstance());
-    add2Loader(CommunityCtl::getInstance());
     add2Loader(DepartCtl::getInstance());
+    add2Loader(CommunityCtl::getInstance());
     add2Loader(RoleCtl::getInstance());
+    add2Loader(PersonCtl::getInstance());
 }
 
 void LoaderCtl::runLoader(QList<Controller *> &list)

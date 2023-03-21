@@ -41,7 +41,7 @@ DbSqlitePerson::DbSqlitePerson()
     traced;
 }
 
-ErrCode DbSqlitePerson::add(DbModel *model)
+ErrCode DbSqlitePerson::add(DbModel *model, bool notifyDataChange)
 {
 
     traced;
@@ -187,7 +187,7 @@ ErrCode DbSqlitePerson::deleteSoft(DbModel *model)
     return err;
 }
 
-ErrCode DbSqlitePerson::deleteHard(DbModel *model)
+ErrCode DbSqlitePerson::deleteHard(DbModel *model, bool force, QString* msg)
 {
     traced;
     ErrCode err = ErrNone;

@@ -14,12 +14,12 @@
  * limitations under the License.
  *
  *
- * Filename: areaperson.cpp
+ * Filename: areacommunity.cpp
  * Author: Anh, Ngo Huy
  * Created date:10/25/2022
  * Brief:
  */
-#include "areaperson.h"
+#include "areacommunity.h"
 
 #include "logger.h"
 #include "errcode.h"
@@ -29,29 +29,31 @@
 #include "dbctl.h"
 #include "dbmodel.h"
 
-AreaPerson::AreaPerson()
+AreaCommunity::AreaCommunity()
 {
     traced;
 }
 
-DbModel *AreaPerson::build()
+DbModel *AreaCommunity::build()
 {
-    return new AreaPerson();
+    AreaCommunity* item = new AreaCommunity();
+    item->init();
+    return item;
 }
 
-DbModelBuilder AreaPerson::getBuilder()
+DbModelBuilder AreaCommunity::getBuilder()
 {
-    return &AreaPerson::build;
-}
-
-
-QString AreaPerson::modelName() const
-{
-    return KModelNameAreaPerson;
+    return &AreaCommunity::build;
 }
 
 
-DbModelHandler *AreaPerson::getDbModelHandler()
+QString AreaCommunity::modelName() const
+{
+    return KModelNameAreaComm;
+}
+
+
+DbModelHandler *AreaCommunity::getDbModelHandler() const
 {
     return DB->getModelHandler(KModelHdlArea);
 }

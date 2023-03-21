@@ -328,8 +328,7 @@ quint64 PersonCtl::getExportTypeList()
 }
 
 PersonCtl::PersonCtl():
-    ModelController(KModelHdlPerson),
-    mModelHdl(nullptr)
+    ModelController(KModelHdlPerson)
 {
     mEnableCache = false;
 }
@@ -340,51 +339,13 @@ PersonCtl::~PersonCtl()
     traced;
 }
 
-const QList<QString> &PersonCtl::importFields() const
-{
-    return mImportFields;
-}
-
-QList<Person *> PersonCtl::searchPerson(const QString &keyword)
-{
-    traced;
-    logd("search persone by name %s", keyword.toStdString().c_str());
-    // TODO:
-    QList<DbModel*> list;
-    QList<Person*> listret;
-    ErrCode ret = modelHdl()->search(keyword, &list);
-    logd("Search result %d", ret);
-    logd("no item %ld", list.count());
-    if (ret == ErrNone) {
-        foreach(DbModel* item, list) {
-            listret.append(dynamic_cast<Person*>(item));
-        }
-    }
-    return listret;
-}
-
-DbModelHandler *PersonCtl::modelHdl()
-{
-    return dynamic_cast<DbModelHandler*>(DB->getModelHandler(KModelHdlPerson));;
-}
-
 DbPersonModelHandler *PersonCtl::personModelHdl()
 {
     return dynamic_cast<DbPersonModelHandler*>(DB->getModelHandler(KModelHdlPerson));
 }
 
-DbModelHandler *PersonCtl::getModelHandler()
-{
-    return modelHdl();
-}
 
 DbModelBuilder PersonCtl::getMainBuilder()
 {
     return &Person::build;
-}
-
-ErrCode PersonCtl::onLoad()
-{
-    traced;
-    // TODO: caching management people, which can be used many times, for fast query
 }

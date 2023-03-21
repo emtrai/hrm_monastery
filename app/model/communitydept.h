@@ -77,7 +77,7 @@ public:
     void setClosedDateFromString(const QString &date, const QString &format="D.M.Y");
 
 protected:
-    virtual DbModelHandler* getDbModelHandler();
+    virtual DbModelHandler* getDbModelHandler() const;
 private:
 
     QString mDepartmentUid;

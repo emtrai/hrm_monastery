@@ -65,15 +65,17 @@ ErrCode DbSqliteEthnicTbl::insertTableField(DbSqliteInsertBuilder *builder,
     return ErrNone;
 }
 
-void DbSqliteEthnicTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqliteEthnicTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     traced;
+    ErrCode err = ErrNone;
     DbSqliteTbl::updateModelFromQuery(item, qry);
     Ethnic* model = (Ethnic*) item;
     model->setCountryUid(qry.value(KFieldCountryUid).toString());
     model->setCountryDbId(qry.value(KFieldCountryDbId).toInt());
     model->setCountryName(qry.value(KFieldCountryName).toString());
     tracede;
+    return err;
 }
 
 QString DbSqliteEthnicTbl::getSearchQueryString(const QString &cond)

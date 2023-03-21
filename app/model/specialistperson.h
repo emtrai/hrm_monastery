@@ -14,30 +14,31 @@
  * limitations under the License.
  *
  *
- * Filename: crypto.h
+ * Filename: specialistperson.h
  * Author: Anh, Ngo Huy
- * Created date:7/31/2022
+ * Created date:11/3/2022
  * Brief:
  */
-#ifndef CRYPTO_H
-#define CRYPTO_H
+#ifndef SPECIALISTPERSON_H
+#define SPECIALISTPERSON_H
 
-#include <QString>
-#include <QCryptographicHash>
+#include "mapdbmodel.h"
 
-class Crypto
+class SpecialistPerson : public MapDbModel
 {
 public:
-    /**
-     * @brief Hash file
-     * @param filename file to be hashed
-     * @param algo algorithm
-     * @return hash in string
-     */
-    static QString hashFile (const QString& filename,
-                            QCryptographicHash::Algorithm algo = QCryptographicHash::Algorithm::Sha256);
-    static QString hashString (const QString& value,
-                            QCryptographicHash::Algorithm algo = QCryptographicHash::Algorithm::Sha256);
+    SpecialistPerson();
+    static DbModel* build();
+    virtual DbModelBuilder getBuilder();
+    virtual QString modelName() const;
+    const QString &experienceHistory() const;
+    void setExperienceHistory(const QString &newExperienceHistory);
+    void setPersonUid(const QString& uid);
+    void setSpecialistUid(const QString& uid);
+protected:
+    virtual DbModelHandler *getDbModelHandler() const;
+protected:
+    QString mExperienceHistory;
 };
 
-#endif // CRYPTO_H
+#endif // SPECIALISTPERSON_H

@@ -44,7 +44,7 @@ public:
     void setCountryName(const QString &newCountryName);
 
 protected:
-    virtual DbModelHandler *getDbModelHandler();
+    virtual DbModelHandler *getDbModelHandler() const;
 private:
     qint64 mCountryDbId;
     QString mCountryUid;

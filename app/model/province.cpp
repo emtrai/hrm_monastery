@@ -77,7 +77,7 @@ void Province::setCountryDbId(qint64 newCountryDbId)
     mCountryDbId = newCountryDbId;
 }
 
-DbModelHandler *Province::getDbModelHandler()
+DbModelHandler *Province::getDbModelHandler() const
 {
     return DB->getModelHandler(KModelHdlProvince);
 }

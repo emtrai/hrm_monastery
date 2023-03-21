@@ -37,11 +37,17 @@ class PersonEvent;
 
 #define PERSONCTL PersonCtl::getInstance()
 
-// TODO: observer Person change?
 class PersonCtl: public ModelController
 {
     GET_INSTANCE_DECL(PersonCtl);
+private:
+    PersonCtl();
+    virtual ~PersonCtl();
+
 public:
+
+    DbPersonModelHandler *personModelHdl();
+
     /**
      * @brief Get person in community
      *        Caller must free data after use
@@ -107,31 +113,14 @@ public:
      * @return
      */
     virtual quint64 getExportTypeList();
-private:
-    PersonCtl();
-    virtual ~PersonCtl();
-
-
-public:
-    const QList<QString> &importFields() const;
 
     /**
-     * Search person by keywords, search keywords in any fields possible
+     * @brief Main model builder
+     * @return model builder
      */
-    QList<Person*> searchPerson(const QString& keyword);
-
-    DbModelHandler *modelHdl();
-    DbPersonModelHandler *personModelHdl();
-
-protected:
-    virtual DbModelHandler* getModelHandler();
     virtual DbModelBuilder getMainBuilder();
 private:
     QList<QString> mImportFields;
-    DbPersonModelHandler* mModelHdl;
-//    QHash<QString, std::function<QString (Person::*())>> mExportFields;
-public :
-    virtual ErrCode onLoad();
 };
 
 #endif // PersonCTL_H

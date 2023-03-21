@@ -69,9 +69,10 @@ ErrCode DbSqliteProvinceTbl::insertTableField(DbSqliteInsertBuilder *builder,
     return ErrNone;
 }
 
-void DbSqliteProvinceTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqliteProvinceTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     traced;
+    ErrCode err = ErrNone;
     DbSqliteTbl::updateModelFromQuery(item, qry);
     Province* model = (Province*) item;
     model->setCountryUid(qry.value(KFieldCountryUid).toString());
@@ -79,4 +80,5 @@ void DbSqliteProvinceTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &q
     model->setParentDbId(qry.value(KFieldParentDbId).toInt());
     model->setParentUid(qry.value(KFieldParentUid).toString());
     tracede;
+    return err;
 }

@@ -49,7 +49,7 @@ DbModelBuilder Mission::getBuilder()
     return &Mission::build;
 }
 
-DbModelHandler *Mission::getDbModelHandler()
+DbModelHandler *Mission::getDbModelHandler() const
 {
     return DB->getModelHandler(KModelHdlMission);
 }

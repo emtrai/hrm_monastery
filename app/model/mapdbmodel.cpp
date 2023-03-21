@@ -27,9 +27,86 @@
 
 #include "dbdefs.h"
 
-MapDbModel::MapDbModel()
+MapDbModel::MapDbModel():DbModel()
 {
     traced;
+}
+
+MapDbModel::~MapDbModel()
+{
+    traced;
+}
+
+MapDbModel::MapDbModel(const MapDbModel &model):DbModel((DbModel*)&model)
+{
+    traced;
+    copy(model);
+    tracede;
+}
+
+MapDbModel::MapDbModel(const MapDbModel *model):DbModel((DbModel*) model)
+{
+    traced;
+    if (model) {
+        copy(*model);
+    } else {
+        loge("contruct failed, null pointer");
+    }
+    tracede;
+}
+
+void MapDbModel::clone(const DbModel *model)
+{
+    traced;
+    if (model) {
+        DbModel::clone(model);
+        copy((*(MapDbModel*)model));
+    } else {
+        loge("clone failed, null model");
+    }
+    tracede;
+}
+
+DbModel *MapDbModel::buildMapModel(DbModelBuilder builder,
+                                   const DbModel *item1, const DbModel *item2,
+                                   int status, qint64 startdate, qint64 enddate,
+                                   const QString &remark)
+{
+    traced;
+    MapDbModel* model = nullptr;
+    ErrCode err = ErrNone;
+    if (!builder || !item1 || !item2) {
+        loge("Invalid argument, seem one of param is null");
+        err = ErrInvalidArg;
+    }
+    if (err == ErrNone) {
+        model = (MapDbModel*)builder();
+        if (!model) {
+            loge("No memory");
+            err = ErrNoMemory;
+        }
+    }
+    if (err == ErrNone && model->modelType() != MODEL_MAP) {
+        loge("Model is not model map");
+        err = ErrInvalidData;
+    }
+    if (err == ErrNone) {
+        model->setDbId1(item1->dbId());
+        model->setUid1(item1->uid());
+        model->setDbId2(item2->dbId());
+        model->setUid2(item2->uid());
+        model->setStatus(status);
+        model->setStartDate(startdate);
+        model->setEndDate(enddate);
+        if (!remark.isEmpty())
+            model->setRemark(remark);
+    } else {
+        loge("Error, release resource err = %d", err);
+        if (model) delete model;
+        model = nullptr;
+    }
+    tracede;
+    return model;
 }
 
 QString MapDbModel::buildUid(const QString *seed)
@@ -149,4 +226,19 @@ const QString &MapDbModel::changeHistory() const
 void MapDbModel::setChangeHistory(const QString &newChangeHistory)
 {
     mChangeHistory = newChangeHistory;
+}
+
+void MapDbModel::copy(const MapDbModel &model)
+{
+    traced;
+    mUid1 = model.mUid1;
+    mDbId1 = model.mDbId1;
+    mUid2 = model.mUid2;
+    mDbId2 = model.mDbId2;
+    mStartDate = model.mStartDate;
+    mEndDate = model.mEndDate;
+    mStatus = model.mStatus;
+    mParentUid = model.mParentUid;
+    mChangeHistory = model.mChangeHistory;
+    tracede;
 }

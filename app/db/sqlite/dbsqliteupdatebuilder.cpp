@@ -106,7 +106,11 @@ QSqlQuery *DbSqliteUpdateBuilder::buildSqlQuery(const QString *cond)
         QString id = ":val_" + field;
         logd("Bind update command field '%s', value '%s'",
              id.toStdString().c_str(), mValue.value(field).value.toStdString().c_str());
-        qry->bindValue(id, mValue.value(field).value); // TODO: check data type
+        if (mValue.value(field).dataType == TEXT) {
+            qry->bindValue(id, mValue.value(field).valueString());
+        } else {
+            qry->bindValue(id, mValue.value(field).valueInt());
+        }
 
     }
     foreach( QString field, mCondition.keys() )

@@ -36,7 +36,7 @@
 GET_INSTANCE_IMPL(DbSqliteCommunityDept);
 
 
-DbSqliteCommunityDept::DbSqliteCommunityDept():DbSqliteModelHandler()
+DbSqliteCommunityDept::DbSqliteCommunityDept():DbSqliteModelHandler(KModelHdlCommDept)
 {
     traced;
 }
@@ -50,15 +50,15 @@ DbSqliteTbl *DbSqliteCommunityDept::getMainTbl()
 QList<DbModel *> DbSqliteCommunityDept::getListPerson(const QString &commDeptUid, int status, bool* ok)
 {
     traced;
-    DbSqliteCommDeptPersonTbl* tbl = (DbSqliteCommDeptPersonTbl*)DbSqlite::getInstance()
-                                           ->getTable(KTableCommDepartPerson);
+    DbSqliteCommDeptPersonTbl* tbl = (DbSqliteCommDeptPersonTbl*)DbSqlite::table(KTableCommDepartPerson);
+    if (ok) *ok = true; // TODO: handle error case
     return tbl->getListPerson(commDeptUid, status);
 }
 
 QList<DbModel *> DbSqliteCommunityDept::getListDept(const QString &communityUid, int status, bool* ok)
 {
-    DbSqliteCommunityDeptTbl* tbl = (DbSqliteCommunityDeptTbl*)DbSqlite::getInstance()
-                                           ->getTable(KTableCommDept);
+    DbSqliteCommunityDeptTbl* tbl = (DbSqliteCommunityDeptTbl*)DbSqlite::table(KTableCommDept);
+    if (ok) *ok = true; // TODO: handle error case
     return tbl->getListDept(communityUid, status);
 }
 
@@ -67,13 +67,15 @@ DbSqliteTbl *DbSqliteCommunityDept::getTable(const QString &modelName)
     traced;
     DbSqliteTbl* tbl = nullptr;
     logd("modelname '%s'", modelName.toStdString().c_str());
-    if (modelName == KModelNameCommPerson) {
+    if (modelName.isEmpty() || modelName == KModelNameCommDept) {
+        tbl = getMainTbl();
+    } else if (modelName == KModelNameCommPerson) {
         tbl = DbSqlite::table(KTableCommPerson);
     } else if (modelName == KModelNamePersonDept) {
         logd("get table '%s'", KTableCommDepartPerson);
         tbl = (DbSqliteTbl*)DbSqlite::getInstance()->getTable(KTableCommDepartPerson);
     } else { // TODO: check & implement more??
-        tbl = getMainTbl();
+        loge("model name '%s' not support", STR2CHA(modelName));
     }
     tracede;
     return tbl;
@@ -84,8 +86,4 @@ DbModelBuilder DbSqliteCommunityDept::getMainBuilder()
     return &CommunityDept::build;
 }
 
-const QString DbSqliteCommunityDept::getName()
-{
-    return KModelHdlCommDept;
-}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Ngo Huy Anh
+ * Copyright (C) 2023 Ngo Huy Anh
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,20 @@
  * limitations under the License.
  *
  *
- * Filename: communityperson.h
+ * Filename: exception.cpp
  * Author: Anh, Ngo Huy
- * Created date:10/16/2022
+ * Created date:3/18/2023
  * Brief:
  */
-#ifndef COMMUNITYPERSON_H
-#define COMMUNITYPERSON_H
+#include "exception.h"
+#include <QString>
 
-#include "mapdbmodel.h"
-
-class CommunityPerson : public MapDbModel
+MyException::MyException(const QString &msg) throw()
 {
-public:
-    CommunityPerson();
-    static DbModel* build();
-    virtual DbModelBuilder getBuilder();
-    virtual QString modelName() const;
-protected:
-    virtual DbModelHandler *getDbModelHandler();
-};
+    mMessage.append(msg.toStdString().c_str());
+}
 
-#endif // COMMUNITYPERSON_H
+const char *MyException::what() const _NOEXCEPT
+{
+    return mMessage.data();
+}

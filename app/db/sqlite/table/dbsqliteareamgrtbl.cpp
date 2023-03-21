@@ -26,12 +26,15 @@
 #include "defs.h"
 #include "logger.h"
 #include "dbsqlitetablebuilder.h"
-#include "model/saintperson.h"
 #include "dbsqliteinsertbuilder.h"
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QHash>
 #include "table/dbsqlitepersontbl.h"
+#include "area.h"
+#include "person.h"
+#include "areaperson.h"
+#include "rolectl.h"
 
 const qint32 DbSqliteAreaMgrTbl::KVersionCode = VERSION_CODE(0,0,1);
 
@@ -61,7 +64,7 @@ QList<DbModel *> DbSqliteAreaMgrTbl::getListPerson(const QString &areaUid, int s
                                                          KFieldPersonUid,
                                                          KFieldUid,
                                                          KFieldAreaUid,
-                                                         &Person::build,
+                                                         &AreaPerson::build,
                                                          areaUid,
                                                          status);
 
@@ -77,21 +80,79 @@ void DbSqliteAreaMgrTbl::addTableField(DbSqliteTableBuilder *builder)
     tracede;
 }
 
-void DbSqliteAreaMgrTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqliteAreaMgrTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     traced;
-    DbSqliteMapTbl::updateModelFromQuery(item, qry);
-    QString modelName = item->modelName();
-    logd("update for map model '%s'", modelName.toStdString().c_str());
-    if (modelName == KModelNamePerson)
-    {
-        logd("update for person model");
-        DbSqlitePersonTbl* tbl = dynamic_cast<DbSqlitePersonTbl*>(DbSqlite::table(KTablePerson));
-        tbl->updateModelFromQuery(item, qry);
+    ErrCode err = ErrNone;
+    if (!item) {
+        err = ErrInvalidArg;
+        loge("invalid argument");
+    }
+    if (err == ErrNone) {
+        err = DbSqliteMapTbl::updateModelFromQuery(item, qry);
+    }
+    if (err == ErrNone) {
+        QString modelName = item->modelName();
+        AreaPerson* areaPerson = nullptr;
+        DbModel* person = nullptr;
+        DbModel* area = nullptr;
+        logd("update for map model '%s'", STR2CHA(modelName));
+        if (modelName == KModelNameAreaPerson) {
+            areaPerson = (AreaPerson*)item;
+            logd("update for person model");
+            person = Person::build();
+            area = Area::build();
+            if (!person || !area) {
+                err = ErrNoMemory;
+                loge("no memory for person or arae");
+            }
+        } else {
+            loge("Invalid mapp model '%s', do nothing", modelName.toStdString().c_str());
+            err = ErrInvalidData;
+        }
+        if (err == ErrNone) {
+            logd("Update person info");
+            DbSqlitePersonTbl* tbl = dynamic_cast<DbSqlitePersonTbl*>(DbSqlite::table(KTablePerson));
+            if (tbl) {
+                err = tbl->updateModelFromQuery(person, qry);
+            } else {
+                loge("not found table %s", KTablePerson);
+                err = ErrNotFound;
+            }
+        }
+        if (err == ErrNone) {
+            logd("update arae info");
+            DbSqlitePersonTbl* tbl = dynamic_cast<DbSqlitePersonTbl*>(DbSqlite::table(KTableArea));
+            if (tbl) {
+                err = tbl->updateModelFromQuery(area, qry);
+            } else {
+                loge("not found table %s", KTableArea);
+                err = ErrNotFound;
+            }
+        }
 
-
-    } else {
-        loge("Invalid mapp model '%s', do nothing", modelName.toStdString().c_str());
+        if (err == ErrNone) {
+            areaPerson->setRoleUid(qry.value(KFieldRoleUid).toString());
+            areaPerson->setPerson(person);
+            areaPerson->setArea(area);
+            if (!areaPerson->roleUid().isEmpty()){
+                logd("search role uid '%s'", STR2CHA(areaPerson->roleUid()));
+                DbModel* model = ROLECTL->getModelByUid(areaPerson->roleUid());
+                if (model) {
+                    areaPerson->setRoleName(model->name());
+                    delete model;
+                } else {
+                    logw("not found role uid '%s'", STR2CHA(areaPerson->roleUid()));
+                }
+            } else {
+                logw("Role uid empty");
+            }
+        } else {
+            loge("update db from model failed, err = %d", err);
+            if (person) delete person;
+            if (area) delete area;
+        }
     }
     tracede;
+    return err;
 }

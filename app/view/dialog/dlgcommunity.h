@@ -43,7 +43,6 @@ public:
     virtual ErrCode fromModel(const DbModel* model);
 protected:
     virtual DbModel* newModel();
-    virtual bool onValidateData(QString& msg);
     void loadData();
     void loadStatus();
 public:

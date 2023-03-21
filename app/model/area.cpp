@@ -29,7 +29,6 @@
 
 Area::Area():DbModel(),
       mCountryDbId(0)
-    , mPersonDbId(0)
 {
     traced;
 }
@@ -49,31 +48,18 @@ DbModel *Area::build()
 void Area::clone(const DbModel *model)
 {
     traced;
-    DbModel::clone(model);
-    Area* area = (Area*)model;
-    this->mCountryDbId = area->countryDbId();
-    this->mCountryName = area->countryName();
-    this->mPersonDbId = area->personDbId();
-    this->mPersonUid = area->personUid();
-    this->mPersonName = area->personName();
-    this->mCountryUid = area->countryUid();
-    this->mAreaCode = area->areaCode();
+    if (model) {
+        DbModel::clone(model);
+        copy(*(Area*)model);
+    } else {
+        loge("clone failed, null model");
+    }
     tracede;
 }
 
 QString Area::modelName() const
 {
     return KModelNameArea;
-}
-
-Country *Area::getCountry() const
-{
-    return country;
-}
-
-void Area::setCountry(Country *newCountry)
-{
-    country = newCountry;
 }
 
 qint64 Area::countryDbId() const
@@ -84,57 +70,8 @@ qint64 Area::countryDbId() const
 void Area::setCountryDbId(qint64 newCountryDbId)
 {
     mCountryDbId = newCountryDbId;
-}
+    markItemAsModified(KItemCountry);
 
-qint64 Area::personDbId() const
-{
-    return mPersonDbId;
-}
-
-void Area::setPersonDbId(qint64 newPersonDbId)
-{
-    mPersonDbId = newPersonDbId;
-}
-
-DbModelHandler *Area::getDbModelHandler()
-{
-
-    return DB->getModelHandler(KModelHdlArea);
-}
-
-DbModelBuilder Area::getBuilder()
-{
-    return &Area::build;
-}
-
-const QString &Area::areaCode() const
-{
-    return mAreaCode;
-}
-
-void Area::setAreaCode(const QString &newAreaCode)
-{
-    mAreaCode = newAreaCode;
-}
-
-QString Area::personName() const
-{
-    return mPersonName;
-}
-
-void Area::setPersonName(QString newPersonName)
-{
-    mPersonName = newPersonName;
-}
-
-QString Area::personUid() const
-{
-    return mPersonUid;
-}
-
-void Area::setPersonUid(QString newPersonUid)
-{
-    mPersonUid = newPersonUid;
 }
 
 QString Area::countryName() const
@@ -155,11 +92,25 @@ const QString &Area::countryUid() const
 void Area::setCountryUid(const QString &newCountryUid)
 {
     mCountryUid = newCountryUid;
+    markItemAsModified(KItemCountry);
 }
 
-// <country name>,<area name>
-QString Area::getFullName()
+DbModelHandler *Area::getDbModelHandler() const
 {
-    // TODO: no country name???
-    return QString("%s,%s").arg(countryName()).arg(name());
+
+    return DB->getModelHandler(KModelHdlArea);
+}
+
+DbModelBuilder Area::getBuilder()
+{
+    return &Area::build;
+}
+
+void Area::copy(const Area &model)
+{
+    traced;
+    mCountryName = model.mCountryName;
+    mCountryDbId = model.mCountryDbId;
+    mCountryUid = model.mCountryUid;
+    tracede;
 }

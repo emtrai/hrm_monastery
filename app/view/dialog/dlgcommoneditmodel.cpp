@@ -37,6 +37,7 @@ DlgCommonEditModel::DlgCommonEditModel(QWidget *parent): QDialog(parent),
 DlgCommonEditModel::~DlgCommonEditModel()
 {
     traced;
+    if (mModel) delete mModel;
 }
 
 bool DlgCommonEditModel::isNew() const
@@ -76,58 +77,89 @@ void DlgCommonEditModel::accept()
     traced;
     QString errMsg;
     ErrCode ret = ErrNone;
-    bool ok2Save = onValidateData(errMsg);
-    logd("ok2save %d", ok2Save);
-    if (!ok2Save) {
-        if (errMsg.isEmpty()) {
-            errMsg = QString("Có dữ liệu lỗi, vui lòng kiểm ra lại"); // TODO: should use "tr" or make it translatable???
-        }
-        logd("invalid data, err msg %s", STR2CHA(errMsg));
-        Utils::showErrorBox(errMsg);
-        ret = ErrInvalidData;
+    bool ok2Save = false;
+    logd("build model to save/return");
+    DbModel* item = model();
+    if (item) {
+        ret = buildModel(item, errMsg);
     } else {
-        logd("build model to save/return");
-        DbModel* item = model();
-        if (item) {
-            ret = buildModel(item, errMsg);
-            if (ret == ErrNone) {
-                if (mIsSelfSave) {
-                    if (mIsNew) {
-                        logd("Save it");
-                        ret = item->save();
-                    } else {
-                        logd("Update it");
-                        ret = item->update();
-                    }
-                    logi("Save/Update person result %d", ret);
+        loge("accept failed, no memory??");
+        ret = ErrNoMemory;
+    }
 
-                    if (ret == ErrNone) {
-                        logd("Save/update ok, close dialog");
-                    } else {
-                        Utils::showErrorBox("Lỗi, không thể lưu thông tin");
-                    }
-                } else {
-                    logd("not mIsSelfSave, just call accept");
-                }
-                if (mListener) {
-                    logd("Call listener");
-                    mListener->onDbModelReady(ErrNone, item, this);
-                } else {
-                    logd("no listener to call");
-                }
+    if (ret == ErrNone) {
+        ok2Save = onValidateData(errMsg);
+        logd("ok2save %d", ok2Save);
+        if (!ok2Save) {
+            if (errMsg.isEmpty()) {
+                errMsg = QString("Có dữ liệu lỗi, vui lòng kiểm ra lại"); // TODO: should use "tr" or make it translatable???
+            }
+            loge("invalid data, err msg %s", STR2CHA(errMsg));
+            Utils::showErrorBox(errMsg);
+            ret = ErrInvalidData;
+        }
+    }
+
+    if (ret == ErrNone) {
+        if (mIsSelfSave) {
+            if (mIsNew) {
+                logd("Save it");
+                ret = item->save();
             } else {
-                Utils::showErrorBox("Lỗi, không thể tạo dữ liệu");
-                ret = ErrBuildDataFailed;
+                logd("Update it");
+                ret = item->update();
+            }
+            logi("Save/Update person result %d", ret);
+
+            if (ret == ErrNone) {
+                logi("Save/update '%s' ok , close dialog", STR2CHA(item->toString()));
+                Utils::showMsgBox(QString(tr("Đã lưu %1")).arg(item->name()));
+            } else {
+                Utils::showErrorBox("Lỗi, không thể lưu thông tin");
             }
         } else {
-            loge("accept failed, no memory??");
-            ret = ErrNoMemory;
+            logd("not mIsSelfSave, just call accept");
         }
+        if (mListener) {
+            logd("Call listener");
+            mListener->onDbModelReady(ErrNone, item, this);
+        } else {
+            logd("no listener to call");
+        }
+    } else {
+        Utils::showErrorBox("Lỗi, không thể tạo dữ liệu");
+        ret = ErrBuildDataFailed;
     }
     if (ret == ErrNone) {
         QDialog::accept();
     }
     tracedr(ret);
+}
+
+bool DlgCommonEditModel::onValidateData(QString &msg)
+{
+    traced;
+    bool isValid = true;
+    if (mModel) {
+        if (mModel->nameId().isEmpty()) {
+            msg += tr("Thiếu mã định danh.");
+            isValid = false;
+            logw("lack name id");
+        }
+        if (mModel->name().isEmpty()) {
+            msg += tr("Thiếu tên.");
+            isValid = false;
+            logw("lack name");
+        }
+    } else {
+        logw("no model to check");
+        isValid = false;
+    }
+    logd("is valid %d", isValid);
+    // TODO: implement this????
+    // TODO do we need this? or just implement on buildModel are enough??
+    tracede;
+    return isValid;
 }
 
 ErrCode DlgCommonEditModel::loadList(QComboBox *cb, ModelController *ctrl)
@@ -139,15 +171,25 @@ ErrCode DlgCommonEditModel::loadList(QComboBox *cb, ModelController *ctrl)
     foreach(DbModel* item, list){
         cb->addItem(item->name(), item->uid());
     }
+    RELEASE_LIST_DBMODEL(list);
     tracedr(err);
     return err;
 }
 
 void DlgCommonEditModel::setModel(DbModel *newModel)
 {
-    // TODO: clone or assign????
-    // TODO: change to use smart pointer??????
-    mModel = newModel;
+    traced;
+    if (newModel) {
+        if (mModel) {
+            logd("delete old model");
+            delete mModel;
+        }
+        logd("clone new model");
+        mModel = newModel->clone();
+    } else {
+        loge("invalid new model");
+    }
+    tracede;
 }
 
 CommonEditModelListener *DlgCommonEditModel::listener() const
@@ -171,7 +213,7 @@ ErrCode DlgCommonEditModel::fromModel(const DbModel *inModel)
     DbModel* item = model();
     if (item) {
         item->clone(inModel);
-        item->validate(); // TODO: should call validate here???
+        item->validateAllFields(); // TODO: should call validate here???
         if (item == nullptr){
             ret = ErrInvalidArg; // TODO: should raise assert instead???
         }

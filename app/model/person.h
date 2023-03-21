@@ -57,7 +57,7 @@ public:
      * @param result of validate for each field Field:ErrCode
      * @return ErrNone on ok, ErrInvalidData if data is invalid, other error code otherwhise
      */
-    virtual ErrCode validate();
+    virtual ErrCode validateAllFields();
 private:
     ErrCode commonCheckField(QString& name,
                              QString& uid,
@@ -417,10 +417,10 @@ public:
     const QString &currentWorkName() const;
     void setCurrentWorkName(const QString &newCurrentWorkName);
 
-    const QHash<QString, std::function<QString (const QString&)> > &exportFields() const;
+    const QHash<QString, ExportCallbackFunc > &exportFields() const;
 
 protected:
-    virtual DbModelHandler *getDbModelHandler();
+    virtual DbModelHandler *getDbModelHandler() const;
     virtual const QString exportTemplatePath(FileExporter* exporter, QString* ftype = nullptr) const;
 
     virtual ErrCode prepare2Save();

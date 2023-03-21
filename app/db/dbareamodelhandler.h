@@ -24,22 +24,50 @@
 
 #include "dbmodelhandler.h"
 #include <QList>
+#include "dbmodel.h"
+
 class Person;
 class Community;
 class Area;
 
+/**
+ * @brief Specific handler for Area
+ */
 class DbAreaModelHandler
 {
 public:
-
-    virtual QList<DbModel*> getListPersonInCharges(const QString& areaUid, int status = 0) = 0;
+    /**
+     * @brief Get List of contact people, caller must free resource after use
+     * @param areaUid
+     * @param status \ref DbModelStatus
+     * @return AreaPerson model
+     */
+    virtual QList<DbModel*> getListContactPeople(const QString& areaUid, int status = 0) = 0;
+    /**
+     * @brief get list of communities of area
+     * @param areaUid
+     * @param status
+     * @return list of \ref Community
+     */
     virtual QList<DbModel*> getListCommunities(const QString& areaUid, int status = 0) = 0;
-    virtual ErrCode addPersonInChargeOfArea(const Area *area,
-                                        const Person* per,
-                                        int status = 0,
-                                        qint64 startdate = 0,
-                                        qint64 enddate = 0,
-                                        const QString& remark = nullptr) = 0;
+    /**
+     * @brief Add contact person to db
+     * @param area Area which persone belong to
+     * @param person Person to be added
+     * @param status status of contact person, i.e active (can contact), inactive (cannot contact)
+     * @param roleUid role of person
+     * @param startdate
+     * @param enddate
+     * @param remark
+     * @return
+     */
+    virtual ErrCode addContactPerson(const DbModel* area,
+                                     const DbModel* person,
+                                     int status = MODEL_ACTIVE,
+                                     const QString& roleUid = nullptr,
+                                     qint64 startdate = 0,
+                                     qint64 enddate = 0,
+                                     const QString& remark = nullptr) = 0;
 };
 
 #endif // DBAREAMODELHANDLER_H

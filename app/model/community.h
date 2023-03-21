@@ -59,12 +59,12 @@ protected:
 public:
     virtual ~Community();
     virtual void clone(const DbModel* per);
+
     virtual DbModelBuilder getBuilder();
     virtual void initExportFields();
     virtual void initImportFields();
 
     virtual QString modelName() const;
-
 
     qint32 level() const;
 
@@ -72,21 +72,17 @@ public:
 
     qint64 createDate() const;
     void setCreateDate(qint64 newCreateDate);
-    void setCreateDateFromString(const QString& date, const QString& format="D.M.Y");
+    ErrCode setCreateDateFromString(const QString& date, const QString& format="D.M.Y");
 
     const QString &parentUid() const;
     void setParentUid(const QString &newParentUid);
 
     DbModelStatus getStatus() const;
-    void setStatus(DbModelStatus newStatus);
     void setStatus(int newStatus);
-
-//    ErrCode save();
-//    void dump();
 
     qint64 closeDate() const;
     void setCloseDate(qint64 newCloseDate);
-    void setCloseDateFromString(const QString& date, const QString& format="D.M.Y");
+    ErrCode setCloseDateFromString(const QString& date, const QString& format="D.M.Y");
 
     const QString &church() const;
     void setChurch(const QString &newChurch);
@@ -97,9 +93,6 @@ public:
     const QString &province() const;
     void setProvince(const QString &newProvince);
 
-    const QString &country() const;
-    void setCountry(const QString &newCountry);
-
     const QString &tel() const;
     void setTel(const QString &newTel);
 
@@ -108,7 +101,7 @@ public:
 
     qint64 feastDate() const;
     void setFeastDate(qint64 newFeastDate);
-    void setFeastDateFromString(const QString& date, const QString& format="D.M");
+    ErrCode setFeastDateFromString(const QString& date, const QString& format="D.M");
 
     virtual bool isValid();
     virtual void dump();
@@ -122,7 +115,7 @@ public:
     qint64 areaDbId() const;
     void setAreaDbId(qint64 newAreaDbId);
 
-    const QString &areaName() const;
+    const QString &areaName();
     void setAreaName(const QString &newAreaName);
 
     const QString &countryUid() const;
@@ -132,29 +125,23 @@ public:
     const QString &statusName() const;
     void setStatusName(const QString &newStatusName);
 
-    const QString &parentName() const;
+    const QString &parentName();
     void setParentName(const QString &newParentName);
 
-    const QString &currentCEO() const;
-    void setCurrentCEO(const QString &newCurrentCEO);
+    const QString &currentCEOName() ;
+    void setCurrentCEOName(const QString &newCurrentCEOName);
 
     const QString &currentCEOUid() const;
     void setCurrentCEOUid(const QString &newCurrentCEOUid);
 
-    const QString &intro() const;
-    void setIntro(const QString &newIntro);
-
     const QString &contact() const;
     void setContact(const QString &newContact);
 
-    const QString &areaCode() const;
-    void setAreaCode(const QString &newAreaCode);
-
-    const QString &parentNameId() const;
+    const QString &parentNameId();
     void setParentNameId(const QString &newParentNameId);
 
-    const QString &currentCEOCode() const;
-    void setCurrentCEOCode(const QString &newCurrentCEOCode);
+    const QString &currentCEONameId();
+    void setCurrentCEONameId(const QString &newCurrentCEOCode);
     virtual const QString exportTemplatePath(FileExporter* exporter, QString* ftype = nullptr) const;
     const QString &brief() const;
     void setBrief(const QString &newBrief);
@@ -170,11 +157,27 @@ public:
     void setMissionName(const QStringList &newMissionName);
     void addMissionName(const QString &newMissionName);
 
-    const QString &countryName() const;
+    const QString &countryName();
     void setCountryName(const QString &newCountryName);
 
+    const QString &areaNameId();
+    void setAreaNameId(const QString &newAreaNameId);
+
+    const QString &countryNameId();
+    void setCountryNameId(const QString &newCountryNameId);
+
+    const QString &fullInfo() const;
+    void setFullInfo(const QString &newFullInfo);
+
+    const QStringList &missionNameId() const;
+    void setMissionNameId(const QStringList &newMissionNameId);
+    void addMissionNameId(const QString &newMissionNameId);
+    QString missionNameIdString() const;
+    const QString &history() const;
+    void setHistory(const QString &newHistory);
+
 protected:
-    virtual DbModelHandler* getDbModelHandler();
+    virtual DbModelHandler* getDbModelHandler() const;
 
     /**
      * @brief return if model is deleted or not
@@ -182,18 +185,19 @@ protected:
      * @return true: allow to delete, false otherwise
      */
     virtual bool allowRemove(QString* msg = nullptr);
+    void copy(const Community& model);
+    void resetResource();
 private:
     QString mImgPath;
     QString mAddr;
     QString mProvince;
-    QString mCountry;
     QString mCountryUid;
     QString mCountryName;
+    QString mCountryNameId;
     QString mChurch;
     QString mTel;
     QString mEmail;
     qint32 mLevel; // level 0: root, Level 1, Level 2 (belong to level 1), etc...
-    Community* mParent;
     QString mParentName;
     QString mParentUid;
     QString mParentNameId;
@@ -201,32 +205,27 @@ private:
     qint64 mCreateDate;
     qint64 mCloseDate;
     qint64 mFeastDate;
-    DbModelStatus status;
+    DbModelStatus mStatus;
     QString mStatusName;
 
     QString mBrief;
     QString mFullInfo;
     QString mHistory;
-    Person* mPIC;
-    QHash<qint32, QList<Person*>> mManagement; // role, list of person
-    Area* mArea;
-    // Board of management?
-    QList<Department*> mDepList;
 
     QString mAreaUid;
     qint64 mAreaDbId;
+    QString mAreaNameId;
     QString mAreaName; // just for display, not store in db of community
-    QString mAreaCode; // Area code
 
-    QString mCurrentCEO; // full name
+    QString mCurrentCEOName; // full name
     QString mCurrentCEOUid; // uid
-    QString mCurrentCEOCode; // code
+    QString mCurrentCEONameId; // code
 
-    QString mIntro;
     QString mContact; // Other detail contact
 
     QStringList mMissionUid;
     QStringList mMissionName;
+    QStringList mMissionNameId;
 };
 
 #endif // COMMUNITY_H

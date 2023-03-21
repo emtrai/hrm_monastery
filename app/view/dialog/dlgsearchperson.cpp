@@ -55,8 +55,14 @@ QString DlgSearchPerson::getTitle()
 int DlgSearchPerson::onSearch(const QString &keyword)
 {
     traced;
+    ErrCode err = ErrNone;
     clearAll();
-    mListItems = INSTANCE(PersonCtl)->searchPerson(keyword);
+
+    err = INSTANCE(PersonCtl)->search(keyword, &mListItems);
+    if (err == ErrNone) {
+        loge("Search person err=%d", err);
+        Utils::showErrorBox(QString(tr("Tìm kiếm lỗi, mã lỗi %1")).arg(err));
+    }
     tracede;
     return mListItems.count();
 }
@@ -65,8 +71,7 @@ void DlgSearchPerson::clearAll()
 {
     traced;
     DlgSearch::clearAll();
-    // TODO: clear each element of list????
-    mListItems.clear();
+    RELEASE_LIST_DBMODEL(mListItems);
     tracede;
 }
 

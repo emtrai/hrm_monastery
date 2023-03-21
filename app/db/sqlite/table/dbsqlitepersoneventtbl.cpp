@@ -78,9 +78,10 @@ ErrCode DbSqlitePersonEventTbl::insertTableField(DbSqliteInsertBuilder *builder,
     return ErrNone;
 }
 
-void DbSqlitePersonEventTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqlitePersonEventTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     traced;
+    ErrCode err = ErrNone;
     DbSqliteTbl::updateModelFromQuery(item, qry);
     PersonEvent* model = (PersonEvent*) item;
     model->setName(qry.value(KFieldName).toString());
@@ -89,6 +90,7 @@ void DbSqlitePersonEventTbl::updateModelFromQuery(DbModel *item, const QSqlQuery
     model->setDate(qry.value(KFieldDate).toInt());
     model->setEndDate(qry.value(KFieldEndDate).toInt());
     tracede;
+    return err;
 }
 
 ErrCode DbSqlitePersonEventTbl::getListEvents(const QString &personUid,

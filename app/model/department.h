@@ -36,7 +36,7 @@ public:
     virtual QString modelName() const;
 
 protected:
-     virtual DbModelHandler* getDbModelHandler();
+     virtual DbModelHandler* getDbModelHandler() const;
 };
 
 #endif // DEPARTMENT_H

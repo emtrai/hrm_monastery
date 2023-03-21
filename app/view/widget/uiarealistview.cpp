@@ -42,12 +42,16 @@ UIAreaListView::~UIAreaListView()
     traced;
 }
 
+int UIAreaListView::getViewType()
+{
+    return VIEW_AREA;
+}
+
 void UIAreaListView::initHeader()
 {
     traced;
     UICommonListView::initHeader();
     mHeader.append(tr("Quốc gia"));
-    mHeader.append(tr("Quản lý vùng"));
 }
 
 void UIAreaListView::updateItem(DbModel *item, UITableItem *tblItem)
@@ -57,7 +61,6 @@ void UIAreaListView::updateItem(DbModel *item, UITableItem *tblItem)
     UICommonListView::updateItem(item, tblItem);
     Area* model = (Area*) item;
     tblItem->addValue(model->countryName());
-    tblItem->addValue(model->personName());
 }
 
 ModelController *UIAreaListView::getController()
@@ -71,7 +74,7 @@ QList<DbModel *> UIAreaListView::getListItem()
     traced;
 //    return AREACTL->getAllItems();
     // TODO: temporary change to this api, should use getAllItems
-    return AREACTL->getAllItemsFromDb();
+    return AREACTL->getAllItems();
 }
 
 DbModel *UIAreaListView::onNewModel()

@@ -51,13 +51,13 @@ void UICommunityListView::initHeader()
 {
     traced;
     UICommonListView::initHeader();
-    mHeader.append(tr("Mã cộng đoàn"));
     mHeader.append(tr("Trạng thái hoạt động"));
     mHeader.append(tr("Vùng"));
     mHeader.append(tr("Địa chỉ"));
     mHeader.append(tr("Tổng phụ trách"));
     mHeader.append(tr("Điện thoại"));
     mHeader.append(tr("Email"));
+    mHeader.append(tr("Quốc gia"));
 }
 
 void UICommunityListView::updateItem(DbModel *item, UITableItem *tblItem)
@@ -66,13 +66,13 @@ void UICommunityListView::updateItem(DbModel *item, UITableItem *tblItem)
 
     UICommonListView::updateItem(item, tblItem);
     Community* model = (Community*) item;
-    tblItem->addValue(model->nameId());
     tblItem->addValue(DbModel::status2Name(model->getStatus()));
     tblItem->addValue(model->areaName());
     tblItem->addValue(model->addr());
-    tblItem->addValue(model->currentCEO());
+    tblItem->addValue(model->currentCEOName());
     tblItem->addValue(model->tel());
     tblItem->addValue(model->email());
+    tblItem->addValue(model->countryName());
 }
 
 
@@ -91,14 +91,6 @@ ErrCode UICommunityListView::onMenuActionImport(QMenu *menu, UITableMenuAction *
     MainWindow::showImportDlg(IMPORT_TARGET_COMMUNITY);
     tracedr(ret);
     return ret;
-}
-
-ErrCode UICommunityListView::onMenuActionDelete(QMenu *menu, UITableMenuAction *act)
-{
-    traced;
-    // TODO: handle it
-    // TODO: don't delete root community
-    return ErrNone;
 }
 
 ErrCode UICommunityListView::onMenuActionAddPerson(QMenu *menu, UITableMenuAction *act)
@@ -186,6 +178,39 @@ void UICommunityListView::onViewItem(UITableWidgetItem *item)
     tracede;
 }
 
+void UICommunityListView::onDeleteItem(UITableWidgetItem *item)
+{
+    traced;
+    ErrCode err = ErrNone;
+    if (item) {
+        DbModel* comm = item->itemData();
+        bool accept = Utils::showConfirmDialog(this,
+                             tr("Xoá"), QString(tr("Bạn có muốn xóa '%1'?").arg(comm->name())), nullptr);
+        if (accept) {
+            QString msg;
+            err = comm->remove(false, &msg);
+            if (err == ErrDependency) {
+                accept = Utils::showConfirmDialog(this,
+                                                  tr("Xoá"),
+                                                  QString(tr("Lỗi:%1.Bạn có muốn tiếp tục xóa '%2'?").arg(msg, comm->name())), nullptr);
+                if (accept) {
+                    err =comm->remove(true, &msg);
+                }
+            }
+
+            if (err != ErrNone) {
+                Utils::showErrorBox(QString(tr("Lỗi, mã lỗi: %1")).arg(err));
+            } else {
+                Utils::showMsgBox(QString(tr("Đã xóa '%1'")).arg(comm->name()));
+            }
+        }
+    } else {
+        loge("Nothing to delete");
+    }
+
+    tracede;
+}
+
 void UICommunityListView::onEditItem(UITableWidgetItem *item)
 {
     traced;
@@ -208,7 +233,7 @@ ErrCode UICommunityListView::onMenuActionListPerson(QMenu *menu, UITableMenuActi
     Community* community = dynamic_cast<Community*>(act->getData());
     if (community != nullptr) {
         community->dump();
-        UITableView* view = (UITableView*)MAIN->getView(ViewType::PERSON);
+        UITableView* view = (UITableView*)MAIN->getView(ViewType::VIEW_PERSON);
         view->addFilter(KItemCommunity, QString(), QVariant(community->uid()));
         MainWindow::getInstance()->switchView(view);
     } else {

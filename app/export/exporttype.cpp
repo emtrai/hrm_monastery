@@ -117,7 +117,7 @@ QString exportItem2Name(const QString &item, bool* isOk)
         s_item2Name.insert(KItemFullName, QObject::tr("Họ Tên"));
         s_item2Name.insert(KItemCountry, QObject::tr("Quốc gia"));
         s_item2Name.insert(KItemTel, QObject::tr("Điện thoại"));
-        s_item2Name.insert(KItemParentCommunityName, QObject::tr("Cộng đoàn chủ quản"));
+        s_item2Name.insert(KItemParentCommunity, QObject::tr("Cộng đoàn chủ quản"));
         s_item2Name.insert(KItemParentCommunityNameId, QObject::tr("Mã Cộng đoàn chủ quản"));
         s_item2Name.insert(KItemEstablishDate, QObject::tr("Ngày thành lập"));
         s_item2Name.insert(KItemCloseDate, QObject::tr("Ngày dừng hoạt động"));

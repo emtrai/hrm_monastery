@@ -43,7 +43,7 @@ DbModelBuilder Event::getBuilder()
 }
 
 
-DbModelHandler *Event::getDbModelHandler()
+DbModelHandler *Event::getDbModelHandler() const
 {
 
     return DB->getModelHandler(KModelHdlEvent);

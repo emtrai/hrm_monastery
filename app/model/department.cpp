@@ -50,7 +50,7 @@ QString Department::modelName() const
 }
 
 
-DbModelHandler *Department::getDbModelHandler()
+DbModelHandler *Department::getDbModelHandler() const
 {
 
     return DB->getModelHandler(KModelHdlDept);

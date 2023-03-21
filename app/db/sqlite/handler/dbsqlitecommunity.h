@@ -22,43 +22,57 @@
 #ifndef DBSQLITECOMMUNITY_H
 #define DBSQLITECOMMUNITY_H
 
-
 #include "dbsqlitemodelhandler.h"
 #include "dbcommunitymodelhandler.h"
+
+#include "utils.h"
 
 class DbSqliteCommunityTbl;
 class Community;
 
 class DbSqliteCommunity : public DbSqliteModelHandler, public DbCommunityModelHandler
 {
+    GET_INSTANCE_DECL(DbSqliteCommunity);
 public:
     DbSqliteCommunity();
-    static DbSqliteCommunity* getInstance();
     /**
      * @brief add model to db
      * @param model
      * @return ErrNone on success, error code otherwise
      */
-    virtual ErrCode add(DbModel* model);
-    virtual const QString getName();
+    virtual ErrCode add(DbModel* model, bool notifyDataChange = true);
+    virtual ErrCode deleteHard(DbModel* model, bool force = false, QString* msg = nullptr);
+
     // TODO: mapping community & person stored in person tbl and community&person mapping table
     // risk of inconsistant data
-    virtual QList<DbModel*> getListPerson(const QString& uid);
+    /**
+     * @brief Get List of people in community. Caller must free data after use
+     * @param communityUid
+     * @return list of Person
+     */
+    virtual QList<DbModel*> getListPerson(const QString& communityUid);
+
+    /**
+     * @brief Add person to community
+     * @param comm
+     * @param per
+     * @param status
+     * @param startdate
+     * @param enddate
+     * @param remark
+     * @return
+     */
     virtual ErrCode addPerson2Community(const Community *comm,
                                       const Person* per,
                                       int status = 0,
                                       qint64 startdate = 0,
                                       qint64 enddate = 0,
-                                      const QString& remark = nullptr);
+                                      const QString& remark = nullptr,
+                                      bool notifyDbChange = true);
 protected:
     virtual DbSqliteTbl* getMainTbl();
     virtual DbSqliteTbl* getTable(const QString& modelName);
     virtual DbModelBuilder getMainBuilder();
-private:
-
-private:
-    static DbSqliteCommunity* gInstance;
-
 
 };
 

@@ -35,6 +35,7 @@
 #include "dbdefs.h"
 #include "dbctl.h"
 #include "dbsqlite.h"
+#include "exception.h"
 
 DbSqliteMapTbl::DbSqliteMapTbl(DbSqlite* db):DbSqliteTbl(db)
 {
@@ -134,50 +135,64 @@ ErrCode DbSqliteMapTbl::insertTableField(DbSqliteInsertBuilder *builder, const D
     return ret;
 }
 
-void DbSqliteMapTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqliteMapTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     traced;
-    DbSqliteTbl::updateModelFromQuery(item, qry);
-    logd("update for map model '%s'", item->modelName().toStdString().c_str());
-    if (item->modelName() == KModelNameMap)
-    {
-        logd("update for map model");
-        MapDbModel* model = (MapDbModel*) item;
-        model->setUid1(qry.value(getFieldNameUid1()).toString());
-        model->setDbId1(qry.value(getFieldNameDbid1()).toInt());
-        model->setUid2(qry.value(getFieldNameUid2()).toString());
-        model->setDbId2(qry.value(getFieldNameDbid2()).toInt());
-        model->setStatus(qry.value(KFieldStatus).toInt());
-        model->setStartDate(qry.value(KFieldStartDate).toInt());
-        model->setEndDate(qry.value(KFieldEndDate).toInt());
-        model->setChangeHistory(qry.value(KFieldChangeHistory).toString());
-        model->setParentUid(qry.value(KFieldParentUid).toString());
-    } else {
-        loge("Invalid mapp model '%s', do nothing", item->modelName().toStdString().c_str());
+    ErrCode err = ErrNone;
+    if (!item) {
+        err = ErrInvalidArg;
+        loge("invalid argument");
     }
-    tracede;
+    if (err == ErrNone) {
+        err = DbSqliteTbl::updateModelFromQuery(item, qry);
+    }
+    if (err == ErrNone) {
+        logd("update for map model '%s'", item->modelName().toStdString().c_str());
+        if (item->modelType() == MODEL_MAP) {
+            logd("update for map model");
+            MapDbModel* model = (MapDbModel*) item;
+            model->setUid1(qry.value(getFieldNameUid1()).toString());
+            model->setDbId1(qry.value(getFieldNameDbid1()).toInt());
+            model->setUid2(qry.value(getFieldNameUid2()).toString());
+            model->setDbId2(qry.value(getFieldNameDbid2()).toInt());
+            model->setStatus(qry.value(KFieldStatus).toInt());
+            model->setStartDate(qry.value(KFieldStartDate).toInt());
+            model->setEndDate(qry.value(KFieldEndDate).toInt());
+            model->setChangeHistory(qry.value(KFieldChangeHistory).toString());
+            model->setParentUid(qry.value(KFieldParentUid).toString());
+        } else {
+            loge("Invalid mapp model '%s', type %d, do nothing",
+                 STR2CHA(item->modelName()), item->modelType());
+            err = ErrInvalidData;
+        }
+    }
+    tracedr(err);
+    return err;
 }
 
 QHash<QString, QString> DbSqliteMapTbl::getFieldsCheckExists(const DbModel *item)
 {
     traced;
     QHash<QString, QString> list;
-    QString modelName = item->modelName();
-    int modelType = item->modelType();
-    logd("modelName %s", modelName.toStdString().c_str());
-    logd("modelType %d", modelType);
-    if (modelType == MODEL_MAP) {
-    // TODO: should we check model name?????
-        const MapDbModel* model = (MapDbModel*)item;
-        // TODO: make as class member?
+    if (!item) {
+        QString modelName = item->modelName();
+        int modelType = item->modelType();
+        logd("modelName %s", STR2CHA(modelName));
+        logd("modelType %d", modelType);
+        if (modelType == MODEL_MAP) {
+            const MapDbModel* model = (MapDbModel*)item;
+            // TODO: make as class member?
 
-        list[getFieldNameUid1()] = model->uid1();
-        list[getFieldNameUid2()] = model->uid2();
-        list[KFieldStartDate] = QString("%1").arg(model->startDate());
-        list[KFieldEndDate] = QString("%1").arg(model->endDate());
-        list[KFieldStatus] = QString("%1").arg(model->status());
+            list[getFieldNameUid1()] = model->uid1();
+            list[getFieldNameUid2()] = model->uid2();
+            list[KFieldStartDate] = QString("%1").arg(model->startDate());
+            list[KFieldEndDate] = QString("%1").arg(model->endDate());
+            list[KFieldStatus] = QString("%1").arg(model->status());
+        } else {
+            THROWEX("Invalid modelName %s", STR2CHA(modelName));
+        }
     } else {
-        logd("Invalid modelName %s", modelName.toStdString().c_str());
+        THROWEX("Invalid parameter");
     }
 
     return list;

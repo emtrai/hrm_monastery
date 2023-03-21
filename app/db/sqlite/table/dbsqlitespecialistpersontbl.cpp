@@ -160,9 +160,10 @@ ErrCode DbSqliteSpecialistPersonTbl::insertTableField(DbSqliteInsertBuilder *bui
     return ret;
 }
 
-void DbSqliteSpecialistPersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqliteSpecialistPersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     traced;
+    ErrCode err = ErrNone;
     QString modelName = item->modelName();
     logd("update for map model '%s'", modelName.toStdString().c_str());
     if (modelName == KModelNamePerson )
@@ -183,4 +184,5 @@ void DbSqliteSpecialistPersonTbl::updateModelFromQuery(DbModel *item, const QSql
         loge("Invalid mapp model '%s', do nothing", modelName.toStdString().c_str());
     }
     tracede;
+    return err;
 }

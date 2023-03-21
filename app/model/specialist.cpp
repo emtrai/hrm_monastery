@@ -49,7 +49,7 @@ QString Specialist::modelName() const
     return KModelNameSpecialist;
 }
 
-DbModelHandler *Specialist::getDbModelHandler()
+DbModelHandler *Specialist::getDbModelHandler() const
 {
     return DbCtl::getInstance()->getDb()->getSpecialistModelHandler();
 }

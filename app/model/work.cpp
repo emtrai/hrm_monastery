@@ -51,7 +51,7 @@ DbModelBuilder Work::getBuilder()
     return &Work::build;
 }
 
-DbModelHandler *Work::getDbModelHandler()
+DbModelHandler *Work::getDbModelHandler() const
 {
     return DB->getModelHandler(KModelHdlWork);
 }

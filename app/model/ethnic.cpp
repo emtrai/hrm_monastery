@@ -58,7 +58,7 @@ void Ethnic::setCountryDbId(qint64 newCountryDbId)
     mCountryDbId = newCountryDbId;
 }
 
-DbModelHandler *Ethnic::getDbModelHandler()
+DbModelHandler *Ethnic::getDbModelHandler() const
 {
     return DB->getModelHandler(KModelHdlEthnic);
 }

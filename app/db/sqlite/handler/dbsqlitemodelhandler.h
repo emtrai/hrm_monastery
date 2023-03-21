@@ -27,6 +27,50 @@
 #include "errcode.h"
 #include "dbmodel.h"
 
+
+#define CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency, msg, force, itemToSearch, itemToSet, tableName, builder) \
+do { \
+    QList<DbModel*> list; \
+    int count = 0; \
+    logd("Check to delete table %s", tableName); \
+    err = getListItems(itemToSearch, tableName, true, &count, &list, builder); \
+    if (err == ErrNone && count > 0) { \
+        if (!force) { \
+            errDependency = true; \
+            if (msg) *msg += QString("'%1' existed in %2.").arg(model->name(), tableName); \
+        } else { \
+            foreach (DbModel* model, list) { \
+                logd("force Update '%s'", STR2CHA(model->toString())); \
+                tmpErr = update(model, itemToSet, tableName); \
+                logd("Update result=%d", tmpErr); \
+            } \
+        } \
+    } \
+    RELEASE_LIST_DBMODEL(list); \
+} while(0)
+
+#define CHECK_REMOVE_TO_DELETE(err, errDependency, msg, force, itemToSearch, tableName, builder) \
+do { \
+    QList<DbModel*> list; \
+    int count = 0; \
+    logd("Check to delete table %s", tableName); \
+    err = getListItems(itemToSearch, tableName, true, &count, &list, builder); \
+    if (err == ErrNone && count > 0) { \
+        if (!force) { \
+            errDependency = true; \
+            if (msg) *msg += QString("'%1' existed in %2.").arg(model->name(), tableName); \
+        } else { \
+            foreach (DbModel* model, list) { \
+                logd("force delete '%s'", STR2CHA(model->toString())); \
+                tmpErr = DbSqliteModelHandler::deleteHard(model, force, msg); \
+                logd("Delete result=%d", tmpErr); \
+            } \
+        } \
+    } \
+    RELEASE_LIST_DBMODEL(list); \
+} while(0)
+
+
 class DbSqlitePerson;
 
 class DbSqliteModelHandler : public virtual DbModelHandler
@@ -43,9 +87,10 @@ public:
      * @param model
      * @return ErrNone on success, error code otherwise
      */
-    virtual ErrCode add(DbModel* model);
+    virtual ErrCode add(DbModel* model, bool notifyDataChange = true);
 
     virtual ErrCode update(DbModel* model);
+    virtual ErrCode update(DbModel* model, const QHash<QString, QString> &inFields, const QString& tableName);
 
     /**
      * @brief delete by change status to delete
@@ -55,10 +100,12 @@ public:
     virtual ErrCode deleteSoft(DbModel* model);
     /**
      * @brief delete completely from db
-     * @param model
+     * @param[in] model
+     * @param[in] force if set true, it'll delete all dependence, else return error if found dependency
+     * @param[out] msg Message in case of error
      * @return
      */
-    virtual ErrCode deleteHard(DbModel* model);
+    virtual ErrCode deleteHard(DbModel* model, bool force, QString* msg);
 
     /**
      * @brief Check if model exist in db
@@ -110,7 +157,20 @@ public:
                        int from = 0,
                        int noItems = 0,
                        int* total = nullptr);
-
+    /**
+     * @brief checkFields
+     * @param inFields
+     * @param tableName
+     * @param isMatchAllField
+     * @param total
+     * @return
+     */
+    virtual ErrCode getListItems(const QHash<QString, QString>& inFields,
+                                const QString& tableName,
+                                bool isMatchAllField = true,
+                                int* total = nullptr,
+                                QList<DbModel*>* outList = nullptr,
+                                const DbModelBuilder& builder = nullptr);
 protected:
     virtual DbSqliteTbl* getMainTbl() = 0;
     virtual DbSqliteTbl* getTable(const QString& modelName);

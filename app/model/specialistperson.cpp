@@ -51,7 +51,7 @@ QString SpecialistPerson::modelName() const
 }
 
 
-DbModelHandler *SpecialistPerson::getDbModelHandler()
+DbModelHandler *SpecialistPerson::getDbModelHandler() const
 {
     return DB->getModelHandler(KModelHdlSpecialist);
 }

@@ -44,7 +44,7 @@ DbModelBuilder Status::getBuilder()
     return &Status::build;
 }
 
-DbModelHandler *Status::getDbModelHandler()
+DbModelHandler *Status::getDbModelHandler() const
 {
     return DB->getModelHandler(KModelHdlStatus);
 }

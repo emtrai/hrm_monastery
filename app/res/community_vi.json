@@ -14,7 +14,7 @@
         "feastday":"01.09",
         "establishday":"",
         "closeday":"",
-        "status":"1",
+        "status":"2",
         "mission":"GIAO_DUC",
         "email":"terkimsac@yahoo.com",
         "remark":""
@@ -33,7 +33,7 @@
         "feastday":"01.09",
         "establishday":"",
         "closeday":"",
-        "status":"1",
+        "status":"2",
         "mission":"GIAO_DUC",
         "email":"terkimsac@yahoo.com",
         "remark":""
@@ -52,7 +52,7 @@
         "feastday":"15.07",
         "establishday":"",
         "closeday":"",
-        "status":"1",
+        "status":"2",
         "mission":"SUC_KHOE",
         "email":"mnttanhdao@yahoo.com.vn"
         }

@@ -33,7 +33,7 @@ public:
     DbSqliteAreaTbl(DbSqlite *db);
     virtual void addTableField(DbSqliteTableBuilder* builder);
     virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
-    virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
+    virtual ErrCode updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
 protected:
 
     virtual QString getSearchQueryString(const QString& cond = nullptr);

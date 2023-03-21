@@ -56,6 +56,7 @@ DbSqliteTableBuilder::DbSqliteTableBuilder(const QString& name)
     mName = name;
 }
 
+
 DbSqliteTableBuilder* DbSqliteTableBuilder::build(const QString& tblName){
     traced;
     return new DbSqliteTableBuilder(tblName);
@@ -89,4 +90,15 @@ QString DbSqliteTableBuilder::buildSqlStatement()
                 "(%2 INTEGER PRIMARY KEY AUTOINCREMENT"
                 "%3)")
         .arg(mName, KFieldId, fields);
+}
+
+QHash<QString, int> DbSqliteTableBuilder::fields()
+{
+    QHash<QString, int> list;
+    foreach (TableFieldItem* item, mFields) {
+        if (item) {
+            list.insert(item->name(), item->datatype());
+        }
+    }
+    return list;
 }

@@ -92,6 +92,9 @@ public:
     virtual DbModelHandler* getSpecialistModelHandler();
     virtual DbModelHandler* getCommunityModelHandler();
     virtual DbSqlitePerson* getPersonModelHandler();
+    virtual DbModelHandler* getMissionModelHandler();
+    virtual DbModelHandler* getAreaModelHandler();
+    virtual DbModelHandler* getCountryModelHandler();
     virtual DbModelHandler* getModelHandler(const QString& name);
 
     static DbSqliteTbl* table(const QString& tblName);

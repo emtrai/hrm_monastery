@@ -69,14 +69,13 @@ ErrCode DlgCommunity::buildModel(DbModel *model, QString& errMsg)
         QString name = ui->txtName->text().trimmed();
         if (!name.isEmpty()) {
             comm->setName(name);
-        } else {
-            err = ErrInvalidData;
-            errMsg += tr("Thiếu Tên");
-            loge("Lack of name");
         }
     }
     if (err == ErrNone){
-        comm->setNameId(ui->txtCode->text().trimmed());
+        QString name = ui->txtCode->text().trimmed();
+        if (!name.isEmpty()) {
+            comm->setNameId(name);
+        }
     }
     if (err == ErrNone){
         SET_VAL_FROM_CBOX(ui->cbArea, comm->setAreaUid, comm->setAreaName);
@@ -94,7 +93,7 @@ ErrCode DlgCommunity::buildModel(DbModel *model, QString& errMsg)
         comm->setEmail(ui->txtEmail->toPlainText().trimmed());
     }
     if (err == ErrNone){
-        SET_VAL_FROM_CBOX(ui->cbCountry, comm->setCountryUid, comm->setCountry);
+        SET_VAL_FROM_CBOX(ui->cbCountry, comm->setCountryUid, comm->setCountryName);
     }
     if (err == ErrNone){
         comm->setChurch(ui->txtChurch->toPlainText().trimmed());
@@ -109,13 +108,13 @@ ErrCode DlgCommunity::buildModel(DbModel *model, QString& errMsg)
         SET_VAL_FROM_CBOX(ui->cbParentCommunity, comm->setParentUid, comm->setParentName);
     }
     if (err == ErrNone){
-        SET_VAL_FROM_TEXTBOX(ui->txtCEO, KItemUid, comm->setCurrentCEOUid, comm->setCurrentCEO);
+        SET_VAL_FROM_TEXTBOX(ui->txtCEO, KItemUid, comm->setCurrentCEOUid, comm->setCurrentCEOName);
     }
     if (err == ErrNone){
         comm->setContact(ui->txtContact->toPlainText().trimmed());
     }
     if (err == ErrNone){
-        comm->setIntro(ui->txtIntro->toPlainText().trimmed());
+        comm->setBrief(ui->txtIntro->toPlainText().trimmed());
     }
     if (err == ErrNone){
         comm->setRemark(ui->txtNote->toPlainText().trimmed());
@@ -145,10 +144,10 @@ ErrCode DlgCommunity::fromModel(const DbModel *item)
         // TODO: image???
         Utils::setSelectItemComboxByData(ui->cbParentCommunity, comm->parentUid());
         SET_TEXTBOX_FROM_VALUE(ui->txtCEO, KItemUid,
-                               comm->currentCEOUid(), comm->currentCEO());
+                               comm->currentCEOUid(), comm->currentCEOName());
 
 
-        ui->txtIntro->setPlainText(comm->intro());
+        ui->txtIntro->setPlainText(comm->brief());
         ui->txtContact->setPlainText(comm->contact());
         ui->txtNote->setPlainText(comm->remark());
     }
@@ -160,14 +159,6 @@ DbModel *DlgCommunity::newModel()
 {
     // TODO: check model parameter???
     return Community::build();
-}
-
-bool DlgCommunity::onValidateData(QString &msg)
-{
-    traced;
-    // TODO: implement this????
-    // TODO do we need this? or just implement on buildModel are enough??
-    return true;
 }
 
 void DlgCommunity::loadData()
@@ -185,7 +176,7 @@ void DlgCommunity::loadStatus()
     traced;
     ui->cbStatus->clear();
     const QHash<int, QString>* statuses = DbModel::getStatusIdNameMap();
-    logd("the number of status %d", statuses->count());
+    logd("the number of status %lld", statuses->count());
     foreach (int key, statuses->keys()) {
         ui->cbStatus->addItem(statuses->value(key), key);
     }

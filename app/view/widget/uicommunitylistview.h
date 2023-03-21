@@ -46,11 +46,11 @@ protected:
 //    virtual ErrCode onMenuAction(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionImport(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onMenuActionDelete(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionAddPerson(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionAddDepart(QMenu* menu, UITableMenuAction* act);
 //    virtual ErrCode onMenuActionView(QMenu* menu, UITableMenuAction* act);
     virtual void onViewItem(UITableWidgetItem *item);
+    virtual void onDeleteItem(UITableWidgetItem *item);
     void onEditItem(UITableWidgetItem *item);
     virtual QString getTitle();
 protected:

@@ -68,6 +68,14 @@ DbModelBuilder DbModelHandler::getMainBuilder()
     return nullptr;
 }
 
+DbModelBuilder DbModelHandler::getBuilder(const QString &modelName)
+{
+    if (modelName.isEmpty()){
+        return getMainBuilder();
+    }
+    return nullptr;
+}
+
 DbModel *DbModelHandler::getByUid(const QString &uid, const DbModelBuilder &builder)
 {
 

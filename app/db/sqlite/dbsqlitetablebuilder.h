@@ -24,6 +24,7 @@
 
 #include <QString>
 #include <QList>
+#include <QHash>
 
 #include "dbsqlitedefs.h"
 
@@ -36,6 +37,8 @@ public:
     static DbSqliteTableBuilder* build(const QString& tblName);
     DbSqliteTableBuilder* addField(const QString& name, TableFieldDatatype_t dataType);
     QString buildSqlStatement();
+    QHash<QString, int> fields();
+
 private:
 
     DbSqliteTableBuilder(const QString& name);

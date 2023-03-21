@@ -29,6 +29,7 @@ class DlgDeptMgr;
 }
 class Person;
 class PersonDept;
+class DbModel;
 
 class DlgDeptMgr : public QDialog
 {
@@ -39,8 +40,11 @@ public:
     ~DlgDeptMgr();
 
 
-    const QList<PersonDept *> &selectedPersons() const;
-    void setSelectedPersons(const QList<PersonDept *> &newSelectedPersons);
+    /**
+     * @brief return selected item. Caller must free data after use
+     * @return list of PersonDept object
+     */
+    QList<DbModel *> selectedPersons() const;
 
 protected:
     void loadCourse();
@@ -52,8 +56,8 @@ private slots:
 
 private:
     Ui::DlgDeptMgr *ui;
-    QList<PersonDept*> mSelectedPersons;
-    QList<Person*> mListPerson;
+    QList<DbModel*> mSelectedPersons;
+    QList<DbModel*> mListPerson;
     bool mIsMultiSelection;
 };
 

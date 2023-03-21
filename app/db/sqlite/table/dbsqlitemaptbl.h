@@ -45,7 +45,7 @@ public:
 protected:
     virtual void addTableField(DbSqliteTableBuilder* builder);
     virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
-    virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
+    virtual ErrCode updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
     virtual QHash<QString, QString> getFieldsCheckExists(const DbModel* item);
 
     virtual const QString& getFieldNameUid1() const;

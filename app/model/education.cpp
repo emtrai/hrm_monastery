@@ -45,7 +45,7 @@ DbModelBuilder Education::getBuilder()
     return &Education::build;
 }
 
-DbModelHandler *Education::getDbModelHandler()
+DbModelHandler *Education::getDbModelHandler() const
 {
     return DbCtl::getInstance()->getDb()->getEduModelHandler();
 }

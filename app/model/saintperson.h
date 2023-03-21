@@ -51,7 +51,7 @@ public:
     void setSaintDbId(qint64 newSaintDbId);
 
 protected:
-    virtual DbModelHandler *getDbModelHandler();
+    virtual DbModelHandler *getDbModelHandler() const;
 private:
     QString mPersonUid;
     qint64 mPersonDbId;

@@ -57,22 +57,23 @@ ErrCode UIDepartmentPersonListView::onMenuActionAdd(QMenu *menu, UITableMenuActi
     }
 
     if (dlg->exec() == QDialog::Accepted){
-        QList<PersonDept*> list = dlg->selectedPersons();
+        QList<DbModel*> list = dlg->selectedPersons();
         ErrCode ret = ErrNone;
         int cnt = 0;
         if (list.count() > 0) {
-            foreach (PersonDept* item, list) {
-                if (item != nullptr) {
-                    item->setCommDeptUid(mCommDept->uid());
-                    item->dump();
+            foreach (DbModel* item, list) {
+                PersonDept* dept = (PersonDept*) item;
+                if (dept != nullptr) {
+                    dept->setCommDeptUid(mCommDept->uid());
+                    dept->dump();
                     logd("Save item to db");
-                    ret = item->save();
+                    ret = dept->save();
                     logi("Save item result %d", ret); // TODO: check return value if one fail, what happend???
                     if (ret == ErrNone){
                         cnt ++;
                     } else {
-                        loge("Add per %s to dep %s failed %d", item->personName().toStdString().c_str(),
-                             item->uid().toStdString().c_str(), ret);
+                        loge("Add per %s to dep %s failed %d", dept->personName().toStdString().c_str(),
+                             dept->uid().toStdString().c_str(), ret);
                     }
                 }
             }

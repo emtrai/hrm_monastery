@@ -27,8 +27,8 @@
 #include "utils.h"
 #include "defs.h"
 
-
 GET_INSTANCE_CONTROLLER_IMPL(StatusCtl)
+
 StatusCtl::StatusCtl():
     ModelController(KModelHdlStatus)
 {

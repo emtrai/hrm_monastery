@@ -77,10 +77,10 @@ class Saint: public DbModel, public DataExporter, public IDataImporter
 
 
     protected:
-        virtual DbModelHandler *getDbModelHandler();
+        virtual DbModelHandler *getDbModelHandler() const;
 
     private:
-        QHash<QString, std::function<void(const QString&)>> mImportFields;
+        QHash<QString, ImportCallbackFunc> mImportCallbacks;
         QString mFullName;
         QString mOriginName;
         Gender mGender;

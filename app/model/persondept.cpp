@@ -50,7 +50,7 @@ DbModelBuilder PersonDept::getBuilder()
     return &PersonDept::build;
 }
 
-QString PersonDept::toString()
+QString PersonDept::toString() const
 {
     QString name = DbModel::toString();
     name.append(":" + personUid());
@@ -118,7 +118,7 @@ void PersonDept::dump()
 
 }
 
-DbModelHandler *PersonDept::getDbModelHandler()
+DbModelHandler *PersonDept::getDbModelHandler() const
 {
     return DB->getModelHandler(KModelHdlCommDept); // TODO: suitable???
 }

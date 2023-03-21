@@ -54,7 +54,10 @@ typedef enum ErrCode {
     ErrException,
     ErrNoHandler,
     ErrNoBuilder,
-
+    ErrDependency,
+    ErrSqlFailed,
+    ErrNoTable,
+    ErrFailedConvert,
     ErrMax
     } ErrCode_t;
 

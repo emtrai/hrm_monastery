@@ -79,9 +79,10 @@ ErrCode DbSqliteCommunityDeptTbl::insertTableField(DbSqliteInsertBuilder *builde
     return ErrNone;
 }
 
-void DbSqliteCommunityDeptTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqliteCommunityDeptTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     traced;
+    ErrCode err = ErrNone;
     DbSqliteTbl::updateModelFromQuery(item, qry);
     CommunityDept* cmm = (CommunityDept*) item;
     cmm->setCommunityUid(qry.value(KFieldCommunityUid).toString());
@@ -97,6 +98,7 @@ void DbSqliteCommunityDeptTbl::updateModelFromQuery(DbModel *item, const QSqlQue
     cmm->setStatus(qry.value(KFieldStatus).toInt());
     cmm->setBrief(qry.value(KFieldBrief).toString());
     tracede;
+    return err;
 }
 
 QString DbSqliteCommunityDeptTbl::getSearchQueryStringWithTag(const QString &cond, const QString& condTag)

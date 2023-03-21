@@ -77,7 +77,7 @@ void PersonEvent::buildUidIfNotSet()
     }
 }
 
-DbModelHandler *PersonEvent::getDbModelHandler()
+DbModelHandler *PersonEvent::getDbModelHandler() const
 {
 //    return DB->getModelHandler(KModelHdlPersonEvent);
     return DB->getModelHandler(KModelHdlPerson);

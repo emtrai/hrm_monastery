@@ -167,7 +167,7 @@ ErrCode DlgImportListResult::onLoad()
                 if (isExist) {
                     widgetItem->setIcon(icDup);
                 } else {
-                    ErrCode valRes = val->validate();
+                    ErrCode valRes = val->validateAllFields();
                     if (valRes == ErrNone) {
                         widgetItem->setFlags(ITEM_CHECK);
                         widgetItem->setCheckState(Qt::CheckState::Unchecked);

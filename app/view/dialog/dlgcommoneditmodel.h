@@ -100,7 +100,7 @@ protected:
      * @param msg: output message if validate is not ok
      * @return
      */
-    virtual bool onValidateData(QString& msg) = 0;
+    virtual bool onValidateData(QString& msg);
 
     virtual ErrCode loadList(QComboBox* cb, ModelController* ctrl);
 protected:

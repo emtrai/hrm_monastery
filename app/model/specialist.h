@@ -35,7 +35,7 @@ class Specialist : public DbModel
             virtual QString modelName() const;
 
         protected:
-            virtual DbModelHandler *getDbModelHandler();
+            virtual DbModelHandler *getDbModelHandler() const;
 
 signals:
 

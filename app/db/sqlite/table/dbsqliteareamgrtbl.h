@@ -32,7 +32,7 @@ public:
 
 protected:
     virtual void addTableField(DbSqliteTableBuilder* builder);
-    virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
+    virtual ErrCode updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
 private:
     static const qint32 KVersionCode;
 };

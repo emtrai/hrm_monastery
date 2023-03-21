@@ -38,7 +38,8 @@ public:
                                       int status = 0,
                                       qint64 startdate = 0,
                                       qint64 enddate = 0,
-                                      const QString& remark = nullptr) = 0;
+                                      const QString& remark = nullptr,
+                                      bool notifyDbChange = true) = 0;
 };
 
 #endif // DBCOMMUNITYMODELHANDLER_H

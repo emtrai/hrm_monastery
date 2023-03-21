@@ -32,7 +32,7 @@ public:
     DbSqliteCommunityPersonTbl(DbSqlite* db);
     QList<DbModel*> getListPerson(const QString& communityUid, int status = MODEL_ACTIVE);
 protected:
-    virtual void updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
+    virtual ErrCode updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
 
 private:
     static const qint32 KVersionCode;

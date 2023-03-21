@@ -23,7 +23,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-485</y>
+        <y>-377</y>
         <width>462</width>
         <height>1021</height>
        </rect>
@@ -138,7 +138,7 @@
          <item row="0" column="0">
           <widget class="QLabel" name="label">
            <property name="text">
-            <string>Tên</string>
+            <string>Tên (*)</string>
            </property>
           </widget>
          </item>
@@ -167,10 +167,17 @@
          <item row="11" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>
-            <widget class="QGraphicsView" name="imgPicture"/>
+            <widget class="QGraphicsView" name="imgPicture">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+            </widget>
            </item>
            <item>
             <widget class="QPushButton" name="pushButton_5">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>+</string>
              </property>
@@ -227,7 +234,7 @@
          <item row="1" column="0">
           <widget class="QLabel" name="label_3">
            <property name="text">
-            <string>Mã</string>
+            <string>Mã định danh (*)</string>
            </property>
           </widget>
          </item>

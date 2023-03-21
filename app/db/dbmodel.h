@@ -48,11 +48,56 @@
         } \
     } while (0)
 
+#define CHECK_SET_IMPORT_NAME_ID(err, value, ctl, funcSetUid, funcSetName) \
+            do { \
+                if (!value.isEmpty()) { \
+                    DbModel* model = (ctl)->getModelByNameId(value); \
+                    if (model) { \
+                        funcSetUid(model->uid()); \
+                        funcSetName(model->name()); \
+                        delete model; \
+                    } else { \
+                        loge("Not found name id '%s'", STR2CHA(value)); \
+                        err = ErrNotFound; \
+                    } \
+                } \
+            } while (0)
+
+/**
+ *  uid: uid variable to check/query value
+ *  valueToBeSet: variable to check and reset value
+ *  funcget: DbModel function to query data from, i.e name, nameid
+ */
+#define CHECK_UID_TO_UPDATE_VALUE(uid, valueToBeSet, hdlName, funcget) \
+            if (valueToBeSet.isEmpty() && !uid.isEmpty()) { \
+                logd("no value, but has uid, update it"); \
+                DbModelHandler* hdl = DB->getModelHandler(hdlName); \
+                DbModel* model = hdl->getByUid(uid); \
+                if (model) { \
+                    valueToBeSet = model->funcget(); \
+                    delete model; \
+                } else { \
+                    logw("uid '%s' not found", STR2CHA(uid)); \
+                } \
+            }
+
 class DbModel;
 class DbModelHandler;
 class DataExporter;
+class ModelController;
 
 typedef DbModel*(*DbModelBuilder)(void);
+
+/**
+ * @brief parameter: value to be imported
+ */
+typedef std::function<ErrCode(const QString&)> ImportCallbackFunc;
+
+/**
+ * @brief parameter:field name
+ */
+typedef std::function<QString(const QString&)> ExportCallbackFunc;
+
 
 /**
  * @brief status of record in db
@@ -99,6 +144,7 @@ protected:
     DbModel();
     DbModel(const DbModel& model);
     DbModel(const DbModel* model);
+    void copy(const DbModel& model);
 public:
     virtual ~DbModel();
     virtual void init();
@@ -148,17 +194,20 @@ public:
      * @return Error code
      */
     virtual ErrCode save();
+
+    virtual DbModel* addUpdate(const QString& field);
     /**
      * @brief Update modified info
      * @return Error code
      */
-    virtual ErrCode update();
+    virtual ErrCode update(bool allFields = false);
 
     /**
      * @brief remove data from db
+     * @param force: if set true, all dependency will be deleted, else not remove if there is dependency
      * @return
      */
-    virtual ErrCode remove();
+    virtual ErrCode remove(bool force = false, QString* msg = nullptr);
     virtual ErrCode markRemove();
 
     virtual ErrCode exportTo(const QString &fpath, ExportType type);
@@ -166,12 +215,9 @@ public:
     virtual qint32 dbStatus() const;
     virtual void setDbStatus(qint32 newDbStatus);
 
-    virtual const QString &history() const;
-    virtual void setHistory(const QString &newHistory);
-
     virtual bool isValid();
     virtual void dump();
-    virtual QString toString();
+    virtual QString toString() const;
 
 
     void setNameId(const QString &newNameId);
@@ -182,7 +228,7 @@ public:
      * @param result of validate for each field Field:ErrCode
      * @return ErrNone on ok, ErrInvalidData if data is invalid, other error code otherwhise
      */
-    virtual ErrCode validate();
+    virtual ErrCode validateAllFields();
     virtual bool isExist();
 
     QHash<QString, ErrCode> *validateResult() const;
@@ -220,8 +266,13 @@ public:
     const QString &remark() const;
     void setRemark(const QString &newRemark);
 
+    const QString &dbHistory() const;
+    void setDbHistory(const QString &newDbHistory);
+
+    bool updateAllFields() const;
+
 protected:
-    virtual DbModelHandler* getDbModelHandler() = 0;
+    virtual DbModelHandler* getDbModelHandler() const = 0;
     virtual ErrCode prepare2Save();
     virtual void markItemAsModified(const QString& itemName);
     virtual void checkModifiedThenSet(QString& cur, const QString& next, const QString& itemName);
@@ -235,12 +286,14 @@ protected:
      */
     virtual bool allowRemove(QString* msg = nullptr);
 protected:
-    QHash<QString, std::function<QString(const QString&)>> mExportFields;
-    QHash<QString, std::function<void(const QString&)>> mImportFields;
+    bool mDeletable; // model can be deleted from db or not
+    QHash<QString, ExportCallbackFunc> mExportCallbacks;
+    QHash<QString, ImportCallbackFunc> mImportCallbacks;
     QHash<QString, ErrCode>* mValidateResult;
     QString mValidateMsg;
     QList<QString> mUpdatedField; // List of fields/info were changed its value
     bool mMarkModified; // true: check & mark item as modified when it's changed. false: not mark anything
+    bool mUpdateAllFields;
 
     qint64 mDbId;
     QString mNameId; // Code/Name id, human readable, for easy searching, unquide.
@@ -249,7 +302,7 @@ protected:
     QString mName;// TODO: support multi languate???
     QString mUid;
     QString mRemark;
-    QString mHistory; // History on DB
+    QString mDbHistory; // History on DB
     qint32 mDbStatus;
     // TODO: time calculated from 1970 will be reset on 2038!!
     qint64 mCreatedTime; // time in ms, since epoc time (1970)

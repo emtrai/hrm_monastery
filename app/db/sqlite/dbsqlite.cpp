@@ -52,7 +52,6 @@
 #include "table/dbsqliteroletbl.h"
 #include "table/dbsqliteareamgrtbl.h"
 #include "table/dbsqlitespecialistpersontbl.h"
-#include "table/dbsqlitecommunitymgrtbl.h"
 #include "table/dbsqlitecommunitydepttbl.h"
 
 #include "dbsqlitedefs.h"
@@ -76,6 +75,8 @@
 #include "dbsqlitecommunitydept.h"
 
 #include "defs.h"
+#include "dbdefs.h"
+#include "exception.h"
 
 static const QString DRIVER("QSQLITE");
 
@@ -121,6 +122,7 @@ FieldValue::FieldValue(const FieldValue &item)
     traced;
     logd("copy constructor");
     value = item.value;
+    mIntValue = item.mIntValue;
     dataType = item.dataType;
 }
 
@@ -130,6 +132,17 @@ FieldValue::FieldValue(const QString &value, int dataType)
     logd("constructor");
     this->value = value;
     this->dataType = dataType;
+    if (dataType == INT32 || dataType == INT64) {
+        bool ok = false;
+        qint64 longValue = value.toLong(&ok);
+        if (!ok) {
+            THROWEX("Failed to convert '%s' to long", STR2CHA(value));
+        } else {
+            logd("convert '%s' to long %lld", STR2CHA(value), longValue);
+        }
+        this->mIntValue = longValue;
+    }
+    tracede;
 }
 
 FieldValue::FieldValue(qint64 value)
@@ -317,6 +330,23 @@ DbModelHandler *DbSqlite::getCommunityModelHandler()
 DbSqlitePerson *DbSqlite::getPersonModelHandler()
 {
     return dynamic_cast<DbSqlitePerson*>(getModelHandler(KModelHdlPerson));
+
+}
+
+DbModelHandler *DbSqlite::getMissionModelHandler()
+{
+    return getModelHandler(KModelHdlMission);
+}
+
+DbModelHandler *DbSqlite::getAreaModelHandler()
+{
+    return getModelHandler(KModelHdlArea);
+
+}
+
+DbModelHandler *DbSqlite::getCountryModelHandler()
+{
+    return getModelHandler(KModelHdlCountry);
 
 }
 

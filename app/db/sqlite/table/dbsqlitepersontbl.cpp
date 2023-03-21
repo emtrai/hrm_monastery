@@ -262,9 +262,10 @@ ErrCode DbSqlitePersonTbl::insertTableField(DbSqliteInsertBuilder *builder, cons
 
 // TODO: separate it into 2 info: detail and brief????
 // as person has a lots of information
-void DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     traced;
+    ErrCode err = ErrNone;
     DbSqliteTbl::updateModelFromQuery(item, qry);
     // TODO: separate into short info and full info, to avoid consume too much memory?
     // TODO: paging to avoid too much memory?
@@ -373,6 +374,9 @@ void DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry
 
 
     // TODO: add field relate to list, like holly list, community, etc.
+
+    tracede;
+    return err;
 }
 
 ErrCode DbSqlitePersonTbl::updateTableField(DbSqliteUpdateBuilder *builder,

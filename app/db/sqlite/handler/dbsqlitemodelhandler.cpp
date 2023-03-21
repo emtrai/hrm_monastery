@@ -22,6 +22,8 @@
 #include "dbsqlitemodelhandler.h"
 #include "logger.h"
 #include "dbmodel.h"
+#include "dbdefs.h"
+#include "dbsqlite.h"
 
 DbSqliteModelHandler::DbSqliteModelHandler()
 {
@@ -35,7 +37,7 @@ DbSqliteModelHandler::DbSqliteModelHandler(const QString &name)
     mName = name;
 }
 
-ErrCode DbSqliteModelHandler::add(DbModel *model)
+ErrCode DbSqliteModelHandler::add(DbModel *model, bool notify)
 {
 
     traced;
@@ -58,7 +60,7 @@ ErrCode DbSqliteModelHandler::add(DbModel *model)
         err = ErrInvalidArg;
         loge("invalid argument");
     }
-    if (err == ErrNone) {
+    if (err == ErrNone && notify) {
         notifyDataChange(model, DBMODEL_CHANGE_ADD, err);
     }
     return err;
@@ -92,6 +94,25 @@ ErrCode DbSqliteModelHandler::update(DbModel *model)
     return err;
 }
 
+ErrCode DbSqliteModelHandler::update(DbModel *model, const QHash<QString, QString> &inFields, const QString &tableName)
+{
+    traced;
+    DbSqliteTbl* tbl = nullptr;
+    ErrCode err = ErrNone;
+    int cnt = 0;
+    tbl = DbSqlite::table(tableName);
+    if (!tbl) {
+        err = ErrNoTable;
+        loge("not found table %s", STR2CHA(tableName));
+    }
+    if (err == ErrNone) {
+        err = tbl->update(model->uid(), inFields);
+        logd("Update err= %d", err);
+    }
+    tracedr(err);
+    return err;
+}
+
 ErrCode DbSqliteModelHandler::deleteSoft(DbModel *model)
 {
     traced;
@@ -118,8 +139,7 @@ ErrCode DbSqliteModelHandler::deleteSoft(DbModel *model)
     tracedr(err);
     return err;
 }
-
-ErrCode DbSqliteModelHandler::deleteHard(DbModel *model)
+ErrCode DbSqliteModelHandler::deleteHard(DbModel *model, bool force, QString *msg)
 {
     traced;
     ErrCode err = ErrNone;
@@ -128,11 +148,17 @@ ErrCode DbSqliteModelHandler::deleteHard(DbModel *model)
 
     if (model != nullptr){
         DbSqliteTbl* tbl = getTable(model->modelName());
-        if (tbl->isExist(model)){
-            err = tbl->deleteHard(model);
-        } else {
-            err = ErrNotExist;
-            loge("model %s not exist", model->name().toStdString().c_str());
+        if (!tbl) {
+            err = ErrNoTable;
+            loge("Not found table for '%s'", STR2CHA(model->modelName()));
+        }
+        if (err == ErrNone) {
+            if (tbl->isExist(model)){
+                err = tbl->deleteHard(model);
+            } else {
+                err = ErrNotExist;
+                loge("model %s not exist", model->name().toStdString().c_str());
+            }
         }
     }
     else{
@@ -146,11 +172,21 @@ ErrCode DbSqliteModelHandler::deleteHard(DbModel *model)
     return err;
 }
 
-bool DbSqliteModelHandler::exist(const DbModel *edu)
+bool DbSqliteModelHandler::exist(const DbModel *model)
 {
     traced;
-
-    return getMainTbl()->isExist(edu);;
+    bool exist = false;
+    if (model) {
+        logd("check exist for model '%s'", STR2CHA(model->toString()));
+        DbSqliteTbl* tbl = getTable(model->modelName());
+        if (tbl) exist = tbl->isExist(model);
+        else loge("not found table for model '%s'", STR2CHA(model->modelName()));
+    } else {
+        exist = false;
+        loge("invalid argument");
+    }
+    tracede;
+    return exist;
 }
 
 QList<DbModel *> DbSqliteModelHandler::getAll(DbModelBuilder builder, qint64 status,
@@ -266,6 +302,33 @@ ErrCode DbSqliteModelHandler::filter(int fieldId,
                               dbStatus, from, noItems, total);
     tracedr(ret);
     return ret;
+}
+
+ErrCode DbSqliteModelHandler::getListItems(const QHash<QString, QString> &inFields,
+                                          const QString &tableName,
+                                          bool isMatchAllField,
+                                          int* total,
+                                          QList<DbModel*>* outList,
+                                          const DbModelBuilder& builder)
+{
+    traced;
+    DbSqliteTbl* tbl = nullptr;
+    ErrCode err = ErrNone;
+    int cnt = 0;
+    logd("get list item for table '%s'", STR2CHA(tableName));
+    tbl = DbSqlite::table(tableName);
+    if (!tbl) {
+        err = ErrNoTable;
+        loge("not found table %s", STR2CHA(tableName));
+    }
+    if (err == ErrNone) {
+        err = tbl->getListItems(inFields, builder, outList,
+                                isMatchAllField, DB_RECORD_ACTIVE, 0, 0, &cnt);
+        logd("found %d items", cnt);
+    }
+    if (total) *total = cnt;
+    tracedr(err);
+    return err;
 }
 
 

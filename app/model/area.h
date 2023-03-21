@@ -35,50 +35,27 @@ protected:
 public:
     virtual ~Area();
     static DbModel *build();
-
     virtual void clone(const DbModel* model);
-    virtual QString modelName() const;
 
-    Country *getCountry() const;
-    void setCountry(Country *newCountry);
+    virtual QString modelName() const;
 
     qint64 countryDbId() const;
     void setCountryDbId(qint64 newCountryDbId);
 
-    qint64 personDbId() const;
-    void setPersonDbId(qint64 newPersonDbId);
-
     const QString &countryUid() const;
     void setCountryUid(const QString &newCountryUid);
-
-    QString getFullName();
 
     QString countryName() const;
     void setCountryName(QString newCountryName);
 
-    QString personUid() const;
-    void setPersonUid(QString newPersonUid);
-
-    QString personName() const;
-    void setPersonName(QString newPersonName);
-
-    const QString &areaCode() const;
-    void setAreaCode(const QString &newAreaCode);
-
 protected:
-    virtual DbModelHandler* getDbModelHandler();
+    virtual DbModelHandler* getDbModelHandler() const;
     virtual DbModelBuilder getBuilder();
+    void copy(const Area& model);
 private:
-    Person* mManager;
-    QHash<qint32, QList<Person*>> mMember; // role, list of member
-    Country* country;
     QString mCountryName; // just for display, not store to db
     qint64 mCountryDbId;
-    qint64 mPersonDbId;
-    QString mPersonUid;
-    QString mPersonName; // just for display, not store to db
     QString mCountryUid;
-    QString mAreaCode;
 
 };
 

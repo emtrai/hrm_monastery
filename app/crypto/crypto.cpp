@@ -25,17 +25,17 @@
 #include "errcode.h"
 #include <QFile>
 #include <QByteArray>
+#include "utils.h"
 
 QString Crypto::hashFile(const QString &filename, QCryptographicHash::Algorithm algo)
 {
     traced;
     QString hashString;
 
-    logd("hash file '%s' alg %d", filename.toStdString().c_str(), algo);
+    logd("hash file '%s' alg %d", STR2CHA(filename), algo);
     if (!filename.isEmpty()){ // TODO: check valid enum
         QFile file(filename);
-        if (file.exists())
-        {
+        if (file.exists()) {
             logi("Hash file %s, algo %d",
                  file.fileName().toStdString().c_str(), algo);
             if (file.open(QFile::ReadOnly)) {
@@ -62,9 +62,8 @@ QString Crypto::hashFile(const QString &filename, QCryptographicHash::Algorithm 
 
 
     if (!hashString.isEmpty()){
-        logi("Hash of file '%s'", hashString.toStdString().c_str());
+        logd("Hash of file '%s'", hashString.toStdString().c_str());
     }
-    // TODO: is it value copy?????
     return hashString;
 }
 
@@ -82,9 +81,4 @@ QString Crypto::hashString(const QString &value, QCryptographicHash::Algorithm a
         loge("hash string failed, empty string");
     }
     return hashString;
-}
-
-Crypto::Crypto()
-{
-
 }

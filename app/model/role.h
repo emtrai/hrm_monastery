@@ -34,7 +34,7 @@ public:
     virtual QString modelName() const;
 
 protected:
-    virtual DbModelHandler *getDbModelHandler();
+    virtual DbModelHandler *getDbModelHandler() const;
 };
 
 #endif // ROLE_H

@@ -38,6 +38,11 @@
 
 // yymd
 #define YMD_TO_INT(y,m,d) (((y) << 16) | ((m) << 8) | (d))
+#define YEAR_FROM_INT(date) ((date >> 16) & 0xFFFF)
+#define MONTH_FROM_INT(date) ((date >> 8) & 0xFF)
+#define DAY_FROM_INT(date) (date & 0xFF)
+
+static const QChar supportedSpli[] = {'/', '-', '.'}; // TODO: make it global????
 
 void Utils::clearListModel(QList<DbModel *>& list)
 {
@@ -99,20 +104,13 @@ qint64 Utils::dateFromString(const QString &date, const QString &f, bool* isOk)
     QString format = f.toUpper().simplified();
     bool ok = false;
     traced;
-    static QChar supportedSpli[] = {'/', '-', '.'}; // TODO: make it global????
+
     logd("Convert date '%s' to int, format '%s'",
          date.toStdString().c_str(),
          format.toStdString().c_str()
          );
     int len = sizeof(supportedSpli)/sizeof(supportedSpli[0]);
 
-//    for (int i = 0; i < len; i++){
-//        if (format.contains(supportedSpli[i]) && date.contains(supportedSpli[i])){
-//            listFormat = format.split(supportedSpli[i]);
-//            listDate = date.split(supportedSpli[i]);
-//            break;
-//        }
-//    }
     for (int i = 0; i < len; i++){
         if (format.contains(supportedSpli[i])){
             listFormat = format.split(supportedSpli[i]);
@@ -123,12 +121,10 @@ qint64 Utils::dateFromString(const QString &date, const QString &f, bool* isOk)
     }
     if (listDate.empty())
         listDate.append(date);
-    logd("listFormat length %d", listFormat.length());
-    logd("listDate length %d", listDate.length());
+    logd("listFormat length %lld", listFormat.length());
+    logd("listDate length %lld", listDate.length());
     if (!listDate.empty() && !listFormat.empty()
-        && (listDate.length() >= 1)){
-//        && (listDate.length() > 1)
-//        && (listDate.length() == listFormat.length())){
+        && (listDate.length() >= 1)) {
 
         qint32 year = 0, month = 0, day = 0;
 
@@ -140,28 +136,29 @@ qint64 Utils::dateFromString(const QString &date, const QString &f, bool* isOk)
             ok = false;
             logd("item %s", item.toStdString().c_str());
             logd("listDate %s", listDate[idx].toStdString().c_str());
-            if (item.simplified().startsWith("Y")){
+            if (item.simplified().startsWith("Y")){ // year
                 year = listDate[idx].toInt(&ok);
+                logd("year '%s' -> %d", STR2CHA(listDate[idx]), year);
 
-            } // TODO: support format like Jan, January???
-            else if (item.simplified().startsWith("M")){
+            } else if (item.simplified().startsWith("M")){
+                 // TODO: support format like Jan, January???
                 month = listDate[idx].toInt(&ok);
+                logd("month '%s' -> %d", STR2CHA(listDate[idx]), month);
 
-            } // TODO: support format like Mon, Tuesday????
-            else if (item.simplified().startsWith("D")){
+            }  else if (item.simplified().startsWith("D")){
+                // TODO: support format like Mon, Tuesday????
                 day = listDate[idx].toInt(&ok);
+                logd("day '%s' -> %d", STR2CHA(listDate[idx]), day);
             }
             if (!ok){
                 break;
             }
             idx ++;
-
         }
         logd("year %d moth %d date %d", year, month, day);
         if (ok){
             ret = YMD_TO_INT(year, month, day);
-        }
-        else{
+        } else{
             ret = 0;
             loge("Invalid data/format: parse faile");
 
@@ -171,31 +168,66 @@ qint64 Utils::dateFromString(const QString &date, const QString &f, bool* isOk)
     }
     if (isOk) *isOk = ok;
     logd("result date 0x%x, ok %d", (quint32) ret, ok);
+    tracede;
     return ret;
 }
 
-QString Utils::date2String(qint64 date, const QString& format)
+QString Utils::date2String(qint64 date, const QString& format, bool* isOk)
 {
     traced;
     int year = 0, month = 0, day = 0;
-    year = (date >> 16) & 0xFFFF;
-    month = (date >> 8) & 0xFF;
-    day = date & 0xFF;
+    QStringList listFormat;
+    QChar split;
+    bool foundSplit = false;
+    bool ok = true;
+    year = YEAR_FROM_INT(date);
+    month = MONTH_FROM_INT(date);
+    day = DAY_FROM_INT(date);
     QString dateString;
     logd("Date 0x%x", (quint32)date);
-    // TODO: use format
-    if (year > 0) dateString += QString::number(year);
+    logd("year %d", (quint32)year);
+    logd("month %d", (quint32)month);
+    logd("day %d", (quint32)day);
+    int len = sizeof(supportedSpli)/sizeof(supportedSpli[0]);
 
-    if (month > 0){
-        if (!dateString.isEmpty()) dateString += "/";
-        dateString += QString::number(month);
+    for (int i = 0; i < len; i++){
+        if (format.contains(supportedSpli[i])){
+            listFormat = format.split(supportedSpli[i]);
+            split = supportedSpli[i];
+            foundSplit = true;
+            break;
+        }
     }
+    if (foundSplit) {
+        logd("split: '%s'", STR2CHA(QString(split)));
+        int idx = 0;
+        foreach (QString item, listFormat){
 
-    if (day > 0) {
-        if (!dateString.isEmpty()) dateString += "/";
-        dateString += QString::number(day);
+            // if 0, still print out 0 so that parsing later can work normally
+            // TODO: should let empty instead? impact to convert string to int
+            if (item.simplified().startsWith("Y")) { // year
+                dateString += QString::number(year);
+            } else if (item.simplified().startsWith("M")) {
+                dateString += QString::number(month);
+            }  else if (item.simplified().startsWith("D")) {
+                dateString += QString::number(day);
+            } else {
+                ok = false;
+                loge("invalid format '%s'", STR2CHA(item));
+                break;
+            }
+            idx++;
+            if (idx < listFormat.size() && !dateString.isEmpty()) {
+                dateString += split;
+            }
+        }
+    } else {
+        ok = false;
+        loge("not found split for format '%s'", STR2CHA(format));
     }
-    logd("DateString %s", dateString.toStdString().c_str());
+    if (isOk) *isOk = ok;
+    logd("DateString %s", STR2CHA(dateString));
+    tracede;
     return dateString;
 }
 
@@ -550,6 +582,24 @@ void Utils::showErrorBox(int ret, const QString *msg)
     }
     errMsg.append(QString("Lỗi ! Mã lỗi %1").arg(ret)); // TODO: translation
     showErrorBox(errMsg);
+}
+
+bool Utils::showConfirmDialog(QWidget *parent, const QString &title, const QString &message, std::function<void(void)> onAccept)
+{
+    traced;
+    QMessageBox::StandardButton reply;
+    bool ok = false;
+    reply = QMessageBox::question(parent, title, message,
+                                  QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+        ok = true;
+        if (onAccept) onAccept();
+    } else {
+        logd("selected no");
+        ok = false;
+    }
+    tracede;
+    return ok;
 }
 
 ErrCode Utils::screenSize(int *w, int *h)

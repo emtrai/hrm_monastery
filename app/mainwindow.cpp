@@ -106,10 +106,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     mSummarizeView = new UISummarizeView();
 
-    mCommunityView = UITableViewFactory::getView(ViewType::COMMUNITY);
-    mSaintsView = UITableViewFactory::getView(ViewType::SAINT);
-    mPersonView = UITableViewFactory::getView(ViewType::PERSON);
-    mAreaView = UITableViewFactory::getView(ViewType::AREA);
+    mCommunityView = UITableViewFactory::getView(ViewType::VIEW_COMMUNITY);
+    mSaintsView = UITableViewFactory::getView(ViewType::VIEW_SAINT);
+    mPersonView = UITableViewFactory::getView(ViewType::VIEW_PERSON);
+    mAreaView = UITableViewFactory::getView(ViewType::VIEW_AREA);
     mDepartView = UITableViewFactory::getView(ViewType::VIEW_DEPARTMENT);
     mRoleView = UITableViewFactory::getView(ViewType::VIEW_ROLE);
     mCourseView = UITableViewFactory::getView(ViewType::VIEW_COURSE);
@@ -276,7 +276,7 @@ QWidget *MainWindow::getView(ViewType type)
     case ViewType::VIEW_DEPARTMENT:
         nextView = mDepartView;
         break;
-    case ViewType::PERSON:
+    case ViewType::VIEW_PERSON:
         nextView = mPersonView;
         break;
     default:

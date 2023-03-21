@@ -74,7 +74,7 @@ void SaintPerson::setPersonDbId(qint64 newPersonDbId)
     mPersonDbId = newPersonDbId;
 }
 
-DbModelHandler *SaintPerson::getDbModelHandler()
+DbModelHandler *SaintPerson::getDbModelHandler() const
 {
     return DB->getModelHandler(KModelHdlPerson);
 }

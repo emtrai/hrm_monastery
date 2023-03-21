@@ -36,7 +36,7 @@ public:
     static DbModel* build();
     virtual DbModelBuilder getBuilder();
 
-    virtual QString toString();
+    virtual QString toString() const;
 
     const QString &roleUid() const;
     void setRoleUid(const QString &newRoleUid);
@@ -81,7 +81,7 @@ public:
     void setPersonName(const QString &newPersonName);
 
 protected:
-    virtual DbModelHandler *getDbModelHandler();
+    virtual DbModelHandler *getDbModelHandler() const;
 protected:
     QString mRoleUid;
     QString mRoleName;

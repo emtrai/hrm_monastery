@@ -65,9 +65,10 @@ ErrCode DbSqliteSaintTbl::insertTableField(DbSqliteInsertBuilder *builder, const
     return ErrNone;
 }
 
-void DbSqliteSaintTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqliteSaintTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     traced;
+    ErrCode err = ErrNone;
     DbSqliteTbl::updateModelFromQuery(item, qry);
     Saint* saint = (Saint*) item;
     saint->setFullName(qry.value(KFieldFullName).toString());
@@ -75,6 +76,8 @@ void DbSqliteSaintTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
     saint->setGender((Gender)qry.value(KFieldGender).toInt());
     saint->setFeastDay(qry.value(KFieldFeastDay).toInt());
     saint->setCountry(qry.value(KFieldCountry).toString());
+    tracede;
+    return err;
 }
 
 QHash<QString, int> DbSqliteSaintTbl::getSearchFields()

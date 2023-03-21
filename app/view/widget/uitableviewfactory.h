@@ -23,27 +23,7 @@
 #define UITABLEVIEWFACTORY_H
 
 #include <QWidget>
-
-enum ViewType {
-    NONE = 0,
-    PERSON,
-    SAINT,
-    COMMUNITY,
-    AREA,
-    COMMUNITY_PERSON,
-    VIEW_COMMUNITY_DEPT,
-    VIEW_DEPARTMENT,
-    VIEW_DEPARTMENT_PERSON,
-    VIEW_ROLE,
-    VIEW_MISSION,
-    VIEW_SPECIALIST,
-    VIEW_EDUCATION,
-    VIEW_WORK,
-    VIEW_COUNTRY,
-    VIEW_ETHNIC,
-    VIEW_COURSE,
-    VIEW_MAX,
-};
+#include "baseview.h"
 
 class UITableView;
 

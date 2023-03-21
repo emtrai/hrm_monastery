@@ -49,6 +49,7 @@ INCLUDEPATH += $$PWD/location
 INCLUDEPATH += $$PWD/export
 INCLUDEPATH += $$PWD/import
 INCLUDEPATH += $$PWD/report
+INCLUDEPATH += $$PWD/exception
 #QT_NO_DEBUG_OUTPUT
 
 # You can make your code fail to compile if it uses deprecated APIs.
@@ -109,16 +110,16 @@ SOURCES += \
     db/sqlite/handler/dbsqliteedu.cpp \
     db/sqlite/handler/dbsqliteethnic.cpp \
     db/sqlite/handler/dbsqliteevent.cpp \
-    db/sqlite/model/areacommunity.cpp \
-    db/sqlite/model/areaperson.cpp \
-    db/sqlite/model/communityperson.cpp \
-    db/sqlite/model/mapdbmodel.cpp \
-    db/sqlite/model/specialistperson.cpp \
+    exception/exception.cpp \
+    model/areacommunity.cpp \
+    model/areaperson.cpp \
+    model/communityperson.cpp \
+    model/mapdbmodel.cpp \
+    model/specialistperson.cpp \
     db/sqlite/table/dbsqliteareamgrtbl.cpp \
     db/sqlite/table/dbsqliteareatbl.cpp \
     db/sqlite/table/dbsqlitecommdeptpersontbl.cpp \
     db/sqlite/table/dbsqlitecommunitydepttbl.cpp \
-    db/sqlite/table/dbsqlitecommunitymgrtbl.cpp \
     db/sqlite/table/dbsqlitecommunitypersontbl.cpp \
     db/sqlite/table/dbsqlitecommunitytbl.cpp \
     db/sqlite/table/dbsqlitecountrytbl.cpp \
@@ -177,7 +178,7 @@ SOURCES += \
     model/province.cpp \
     model/role.cpp \
     model/saint.cpp \
-    db/sqlite/model/saintperson.cpp \
+    model/saintperson.cpp \
     model/specialist.cpp \
     model/status.cpp \
     model/work.cpp \
@@ -293,16 +294,16 @@ HEADERS += \
     db/sqlite/handler/dbsqlitespecialist.h \
     db/sqlite/handler/dbsqlitestatus.h \
     db/sqlite/handler/dbsqlitework.h \
-    db/sqlite/model/areacommunity.h \
-    db/sqlite/model/areaperson.h \
-    db/sqlite/model/communityperson.h \
-    db/sqlite/model/mapdbmodel.h \
-    db/sqlite/model/specialistperson.h \
+    exception/exception.h \
+    model/areacommunity.h \
+    model/areaperson.h \
+    model/communityperson.h \
+    model/mapdbmodel.h \
+    model/specialistperson.h \
     db/sqlite/table/dbsqliteareamgrtbl.h \
     db/sqlite/table/dbsqliteareatbl.h \
     db/sqlite/table/dbsqlitecommdeptpersontbl.h \
     db/sqlite/table/dbsqlitecommunitydepttbl.h \
-    db/sqlite/table/dbsqlitecommunitymgrtbl.h \
     db/sqlite/table/dbsqlitecommunitypersontbl.h \
     db/sqlite/table/dbsqlitecommunitytbl.h \
     db/sqlite/table/dbsqlitecountrytbl.h \
@@ -362,7 +363,7 @@ HEADERS += \
     model/province.h \
     model/role.h \
     model/saint.h \
-    db/sqlite/model/saintperson.h \
+    model/saintperson.h \
     model/specialist.h \
     model/status.h \
     model/work.h \

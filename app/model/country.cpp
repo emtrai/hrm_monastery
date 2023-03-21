@@ -51,7 +51,7 @@ DbModelBuilder Country::getBuilder()
 }
 
 
-DbModelHandler *Country::getDbModelHandler()
+DbModelHandler *Country::getDbModelHandler() const
 {
     return DB->getModelHandler(KModelHdlCountry);
 }

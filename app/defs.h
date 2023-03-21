@@ -42,6 +42,7 @@ enum Gender{
 };
 
 const char* const KLanguage = "vi";
+const char* const KManagementDeptNameId = "QUAN_LY";
 
 const char* const KPrebuiltDirName = "prebuilt";
 const char* const KLogDirName = "log";
@@ -91,7 +92,7 @@ const char* const KModelHdlPersonEvent = "person_event";
 const char* const KModelHdlEvent = "event";
 
 const char* const KModelNamePerson = "person";
-const char* const KModelNameArea = "person";
+const char* const KModelNameArea = "area";
 const char* const KModelNamePersonEvent = "person_event";
 const char* const KModelNameSaintPerson = "saint_person";
 const char* const KModelNameCommDept = "comm_dept";
@@ -146,6 +147,7 @@ const char* const KItemRetirePlace = "NOI_NGHI_HUU";
 const char* const KItemDeadDate = "NGAY_MAT";
 const char* const KItemDeadPlace = "NOI_CHON_CAT";
 const char* const KItemCountry = "QUOC_GIA";
+const char* const KItemCountryNameId = "MA_QUOC_GIA";
 const char* const KItemProvince = "TINH_TP";
 const char* const KItemAddress = "DIA_CHI";
 const char* const KItemChurchAddress = "GIAO_XU";
@@ -164,7 +166,7 @@ const char* const KItemWorkHistory = "LICH_SU_CONG_TAC";
 const char* const KItemDepartment = "PHONG_BAN";
 const char* const KItemCommunity = "CONG_DOAN";
 const char* const KItemCommunityNameId = "MA_CONG_DOAN";
-const char* const KItemParentCommunityName = "CONG_DOAN_CHA";
+const char* const KItemParentCommunity = "CONG_DOAN_CHA";
 const char* const KItemParentCommunityNameId = "MA_CONG_DOAN_CHA";
 const char* const KItemCommunityHistory = "LICH_SU_CONG_DOAN";
 const char* const KItemDad = "TEN_CHA"; // TODO: holly name of dad?
@@ -208,12 +210,18 @@ const char* const KItemImg = "HINH_ANH";
 const char* const KItemEstablishDate = "NGAY_THANH_LAP";
 const char* const KItemCloseDate = "NGAY_DUNG_HOAT_DONG";
 const char* const KItemIntro = "GIOI_THIEU";
+const char* const KItemFullIntro = "THONG_TIN_CHI_TIET";
 const char* const KItemCEO = "TONG_PHU_TRACH";
 const char* const KItemCEONameId = "MA_TONG_PHU_TRACH";
 const char* const KItemNameId = "MA_DINH_DANH";
 const char* const KItemMission = "SU_VU";
 const char* const KItemMissionNameId = "MA_SU_VU";
-
+const char* const KItemLastUpdateTime = "THOI_GIAN_CAP_NHAT_CUOI";
+const char* const KItemCreateTime = "NGAY_TAO";
+const char* const KItemCloseTime = "NGAY_KET_THUC";
+const char* const KItemRole = "VAI_TRO";
+const char* const KItemLevel = "CAP";
+const char* const KItemContact = "LIEN_HE";
 
 // Special item name
 const char* const KItemDbStatus = "DB_STATUS";

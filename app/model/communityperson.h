@@ -14,27 +14,27 @@
  * limitations under the License.
  *
  *
- * Filename: areacommunity.h
+ * Filename: communityperson.h
  * Author: Anh, Ngo Huy
- * Created date:10/25/2022
+ * Created date:10/16/2022
  * Brief:
  */
-#ifndef AREACOMMUNITY_H
-#define AREACOMMUNITY_H
+#ifndef COMMUNITYPERSON_H
+#define COMMUNITYPERSON_H
 
 #include "mapdbmodel.h"
-#include <dbmodel.h>
-#include "model/mapdbmodel.h"
 
-class AreaCommunity : public MapDbModel
+class CommunityPerson : public MapDbModel
 {
+protected:
+    CommunityPerson();
 public:
-    AreaCommunity();
+    virtual ~CommunityPerson();
     static DbModel* build();
     virtual DbModelBuilder getBuilder();
     virtual QString modelName() const;
 protected:
-    virtual DbModelHandler *getDbModelHandler();
+    virtual DbModelHandler *getDbModelHandler() const;
 };
 
-#endif // AREACOMMUNITY_H
+#endif // COMMUNITYPERSON_H

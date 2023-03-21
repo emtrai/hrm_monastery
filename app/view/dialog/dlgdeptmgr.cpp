@@ -28,8 +28,6 @@
 #include "person.h"
 #include "coursectl.h"
 #include "rolectl.h"
-#include "role.h"
-#include "course.h"
 
 DlgDeptMgr::DlgDeptMgr(QWidget *parent) :
     QDialog(parent),
@@ -62,6 +60,8 @@ DlgDeptMgr::DlgDeptMgr(QWidget *parent) :
 
 DlgDeptMgr::~DlgDeptMgr()
 {
+    RELEASE_LIST_DBMODEL(mSelectedPersons);
+    RELEASE_LIST_DBMODEL(mListPerson);
     delete ui;
 }
 
@@ -106,7 +106,7 @@ void DlgDeptMgr::accept()
         {
             QModelIndex index = selection.at(i);
             // TODO: validate value
-            Person* per =  mListPerson.at(index.row());
+            Person* per =  (Person*)mListPerson.at(index.row());
             PersonDept* perdep = (PersonDept*)PersonDept::build();
             perdep->setPersonUid(per->uid());
             perdep->setPersonName(per->getFullName());
@@ -129,38 +129,44 @@ void DlgDeptMgr::accept()
 void DlgDeptMgr::on_btnSearch_clicked()
 {
     traced;
+    ErrCode err = ErrNone;
     QTableWidget* tbl = ui->tblList;
     QString name = ui->txtSearch->text().trimmed();
-    //    mPerson = nullptr;
-    mSelectedPersons.clear();
-    if (!name.isEmpty()) {
+    RELEASE_LIST_DBMODEL(mSelectedPersons);
+    if (name.isEmpty()) {
         tbl->clearContents();
         tbl->model()->removeRows(0, tbl->rowCount());
-        mListPerson.clear();
-        mListPerson = INSTANCE(PersonCtl)->searchPerson(name);
-        logd("Found %d per", mListPerson.count());
-        if (mListPerson.count() > 0) {
+        RELEASE_LIST_DBMODEL(mListPerson);
+        err = INSTANCE(PersonCtl)->search(name, &mListPerson);
+        if (err == ErrNone) {
+            logd("Found %d per", mListPerson.count());
+            if (mListPerson.count() > 0) {
 
-            qint32 col = 0;
-            qint32 idx = tbl->rowCount();
+                qint32 col = 0;
+                qint32 idx = tbl->rowCount();
 
-            foreach(Person* per, mListPerson) {
-                col = 0;
-                if (per == nullptr) {
-                    continue;
+                foreach(DbModel* item, mListPerson) {
+                    Person* per = (Person*)item;
+                    col = 0;
+                    if (per == nullptr) {
+                        continue;
+                    }
+                    logd("idx=%d", idx);
+                    per->dump();
+                    tbl->insertRow(idx);
+                    tbl->setItem(idx, col++, new QTableWidgetItem(per->uid()));
+                    tbl->setItem(idx, col++, new QTableWidgetItem(per->hollyName()));
+                    tbl->setItem(idx, col++, new QTableWidgetItem(per->getFullName()));
+                    tbl->setItem(idx, col++, new QTableWidgetItem(Utils::date2String(per->birthday())));
+                    tbl->setItem(idx, col++, new QTableWidgetItem(per->birthPlace()));
+                    idx++;
                 }
-                logd("idx=%d", idx);
-                per->dump();
-                tbl->insertRow(idx);
-                tbl->setItem(idx, col++, new QTableWidgetItem(per->uid()));
-                tbl->setItem(idx, col++, new QTableWidgetItem(per->hollyName()));
-                tbl->setItem(idx, col++, new QTableWidgetItem(per->getFullName()));
-                tbl->setItem(idx, col++, new QTableWidgetItem(Utils::date2String(per->birthday())));
-                tbl->setItem(idx, col++, new QTableWidgetItem(per->birthPlace()));
-                idx++;
+            } else {
+                logi("No person");
             }
         } else {
-            logi("No person");
+            loge("search failed, err=%d", err);
+            Utils::showErrorBox(QString(tr("Tìm kiếm lỗi, mã lỗi %1")).arg(err));
         }
     } else {
         loge("Nothing to search");
@@ -168,13 +174,13 @@ void DlgDeptMgr::on_btnSearch_clicked()
     }
 }
 
-const QList<PersonDept *> &DlgDeptMgr::selectedPersons() const
+QList<DbModel *> DlgDeptMgr::selectedPersons() const
 {
-    return mSelectedPersons;
-}
-
-void DlgDeptMgr::setSelectedPersons(const QList<PersonDept *> &newSelectedPersons)
-{
-    mSelectedPersons = newSelectedPersons;
+    QList<DbModel*> list;
+    // Clone data, as data in mSelected will be deleted
+    foreach (DbModel* item, mSelectedPersons) {
+        list.append(item->clone());
+    }
+    return list;
 }
 
