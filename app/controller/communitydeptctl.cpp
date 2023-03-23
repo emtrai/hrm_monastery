@@ -154,7 +154,7 @@ CommunityDept* CommunityDeptCtl::onJsonParseOneItem(const QJsonObject& jobj, boo
 
 }
 
-ErrCode CommunityDeptCtl::onImportStart(const QString &importName, int importFileType, const QString &fname)
+ErrCode CommunityDeptCtl::onImportDataStart(const QString &importName, int importFileType, const QString &fname)
 {
     traced;
     logi("start import '%s', fname '%s'", STR2CHA(importName), STR2CHA(fname));
@@ -243,7 +243,7 @@ QList<DbModel *> CommunityDeptCtl::getListDept(const QString &communityUid, bool
     traced;
     QList<DbModel *> items;
     logd("get dept for community uid='%s'", STR2CHA(communityUid));
-    if (communityUid.isEmpty()) {
+    if (!communityUid.isEmpty()) {
         DbCommDeptModelHandler* modelHdl =  dynamic_cast<DbCommDeptModelHandler*>(DB->getModelHandler(KModelHdlCommDept));
         if (modelHdl) {
             items = modelHdl->getListDept(communityUid, MODEL_ACTIVE, ok);
@@ -328,7 +328,7 @@ DbModel *CommunityDeptCtl::doImportOneItem(const QString& importName, int import
             foreach (QString item, items) {
                 QString field = mImportFields[i++];
                 logd("Import field %s", field.toStdString().c_str());
-                ret = model->onImportItem(importName, importFileType, field, item, idx);
+                ret = model->onImportDataItem(importName, importFileType, field, item, idx);
                 if (ret != ErrNone) {
                     loge("on import item failed, %d", ret);
                     break;
@@ -367,7 +367,7 @@ DbModel *CommunityDeptCtl::doImportOneItem(const QString& importName, int import
             QString value = items.value(field);
             logd("Import field %s", field.toStdString().c_str());
             logd("Import value %s", value.toStdString().c_str());
-            ret = model->onImportItem(importName, importFileType, field, value, idx);
+            ret = model->onImportDataItem(importName, importFileType, field, value, idx);
             if (ret != ErrNone) {
                 loge("on import item failed, %d", ret);
                 break;

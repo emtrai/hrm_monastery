@@ -23,19 +23,21 @@
 #define UISUMMARIZEVIEW_H
 
 #include <QFrame>
-
+#include "baseview.h"
 namespace Ui {
 class UISummarizeView;
 }
 
-class UISummarizeView : public QFrame
+class UISummarizeView : public QFrame, public BaseView
 {
     Q_OBJECT
 
 public:
     explicit UISummarizeView(QWidget *parent = nullptr);
     ~UISummarizeView();
-
+    virtual QWidget* getWidget() {return this; }
+protected:
+    virtual int getViewType() { return VIEW_SUMMARY;}
 private:
     Ui::UISummarizeView *ui;
 };

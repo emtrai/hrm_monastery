@@ -42,11 +42,6 @@ UIAreaListView::~UIAreaListView()
     traced;
 }
 
-int UIAreaListView::getViewType()
-{
-    return VIEW_AREA;
-}
-
 void UIAreaListView::initHeader()
 {
     traced;

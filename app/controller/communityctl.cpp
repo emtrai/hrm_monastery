@@ -193,7 +193,7 @@ const QString CommunityCtl::exportListPrebuiltTemplateName() const
     return KPrebuiltCommunityExportTemplateName;
 }
 
-ErrCode CommunityCtl::onImportStart(const QString &importName, int importFileType, const QString &fname)
+ErrCode CommunityCtl::onImportDataStart(const QString &importName, int importFileType, const QString &fname)
 {
     traced;
     logi("start import '%s', fname '%s'", STR2CHA(importName), STR2CHA(fname));
@@ -316,7 +316,7 @@ DbModel *CommunityCtl::doImportOneItem(const QString& importName, int importFile
                 // TODO: this is not safe, should not be used???
                 QString field = mImportFields[i++];
                 logd("Import field %s", field.toStdString().c_str());
-                err = model->onImportItem(importName, importFileType, field, item, idx);
+                err = model->onImportDataItem(importName, importFileType, field, item, idx);
                 if (err != ErrNone) {
                     loge("on import item failed, %d", err);
                     break;
@@ -354,7 +354,7 @@ DbModel *CommunityCtl::doImportOneItem(const QString& importName, int importFile
             QString value = items.value(field);
             logd("Import field %s", field.toStdString().c_str());
             logd("Import value %s", value.toStdString().c_str());
-            err = model->onImportItem(importName, importFileType, field, value, idx);
+            err = model->onImportDataItem(importName, importFileType, field, value, idx);
             if (err != ErrNone) {
                 loge("on import item failed, %d", err);
                 break;

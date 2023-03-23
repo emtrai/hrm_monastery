@@ -32,6 +32,7 @@ public:
     virtual ~UIWorkListView();
 protected:
 
+    virtual int getViewType() { return VIEW_WORK;}
     virtual ModelController* getController();
     virtual QString getTitle();
     virtual DbModel* onNewModel();

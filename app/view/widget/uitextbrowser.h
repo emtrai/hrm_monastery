@@ -14,28 +14,27 @@
  * limitations under the License.
  *
  *
- * Filename: uimissionlistview.h
+ * Filename: uitextbrowser.h
  * Author: Anh, Ngo Huy
- * Created date:2/12/2023
+ * Created date:3/22/2023
  * Brief:
  */
-#ifndef UIMISSIONLISTVIEW_H
-#define UIMISSIONLISTVIEW_H
+#ifndef UITEXTBROWSER_H
+#define UITEXTBROWSER_H
 
-#include "uicommonlistview.h"
+#include <QTextBrowser>
+#include "baseview.h"
 
-class UIMissionListView : public UICommonListView
+class UITextBrowser : public QTextBrowser, public BaseView
 {
 public:
-    explicit UIMissionListView(QWidget *parent = nullptr);
-    virtual ~UIMissionListView();
-protected:
+    explicit UITextBrowser(QWidget *parent = nullptr);
+    ~UITextBrowser();
 
-    virtual int getViewType() { return VIEW_MISSION;}
-    virtual QString getTitle();
-    virtual DbModel* onNewModel();
+    virtual QWidget* getWidget() {return this; }
 protected:
-    virtual ErrCode onLoad();
+    virtual int getViewType() { return VIEW_TEXT_BROWSER;}
+private:
 };
 
-#endif // UIMISSIONLISTVIEW_H
+#endif // UITEXTBROWSER_H

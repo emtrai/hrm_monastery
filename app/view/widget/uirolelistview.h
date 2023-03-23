@@ -32,6 +32,7 @@ public:
     virtual ~UIRoleListView();
 protected:
 
+    virtual int getViewType() { return VIEW_ROLE;}
     virtual QString getTitle();
     virtual DbModel* onNewModel();
 protected:

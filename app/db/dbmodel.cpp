@@ -417,7 +417,7 @@ ErrCode DbModel::getExportDataString(const QString &item, QString *data) const
     return ret;
 }
 
-ErrCode DbModel::onImportItem(const QString& importName, int importFileType,
+ErrCode DbModel::onImportDataItem(const QString& importName, int importFileType,
                               const QString &keyword, const QString &value,
                               quint32 idx, QList<DbModel *>* outList)
 {

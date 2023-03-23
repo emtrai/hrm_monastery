@@ -21,3 +21,13 @@
  */
 #include "baseview.h"
 
+
+void *BaseView::data() const
+{
+    return mData;
+}
+
+void BaseView::setData(void *newData)
+{
+    mData = newData;
+}

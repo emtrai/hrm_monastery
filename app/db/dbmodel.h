@@ -169,7 +169,7 @@ public:
      * @param tag
      * @return
      */
-    virtual ErrCode onImportItem(const QString& importName,
+    virtual ErrCode onImportDataItem(const QString& importName,
                                  int importFileType,
                                  const QString& keyword,
                                  const QString& value,

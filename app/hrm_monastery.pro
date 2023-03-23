@@ -111,6 +111,7 @@ SOURCES += \
     db/sqlite/handler/dbsqliteethnic.cpp \
     db/sqlite/handler/dbsqliteevent.cpp \
     exception/exception.cpp \
+    import/importlistener.cpp \
     model/areacommunity.cpp \
     model/areaperson.cpp \
     model/communityperson.cpp \
@@ -237,6 +238,7 @@ SOURCES += \
     view/widget/uisummarizeview.cpp \
     view/widget/uitableview.cpp \
     view/widget/uitableviewfactory.cpp \
+    view/widget/uitextbrowser.cpp \
     view/widget/uiworklistview.cpp
 
 HEADERS += \
@@ -295,6 +297,7 @@ HEADERS += \
     db/sqlite/handler/dbsqlitestatus.h \
     db/sqlite/handler/dbsqlitework.h \
     exception/exception.h \
+    import/importlistener.h \
     model/areacommunity.h \
     model/areaperson.h \
     model/communityperson.h \
@@ -423,6 +426,7 @@ HEADERS += \
     view/widget/uisummarizeview.h \
     view/widget/uitableview.h \
     view/widget/uitableviewfactory.h \
+    view/widget/uitextbrowser.h \
     view/widget/uiworklistview.h
 
 FORMS += \

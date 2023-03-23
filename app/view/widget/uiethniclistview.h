@@ -31,6 +31,7 @@ public:
     virtual ~UIEthnicListView();
 protected:
 
+    virtual int getViewType() { return VIEW_ETHNIC;}
     virtual ModelController* getController();
     virtual QString getTitle();
     virtual DbModel* onNewModel();

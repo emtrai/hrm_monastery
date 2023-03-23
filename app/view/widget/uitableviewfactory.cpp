@@ -37,13 +37,17 @@
 #include "view/widget/uicountrylistview.h"
 #include "view/widget/uiethniclistview.h"
 #include "view/widget/uicourselistview.h"
+#include "view/widget/uitextbrowser.h"
 
-UITableView *UITableViewFactory::getView(ViewType type, QWidget *parent )
+BaseView *UITableViewFactory::getView(ViewType type, QWidget *parent )
 {
-    UITableView* view = nullptr;
+    BaseView* view = nullptr;
     traced;
     logd("type %d", type);
     switch (type) {
+    case VIEW_TEXT_BROWSER:
+        view = new UITextBrowser(parent);
+        break;
     case VIEW_PERSON:
         view = new UIPersonListView(parent);
         break;
@@ -56,7 +60,7 @@ UITableView *UITableViewFactory::getView(ViewType type, QWidget *parent )
     case VIEW_AREA:
         view = new UIAreaListView(parent);
         break;
-    case COMMUNITY_PERSON:
+    case VIEW_COMMUNITY_PERSON:
         view = new UICommunityPersonListView(parent);
         break;
     case VIEW_DEPARTMENT:

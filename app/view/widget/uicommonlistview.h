@@ -29,7 +29,7 @@
 #include "modelcontroller.h"
 #include "dlgcommoneditmodel.h"
 
-class UICommonListView : public UITableView, public CommonEditModelListener
+class UICommonListView : public UITableView, public CommonEditModelListener, public OnModelControllerListener
 {
 public:
     explicit UICommonListView(QWidget *parent = nullptr);
@@ -50,8 +50,11 @@ protected:
 
     virtual void onDbModelReady(ErrCode ret, DbModel* model, DlgCommonEditModel* dlg);
     virtual DbModel* onNewModel();
+    virtual QString getName();
+    virtual void onModelControllerDataUpdated();
 protected:
     QList<DbModel*> mItemList;
+    bool mSuspendReloadOnDbUpdate;
 };
 
 #endif // UICOMMONLISTVIEW_H

@@ -57,7 +57,8 @@ ErrCode UIMissionListView::onLoad()
 {
     QList<DbModel*> items = MISSIONCTL->getAllItemsFromDb();
     traced;
-    mItemList.clear(); // TODO: clean up item data
+
+    RELEASE_LIST_DBMODEL(mItemList);
     // TODO: loop to much, redundant, do something better?
     foreach (DbModel* item, items) {
         mItemList.append(dynamic_cast<Mission*>(item));

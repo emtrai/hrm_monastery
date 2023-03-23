@@ -48,7 +48,7 @@ QString UICommDeptListView::getTitle()
 {
     traced;
     QString title;
-    title = QString(tr("Phòng ban của cộng đoàn: %1")).arg(mCommunity->name());
+    title = QString(tr("Phòng ban của cộng đoàn: %1")).arg(mCommunity?mCommunity->name():tr("Không rõ"));
 
     return title;
 }
@@ -75,8 +75,6 @@ DbModel *UICommDeptListView::onNewModel()
 {
     return CommunityDept::build();
 }
-
-
 
 ErrCode UICommDeptListView::onMenuActionListPerson(QMenu *menu, UITableMenuAction *act)
 {
@@ -132,12 +130,15 @@ ErrCode UICommDeptListView::onLoad()
     QList<DbModel*> items;
     ErrCode ret = ErrNone;
     traced;
-    items = COMMUNITYDEPTCTL->getListDept(mCommunity->uid());
-    mItemList.clear(); // TODO: clean up item data
-    // TODO: loop to much, redundant, do something better?
-    foreach (DbModel* item, items) {
-        mItemList.append(static_cast<DbModel*>(item));
-//        mItemList.append(std::shared_ptr<DbModel>(item));
+    if (mCommunity) {
+        setTitle(getTitle());
+        items = COMMUNITYDEPTCTL->getListDept(mCommunity->uid());
+        mItemList.clear(); // TODO: clean up item data
+        // TODO: loop to much, redundant, do something better?
+        foreach (DbModel* item, items) {
+            mItemList.append(static_cast<DbModel*>(item));
+    //        mItemList.append(std::shared_ptr<DbModel>(item));
+        }
     }
     tracedr(ret);
     return ret;

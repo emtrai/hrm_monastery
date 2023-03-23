@@ -43,7 +43,7 @@ ErrCode UISaintListView::onLoad()
 {
 
     traced;
-    mItemList.clear(); // TODO: clean up item data
+    RELEASE_LIST_DBMODEL(mItemList);
     mItemList = SAINTCTL->getAllItems();
     // TODO: loop to much, redundant, do something better?
 //    foreach (Saint* item, items) {
@@ -79,7 +79,7 @@ int UISaintListView::onFilter(int catetoryid, const QString &catetory, qint64 op
     logd("Search %s", keywords.toStdString().c_str());
     ErrCode ret = SAINTCTL->search(keywords, &list);
     logd("Search ret %d", ret);
-    mItemList.clear(); // TODO: clean up item data
+    RELEASE_LIST_DBMODEL(mItemList);
     // TODO: loop to much, redundant, do something better?
     if (ret == ErrNone) {
         foreach (DbModel* item, list) {

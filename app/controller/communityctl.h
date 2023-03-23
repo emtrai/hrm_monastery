@@ -101,7 +101,7 @@ protected:
      * @param fname
      * @return
      */
-    virtual ErrCode onImportStart(const QString& importName, int importFileType, const QString& fname);
+    virtual ErrCode onImportDataStart(const QString& importName, int importFileType, const QString& fname);
     /**
      * @brief import one item, this called by IDataImport callback when import, mainly when import csv
      * @param importFileType

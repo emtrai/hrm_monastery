@@ -31,6 +31,7 @@ public:
     virtual ~UIEducationListView();
 protected:
 
+    virtual int getViewType() { return VIEW_EDUCATION;}
     virtual ModelController* getController();
     virtual QString getTitle();
     virtual DbModel* onNewModel();

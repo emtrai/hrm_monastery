@@ -30,7 +30,7 @@ class DbModel;
 class IDataImporter
 {
 public:
-    virtual ErrCode onImportStart(const QString& importName, int importFileType, const QString& fname);
+    virtual ErrCode onImportDataStart(const QString& importName, int importFileType, const QString& fname);
     /**
      * @brief Import one field/item
      * @param importFileType file type, like CSV, CSV_LIST. \ref ImportType
@@ -40,16 +40,16 @@ public:
      * @param tag
      * @return ErrNone on success, error code otherwise
      */
-    virtual ErrCode onImportItem(const QString& importName, int importFileType,
+    virtual ErrCode onImportDataItem(const QString& importName, int importFileType,
                                  const QString& keyword, const QString& value,
                                  quint32 idx = 0, QList<DbModel *>* outList = nullptr);
-    virtual ErrCode onImportItem(const QString& importName, int importFileType,
+    virtual ErrCode onImportDataItem(const QString& importName, int importFileType,
                                  const QStringList& items, quint32 idx = 0,
                                  QList<DbModel *>* outList = nullptr);
-    virtual ErrCode onImportItem(const QString& importName, int importFileType,
+    virtual ErrCode onImportDataItem(const QString& importName, int importFileType,
                                  const QHash<QString, QString>& items, quint32 idx = 0,
                                  QList<DbModel *>* outList = nullptr);
-    virtual void onImportEnd(const QString& importName, int importFileType,
+    virtual void onImportDataEnd(const QString& importName, int importFileType,
                                 const QString& fname, ErrCode result);
 };
 

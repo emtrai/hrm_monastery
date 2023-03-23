@@ -78,11 +78,13 @@ ErrCode UIPersonListView::onLoad()
         logd("get all person");
         items = PERSONCTL->getAllItems();
     }
-    mItemList.clear(); // TODO: clean up item data
+
+    RELEASE_LIST_DBMODEL(mItemList);
     // TODO: loop to much, redundant, do something better?
     foreach (DbModel* item, items) {
         mItemList.append(item);
     }
+
     clearFilter();
     return ErrNone;
 }
@@ -313,7 +315,7 @@ int UIPersonListView::onFilter(int catetoryid,
                                const QVariant *value)
 {
     traced;
-    mItemList.clear(); // TODO: clean up item data
+    RELEASE_LIST_DBMODEL(mItemList);
     ErrCode ret = PERSONCTL->filter(catetoryid, opFlags, keywords, KModelNamePerson, &mItemList);
     logd("filter ret %d", ret);
     logd("mItemList cnt %d", mItemList.count());

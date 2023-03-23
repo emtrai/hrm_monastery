@@ -28,6 +28,7 @@
 #include <QAction>
 #include "errcode.h"
 #include "filter.h"
+#include "baseview.h"
 
 class UITableItem;
 class QMenu;
@@ -47,6 +48,8 @@ class UITableView;
 
 class UITableItem
 {
+public:
+    virtual ~UITableItem();
 public:
     static UITableItem* build(DbModel* data);
     UITableItem* addValue(const QString& val);
@@ -132,7 +135,7 @@ private:
     UITableMenuActionType mMenuType;
 };
 
-class UITableView : public QFrame
+class UITableView : public QFrame, public BaseView
 {
     Q_OBJECT
 
@@ -172,6 +175,7 @@ public:
      */
     virtual ErrCode addFilter(const QString& filterItem, const QString& keyword, const QVariant& value);
 
+    virtual QWidget* getWidget();
 protected:
     virtual QString getTitle();
     virtual QStringList getHeader();

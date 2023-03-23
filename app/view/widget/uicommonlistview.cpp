@@ -27,13 +27,16 @@
 #include "mainwindow.h"
 
 UICommonListView::UICommonListView(QWidget *parent):
-    UITableView(parent)
+    UITableView(parent),
+    mSuspendReloadOnDbUpdate(false)
 {
 }
 
 UICommonListView::~UICommonListView()
 {
     traced;
+    RELEASE_LIST_DBMODEL(mItemList);
+    tracede;
 }
 
 QList<UITableItem *> UICommonListView::getListItem(qint32 page, qint32 perPage, qint32 totalPages)
@@ -41,7 +44,7 @@ QList<UITableItem *> UICommonListView::getListItem(qint32 page, qint32 perPage, 
     QList<UITableItem *> items;
     traced;
     foreach (DbModel* item, mItemList) {
-        UITableItem* tblItem = UITableItem::build(item);
+        UITableItem* tblItem = UITableItem::build(item->clone());
         updateItem(item, tblItem);
         items.append(tblItem);
     }
@@ -86,7 +89,7 @@ ModelController *UICommonListView::getController()
 ErrCode UICommonListView::onLoad()
 {
     traced;
-    mItemList.clear(); // TODO: clean up item data???
+    RELEASE_LIST_DBMODEL(mItemList);
     mItemList = getListItem();
     clearFilter();
     tracede;
@@ -175,4 +178,20 @@ DbModel *UICommonListView::onNewModel()
 {
     traced;
     return nullptr;
+}
+
+QString UICommonListView::getName()
+{
+    return "UICommonListView";
+}
+
+void UICommonListView::onModelControllerDataUpdated()
+{
+    traced;
+    if (!mSuspendReloadOnDbUpdate) {
+        reload();
+    } else {
+        logw("Suspend reload on data update");
+    }
+    tracede;
 }

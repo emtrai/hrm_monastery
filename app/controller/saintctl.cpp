@@ -73,7 +73,7 @@ DbModel *SaintCtl::doImportOneItem(const QString& importName, int importFileType
 
         saint = (Saint*)Saint::build();
         foreach (QString item, items) {
-            ret = saint->onImportItem(importName, importFileType, mImportFields[i++], item, idx);
+            ret = saint->onImportDataItem(importName, importFileType, mImportFields[i++], item, idx);
         }
     }
 

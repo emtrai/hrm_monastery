@@ -960,7 +960,7 @@ ErrCode ModelController::exportToFile(const QList<DbModel *>* listModel, ExportT
 }
 
 
-ErrCode ModelController::onImportItem(const QString& importName, int importFileType,
+ErrCode ModelController::onImportDataItem(const QString& importName, int importFileType,
                                 const QStringList &items, quint32 idx, QList<DbModel *>* outList)
 {
     traced;
@@ -984,7 +984,7 @@ ErrCode ModelController::onImportItem(const QString& importName, int importFileT
 
 }
 
-ErrCode ModelController::onImportItem(const QString& importName, int importFileType,
+ErrCode ModelController::onImportDataItem(const QString& importName, int importFileType,
                                 const QHash<QString, QString> &items, quint32 idx, QList<DbModel *>* outList)
 {
     traced;

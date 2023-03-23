@@ -23,17 +23,12 @@
 #define IMPORTFACTORY_H
 
 #include "importer.h"
+#include "utils.h"
+#include <QList>
+#include "importlistener.h"
+#include "importer.h"
 
 class DbModel;
-
-enum ImportType {
-    IMPORT_NONE = 0,
-    IMPORT_CSV,
-    IMPORT_CSV_LIST,
-    IMPORT_DOCX,
-    IMPORT_XLSX,
-    IMPORT_MAX
-};
 
 enum ImportTarget {
     IMPORT_TARGET_PERSON = 0,
@@ -44,6 +39,7 @@ enum ImportTarget {
 
 class ImportFactory
 {
+    GET_INSTANCE_DECL(ImportFactory)
 public:
     ImportFactory();
     static Importer* getImporter(ImportType type);
@@ -51,6 +47,21 @@ public:
     static ErrCode importFrom(const QString& importName, IDataImporter* item,
                               const QString& fpath, ImportType type,
                               QList<DbModel *>* outList = nullptr);
+
+    static void addListener(ImportListener* listener);
+    static void removeListener(ImportListener* listener);
+protected:
+    Importer* doGetImporter(ImportType type);
+    ErrCode doImportFrom(const QString& importName, IDataImporter* item,
+                              const QString& fpath, ImportType type,
+                              QList<DbModel *>* outList = nullptr);
+
+    void doAddListener(ImportListener* listener);
+    void doRemoveListener(ImportListener* listener);
+    void notifyListenerStart(const QString& importName, const QString& fpath, ImportType type);
+    void notifyListenerEnd(const QString& importName, ErrCode err, const QString& fpath, ImportType type);
+protected:
+    QList<ImportListener*> mImportListener;
 
 };
 

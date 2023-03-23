@@ -29,6 +29,16 @@
 class IDataImporter;
 class DbModel;
 
+enum ImportType {
+    IMPORT_NONE = 0,
+    IMPORT_CSV,
+    IMPORT_CSV_LIST,
+    IMPORT_DOCX,
+    IMPORT_XLSX,
+    IMPORT_MAX
+};
+
+
 class Importer
 {
 public:

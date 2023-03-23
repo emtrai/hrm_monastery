@@ -47,14 +47,24 @@ UICommunityListView::~UICommunityListView()
     traced;
 }
 
+void UICommunityListView::setupUI()
+{
+    traced;
+    UITableView::setupUI();
+    COMMUNITYCTL->addListener(this);
+    tracede;
+}
+
 void UICommunityListView::initHeader()
 {
     traced;
     UICommonListView::initHeader();
     mHeader.append(tr("Trạng thái hoạt động"));
+    mHeader.append(tr("Nhiệm vụ xã hội"));
     mHeader.append(tr("Vùng"));
-    mHeader.append(tr("Địa chỉ"));
     mHeader.append(tr("Tổng phụ trách"));
+    mHeader.append(tr("Giáo xứ"));
+    mHeader.append(tr("Địa chỉ"));
     mHeader.append(tr("Điện thoại"));
     mHeader.append(tr("Email"));
     mHeader.append(tr("Quốc gia"));
@@ -67,9 +77,11 @@ void UICommunityListView::updateItem(DbModel *item, UITableItem *tblItem)
     UICommonListView::updateItem(item, tblItem);
     Community* model = (Community*) item;
     tblItem->addValue(DbModel::status2Name(model->getStatus()));
+    tblItem->addValue(model->missionNameString());
     tblItem->addValue(model->areaName());
-    tblItem->addValue(model->addr());
     tblItem->addValue(model->currentCEOName());
+    tblItem->addValue(model->church());
+    tblItem->addValue(model->addr());
     tblItem->addValue(model->tel());
     tblItem->addValue(model->email());
     tblItem->addValue(model->countryName());
@@ -79,7 +91,6 @@ void UICommunityListView::updateItem(DbModel *item, UITableItem *tblItem)
 ErrCode UICommunityListView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act)
 {
     traced;
-    // TODO: handle it
     MainWindow::showAddEditCommunity(true, nullptr, this);
     return ErrNone;
 }
@@ -135,33 +146,6 @@ ErrCode UICommunityListView::onMenuActionAddDepart(QMenu *menu, UITableMenuActio
     return err;
 }
 
-//ErrCode UICommunityListView::onMenuActionView(QMenu *menu, UITableMenuAction *act)
-//{
-//    traced;
-//    if (act == nullptr) {
-//        loge("Invalid arg");
-//        return ErrInvalidArg;
-//    }
-
-//    Community* model = (Community*)act->getData();
-//    if (model == nullptr) {
-//        loge("no data");
-//        return ErrInvalidData;
-//    }
-//    model->dump();
-//    QString uid = model->uid();
-//    if (uid.isEmpty()) {
-//        loge("no uid");
-//        return ErrNoData;
-//    }
-//    UICommunityPersonListView* view = (UICommunityPersonListView*)UITableViewFactory::getView(ViewType::COMMUNITY_PERSON);
-
-//    logd("community uid %s", uid.toStdString().c_str());
-//    view->setCommunityUid(uid);
-//    MainWindow::getInstance()->switchView(view);
-//    // TODO: handle it
-//    return ErrNone;
-//}
 void UICommunityListView::onViewItem(UITableWidgetItem *item)
 {
     traced;
@@ -224,6 +208,28 @@ QString UICommunityListView::getTitle()
     return tr("Danh sách cộng đoàn");
 }
 
+QString UICommunityListView::getName()
+{
+    return "UICommunityListView";
+}
+
+void UICommunityListView::onImportStart(const QString &importName, const QString &fpath, ImportType type)
+{
+    traced;
+    mSuspendReloadOnDbUpdate = true;
+    logd("suspend reload on db update");
+    tracede;
+}
+
+void UICommunityListView::onImportEnd(const QString &importName, ErrCode err, const QString &fpath, ImportType type)
+{
+    traced;
+    mSuspendReloadOnDbUpdate = false;
+    logd("resume reload on db update");
+    reload();
+    tracede;
+}
+
 
 
 ErrCode UICommunityListView::onMenuActionListPerson(QMenu *menu, UITableMenuAction *act)
@@ -263,7 +269,7 @@ ErrCode UICommunityListView::onMenuActionListDepartment(QMenu *menu, UITableMenu
     Community* community = dynamic_cast<Community*>(act->getData());
     if (community != nullptr) {
         community->dump();
-        UICommDeptListView* view = (UICommDeptListView*)UITableViewFactory::getView(ViewType::VIEW_DEPARTMENT);
+        UICommDeptListView* view = (UICommDeptListView*)UITableViewFactory::getView(ViewType::VIEW_COMMUNITY_DEPT);
 
         view->setCommunity(community);
         MainWindow::getInstance()->switchView(view);
@@ -286,7 +292,7 @@ ErrCode UICommunityListView::onMenuActionListDepartment(QMenu *menu, UITableMenu
 //            loge("no uid");
 //            return;
 //        }
-//        UICommunityPersonListView* view = (UICommunityPersonListView*)UITableViewFactory::getView(ViewType::COMMUNITY_PERSON);
+//        UICommunityPersonListView* view = (UICommunityPersonListView*)UITableViewFactory::getView(ViewType::VIEW_COMMUNITY_PERSON);
 
 //        logd("community uid %s", uid.toStdString().c_str());
 //        //        view->setCommunityUid(uid);
@@ -433,7 +439,7 @@ ErrCode UICommunityListView::onLoad()
 {
 //    QList<Community*> items = COMMUNITYCTL->getAllItems();
     traced;
-    mItemList.clear(); // TODO: clean up item data
+    RELEASE_LIST_DBMODEL(mItemList);
     mItemList = COMMUNITYCTL->getAllItems();
     // TODO: loop to much, redundant, do something better?
 //    foreach (Community* item, items) {

@@ -31,6 +31,7 @@ public:
     explicit UISaintListView(QWidget *parent = nullptr);
     virtual ~UISaintListView();
 protected:
+    virtual int getViewType() { return VIEW_SAINT;}
     virtual ErrCode onLoad();
     virtual void updateItem(DbModel* item, UITableItem* tblItem);
     virtual void initHeader();

@@ -36,6 +36,7 @@ public:
     void setCommDept(CommunityDept *commDept);
 
 protected:
+    virtual int getViewType() { return VIEW_DEPARTMENT_PERSON;}
     virtual void initHeader();
     virtual void updateItem(DbModel* item, UITableItem* tblItem);
 

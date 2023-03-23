@@ -52,7 +52,7 @@ ErrCode ImportCSVList::importFrom(const QString& importName, int importFileType,
     }
 
     if (ret == ErrNone) {
-        ret = importer->onImportStart(importName, importFileType, fpath);
+        ret = importer->onImportDataStart(importName, importFileType, fpath);
     }
     if (ret == ErrNone) {
         logd("parse csv file %s", fpath.toStdString().c_str());
@@ -67,14 +67,14 @@ ErrCode ImportCSVList::importFrom(const QString& importName, int importFileType,
 //                IDataImporter* importer = (IDataImporter)*param;
                 ErrCode ret2 = ErrNone;
                 if (importer != nullptr){
-                    ret2 = importer->onImportItem(importName, importFileType, items, idx, (QList<DbModel *>*)param);
+                    ret2 = importer->onImportDataItem(importName, importFileType, items, idx, (QList<DbModel *>*)param);
                 }
                 tracedr(ret2);
                 return ret2;
                 },
             this, outList, CSV_LIST_ITEM_SPLIT, &cnt);
     }
-    importer->onImportEnd(importName, importFileType, fpath, ret);
+    importer->onImportDataEnd(importName, importFileType, fpath, ret);
     logi("Parsed %d item", cnt);
     logd("Parse result %d", ret);
     // TODO: handle error case, some items may added to system, some error, should continue???

@@ -97,7 +97,7 @@ DbModel *PersonCtl::doImportOneItem(const QString& importName, int importFileTyp
             foreach (QString item, items) {
                 QString field = mImportFields[i++];
                 logd("Import field %s", field.toStdString().c_str());
-                ret = person->onImportItem(importName, importFileType, field, item, idx);
+                ret = person->onImportDataItem(importName, importFileType, field, item, idx);
             }
         } else {
             ret = ErrNoMemory;
@@ -123,7 +123,7 @@ DbModel *PersonCtl::doImportOneItem(const QString& importName, int importFileTyp
             QString value = items.value(field);
             logd("Import field %s", field.toStdString().c_str());
             logd("Import value %s", value.toStdString().c_str());
-            ret = person->onImportItem(importName, importFileType, field, value, idx);
+            ret = person->onImportDataItem(importName, importFileType, field, value, idx);
         }
     } else {
         ret = ErrNoMemory;

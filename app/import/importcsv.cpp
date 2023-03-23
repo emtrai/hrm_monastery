@@ -61,7 +61,7 @@ ErrCode ImportCSV::importFrom(const QString& importName, int importFileType,
         int noItem = items.count();
         logd("noItem %d", noItem);
         if (noItem > 0) {
-            ret = importer->onImportStart(importName, importFileType, fpath);
+            ret = importer->onImportDataStart(importName, importFileType, fpath);
         } else {
             logd("no item");
             ret = ErrNoData;
@@ -72,18 +72,18 @@ ErrCode ImportCSV::importFrom(const QString& importName, int importFileType,
                 logd("Parsed %d key", cnt);
                 int idx = 0;
                 if (cnt > 0) {
-                    importer->onImportItem(importName, importFileType, item, idx++, outList);
+                    importer->onImportDataItem(importName, importFileType, item, idx++, outList);
 
 //                    foreach (QString key, item.keys()) {
 //                        logd("key %s", key.toStdString().c_str());
 //                        logd("val %s", item.value(key).toStdString().c_str());
-//                        importer->onImportItem(importFileType, key, item.value(key), idx++, tag);
+//                        importer->onImportDataItem(importFileType, key, item.value(key), idx++, tag);
 //                    }
                 }
             }
 
         }
-        importer->onImportEnd(importName, importFileType, fpath, ret);
+        importer->onImportDataEnd(importName, importFileType, fpath, ret);
     }
 
     tracedr(ret);

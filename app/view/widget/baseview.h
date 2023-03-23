@@ -22,14 +22,15 @@
 #ifndef BASEVIEW_H
 #define BASEVIEW_H
 #include "errcode.h"
-
+#include <QWidget>
 enum ViewType {
     NONE = 0,
+    VIEW_TEXT_BROWSER,
     VIEW_PERSON,
     VIEW_SAINT,
     VIEW_COMMUNITY,
     VIEW_AREA,
-    COMMUNITY_PERSON,
+    VIEW_COMMUNITY_PERSON,
     VIEW_COMMUNITY_DEPT,
     VIEW_DEPARTMENT,
     VIEW_DEPARTMENT_PERSON,
@@ -41,6 +42,7 @@ enum ViewType {
     VIEW_COUNTRY,
     VIEW_ETHNIC,
     VIEW_COURSE,
+    VIEW_SUMMARY,
     VIEW_MAX,
     };
 
@@ -50,8 +52,15 @@ typedef std::function<ErrCode(void* data)> ActionFunc_t;
 class BaseView
 {
 public:
+    virtual void setupUI() {};
+    virtual QWidget* getWidget() = 0;
+    void *data() const;
+    void setData(void *newData);
+
+protected:
     virtual int getViewType() = 0;
 protected:
+    void* mData;
     ActionFunc_t mShowActionFunc;// action to run when view show
     bool mShowActionFuncRunOnce; // TODO: support other mode? run once, run on resume, run on pause, etc.???
 };

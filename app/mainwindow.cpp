@@ -114,7 +114,7 @@ MainWindow::MainWindow(QWidget *parent)
     mRoleView = UITableViewFactory::getView(ViewType::VIEW_ROLE);
     mCourseView = UITableViewFactory::getView(ViewType::VIEW_COURSE);
 
-    mHomeView = new QTextBrowser(this);
+    mHomeView = new UITextBrowser(this);
     mHomeView->clearHistory();
     mHomeView->clear();
 
@@ -125,15 +125,15 @@ MainWindow::MainWindow(QWidget *parent)
         FileCtl::getUpdatePrebuiltDataFilePath(KPrebuiltHomeHtmlFileName, false)));
 
 
-    mMainViews.append((QWidget*)mSummarizeView);
-    mMainViews.append((QWidget*)mSaintsView);
-    mMainViews.append((QWidget*)mPersonView);
-    mMainViews.append((QWidget*)mAreaView);
-    mMainViews.append((QWidget*)mHomeView);
-    mMainViews.append((QWidget*)mCommunityView);
-    mMainViews.append((QWidget*)mDepartView);
-    mMainViews.append((QWidget*)mRoleView);
-    mMainViews.append((QWidget*)mCourseView);
+    mMainViews.append((BaseView*)mSummarizeView);
+    mMainViews.append((BaseView*)mSaintsView);
+    mMainViews.append((BaseView*)mPersonView);
+    mMainViews.append((BaseView*)mAreaView);
+    mMainViews.append((BaseView*)mHomeView);
+    mMainViews.append((BaseView*)mCommunityView);
+    mMainViews.append((BaseView*)mDepartView);
+    mMainViews.append((BaseView*)mRoleView);
+    mMainViews.append((BaseView*)mCourseView);
 
     switchView(mHomeView);
 
@@ -224,23 +224,24 @@ ErrCode MainWindow::exportListItems(const QList<DbModel *>* items,
     return err;
 }
 
-void MainWindow::switchView(ViewType type)
+void MainWindow::switchView(ViewType type, void* data)
 {
     traced;
-    QWidget *nextView = getView(type);
+    BaseView *nextView = getView(type);
     if (nextView != nullptr) {
+        nextView->setData(data);
         switchView(nextView);
     }
     tracede;
 }
 
-void MainWindow::switchView(QWidget *nextView)
+void MainWindow::switchView(BaseView *nextView)
 {
     traced;
     if (mCurrentView != nullptr) {
         logd("hide currentl widget");
-        mCurrentView->hide();
-        ui->centralLayout->replaceWidget(mCurrentView, nextView);
+        mCurrentView->getWidget()->hide();
+        ui->centralLayout->replaceWidget(mCurrentView->getWidget(), nextView->getWidget());
 //        ui->centralwidget->layout()->replaceWidget(mCurrentView, nextView);
         // TODO: make this as stack????
         if (!mMainViews.contains(mCurrentView)) {
@@ -258,19 +259,19 @@ void MainWindow::switchView(QWidget *nextView)
     }
     else{
 //        ui->centralwidget->layout()->addWidget(nextView);
-        ui->centralLayout->addWidget(nextView);
+        ui->centralLayout->addWidget(nextView->getWidget());
 
     }
     logd("show next");
     mCurrentView = nextView;
-    mCurrentView->show();
+    mCurrentView->getWidget()->show();
     tracede;
 }
 
-QWidget *MainWindow::getView(ViewType type)
+BaseView *MainWindow::getView(ViewType type)
 {
     traced;
-    QWidget *nextView = nullptr;
+    BaseView *nextView = nullptr;
     logd("type %d", type);
     switch (type) {
     case ViewType::VIEW_DEPARTMENT:
@@ -281,9 +282,9 @@ QWidget *MainWindow::getView(ViewType type)
         break;
     default:
         {
-            UITableView* view = UITableViewFactory::getView(type);
+            BaseView* view = UITableViewFactory::getView(type);
             if (view) {
-                nextView = (QWidget*) view;
+                nextView = (BaseView*) view;
             } else {
                 loge("Unknown type %d", type);
             }

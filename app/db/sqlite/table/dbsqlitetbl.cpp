@@ -1138,9 +1138,11 @@ ErrCode DbSqliteTbl::search(const QHash<QString, FieldValue> &searchCond,
     // TODO: check sql injection issue
     foreach (QString field, searchCond.keys()) {
         if (searchCond.value(field).dataType == TEXT){
+            logd("bind text value, field='%s', value='%s'", STR2CHA(field), STR2CHA(searchCond.value(field).valueString()));
             qry.bindValue( QString(":keyword_%1").arg(field),
-                          QString("%%1%").arg(searchCond.value(field).valueString().trimmed().toLower()) );
+                          QString("%1").arg(searchCond.value(field).valueString().trimmed().toLower()) );
         } else {
+            logd("bind int value, field='%s', value='%ld'", STR2CHA(field), searchCond.value(field).valueInt());
             qry.bindValue( QString(":keyword_%1").arg(field),
                           QString("%1").arg(searchCond.value(field).valueInt()) );
         }

@@ -26,13 +26,13 @@
 #include "baseview.h"
 class Area;
 
-class UIAreaListView : public UICommonListView, public BaseView
+class UIAreaListView : public UICommonListView
 {
 public:
     explicit UIAreaListView(QWidget *parent = nullptr);
     virtual ~UIAreaListView();
-    virtual int getViewType();
 protected:
+    virtual int getViewType() { return VIEW_AREA;}
     void initHeader();
     void updateItem(DbModel *item, UITableItem *tblItem);
 

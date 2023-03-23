@@ -30,6 +30,7 @@ public:
     explicit UISpecialistListView(QWidget *parent = nullptr);
     virtual ~UISpecialistListView();
 protected:
+    virtual int getViewType() { return VIEW_SPECIALIST;}
     virtual QString getTitle();
     virtual ModelController* getController();
     virtual DbModel* onNewModel();

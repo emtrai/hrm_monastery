@@ -1100,7 +1100,7 @@ void Person::dump()
     logd("- JoinPIC Name %s", joinPICName().toStdString().c_str());
     logd("- JoinPIC Uid %s", joinPICUid().toStdString().c_str());
 }
-ErrCode Person::onImportItem(const QString& importName, int importFileType,
+ErrCode Person::onImportDataItem(const QString& importName, int importFileType,
                              const QString &keyword, const QString &value,
                              quint32 idx, QList<DbModel *>* outList)
 {

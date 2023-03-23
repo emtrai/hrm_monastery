@@ -28,6 +28,7 @@
 #include "filectl.h"
 #include "utils.h"
 #include "filter.h"
+#include "dbmodel.h"
 
 UITableView::UITableView(QWidget *parent) :
     QFrame(parent),
@@ -490,6 +491,11 @@ ErrCode UITableView::addFilter(const QString &filterItem, const QString &keyword
     return err;
 }
 
+QWidget *UITableView::getWidget()
+{
+    return this;
+}
+
 qint32 UITableView::itemPerPage() const
 {
     return mItemPerPage;
@@ -518,6 +524,13 @@ void UITableView::setFpDataReq(onRequestData newFpDataReq)
 void UITableView::setHeader(const QStringList &newHeader)
 {
     mHeader = newHeader;
+}
+
+UITableItem::~UITableItem()
+{
+    traced;
+    if (mData) delete mData;
+    tracede;
 }
 
 UITableItem *UITableItem::build(DbModel *data)
@@ -752,10 +765,10 @@ int UITableMenuAction::itemListData(QList<DbModel *>&outList)
 {
     traced;
     if (mItemList.count() > 0) {
-        logd("selected %d items", mItemList.count());
+        logd("selected %lld items", mItemList.count());
         foreach (UITableItem* item, mItemList) {
             if (item->data() != nullptr) {
-                outList.append(item->data());
+                outList.append(item->data()->clone());
             }
         }
     } else {
@@ -796,6 +809,7 @@ DbModel *UITableMenuAction::getData()
 UITableMenuAction* UITableMenuAction::setItemList(const QList<UITableItem *> &newItemList)
 {
     traced;
+    RELEASE_LIST(mItemList, UITableItem);
     mItemList = newItemList;
     return this;
 }
@@ -804,6 +818,7 @@ UITableMenuAction *UITableMenuAction::addItemList(UITableItem *newItemList)
 {
     traced;
     if (newItemList != nullptr) {
+        RELEASE_LIST(mItemList, UITableItem);
         mItemList.append(newItemList);
     }
     return this;

@@ -24,13 +24,16 @@
 
 #include "uicommonlistview.h"
 #include "dlgcommoneditmodel.h"
+#include "importlistener.h"
 
-class UICommunityListView : public UICommonListView
+class UICommunityListView : public UICommonListView, public ImportListener
 {
 public:
     explicit UICommunityListView(QWidget *parent = nullptr);
     virtual ~UICommunityListView();
+    virtual void setupUI();
 protected:
+    virtual int getViewType() { return VIEW_COMMUNITY;}
     void initHeader();
     void updateItem(DbModel *item, UITableItem *tblItem);
     virtual QList<UITableMenuAction*> getMenuItemActions(const QMenu* menu,
@@ -53,6 +56,11 @@ protected:
     virtual void onDeleteItem(UITableWidgetItem *item);
     void onEditItem(UITableWidgetItem *item);
     virtual QString getTitle();
+
+    virtual QString getName();
+    virtual void onImportStart(const QString& importName, const QString& fpath, ImportType type);
+    virtual void onImportEnd(const QString& importName, ErrCode err, const QString& fpath, ImportType type);
+
 protected:
     virtual ErrCode onLoad();
     virtual ErrCode onReload();

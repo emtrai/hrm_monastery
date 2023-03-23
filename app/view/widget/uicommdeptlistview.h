@@ -35,6 +35,7 @@ public:
     void setCommunity(Community *newCommunity);
 
 protected:
+    virtual int getViewType() { return VIEW_COMMUNITY_DEPT;}
     virtual QList<UITableMenuAction*> getMenuItemActions(const QMenu* menu,
                                                           UITableWidgetItem* item);
     virtual ErrCode onMenuActionListPerson(QMenu* menu, UITableMenuAction* act);

@@ -34,6 +34,8 @@
 #include "view/dialog/dlgcommoneditmodel.h"
 #include "importfactory.h"
 #include <QStack>
+#include "view/widget/baseview.h"
+#include "view/widget/uitextbrowser.h"
 
 QT_BEGIN_NAMESPACE
     namespace Ui { class MainWindow; }
@@ -79,9 +81,9 @@ class ModelController;
         protected:
      void showEvent(QShowEvent *ev);
  public:
-     void switchView(ViewType type);
-     void switchView(QWidget* nextView);
-     QWidget* getView(ViewType type);
+     void switchView(ViewType type, void* data = nullptr);
+     void switchView(BaseView* nextView);
+     BaseView* getView(ViewType type);
      AppState appState() const;
      void setAppState(AppState newAppState);
 
@@ -114,16 +116,16 @@ class ModelController;
  private:
     Ui::MainWindow *ui;
     UISummarizeView* mSummarizeView;
-    UITableView* mCommunityView;
-    UITableView* mSaintsView;
-    UITableView* mPersonView;
-    UITableView* mAreaView;
-    UITableView* mDepartView;
-    UITableView* mRoleView;
-    UITableView* mCourseView;
-    QList<QWidget*> mMainViews;
-    QTextBrowser* mHomeView;
-    QWidget* mCurrentView;
+    BaseView* mCommunityView;
+    BaseView* mSaintsView;
+    BaseView* mPersonView;
+    BaseView* mAreaView;
+    BaseView* mDepartView;
+    BaseView* mRoleView;
+    BaseView* mCourseView;
+    QList<BaseView*> mMainViews;
+    UITextBrowser* mHomeView;
+    BaseView* mCurrentView;
 
     QToolButton *mImportButton;
     QAction* mActionImportPersonList;

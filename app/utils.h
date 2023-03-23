@@ -224,7 +224,12 @@ do { \
 
 #define RELEASE_LIST_DBMODEL(list) \
     do { \
-        Utils::clearListModel(list); \
+        Utils::clearListModel<DbModel>(list); \
+    } while(0)
+
+#define RELEASE_LIST(list, T) \
+    do { \
+    Utils::clearListModel<T>(list); \
     } while(0)
 
 typedef ErrCode (*func_one_csv_item_t)(const QStringList& items, void* caller, void* param);
@@ -244,7 +249,14 @@ class DbModel;
 class Utils
 {
 public:
-    static void clearListModel(QList<DbModel*>& list);
+    template<class T>
+    static void clearListModel(QList<T*>& list)
+    {
+        foreach (T* model, list) {
+            if  (model) delete model;
+        }
+        list.clear();
+    }
     static qint64 currentTimeMs();
     static QString timeMsToDatestring(qint64 timMs, const QString& format = "yyyy/MM/dd hh:mm:ss");
     static Gender genderFromString(const QString& gender);

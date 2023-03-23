@@ -47,7 +47,7 @@ class Saint: public DbModel, public DataExporter, public IDataImporter
         void init();
         void initImportFields();
         Saint();
-        virtual ErrCode onImportItem(const QString& importName, int importFileType,
+        virtual ErrCode onImportDataItem(const QString& importName, int importFileType,
                                      const QString& keyword, const QString& value,
                                      quint32 idx = 0, QList<DbModel *>* outList = nullptr);
 

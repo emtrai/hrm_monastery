@@ -35,6 +35,7 @@ protected:
     virtual void updateItem(DbModel* item, UITableItem* tblItem);
     virtual void initHeader();
 protected:
+    virtual int getViewType() { return VIEW_PERSON;}
     virtual void importRequested(const QString& fpath);
     virtual QList<UITableMenuAction*> getMenuCommonActions(const QMenu* menu);
     /**

@@ -14,28 +14,23 @@
  * limitations under the License.
  *
  *
- * Filename: uimissionlistview.h
+ * Filename: importlistener.h
  * Author: Anh, Ngo Huy
- * Created date:2/12/2023
+ * Created date:3/22/2023
  * Brief:
  */
-#ifndef UIMISSIONLISTVIEW_H
-#define UIMISSIONLISTVIEW_H
+#ifndef IMPORTLISTENER_H
+#define IMPORTLISTENER_H
 
-#include "uicommonlistview.h"
+#include "importer.h"
+#include <QString>
 
-class UIMissionListView : public UICommonListView
+class ImportListener
 {
 public:
-    explicit UIMissionListView(QWidget *parent = nullptr);
-    virtual ~UIMissionListView();
-protected:
-
-    virtual int getViewType() { return VIEW_MISSION;}
-    virtual QString getTitle();
-    virtual DbModel* onNewModel();
-protected:
-    virtual ErrCode onLoad();
+    virtual QString getName() = 0;
+    virtual void onImportStart(const QString& importName, const QString& fpath, ImportType type) = 0;
+    virtual void onImportEnd(const QString& importName, ErrCode err, const QString& fpath, ImportType type) = 0;
 };
 
-#endif // UIMISSIONLISTVIEW_H
+#endif // IMPORTLISTENER_H

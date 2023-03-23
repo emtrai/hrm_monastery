@@ -35,6 +35,7 @@ protected:
     virtual DbModel* onNewModel();
 protected:
 
+    virtual int getViewType() { return VIEW_COURSE;}
     virtual QList<DbModel*> getListItem();
     virtual void initHeader();
     virtual void updateItem(DbModel* item, UITableItem* tblItem);

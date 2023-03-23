@@ -30,7 +30,7 @@ class UITableView;
 class UITableViewFactory
 {
 public:
-    static UITableView* getView(ViewType type, QWidget *parent = nullptr);
+    static BaseView* getView(ViewType type, QWidget *parent = nullptr);
 };
 
 #endif // UITABLEVIEWFACTORY_H

@@ -44,13 +44,13 @@
 
 static const QChar supportedSpli[] = {'/', '-', '.'}; // TODO: make it global????
 
-void Utils::clearListModel(QList<DbModel *>& list)
-{
-    foreach (DbModel* model, list) {
-        if  (model) delete model;
-    }
-    list.clear();
-}
+//void Utils::clearListModel(QList<DbModel *>& list)
+//{
+//    foreach (DbModel* model, list) {
+//        if  (model) delete model;
+//    }
+//    list.clear();
+//}
 
 qint64 Utils::currentTimeMs()
 {

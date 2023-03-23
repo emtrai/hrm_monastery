@@ -376,7 +376,7 @@ public:
     void setFeastDay(const QString& newFeastDay,
                      const QString& format = DATE_FORMAT_MD);
 
-    virtual ErrCode onImportItem(const QString& importName,
+    virtual ErrCode onImportDataItem(const QString& importName,
                                  int importFileType,
                                  const QString& keyword,
                                  const QString& value,

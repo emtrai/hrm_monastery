@@ -30,6 +30,7 @@ public:
     explicit UIDepartmentListView(QWidget *parent = nullptr);
     virtual ~UIDepartmentListView();
 protected:
+    virtual int getViewType() { return VIEW_DEPARTMENT;}
     void initHeader();
     void updateItem(DbModel *item, UITableItem *tblItem);
     virtual ModelController* getController();

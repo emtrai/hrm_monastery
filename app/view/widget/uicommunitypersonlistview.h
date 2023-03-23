@@ -39,6 +39,7 @@ public:
     void setCommunity(Community *newCommunity);
 
 protected:
+    virtual int getViewType() { return VIEW_COMMUNITY_PERSON;}
     virtual void initHeader();
     virtual void updateItem(DbModel* item, UITableItem* tblItem);
 

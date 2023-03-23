@@ -133,7 +133,7 @@ void DlgDeptMgr::on_btnSearch_clicked()
     QTableWidget* tbl = ui->tblList;
     QString name = ui->txtSearch->text().trimmed();
     RELEASE_LIST_DBMODEL(mSelectedPersons);
-    if (name.isEmpty()) {
+    if (!name.isEmpty()) {
         tbl->clearContents();
         tbl->model()->removeRows(0, tbl->rowCount());
         RELEASE_LIST_DBMODEL(mListPerson);

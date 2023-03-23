@@ -214,10 +214,10 @@ protected:
      */
     virtual ErrCode getExportDataString(const QString& item, const DbModel* data, QString* exportData) const;
 
-    virtual ErrCode onImportItem(const QString& importName, int importFileType,
+    virtual ErrCode onImportDataItem(const QString& importName, int importFileType,
                                  const QStringList& items, quint32 idx = 0,
                                  QList<DbModel *>* outList = nullptr);
-    virtual ErrCode onImportItem(const QString& importName, int importFileType,
+    virtual ErrCode onImportDataItem(const QString& importName, int importFileType,
                                  const QHash<QString, QString>& items, quint32 idx = 0,
                                  QList<DbModel *>* outList = nullptr);
     // in list, with header
