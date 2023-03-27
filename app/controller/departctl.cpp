@@ -38,7 +38,7 @@ GET_INSTANCE_CONTROLLER_IMPL(DepartCtl)
 
 DepartCtl::DepartCtl():ModelController(KModelHdlDept)
 {
-    traced;
+    tracein;
 }
 
 DbModelBuilder DepartCtl::getMainBuilder()

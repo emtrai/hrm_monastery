@@ -24,6 +24,7 @@
 
 #include "dbmodelhandler.h"
 #include <QList>
+#include "dbmodel.h"
 
 class Person;
 class Community;
@@ -32,7 +33,7 @@ class DbCommunityModelHandler
 {
 public:
 
-    virtual QList<DbModel*> getListPerson(const QString& uid) = 0;
+    virtual QList<DbModel*> getListPerson(const QString& uid, int modelStatus = MODEL_ACTIVE, const QString* perStatusUid = nullptr) = 0;
     virtual ErrCode addPerson2Community(const Community *comm,
                                         const Person* per,
                                       int status = 0,

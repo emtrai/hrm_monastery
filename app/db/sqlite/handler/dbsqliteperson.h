@@ -37,7 +37,7 @@ public:
     DbSqlitePerson();
     virtual const QString getName();
     virtual ErrCode add(DbModel* model, bool notifyDataChange = true);
-    virtual ErrCode update(DbModel* model);
+//    virtual ErrCode update(DbModel* model);
     virtual ErrCode add2Table(DbModel* model, DbSqliteTbl* tbl);
 
     /**

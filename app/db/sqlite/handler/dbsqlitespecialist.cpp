@@ -34,7 +34,7 @@ DbSqliteSpecialist* DbSqliteSpecialist::gInstance = nullptr;
 DbSqliteSpecialist::DbSqliteSpecialist():
     DbSqliteModelHandler()
 {
-    traced;
+    tracein;
 }
 
 DbSqliteSpecialist *DbSqliteSpecialist::getInstance()
@@ -53,7 +53,7 @@ const QString DbSqliteSpecialist::getName()
 
 QList<DbModel *> DbSqliteSpecialist::getListPerson(const QString &specialistUid)
 {
-    traced;
+    tracein;
     DbSqliteSpecialistPersonTbl* tbl =
         (DbSqliteSpecialistPersonTbl*)DbSqlite::getInstance()->getTable(KTableSpecialistPerson);
     // assume main tbl is not null, if not programming error,
@@ -61,7 +61,7 @@ QList<DbModel *> DbSqliteSpecialist::getListPerson(const QString &specialistUid)
     Q_ASSERT(tbl != nullptr);
     QList<DbModel *> list = tbl->getListPerson(specialistUid);
     logd("found %lld", list.count());
-    tracede;
+    traceout;
     return list;
 }
 
@@ -72,7 +72,7 @@ DbSqliteTbl *DbSqliteSpecialist::getMainTbl()
 
 DbSqliteTbl *DbSqliteSpecialist::getTable(const QString &modelName)
 {
-    traced;
+    tracein;
     DbSqliteTbl* tbl = nullptr;
     logd("modelname '%s'", modelName.toStdString().c_str());
     if (modelName == KModelNameSpecialistPerson) {
@@ -80,7 +80,7 @@ DbSqliteTbl *DbSqliteSpecialist::getTable(const QString &modelName)
     } else {
         tbl = getMainTbl();
     }
-    tracede;
+    traceout;
     return tbl;
 }
 

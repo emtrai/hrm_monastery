@@ -31,12 +31,12 @@ GET_INSTANCE_IMPL(ExportCSVList)
 
 ExportCSVList::ExportCSVList()
 {
-    traced;
+    tracein;
 }
 
 ErrCode ExportCSVList::saveTo(const DataExporter* exporter, const QList<DbModel*> listData, const QString &fpath)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     qint32 cnt = 0;
     QStringList items;
@@ -85,7 +85,7 @@ ErrCode ExportCSVList::saveTo(const DataExporter* exporter, const QList<DbModel*
         logd("Write %d finadata to file %s", finalData.length(), fpath.toStdString().c_str());
         ret = FileCtl::writeStringToFile(finalData, fpath);
     }
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 

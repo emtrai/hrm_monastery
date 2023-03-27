@@ -34,7 +34,7 @@ class PersonDept : public DbModel
 public:
     PersonDept();
     static DbModel* build();
-    virtual DbModelBuilder getBuilder();
+    virtual DbModelBuilder getBuilder() const;
 
     virtual QString toString() const;
 
@@ -58,12 +58,12 @@ public:
     qint64 startDate() const;
     void setStartDate(qint64 newStartDate);
     void setStartDate(const QString&  newStartDate,
-                     const QString& format = DATE_FORMAT_DMY);
+                     const QString& format = DEFAULT_FORMAT_YMD);
 
     qint64 endDate() const;
     void setEndDate(qint64 newEndDate);
     void setEndDate(const QString&  newEndDate,
-                      const QString& format = DATE_FORMAT_DMY);
+                      const QString& format = DEFAULT_FORMAT_YMD);
 
     int status() const;
     void setStatus(int newStatus);

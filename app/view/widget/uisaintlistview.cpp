@@ -36,13 +36,13 @@ UISaintListView::UISaintListView(QWidget *parent):
 
 UISaintListView::~UISaintListView()
 {
-    traced;
+    tracein;
 }
 
 ErrCode UISaintListView::onLoad()
 {
 
-    traced;
+    tracein;
     RELEASE_LIST_DBMODEL(mItemList);
     mItemList = SAINTCTL->getAllItems();
     // TODO: loop to much, redundant, do something better?
@@ -52,13 +52,13 @@ ErrCode UISaintListView::onLoad()
     return ErrNone;
 }
 
-void UISaintListView::updateItem(DbModel *item, UITableItem *tblItem)
+void UISaintListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
 {
-    UICommonListView::updateItem(item, tblItem);
-    traced;
+    UICommonListView::updateItem(item, tblItem, idx);
+    tracein;
     Saint* saint = (Saint*)item;
     tblItem->addValue(saint->fullName());
-    tblItem->addValue(Utils::date2String(static_cast<Saint*>(item)->feastDay(), DATE_FORMAT_MD));
+    tblItem->addValue(Utils::date2String(static_cast<Saint*>(item)->feastDay(), DEFAULT_FORMAT_MD));
     tblItem->addValue(saint->remark());
 
 }
@@ -66,7 +66,7 @@ void UISaintListView::updateItem(DbModel *item, UITableItem *tblItem)
 void UISaintListView::initHeader()
 {
     UICommonListView::initHeader();
-    traced;
+    tracein;
     mHeader.append(tr("Tên đầy đủ"));
     mHeader.append(tr("Ngày bổn mạng"));
     mHeader.append(tr("Ghi chú"));
@@ -74,7 +74,7 @@ void UISaintListView::initHeader()
 
 int UISaintListView::onFilter(int catetoryid, const QString &catetory, qint64 opFlags, const QString &keywords, const QVariant *value)
 {
-    traced;
+    tracein;
     QList<DbModel*> list;
     logd("Search %s", keywords.toStdString().c_str());
     ErrCode ret = SAINTCTL->search(keywords, &list);

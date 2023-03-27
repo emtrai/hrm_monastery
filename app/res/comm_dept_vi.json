@@ -1,20 +1,6 @@
 { "items":
     [
         {
-        "nameid":"HOI_DONG_QUAN_LY",
-        "community":"HOI_DONG",
-        "department":"QUAN_LY",
-        "name":"Ban quản lý",
-        "addr":"",
-        "tel":"",
-        "establishday":"",
-        "closeday":"",
-        "status":"2",
-        "email":"",
-        "brief":"",
-        "remark":""
-        },
-        {
         "nameid":"HOI_DONG_LINH_HUONG",
         "community":"HOI_DONG",
         "department":"LINH_HUONG",

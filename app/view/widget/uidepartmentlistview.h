@@ -32,7 +32,7 @@ public:
 protected:
     virtual int getViewType() { return VIEW_DEPARTMENT;}
     void initHeader();
-    void updateItem(DbModel *item, UITableItem *tblItem);
+    void updateItem(DbModel *item, UITableItem *tblItem, int idx);
     virtual ModelController* getController();
 
     virtual QList<DbModel*> getListItem();

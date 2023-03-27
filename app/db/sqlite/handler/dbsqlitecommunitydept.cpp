@@ -38,7 +38,7 @@ GET_INSTANCE_IMPL(DbSqliteCommunityDept);
 
 DbSqliteCommunityDept::DbSqliteCommunityDept():DbSqliteModelHandler(KModelHdlCommDept)
 {
-    traced;
+    tracein;
 }
 
 DbSqliteTbl *DbSqliteCommunityDept::getMainTbl()
@@ -49,7 +49,7 @@ DbSqliteTbl *DbSqliteCommunityDept::getMainTbl()
 
 QList<DbModel *> DbSqliteCommunityDept::getListPerson(const QString &commDeptUid, int status, bool* ok)
 {
-    traced;
+    tracein;
     DbSqliteCommDeptPersonTbl* tbl = (DbSqliteCommDeptPersonTbl*)DbSqlite::table(KTableCommDepartPerson);
     if (ok) *ok = true; // TODO: handle error case
     return tbl->getListPerson(commDeptUid, status);
@@ -64,7 +64,7 @@ QList<DbModel *> DbSqliteCommunityDept::getListDept(const QString &communityUid,
 
 DbSqliteTbl *DbSqliteCommunityDept::getTable(const QString &modelName)
 {
-    traced;
+    tracein;
     DbSqliteTbl* tbl = nullptr;
     logd("modelname '%s'", modelName.toStdString().c_str());
     if (modelName.isEmpty() || modelName == KModelNameCommDept) {
@@ -77,7 +77,7 @@ DbSqliteTbl *DbSqliteCommunityDept::getTable(const QString &modelName)
     } else { // TODO: check & implement more??
         loge("model name '%s' not support", STR2CHA(modelName));
     }
-    tracede;
+    traceout;
     return tbl;
 }
 

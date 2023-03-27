@@ -29,7 +29,7 @@
 
 DbSqliteCountry::DbSqliteCountry():DbSqliteModelHandler(KModelHdlCountry)
 {
-    traced;
+    tracein;
 }
 
 DbSqliteTbl *DbSqliteCountry::getMainTbl()

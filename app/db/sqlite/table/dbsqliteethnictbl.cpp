@@ -40,47 +40,47 @@ DbSqliteEthnicTbl::DbSqliteEthnicTbl():
 DbSqliteEthnicTbl::DbSqliteEthnicTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableEthnic, KTableEthnic, KVersionCode)
 {
-    traced;
+    tracein;
 }
 
 void DbSqliteEthnicTbl::addTableField(DbSqliteTableBuilder *builder)
 {
-    traced;
+    tracein;
     DbSqliteTbl::addTableField(builder);
     builder->addField(KFieldCountryUid, TEXT);
     builder->addField(KFieldCountryDbId, INT64); // DB ID
-    tracede;
+    traceout;
 }
 
 ErrCode DbSqliteEthnicTbl::insertTableField(DbSqliteInsertBuilder *builder,
                                            const DbModel *item)
 {
-    traced;
+    tracein;
     DbSqliteTbl::insertTableField(builder, item);
 
     Ethnic* model = (Ethnic*) item;
     builder->addValue(KFieldCountryUid, model->countryUid());
     builder->addValue(KFieldCountryDbId, model->countryDbId());
-    tracede;
+    traceout;
     return ErrNone;
 }
 
 ErrCode DbSqliteEthnicTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     DbSqliteTbl::updateModelFromQuery(item, qry);
     Ethnic* model = (Ethnic*) item;
     model->setCountryUid(qry.value(KFieldCountryUid).toString());
     model->setCountryDbId(qry.value(KFieldCountryDbId).toInt());
     model->setCountryName(qry.value(KFieldCountryName).toString());
-    tracede;
+    traceout;
     return err;
 }
 
 QString DbSqliteEthnicTbl::getSearchQueryString(const QString &cond)
 {
-    traced;
+    tracein;
     QString queryString = QString("SELECT *, %2.%4 AS %7, %2.%5 AS %6 FROM %1 LEFT JOIN %2 ON %1.%3 = %2.%4")
                               .arg(name(), KTableCountry) // 1 & 2
                               .arg(KFieldCountryUid, KFieldUid) // 3 & 4

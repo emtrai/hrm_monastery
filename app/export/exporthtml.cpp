@@ -31,12 +31,12 @@ GET_INSTANCE_IMPL(ExportHtml)
 
 ExportHtml::ExportHtml()
 {
-    traced;
+    tracein;
 }
 
 ErrCode ExportHtml::saveTo(const DataExporter *item, const QString &fpath)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     QString ftype;
     const QString templatePath = item->exportTemplatePath(this, &ftype);
@@ -97,7 +97,7 @@ ErrCode ExportHtml::saveTo(const DataExporter *item, const QString &fpath)
         ret = FileCtl::writeStringToFile(finadata, fpath);
 
     }
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 

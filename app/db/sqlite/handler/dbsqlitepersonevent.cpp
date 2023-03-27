@@ -31,7 +31,7 @@ GET_INSTANCE_IMPL(DbSqlitePersonEvent)
 
 DbSqlitePersonEvent::DbSqlitePersonEvent()
 {
-    traced;
+    tracein;
 }
 
 

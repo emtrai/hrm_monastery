@@ -65,13 +65,14 @@ DlgImportListResult::DlgImportListResult(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DlgImportListResult)
 {
-    traced;
+    tracein;
     ui->setupUi(this);
 //    DIALOG_SIZE_SHOW(this);
 }
 
 DlgImportListResult::~DlgImportListResult()
 {
+    RELEASE_LIST_DBMODEL(mList);
     delete ui;
 }
 
@@ -92,7 +93,7 @@ void DlgImportListResult::setup(const QList<DbModel *> &newList)
 
 void DlgImportListResult::setupUI()
 {
-    traced;
+    tracein;
 
     initHeader();
     QStringList hdrs = getFinalHeader();
@@ -110,12 +111,12 @@ void DlgImportListResult::setupUI()
 
 void DlgImportListResult::initHeader()
 {
-    traced;
+    tracein;
 }
 
 QStringList DlgImportListResult::getFinalHeader()
 {
-    traced;
+    tracein;
     QStringList hdrs;
     hdrs.append(tr("Chọn"));
 //    hdrs.append(tr(""));
@@ -135,7 +136,7 @@ QList<UIImportItem *>* DlgImportListResult::getItems()
 
 ErrCode DlgImportListResult::onLoad()
 {
-    traced;
+    tracein;
     QTableWidget* tbl = ui->tblList;
 
     // TODO: is it really remove all data?
@@ -198,14 +199,14 @@ ErrCode DlgImportListResult::onLoad()
 
 void DlgImportListResult::showEvent(QShowEvent *event)
 {
-    traced;
+    tracein;
     QWidget::showEvent( event );
     onLoad();
 }
 
 ErrCode DlgImportListResult::saveItems(const QList<DbModel *> &list)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     // TODO: review this again
     foreach (DbModel* item, list) {
@@ -219,7 +220,7 @@ ErrCode DlgImportListResult::saveItems(const QList<DbModel *> &list)
 
 void DlgImportListResult::accept()
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     // TODO: show dialog to confirm when dialog is closed/saved???
     if (mList.count() > 0) {
@@ -248,7 +249,7 @@ void DlgImportListResult::accept()
 
 void DlgImportListResult::on_chkSelect_stateChanged(int arg1)
 {
-    traced;
+    tracein;
     logd("state %d", arg1);
     bool isChecked = (arg1 == Qt::Checked);
     QTableWidget* tbl = ui->tblList;
@@ -262,6 +263,6 @@ void DlgImportListResult::on_chkSelect_stateChanged(int arg1)
         }
     }
     // TODO: allow to edit item before saving????
-    tracede;
+    traceout;
 }
 

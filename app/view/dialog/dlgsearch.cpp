@@ -31,7 +31,7 @@ DlgSearch::DlgSearch(QWidget *parent, bool isMulti) :
 //    mPerson(nullptr),
     mIsMultiSelection(isMulti)
 {
-    traced;
+    tracein;
     ui->setupUi(this);
     ui->tblList->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tblList->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
@@ -52,7 +52,7 @@ DlgSearch::DlgSearch(QWidget *parent, bool isMulti) :
 
 DlgSearch::~DlgSearch()
 {
-    traced;
+    tracein;
     clearAll();
     delete ui;
 }
@@ -60,7 +60,7 @@ DlgSearch::~DlgSearch()
 
 void DlgSearch::on_btnSearch_clicked()
 {
-//    traced;
+//    tracein;
 //    QTableWidget* tbl = ui->tblList;
     QString keyword = ui->txtName->text().trimmed();
 ////    mPerson = nullptr;
@@ -92,7 +92,7 @@ void DlgSearch::on_btnSearch_clicked()
 //        loge("Nothing to search");
 //        Utils::showErrorBox(tr("Nhập tên để tìm")); // TODO: translation
 //    }
-    traced;
+    tracein;
     if (!keyword.isEmpty()) {
         logd("search with keyword '%s'", keyword.toStdString().c_str());
         query([this, keyword](){
@@ -102,7 +102,7 @@ void DlgSearch::on_btnSearch_clicked()
         loge("Nothing to search");
         Utils::showErrorBox(tr("Nhập tên để tìm")); // TODO: translation
     }
-    tracede;
+    traceout;
 }
 
 const QList<DbModel *> &DlgSearch::selectedItems() const
@@ -113,12 +113,12 @@ const QList<DbModel *> &DlgSearch::selectedItems() const
 DbModel *DlgSearch::selectedItem() const
 {
     DbModel* ret = nullptr;
-    traced;
+    tracein;
     logd("no. selected item %d", mSelectedItems.count());
     if (mSelectedItems.count() > 0) {
         ret = mSelectedItems[0];
     }
-    tracede;
+    traceout;
     return ret;
 }
 
@@ -138,42 +138,42 @@ void DlgSearch::setIsMultiSelection(bool newIsMultiSelection)
 
 void DlgSearch::enableGetAllSupport()
 {
-    traced;
+    tracein;
     ui->btnAll->setVisible(true);
 }
 
 void DlgSearch::setupUi()
 {
-    traced;
+    tracein;
     initHeader();
     ui->tblList->setColumnCount(mHeader.count());
     ui->tblList->setHorizontalHeaderLabels(mHeader);
     ui->lblTitle->setText(getTitle());
 
 
-    tracede;
+    traceout;
 }
 
 void DlgSearch::clearAll()
 {
-    traced;
+    tracein;
     // TODO: free up data of each item? i.e. delete DbModel*
     clearSelectedItem();
-    tracede;
+    traceout;
 }
 
 void DlgSearch::clearSelectedItem()
 {
-    traced;
+    tracein;
     mSelectedItems.clear();
     // TODO: free up data of each item? i.e. delete DbModel*
-    tracede;
+    traceout;
 }
 
 
 void DlgSearch::accept()
 {
-    traced;
+    tracein;
     // TODO: validate data
     QTableWidget* tbl = ui->tblList;
     QItemSelectionModel* selectionModel = tbl->selectionModel();
@@ -203,22 +203,22 @@ QString DlgSearch::getTitle()
 
 void DlgSearch::initHeader()
 {
-    traced;
+    tracein;
     mHeader.append(tr("Mã"));
     mHeader.append(tr("Tên"));
 }
 
 int DlgSearch::onGetAll()
 {
-    traced;
+    tracein;
     loge("MUST BE CALLED BY DERIVED CLASS, NOT CALL HERE");
-    tracede;
+    traceout;
     return 0;
 }
 
 QString DlgSearch::getValueOfItemAt(int idx, int col, QString header, DbModel *item)
 {
-    traced;
+    tracein;
     QString val;
     logd("idx = %d, col = %d", idx, col);
     if (item != nullptr) {
@@ -237,13 +237,13 @@ QString DlgSearch::getValueOfItemAt(int idx, int col, QString header, DbModel *i
             break;
         }
     }
-    tracede;
+    traceout;
     return val;
 }
 
 int DlgSearch::query(std::function<int ()> queryfunc)
 {
-    traced;
+    tracein;
     QTableWidget* tbl = ui->tblList;
     clearAll();
     tbl->clearContents();
@@ -275,10 +275,10 @@ int DlgSearch::query(std::function<int ()> queryfunc)
 
 void DlgSearch::on_btnAll_clicked()
 {
-    traced;
+    tracein;
     query([this](){
         return this->onGetAll();
     });
-    tracede;
+    traceout;
 }
 

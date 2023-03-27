@@ -35,7 +35,7 @@ GET_INSTANCE_CONTROLLER_IMPL(EduCtl);
 
 EduCtl::EduCtl():ModelController(KModelHdlEdu)
 {
-    traced;
+    tracein;
 }
 
 DbModelBuilder EduCtl::getMainBuilder()

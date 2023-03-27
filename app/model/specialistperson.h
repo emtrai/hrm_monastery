@@ -29,7 +29,7 @@ class SpecialistPerson : public MapDbModel
 public:
     SpecialistPerson();
     static DbModel* build();
-    virtual DbModelBuilder getBuilder();
+    virtual DbModelBuilder getBuilder() const;
     virtual QString modelName() const;
     const QString &experienceHistory() const;
     void setExperienceHistory(const QString &newExperienceHistory);

@@ -77,6 +77,7 @@ public:
      * @return true if exists
      */
     virtual bool exist(const DbModel* model) = 0;
+    virtual bool isNameidExist(const QString& nameId, const char* modelName = nullptr) = 0;
 
     virtual QList<DbModel*> getAll(const char* modelName = nullptr,
                                     qint64 status = DB_RECORD_ACTIVE,

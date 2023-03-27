@@ -31,7 +31,7 @@ GET_INSTANCE_IMPL(DbSqliteCourse)
 
 DbSqliteCourse::DbSqliteCourse()
 {
-    traced;
+    tracein;
 }
 
 const QString DbSqliteCourse::getName()

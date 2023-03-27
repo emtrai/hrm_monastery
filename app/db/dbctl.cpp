@@ -35,7 +35,7 @@ DbCtl* DbCtl::gInstance = nullptr;
 
 DbCtl::DbCtl()
 {
-    traced;
+    tracein;
     mDatabase = DbSqlite::getInstance();
     dbInfo = new DbInfo();
     // TODO: refactor this code
@@ -71,7 +71,7 @@ QString DbCtl::getName()
 
 
 DbCtl* DbCtl::getInstance(){
-    traced;
+    tracein;
     if (gInstance == nullptr){
         gInstance = new DbCtl();
     }
@@ -84,8 +84,8 @@ IDatabase* DbCtl::getDb(){
 }
 
 ErrCode DbCtl::onLoad(){
-    traced;
+    tracein;
     mDatabase->loadDb(dbInfo);
-    tracede;
+    traceout;
     return ErrNone;
 }

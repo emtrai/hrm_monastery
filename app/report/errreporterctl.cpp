@@ -26,12 +26,12 @@ GET_INSTANCE_IMPL(ErrReporterCtl)
 
 ErrReporterCtl::ErrReporterCtl()
 {
-    traced;
+    tracein;
 }
 
 ErrReporterCtl::~ErrReporterCtl()
 {
-    traced;
+    tracein;
 }
 
 void ErrReporterCtl::reportErr(const QString &errMsg, ErrCode err,

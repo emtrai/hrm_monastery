@@ -32,18 +32,17 @@ public:
     explicit UICommunityPersonListView(QWidget *parent = nullptr);
     virtual ~UICommunityPersonListView();
     void loadCommunityPerson(const QString& communityUid, bool isActive = true);
-    const QString &communityUid() const;
-    void setCommunityUid(const QString &newCommunityUid);
 
     Community *community() const;
-    void setCommunity(Community *newCommunity);
+    void setCommunity(const Community *newCommunity);
 
 protected:
     virtual int getViewType() { return VIEW_COMMUNITY_PERSON;}
     virtual void initHeader();
-    virtual void updateItem(DbModel* item, UITableItem* tblItem);
+    virtual QString getTitle();
+    virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
 
-    virtual QList<UITableMenuAction*> getMenuMultiItemActions(const QMenu *menu,
+    virtual QList<UITableMenuAction*> getMenuMultiSelectedItemActions(const QMenu *menu,
                                                                const QList<UITableItem *>& items);
     virtual ErrCode onMenuActionListPerson(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionListDepartment(QMenu* menu, UITableMenuAction* act);
@@ -55,7 +54,6 @@ protected:
 protected:
     virtual ErrCode onLoad();
 private:
-    QString mCommunityUid;
     Community* mCommunity;
 };
 

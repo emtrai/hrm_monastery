@@ -32,13 +32,13 @@ PersonEvent::PersonEvent():
     mDate(0),
     mEndDate(0)
 {
-    traced;
+    tracein;
 }
 
 PersonEvent::PersonEvent(const PersonEvent *model):
     DbModel((const DbModel *)model)
 {
-    traced;
+    tracein;
     setRemark(model->remark());
     setDate(model->date());
     setEndDate(model->endDate());
@@ -54,7 +54,7 @@ DbModel *PersonEvent::build()
     return model;
 }
 
-DbModelBuilder PersonEvent::getBuilder()
+DbModelBuilder PersonEvent::getBuilder() const
 {
     return &PersonEvent::build;
 }
@@ -65,7 +65,7 @@ QString PersonEvent::modelName() const
 }
 void PersonEvent::buildUidIfNotSet()
 {
-    traced;
+    tracein;
     if (uid().isEmpty()){
         bool isOk = false;
         QString uid = Utils::UidFromName(

@@ -35,7 +35,7 @@ DlgAddPersonEvent::DlgAddPersonEvent(QWidget *parent) :
     ui(new Ui::DlgAddPersonEvent),
     mPersonEvent(nullptr)
 {
-    traced;
+    tracein;
     ui->setupUi(this);
 
     QList<DbModel*> eventList = INSTANCE(EventCtl)->getAllItemsFromDb(); // TODO: getAllItem???
@@ -49,7 +49,7 @@ DlgAddPersonEvent::DlgAddPersonEvent(QWidget *parent) :
 
 DlgAddPersonEvent::~DlgAddPersonEvent()
 {
-    traced;
+    tracein;
     delete ui;
 
     if (mPersonEvent != nullptr) {
@@ -61,7 +61,7 @@ DlgAddPersonEvent::~DlgAddPersonEvent()
 
 void DlgAddPersonEvent::accept()
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     QString name = ui->txtTitle->text().trimmed();
     QString date = ui->txtDate->text().trimmed();

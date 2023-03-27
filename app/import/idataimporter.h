@@ -40,13 +40,13 @@ public:
      * @param tag
      * @return ErrNone on success, error code otherwise
      */
-    virtual ErrCode onImportDataItem(const QString& importName, int importFileType,
+    virtual ErrCode onImportParseDataItem(const QString& importName, int importFileType,
                                  const QString& keyword, const QString& value,
                                  quint32 idx = 0, QList<DbModel *>* outList = nullptr);
-    virtual ErrCode onImportDataItem(const QString& importName, int importFileType,
+    virtual ErrCode onImportParseDataItem(const QString& importName, int importFileType,
                                  const QStringList& items, quint32 idx = 0,
                                  QList<DbModel *>* outList = nullptr);
-    virtual ErrCode onImportDataItem(const QString& importName, int importFileType,
+    virtual ErrCode onImportParseDataItem(const QString& importName, int importFileType,
                                  const QHash<QString, QString>& items, quint32 idx = 0,
                                  QList<DbModel *>* outList = nullptr);
     virtual void onImportDataEnd(const QString& importName, int importFileType,

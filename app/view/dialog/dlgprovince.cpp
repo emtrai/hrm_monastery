@@ -56,7 +56,7 @@ Province *DlgProvince::province() const
 
 void DlgProvince::loadCountry()
 {
-    traced;
+    tracein;
     logd("Load country");
     QList<DbModel*> listCountry = COUNTRYCTL->getAllItemsFromDb();
     ui->cbCountry->clear();
@@ -67,7 +67,7 @@ void DlgProvince::loadCountry()
 
 void DlgProvince::loadProvince()
 {
-    traced;
+    tracein;
     logd("Load province");
     ui->cbProvince->clear();
     QString countryUid = Utils::getCurrentComboxDataString(ui->cbCountry);
@@ -81,7 +81,7 @@ void DlgProvince::loadProvince()
 
 void DlgProvince::accept()
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     QString name = ui->txtName->text().trimmed();
     if (!name.isEmpty()){
@@ -115,7 +115,7 @@ void DlgProvince::accept()
 
 void DlgProvince::on_btnAddCountry_clicked()
 {
-    traced;
+    tracein;
     DlgCountry * dlg = new DlgCountry();
     if (dlg == nullptr) {
         loge("Open dlg country fail, No memory");
@@ -133,6 +133,6 @@ void DlgProvince::on_btnAddCountry_clicked()
 
 void DlgProvince::on_btnAddCountry_triggered(QAction *arg1)
 {
-    traced;
+    tracein;
 }
 

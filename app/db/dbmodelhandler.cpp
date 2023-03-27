@@ -25,17 +25,17 @@
 
 void DbModelHandler::cleanUpModelList(QList<DbModel *> &list)
 {
-    traced;
+    tracein;
     foreach (DbModel* model, list) {
         if (model) delete model;
     }
     list.clear();
-    tracede;
+    traceout;
 }
 
 DbModelHandler::DbModelHandler()
 {
-    traced;
+    tracein;
 }
 
 QList<DbModel *> DbModelHandler::getAll(const char *modelName, qint64 status, int from, int noItems, int *total)
@@ -45,7 +45,7 @@ QList<DbModel *> DbModelHandler::getAll(const char *modelName, qint64 status, in
 
 DbModel *DbModelHandler::getItem(const QString &uid, DbModelBuilder builder, const char* modelName)
 {
-    traced;
+    tracein;
     logd("uid %s", uid.toStdString().c_str());
     QHash<QString, DbModel*> list = getAllInDict(builder, DB_RECORD_ALL, modelName); // TODO: all status or action one only???
     DbModel* model = nullptr;
@@ -58,7 +58,7 @@ DbModel *DbModelHandler::getItem(const QString &uid, DbModelBuilder builder, con
     } else {
         logi("Not found any item");
     }
-    tracede;
+    traceout;
     return model;
 }
 
@@ -79,28 +79,28 @@ DbModelBuilder DbModelHandler::getBuilder(const QString &modelName)
 DbModel *DbModelHandler::getByUid(const QString &uid, const DbModelBuilder &builder)
 {
 
-    traced;
+    tracein;
     loge("Default one, do nothing");
     return nullptr;// TODO: throw exception????
 }
 
 DbModel *DbModelHandler::getByUid(const QString &uid)
 {
-    traced;
+    tracein;
     loge("Default one, do nothing");
     return nullptr; // TODO: throw exception????
 }
 
 DbModel *DbModelHandler::getByNameId(const QString &nameId, const DbModelBuilder &builder)
 {
-    traced;
+    tracein;
     loge("Default one, do nothing");
     return nullptr; // TODO: throw exception????
 }
 
 DbModel *DbModelHandler::getByNameId(const QString &nameId)
 {
-    traced;
+    tracein;
     DbModel *model = nullptr;
     DbModelBuilder builder = getMainBuilder();
     if (builder) {
@@ -109,14 +109,14 @@ DbModel *DbModelHandler::getByNameId(const QString &nameId)
         loge("NO BUILDER, SHOULD NOT BE CALLED, MUST BE IMPLEMENTED BY DERIVED CLASS");
     }
     // TODO: throw exception???
-    tracede;
+    traceout;
     return model;
 }
 
 
 void DbModelHandler::addListener(onDbModelHandlerListener *listener)
 {
-    traced;
+    tracein;
     if (listener) {
         if (!mListeners.contains(listener)) {
             logd("Add listener '%s'", STR2CHA(listener->getName()));
@@ -127,29 +127,29 @@ void DbModelHandler::addListener(onDbModelHandlerListener *listener)
     } else {
         loge("Invalid listener");
     }
-    tracede;
+    traceout;
 }
 
 void DbModelHandler::delListener(onDbModelHandlerListener *listener)
 {
-    traced;
+    tracein;
     if (listener) {
         logd("Remove listener '%s'", STR2CHA(listener->getName()));
         mListeners.removeOne(listener);
     } else {
         loge("Invalid listener");
     }
-    tracede;
+    traceout;
 }
 
 void DbModelHandler::notifyDataChange(DbModel *model, int type, ErrCode err)
 {
-    traced;
+    tracein;
     foreach (onDbModelHandlerListener* listener, mListeners) {
         if (listener) {
             loge("Call listener '%s'", STR2CHA(listener->getName()));
             listener->onDbModelHandlerDataUpdate(model, type, err);
         }
     }
-    tracede;
+    traceout;
 }

@@ -29,7 +29,7 @@ class Status : public DbModel
 public:
     Status();
     static DbModel *build();
-    virtual DbModelBuilder getBuilder();
+    virtual DbModelBuilder getBuilder() const;
 
 
 protected:

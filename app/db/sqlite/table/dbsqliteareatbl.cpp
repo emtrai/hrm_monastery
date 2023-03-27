@@ -39,34 +39,34 @@ DbSqliteAreaTbl::DbSqliteAreaTbl():
 DbSqliteAreaTbl::DbSqliteAreaTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableArea, KTableArea, KVersionCode)
 {
-    traced;
+    tracein;
 }
 
 void DbSqliteAreaTbl::addTableField(DbSqliteTableBuilder *builder)
 {
-    traced;
+    tracein;
     DbSqliteTbl::addTableField(builder);
     builder->addField(KFieldCountryUid, TEXT); // DB ID
     builder->addField(KFieldCountryDbId, INT64); // DB ID
-    tracede;
+    traceout;
 }
 
 ErrCode DbSqliteAreaTbl::insertTableField(DbSqliteInsertBuilder *builder,
                                            const DbModel *item)
 {
-    traced;
+    tracein;
     DbSqliteTbl::insertTableField(builder, item); // TODO: handle error code
 
     Area* model = (Area*) item;
     builder->addValue(KFieldCountryUid, model->countryUid());
     builder->addValue(KFieldCountryDbId, model->countryDbId());
-    tracede;
+    traceout;
     return ErrNone;
 }
 
 ErrCode DbSqliteAreaTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     DbSqliteTbl::updateModelFromQuery(item, qry);
     Area* model = (Area*) item;
@@ -75,13 +75,13 @@ ErrCode DbSqliteAreaTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qr
     if (qry.value(KFieldCountryName).isValid())
         model->setCountryName(qry.value(KFieldCountryName).toString());
 
-    tracede;
+    traceout;
     return err;
 }
 
 QString DbSqliteAreaTbl::getSearchQueryString(const QString &cond)
 {
-    traced;
+    tracein;
     QString queryString = QString("SELECT *, %2.%5 AS %6, %2.%7 AS %8, %2.%4 AS %9 FROM %1 JOIN %2 ON %1.%3 = %2.%4")
                               .arg(name(), KTableCountry)
                               .arg(KFieldCountryUid, KFieldUid)

@@ -38,13 +38,13 @@ Mission::Mission()
 
 DbModel *Mission::build()
 {
-    traced;
+    tracein;
     Mission* model = new Mission();
     model->init();
     return model;
 }
 
-DbModelBuilder Mission::getBuilder()
+DbModelBuilder Mission::getBuilder() const
 {
     return &Mission::build;
 }

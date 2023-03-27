@@ -42,7 +42,7 @@
 BaseView *UITableViewFactory::getView(ViewType type, QWidget *parent )
 {
     BaseView* view = nullptr;
-    traced;
+    tracein;
     logd("type %d", type);
     switch (type) {
     case VIEW_TEXT_BROWSER:
@@ -103,6 +103,6 @@ BaseView *UITableViewFactory::getView(ViewType type, QWidget *parent )
     if (nullptr != view)
         view->setupUI();
 
-    tracede;
+    traceout;
     return view;
 }

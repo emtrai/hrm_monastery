@@ -34,7 +34,7 @@ public:
 protected:
     virtual int getViewType() { return VIEW_AREA;}
     void initHeader();
-    void updateItem(DbModel *item, UITableItem *tblItem);
+    void updateItem(DbModel *item, UITableItem *tblItem, int idx);
 
     virtual ModelController* getController();
 

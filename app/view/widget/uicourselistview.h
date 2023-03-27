@@ -38,7 +38,7 @@ protected:
     virtual int getViewType() { return VIEW_COURSE;}
     virtual QList<DbModel*> getListItem();
     virtual void initHeader();
-    virtual void updateItem(DbModel* item, UITableItem* tblItem);
+    virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
 };
 
 #endif // UICOURSELISTVIEW_H

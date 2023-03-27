@@ -33,12 +33,12 @@
 UIRoleListView::UIRoleListView(QWidget *parent):
     UICommonListView(parent)
 {
-    traced;
+    tracein;
 }
 
 UIRoleListView::~UIRoleListView()
 {
-    traced;
+    tracein;
 }
 
 QString UIRoleListView::getTitle()
@@ -54,7 +54,7 @@ DbModel *UIRoleListView::onNewModel()
 ErrCode UIRoleListView::onLoad()
 {
     QList<DbModel*> items = ROLECTL->getAllItems();
-    traced;
+    tracein;
     RELEASE_LIST_DBMODEL(mItemList);
     // TODO: loop to much, redundant, do something better?
     foreach (DbModel* item, items) {

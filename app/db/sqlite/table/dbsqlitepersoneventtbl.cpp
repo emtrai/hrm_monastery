@@ -43,29 +43,29 @@ DbSqlitePersonEventTbl::DbSqlitePersonEventTbl():
 DbSqlitePersonEventTbl::DbSqlitePersonEventTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTablePersonEvent, KTablePersonEvent, KVersionCode)
 {
-    traced;
+    tracein;
 }
 
 DbSqlitePersonEventTbl::~DbSqlitePersonEventTbl()
 {
-    traced;
+    tracein;
 }
 
 void DbSqlitePersonEventTbl::addTableField(DbSqliteTableBuilder *builder)
 {
-    traced;
+    tracein;
     DbSqliteTbl::addTableField(builder);
     builder->addField(KFieldDate, INT64);
     builder->addField(KFieldEndDate, INT64);
     builder->addField(KFieldEventUid, TEXT);
     builder->addField(KFieldPersonId, TEXT);
-    tracede;
+    traceout;
 }
 
 ErrCode DbSqlitePersonEventTbl::insertTableField(DbSqliteInsertBuilder *builder,
                                          const DbModel *item)
 {
-    traced;
+    tracein;
     DbSqliteTbl::insertTableField(builder, item);
 
     PersonEvent* model = (PersonEvent*) item;
@@ -74,13 +74,13 @@ ErrCode DbSqlitePersonEventTbl::insertTableField(DbSqliteInsertBuilder *builder,
     builder->addValue(KFieldName, model->name());
     builder->addValue(KFieldEventUid, model->eventUid());
     builder->addValue(KFieldPersonId, model->personUid());
-    tracede;
+    traceout;
     return ErrNone;
 }
 
 ErrCode DbSqlitePersonEventTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     DbSqliteTbl::updateModelFromQuery(item, qry);
     PersonEvent* model = (PersonEvent*) item;
@@ -89,7 +89,7 @@ ErrCode DbSqlitePersonEventTbl::updateModelFromQuery(DbModel *item, const QSqlQu
     model->setEventUid(qry.value(KFieldEventUid).toString());
     model->setDate(qry.value(KFieldDate).toInt());
     model->setEndDate(qry.value(KFieldEndDate).toInt());
-    tracede;
+    traceout;
     return err;
 }
 
@@ -98,11 +98,11 @@ ErrCode DbSqlitePersonEventTbl::getListEvents(const QString &personUid,
                                                             const QString *eventUid,
                                                             qint64 date)
 {
-    traced;
+    tracein;
 //    DB->openDb();
     QSqlQuery qry(SQLITE->currentDb());
     ErrCode ret = ErrNone;
-    traced;
+    tracein;
     QString queryString = QString("SELECT * "
                                   "FROM %1").arg(name());
     bool hasEid = false;
@@ -159,6 +159,6 @@ ErrCode DbSqlitePersonEventTbl::getListEvents(const QString &personUid,
 
 
     logd("ret %d", ret);
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }

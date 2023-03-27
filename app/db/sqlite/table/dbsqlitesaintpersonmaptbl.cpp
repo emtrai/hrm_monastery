@@ -37,12 +37,12 @@ const qint32 DbSqliteSaintPersonMapTbl::KVersionCode = VERSION_CODE(0,0,1);
 DbSqliteSaintPersonMapTbl::DbSqliteSaintPersonMapTbl(DbSqlite* db)
     : DbSqliteTbl(db, KTableSaintPerson, KTableSaintPerson, KVersionCode)
 {
-    traced;
+    tracein;
 }
 
 void DbSqliteSaintPersonMapTbl::addTableField(DbSqliteTableBuilder *builder)
 {
-    traced;
+    tracein;
     DbSqliteTbl::addTableField(builder);
     builder->addField(KFieldSaintUid, TEXT);
     builder->addField(KFieldSaintDbId, INT64);
@@ -52,20 +52,20 @@ void DbSqliteSaintPersonMapTbl::addTableField(DbSqliteTableBuilder *builder)
 
 ErrCode DbSqliteSaintPersonMapTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
 {
-    traced;
+    tracein;
     DbSqliteTbl::insertTableField(builder, item);
     SaintPerson* saint = (SaintPerson*) item;
     builder->addValue(KFieldSaintUid, saint->saintUid());
     builder->addValue(KFieldSaintDbId, saint->saintDbId());
     builder->addValue(KFieldPersonUid, saint->personUid());
     builder->addValue(KFieldPersonDbId, saint->personDbId());
-    tracede;
+    traceout;
     return ErrNone;
 }
 
 ErrCode DbSqliteSaintPersonMapTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     DbSqliteTbl::updateModelFromQuery(item, qry);
     SaintPerson* saint = (SaintPerson*) item;
@@ -73,7 +73,7 @@ ErrCode DbSqliteSaintPersonMapTbl::updateModelFromQuery(DbModel *item, const QSq
     saint->setSaintUid(qry.value(KFieldSaintUid).toString());
     saint->setPersonDbId(qry.value(KFieldPersonDbId).toInt());
     saint->setPersonUid(qry.value(KFieldPersonUid).toString());
-    tracede;
+    traceout;
     return err;
 }
 

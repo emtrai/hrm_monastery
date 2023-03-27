@@ -24,6 +24,7 @@
 #include "defs.h"
 #include "utils.h"
 #include "dataexporter.h"
+#include "importexportdefs.h"
 
 #include "xlsxdocument.h"
 #include "xlsxchartsheet.h"
@@ -38,31 +39,31 @@ GET_INSTANCE_IMPL(ExportXlsx)
 
 ExportXlsx::ExportXlsx()
 {
-    traced;
+    tracein;
 
 }
 
 ErrCode ExportXlsx::saveTo(const DataExporter *item, const QString &fpath)
 {
-    traced;
+    tracein;
     QXlsx::Document xlsx;
     xlsx.write("A1", "Hello Qt!"); // write "Hello Qt!" to cell(A,1). it's shared string.
     xlsx.saveAs(fpath); // save the document as 'Test.xlsx'
     // TODO: implement it carefully!
-    tracede;
+    traceout;
     return ErrNone;
 }
 
 ErrCode ExportXlsx::saveTo(const DataExporter *exporter, const QList<DbModel *> listData, const QString &fpath)
 {
-//    traced;
+//    tracein;
 //    QXlsx::Document xlsx;
 //    xlsx.write("A1", "Hello Qt!"); // write "Hello Qt!" to cell(A,1). it's shared string.
 //    xlsx.saveAs(fpath); // save the document as 'Test.xlsx'
 //    // TODO: implement it carefully!
-//    tracede;
+//    traceout;
 //    return ErrNone;
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     QList<QPair<QString,QString>> keywordMap;
     qint32 cnt = 0;
@@ -79,6 +80,7 @@ ErrCode ExportXlsx::saveTo(const DataExporter *exporter, const QList<DbModel *> 
         logd("get header");
         int col = 1;
         int row = 1;
+        xlsx.write(row+1, col, MARK_START_CHAR);
         foreach (auto item, keywordMap) {
             col++;
             xlsx.write(row, col, item.second);
@@ -114,7 +116,7 @@ ErrCode ExportXlsx::saveTo(const DataExporter *exporter, const QList<DbModel *> 
         logd("Write to file %s", fpath.toStdString().c_str());
         xlsx.saveAs(fpath);
     }
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 

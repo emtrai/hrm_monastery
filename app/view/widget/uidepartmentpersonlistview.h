@@ -38,9 +38,9 @@ public:
 protected:
     virtual int getViewType() { return VIEW_DEPARTMENT_PERSON;}
     virtual void initHeader();
-    virtual void updateItem(DbModel* item, UITableItem* tblItem);
+    virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
 
-    virtual QList<UITableMenuAction*> getMenuMultiItemActions(const QMenu *menu,
+    virtual QList<UITableMenuAction*> getMenuMultiSelectedItemActions(const QMenu *menu,
                                                                const QList<UITableItem *>& items);
     virtual ErrCode onMenuActionListPerson(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionListDepartment(QMenu* menu, UITableMenuAction* act);

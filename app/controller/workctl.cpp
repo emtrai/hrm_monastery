@@ -32,12 +32,12 @@ GET_INSTANCE_CONTROLLER_IMPL(WorkCtl)
 WorkCtl::WorkCtl():
     ModelController(KModelHdlWork)
 {
-    traced;
+    tracein;
 }
 
 WorkCtl::~WorkCtl()
 {
-    traced;
+    tracein;
 }
 
 DbModelBuilder WorkCtl::getMainBuilder()

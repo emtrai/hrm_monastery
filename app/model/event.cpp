@@ -27,7 +27,7 @@
 #include "dbmodel.h"
 Event::Event()
 {
-    traced;
+    tracein;
 }
 
 DbModel *Event::build()
@@ -37,7 +37,7 @@ DbModel *Event::build()
     return model;
 }
 
-DbModelBuilder Event::getBuilder()
+DbModelBuilder Event::getBuilder() const
 {
     return &Event::build;
 }

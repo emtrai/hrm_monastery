@@ -32,21 +32,21 @@ DlgImportExportSelect::DlgImportExportSelect(QWidget *parent) :
     mExportType(0),
     mIsExport(false)
 {
-    traced;
+    tracein;
     ui->setupUi(this);
-    tracede;
+    traceout;
 }
 
 DlgImportExportSelect::~DlgImportExportSelect()
 {
-    traced;
+    tracein;
     delete ui;
-    tracede;
+    traceout;
 }
 
 ErrCode DlgImportExportSelect::setExportTypes(quint64 exportTypes)
 {
-    traced;
+    tracein;
     QHash<int, QString> exportTypeName;
     ErrCode err = ErrNone;
     logd("Export Type 0x%x", exportTypes);
@@ -69,14 +69,14 @@ ErrCode DlgImportExportSelect::setExportTypes(quint64 exportTypes)
             loge("not found any export type name");
         }
     }
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 
 void DlgImportExportSelect::setImportExport(bool isExport, const QString &title)
 {
-    traced;
+    tracein;
     logd("isExport %d", isExport);
     mIsExport = isExport;
     mTitle = isExport?"Xuất dữ liệu":"Nhập dữ liệu";
@@ -84,7 +84,7 @@ void DlgImportExportSelect::setImportExport(bool isExport, const QString &title)
         mTitle += ": " + title;
     }
     ui->lblTitle->setText(mTitle);
-    tracede;
+    traceout;
 }
 
 const QString &DlgImportExportSelect::path() const
@@ -104,7 +104,7 @@ void DlgImportExportSelect::setSelectedExportType(ExportType newSelectedExportTy
 
 void DlgImportExportSelect::accept()
 {
-    traced;
+    tracein;
     logd("mIsExport %d", mIsExport);
     mPath.clear();
     QVariant currentData = ui->cbExportType->currentData();
@@ -155,5 +155,5 @@ void DlgImportExportSelect::accept()
     } else {
         loge("Get export path filed, err %d", err);
     }
-    tracede;
+    traceout;
 }

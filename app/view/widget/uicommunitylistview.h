@@ -35,15 +35,15 @@ public:
 protected:
     virtual int getViewType() { return VIEW_COMMUNITY;}
     void initHeader();
-    void updateItem(DbModel *item, UITableItem *tblItem);
-    virtual QList<UITableMenuAction*> getMenuItemActions(const QMenu* menu,
-                                                          UITableWidgetItem* item);
+    void updateItem(DbModel *item, UITableItem *tblItem, int idx);
+    virtual QList<UITableMenuAction*> getMenuSingleSelectedItemActions(const QMenu* menu,
+                                                          UITableCellWidgetItem* item);
     virtual QList<UITableMenuAction*> getMenuCommonActions(const QMenu* menu);
-    virtual QList<UITableMenuAction *> getMenuMultiItemActions(const QMenu *menu, const QList<UITableItem *> &items);
+    virtual QList<UITableMenuAction *> getMenuMultiSelectedItemActions(const QMenu *menu, const QList<UITableItem *> &items);
     virtual ErrCode onMenuActionExportListPerson(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionExportListCommunity(QMenu *menu, UITableMenuAction *act);
     virtual ErrCode onMenuActionListPerson(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onMenuActionListPersonHistory(QMenu* menu, UITableMenuAction* act);
+    virtual ErrCode onMenuActionListAllPerson(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionListDepartment(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionListManagers(QMenu* menu, UITableMenuAction* act);
 //    virtual ErrCode onMenuAction(QMenu* menu, UITableMenuAction* act);
@@ -52,9 +52,8 @@ protected:
     virtual ErrCode onMenuActionAddPerson(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionAddDepart(QMenu* menu, UITableMenuAction* act);
 //    virtual ErrCode onMenuActionView(QMenu* menu, UITableMenuAction* act);
-    virtual void onViewItem(UITableWidgetItem *item);
-    virtual void onDeleteItem(UITableWidgetItem *item);
-    void onEditItem(UITableWidgetItem *item);
+    virtual void onViewItem(UITableCellWidgetItem *item);
+    void onEditItem(UITableCellWidgetItem *item);
     virtual QString getTitle();
 
     virtual QString getName();

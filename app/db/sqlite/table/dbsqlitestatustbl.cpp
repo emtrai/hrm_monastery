@@ -41,5 +41,5 @@ DbSqliteStatusTbl::DbSqliteStatusTbl():
 DbSqliteStatusTbl::DbSqliteStatusTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableStatus, KTableStatus, KVersionCode)
 {
-    traced;
+    tracein;
 }

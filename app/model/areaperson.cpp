@@ -31,15 +31,15 @@
 
 AreaPerson::AreaPerson():mArea(nullptr), mPerson(nullptr)
 {
-    traced;
+    tracein;
 }
 
 AreaPerson::~AreaPerson()
 {
-    traced;
+    tracein;
     if (mPerson) delete mPerson;
     if (mArea) delete mArea;
-    tracede;
+    traceout;
 }
 
 DbModel *AreaPerson::build()
@@ -49,16 +49,16 @@ DbModel *AreaPerson::build()
 
 void AreaPerson::clone(const DbModel *model)
 {
-    traced;
+    tracein;
     if (model) {
         copy(*(AreaPerson*)model);
     } else {
         loge("clone failed, null model");
     }
-    tracede;
+    traceout;
 }
 
-DbModelBuilder AreaPerson::getBuilder()
+DbModelBuilder AreaPerson::getBuilder() const
 {
     return &AreaPerson::build;
 }
@@ -77,13 +77,13 @@ DbModelHandler *AreaPerson::getDbModelHandler() const
 
 void AreaPerson::copy(const AreaPerson &model)
 {
-    traced;
+    tracein;
     mRoleUid = model.mRoleUid;
     if (mPerson) delete mPerson;
     mPerson = model.mPerson->clone();
     if (mArea) delete mArea;
     mArea = model.mArea->clone();
-    tracede;
+    traceout;
 }
 
 const QString &AreaPerson::roleName()

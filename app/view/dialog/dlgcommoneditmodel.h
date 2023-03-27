@@ -30,7 +30,7 @@
 #define DLG_BUILDER(className) \
 public: \
 inline static className* build(QWidget *parent = nullptr, bool isSelfSave = true, DbModel* model = nullptr) { \
-    traced; \
+    tracein; \
     className* dlg = nullptr; \
     dlg = new className(parent); \
     dlg->setIsSelfSave(isSelfSave); \
@@ -40,7 +40,7 @@ inline static className* build(QWidget *parent = nullptr, bool isSelfSave = true
     } else { \
         dlg->setIsNew(true); \
     } \
-    tracede; \
+    traceout; \
     return dlg; \
 }
 

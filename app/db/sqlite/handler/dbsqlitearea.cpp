@@ -39,17 +39,17 @@ GET_INSTANCE_IMPL(DbSqliteArea)
 
 DbSqliteArea::DbSqliteArea():DbSqliteModelHandler(KModelHdlArea)
 {
-    traced;
+    tracein;
 }
 
 DbSqliteArea::~DbSqliteArea()
 {
-    traced;
+    tracein;
 }
 
 QList<DbModel *> DbSqliteArea::getListContactPeople(const QString &areaUid, int status)
 {
-    traced;
+    tracein;
     QList<DbModel *> list;
     ErrCode err = ErrNone;
     DbSqliteAreaMgrTbl* tbl = nullptr;
@@ -69,13 +69,13 @@ QList<DbModel *> DbSqliteArea::getListContactPeople(const QString &areaUid, int 
         list = tbl->getListPerson(areaUid, status);
         logd("found %lld item", list.size());
     }
-    tracede;
+    traceout;
     return list;
 }
 
 QList<DbModel *> DbSqliteArea::getListCommunities(const QString &areaUid, int status)
 {
-    traced;
+    tracein;
     QList<DbModel *> list;
     ErrCode err = ErrNone;
     DbSqliteCommunityTbl* tbl = nullptr;
@@ -95,7 +95,7 @@ QList<DbModel *> DbSqliteArea::getListCommunities(const QString &areaUid, int st
         list = tbl->getListCommunitiesInArea(areaUid, status);
         logd("found %lld item", list.size());
     }
-    tracede;
+    traceout;
     return list;
 }
 
@@ -106,7 +106,7 @@ ErrCode DbSqliteArea::addContactPerson(const DbModel* area,
                                        qint64 startdate, qint64 enddate,
                                        const QString &remark)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     AreaPerson* mapModel = (AreaPerson*)MapDbModel::buildMapModel(&AreaPerson::build,
                                                                 area, person,
@@ -122,13 +122,13 @@ ErrCode DbSqliteArea::addContactPerson(const DbModel* area,
         loge("Failed to create map db model");
     }
 
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 ErrCode DbSqliteArea::deleteHard(DbModel *model, bool force, QString *msg)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     if (!model) {
         err = ErrInvalidArg;
@@ -213,7 +213,7 @@ ErrCode DbSqliteArea::deleteHard(DbModel *model, bool force, QString *msg)
             }
         }
     }
-    tracede;
+    traceout;
     return err;
 }
 
@@ -224,7 +224,7 @@ DbSqliteTbl *DbSqliteArea::getMainTbl()
 
 DbSqliteTbl *DbSqliteArea::getTable(const QString &modelName)
 {
-    traced;
+    tracein;
     DbSqliteTbl* tbl = nullptr;
     logd("getTable modelname '%s'", STR2CHA(modelName));
     if (modelName.isEmpty() || modelName == KModelNameArea) {
@@ -237,7 +237,7 @@ DbSqliteTbl *DbSqliteArea::getTable(const QString &modelName)
         loge("Invalid model name '%s' for area model handler", STR2CHA(modelName));
         // TODO: raise exception??
     }
-    tracede;
+    traceout;
     return tbl;
 }
 
@@ -248,7 +248,7 @@ DbModelBuilder DbSqliteArea::getMainBuilder()
 
 DbModelBuilder DbSqliteArea::getBuilder(const QString &modelName)
 {
-    traced;
+    tracein;
     DbModelBuilder buildr = nullptr;
     logd("get builder for model '%s'", STR2CHA(modelName));
     if (modelName.isEmpty() || modelName == KModelNameArea) {
@@ -258,7 +258,7 @@ DbModelBuilder DbSqliteArea::getBuilder(const QString &modelName)
     } else {
         loge("Invalid model name '%s'", STR2CHA(modelName));
     }
-    tracede;
+    traceout;
     return buildr;
 }
 

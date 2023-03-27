@@ -27,6 +27,8 @@
 #include <QStandardPaths>
 #include <QRandomGenerator>
 #include <QDir>
+#include "dbctl.h"
+#include "utils.h"
 
 Config* Config::gInstance = nullptr;
 
@@ -41,29 +43,43 @@ Config *Config::getInstance()
 
 ErrCode Config::init()
 {
-    traced;
+    tracein;
     return getInstance()->doInit();
 }
 
 
-QString Config::getNextPersonalCode()
+QString Config::getNextPersonalCode(qint64* code)
 {
-    traced;
-    return getInstance()->doGetNextPersonalCode();
+    tracein;
+    return getInstance()->doGetNextPersonalCode(code);
 }
 
-QString Config::doGetNextPersonalCode()
+QString Config::doGetNextPersonalCode(qint64* code)
 {
-    traced;
+    tracein;
+    qint64 seq = 0;
+    if (!code) {
+        logd("get from db");
+        bool ok = false;
+        seq = DB->getCurrentPersonCodeNumber(&ok);
+        if (!ok) {
+            loge("Get sequence number failed, restart from 0");
+            seq = 1;
+        }
+    } else {
+        logd("get from input");
+        seq = *code;
+    }
+
     // TODO: this is just dummy persone code, IMPLEMENT IT AGAIN
-//    int id = Utils::currentTimeMs();
-//    logd("id %d", id);
+//    int id = Utils::currentTimeMs(qint64 code);
+    logd("seq %d", seq);
 //    QString code = "MS" + QString::number(id).rightJustified(8, '0');
-    QString code = QString("%1%2").arg(mConfigKeyValue.value("codeprefix"),
-                                       QString::number(QRandomGenerator::global()->bounded(1000)));
-    logd("MS code %s", code.toStdString().c_str());
-    tracede;
-    return code;
+    QString id = QString("%1%2").arg(mConfigKeyValue.value("codeprefix"),
+                                       QString::number(seq));
+    logd("MS id %s", STR2CHA(id));
+    traceout;
+    return id;
 
 
 }
@@ -72,14 +88,14 @@ QString Config::doGetNextPersonalCode()
 
 ErrCode Config::loadConfig()
 {
-    mConfigKeyValue["codeprefix"] = "MSNV";
+    mConfigKeyValue["codeprefix"] = "NUTU_";
     dumpConfig();
     return ErrNone;
 }
 
 void Config::dumpConfig()
 {
-    traced;
+    tracein;
     foreach (QString key, mConfigKeyValue.keys()){
         logd("%s:%s", key.toStdString().c_str(),
              mConfigKeyValue[key].toStdString().c_str());
@@ -94,7 +110,7 @@ Config::Config()
 
 ErrCode Config::doInit()
 {
-    traced;
+    tracein;
 
     loadConfig();
 

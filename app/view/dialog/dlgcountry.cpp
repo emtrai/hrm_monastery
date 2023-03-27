@@ -30,12 +30,12 @@
 DlgCountry::DlgCountry(QWidget *parent) :
     DlgEditModel(parent)
 {
-    traced;
+    tracein;
 }
 
 DlgCountry::~DlgCountry()
 {
-    traced;
+    tracein;
 }
 
 DbModel *DlgCountry::newModel()

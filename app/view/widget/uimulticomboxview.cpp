@@ -43,7 +43,7 @@ UIMultiComboxView::UIMultiComboxView(QWidget *parent) :
 UIMultiComboxView::UIMultiComboxView(const QString &name, QWidget *parent):
     UIMultiComboxView(parent)
 {
-    traced;
+    tracein;
     mName = name;
 }
 
@@ -56,7 +56,7 @@ UIMultiComboxView::~UIMultiComboxView()
 
 ErrCode UIMultiComboxView::addItem(const QString &name, const QVariant& value)
 {
-    traced;
+    tracein;
     ui->cbItems->addItem(name, value);
 
     return ErrNone;
@@ -64,18 +64,18 @@ ErrCode UIMultiComboxView::addItem(const QString &name, const QVariant& value)
 
 void UIMultiComboxView::on_btnAdd_clicked()
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     QString currtxt = ui->cbItems->currentText().trimmed();
 
     if (!currtxt.isEmpty()) {
         addSelectedItemByName(currtxt);
     }
-    tracede;
+    traceout;
 }
 
 void UIMultiComboxView::on_item_clicked( UIItemButton * button, QVariant value){
-    traced;
+    tracein;
     logd("Remain count %lld", mValueList.count());
     mValueList.remove(button->text());
     logd("Remove %s", button->text().toStdString().c_str());
@@ -96,7 +96,7 @@ const QString &UIMultiComboxView::name() const
 
 void UIMultiComboxView::clearAll()
 {
-    traced;
+    tracein;
     ui->cbItems->clear();
 
     mValueList.clear();
@@ -114,7 +114,7 @@ void UIMultiComboxView::clearAll()
 
 void UIMultiComboxView::addSelectedItemByName(const QString &txt)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
 
     int index = ui->cbItems->findText(txt);
@@ -162,7 +162,7 @@ void UIMultiComboxView::addSelectedItemByName(const QString &txt)
 
 void UIMultiComboxView::addSelectedItemByData(const QVariant &data)
 {
-    traced;
+    tracein;
     // TODO: assume data is string, how about others kind of value????
     int cnt = ui->cbItems->count();
     logd ("no. item %d", cnt);
@@ -197,7 +197,7 @@ void UIMultiComboxView::addSelectedItemByData(const QVariant &data)
             break;
         }
     }
-    tracede;
+    traceout;
 }
 
 

@@ -47,12 +47,12 @@ UIPersonListView::UIPersonListView(QWidget *parent):
 
 UIPersonListView::~UIPersonListView()
 {
-    traced;
+    tracein;
 }
 
 ErrCode UIPersonListView::onLoad()
 {
-    traced;
+    tracein;
     QList<DbModel*> items;
     if (mFilterList.count() > 0) {
         // TODO: multi filter items???? should limite???? what the hell is it
@@ -89,17 +89,17 @@ ErrCode UIPersonListView::onLoad()
     return ErrNone;
 }
 
-void UIPersonListView::updateItem(DbModel *item, UITableItem *tblItem)
+void UIPersonListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
 {
-    traced;
+    tracein;
     Person* per = (Person*) item;
-    tblItem->addValue(per->personCode());
+    tblItem->addValue(per->nameId());
     tblItem->addValue(per->hollyName());
     tblItem->addValue(per->getFullName());
     tblItem->addValue(per->communityName());
     tblItem->addValue(Utils::date2String(per->birthday()));
     tblItem->addValue(per->birthPlace());
-    tblItem->addValue(Utils::date2String(per->feastDay(), DATE_FORMAT_MD)); // seem feastday convert repeate many time, make it common????
+    tblItem->addValue(Utils::date2String(per->feastDay(), DEFAULT_FORMAT_MD)); // seem feastday convert repeate many time, make it common????
 
     tblItem->addValue(per->tel().join(";"));
     tblItem->addValue(per->email().join(";"));
@@ -110,7 +110,7 @@ void UIPersonListView::updateItem(DbModel *item, UITableItem *tblItem)
 
 void UIPersonListView::initHeader()
 {
-    traced;
+    tracein;
     mHeader.append(tr("Mã"));
     mHeader.append(tr("Tên Thánh"));
     mHeader.append(tr("Họ tên"));
@@ -134,7 +134,7 @@ void UIPersonListView::initHeader()
 
 void UIPersonListView::importRequested(const QString &fpath)
 {
-    traced;
+    tracein;
     QList<DbModel*> list;
     logd("Import from file %s", fpath.toStdString().c_str());
     ErrCode ret = INSTANCE(PersonCtl)->importFromFile(KModelHdlPerson, ImportType::IMPORT_CSV_LIST, fpath, &list);
@@ -148,61 +148,61 @@ void UIPersonListView::importRequested(const QString &fpath)
 
 QList<UITableMenuAction *> UIPersonListView::getMenuCommonActions(const QMenu *menu)
 {
-    traced;
+    tracein;
     QList<UITableMenuAction*> actionList = UITableView::getMenuCommonActions(menu);
     actionList.append(UITableMenuAction::build(tr("Nhập từ tập tin"), this)
                                                    ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                        return this->onMenuActionImport(m, a);
                                                    }));
-    tracede;
+    traceout;
     return actionList;
 }
 
-QList<UITableMenuAction *> UIPersonListView::getMenuItemActions(const QMenu *menu, UITableWidgetItem *item)
+QList<UITableMenuAction *> UIPersonListView::getMenuSingleSelectedItemActions(const QMenu *menu, UITableCellWidgetItem *item)
 {
-    traced;
-    QList<UITableMenuAction*> actionList = UITableView::getMenuItemActions(menu, item);
+    tracein;
+    QList<UITableMenuAction*> actionList = UITableView::getMenuSingleSelectedItemActions(menu, item);
     actionList.append(UITableMenuAction::build(tr("Đổi cộng đoàn"), this, item)
                                                    ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                        return this->onChangeCommunity(m, a);
                                                    }));
-    tracede;
+    traceout;
     return actionList;
 }
 
-QList<UITableMenuAction *> UIPersonListView::getMenuMultiItemActions(const QMenu *menu, const QList<UITableItem *> &items)
+QList<UITableMenuAction *> UIPersonListView::getMenuMultiSelectedItemActions(const QMenu *menu, const QList<UITableItem *> &items)
 {
-    traced;
-    QList<UITableMenuAction*> actionList = UITableView::getMenuMultiItemActions(menu, items);
+    tracein;
+    QList<UITableMenuAction*> actionList = UITableView::getMenuMultiSelectedItemActions(menu, items);
     actionList.append(UITableMenuAction::buildMultiItem(tr("Đổi cộng đoàn"), this, &items)
                                                    ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                        return this->onChangeCommunity(m, a);
                                                    }));
-    tracede;
+    traceout;
     return actionList;
 }
 
 ErrCode UIPersonListView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     MainWindow::showAddEditPerson();
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
 ErrCode UIPersonListView::onMenuActionImport(QMenu *menu, UITableMenuAction *act)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     MainWindow::showImportDlg(IMPORT_TARGET_PERSON);
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
 ErrCode UIPersonListView::onChangeCommunity(QMenu *menu, UITableMenuAction *act)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     DlgSearchCommunity* dlg = DlgSearchCommunity::build(this, false);
     dlg->setIsMultiSelection(false);
@@ -230,13 +230,13 @@ ErrCode UIPersonListView::onChangeCommunity(QMenu *menu, UITableMenuAction *act)
     // TODO: update history of person/community??
     // TODO: update event of person???
     delete dlg;
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
-void UIPersonListView::onViewItem(UITableWidgetItem *item)
+void UIPersonListView::onViewItem(UITableCellWidgetItem *item)
 {
-    traced;
+    tracein;
     int idx = item->idx();
     logd("idx=%d",idx);
     if (idx < mItemList.length()){
@@ -253,12 +253,12 @@ void UIPersonListView::onViewItem(UITableWidgetItem *item)
         loge("Invalid idx");
         // TODO: popup message???
     }
-    tracede;
+    traceout;
 }
 
-void UIPersonListView::onEditItem(UITableWidgetItem *item)
+void UIPersonListView::onEditItem(UITableCellWidgetItem *item)
 {
-    traced;
+    tracein;
     DbModel* model = item->itemData();
 //    logd("idx=%d",idx);
     if (model){
@@ -271,23 +271,7 @@ void UIPersonListView::onEditItem(UITableWidgetItem *item)
         loge("Invalid item data");
         // TODO: popup message???
     }
-    tracede;
-}
-
-void UIPersonListView::onDeleteItem(UITableWidgetItem *item)
-{
-    traced;
-    DbModel* model = item->itemData();
-    //    logd("idx=%d",idx);
-    if (model){
-        logd("DELETE item:");
-        model->dump();
-        model->remove(); // TODO: call markRemove
-    } else {
-        loge("Invalid item data");
-        // TODO: popup message???
-    }
-    tracede;
+    traceout;
 }
 
 QString UIPersonListView::getTitle()
@@ -297,7 +281,7 @@ QString UIPersonListView::getTitle()
 
 void UIPersonListView::initFilterFields()
 {
-    traced;
+    tracein;
     appendFilterField(FILTER_FIELD_FULL_NAME, tr("Họ tên"));
     appendFilterField(FILTER_FIELD_COMMUNITY, tr("Cộng đoàn"));
     appendFilterField(FILTER_FIELD_HOLLY_NAME, tr("Tên Thánh"));
@@ -305,7 +289,7 @@ void UIPersonListView::initFilterFields()
     appendFilterField(FILTER_FIELD_SPECIALIST, tr("Chuyên môn"));
     appendFilterField(FILTER_FIELD_WORK, tr("Công việc"));
     appendFilterField(FILTER_FIELD_COURSE, tr("Khoá"));
-    tracede;
+    traceout;
 }
 
 int UIPersonListView::onFilter(int catetoryid,
@@ -314,12 +298,12 @@ int UIPersonListView::onFilter(int catetoryid,
                                 const QString &keywords,
                                const QVariant *value)
 {
-    traced;
+    tracein;
     RELEASE_LIST_DBMODEL(mItemList);
     ErrCode ret = PERSONCTL->filter(catetoryid, opFlags, keywords, KModelNamePerson, &mItemList);
     logd("filter ret %d", ret);
     logd("mItemList cnt %d", mItemList.count());
-    tracede;
+    traceout;
     return mItemList.count();
 }
 
@@ -331,7 +315,7 @@ DbModel *UIPersonListView::onNewModel()
 
 void UIPersonListView::cleanUpItem()
 {
-    traced;
+    tracein;
 //    logd("Clean up %d items", mPersonList.count());
 //    foreach (Person* per, mPersonList){
 //        logd("Delet per %s", per->getFullName().toStdString().c_str());

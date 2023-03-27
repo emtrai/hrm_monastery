@@ -33,14 +33,14 @@ GET_INSTANCE_IMPL(ImportCSV)
 
 ImportCSV::ImportCSV()
 {
-    traced;
+    tracein;
 }
 
 ErrCode ImportCSV::importFrom(const QString& importName, int importFileType,
                               IDataImporter *importer, const QString &fpath,
                               QList<DbModel *>* outList)
 {
-    traced;
+    tracein;
     QList<QHash<QString, QString>> items;
     ErrCode ret = ErrNone;
 
@@ -72,12 +72,12 @@ ErrCode ImportCSV::importFrom(const QString& importName, int importFileType,
                 logd("Parsed %d key", cnt);
                 int idx = 0;
                 if (cnt > 0) {
-                    importer->onImportDataItem(importName, importFileType, item, idx++, outList);
+                    importer->onImportParseDataItem(importName, importFileType, item, idx++, outList);
 
 //                    foreach (QString key, item.keys()) {
 //                        logd("key %s", key.toStdString().c_str());
 //                        logd("val %s", item.value(key).toStdString().c_str());
-//                        importer->onImportDataItem(importFileType, key, item.value(key), idx++, tag);
+//                        importer->onImportParseDataItem(importFileType, key, item.value(key), idx++, tag);
 //                    }
                 }
             }
@@ -86,7 +86,7 @@ ErrCode ImportCSV::importFrom(const QString& importName, int importFileType,
         importer->onImportDataEnd(importName, importFileType, fpath, ret);
     }
 
-    tracedr(ret);
+    traceret(ret);
     return ret;
 
 }

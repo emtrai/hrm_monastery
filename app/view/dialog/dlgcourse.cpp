@@ -44,7 +44,7 @@ DlgCourse::~DlgCourse()
 
 void DlgCourse::accept()
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     QString name = ui->txtName->text().trimmed();
 

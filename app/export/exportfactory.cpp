@@ -29,13 +29,13 @@
 
 ExportFactory::ExportFactory()
 {
-    traced;
+    tracein;
 }
 
 FileExporter *ExportFactory::getExporter(ExportType type)
 {
     FileExporter* ret = nullptr;
-    traced;
+    tracein;
     logd("get export type %d", type);
     switch (type) {
     case EXPORT_HTML:
@@ -57,7 +57,7 @@ FileExporter *ExportFactory::getExporter(ExportType type)
 
 ErrCode ExportFactory::exportTo(const DataExporter *item, const QString &fpath, ExportType type)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     logi("Export to %d", type);
     FileExporter* exporter = getExporter(type);
@@ -72,7 +72,7 @@ ErrCode ExportFactory::exportTo(const DataExporter *item, const QString &fpath, 
 
 ErrCode ExportFactory::exportTo(const DataExporter* item, QList<DbModel*> data, const QString &fpath, ExportType type)
 {
-    traced;
+    tracein;
     // TODO: add "tag" parameter here to input to getExporter/saveTo???
     // so that derived class can have more information to judge which data should be used.
     // TODO: add title? (title for export info)

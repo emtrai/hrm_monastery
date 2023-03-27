@@ -37,12 +37,12 @@ GET_INSTANCE_CONTROLLER_IMPL(SpecialistCtl);
 SpecialistCtl::SpecialistCtl():
     ModelController(KModelHdlSpecialist)
 {
-    traced;
+    tracein;
 }
 
 SpecialistCtl::~SpecialistCtl()
 {
-    traced;
+    tracein;
 }
 
 DbModelBuilder SpecialistCtl::getMainBuilder()
@@ -58,7 +58,7 @@ const char *SpecialistCtl::getPrebuiltFileName()
 
 QList<DbModel *> SpecialistCtl::getListPerson(const QString &specialistUid)
 {
-    traced;
+    tracein;
     QList<DbModel*> list;
     logd("get list person of specialist uid '%s'", STR2CHA(specialistUid));
     if (!specialistUid.isEmpty()) {
@@ -72,7 +72,7 @@ QList<DbModel *> SpecialistCtl::getListPerson(const QString &specialistUid)
         loge("Invalid arg");
     }
     logd("No. item: %lld", list.count());
-    tracede;
+    traceout;
     return list;
 }
 

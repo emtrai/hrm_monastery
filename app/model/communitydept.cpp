@@ -29,7 +29,7 @@
 
 CommunityDept::CommunityDept():DbModel()
 {
-    traced;
+    tracein;
     mEstablishDate = 0;
     mStatus = 0;
 }
@@ -41,7 +41,7 @@ DbModel *CommunityDept::build()
     return model;
 }
 
-DbModelBuilder CommunityDept::getBuilder()
+DbModelBuilder CommunityDept::getBuilder() const
 {
     return &CommunityDept::build;
 }
@@ -49,11 +49,6 @@ DbModelBuilder CommunityDept::getBuilder()
 QString CommunityDept::modelName() const
 {
     return KModelNameCommDept;
-}
-
-const QString &CommunityDept::name() const
-{
-    return mName.isEmpty()?mDepartmentName:mName;
 }
 
 qint64 CommunityDept::establishDate() const
@@ -68,7 +63,7 @@ void CommunityDept::setEstablishDate(qint64 newEstablishDate)
 
 void CommunityDept::setEstablishDateFromString(const QString &date, const QString &format)
 {
-    traced;
+    tracein;
     logd("create date string '%s'", date.toStdString().c_str());
     mEstablishDate = Utils::dateFromString(date, format);
     logd("mEstablishDate %ll", mEstablishDate);
@@ -130,6 +125,26 @@ DbModelHandler *CommunityDept::getDbModelHandler() const
     return DB->getModelHandler(KModelHdlCommDept);
 }
 
+const QString &CommunityDept::communityNameId() const
+{
+    return mCommunityNameId;
+}
+
+void CommunityDept::setCommunityNameId(const QString &newCommunityNameId)
+{
+    mCommunityNameId = newCommunityNameId;
+}
+
+const QString &CommunityDept::departmentNameId() const
+{
+    return mDepartmentNameId;
+}
+
+void CommunityDept::setDepartmentNameId(const QString &newDepartmentNameId)
+{
+    mDepartmentNameId = newDepartmentNameId;
+}
+
 qint64 CommunityDept::closedDate() const
 {
     return mClosedDate;
@@ -142,7 +157,7 @@ void CommunityDept::setClosedDate(qint64 newClosedDate)
 
 void CommunityDept::setClosedDateFromString(const QString &date, const QString &format)
 {
-    traced;
+    tracein;
     logd("close date string '%s'", date.toStdString().c_str());
     mClosedDate = Utils::dateFromString(date, format);
     logd("mClosedDate %ll", mClosedDate);

@@ -52,12 +52,25 @@ public:
 
     virtual uint32_t versionCode() const;
     virtual void setVersionCode(uint32_t newVersionCode);
-    virtual int getDataType(const QString& field);
+    virtual ErrCode getDataType(const QString& field, int& dataType);
 
     virtual ErrCode add(DbModel* item);
     virtual ErrCode update(DbModel* item);
     virtual ErrCode updateUid(const DbModel* item, const QString& uid);
+    /**
+     * @brief update db
+     * @param uid Uid for search
+     * @param fieldValues updated field, in map of field id (i.e. KFieldName) and its value
+     * @return
+     */
     virtual ErrCode update(const QString& uid, const QHash<QString, FieldValue>& fieldValues);
+    /**
+     * @brief update db
+     * @param uid Uid for search
+     * @param fieldValues updated field, in map of field id (i.e. KFieldName) and its value in string format
+     *                    type of filed will be search on \ref mFieldDataTypeMap basing on field name
+     * @return
+     */
     virtual ErrCode update(const QString& uid, const QHash<QString, QString>& fieldValues);
 
     /**
@@ -74,6 +87,7 @@ public:
     virtual ErrCode deleteHard(DbModel* item);
 
     virtual bool isExist(const DbModel* item);
+    virtual bool isNameidExist(const QString& nameId);
     virtual QHash<QString, QString> getFieldsCheckExists(const DbModel* item);
     virtual QList<DbModel*> getAll(const DbModelBuilder& builder, qint64 status = DB_RECORD_ACTIVE,
                                     int from = 0, int noItems = 0, int* total = nullptr);
@@ -110,6 +124,9 @@ public:
 
     virtual QString toDbStatusCond(qint64 dbStatus);
     virtual void appendDbStatusCond(QString& cond, qint64 dbStatus);
+
+    virtual QString toModelStatusCond(qint64 modelStatus);
+    virtual void appendModelStatusCond(QString& cond, qint64 modelStatus);
     /**
      * @brief Search
      * @param keyword keyword
@@ -176,7 +193,6 @@ public:
                                int from = 0,
                                int noItems = 0,
                                int* total = nullptr);
-    virtual ErrCode updateFields(QHash<QString, QString> fields);
 
 protected:
     virtual DbSqliteTableBuilder* getTableBuilder();
@@ -201,8 +217,8 @@ protected:
     virtual QString getSearchQueryString(const QString& cond = nullptr);
     virtual QString getSearchQueryStringWithTag(const QString& cond = nullptr, const QString& tag = nullptr);
     virtual QString getFilterQueryString(int fieldId, const QString& cond = nullptr);
-    virtual QSqlQuery *getAllQuery(qint64 status = DB_RECORD_ACTIVE);
-    virtual QString getAllQueryString(qint64 status = DB_RECORD_ACTIVE);
+    virtual QSqlQuery *getAllQuery(qint64 dbstatus = DB_RECORD_ACTIVE);
+    virtual QString getAllQueryString(qint64 dbstatus = DB_RECORD_ACTIVE);
     virtual DbModelBuilder mainModelBuilder();
 public:
 

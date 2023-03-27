@@ -44,7 +44,7 @@ const qint32 DbSqliteSpecialistPersonTbl::KVersionCode = VERSION_CODE(0,0,1);
 DbSqliteSpecialistPersonTbl::DbSqliteSpecialistPersonTbl(DbSqlite *db):
     DbSqliteMapTbl(db, KTableSpecialistPerson, KTableSpecialistPerson, KVersionCode)
 {
-    traced;
+    tracein;
 
     mFieldNameUid1 = KFieldPersonUid;
     mFieldNameDbId1 = KFieldPersonDbId;
@@ -58,7 +58,7 @@ DbSqliteSpecialistPersonTbl::DbSqliteSpecialistPersonTbl(DbSqlite *db,
                                                          qint32 versionCode)
     : DbSqliteMapTbl(db, baseName, name, versionCode)
 {
-    traced;
+    tracein;
     mFieldNameUid1 = KFieldPersonUid;
     mFieldNameDbId1 = KFieldPersonDbId;
     mFieldNameUid2 = KFieldSpecialistUid;
@@ -68,7 +68,7 @@ DbSqliteSpecialistPersonTbl::DbSqliteSpecialistPersonTbl(DbSqlite *db,
 QList<DbModel *> DbSqliteSpecialistPersonTbl::getListPerson(
     const QString &specialistUid, int status)
 {
-    traced;
+    tracein;
 //    DB->openDb();
     QSqlQuery qry(SQLITE->currentDb());
     qint32 cnt = 0;
@@ -93,13 +93,13 @@ QList<DbModel *> DbSqliteSpecialistPersonTbl::getListPerson(
                                                          status
                                                          );
 
-    tracede;
+    traceout;
     return list;
 }
 
 QList<DbModel *> DbSqliteSpecialistPersonTbl::getListSpecialist(const QString &personUid, int status)
 {
-    traced;
+    tracein;
 //    DB->openDb();
 //    QSqlQuery qry(SQLITE->currentDb());
     qint32 cnt = 0;
@@ -129,22 +129,22 @@ QList<DbModel *> DbSqliteSpecialistPersonTbl::getListSpecialist(const QString &p
                                                              .arg(KFieldSpecialistUid)
                                                          );
 
-    tracede;
+    traceout;
     return list;
 }
 
 
 void DbSqliteSpecialistPersonTbl::addTableField(DbSqliteTableBuilder *builder)
 {
-    traced;
+    tracein;
     DbSqliteMapTbl::addTableField(builder);
     builder->addField(KFieldExperienceHistory, TEXT);
-    tracede;
+    traceout;
 }
 
 ErrCode DbSqliteSpecialistPersonTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     QString modelName = item->modelName();
     logd("model name to insert '%s'", modelName.toStdString().c_str());
@@ -156,13 +156,13 @@ ErrCode DbSqliteSpecialistPersonTbl::insertTableField(DbSqliteInsertBuilder *bui
         ret = ErrInvalidArg;
         loge("Invali model name '%s'", modelName.toStdString().c_str());
     }
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
 ErrCode DbSqliteSpecialistPersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     QString modelName = item->modelName();
     logd("update for map model '%s'", modelName.toStdString().c_str());
@@ -170,19 +170,19 @@ ErrCode DbSqliteSpecialistPersonTbl::updateModelFromQuery(DbModel *item, const Q
     {
         logd("update for person model");
         DbSqlitePersonTbl* tbl = dynamic_cast<DbSqlitePersonTbl*>(DbSqlite::table(KTablePerson));
-        tbl->updateModelFromQuery(item, qry);
+        err = tbl->updateModelFromQuery(item, qry);
     } else if (modelName == KModelNameSpecialist) {
         logd("update for specialist model");
         DbSqliteSpecialistTbl* tbl = dynamic_cast<DbSqliteSpecialistTbl*>(DbSqlite::table(KTableSpecialist));
-        tbl->updateModelFromQuery(item, qry);
+        err = tbl->updateModelFromQuery(item, qry);
     } else if (modelName == KModelNameSpecialistPerson) {
         logd("update for specialist person model");
-        DbSqliteMapTbl::updateModelFromQuery(item, qry);
+        err = DbSqliteMapTbl::updateModelFromQuery(item, qry);
         SpecialistPerson* model = (SpecialistPerson*) item;
         model->setExperienceHistory(qry.value(KFieldExperienceHistory).toString());
     } else {
         loge("Invalid mapp model '%s', do nothing", modelName.toStdString().c_str());
     }
-    tracede;
+    traceout;
     return err;
 }

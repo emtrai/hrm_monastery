@@ -48,14 +48,14 @@ DlgCommunity::DlgCommunity(QWidget *parent) :
 
 DlgCommunity::~DlgCommunity()
 {
-    traced;
+    tracein;
     delete ui;
-    tracede;
+    traceout;
 }
 
 ErrCode DlgCommunity::buildModel(DbModel *model, QString& errMsg)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     Community* comm = (Community*) model;
     if (!model){
@@ -81,7 +81,7 @@ ErrCode DlgCommunity::buildModel(DbModel *model, QString& errMsg)
         SET_VAL_FROM_CBOX(ui->cbArea, comm->setAreaUid, comm->setAreaName);
     }
     if (err == ErrNone){
-        SET_DATE_FORMAT_VAL_FROM_WIDGET(ui->txtFeaseDay, comm->setFeastDate, DATE_FORMAT_MD);
+        SET_DATE_FORMAT_VAL_FROM_WIDGET(ui->txtFeaseDay, comm->setFeastDate, DATE_FORMAT_DM);
     }
     if (err == ErrNone){
         comm->setAddr(ui->txtAddr->toPlainText().trimmed());
@@ -102,7 +102,7 @@ ErrCode DlgCommunity::buildModel(DbModel *model, QString& errMsg)
         SET_INT_VAL_FROM_CBOX(ui->cbStatus, comm->setStatus, comm->setStatusName);
     }
     if (err == ErrNone){
-        SET_DATE_VAL_FROM_WIDGET(ui->txtEstablishDate, comm->setCreateDate);
+        SET_DATE_FORMAT_VAL_FROM_WIDGET(ui->txtEstablishDate, comm->setCreateDate, DEFAULT_FORMAT_YMD);
     }
     if (err == ErrNone){
         SET_VAL_FROM_CBOX(ui->cbParentCommunity, comm->setParentUid, comm->setParentName);
@@ -119,13 +119,13 @@ ErrCode DlgCommunity::buildModel(DbModel *model, QString& errMsg)
     if (err == ErrNone){
         comm->setRemark(ui->txtNote->toPlainText().trimmed());
     }
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 ErrCode DlgCommunity::fromModel(const DbModel *item)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     err = DlgCommonEditModel::fromModel(item);
     Community* comm = (Community*)model();
@@ -133,8 +133,8 @@ ErrCode DlgCommunity::fromModel(const DbModel *item)
         ui->txtName->setText(comm->name());
         ui->txtCode->setText(comm->nameId()); // TODO: auto generate???
         Utils::setSelectItemComboxByData(ui->cbArea, comm->areaUid());
-        ui->txtEstablishDate->setText(Utils::date2String(comm->createDate()));
-        ui->txtFeaseDay->setText(Utils::date2String(comm->feastDate(), DATE_FORMAT_MD));
+        ui->txtEstablishDate->setText(Utils::date2String(comm->createDate(), DEFAULT_FORMAT_YMD));
+        ui->txtFeaseDay->setText(Utils::date2String(comm->feastDate(), DEFAULT_FORMAT_MD));
         ui->txtAddr->setPlainText(comm->addr());
         Utils::setSelectItemComboxByData(ui->cbCountry, comm->countryUid());
         ui->txtTel->setText(comm->tel());
@@ -151,7 +151,7 @@ ErrCode DlgCommunity::fromModel(const DbModel *item)
         ui->txtContact->setPlainText(comm->contact());
         ui->txtNote->setPlainText(comm->remark());
     }
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
@@ -163,30 +163,30 @@ DbModel *DlgCommunity::newModel()
 
 void DlgCommunity::loadData()
 {
-    traced;
+    tracein;
     loadList(ui->cbArea, AREACTL);
     loadList(ui->cbCountry, COUNTRYCTL);
     loadList(ui->cbParentCommunity, COMMUNITYCTL);
     loadStatus();
-    tracede;
+    traceout;
 }
 
 void DlgCommunity::loadStatus()
 {
-    traced;
+    tracein;
     ui->cbStatus->clear();
-    const QHash<int, QString>* statuses = DbModel::getStatusIdNameMap();
+    const QHash<int, QString>* statuses = DbModel::getModelStatusIdNameMap();
     logd("the number of status %lld", statuses->count());
     foreach (int key, statuses->keys()) {
         ui->cbStatus->addItem(statuses->value(key), key);
     }
-    tracede;
+    traceout;
 }
 
 
 void DlgCommunity::on_btnSearchCEO_clicked()
 {
-    traced;
+    tracein;
     DlgSearchPerson * dlg = DlgSearchPerson::build(this);
     if (dlg == nullptr) {
         loge("Open dlg DlgAddPersonEvent fail, No memory");
@@ -205,6 +205,6 @@ void DlgCommunity::on_btnSearchCEO_clicked()
         }
     }
     delete dlg;
-    tracede;
+    traceout;
 }
 

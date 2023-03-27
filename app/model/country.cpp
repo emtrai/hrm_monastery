@@ -33,19 +33,19 @@
 
 Country::Country()
 {
-    traced;
+    tracein;
 }
 
 Country::Country(const Country &country):DbModel(country)
 {
-    traced;
+    tracein;
 }
 Country::~Country()
 {
-    traced;
+    tracein;
 }
 
-DbModelBuilder Country::getBuilder()
+DbModelBuilder Country::getBuilder() const
 {
     return &Country::build;
 }

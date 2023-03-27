@@ -33,7 +33,7 @@
 
 DbModel *Community::build()
 {
-    traced;
+    tracein;
     Community* item = new Community();
     item->init();
     return item;
@@ -41,44 +41,44 @@ DbModel *Community::build()
 
 Community::Community():DbModel()
 {
-    traced;
+    tracein;
     resetResource();
-    tracede;
+    traceout;
 }
 
 Community::Community(const Community &obj):DbModel(obj)
 {
-    traced;
+    tracein;
     resetResource();
     copy(obj);
-    tracede;
+    traceout;
 }
 
 Community::~Community()
 {
-    traced;
+    tracein;
     resetResource();
-    traced;
+    tracein;
 }
 
 void Community::clone(const DbModel *model)
 {
-    traced;
+    tracein;
     if (model && model->modelName() == KModelNameCommunity) {
         DbModel::clone(model);
         copy(*(Community*)model);
     }
-    tracede;
+    traceout;
 }
 
-DbModelBuilder Community::getBuilder()
+DbModelBuilder Community::getBuilder() const
 {
     return &Community::build;
 }
 
 void Community::initExportFields()
 {
-    traced;
+    tracein;
     DbModel::initExportFields();
     mExportCallbacks.insert(KItemCountry, [this](const QString& item){
         return this->countryName();
@@ -96,13 +96,13 @@ void Community::initExportFields()
         return this->tel();
     });
     mExportCallbacks.insert(KItemEstablishDate, [this](const QString& item){
-        return Utils::date2String(this->createDate(), DATE_FORMAT_YMD);
+        return Utils::date2String(this->createDate(), DEFAULT_FORMAT_YMD);
     });
     mExportCallbacks.insert(KItemCloseDate, [this](const QString& item){
-        return Utils::date2String(this->closeDate(), DATE_FORMAT_YMD);
+        return Utils::date2String(this->closeDate(), DEFAULT_FORMAT_YMD);
     });
     mExportCallbacks.insert(KItemFeastDay, [this](const QString& item){
-        return Utils::date2String(this->feastDate(), DATE_FORMAT_MD);
+        return Utils::date2String(this->feastDate(), DEFAULT_FORMAT_MD);
     });
     mExportCallbacks.insert(KItemOtherContact, [this](const QString& item){
         return this->contact();
@@ -147,12 +147,12 @@ void Community::initExportFields()
         return this->missionNameIdString();
     });
     // TODO: implement more
-    tracede;
+    traceout;
 }
 
 void Community::initImportFields()
 {
-    traced;
+    tracein;
     DbModel::initImportFields();
     mImportCallbacks.insert(KItemStatus, [this](const QString& value){
         this->setStatus(value.toInt()); // TODO: handle error case when convert to Int
@@ -225,7 +225,7 @@ void Community::initImportFields()
         return err;
     });
     // TODO: implement more
-    tracede;
+    traceout;
 }
 
 QString Community::modelName() const
@@ -260,7 +260,7 @@ void Community::setCreateDate(qint64 newCreateDate)
 
 ErrCode Community::setCreateDateFromString(const QString &date, const QString &format)
 {
-    traced;
+    tracein;
     logd("create date string '%s'", date.toStdString().c_str());
     bool ok = false;
     mCreateDate = Utils::dateFromString(date, format, &ok);
@@ -270,7 +270,7 @@ ErrCode Community::setCreateDateFromString(const QString &date, const QString &f
     }
 
     markItemAsModified(KItemCreateTime);
-    tracede;
+    traceout;
     return ok?ErrNone:ErrInvalidArg;
 }
 
@@ -281,18 +281,25 @@ const QString &Community::parentUid() const
 
 void Community::setParentUid(const QString &newParentUid)
 {
-    mParentUid = newParentUid;
-    if (mLevel < 0) {
-        logd("reset level");
-        DbModelHandler* hdl = getDbModelHandler();
-        Community* model = (Community*)hdl->getByUid(mParentUid);
-        if (model) {
-            mLevel = model->level() + 1;
-            delete model;
-        } else {
-            logw("uid '%s' not found", STR2CHA(newParentUid));
-        }
+    if (newParentUid != uid()) {
+        mParentUid = newParentUid;
+    } else {
+        loge("Cannot set parent to itself");
     }
+    // TODO: check logic of level again!!!
+//    if (mLevel < 0) {
+//        logd("reset level");
+//        DbModelHandler* hdl = getDbModelHandler();
+//        logd("get parent model uid '%s'", STR2CHA(mParentUid));
+//        Community* model = (Community*)hdl->getByUid(mParentUid);
+//        if (model) {
+//            mLevel = model->level() + 1;
+//            logd("new level = %d", mLevel);
+//            delete model;
+//        } else {
+//            logw("uid '%s' not found", STR2CHA(newParentUid));
+//        }
+//    }
 
     markItemAsModified(KItemParentCommunity);
 }
@@ -306,7 +313,7 @@ void Community::setStatus(int newStatus)
 {
     if ((newStatus & MODEL_STATUS_MAX) != 0) {
         mStatus = (DbModelStatus)newStatus;
-        mStatusName = DbModel::status2Name(mStatus);
+        mStatusName = DbModel::modelStatus2Name(mStatus);
     }
     logd("new status = %d", mStatus);
     logd("new mStatusName = %s", STR2CHA(mStatusName));
@@ -320,7 +327,7 @@ void Community::setStatus(int newStatus)
 
 //void Community::dump()
 //{
-//    traced;
+//    tracein;
 //    QString log = QStringLiteral(
 //                      "name '%1'\n"
 //                      )
@@ -341,7 +348,7 @@ void Community::setCloseDate(qint64 newCloseDate)
 
 ErrCode Community::setCloseDateFromString(const QString &date, const QString &format)
 {
-    traced;
+    tracein;
     bool ok = false;
     logd("close date string '%s'", date.toStdString().c_str());
     mCloseDate = Utils::dateFromString(date, format, &ok);
@@ -350,7 +357,7 @@ ErrCode Community::setCloseDateFromString(const QString &date, const QString &fo
         loge("Invalid date '%s', format '%s'", STR2CHA(date), STR2CHA(format));
     }
     markItemAsModified(KItemCloseTime);
-    tracede;
+    traceout;
     return ok?ErrNone:ErrInvalidArg;
 }
 
@@ -362,22 +369,22 @@ DbModelHandler *Community::getDbModelHandler() const
 
 bool Community::allowRemove(QString *msg)
 {
-    traced;
-    bool allow = (level() != 0);
-    logd("level %d, allow %d", level(), allow); // TODO: level only is enought???
+    tracein;
+    bool allow = (level() != 0) || (!mParentUid.isEmpty());
+    logd("level %d, parent uid '%s', allow %d", level(), STR2CHA(mParentUid), allow); // TODO: level only is enought???
     if (msg) {
-        if (level() == 0) {
+        if (level() == 0 && !mParentUid.isEmpty()) {
             loge("Not allow to delete root community");
             *msg = QObject::tr("Không được phép xóa cộng đoàn gốc");
         }
     }
-    tracede;
+    traceout;
     return allow; // not allow to deleve root community, only update is allowed
 }
 
 void Community::copy(const Community &model)
 {
-    traced;
+    tracein;
     mImgPath = model.mImgPath;
     mAddr = model.mAddr;
 
@@ -421,7 +428,7 @@ void Community::copy(const Community &model)
 
     mMissionUid = model.mMissionUid;
     mMissionName = model.mMissionName;
-    tracede;
+    traceout;
 }
 
 void Community::resetResource()
@@ -739,7 +746,7 @@ void Community::setFeastDate(qint64 newFeastDate)
 
 ErrCode Community::setFeastDateFromString(const QString &date, const QString &format)
 {
-    traced;
+    tracein;
     bool ok = false;
     logd("mFeastDate date string '%s'", date.toStdString().c_str());
     mFeastDate = Utils::dateFromString(date, format, &ok);
@@ -748,7 +755,7 @@ ErrCode Community::setFeastDateFromString(const QString &date, const QString &fo
         loge("Invalid date '%s', format '%s'", STR2CHA(date), STR2CHA(format));
     }
     markItemAsModified(KItemFeastDay);
-    tracede;
+    traceout;
     return ok?ErrNone:ErrInvalidArg;
 
 }
@@ -761,7 +768,7 @@ bool Community::isValid()
 
 void Community::dump()
 {
-    traced;
+    tracein;
 #ifdef DEBUG_TRACE
 
     logd("DUMP:");

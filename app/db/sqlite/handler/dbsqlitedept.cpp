@@ -31,7 +31,7 @@ GET_INSTANCE_IMPL(DbSqliteDept);
 
 DbSqliteDept::DbSqliteDept()
 {
-    traced;
+    tracein;
 }
 
 const QString DbSqliteDept::getName()

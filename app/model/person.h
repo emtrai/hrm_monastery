@@ -49,7 +49,7 @@ class Person: public DbModel
 {
 public:
     static DbModel* build();
-    virtual DbModelBuilder getBuilder();
+    virtual DbModelBuilder getBuilder() const;
     virtual void initExportFields();
     virtual void initImportFields();
     /**
@@ -59,13 +59,14 @@ public:
      */
     virtual ErrCode validateAllFields();
 private:
+    Person();
     ErrCode commonCheckField(QString& name,
                              QString& uid,
                              ModelController* controller,
                              const char* const itemName,
                              int& invalidField);
 public:
-    Person();
+    Person(const Person& person) = delete;
     virtual ~Person();
     virtual void clone(const DbModel* per);
     virtual void buildUidIfNotSet();
@@ -91,13 +92,11 @@ public:
     ErrCode fromCSVFile(const QString& fname);
 
     virtual DataExporter* getExporter();
-    const QString &personCode() const;
-    void setPersonCode(const QString &newPersonCode);
 
     qint64 christenDate() const;
     void setChristenDate(qint64 newChristenDate);
     void setChristenDate(const QString& newChristenDate,
-                         const QString& format = DATE_FORMAT_DMY);
+                         const QString& format = DEFAULT_FORMAT_YMD);
 
     virtual ErrCode exportTo(const QString &fpath, ExportType type);
 
@@ -107,7 +106,7 @@ public:
     qint64 trainJoinDate() const;
     void setTrainJoinDate(qint64 newTrainJoinDate);
     void setTrainJoinDate(const QString& newTrainJoinDate,
-                          const QString& format = DATE_FORMAT_DMY);
+                          const QString& format = DEFAULT_FORMAT_YMD);
 
     Person *trainPIC() const;
     void setTrainPIC(Person *newTrainPIC);
@@ -204,7 +203,7 @@ public:
     qint64 dadBirthday() const;
     void setDadBirthday(qint64 newDadBirthday);
     void setDadBirthday(const QString& newDadBirthday,
-                        const QString& format = DATE_FORMAT_DMY);
+                        const QString& format = DEFAULT_FORMAT_YMD);
 
     const QString &dadAddr() const;
     void setDadAddr(const QString &newDadAddr);
@@ -215,7 +214,7 @@ public:
     qint64 momBirthday() const;
     void setMomBirthday(qint64 newMomBirthday);
     void setMomBirthday(const QString& newMomBirthday,
-                        const QString& format = DATE_FORMAT_DMY);
+                        const QString& format = DEFAULT_FORMAT_YMD);
 
     const QString &momAddr() const;
     void setMomAddr(const QString &newMomAddr);
@@ -233,7 +232,7 @@ public:
     qint64 hollyDate() const;
     void setHollyDate(qint64 newHollyDate);
     void setHollyDate(const QString& newHollyDate,
-                      const QString& format = DATE_FORMAT_DMY);
+                      const QString& format = DEFAULT_FORMAT_YMD);
 
     const QString &familyContact() const;
     void setFamilyContact(const QString &newFamilyContact);
@@ -241,7 +240,7 @@ public:
     qint64 joinDate() const;
     void setJoinDate(qint64 newJoinDate);
     void setJoinDate(const QString& newJoinDate,
-                     const QString& format = DATE_FORMAT_DMY);
+                     const QString& format = DEFAULT_FORMAT_YMD);
 
     const QString &joinPICUid() const;
     void setJoinPICUid(const QString &newJoinPICUid);
@@ -252,7 +251,7 @@ public:
     qint64 preTrainJoinDate() const;
     void setPreTrainJoinDate(qint64 newPreTrainJoinDate);
     void setPreTrainJoinDate(const QString& newPreTrainJoinDate,
-                             const QString& format = DATE_FORMAT_DMY);
+                             const QString& format = DEFAULT_FORMAT_YMD);
 
     const QString &preTrainPICUid() const;
     void setPreTrainPICUid(const QString &newPreTrainPICUid);
@@ -275,12 +274,12 @@ public:
     qint64 vowsDate() const;
     void setVowsDate(qint64 newVowsDate);
     void setVowsDate(const QString& newVowsDate,
-                     const QString& format = DATE_FORMAT_DMY);
+                     const QString& format = DEFAULT_FORMAT_YMD);
 
     qint64 eternalVowsDate() const;
     void setEternalVowsDate(qint64 newEternalVowsDate);
     void setEternalVowsDate(const QString& newEternalVowsDate,
-                            const QString& format = DATE_FORMAT_DMY);
+                            const QString& format = DEFAULT_FORMAT_YMD);
 
     const QString &eternalVowsCEOUid() const;
     void setEternalVowsCEOUid(const QString &newEternalVowsCEOUid);
@@ -297,7 +296,7 @@ public:
     qint64 bankDate() const;
     void setBankDate(qint64 newBankDate);
     void setBankDate(const QString& newBankDate,
-                     const QString& format = DATE_FORMAT_DMY);
+                     const QString& format = DEFAULT_FORMAT_YMD);
 
     const QString &bankPlace() const;
     void setBankPlace(const QString &newBankPlace);
@@ -305,7 +304,7 @@ public:
     qint64 goldenDate() const;
     void setGoldenDate(qint64 newGoldenDate);
     void setGoldenDate(const QString& newGoldenDate,
-                       const QString& format = DATE_FORMAT_DMY);
+                       const QString& format = DEFAULT_FORMAT_YMD);
 
     const QString &goldenPlace() const;
     void setGoldenPlace(const QString &newGoldenPlace);
@@ -313,7 +312,7 @@ public:
     qint64 eternalDate() const;
     void setEternalDate(qint64 newEternalDate);
     void setEternalDate(const QString& newEternalDate,
-                       const QString& format = DATE_FORMAT_DMY);
+                       const QString& format = DEFAULT_FORMAT_YMD);
 
     const QString &eternalPlace() const;
     void setEternalPlace(const QString &newEternalPlace);
@@ -327,7 +326,7 @@ public:
     qint64 retireDate() const;
     void setRetireDate(qint64 newRetireDate);
     void setRetireDate(const QString & newRetireDate,
-                       const QString& format = DATE_FORMAT_DMY);
+                       const QString& format = DEFAULT_FORMAT_YMD);
 
     const QString &retirePlace() const;
     void setRetirePlace(const QString &newRetirePlace);
@@ -335,7 +334,7 @@ public:
     qint64 deadDate() const;
     void setDeadDate(qint64 newDeadDate);
     void setDeadDate(const QString&  newDeadDate,
-                     const QString& format = DATE_FORMAT_DMY);
+                     const QString& format = DEFAULT_FORMAT_YMD);
 
     const QString &deadPlace() const;
     void setDeadPlace(const QString &newDeadPlace);
@@ -366,7 +365,7 @@ public:
     qint64 eucharistDate() const;
     void setEucharistDate(qint64 newEucharistDate);
     void setEucharistDate(const QString& newEucharistDate,
-                          const QString& format = DATE_FORMAT_DMY);
+                          const QString& format = DEFAULT_FORMAT_YMD);
 
     const QString &eucharistPlace() const;
     void setEucharistPlace(const QString &newEucharistPlace);
@@ -374,9 +373,9 @@ public:
     qint64 feastDay() const;
     void setFeastDay(qint64 newFeastDay);
     void setFeastDay(const QString& newFeastDay,
-                     const QString& format = DATE_FORMAT_MD);
+                     const QString& format = DEFAULT_FORMAT_MD);
 
-    virtual ErrCode onImportDataItem(const QString& importName,
+    virtual ErrCode onImportParseDataItem(const QString& importName,
                                  int importFileType,
                                  const QString& keyword,
                                  const QString& value,
@@ -426,7 +425,6 @@ protected:
     virtual ErrCode prepare2Save();
 
 protected:
-    QString mPersonCode; // TODO: reconsider again if we need this, as we have common "nameid"
 
     QString mFirstName;
     QString mLastName;

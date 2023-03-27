@@ -55,8 +55,11 @@ const char* const KFieldCreateDate = "createdate";
 const char* const KFieldCloseDate = "closedate";
 const char* const KFieldDateFormat = "dateformat";
 const char* const KFieldCreateTime = "create_time";
+const char* const KFieldDbCreateTime = "db_create_time";
 const char* const KFieldLastUpdateItme = "LastUpdateTime";
+const char* const KFieldLastDbUpdateItme = "db_last_update_time";
 const char* const KFieldStatus = "status";
+const char* const KFieldModelStatus = "model_status"; // status of model, i.e active, deactive (i.e. died/closed etc.)
 const char* const KFieldDbStatus = "dbstatus";
 const char* const KFieldCEOUid = "ceouid";
 const char* const KFieldChurchUid = "church_uid";
@@ -69,6 +72,7 @@ const char* const KFieldAreaName = "area_name";
 const char* const KFieldDepartmentUid = "depart_uid";
 const char* const KFieldDepartmentDbId = "depart_dbid";
 const char* const KFieldDepartmentName = "depart_name";
+const char* const KFieldDepartmentNameId = "depart_nameid";
 const char* const KFieldPreset = "preset";
 const char* const KFieldGender = "gender";
 const char* const KFieldFeastDay = "feastday";
@@ -159,6 +163,8 @@ const char* const KFieldSaintDbId = "saint_dbid";
 const char* const KFieldPersonUid = "person_uid";
 const char* const KFieldPersonDbId = "person_dbid";
 const char* const KFieldPersonName = "person_name";
+const char* const KFieldPersonNameId = "person_nameId";
+const char* const KFieldPersonRemark = "person_remark";
 const char* const KFieldRoleDbId = "role_dbid";
 const char* const KFieldRoleUid = "role_uid";
 const char* const KFieldRoleName = "role_name";
@@ -175,9 +181,14 @@ const char* const KFieldExperienceHistory = "experience_history";
 const char* const KFieldChangeHistory = "change_history";
 const char* const KFieldCommDeptUid = "comm_dept_uid";
 const char* const KFieldCommDeptDbId = "comm_dept_dbid";
+const char* const KFieldKey = "key";
+const char* const KFieldValue = "value";
+const char* const KFieldSeq = "seq";
 
 
 // TABLES NAME
+const char* const KTableMetadata = "metadata";
+const char* const KTableSqliteSequence = "sqlite_sequence";
 const char* const KTablePerson = "person"; // Person
 const char* const KTableCommunity = "community"; // cong doan
 const char* const KTableDepartment = "department"; // BQL
@@ -204,6 +215,10 @@ const char* const KTableAreaPerson = "area_person";
 const char* const KTableCommDepartPerson = "com_depart_person";
 const char* const KTableAreaCommunity = "area_community";
 const char* const KTableSpecialistPerson = "specialist_person";
+
+
+const char* const KMetadataKeyVersion = "version";
+const char* const KMetadataKeyPersonCode = "person_code";
 
 // TODO: move to class???
 QString getDateTypeString(TableFieldDatatype_t dataType);

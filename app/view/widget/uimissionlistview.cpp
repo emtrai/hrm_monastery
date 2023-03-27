@@ -34,12 +34,12 @@
 UIMissionListView::UIMissionListView(QWidget *parent):
     UICommonListView(parent)
 {
-    traced;
+    tracein;
 }
 
 UIMissionListView::~UIMissionListView()
 {
-    traced;
+    tracein;
 }
 
 
@@ -56,7 +56,7 @@ DbModel *UIMissionListView::onNewModel()
 ErrCode UIMissionListView::onLoad()
 {
     QList<DbModel*> items = MISSIONCTL->getAllItemsFromDb();
-    traced;
+    tracein;
 
     RELEASE_LIST_DBMODEL(mItemList);
     // TODO: loop to much, redundant, do something better?

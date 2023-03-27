@@ -29,7 +29,7 @@
 
 DbSqliteStatus::DbSqliteStatus()
 {
-    traced;
+    tracein;
 }
 
 

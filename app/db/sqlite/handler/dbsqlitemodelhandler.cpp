@@ -27,20 +27,20 @@
 
 DbSqliteModelHandler::DbSqliteModelHandler()
 {
-    traced;
+    tracein;
 }
 
 DbSqliteModelHandler::DbSqliteModelHandler(const QString &name)
     :DbSqliteModelHandler()
 {
-    traced;
+    tracein;
     mName = name;
 }
 
 ErrCode DbSqliteModelHandler::add(DbModel *model, bool notify)
 {
 
-    traced;
+    tracein;
     ErrCode_t err = ErrNone;
 
     // TODO: should check if some sub-item not exist???
@@ -53,7 +53,7 @@ ErrCode DbSqliteModelHandler::add(DbModel *model, bool notify)
         }
         else{
             err = ErrExisted;
-            loge("Saint %s already exist", model->name().toStdString().c_str());
+            loge("Model %s already exist", model->name().toStdString().c_str());
         }
     }
     else{
@@ -68,7 +68,7 @@ ErrCode DbSqliteModelHandler::add(DbModel *model, bool notify)
 
 ErrCode DbSqliteModelHandler::update(DbModel *model)
 {
-    traced;
+    tracein;
     ErrCode_t err = ErrNone;
 
     // TODO: should check if some sub-item not exist???
@@ -96,7 +96,7 @@ ErrCode DbSqliteModelHandler::update(DbModel *model)
 
 ErrCode DbSqliteModelHandler::update(DbModel *model, const QHash<QString, QString> &inFields, const QString &tableName)
 {
-    traced;
+    tracein;
     DbSqliteTbl* tbl = nullptr;
     ErrCode err = ErrNone;
     int cnt = 0;
@@ -109,13 +109,13 @@ ErrCode DbSqliteModelHandler::update(DbModel *model, const QHash<QString, QStrin
         err = tbl->update(model->uid(), inFields);
         logd("Update err= %d", err);
     }
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 ErrCode DbSqliteModelHandler::deleteSoft(DbModel *model)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     // TODO: should check if some sub-item not exist???
     // i.e.import person, but country, holly name, etc. not exist, need to check and add it
@@ -136,45 +136,74 @@ ErrCode DbSqliteModelHandler::deleteSoft(DbModel *model)
     if (err == ErrNone) {
         notifyDataChange(model, DBMODEL_CHANGE_DELETE, err);
     }
-    tracedr(err);
+    traceret(err);
     return err;
 }
 ErrCode DbSqliteModelHandler::deleteHard(DbModel *model, bool force, QString *msg)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
+    DbSqliteTbl* tbl = nullptr;
     // TODO: should check if some sub-item not exist???
     // i.e.import person, but country, holly name, etc. not exist, need to check and add it
-
-    if (model != nullptr){
-        DbSqliteTbl* tbl = getTable(model->modelName());
+    if (!model) {
+        err = ErrInvalidArg;
+        loge("invalid argument");
+    }
+    if (err == ErrNone){
+        tbl = getTable(model->modelName());
         if (!tbl) {
             err = ErrNoTable;
             loge("Not found table for '%s'", STR2CHA(model->modelName()));
         }
-        if (err == ErrNone) {
-            if (tbl->isExist(model)){
-                err = tbl->deleteHard(model);
-            } else {
-                err = ErrNotExist;
-                loge("model %s not exist", model->name().toStdString().c_str());
-            }
-        }
     }
-    else{
+    if (err == ErrNone) {
+        err = doDeleteHard(tbl, model, force, msg);
+    }
+    traceret(err);
+    return err;
+}
+
+ErrCode DbSqliteModelHandler::deleteHard(DbModel *model, bool force, QString *msg, const QString &tableName)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    // TODO: should check if some sub-item not exist???
+    // i.e.import person, but country, holly name, etc. not exist, need to check and add it
+    DbSqliteTbl* tbl = DbSqlite::table(tableName);
+    err = doDeleteHard(tbl, model, force, msg);
+    traceret(err);
+    return err;
+}
+
+ErrCode DbSqliteModelHandler::doDeleteHard(DbSqliteTbl *tbl, DbModel *model, bool force, QString *msg)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    // TODO: should check if some sub-item not exist???
+    // i.e.import person, but country, holly name, etc. not exist, need to check and add it
+    if (!tbl || !model) {
         err = ErrInvalidArg;
-        loge("invalid argument");
+        loge("Invalid argument");
+    }
+    if (err == ErrNone) {
+        if (tbl->isExist(model)){
+            err = tbl->deleteHard(model);
+        } else {
+            err = ErrNotExist;
+            loge("model %s not exist", model->name().toStdString().c_str());
+        }
     }
     if (err == ErrNone) {
         notifyDataChange(model, DBMODEL_CHANGE_DELETE, err);
     }
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 bool DbSqliteModelHandler::exist(const DbModel *model)
 {
-    traced;
+    tracein;
     bool exist = false;
     if (model) {
         logd("check exist for model '%s'", STR2CHA(model->toString()));
@@ -185,20 +214,43 @@ bool DbSqliteModelHandler::exist(const DbModel *model)
         exist = false;
         loge("invalid argument");
     }
-    tracede;
+    traceout;
+    return exist;
+}
+
+bool DbSqliteModelHandler::isNameidExist(const QString &nameId, const char *modelName)
+{
+    tracein;
+    DbSqliteTbl* tbl = nullptr;
+    bool exist = false;
+    logd("check nameid exist for model '%s'", modelName?modelName:"(null)");
+    if (modelName) {
+        tbl = getTable(modelName);
+    } else {
+        logd("get main table");
+        tbl = getMainTbl();
+    }
+    if (tbl){
+        exist = tbl->isNameidExist(nameId);
+    } else {
+        loge("not found suitable table to check name exist");
+    }
+
+    logd("exist=%d", exist);
+    traceout;
     return exist;
 }
 
 QList<DbModel *> DbSqliteModelHandler::getAll(DbModelBuilder builder, qint64 status,
                                               const char* modelName, int from, int noItems, int* total)
 {
-    traced;
+    tracein;
     return getMainTbl()->getAll(builder, status, from, noItems, total);
 }
 
 QHash<QString, DbModel *> DbSqliteModelHandler::getAllInDict(DbModelBuilder builder, qint64 status, const char *modelName)
 {
-    traced;
+    tracein;
     QList<DbModel *> list = getAll(builder, status, modelName);
     QHash<QString, DbModel *> map;
     logd("found %lld item", list.count());
@@ -206,19 +258,19 @@ QHash<QString, DbModel *> DbSqliteModelHandler::getAllInDict(DbModelBuilder buil
         map.insert(item->uid(), item);
     }
     // TODO: cache it??????
-    tracede;
+    traceout;
     return map;
 }
 
 DbModel *DbSqliteModelHandler::getModel(qint64 dbId)
 {
-    traced;
+    tracein;
     return nullptr;
 }
 
 DbModel *DbSqliteModelHandler::getByUid(const QString &uid, const DbModelBuilder &builder)
 {
-    traced;
+    tracein;
     DbSqliteTbl* tbl = getMainTbl();
     // assume main tbl is not null, if not programming error,
     // and require override search function
@@ -228,7 +280,7 @@ DbModel *DbSqliteModelHandler::getByUid(const QString &uid, const DbModelBuilder
 
 DbModel *DbSqliteModelHandler::getByUid(const QString &uid)
 {
-    traced;
+    tracein;
     DbModel *model = nullptr;
     DbModelBuilder builder = getMainBuilder();
     if (builder) {
@@ -237,13 +289,13 @@ DbModel *DbSqliteModelHandler::getByUid(const QString &uid)
         loge("NO BUILDER, SHOULD NOT BE CALLED, MUST BE IMPLEMENTED BY DERIVED CLASS");
     }
     // TODO: throw exception???
-    tracede;
+    traceout;
     return model;
 }
 
 DbModel *DbSqliteModelHandler::getByNameId(const QString &nameId, const DbModelBuilder &builder)
 {
-    traced;
+    tracein;
     DbSqliteTbl* tbl = getMainTbl();
     // assume main tbl is not null, if not programming error,
     // and require override search function
@@ -264,7 +316,7 @@ ErrCode DbSqliteModelHandler::search(const QString& keyword,
                                  int noItems,
                                  int* total)
 {
-    traced;
+    tracein;
     DbSqliteTbl* tbl = getMainTbl();
     // assume main tbl is not null, if not programming error,
     // and require override search function
@@ -283,7 +335,7 @@ ErrCode DbSqliteModelHandler::filter(int fieldId,
                                  int noItems,
                                  int* total)
 {
-    traced;
+    tracein;
     DbSqliteTbl* tbl = nullptr;
     DbModelBuilder builder = nullptr;
     if (targetModelName) {
@@ -300,7 +352,7 @@ ErrCode DbSqliteModelHandler::filter(int fieldId,
 
     ErrCode ret = tbl->filter(fieldId, operatorId, keyword, builder, outList,
                               dbStatus, from, noItems, total);
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
@@ -311,7 +363,7 @@ ErrCode DbSqliteModelHandler::getListItems(const QHash<QString, QString> &inFiel
                                           QList<DbModel*>* outList,
                                           const DbModelBuilder& builder)
 {
-    traced;
+    tracein;
     DbSqliteTbl* tbl = nullptr;
     ErrCode err = ErrNone;
     int cnt = 0;
@@ -327,7 +379,7 @@ ErrCode DbSqliteModelHandler::getListItems(const QHash<QString, QString> &inFiel
         logd("found %d items", cnt);
     }
     if (total) *total = cnt;
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
@@ -339,7 +391,7 @@ DbSqliteTbl *DbSqliteModelHandler::getTable(const QString& modelName)
 
 DbModelBuilder DbSqliteModelHandler::getBuilder(const QString &modelName)
 {
-    traced;
+    tracein;
     logd("get builder for model '%s'", STR2CHA(modelName));
     DbModelBuilder builder = nullptr;
     if (!modelName.isEmpty()) {
@@ -348,7 +400,7 @@ DbModelBuilder DbSqliteModelHandler::getBuilder(const QString &modelName)
         logd("null modelName, try to get defaule onle");
         builder = getMainBuilder();
     }
-    tracede;
+    traceout;
     return builder;
 }
 

@@ -32,12 +32,12 @@
 UICountryListView::UICountryListView(QWidget *parent):
     UICommonListView(parent)
 {
-    traced;
+    tracein;
 }
 
 UICountryListView::~UICountryListView()
 {
-    traced;
+    tracein;
 }
 
 ModelController *UICountryListView::getController()

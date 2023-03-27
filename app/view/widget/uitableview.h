@@ -58,9 +58,12 @@ public:
     void setValueList(const QStringList &newValueList);
 
     DbModel *data() const;
+    UITableItem* clone();
+    void clone(const UITableItem* item);
 
 private:
     UITableItem();
+    UITableItem(const UITableItem& item);
     UITableItem(DbModel* data);
 private:
     QStringList mValueList;
@@ -71,11 +74,11 @@ private:
 /**
  * @brief Re-present for a item in table
  */
-class UITableWidgetItem: public QTableWidgetItem
+class UITableCellWidgetItem: public QTableWidgetItem
 {
 public:
-    UITableWidgetItem(const QString &text);
-    static UITableWidgetItem* build(const QString& txt, qint32 itemIdx = 0, qint32 idx = 0, UITableItem* mItem = nullptr);
+    UITableCellWidgetItem(const QString &text);
+    static UITableCellWidgetItem* build(const QString& txt, qint32 itemIdx = 0, qint32 idx = 0, UITableItem* mItem = nullptr);
     UITableItem *item() const;
     DbModel *itemData() const;
     void setItem(UITableItem *newItem);
@@ -100,15 +103,15 @@ class UITableMenuAction: public QAction {
 
 public:
     UITableMenuAction(QObject *parent = nullptr);
+    virtual ~UITableMenuAction();
     UITableMenuAction(const QString &text, QObject *parent = nullptr);
-    UITableWidgetItem *tblItem() const;
-    UITableMenuAction* setTblItem(UITableWidgetItem *newTblItem);
+    UITableCellWidgetItem *tblItem() const;
+    UITableMenuAction* setTblCellItem(UITableCellWidgetItem *newTblItem);
 
 
     const std::function<ErrCode (QMenu *, UITableMenuAction *)> &callback() const;
     UITableMenuAction* setCallback(const std::function<ErrCode (QMenu *, UITableMenuAction *)> &newCallback);
     DbModel* getData();
-    UITableMenuAction* setItemList(const QList<UITableItem *> &newItemList);
     UITableMenuAction* addItemList(UITableItem* newItemList);
 
     UITableMenuActionType menuType() const;
@@ -116,7 +119,7 @@ public:
 public:
     static UITableMenuAction* build(const QString &text,
                                     QObject *parent = nullptr,
-                                    UITableWidgetItem* item = nullptr,
+                                    UITableCellWidgetItem* item = nullptr,
                                     qint32 idx = 0);
 
     static UITableMenuAction* buildMultiItem(const QString &text,
@@ -129,7 +132,7 @@ public:
     int itemListData(QList<DbModel *>&outList);
 
 private:
-    UITableWidgetItem* mTblItem;
+    UITableCellWidgetItem* mTblCellItem;
     QList<UITableItem*> mItemList;
     std::function<ErrCode(QMenu* menu, UITableMenuAction* act)> mCallback;
     UITableMenuActionType mMenuType;
@@ -191,14 +194,14 @@ protected:
      */
     virtual ErrCode onReload();
     virtual void importRequested(const QString& fpath);
-    virtual void onViewItem(UITableWidgetItem *item);
-    virtual void onEditItem(UITableWidgetItem *item);
-    virtual void onDeleteItem(UITableWidgetItem *item);
-    virtual void onAddItem(UITableWidgetItem *item);
+    virtual void onViewItem(UITableCellWidgetItem *item);
+    virtual void onEditItem(UITableCellWidgetItem *item);
+    virtual void onDeleteItem(const QList<UITableItem *>& selectedItems);
+    virtual void onAddItem(UITableCellWidgetItem *item);
 //    virtual void onDeleteItem(UITableItem *item);
 
     // MENU
-    virtual QMenu* buildPopupMenu(UITableWidgetItem* item, const QList<UITableItem*>& items);
+    virtual QMenu* buildPopupMenu(UITableCellWidgetItem* item, const QList<UITableItem*>& items);
     /**
      * @brief Common menu action, always show
      * @param menu
@@ -211,14 +214,14 @@ protected:
      * @param item
      * @return
      */
-    virtual QList<UITableMenuAction*> getMenuItemActions(const QMenu* menu, UITableWidgetItem* item);
+    virtual QList<UITableMenuAction*> getMenuSingleSelectedItemActions(const QMenu* menu, UITableCellWidgetItem* item);
     /**
      * @brief get menu action list when multi item is selected
      * @param menu
      * @param items
      * @return
      */
-    virtual QList<UITableMenuAction*> getMenuMultiItemActions(const QMenu* menu, const QList<UITableItem *>& items);
+    virtual QList<UITableMenuAction*> getMenuMultiSelectedItemActions(const QMenu* menu, const QList<UITableItem *>& items);
 //    virtual ErrCode onMenuActionTrigger(QMenu* menu, UITableMenuAction*);
     virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionDelete(QMenu* menu, UITableMenuAction* act);

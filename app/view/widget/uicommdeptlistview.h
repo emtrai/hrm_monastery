@@ -36,13 +36,13 @@ public:
 
 protected:
     virtual int getViewType() { return VIEW_COMMUNITY_DEPT;}
-    virtual QList<UITableMenuAction*> getMenuItemActions(const QMenu* menu,
-                                                          UITableWidgetItem* item);
+    virtual QList<UITableMenuAction*> getMenuSingleSelectedItemActions(const QMenu* menu,
+                                                          UITableCellWidgetItem* item);
     virtual ErrCode onMenuActionListPerson(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionListDepartment(QMenu* menu, UITableMenuAction* act);
     virtual QString getTitle();
     virtual void initHeader();
-    virtual void updateItem(DbModel* item, UITableItem* tblItem);
+    virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
     virtual DbModel* onNewModel();
 
 protected:

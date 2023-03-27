@@ -59,15 +59,19 @@
 #endif // DEBUG_LOG
 
 #ifdef DEBUG_TRACE
-#define traced logd("IN>> %s", __func__)
-#define tracedr(ret) logd("<<END %s with ret=%d", __func__, (int)ret)
-#define tracede logd("<<END %s", __func__)
+#define traced logd("CALL>> %s", __func__)
+#define tracein logd("CALL IN>> %s", __func__)
+#define traceret(ret) logd("<<CALL OUT %s with ret=%d", __func__, (int)ret)
+#define traceout logd("<<CALL OUT %s", __func__)
+#define tracelog(fmt, ...) logd(fmt, ##__VA_ARGS__)
 
 #else // DEBUG_TRACE
 
 #define traced NO_OP
-#define tracedr(ret) NO_OP
-#define tracede NO_OP
+#define tracein NO_OP
+#define traceout NO_OP
+#define traceret(ret) NO_OP
+#define tracelog(fmt, ...) NO_OP
 #endif // DEBUG_TRACE
 
 

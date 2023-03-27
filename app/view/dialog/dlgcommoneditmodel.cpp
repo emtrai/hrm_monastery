@@ -31,12 +31,12 @@
 DlgCommonEditModel::DlgCommonEditModel(QWidget *parent): QDialog(parent),
     mModel(nullptr), mIsNew(false), mIsSelfSave(false)
 {
-    traced;
+    tracein;
 }
 
 DlgCommonEditModel::~DlgCommonEditModel()
 {
-    traced;
+    tracein;
     if (mModel) delete mModel;
 }
 
@@ -74,7 +74,7 @@ DbModel *DlgCommonEditModel::model()
 
 void DlgCommonEditModel::accept()
 {
-    traced;
+    tracein;
     QString errMsg;
     ErrCode ret = ErrNone;
     bool ok2Save = false;
@@ -109,7 +109,7 @@ void DlgCommonEditModel::accept()
                 logd("Update it");
                 ret = item->update();
             }
-            logi("Save/Update person result %d", ret);
+            logi("Save/Update result %d", ret);
 
             if (ret == ErrNone) {
                 logi("Save/update '%s' ok , close dialog", STR2CHA(item->toString()));
@@ -133,12 +133,12 @@ void DlgCommonEditModel::accept()
     if (ret == ErrNone) {
         QDialog::accept();
     }
-    tracedr(ret);
+    traceret(ret);
 }
 
 bool DlgCommonEditModel::onValidateData(QString &msg)
 {
-    traced;
+    tracein;
     bool isValid = true;
     if (mModel) {
         if (mModel->nameId().isEmpty()) {
@@ -158,13 +158,13 @@ bool DlgCommonEditModel::onValidateData(QString &msg)
     logd("is valid %d", isValid);
     // TODO: implement this????
     // TODO do we need this? or just implement on buildModel are enough??
-    tracede;
+    traceout;
     return isValid;
 }
 
 ErrCode DlgCommonEditModel::loadList(QComboBox *cb, ModelController *ctrl)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     cb->clear();
     QList<DbModel*> list = ctrl->getAllItems(true);
@@ -172,13 +172,13 @@ ErrCode DlgCommonEditModel::loadList(QComboBox *cb, ModelController *ctrl)
         cb->addItem(item->name(), item->uid());
     }
     RELEASE_LIST_DBMODEL(list);
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 void DlgCommonEditModel::setModel(DbModel *newModel)
 {
-    traced;
+    tracein;
     if (newModel) {
         if (mModel) {
             logd("delete old model");
@@ -189,7 +189,7 @@ void DlgCommonEditModel::setModel(DbModel *newModel)
     } else {
         loge("invalid new model");
     }
-    tracede;
+    traceout;
 }
 
 CommonEditModelListener *DlgCommonEditModel::listener() const
@@ -204,7 +204,7 @@ void DlgCommonEditModel::setListener(CommonEditModelListener *newListener)
 
 ErrCode DlgCommonEditModel::fromModel(const DbModel *inModel)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     if (inModel == nullptr) {
         loge("Invalid model info to clone");
@@ -221,6 +221,6 @@ ErrCode DlgCommonEditModel::fromModel(const DbModel *inModel)
         ret = ErrNoData;
         loge("No db model found");
     }
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }

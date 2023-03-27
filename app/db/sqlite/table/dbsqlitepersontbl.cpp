@@ -45,7 +45,7 @@ DbSqlitePersonTbl::DbSqlitePersonTbl(DbSqlite* db):
 void DbSqlitePersonTbl::addTableField(DbSqliteTableBuilder *builder)
 {
 
-    traced;
+    tracein;
     DbSqliteTbl::addTableField(builder);
     builder->addField(KFieldImgId, TEXT);
 
@@ -164,7 +164,6 @@ ErrCode DbSqlitePersonTbl::insertTableField(DbSqliteInsertBuilder *builder, cons
     builder->addValue(KFieldImgId, per->imgId());
     builder->addValue(KFieldLastName, per->lastName());
     builder->addValue(KFieldFirstName, per->firstName());
-    builder->addValue(KFieldPersonCode, per->personCode());
 
     builder->addValue(KFieldBirthDay, per->birthday());
     builder->addValue(KFieldBirthPlace, per->birthPlace());
@@ -264,17 +263,25 @@ ErrCode DbSqlitePersonTbl::insertTableField(DbSqliteInsertBuilder *builder, cons
 // as person has a lots of information
 ErrCode DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     DbSqliteTbl::updateModelFromQuery(item, qry);
     // TODO: separate into short info and full info, to avoid consume too much memory?
     // TODO: paging to avoid too much memory?
     Person* cmm = (Person*) item;
+    if (!qry.isNull(KFieldPersonUid)) {
+        cmm->setUid(qry.value(KFieldPersonUid).toString());
+    }
+    if (!qry.isNull(KFieldPersonNameId)) {
+        cmm->setNameId(qry.value(KFieldPersonNameId).toString());
+    }
+    if (!qry.isNull(KFieldPersonRemark)) {
+        cmm->setRemark(qry.value(KFieldPersonRemark).toString());
+    }
     cmm->setImgId(qry.value(KFieldImgId).toString());
 
     cmm->setLastName(qry.value(KFieldLastName).toString());
     cmm->setFirstName(qry.value(KFieldFirstName).toString());
-    cmm->setPersonCode(qry.value(KFieldPersonCode).toString());
 
     cmm->setBirthday(qry.value(KFieldBirthDay).toInt());
     cmm->setBirthPlace(qry.value(KFieldBirthPlace).toString());
@@ -375,7 +382,7 @@ ErrCode DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
 
     // TODO: add field relate to list, like holly list, community, etc.
 
-    tracede;
+    traceout;
     return err;
 }
 
@@ -383,7 +390,7 @@ ErrCode DbSqlitePersonTbl::updateTableField(DbSqliteUpdateBuilder *builder,
                                             const QList<QString> &updateField,
                                             const DbModel *item)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     logd("Add %d field to update", updateField.count());
     Person* per = (Person*) item;
@@ -399,7 +406,7 @@ ErrCode DbSqlitePersonTbl::updateTableField(DbSqliteUpdateBuilder *builder,
             builder->addValue(KFieldSaintUid, per->saintUidListInString());
         }
     }
-    tracedr(err);
+    traceret(err);
     return err;
 }
 QHash<QString, int> DbSqlitePersonTbl::getSearchFields()
@@ -419,7 +426,7 @@ QHash<QString, int> DbSqlitePersonTbl::getSearchFields()
 
 QList<QString> DbSqlitePersonTbl::getNameFields()
 {
-    traced;
+    tracein;
     QList<QString> list;// TODO: make as class member?
     list.append(KFieldFirstName);
     list.append(KFieldLastName);
@@ -428,7 +435,7 @@ QList<QString> DbSqlitePersonTbl::getNameFields()
 
 QString DbSqlitePersonTbl::getSearchQueryString(const QString &cond)
 {
-    traced;
+    tracein;
     QString queryString = QString("SELECT *, (%2 || ' ' || %3) AS %4, %5.%8 AS %9 FROM %1 " \
                                   " LEFT JOIN %5 ON %1.%6 = %5.%7 ")
                               .arg(name())
@@ -445,7 +452,7 @@ QString DbSqlitePersonTbl::getSearchQueryString(const QString &cond)
 
 QString DbSqlitePersonTbl::getFilterQueryString(int fieldId, const QString &cond)
 {
-    traced;
+    tracein;
     logd("fieldId %d", fieldId);
     QString joinQuery;
     switch (fieldId) {
@@ -473,19 +480,19 @@ QString DbSqlitePersonTbl::getFilterQueryString(int fieldId, const QString &cond
 
 ErrCode DbSqlitePersonTbl::updateCommunity(const QString &uid, const QString &communityUid)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     logd("update community for person, uid '%s', community uid '%s'", STR2CHA(uid), STR2CHA(communityUid));
     QHash<QString, FieldValue> fields;
     fields[KFieldCommunityUid] = FieldValue(communityUid);
     ret = this->update(uid, fields);
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
 QHash<QString, QString> DbSqlitePersonTbl::getFieldsCheckExists(const DbModel *item)
 {
-    traced;
+    tracein;
     const Person* per = (Person*)item;
     // TODO: make as class member?
     QHash<QString, QString> list;// = DbSqliteTbl::getFieldsCheckExists(item);

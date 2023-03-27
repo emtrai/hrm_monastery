@@ -38,7 +38,7 @@ class Config:public QObject
             static ErrCode init();
 
 
-            static QString getNextPersonalCode();
+            static QString getNextPersonalCode(qint64* code = nullptr);
 
             ErrCode loadConfig();
             void dumpConfig();
@@ -47,7 +47,7 @@ class Config:public QObject
         private:
             Config();
             ErrCode doInit();
-            QString doGetNextPersonalCode();
+            QString doGetNextPersonalCode(qint64* code = nullptr);
         private:
             static Config* gInstance;
             QMap<QString, QString> mConfigKeyValue;

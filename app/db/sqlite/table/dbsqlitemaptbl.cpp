@@ -39,7 +39,7 @@
 
 DbSqliteMapTbl::DbSqliteMapTbl(DbSqlite* db):DbSqliteTbl(db)
 {
-    traced;
+    tracein;
 }
 
 DbSqliteMapTbl::DbSqliteMapTbl(DbSqlite *db,
@@ -69,7 +69,7 @@ QList<DbModel *> DbSqliteMapTbl::getListItems(const QString &mapTblName,
                                               const QString &uid, int status,
                                               const QString& selectedField)
 {
-    traced;
+    tracein;
 //    DB->openDb();
     QSqlQuery qry(SQLITE->currentDb());
     qint32 cnt = 0;
@@ -94,19 +94,19 @@ QList<DbModel *> DbSqliteMapTbl::getListItems(const QString &mapTblName,
     cnt = runQuery(qry, builder, &outList);
 
     logi("Found %d", cnt);
-    tracede;
+    traceout;
     return outList;
 }
 
 void DbSqliteMapTbl::addTableField(DbSqliteTableBuilder *builder)
 {
-    traced;
+    tracein;
     DbSqliteTbl::addTableField(builder);
     builder->addField(getFieldNameUid1(), TEXT);
     builder->addField(getFieldNameDbid1(), INT64);
     builder->addField(getFieldNameUid2(), TEXT);
     builder->addField(getFieldNameDbid2(), INT64);
-    builder->addField(KFieldStatus, INT64);
+    builder->addField(KFieldModelStatus, INT64);
     builder->addField(KFieldStartDate, INT64);
     builder->addField(KFieldEndDate, INT64);
     builder->addField(KFieldChangeHistory, TEXT);
@@ -115,7 +115,7 @@ void DbSqliteMapTbl::addTableField(DbSqliteTableBuilder *builder)
 
 ErrCode DbSqliteMapTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     ret = DbSqliteTbl::insertTableField(builder, item);
     if (ret == ErrNone) {
@@ -124,20 +124,20 @@ ErrCode DbSqliteMapTbl::insertTableField(DbSqliteInsertBuilder *builder, const D
         builder->addValue(getFieldNameDbid1(), model->dbId1());
         builder->addValue(getFieldNameUid2(), model->uid2());
         builder->addValue(getFieldNameDbid2(), model->dbId2());
-        builder->addValue(KFieldStatus, model->status());
+        builder->addValue(KFieldModelStatus, model->status());
         builder->addValue(KFieldStartDate, model->startDate());
         builder->addValue(KFieldEndDate, model->endDate());
         builder->addValue(KFieldChangeHistory, model->changeHistory());
         builder->addValue(KFieldParentUid, model->parentUid());
         // TODO: implement change history by event, i.e. IN:<datetime>, OUT:<datetime.
     }
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
 ErrCode DbSqliteMapTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     if (!item) {
         err = ErrInvalidArg;
@@ -155,7 +155,7 @@ ErrCode DbSqliteMapTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry
             model->setDbId1(qry.value(getFieldNameDbid1()).toInt());
             model->setUid2(qry.value(getFieldNameUid2()).toString());
             model->setDbId2(qry.value(getFieldNameDbid2()).toInt());
-            model->setStatus(qry.value(KFieldStatus).toInt());
+            model->setStatus(qry.value(KFieldModelStatus).toInt());
             model->setStartDate(qry.value(KFieldStartDate).toInt());
             model->setEndDate(qry.value(KFieldEndDate).toInt());
             model->setChangeHistory(qry.value(KFieldChangeHistory).toString());
@@ -166,13 +166,13 @@ ErrCode DbSqliteMapTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry
             err = ErrInvalidData;
         }
     }
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 QHash<QString, QString> DbSqliteMapTbl::getFieldsCheckExists(const DbModel *item)
 {
-    traced;
+    tracein;
     QHash<QString, QString> list;
     if (!item) {
         QString modelName = item->modelName();
@@ -187,7 +187,7 @@ QHash<QString, QString> DbSqliteMapTbl::getFieldsCheckExists(const DbModel *item
             list[getFieldNameUid2()] = model->uid2();
             list[KFieldStartDate] = QString("%1").arg(model->startDate());
             list[KFieldEndDate] = QString("%1").arg(model->endDate());
-            list[KFieldStatus] = QString("%1").arg(model->status());
+            list[KFieldModelStatus] = QString("%1").arg(model->status());
         } else {
             THROWEX("Invalid modelName %s", STR2CHA(modelName));
         }

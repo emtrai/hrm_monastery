@@ -37,16 +37,19 @@ UICommDeptListView::UICommDeptListView(QWidget *parent):
     UICommonListView(parent),
     mCommunity(nullptr)
 {
-    traced;
+    tracein;
 }
 
 UICommDeptListView::~UICommDeptListView()
 {
-    traced;
+    tracein;
+    if (mCommunity) delete mCommunity;
+
+    mCommunity = nullptr;
 }
 QString UICommDeptListView::getTitle()
 {
-    traced;
+    tracein;
     QString title;
     title = QString(tr("Phòng ban của cộng đoàn: %1")).arg(mCommunity?mCommunity->name():tr("Không rõ"));
 
@@ -55,20 +58,20 @@ QString UICommDeptListView::getTitle()
 
 void UICommDeptListView::initHeader()
 {
-    traced;
+    tracein;
     UICommonListView::initHeader();
 //    mHeader.append(tr("Cộng đoàn"));
-    tracede;
+    traceout;
 }
 
-void UICommDeptListView::updateItem(DbModel *item, UITableItem *tblItem)
+void UICommDeptListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
 {
-    traced;
-    UICommonListView::updateItem(item, tblItem);
+    tracein;
+    UICommonListView::updateItem(item, tblItem, idx);
 //    CommunityDept* dept = (CommunityDept*)item;
 
 //    tblItem->addValue(dept->communityUid());
-    tracede;
+    traceout;
 }
 
 DbModel *UICommDeptListView::onNewModel()
@@ -78,7 +81,7 @@ DbModel *UICommDeptListView::onNewModel()
 
 ErrCode UICommDeptListView::onMenuActionListPerson(QMenu *menu, UITableMenuAction *act)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     CommunityDept* item = dynamic_cast<CommunityDept*>(act->getData());
     if (item != nullptr) {
@@ -93,14 +96,14 @@ ErrCode UICommDeptListView::onMenuActionListPerson(QMenu *menu, UITableMenuActio
         ret = ErrNoData;
     }
 
-    tracedr(ret);
+    traceret(ret);
     return ret;
 
 }
 
 ErrCode UICommDeptListView::onMenuActionListDepartment(QMenu *menu, UITableMenuAction *act)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     DbModel* data = (DbModel*)(act->getData());
     if (data != nullptr) {
@@ -110,12 +113,12 @@ ErrCode UICommDeptListView::onMenuActionListDepartment(QMenu *menu, UITableMenuA
     return ret;
 }
 
-QList<UITableMenuAction *> UICommDeptListView::getMenuItemActions(const QMenu* menu,
-                                            UITableWidgetItem *item)
+QList<UITableMenuAction *> UICommDeptListView::getMenuSingleSelectedItemActions(const QMenu* menu,
+                                            UITableCellWidgetItem *item)
 {
-    traced;
+    tracein;
 //    logd("idx %d", idx);
-    QList<UITableMenuAction*> actionList = UITableView::getMenuItemActions(menu, item);
+    QList<UITableMenuAction*> actionList = UITableView::getMenuSingleSelectedItemActions(menu, item);
 
     actionList.append(UITableMenuAction::build(tr("Danh sách thành viên"), this, item)
                                               ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
@@ -129,18 +132,21 @@ ErrCode UICommDeptListView::onLoad()
 {
     QList<DbModel*> items;
     ErrCode ret = ErrNone;
-    traced;
+    tracein;
     if (mCommunity) {
         setTitle(getTitle());
+        logd("get list of dept of community '%s'", STR2CHA(mCommunity->toString()));
         items = COMMUNITYDEPTCTL->getListDept(mCommunity->uid());
+        RELEASE_LIST_DBMODEL(mItemList);
         mItemList.clear(); // TODO: clean up item data
         // TODO: loop to much, redundant, do something better?
+        logd("found %ld dept", items.size());
         foreach (DbModel* item, items) {
             mItemList.append(static_cast<DbModel*>(item));
     //        mItemList.append(std::shared_ptr<DbModel>(item));
         }
     }
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
@@ -151,5 +157,15 @@ Community *UICommDeptListView::community() const
 
 void UICommDeptListView::setCommunity(Community *newCommunity)
 {
-    mCommunity = newCommunity;
+    tracein;
+    if (mCommunity) {
+        delete mCommunity;
+        mCommunity = nullptr;
+    }
+    if (newCommunity) {
+        mCommunity = (Community*)((DbModel*)newCommunity)->clone();
+    } else {
+        logw("No community to set");
+    }
+    traceout;
 }

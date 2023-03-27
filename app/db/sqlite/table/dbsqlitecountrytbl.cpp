@@ -33,6 +33,6 @@ const qint32 DbSqliteCountryTbl::KVersionCode = VERSION_CODE(0,0,1);
 DbSqliteCountryTbl::DbSqliteCountryTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableCountry, KTableCountry, KVersionCode)
 {
-    traced;
+    tracein;
 }
 

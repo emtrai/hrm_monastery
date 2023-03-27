@@ -30,23 +30,23 @@
 
 Work::Work()
 {
-    traced;
+    tracein;
 }
 
 Work::~Work()
 {
-    traced;
+    tracein;
 }
 
 DbModel *Work::build()
 {
-    traced;
+    tracein;
     Work* model = new Work();
     model->init();
     return model;
 }
 
-DbModelBuilder Work::getBuilder()
+DbModelBuilder Work::getBuilder() const
 {
     return &Work::build;
 }

@@ -58,8 +58,8 @@ QString TestCtl::GetRandomName(qint32 length){
 
 Person *TestCtl::genRandomPerson()
 {
-    traced;
-    Person* person = new Person();
+    tracein;
+    Person* person = (Person*)Person::build();
 
     person->setName(GetRandomName());
     person->dump();
@@ -69,7 +69,7 @@ Person *TestCtl::genRandomPerson()
 
 Community* TestCtl::genRandomCommunity(){
 
-    traced;
+    tracein;
     Community* commObj = (Community*)Community::build();
 
     commObj->setName(GetRandomName(2));

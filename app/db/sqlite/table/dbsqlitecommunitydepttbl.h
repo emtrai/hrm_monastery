@@ -34,7 +34,7 @@ protected:
     virtual void addTableField(DbSqliteTableBuilder* builder);
     virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
     virtual ErrCode updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
-    virtual QString getSearchQueryStringWithTag(const QString& cond = nullptr, const QString& condTag = nullptr);
+//    virtual QString getSearchQueryStringWithTag(const QString& cond = nullptr, const QString& condTag = nullptr);
 
     virtual DbModelBuilder mainModelBuilder();
 private:

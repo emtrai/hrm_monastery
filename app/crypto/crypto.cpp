@@ -29,7 +29,7 @@
 
 QString Crypto::hashFile(const QString &filename, QCryptographicHash::Algorithm algo)
 {
-    traced;
+    tracein;
     QString hashString;
 
     logd("hash file '%s' alg %d", STR2CHA(filename), algo);
@@ -69,7 +69,7 @@ QString Crypto::hashFile(const QString &filename, QCryptographicHash::Algorithm 
 
 QString Crypto::hashString(const QString &value, QCryptographicHash::Algorithm algo)
 {
-    traced;
+    tracein;
     QString hashString;
     if (!value.isEmpty()){
         QCryptographicHash hash(algo);

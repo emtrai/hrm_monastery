@@ -30,6 +30,21 @@
 #include "idataimporter.h"
 #include "dataexporter.h"
 
+#define CLEAR_THEN_SET(curr, newModel, type) \
+do { \
+    if (curr) { \
+        logd("delete olde model'%s'", STR2CHA(curr->toString())); \
+        delete curr; \
+        curr = nullptr; \
+    } \
+    if (newModel) { \
+        logd("clone new model '%s'", STR2CHA(newModel->toString())); \
+        curr = (type*)((DbModel*)newModel)->clone(); \
+    } else { \
+        logd("null model is set"); \
+    } \
+} while(0)
+
 // if (markModified()) logd("value is different '%s'", QString("'%1' vs '%2'").arg(cur, next).toStdString().c_str());
 #define CHECK_MODIFIED_THEN_SET(cur, next, itemName) \
     do { \
@@ -136,9 +151,10 @@ public:
 class DbModel: public IDataImporter, public DataExporter
 {
 public:
-    static const QHash<int, QString>* getStatusIdNameMap();
-    static QString status2Name(DbModelStatus status);
-    static const QList<int>& getStatusList();
+    static const QHash<int, QString>* getModelStatusIdNameMap();
+    static QString modelStatus2Name(DbModelStatus status);
+    static const QList<int>* getModelStatusList();
+    static const QList<int>* getDbStatusList();
     static DbModelBuilder getBuilderByModelName(const QString& modelName);
 protected:
     DbModel();
@@ -148,11 +164,11 @@ protected:
 public:
     virtual ~DbModel();
     virtual void init();
-    virtual DbModelBuilder getBuilder() = 0;
+    virtual DbModelBuilder getBuilder() const const = 0;
     // TODO: override operation ==?
 
     virtual void clone(const DbModel* model);
-    virtual DbModel* clone();
+    virtual DbModel* clone() const;
 
     virtual QString modelName() const;
     virtual int modelType() const;
@@ -169,7 +185,7 @@ public:
      * @param tag
      * @return
      */
-    virtual ErrCode onImportDataItem(const QString& importName,
+    virtual ErrCode onImportParseDataItem(const QString& importName,
                                  int importFileType,
                                  const QString& keyword,
                                  const QString& value,
@@ -239,11 +255,11 @@ public:
     void appendValidateMsg(const QString &newValidateMsg);
     void cleanValidateResult();
 
-    qint64 createdTime() const;
-    void setCreatedTime(qint64 newCreatedTime);
+    qint64 dbCreatedTime() const;
+    void setDbCreatedTime(qint64 newCreatedTime);
 
-    qint64 lastUpdatedTime() const;
-    void setLastUpdatedTime(qint64 newLastUpdatedTime);
+    qint64 lastDbUpdatedTime() const;
+    void setLastDbUpdatedTime(qint64 newLastUpdatedTime);
 
     const QList<QString> &updatedField() const;
 
@@ -305,8 +321,8 @@ protected:
     QString mDbHistory; // History on DB
     qint32 mDbStatus;
     // TODO: time calculated from 1970 will be reset on 2038!!
-    qint64 mCreatedTime; // time in ms, since epoc time (1970)
-    qint64 mLastUpdatedTime; // time in ms, since epoc time (1970)
+    qint64 mDbCreatedTime; // time in ms, since epoc time (1970)
+    qint64 mLastDbUpdatedTime; // time in ms, since epoc time (1970)
 };
 
 #endif // DBMODEL_H

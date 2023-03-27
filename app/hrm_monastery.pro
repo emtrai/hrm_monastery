@@ -110,8 +110,11 @@ SOURCES += \
     db/sqlite/handler/dbsqliteedu.cpp \
     db/sqlite/handler/dbsqliteethnic.cpp \
     db/sqlite/handler/dbsqliteevent.cpp \
+    db/sqlite/table/dbmetadatatbl.cpp \
+    db/sqlite/table/dbsqlsequencetbl.cpp \
     exception/exception.cpp \
     import/importlistener.cpp \
+    import/importxlsx.cpp \
     model/areacommunity.cpp \
     model/areaperson.cpp \
     model/communityperson.cpp \
@@ -296,8 +299,12 @@ HEADERS += \
     db/sqlite/handler/dbsqlitespecialist.h \
     db/sqlite/handler/dbsqlitestatus.h \
     db/sqlite/handler/dbsqlitework.h \
+    db/sqlite/table/dbmetadatatbl.h \
+    db/sqlite/table/dbsqlsequencetbl.h \
     exception/exception.h \
     import/importlistener.h \
+    import/importxlsx.h \
+    importexportdefs.h \
     model/areacommunity.h \
     model/areaperson.h \
     model/communityperson.h \

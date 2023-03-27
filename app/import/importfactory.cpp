@@ -25,12 +25,13 @@
 #include "utils.h"
 #include "importcsv.h"
 #include "importcsvlist.h"
+#include "importxlsx.h"
 
 GET_INSTANCE_IMPL(ImportFactory)
 
 ImportFactory::ImportFactory()
 {
-    traced;
+    tracein;
 }
 
 Importer *ImportFactory::getImporter(ImportType type)
@@ -38,10 +39,25 @@ Importer *ImportFactory::getImporter(ImportType type)
     return INSTANCE(ImportFactory)->doGetImporter(type);
 }
 
+ImportType ImportFactory::importTypeFromExt(const QString &fpath, bool list)
+{
+    tracein;
+    ImportType type = IMPORT_NONE;
+    if (!fpath.isEmpty()) {
+        if (fpath.toLower().endsWith(".csv")) type = list?IMPORT_CSV_LIST:IMPORT_CSV;
+        else if (fpath.toLower().endsWith(".xlsx")) type = IMPORT_XLSX;
+        logd("fpath '%s' -> type %d", STR2CHA(fpath), type);
+    } else {
+        logw("Empty fpath");
+    }
+    traceret(type);
+    return type;
+}
+
 Importer *ImportFactory::doGetImporter(ImportType type)
 {
     Importer* ret = nullptr;
-    traced;
+    tracein;
     logd("get import type %d", type);
     switch (type) {
     case IMPORT_CSV:
@@ -49,6 +65,9 @@ Importer *ImportFactory::doGetImporter(ImportType type)
         break;
     case IMPORT_CSV_LIST:
         ret = INSTANCE(ImportCSVList);
+        break;
+    case IMPORT_XLSX:
+        ret = INSTANCE(ImportXlsx);
         break;
     default:
         loge("Import type %d not support", type);
@@ -72,12 +91,12 @@ void ImportFactory::addListener(ImportListener *listener)
 
 void ImportFactory::doAddListener(ImportListener *listener)
 {
-    traced;
+    tracein;
     if (!mImportListener.contains(listener)) {
         logd("add listener '%s'", STR2CHA(listener->getName()));
         mImportListener.append(listener);
     }
-    tracede;
+    traceout;
 }
 
 
@@ -89,43 +108,43 @@ void ImportFactory::removeListener(ImportListener *listener)
 
 void ImportFactory::doRemoveListener(ImportListener *listener)
 {
-    traced;
+    tracein;
     if (mImportListener.contains(listener)) {
         logd("remove listener '%s'", STR2CHA(listener->getName()));
         mImportListener.removeOne(listener);
     }
-    tracede;
+    traceout;
 }
 
 void ImportFactory::notifyListenerStart(const QString &importName, const QString &fpath, ImportType type)
 {
-    traced;
+    tracein;
     foreach(ImportListener* listener, mImportListener) {
         if (listener != nullptr) {
             logd("Call import listener onImportStart '%s'", STR2CHA(listener->getName()));
             listener->onImportStart(importName, fpath, type);
         }
     }
-    traced;
+    tracein;
 }
 
 void ImportFactory::notifyListenerEnd(const QString &importName, ErrCode err, const QString &fpath, ImportType type)
 {
-    traced;
+    tracein;
     foreach(ImportListener* listener, mImportListener) {
         if (listener != nullptr) {
             logd("Call import listener onImportEnd '%s'", STR2CHA(listener->getName()));
             listener->onImportEnd(importName, err, fpath, type);
         }
     }
-    traced;
+    tracein;
 }
 
 ErrCode ImportFactory::doImportFrom(const QString& importName, IDataImporter *item,
                                   const QString &fpath, ImportType type,
                                   QList<DbModel *>* outList)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     logi("Import from %d", type);
     Importer* importer = getImporter(type);

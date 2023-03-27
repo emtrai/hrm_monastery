@@ -30,10 +30,8 @@ public:
     CommunityDept();
 
     static DbModel *build();
-    virtual DbModelBuilder getBuilder();
+    virtual DbModelBuilder getBuilder() const;
     virtual QString modelName() const;
-
-    virtual const QString &name() const;
 
     qint64 establishDate() const;
     void setEstablishDate(qint64 newEstablishDate);
@@ -76,14 +74,23 @@ public:
     void setClosedDate(qint64 newClosedDate);
     void setClosedDateFromString(const QString &date, const QString &format="D.M.Y");
 
+
+    const QString &departmentNameId() const;
+    void setDepartmentNameId(const QString &newDepartmentNameId);
+
+    const QString &communityNameId() const;
+    void setCommunityNameId(const QString &newCommunityNameId);
+
 protected:
     virtual DbModelHandler* getDbModelHandler() const;
 private:
 
     QString mDepartmentUid;
     qint64 mDepartmentDbId;
+    QString mDepartmentNameId;
     QString mDepartmentName; // just for caching
     QString mCommunityUid;
+    QString mCommunityNameId;
     qint64 mCommunityDbId;
     QString mCommunityName; // just for caching
     qint64 mEstablishDate;

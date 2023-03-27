@@ -30,7 +30,7 @@
 
 SaintPerson::SaintPerson()
 {
-    traced;
+    tracein;
 }
 
 DbModel *SaintPerson::build()
@@ -38,14 +38,14 @@ DbModel *SaintPerson::build()
     return new SaintPerson();
 }
 
-DbModelBuilder SaintPerson::getBuilder()
+DbModelBuilder SaintPerson::getBuilder() const
 {
     return &SaintPerson::build;
 }
 
 QString SaintPerson::buildUid(const QString *seed)
 {
-    traced;
+    tracein;
     return Utils::UidFromName(personUid() + saintUid(), UidNameConvertType::HASH_NAME);
 }
 

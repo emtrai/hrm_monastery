@@ -34,24 +34,26 @@ UICommunityPersonListView::UICommunityPersonListView(QWidget *parent):
     UICommonListView(parent),
     mCommunity(nullptr)
 {
-    traced;
+    tracein;
 }
 
 
 UICommunityPersonListView::~UICommunityPersonListView()
 {
-    traced;
+    tracein;
+    if (mCommunity) delete mCommunity;
+    traceout;
 }
 
 void UICommunityPersonListView::loadCommunityPerson(const QString &communityUid, bool isActive)
 {
-    traced;
+    tracein;
 
 }
 
 ErrCode UICommunityPersonListView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act)
 {
-    traced;
+    tracein;
     DlgSearchPerson * dlg = DlgSearchPerson::build(this, true);
     if (dlg == nullptr) {
         loge("Open dlg DlgAddPersonEvent fail, No memory");
@@ -93,14 +95,14 @@ ErrCode UICommunityPersonListView::onMenuActionAdd(QMenu *menu, UITableMenuActio
 
 ErrCode UICommunityPersonListView::onMenuActionDelete(QMenu *menu, UITableMenuAction *act)
 {
-    traced;
+    tracein;
     // TODO: handle it
     return ErrNone;
 }
 
 ErrCode UICommunityPersonListView::onMenuActionView(QMenu *menu, UITableMenuAction *act)
 {
-    traced;
+    tracein;
     // TODO: handle it
     return ErrNone;
 }
@@ -108,7 +110,7 @@ ErrCode UICommunityPersonListView::onMenuActionView(QMenu *menu, UITableMenuActi
 
 ErrCode UICommunityPersonListView::onMenuActionListPerson(QMenu *menu, UITableMenuAction *act)
 {
-    traced;
+    tracein;
 
     return ErrNone;
 
@@ -116,17 +118,17 @@ ErrCode UICommunityPersonListView::onMenuActionListPerson(QMenu *menu, UITableMe
 
 ErrCode UICommunityPersonListView::onMenuActionListDepartment(QMenu *menu, UITableMenuAction *act)
 {
-    traced;
+    tracein;
     return ErrNone;
 
 }
 
-QList<UITableMenuAction *> UICommunityPersonListView::getMenuMultiItemActions(const QMenu *menu,
+QList<UITableMenuAction *> UICommunityPersonListView::getMenuMultiSelectedItemActions(const QMenu *menu,
                                                                               const QList<UITableItem *>& items)
 {
-    traced;
+    tracein;
 //    logd("idx %d", idx);
-    QList<UITableMenuAction*> actionList = UITableView::getMenuMultiItemActions(menu, items);
+    QList<UITableMenuAction*> actionList = UITableView::getMenuMultiSelectedItemActions(menu, items);
 
 //    actionList.append(UITableMenuAction::build(tr("Danh sách nữ tu"), this)
 //                                              ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
@@ -142,22 +144,19 @@ QList<UITableMenuAction *> UICommunityPersonListView::getMenuMultiItemActions(co
 
 ErrCode UICommunityPersonListView::onLoad()
 {
-//    QList<Community*> items = COMMUNITYCTL->getCommunityList();
-    traced;
+    tracein;
+    ErrCode err = ErrNone;
     if (mCommunity != nullptr) {
-        logd("Load person list of ocmmunity");
-        mCommunity->dump();
-        QList<DbModel*> items = COMMUNITYCTL->getActivePersonList(mCommunity->uid());
+        setTitle(getTitle());
+        logd("Load person list of community '%s'", STR2CHA(mCommunity->toString()));
+        QList<DbModel*> items;
+        err = COMMUNITYCTL->getPersonList(mCommunity->uid(), items);
         RELEASE_LIST_DBMODEL(mItemList);
         mItemList.append(items);
     } else {
         loge("Nothing to load");
     }
-    // TODO: loop to much, redundant, do something better?
-//    foreach (Community* item, items) {
-//        mItemList.append(static_cast<DbModel*>(item));
-//    }
-    return ErrNone;
+    return err;
 }
 
 Community *UICommunityPersonListView::community() const
@@ -165,31 +164,38 @@ Community *UICommunityPersonListView::community() const
     return mCommunity;
 }
 
-void UICommunityPersonListView::setCommunity(Community *newCommunity)
+void UICommunityPersonListView::setCommunity(const Community *newCommunity)
 {
-    mCommunity = newCommunity;
-}
-
-const QString &UICommunityPersonListView::communityUid() const
-{
-    return mCommunityUid;
-}
-
-void UICommunityPersonListView::setCommunityUid(const QString &newCommunityUid)
-{
-    mCommunityUid = newCommunityUid;
+    tracein;
+    if (mCommunity) {
+        logd("Delete old community");
+        delete mCommunity;
+        mCommunity = nullptr;
+    }
+    if (newCommunity) {
+        mCommunity = (Community*)((DbModel*)newCommunity)->clone();
+    } else {
+        loge("No community");
+    }
+    traceout;
 }
 
 void UICommunityPersonListView::initHeader()
 {
-    traced;
+    tracein;
     mHeader.append(tr("ID"));
     mHeader.append(tr("Tên"));
 }
 
-void UICommunityPersonListView::updateItem(DbModel *item, UITableItem *tblItem)
+QString UICommunityPersonListView::getTitle()
 {
-    traced;
+
+    return QString(tr("Danh sách nữ tu của cộng đoàn: %1")).arg(mCommunity?mCommunity->name():tr("Không rõ"));
+}
+
+void UICommunityPersonListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
+{
+    tracein;
     Person* per = (Person*) item;
     tblItem->addValue(QString("%1").arg(item->dbId()));
     tblItem->addValue(per->getFullName());

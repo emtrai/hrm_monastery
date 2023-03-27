@@ -30,7 +30,7 @@ DbSqliteEdu* DbSqliteEdu::gInstance = nullptr;
 
 DbSqliteEdu::DbSqliteEdu()
 {
-    traced;
+    tracein;
 }
 
 DbSqliteEdu *DbSqliteEdu::getInstance()

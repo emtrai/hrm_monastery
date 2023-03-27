@@ -25,12 +25,12 @@
 
 DlgImportCommunityListResult::DlgImportCommunityListResult(QWidget *parent):DlgImportListResult(parent)
 {
-    traced;
+    tracein;
 }
 
 void DlgImportCommunityListResult::initHeader()
 {
-    traced;
+    tracein;
     mHeader.append(tr("Mã"));
     mHeader.append(tr("Tên"));
     mHeader.append(tr("Địa chỉ"));
@@ -40,7 +40,7 @@ void DlgImportCommunityListResult::initHeader()
 
 QList<UIImportItem *> *DlgImportCommunityListResult::getItems()
 {
-    traced;
+    tracein;
     QList<UIImportItem *> *items = new QList<UIImportItem *>();
     foreach (DbModel* item, mList) {
         Community* comm = (Community*)item;
@@ -54,6 +54,6 @@ QList<UIImportItem *> *DlgImportCommunityListResult::getItems()
         // TODO: add more information??
         items->append(wgitem);
     }
-    tracede;
+    traceout;
     return items;
 }

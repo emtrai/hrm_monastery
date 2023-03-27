@@ -39,7 +39,7 @@ SaintCtl *SaintCtl::gInstance = nullptr;
 
 //QList<Saint*> SaintCtl::getListSaints()
 //{
-//    traced;
+//    tracein;
 //    QList<Saint*> list;
 //    DbModelHandler* dbSaint = DbCtl::getDb()->getSaintModelHandler();
 //    if (dbSaint != nullptr){
@@ -73,11 +73,11 @@ DbModel *SaintCtl::doImportOneItem(const QString& importName, int importFileType
 
         saint = (Saint*)Saint::build();
         foreach (QString item, items) {
-            ret = saint->onImportDataItem(importName, importFileType, mImportFields[i++], item, idx);
+            ret = saint->onImportParseDataItem(importName, importFileType, mImportFields[i++], item, idx);
         }
     }
 
-    tracedr(ret);
+    traceret(ret);
     return saint;
 }
 
@@ -89,7 +89,7 @@ SaintCtl::SaintCtl():
 
 DbModel *SaintCtl::buildModel(void *params, const QString &fmt)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     int idx = 0;
     Saint* saint = new Saint();
@@ -121,7 +121,7 @@ DbModel *SaintCtl::buildModel(void *params, const QString &fmt)
     // memory date
     if (ret == ErrNone)
     {
-        qint64 date = Utils::dateFromString(items->at(idx++).simplified(),"M/D");
+        qint64 date = Utils::dateFromString(items->at(idx++).simplified(),DEFAULT_FORMAT_MD);
         if (date > 0){
             saint->setFeastDay(date);
         }
@@ -155,7 +155,7 @@ DbModel *SaintCtl::buildModel(void *params, const QString &fmt)
 ErrCode SaintCtl::parsePrebuiltFile(const QString &fpath, const QString &ftype)
 {
     ErrCode ret = ErrNone;
-    traced;
+    tracein;
     // TODO: should we add meta field in beginning of file to know status of information???
     // i.e.: version, last update time.
     // This can be used to check/compare witl one stored in db
@@ -200,14 +200,14 @@ DbModelBuilder SaintCtl::getMainBuilder()
 
 ErrCode SaintCtl::getSaintUidListFromName(const QString &hollyName, QHash<QString, QString>* list)
 {
-    traced;
+    tracein;
 
     return getUidListFromName(hollyName, list);
 }
 
 QString SaintCtl::getHollyNameFromSaintUidList(const QStringList &uidList)
 {
-    traced;
+    tracein;
 
     return getNameFromUidList(uidList);
 
@@ -215,7 +215,7 @@ QString SaintCtl::getHollyNameFromSaintUidList(const QStringList &uidList)
 
 QString SaintCtl::getHollyNameFromSaintUidList(const QString &uidList)
 {
-    traced;
+    tracein;
     return getNameFromUidList(uidList);
 }
 

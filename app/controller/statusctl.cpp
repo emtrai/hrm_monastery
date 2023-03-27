@@ -32,7 +32,7 @@ GET_INSTANCE_CONTROLLER_IMPL(StatusCtl)
 StatusCtl::StatusCtl():
     ModelController(KModelHdlStatus)
 {
-    traced;
+    tracein;
 }
 
 const char *StatusCtl::getPrebuiltFileName()

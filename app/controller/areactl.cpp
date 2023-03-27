@@ -32,18 +32,18 @@ GET_INSTANCE_CONTROLLER_IMPL(AreaCtl)
 
 AreaCtl::AreaCtl():ModelController(KModelHdlArea)
 {
-    traced;
+    tracein;
 }
 
 AreaCtl::~AreaCtl()
 {
-    traced;
+    tracein;
 }
 
 // Format: Country name id, name id, Name, remark
 DbModel* AreaCtl::buildModel(void *items, const QString &fmt)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     Area* item = nullptr;
     QStringList* itemList = nullptr;
@@ -118,7 +118,7 @@ DbModel* AreaCtl::buildModel(void *items, const QString &fmt)
             item = nullptr;
         }
     }
-    tracede;
+    traceout;
     return item;
 }
 

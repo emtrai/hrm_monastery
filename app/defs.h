@@ -232,6 +232,7 @@ const char* const KItemDbHistory = "DB_HISTORY";
 // when parsing
 const char* const KCsvItemName = "TEN";
 const char* const KCsvItemPersonCode = "MA";
+const char* const KCsvItemNameId = "MA_DINH_DANH";
 const char* const KCsvItemChristenDate = "NGAY_RUA_TOI";
 const char* const KCsvItemBirthDay = "NGAY_SINH";
 const char* const KCsvItemBirthPlace = "NOI_SINH";

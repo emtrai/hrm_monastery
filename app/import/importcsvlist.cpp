@@ -34,14 +34,14 @@ GET_INSTANCE_IMPL(ImportCSVList)
 
 ImportCSVList::ImportCSVList()
 {
-    traced;
+    tracein;
 }
 
 ErrCode ImportCSVList::importFrom(const QString& importName, int importFileType,
                                   IDataImporter *importer, const QString &fpath,
                                   QList<DbModel *>* outList)
 {
-    traced;
+    tracein;
 //    QHash<QString, QString> item;
     ErrCode ret = ErrNone;
     qint32 cnt = 0;
@@ -62,14 +62,14 @@ ErrCode ImportCSVList::importFrom(const QString& importName, int importFileType,
         // parse and check whole will ensure parsing finished ok
         ret = Utils::parseCSVFile(fpath,
                 [importer, importFileType, importName](const QStringList& items, void* caller, void* param, quint32 idx){
-                traced;
+                tracein;
                 logd("called from lambda of importFrom");
 //                IDataImporter* importer = (IDataImporter)*param;
                 ErrCode ret2 = ErrNone;
                 if (importer != nullptr){
-                    ret2 = importer->onImportDataItem(importName, importFileType, items, idx, (QList<DbModel *>*)param);
+                    ret2 = importer->onImportParseDataItem(importName, importFileType, items, idx, (QList<DbModel *>*)param);
                 }
-                tracedr(ret2);
+                traceret(ret2);
                 return ret2;
                 },
             this, outList, CSV_LIST_ITEM_SPLIT, &cnt);
@@ -79,6 +79,6 @@ ErrCode ImportCSVList::importFrom(const QString& importName, int importFileType,
     logd("Parse result %d", ret);
     // TODO: handle error case, some items may added to system, some error, should continue???
 
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }

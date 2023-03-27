@@ -164,21 +164,21 @@ MainWindow::~MainWindow()
 
 void MainWindow::showAddEditPerson(bool isSelfUpdate, Person *per, bool isNew)
 {
-    traced;
+    tracein;
     getInstance()->doShowAddEditPerson(isSelfUpdate, per, isNew);
-    tracede;
+    traceout;
 }
 
 void MainWindow::showAddEditCommunity(bool isSelfUpdate, Community *com, CommonEditModelListener* listener)
 {
-    traced;
+    tracein;
     getInstance()->doShowAddEditCommunity(isSelfUpdate, com, listener);
-    tracede;
+    traceout;
 }
 
 void MainWindow::showImportDlg(ImportTarget target)
 {
-    traced;
+    tracein;
     logd("import target %d", target);
     switch (target) {
     case IMPORT_TARGET_PERSON:
@@ -190,7 +190,7 @@ void MainWindow::showImportDlg(ImportTarget target)
     }
     // TODO: return value to handle error case???
     // TODO: use function pointer instead?
-    tracede;
+    traceout;
 }
 
 void MainWindow::showOnHtmlViewer(DbModel *model, const QString& subject)
@@ -207,9 +207,9 @@ void MainWindow::showOnHtmlViewer(DbModel *model, const QString& subject)
 
 void MainWindow::showAddEditCommonModel(bool isSelfUpdate, DbModel *model, CommonEditModelListener *listener)
 {
-    traced;
+    tracein;
     getInstance()->doShowAddEditCommonModel(isSelfUpdate, model, listener);
-    tracede;
+    traceout;
 
 }
 
@@ -217,60 +217,69 @@ ErrCode MainWindow::exportListItems(const QList<DbModel *>* items,
                                     ModelController* controller,
                                     const QString& title, quint64 exportTypeList)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     err = getInstance()->doExportListItems(items, controller, title, exportTypeList);
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 void MainWindow::switchView(ViewType type, void* data)
 {
-    traced;
+    tracein;
     BaseView *nextView = getView(type);
     if (nextView != nullptr) {
         nextView->setData(data);
         switchView(nextView);
     }
-    tracede;
+    traceout;
 }
 
-void MainWindow::switchView(BaseView *nextView)
+void MainWindow::switchView(BaseView *nextView, bool fromStack)
 {
-    traced;
-    if (mCurrentView != nullptr) {
-        logd("hide currentl widget");
-        mCurrentView->getWidget()->hide();
-        ui->centralLayout->replaceWidget(mCurrentView->getWidget(), nextView->getWidget());
-//        ui->centralwidget->layout()->replaceWidget(mCurrentView, nextView);
-        // TODO: make this as stack????
-        if (!mMainViews.contains(mCurrentView)) {
-            logd("Not in cached view, remove");
-//            delete mCurrentView;
-            // TODO: delete here cause something terrible, i.e UICommDeptListView --> uidepartmentpersonlistview.cpp
-            // UICommDeptListView is deleted, but its function is still called, because
-            // uidepartmentpersonlistview is created in menu UICommDeptListView::onMenuActionListPerson
-            // cause use-after-free issue
-            // Need to rethink this again!!!!!
-            mCurrentView = nullptr;
-        } else {
-            logd("In cache view, keep current, just hide");
+    tracein;
+    logd("fromStack=%d", fromStack);
+    if (mCurrentView != nextView) {
+        if (mCurrentView && !fromStack) {
+            logd("push view to stack");
+            pushViewToStack(mCurrentView);
         }
-    }
-    else{
-//        ui->centralwidget->layout()->addWidget(nextView);
-        ui->centralLayout->addWidget(nextView->getWidget());
+        if (mCurrentView != nullptr) {
+            logd("hide currentl widget");
+            mCurrentView->getWidget()->hide();
+            ui->centralLayout->replaceWidget(mCurrentView->getWidget(), nextView->getWidget());
+    //        ui->centralwidget->layout()->replaceWidget(mCurrentView, nextView);
+            // TODO: make this as stack????
+    //        if (!mMainViews.contains(mCurrentView)) {
+    //            logd("Not in cached view, remove");
+    //            delete mCurrentView;
+                // TODO: delete here cause something terrible, i.e UICommDeptListView --> uidepartmentpersonlistview.cpp
+                // UICommDeptListView is deleted, but its function is still called, because
+                // uidepartmentpersonlistview is created in menu UICommDeptListView::onMenuActionListPerson
+                // cause use-after-free issue
+                // Need to rethink this again!!!!!
+    //            mCurrentView = nullptr;
+    //        } else {
+    //            logd("In cache view, keep current, just hide");
+    //        }
+        }
+        else{
+    //        ui->centralwidget->layout()->addWidget(nextView);
+            ui->centralLayout->addWidget(nextView->getWidget());
 
+        }
+        logd("show next");
+        mCurrentView = nextView;
+        mCurrentView->getWidget()->show();
+    } else {
+        logd("Same view!");
     }
-    logd("show next");
-    mCurrentView = nextView;
-    mCurrentView->getWidget()->show();
-    tracede;
+    traceout;
 }
 
 BaseView *MainWindow::getView(ViewType type)
 {
-    traced;
+    tracein;
     BaseView *nextView = nullptr;
     logd("type %d", type);
     switch (type) {
@@ -291,72 +300,101 @@ BaseView *MainWindow::getView(ViewType type)
         }
         break;
     }
-    tracede;
+    traceout;
     return nextView;
 }
 
 void MainWindow::onLoadController (Controller* ctl)
 {
-    traced;
+    tracein;
     logd("on load ctrl %s", ctl->getName().toStdString().c_str());
     if (mWaitDlg != nullptr) {
         mWaitDlg->setMessage(ctl->getName());
     }
 //    QThread::msleep(500);
-    tracede;
+    traceout;
 }
 
 void MainWindow::doShowAddEditPerson(bool isSelfUpdate, Person *per, bool isNew)
 {
-    traced;
+    tracein;
     logd("isSelfUpdate %d", isSelfUpdate);
     DlgPerson* dlg = DlgPerson::buildDlg(this, per, isNew);
     dlg->setIsSelfSave(isSelfUpdate);
     dlg->exec();
     delete dlg;
-    tracede;
+    traceout;
 }
 
 void MainWindow::doShowAddEditCommunity(bool isSelfUpdate, Community *com, CommonEditModelListener* listener)
 {
-    traced;
+    tracein;
     logd("isSelfUpdate %d", isSelfUpdate);
     DlgCommunity* dlg = DlgCommunity::build(this, isSelfUpdate, (DbModel*)com);
     dlg->setListener(listener);
     dlg->exec();
     delete dlg;
-    tracede;
+    traceout;
 }
 
 void MainWindow::doShowImportPerson()
 {
-    traced;
-    ErrCode err = ErrNone;
+//    tracein;
+//    ErrCode err = ErrNone;
+//    // TODO: show dialog to select which type of file to be imported???
+//    QString fname = QFileDialog::getOpenFileName(
+//        this,
+//        tr("Open file"),
+//        FileCtl::getAppDataDir(),
+//        tr("CSV Files (*.csv);;Excel (*.xls *.xlsx)"));
+//    // TODO: this is duplicate code, make it common please
+//    if (!fname.isEmpty()){
+//        logd("File %s is selected", fname.toStdString().c_str());
+//        QList<DbModel*> list;
+//        logd("Import from file %s", fname.toStdString().c_str());
+//        ErrCode ret = INSTANCE(PersonCtl)->importFromFile(KModelHdlPerson, ImportType::IMPORT_CSV, fname, &list);
+//        logd("Import result %d", ret);
+//        logd("No of import item %d", list.count());
+//        DlgImportPersonListResult* dlg = new DlgImportPersonListResult();
+//        dlg->setup(list);
+//        dlg->exec();
+//        delete dlg;
+//    }
+//    traceout;
+    tracein;
+    ErrCode ret = ErrNone;
     // TODO: show dialog to select which type of file to be imported???
     QString fname = QFileDialog::getOpenFileName(
         this,
         tr("Open file"),
         FileCtl::getAppDataDir(),
-        tr("CSV Files (*.csv);;Excel (*.xls *.xlsx)"));
+        tr("Excel (*.xlsx);;CSV Files (*.csv);;All Files (*.*)"));
     // TODO: this is duplicate code, make it common please
     if (!fname.isEmpty()){
-        logd("File %s is selected", fname.toStdString().c_str());
         QList<DbModel*> list;
-        logd("Import from file %s", fname.toStdString().c_str());
-        ErrCode ret = INSTANCE(PersonCtl)->importFromFile(KModelHdlPerson, ImportType::IMPORT_CSV, fname, &list);
+        logd("Import from file %s", STR2CHA(fname));
+        ImportType type = ImportFactory::importTypeFromExt(fname, true);
+        if (type == IMPORT_XLSX || type == IMPORT_CSV_LIST || type == IMPORT_CSV) {
+            ret = PERSONCTL->importFromFile(KModelHdlPerson, type, fname, &list);
+        } else {
+            ret = ErrNotSupport;
+            loge("Import type %d not support (fname = '%s'", type, STR2CHA(fname));
+        }
         logd("Import result %d", ret);
         logd("No of import item %d", list.count());
-        DlgImportPersonListResult* dlg = new DlgImportPersonListResult();
-        dlg->setup(list);
-        dlg->exec();
-        delete dlg;
+        if (ret == ErrNone) {
+            DlgImportPersonListResult* dlg = new DlgImportPersonListResult();
+            dlg->setup(list);
+            dlg->exec();
+            delete dlg; // no clean list, as dlg will take over it
+        }
     }
-    tracede;
+    traceout;
 }
 
 void MainWindow::doShowImportCommunity()
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     // TODO: show dialog to select which type of file to be imported???
     QString fname = QFileDialog::getOpenFileName(
@@ -377,24 +415,24 @@ void MainWindow::doShowImportCommunity()
         dlg->exec();
         delete dlg;
     }
-    tracede;
+    traceout;
 }
 
 void MainWindow::doShowAddEditCommonModel(bool isSelfUpdate, DbModel *model, CommonEditModelListener *listener)
 {
-    traced;
+    tracein;
     logd("isSelfUpdate %d", isSelfUpdate);
     DlgEditModel* dlg = DlgEditModel::build(this, isSelfUpdate, model);
     dlg->setListener(listener);
     dlg->exec();
     delete dlg;
-    tracede;
+    traceout;
 }
 
 ErrCode MainWindow::doExportListItems(const QList<DbModel *> *items, ModelController *controller,
                                       const QString& title, quint64 exportTypeList)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     QString fpath;
     ExportType type;
@@ -412,7 +450,7 @@ ErrCode MainWindow::doExportListItems(const QList<DbModel *> *items, ModelContro
         loge("Not selected type nor fpath");
     }
     delete dlg;
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
@@ -420,7 +458,7 @@ ErrCode MainWindow::doExportListItems(const QList<DbModel *> *items, ModelContro
 
 void MainWindow::loadHomePageFile()
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     ret = FileCtl::checkAndUpdatePrebuiltFile(KPrebuiltHomeHtmlFileName, true);
     if (ret == ErrNone)
@@ -441,7 +479,7 @@ void MainWindow::loadHomePageFile()
 
 void MainWindow::loadOtherAddMenu()
 {
-    traced;
+    tracein;
 
     QToolButton *otherButton = new QToolButton(this);
     // TODO: when other button be clear? check it
@@ -469,7 +507,7 @@ void MainWindow::loadOtherAddMenu()
 
 void MainWindow::loadOtherMenu()
 {
-    traced;
+    tracein;
 
     QToolButton *otherButton = new QToolButton(this);
     // TODO: when other button be clear? check it
@@ -565,7 +603,7 @@ void MainWindow::loadOtherMenu()
 
 void MainWindow::loadImportMenu()
 {
-    traced;
+    tracein;
 
     mImportButton = new QToolButton(this);
     // TODO: when import button be clear? check it
@@ -626,12 +664,12 @@ void MainWindow::loadImportMenu()
 //    mActionImportCommunityList->setIcon(mImportCommunityIcon);
 //    importMenu->addAction(mActionImportCommunityList);
 
-    tracede;
+    traceout;
 }
 
 void MainWindow::loadExportMenu()
 {
-    traced;
+    tracein;
 
     mExportButton = new QToolButton(this);
     // TODO: when import button be clear? check it
@@ -657,7 +695,7 @@ void MainWindow::loadExportMenu()
                   ICON_PATH("icons8-community-64.png"));
 
 
-    tracede;
+    traceout;
 
 }
 
@@ -672,21 +710,32 @@ void MainWindow::setAppState(AppState newAppState)
     mAppState = newAppState;
 }
 
-bool MainWindow::popViewFromStackAndShow()
+BaseView* MainWindow::popViewFromStackAndShow()
 {
     // TODO: implement his
-    traced;
+    tracein;
+    BaseView* view = nullptr;
+    if (!mViewStack.empty()) {
+        view = mViewStack.pop();
+    } else {
+        logd("view stack is empty");
+    }
+    traceout;
+    return view;
 }
 
-void MainWindow::pushViewToStack(ViewType type)
+void MainWindow::pushViewToStack(BaseView* view)
 {
     // TODO: implement this
     // TODO: should limit max view, auto clean up old view
+    tracein;
+    mViewStack.push(view);
+    traceout;
 }
 
 void MainWindow::onLoad()
 {
-    traced;
+    tracein;
     mAppState = APP_STATE_LOADING;
     if (!mWaitDlg)
         mWaitDlg = new DlgWait(this);
@@ -708,19 +757,20 @@ void MainWindow::onLoad()
         );
 //    LoaderCtl::getInstance()->onLoad();
 //    this->setAppState(APP_STATE_READY);
-    tracede;
+    traceout;
 }
 
 void MainWindow::on_action_ImportPerson_triggered()
 {
-    traced;
+    tracein;
     doShowImportPerson();
-    tracede;
+    traceout;
 }
 
 void MainWindow::on_action_ImportPersonList_triggered()
 {
-    traced;
+    tracein;
+    ErrCode ret = ErrNone;
     // TODO: show dialog to select which type of file to be imported???
     QString fname = QFileDialog::getOpenFileName(
         this,
@@ -729,30 +779,37 @@ void MainWindow::on_action_ImportPersonList_triggered()
         tr("CSV Files (*.csv);;Excel (*.xls *.xlsx)"));
     // TODO: this is duplicate code, make it common please
     if (!fname.isEmpty()){
-        logd("File %s is selected", fname.toStdString().c_str());
         QList<DbModel*> list;
-        logd("Import from file %s", fname.toStdString().c_str());
-        ErrCode ret = INSTANCE(PersonCtl)->importFromFile(KModelHdlPerson, ImportType::IMPORT_CSV_LIST, fname, &list);
+        logd("Import from file %s", STR2CHA(fname));
+        ImportType type = ImportFactory::importTypeFromExt(fname, true);
+        if (type == IMPORT_XLSX || type == IMPORT_CSV_LIST || type == IMPORT_CSV) {
+            ret = INSTANCE(PersonCtl)->importFromFile(KModelHdlPerson, type, fname, &list);
+        } else {
+            ret = ErrNotSupport;
+            loge("Import type %d not support (fname = '%s'", type, STR2CHA(fname));
+        }
         logd("Import result %d", ret);
         logd("No of import item %d", list.count());
-        DlgImportPersonListResult* dlg = new DlgImportPersonListResult();
-        dlg->setup(list);
-        dlg->exec();
-        delete dlg;
+        if (ret == ErrNone) {
+            DlgImportPersonListResult* dlg = new DlgImportPersonListResult();
+            dlg->setup(list);
+            dlg->exec();
+            delete dlg; // no clean list, as dlg will take over it
+        }
     }
-
+    traceout;
 }
 
 void MainWindow::on_action_ImportCommunityList_triggered()
 {
-    traced;
+    tracein;
     UNDER_DEV(tr("Nhập danh sách Cộng Đoàn từ tập tin"));
     // TODO: implement it
 }
 
 void MainWindow::on_action_ImportCommunity_triggered()
 {
-    traced;
+    tracein;
 //    UNDER_DEV(tr("Nhập Cộng Đoàn từ tập tin"));
     MainWindow::showImportDlg(ImportTarget::IMPORT_TARGET_COMMUNITY);
     // TODO: handle error case??
@@ -761,7 +818,7 @@ void MainWindow::on_action_ImportCommunity_triggered()
 
 void MainWindow::on_action_New_triggered()
 {
-    traced;
+    tracein;
 //    Person* person = TestCtl::genRandomPerson();
 //    person->save();
 
@@ -775,7 +832,7 @@ void MainWindow::on_action_New_triggered()
 
 void MainWindow::on_actionNew_Community_triggered()
 {
-    traced;
+    tracein;
 //    Community* comm = TestCtl::genRandomCommunity();
 //    comm->save();
 
@@ -788,71 +845,71 @@ void MainWindow::on_actionNew_Community_triggered()
 
 void MainWindow::on_actionCommunity_triggered()
 {
-    traced;
+    tracein;
     switchView(mCommunityView);
-    tracede;
+    traceout;
 }
 
 
 void MainWindow::on_actionSummarize_triggered()
 {
-    traced;
+    tracein;
     switchView(mSummarizeView);
-    tracede;
+    traceout;
 }
 
 
 void MainWindow::on_actionSaints_2_triggered()
 {
-    traced;
+    tracein;
     switchView(mSaintsView);
-    tracede;
+    traceout;
 
 }
 
 
 void MainWindow::on_actionHome_triggered()
 {
-    traced;
+    tracein;
     switchView(mHomeView);
-    tracede;
+    traceout;
 }
 
 
 void MainWindow::on_actionPerson_triggered()
 {
-    traced;
+    tracein;
     switchView(mPersonView);
-    tracede;
+    traceout;
 }
 
 
 void MainWindow::on_actionSearch_triggered()
 {
-    traced;
+    tracein;
     UNDER_DEV(tr("Tìm kiếm thông tin"));
 }
 
 void MainWindow::on_actionArea_triggered()
 {
-    traced;
+    tracein;
     switchView(mAreaView);
-    tracede;
+    traceout;
 }
 
 
 void MainWindow::on_actionRole_triggered()
 {
-    traced;
+    tracein;
     switchView(mRoleView);
-    tracede;
+    traceout;
 }
 
 void MainWindow::on_actionCourse_triggered()
 {
-    traced;
+    tracein;
     switchView(mCourseView);
-    tracede;
+    traceout;
 }
 
 
@@ -864,15 +921,15 @@ MainWindow *MainWindow::getInstance()
 
 void MainWindow::on_actionDept_triggered()
 {
-    traced;
+    tracein;
     switchView(mDepartView);
-    tracede;
+    traceout;
 
 }
 
 void MainWindow::on_action_ExportPersonList_triggered()
 {
-    traced;
+    tracein;
     QList<DbModel*> list;
 //    UNDER_DEV(tr("Xuất danh sách nữ tu ra tập tin"));
     doExportListItems(&list, PERSONCTL, "Danh sách nữ tu", ExportType::EXPORT_XLSX | ExportType::EXPORT_CSV_LIST);
@@ -880,7 +937,7 @@ void MainWindow::on_action_ExportPersonList_triggered()
 
 void MainWindow::on_action_ExportCommunityList_triggered()
 {
-    traced;
+    tracein;
     QList<DbModel*> list = COMMUNITYCTL->getAllItemsFromDb();
 //    UNDER_DEV(tr("Xuất danh sách nữ tu ra tập tin"));
     doExportListItems(&list, COMMUNITYCTL, "Danh sách cộng đoàn", ExportType::EXPORT_XLSX);
@@ -897,7 +954,7 @@ void MainWindow::on_action_About_triggered()
 
 void MainWindow::on_action_Backup_triggered()
 {
-    traced;
+    tracein;
     UNDER_DEV(tr("Sao lưu dữ liệu"));
     // TODO: implement it
 
@@ -906,7 +963,7 @@ void MainWindow::on_action_Backup_triggered()
 
 void MainWindow::on_actionRestore_triggered()
 {
-    traced;
+    tracein;
     UNDER_DEV(tr("Phục hồi dữ liệu đã sao lưu"));
     // TODO: implement it
 
@@ -915,7 +972,7 @@ void MainWindow::on_actionRestore_triggered()
 
 void MainWindow::on_actionRevert_triggered()
 {
-    traced;
+    tracein;
     UNDER_DEV(tr("Khôi phục dữ liệu (khôi phục dữ liệu cũ, trong trường hợp dữ liệu hiện tại bị lỗi)"));
     // TODO: implement it
 
@@ -924,7 +981,7 @@ void MainWindow::on_actionRevert_triggered()
 
 void MainWindow::on_action_Help_triggered()
 {
-    traced;
+    tracein;
     UNDER_DEV(tr("Hướng dẫn sử dụng phần mềm"));
     // TODO: implement it
 
@@ -932,7 +989,7 @@ void MainWindow::on_action_Help_triggered()
 
 void MainWindow::on_actionEthnic_triggered()
 {
-    traced;
+    tracein;
 //    UNDER_DEV(tr("Dân tộc"));
     // TODO: implement it
     switchView(VIEW_ETHNIC);
@@ -941,7 +998,7 @@ void MainWindow::on_actionEthnic_triggered()
 void MainWindow::on_actionWork_triggered()
 {
 
-    traced;
+    tracein;
     switchView(VIEW_WORK);
     // TODO: implement it
 
@@ -950,7 +1007,7 @@ void MainWindow::on_actionWork_triggered()
 void MainWindow::on_actionEducation_triggered()
 {
 
-    traced;
+    tracein;
 //    UNDER_DEV(tr("Giáo dục"));
     // TODO: implement it
     switchView(VIEW_EDUCATION);
@@ -958,7 +1015,7 @@ void MainWindow::on_actionEducation_triggered()
 
 void MainWindow::on_actionSpeclialist_triggered()
 {
-    traced;
+    tracein;
 //    UNDER_DEV(tr("Chuyên môn"));
 
     switchView(VIEW_SPECIALIST);
@@ -966,23 +1023,23 @@ void MainWindow::on_actionSpeclialist_triggered()
 
 void MainWindow::on_actionMisson_triggered()
 {
-    traced;
+    tracein;
 //    UNDER_DEV(tr("Nhiệm vụ"));
     // TODO: implement it
     switchView(VIEW_MISSION);
-    tracede;
+    traceout;
 }
 
 void MainWindow::on_actionProvince_triggered()
 {
-    traced;
+    tracein;
     UNDER_DEV(tr("Tỉnh/Thành phố/Bang"));
     // TODO: implement it
 }
 
 void MainWindow::on_actionCountry_triggered()
 {
-    traced;
+    tracein;
 //    UNDER_DEV(tr("Quốc gia"));
     // TODO: implement it
 
@@ -992,10 +1049,15 @@ void MainWindow::on_actionCountry_triggered()
 
 void MainWindow::on_actionBack_triggered()
 {
-    traced;
+    tracein;
     // TODO: implemen this
     // TODO: how about forward/redo???? show we support it?
 //    popViewFromStackAndShow();
-    UNDER_DEV(tr("Quay lại màn hình trước"));
+//    UNDER_DEV(tr("Quay lại màn hình trước"));
+    BaseView* view = popViewFromStackAndShow();
+    if (view) {
+        switchView(view, true);
+    }
+    traceout;
 }
 

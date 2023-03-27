@@ -44,7 +44,7 @@ const qint32 DbSqliteCommDeptPersonTbl::KVersionCode = VERSION_CODE(0,0,1);
 DbSqliteCommDeptPersonTbl::DbSqliteCommDeptPersonTbl(DbSqlite *db):
     DbSqliteTbl(db, KTableCommDepartPerson, KTableCommDepartPerson, KVersionCode)
 {
-    traced;
+    tracein;
 
 
 }
@@ -52,7 +52,7 @@ DbSqliteCommDeptPersonTbl::DbSqliteCommDeptPersonTbl(DbSqlite *db):
 
 //QList<DbModel *> DbSqliteCommDeptPersonTbl::getListPerson(const QString &commDeptUid, int status)
 //{
-//    traced;
+//    tracein;
 ////    DB->openDb();
 //    QSqlQuery qry(SQLITE->currentDb());
 //    qint32 cnt = 0;
@@ -83,23 +83,23 @@ DbSqliteCommDeptPersonTbl::DbSqliteCommDeptPersonTbl(DbSqlite *db):
 //}
 QList<DbModel *> DbSqliteCommDeptPersonTbl::getListPerson(const QString &commDeptUid, int status)
 {
-    traced;
+    tracein;
     QList<DbModel *> olist;
     ErrCode ret = ErrNone;
     QHash<QString, FieldValue> fields;
     fields.insert(KFieldCommDeptUid, FieldValue(commDeptUid));
-    fields.insert(KFieldStatus, FieldValue(status));
+    fields.insert(KFieldModelStatus, FieldValue(status));
     // TODO: check status???
     logd("Start search commDeptUid %s", commDeptUid.toStdString().c_str());
     ret = search(fields, true, nullptr, &PersonDept::build, &olist, true);
     logd("ret=%d", ret);
-    tracede;
+    traceout;
     return olist;
 }
 
 QString DbSqliteCommDeptPersonTbl::getSearchQueryStringWithTag(const QString &cond, const QString &condTag)
 {
-    traced;
+    tracein;
     // TODO: check with condTag????
     QString queryString = QString("SELECT * FROM %1 LEFT JOIN %2 ON %1.%3 = %2.%4")
                               .arg(KTableCommDepartPerson, KTablePerson) // 1 & 2
@@ -114,22 +114,22 @@ QString DbSqliteCommDeptPersonTbl::getSearchQueryStringWithTag(const QString &co
 
 void DbSqliteCommDeptPersonTbl::addTableField(DbSqliteTableBuilder *builder)
 {
-    traced;
+    tracein;
     DbSqliteTbl::addTableField(builder);
     builder->addField(KFieldCommDeptUid, TEXT);
     builder->addField(KFieldPersonUid, TEXT);
     builder->addField(KFieldRoleUid, TEXT);
     builder->addField(KFieldCourseUid, TEXT);
-    builder->addField(KFieldStatus, INT64);
+    builder->addField(KFieldModelStatus, INT64);
     builder->addField(KFieldStartDate, INT64);
     builder->addField(KFieldEndDate, INT64);
     builder->addField(KFieldChangeHistory, TEXT); // history of changing role/person in dept
-    tracede;
+    traceout;
 }
 
 ErrCode DbSqliteCommDeptPersonTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
 
     ret = DbSqliteTbl::insertTableField(builder, item); // TODO: handle error code
@@ -142,7 +142,7 @@ ErrCode DbSqliteCommDeptPersonTbl::insertTableField(DbSqliteInsertBuilder *build
         builder->addValue(KFieldPersonUid, model->personUid());
         builder->addValue(KFieldRoleUid, model->roleUid());
         builder->addValue(KFieldCourseUid, model->courseUid());
-        builder->addValue(KFieldStatus, model->status());
+        builder->addValue(KFieldModelStatus, model->status());
         builder->addValue(KFieldStartDate, model->startDate());
         builder->addValue(KFieldEndDate, model->endDate());
         builder->addValue(KFieldChangeHistory, model->changeHistory());
@@ -151,13 +151,13 @@ ErrCode DbSqliteCommDeptPersonTbl::insertTableField(DbSqliteInsertBuilder *build
         ret = ErrInvalidArg;
         loge("Invali model name '%s'", modelName.toStdString().c_str());
     }
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
 ErrCode DbSqliteCommDeptPersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     DbSqliteTbl::updateModelFromQuery(item, qry);
     QString modelName = item->modelName();
@@ -203,7 +203,7 @@ ErrCode DbSqliteCommDeptPersonTbl::updateModelFromQuery(DbModel *item, const QSq
         }
 
 
-        model->setStatus(qry.value(KFieldStatus).toInt());
+        model->setStatus(qry.value(KFieldModelStatus).toInt());
         model->setStartDate(qry.value(KFieldStartDate).toInt());
         model->setEndDate(qry.value(KFieldEndDate).toInt());
         model->setChangeHistory(qry.value(KFieldChangeHistory).toString());
@@ -211,6 +211,6 @@ ErrCode DbSqliteCommDeptPersonTbl::updateModelFromQuery(DbModel *item, const QSq
     } else {
         loge("Invalid mapp model '%s', do nothing", modelName.toStdString().c_str());
     }
-    tracede;
+    traceout;
     return err;
 }

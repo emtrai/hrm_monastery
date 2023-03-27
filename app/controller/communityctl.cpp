@@ -44,18 +44,18 @@ GET_INSTANCE_CONTROLLER_IMPL(CommunityCtl)
 
 CommunityCtl::CommunityCtl():ModelController(KModelHdlCommunity)
 {
-    traced;
+    tracein;
 }
 
 CommunityCtl::~CommunityCtl()
 {
-    traced;
+    tracein;
 }
 
 DbModel* CommunityCtl::onJsonParseOneItem(const QJsonObject& jobj, bool* ok )
 {
     // TODO: use import instead???
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     Community* ret = static_cast<Community*>(ModelController::onJsonParseOneItem(jobj, ok));
     if (!ret) {
@@ -183,7 +183,7 @@ DbModel* CommunityCtl::onJsonParseOneItem(const QJsonObject& jobj, bool* ok )
         delete ret;
         ret = nullptr;
     }
-    tracede;
+    traceout;
     return ret;
 
 }
@@ -195,20 +195,28 @@ const QString CommunityCtl::exportListPrebuiltTemplateName() const
 
 ErrCode CommunityCtl::onImportDataStart(const QString &importName, int importFileType, const QString &fname)
 {
-    traced;
+    tracein;
     logi("start import '%s', fname '%s'", STR2CHA(importName), STR2CHA(fname));
     mImportFields.clear();
-    tracede;
+    traceout;
     return ErrNone;
 }
 
-const QList<DbModel *> CommunityCtl::getActivePersonList(const QString &communityUid)
+ErrCode CommunityCtl::getActivePersonList(const QString &communityUid, QList<DbModel*>& outList)
 {
-    traced;
+    tracein;
+    ErrCode err = getPersonList(communityUid, outList, MODEL_ACTIVE);
+    traceout;
+    return err;
+}
+
+ErrCode CommunityCtl::getPersonList(const QString &communityUid, QList<DbModel *> &outList, qint64 modelStatus)
+{
+    tracein;
     ErrCode err = ErrNone;
     DbCommunityModelHandler* hdl = nullptr;
     QList<DbModel *> items;
-    logd("get list of active person for community uid '%s'", STR2CHA(communityUid));
+    logd("get list of person for community uid '%s', status 0x%x", STR2CHA(communityUid), modelStatus);
     if (communityUid.isEmpty()) {
         err = ErrInvalidArg;
         loge("Get person failed invalid args");
@@ -223,7 +231,12 @@ const QList<DbModel *> CommunityCtl::getActivePersonList(const QString &communit
     }
 
     if (err == ErrNone) {
-        items = hdl->getListPerson(communityUid);
+        items = hdl->getListPerson(communityUid, modelStatus);
+        if (items.size() > 0) {
+            outList.append(items);
+        } else {
+            logw("not found list person of communit uid '%s'", STR2CHA(communityUid));
+        }
     }
     if (err != ErrNone) {
         loge("Get list of active person failed, err=%d", err);
@@ -233,8 +246,8 @@ const QList<DbModel *> CommunityCtl::getActivePersonList(const QString &communit
         logd("Got %lld items", items.size());
     }
 
-    tracede;
-    return items;
+    traceout;
+    return err;
 }
 
 ErrCode CommunityCtl::addPerson2Community(const Community *comm, const Person *per,
@@ -243,7 +256,7 @@ ErrCode CommunityCtl::addPerson2Community(const Community *comm, const Person *p
                                           qint64 enddate,
                                           const QString &remark)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     DbCommunityModelHandler* hdl = nullptr;
     if (!comm || !per) {
@@ -261,7 +274,7 @@ ErrCode CommunityCtl::addPerson2Community(const Community *comm, const Person *p
         logd("add person to community");
         err = hdl->addPerson2Community(comm, per, status, startdate, enddate, remark);
     }
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
@@ -316,7 +329,7 @@ DbModel *CommunityCtl::doImportOneItem(const QString& importName, int importFile
                 // TODO: this is not safe, should not be used???
                 QString field = mImportFields[i++];
                 logd("Import field %s", field.toStdString().c_str());
-                err = model->onImportDataItem(importName, importFileType, field, item, idx);
+                err = model->onImportParseDataItem(importName, importFileType, field, item, idx);
                 if (err != ErrNone) {
                     loge("on import item failed, %d", err);
                     break;
@@ -354,7 +367,7 @@ DbModel *CommunityCtl::doImportOneItem(const QString& importName, int importFile
             QString value = items.value(field);
             logd("Import field %s", field.toStdString().c_str());
             logd("Import value %s", value.toStdString().c_str());
-            err = model->onImportDataItem(importName, importFileType, field, value, idx);
+            err = model->onImportParseDataItem(importName, importFileType, field, value, idx);
             if (err != ErrNone) {
                 loge("on import item failed, %d", err);
                 break;
@@ -368,7 +381,7 @@ DbModel *CommunityCtl::doImportOneItem(const QString& importName, int importFile
             model = nullptr;
         }
     }
-    tracede;
+    traceout;
     return model;
 }
 

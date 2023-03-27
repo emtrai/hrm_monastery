@@ -59,11 +59,11 @@ qint64 Utils::currentTimeMs()
 
 QString Utils::timeMsToDatestring(qint64 timeMs, const QString &format)
 {
-    traced;
+    tracein;
     logd("conver time ms %ld", timeMs);
     QString time = QDateTime::fromSecsSinceEpoch(timeMs).toString(format);
     logd("time in string %s", time.toStdString().c_str());
-    tracede;
+    traceout;
     return time;
 }
 
@@ -71,7 +71,7 @@ Gender Utils::genderFromString(const QString &gender)
 {
     static QHash<QString, Gender> map;
     static bool mapInit = false;
-    traced;
+    tracein;
 
     if (!mapInit)
     {
@@ -103,7 +103,7 @@ qint64 Utils::dateFromString(const QString &date, const QString &f, bool* isOk)
     qint64 ret = 0;
     QString format = f.toUpper().simplified();
     bool ok = false;
-    traced;
+    tracein;
 
     logd("Convert date '%s' to int, format '%s'",
          date.toStdString().c_str(),
@@ -168,72 +168,76 @@ qint64 Utils::dateFromString(const QString &date, const QString &f, bool* isOk)
     }
     if (isOk) *isOk = ok;
     logd("result date 0x%x, ok %d", (quint32) ret, ok);
-    tracede;
+    traceout;
     return ret;
 }
 
 QString Utils::date2String(qint64 date, const QString& format, bool* isOk)
 {
-    traced;
+    tracein;
     int year = 0, month = 0, day = 0;
     QStringList listFormat;
     QChar split;
     bool foundSplit = false;
     bool ok = true;
-    year = YEAR_FROM_INT(date);
-    month = MONTH_FROM_INT(date);
-    day = DAY_FROM_INT(date);
     QString dateString;
-    logd("Date 0x%x", (quint32)date);
-    logd("year %d", (quint32)year);
-    logd("month %d", (quint32)month);
-    logd("day %d", (quint32)day);
-    int len = sizeof(supportedSpli)/sizeof(supportedSpli[0]);
+    if (date > 0) {
+        year = YEAR_FROM_INT(date);
+        month = MONTH_FROM_INT(date);
+        day = DAY_FROM_INT(date);
+        logd("Date 0x%x", (quint32)date);
+        logd("year %d", (quint32)year);
+        logd("month %d", (quint32)month);
+        logd("day %d", (quint32)day);
+        int len = sizeof(supportedSpli)/sizeof(supportedSpli[0]);
 
-    for (int i = 0; i < len; i++){
-        if (format.contains(supportedSpli[i])){
-            listFormat = format.split(supportedSpli[i]);
-            split = supportedSpli[i];
-            foundSplit = true;
-            break;
-        }
-    }
-    if (foundSplit) {
-        logd("split: '%s'", STR2CHA(QString(split)));
-        int idx = 0;
-        foreach (QString item, listFormat){
-
-            // if 0, still print out 0 so that parsing later can work normally
-            // TODO: should let empty instead? impact to convert string to int
-            if (item.simplified().startsWith("Y")) { // year
-                dateString += QString::number(year);
-            } else if (item.simplified().startsWith("M")) {
-                dateString += QString::number(month);
-            }  else if (item.simplified().startsWith("D")) {
-                dateString += QString::number(day);
-            } else {
-                ok = false;
-                loge("invalid format '%s'", STR2CHA(item));
+        for (int i = 0; i < len; i++){
+            if (format.contains(supportedSpli[i])){
+                listFormat = format.split(supportedSpli[i]);
+                split = supportedSpli[i];
+                foundSplit = true;
                 break;
             }
-            idx++;
-            if (idx < listFormat.size() && !dateString.isEmpty()) {
-                dateString += split;
+        }
+        if (foundSplit) {
+            logd("split: '%s'", STR2CHA(QString(split)));
+            int idx = 0;
+            foreach (QString item, listFormat){
+
+                // if 0, still print out 0 so that parsing later can work normally
+                // TODO: should let empty instead? impact to convert string to int
+                if (item.simplified().startsWith("Y")) { // year
+                    dateString += QString::number(year);
+                } else if (item.simplified().startsWith("M")) {
+                    dateString += QString::number(month);
+                }  else if (item.simplified().startsWith("D")) {
+                    dateString += QString::number(day);
+                } else {
+                    ok = false;
+                    loge("invalid format '%s'", STR2CHA(item));
+                    break;
+                }
+                idx++;
+                if (idx < listFormat.size() && !dateString.isEmpty()) {
+                    dateString += split;
+                }
             }
+        } else {
+            ok = false;
+            loge("not found split for format '%s'", STR2CHA(format));
         }
     } else {
-        ok = false;
-        loge("not found split for format '%s'", STR2CHA(format));
+        logd("date is zero, nothing to return");
     }
     if (isOk) *isOk = ok;
     logd("DateString %s", STR2CHA(dateString));
-    tracede;
+    traceout;
     return dateString;
 }
 
 void Utils::date2ymd(qint64 date, int *pday, int *pmonth, int *pyear)
 {
-    traced;
+    tracein;
     int year = 0, month = 0, day = 0;
     year = (date >> 16) & 0xFF;
     month = (date >> 8) & 0xFF;
@@ -256,7 +260,7 @@ ErrCode Utils::parseCSVFile(const QString &filePath,
     qint32* cnt,
     QStringList* outItems) // TODO: therewill be the case that outIttem.length > 0 but cnt == 0
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     qint32 count = 0;
     if (!filePath.isEmpty())
@@ -335,7 +339,7 @@ ErrCode Utils::parseDataFromCSVFile(const QString &filePath,
                                     void* caller,
                                     void* paramCb)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     if (!filePath.isEmpty())
     {
@@ -467,7 +471,7 @@ QString Utils::getPrebuiltFileByLang(const QString &prebuiltName, bool lang)
 
 QString Utils::UidFromName(const QString &name, UidNameConvertType type, bool* isOk)
 {
-    traced;
+    tracein;
     QString normalize = name.simplified();
     QString uid;
     logd("conver type %d", type);
@@ -531,7 +535,7 @@ static const QString VNSigns[] =
 
 QString Utils::removeVietnameseSign(const QString &vietnameseString)
 {
-    traced;
+    tracein;
     QString finalString = vietnameseString;
     int numEle = sizeof(VNSigns)/sizeof(QString);
     logd("numEle '%d'", numEle);
@@ -555,26 +559,26 @@ QString Utils::readAll(const QString &fpath)
 void Utils::showMsgBox(const QString &msg)
 {
     QMessageBox msgBox;
-    traced;
+    tracein;
     logd("Msg box %s", msg.toStdString().c_str());
     // TODO: title???
     msgBox.setInformativeText(msg);
     msgBox.setStandardButtons(QMessageBox::Close);
     msgBox.exec();
-    tracede;
+    traceout;
 }
 
 void Utils::showErrorBox(const QString &msg)
 {
-    traced;
+    tracein;
     logd("Error box %s", msg.toStdString().c_str());
     QMessageBox::critical(nullptr, "Lỗi", msg, QMessageBox::Close);
-    tracede;
+    traceout;
 }
 
 void Utils::showErrorBox(int ret, const QString *msg)
 {
-    traced;
+    tracein;
     QString errMsg;
     if (msg != nullptr) {
         errMsg.append(*msg);
@@ -586,7 +590,7 @@ void Utils::showErrorBox(int ret, const QString *msg)
 
 bool Utils::showConfirmDialog(QWidget *parent, const QString &title, const QString &message, std::function<void(void)> onAccept)
 {
-    traced;
+    tracein;
     QMessageBox::StandardButton reply;
     bool ok = false;
     reply = QMessageBox::question(parent, title, message,
@@ -598,13 +602,13 @@ bool Utils::showConfirmDialog(QWidget *parent, const QString &title, const QStri
         logd("selected no");
         ok = false;
     }
-    tracede;
+    traceout;
     return ok;
 }
 
 ErrCode Utils::screenSize(int *w, int *h)
 {
-    traced;
+    tracein;
     QScreen *screen = QGuiApplication::primaryScreen();
     QRect  screenGeometry = screen->geometry();
     int height = screenGeometry.height();
@@ -619,7 +623,7 @@ ErrCode Utils::screenSize(int *w, int *h)
 
 int Utils::screenHeight()
 {
-    traced;
+    tracein;
     int h = 0;
     screenSize(nullptr, &h);
     return h;
@@ -628,7 +632,7 @@ int Utils::screenHeight()
 
 int Utils::getCurrentComboxIndex(const QComboBox *cb)
 {
-    traced;
+    tracein;
     QString currtxt = cb->currentText().trimmed();
     int index = cb->findText(currtxt);
     logd("Current text %s", currtxt.toStdString().c_str());
@@ -638,7 +642,7 @@ int Utils::getCurrentComboxIndex(const QComboBox *cb)
 
 QString Utils::getCurrentComboxDataString(const QComboBox *cb, bool *isOk)
 {
-    traced;
+    tracein;
     int idx = getCurrentComboxIndex(cb);
     logd("current idx %d", idx);
     QString ret;
@@ -655,7 +659,7 @@ QString Utils::getCurrentComboxDataString(const QComboBox *cb, bool *isOk)
 
 ErrCode Utils::getCurrentComboxDataString(const QComboBox *cb, QString *data, QString *name)
 {
-    traced;
+    tracein;
     int idx = getCurrentComboxIndex(cb);
     logd("current idx %d", idx);
     ErrCode ret = ErrNone;
@@ -676,13 +680,13 @@ ErrCode Utils::getCurrentComboxDataString(const QComboBox *cb, QString *data, QS
     } else {
         ret = ErrInvalidData;
     }
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
 ErrCode Utils::setSelectItemComboxByData(QComboBox *cb, const QVariant &data)
 {
-    traced;
+    tracein;
     int cnt = cb->count();
     logd ("no. item %d", cnt);
     logd("data %s", STR2CHA(data.toString()));
@@ -697,7 +701,7 @@ ErrCode Utils::setSelectItemComboxByData(QComboBox *cb, const QVariant &data)
             break;
         }
     }
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
@@ -705,7 +709,7 @@ ErrCode Utils::setSelectItemComboxByData(QComboBox *cb, const QVariant &data)
 void Utils::showDlgUnderDev(const QString &info)
 {
     QMessageBox msgBox;
-    traced;
+    tracein;
     QString msg = QObject::tr("Tính năng đang phát triển");
     if (!info.isEmpty()) {
         msg += QObject::tr("\n* "); // TODO: translation???
@@ -715,7 +719,7 @@ void Utils::showDlgUnderDev(const QString &info)
     msgBox.setText(msg);
     msgBox.setStandardButtons(QMessageBox::Close);
     msgBox.exec();
-    tracede;
+    traceout;
 }
 
 QString Utils::saveFileDialog(QWidget *parent,
@@ -724,7 +728,7 @@ QString Utils::saveFileDialog(QWidget *parent,
                               const QString& filter,
                               const QString& initDir)
 {
-    traced;
+    tracein;
     QString dir = !(initDir.isEmpty())?initDir:QDir::homePath();
     QString name = !(initFileName.isEmpty())?initFileName:"";
     QString fileFilter = !(filter.isEmpty())?filter:"Tất cả loại tập tin (*.*)";
@@ -738,7 +742,7 @@ QString Utils::saveFileDialog(QWidget *parent,
                                                  dir + "/" + name,
                                                  fileFilter);
     logd("save to file '%s'", STR2CHA(fpath));
-    tracede;
+    traceout;
     return fpath;
 }
 

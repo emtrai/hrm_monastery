@@ -30,6 +30,13 @@
 #include <QSqlDatabase>
 #include <QThreadStorage>
 #include "dbsqlitedefs.h"
+#include "table/dbmetadatatbl.h"
+#include "table/dbsqlsequencetbl.h"
+
+#define DB_VERSION_MAJOR    0
+#define DB_VERSION_MINOR    0
+#define DB_VERSION_PATCH    1
+#define DB_VERSION      ((DB_VERSION_MAJOR << 24) | (DB_VERSION_MINOR << 8) | DB_VERSION_PATCH)
 
 #define SQLITE (DbSqlite::getInstance())
 
@@ -96,6 +103,7 @@ public:
     virtual DbModelHandler* getAreaModelHandler();
     virtual DbModelHandler* getCountryModelHandler();
     virtual DbModelHandler* getModelHandler(const QString& name);
+    virtual DbModelHandler* getDepartmentModelHandler();
 
     static DbSqliteTbl* table(const QString& tblName);
     static DbModelHandler* handler(const QString& name);
@@ -103,6 +111,16 @@ public:
     QSqlDatabase currentDb();
     QSqlQuery createQuery();
 
+
+    virtual quint64 getDbVersion();
+    virtual quint64 getDbVersionInMetadata(bool* ok = nullptr);
+    virtual ErrCode updateDbVersionInMetadata(qint64 value);
+    virtual ErrCode getMetadataValue(const QString& key, QString& value);
+    virtual ErrCode getMetadataValue(const QString& key, qint64& value);
+    virtual ErrCode updateMetadataValue(const QString& key, qint64 value);
+    virtual ErrCode updateMetadataValue(const QString& key, const QString& value);
+    virtual quint64 getCurrentPersonCodeNumber(bool* ok = nullptr);
+    virtual quint64 getDbSeqNumber(const QString& tblName, bool* ok = nullptr);
 private:
 
     DbSqlite();
@@ -121,7 +139,8 @@ private:
 
     void appendModelHandler(DbModelHandler* tbl);
     void setupModelHandler();
-
+    DbMetadataTbl* tableMetadata();
+    DbSqlSequenceTbl* tblSqlSequence();
 private:
     static DbSqlite* gInstance;
     QMap<QString, DbSqliteTbl*> mListTbl;

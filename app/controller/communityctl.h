@@ -47,15 +47,16 @@ public:
      * @param communityUid
      * @return List of items
      */
-    const QList<DbModel*> getActivePersonList(const QString& communityUid);
+    ErrCode getActivePersonList(const QString& communityUid, QList<DbModel*>& outList);
+    ErrCode getPersonList(const QString& communityUid, QList<DbModel*>& outList, qint64 modelStatus = MODEL_ACTIVE);
 
     /**
      * @brief Add person to community
      * @param comm community
      * @param per person to be added
      * @param status status of person in community \ref DbModelStatus
-     * @param startdate start date of person in community, in format of YYYYMMDD
-     * @param enddate end date of person in community if any, in format of YYYYMMDD
+     * @param startdate start date of person in community, in format of DDMMYYY
+     * @param enddate end date of person in community if any, in format of DDMMYYY
      * @param remark
      * @return error code
      */

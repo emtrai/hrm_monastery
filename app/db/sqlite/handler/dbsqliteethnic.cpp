@@ -29,7 +29,7 @@
 
 DbSqliteEthnic::DbSqliteEthnic()
 {
-    traced;
+    tracein;
 }
 
 const QString DbSqliteEthnic::getName()
@@ -39,7 +39,7 @@ const QString DbSqliteEthnic::getName()
 
 DbModel *DbSqliteEthnic::getByUid(const QString &uid)
 {
-    traced;
+    tracein;
     return DbSqliteModelHandler::getByUid(uid, Ethnic::build);
 }
 

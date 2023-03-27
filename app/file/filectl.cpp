@@ -33,7 +33,7 @@ FileCtl* FileCtl::gInstance = nullptr;
 
 FileCtl::~FileCtl()
 {
-    traced;
+    tracein;
 }
 
 FileCtl *FileCtl::getInstance()
@@ -47,7 +47,7 @@ FileCtl *FileCtl::getInstance()
 
 void FileCtl::init()
 {
-    traced;
+    tracein;
 }
 
 QString FileCtl::getAppDataDir(const QString& subDir)
@@ -77,14 +77,14 @@ QString FileCtl::getAppDataDir()
 
 QString FileCtl::getTmpDataDir(const QString& subDir)
 {
-    traced;
+    tracein;
     // TODO: implement it, this is just termprary processing
     return getAppDataDir(subDir);
 }
 
 QString FileCtl::getTmpDataDir()
 {
-    traced;
+    tracein;
     // TODO: implement it, this is just termprary processing
     return getAppDataDir();
 }
@@ -117,7 +117,7 @@ QString FileCtl::getFullFilePath(const QString &fileName)
 
 ErrCode FileCtl::writeStringToFile(const QString &content, const QString &fpath)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     QFile file(fpath);
     logd("Open file %s", fpath.toStdString().c_str());
@@ -136,7 +136,7 @@ ErrCode FileCtl::writeStringToFile(const QString &content, const QString &fpath)
 }
 QString FileCtl::getUpdatePrebuiltDataFilePath(const QString name, bool lang)
 {
-    traced;
+    tracein;
     QString fname = Utils::getPrebuiltFileByLang(name, lang);
     QString prebuiltDir = getOrCreatePrebuiltDataDir();
     QString newFpath = QDir(prebuiltDir).filePath(fname);
@@ -146,7 +146,7 @@ ErrCode FileCtl::checkAndUpdatePrebuiltFile(const QString &name, bool backup)
 {
     ErrCode ret = ErrNone;
     UNUSED(backup);
-    traced;
+    tracein;
     // TODO: file should be from installed dir, rather than embedded inside bin??
     QString fname = Utils::getPrebuiltFileByLang(name, false);
     QString fpath = getPrebuiltDataFilePath(fname);
@@ -219,7 +219,7 @@ QString FileCtl::getPrebuiltDataFileHashPath(const QString &fname)
 
 bool FileCtl::checkPrebuiltDataFileHash(const QString &fname)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     QString fileHash;
     bool match = false;
@@ -244,7 +244,7 @@ bool FileCtl::checkPrebuiltDataFileHash(const QString &fname)
 
 ErrCode FileCtl::readPrebuiltDataFileHash(const QString &fname, QString* hashOut)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     QString hashFname = getPrebuiltDataFileHashPath(fname);
     QFile hashFile(hashFname);
@@ -278,7 +278,7 @@ ErrCode FileCtl::readPrebuiltDataFileHash(const QString &fname, QString* hashOut
 
 ErrCode FileCtl::updatePrebuiltDataFileHash(const QString &fname)
 {
-    traced;
+    tracein;
 
     QString fpath = getPrebuiltDataFilePath(fname);
     QString fHashpath = getPrebuiltDataFileHashPath(fname);
@@ -299,7 +299,7 @@ const QString &FileCtl::tmpDirPath() const
 
 void FileCtl::cleanUpData()
 {
-    traced;
+    tracein;
     // TODO: implement it, clean up all data, i.e data in temp storage
 }
 
@@ -310,6 +310,6 @@ QString FileCtl::getName()
 
 ErrCode FileCtl::onLoad()
 {
-    traced;
+    tracein;
     return ErrNone;
 }

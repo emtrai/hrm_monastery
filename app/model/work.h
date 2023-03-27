@@ -31,7 +31,7 @@ public:
     Work();
     virtual ~Work();
     static DbModel *build();
-    virtual DbModelBuilder getBuilder();
+    virtual DbModelBuilder getBuilder() const;
 
 protected:
     virtual DbModelHandler* getDbModelHandler() const;

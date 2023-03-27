@@ -27,23 +27,23 @@
 
 DlgSearchPerson::~DlgSearchPerson()
 {
-    traced;
+    tracein;
 }
 
 DlgSearchPerson *DlgSearchPerson::build(QWidget *parent, bool isMulti)
 {
-    traced;
+    tracein;
     // TODO: create factory class and move this to factory???
     DlgSearchPerson* ret = new DlgSearchPerson(parent, isMulti);
     ret->setupUi();
-    tracede;
+    traceout;
     return ret;
 }
 
 DlgSearchPerson::DlgSearchPerson(QWidget *parent, bool isMulti):
     DlgSearch(parent, isMulti)
 {
-    traced;
+    tracein;
 }
 
 QString DlgSearchPerson::getTitle()
@@ -54,7 +54,7 @@ QString DlgSearchPerson::getTitle()
 
 int DlgSearchPerson::onSearch(const QString &keyword)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     clearAll();
 
@@ -63,21 +63,21 @@ int DlgSearchPerson::onSearch(const QString &keyword)
         loge("Search person err=%d", err);
         Utils::showErrorBox(QString(tr("Tìm kiếm lỗi, mã lỗi %1")).arg(err));
     }
-    tracede;
+    traceout;
     return mListItems.count();
 }
 
 void DlgSearchPerson::clearAll()
 {
-    traced;
+    tracein;
     DlgSearch::clearAll();
     RELEASE_LIST_DBMODEL(mListItems);
-    tracede;
+    traceout;
 }
 
 DbModel *DlgSearchPerson::getItemAtIdx(int idx)
 {
-    traced;
+    tracein;
     DbModel* ret = nullptr;
     logd("get item at idx=%d", idx);
     if (idx >= 0 && idx < mListItems.count()) {
@@ -85,7 +85,7 @@ DbModel *DlgSearchPerson::getItemAtIdx(int idx)
     } else {
         loge("invalid idx %d", idx);
     }
-    tracede;
+    traceout;
     return ret;
 }
 void DlgSearchPerson::initHeader()
@@ -102,7 +102,7 @@ void DlgSearchPerson::initHeader()
 
 QString DlgSearchPerson::getValueOfItemAt(int idx, int col, QString header, DbModel* item)
 {
-    traced;
+    tracein;
     QString val;
     logd("idx = %d, col = %d", idx, col);
     if (item != nullptr) {
@@ -115,7 +115,7 @@ QString DlgSearchPerson::getValueOfItemAt(int idx, int col, QString header, DbMo
         // TODO: improve this, i.e. app callback to mHeader?
         switch (col) {
         case 0:
-            val = per->personCode();
+            val = per->nameId();
             break;
         case 1:
             val = per->hollyName();
@@ -134,6 +134,6 @@ QString DlgSearchPerson::getValueOfItemAt(int idx, int col, QString header, DbMo
             break;
         }
     }
-    tracede;
+    traceout;
     return val;
 }

@@ -35,37 +35,37 @@
 UIDepartmentListView::UIDepartmentListView(QWidget *parent):
     UICommonListView(parent)
 {
-    traced;
+    tracein;
 }
 
 UIDepartmentListView::~UIDepartmentListView()
 {
-    traced;
+    tracein;
 }
 
 void UIDepartmentListView::initHeader()
 {
-    traced;
+    tracein;
     UICommonListView::initHeader();
 }
 
-void UIDepartmentListView::updateItem(DbModel *item, UITableItem *tblItem)
+void UIDepartmentListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
 {
-    traced;
+    tracein;
 
-    UICommonListView::updateItem(item, tblItem);
+    UICommonListView::updateItem(item, tblItem, idx);
 }
 
 
 ModelController *UIDepartmentListView::getController()
 {
-    traced;
+    tracein;
     return DEPART;
 }
 
 QList<DbModel *> UIDepartmentListView::getListItem()
 {
-    traced;
+    tracein;
     return DEPART->getAllItemsFromDb(); // TODO: getAllItem???
 }
 

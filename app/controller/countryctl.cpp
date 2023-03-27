@@ -30,12 +30,12 @@ GET_INSTANCE_CONTROLLER_IMPL(CountryCtl)
 
 CountryCtl::CountryCtl():ModelController(KModelHdlCountry)
 {
-    traced;
+    tracein;
 }
 
 CountryCtl::~CountryCtl()
 {
-    traced;
+    tracein;
 }
 
 DbModelBuilder CountryCtl::getMainBuilder()

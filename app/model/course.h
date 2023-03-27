@@ -42,7 +42,7 @@ public:
     static DbModel *build();
     virtual void clone(const DbModel* model);
 
-    virtual DbModelBuilder getBuilder();
+    virtual DbModelBuilder getBuilder() const;
     qint64 startDate() const;
     void setStartDate(qint64 newStartDate);
 

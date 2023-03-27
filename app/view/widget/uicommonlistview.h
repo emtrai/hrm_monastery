@@ -42,11 +42,11 @@ protected:
     virtual ErrCode onLoad();
     virtual ErrCode onReload();
     virtual void initHeader();
-    virtual void updateItem(DbModel* item, UITableItem* tblItem);
+    virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
     virtual void initFilterFields();
     virtual QHash<QString, QString> getFilterKeywords(int fieldId, const QString& fieldText);
-    virtual void onViewItem(UITableWidgetItem *item);
-    virtual void onAddItem(UITableWidgetItem *item);
+    virtual void onViewItem(UITableCellWidgetItem *item);
+    virtual void onAddItem(UITableCellWidgetItem *item);
 
     virtual void onDbModelReady(ErrCode ret, DbModel* model, DlgCommonEditModel* dlg);
     virtual DbModel* onNewModel();

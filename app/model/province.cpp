@@ -31,7 +31,7 @@
 
 Province::Province()
 {
-    traced;
+    tracein;
 }
 
 DbModel *Province::build()
@@ -41,7 +41,7 @@ DbModel *Province::build()
     return model;
 }
 
-DbModelBuilder Province::getBuilder()
+DbModelBuilder Province::getBuilder() const
 {
     return &Province::build;
 }

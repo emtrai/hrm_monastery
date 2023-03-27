@@ -27,23 +27,23 @@
 
 DlgSearchCommunity::~DlgSearchCommunity()
 {
-    traced;
+    tracein;
 }
 
 DlgSearchCommunity *DlgSearchCommunity::build(QWidget *parent, bool isMulti)
 {
-    traced;
+    tracein;
     // TODO: create factory class and move this to factory???
     DlgSearchCommunity* ret = new DlgSearchCommunity(parent, isMulti);
     ret->setupUi();
-    tracede;
+    traceout;
     return ret;
 }
 
 DlgSearchCommunity::DlgSearchCommunity(QWidget *parent, bool isMulti):
     DlgSearch(parent, isMulti)
 {
-    traced;
+    tracein;
 }
 
 QString DlgSearchCommunity::getTitle()
@@ -54,39 +54,39 @@ QString DlgSearchCommunity::getTitle()
 
 int DlgSearchCommunity::onSearch(const QString &keyword)
 {
-    traced;
+    tracein;
     clearAll();
     logd("Start search community %s", keyword.toStdString().c_str());
     ErrCode err = COMMUNITYCTL->search(keyword, &mListItems);
     logd("search err=%d", err);
-    tracede;
+    traceout;
     return mListItems.count();
 }
 
 int DlgSearchCommunity::onGetAll()
 {
-    traced;
+    tracein;
     clearAll();
     mListItems = COMMUNITYCTL->getAllItemsFromDb();
     logd("get all cnt=%d", mListItems.count());
-    tracede;
+    traceout;
     return mListItems.count();
 
 }
 
 void DlgSearchCommunity::clearAll()
 {
-    traced;
+    tracein;
 
     DlgSearch::clearAll();
     // TODO: clear each element of list????
     mListItems.clear();
-    tracede;
+    traceout;
 }
 
 DbModel *DlgSearchCommunity::getItemAtIdx(int idx)
 {
-    traced;
+    tracein;
     DbModel* ret = nullptr;
     logd("get item at idx=%d", idx);
     if (idx >= 0 && idx < mListItems.count()) {
@@ -94,6 +94,6 @@ DbModel *DlgSearchCommunity::getItemAtIdx(int idx)
     } else {
         loge("invalid idx %d", idx);
     }
-    tracede;
+    traceout;
     return ret;
 }

@@ -31,7 +31,7 @@
 
 SpecialistPerson::SpecialistPerson()
 {
-    traced;
+    tracein;
 }
 
 DbModel *SpecialistPerson::build()
@@ -39,7 +39,7 @@ DbModel *SpecialistPerson::build()
     return new SpecialistPerson();
 }
 
-DbModelBuilder SpecialistPerson::getBuilder()
+DbModelBuilder SpecialistPerson::getBuilder() const
 {
     return &SpecialistPerson::build;
 }

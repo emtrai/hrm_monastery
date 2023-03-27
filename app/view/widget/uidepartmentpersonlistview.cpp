@@ -37,19 +37,19 @@ UIDepartmentPersonListView::UIDepartmentPersonListView(QWidget *parent):
     UICommonListView(parent),
     mCommDept(nullptr)
 {
-    traced;
+    tracein;
 }
 
 
 UIDepartmentPersonListView::~UIDepartmentPersonListView()
 {
-    traced;
+    tracein;
 }
 
 
 ErrCode UIDepartmentPersonListView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act)
 {
-    traced;
+    tracein;
     DlgDeptMgr * dlg = new DlgDeptMgr();
     if (dlg == nullptr) {
         loge("Open dlg DlgDeptMgr fail, No memory");
@@ -120,14 +120,14 @@ ErrCode UIDepartmentPersonListView::onMenuActionAdd(QMenu *menu, UITableMenuActi
 
 ErrCode UIDepartmentPersonListView::onMenuActionDelete(QMenu *menu, UITableMenuAction *act)
 {
-    traced;
+    tracein;
     // TODO: handle it
     return ErrNone;
 }
 
 ErrCode UIDepartmentPersonListView::onMenuActionView(QMenu *menu, UITableMenuAction *act)
 {
-    traced;
+    tracein;
     // TODO: handle it
     return ErrNone;
 }
@@ -141,7 +141,7 @@ DbModel *UIDepartmentPersonListView::onNewModel()
 
 ErrCode UIDepartmentPersonListView::onMenuActionListPerson(QMenu *menu, UITableMenuAction *act)
 {
-    traced;
+    tracein;
 
     return ErrNone;
 
@@ -149,17 +149,17 @@ ErrCode UIDepartmentPersonListView::onMenuActionListPerson(QMenu *menu, UITableM
 
 ErrCode UIDepartmentPersonListView::onMenuActionListDepartment(QMenu *menu, UITableMenuAction *act)
 {
-    traced;
+    tracein;
     return ErrNone;
 
 }
 
-QList<UITableMenuAction *> UIDepartmentPersonListView::getMenuMultiItemActions(const QMenu *menu,
+QList<UITableMenuAction *> UIDepartmentPersonListView::getMenuMultiSelectedItemActions(const QMenu *menu,
                                                                                 const QList<UITableItem *>& items)
 {
-    traced;
+    tracein;
     //    logd("idx %d", idx);
-    QList<UITableMenuAction*> actionList = UITableView::getMenuMultiItemActions(menu, items);
+    QList<UITableMenuAction*> actionList = UITableView::getMenuMultiSelectedItemActions(menu, items);
 
     //    actionList.append(UITableMenuAction::build(tr("Danh sách ban"), this)
     //                                          ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
@@ -172,7 +172,7 @@ QList<UITableMenuAction *> UIDepartmentPersonListView::getMenuMultiItemActions(c
 ErrCode UIDepartmentPersonListView::onLoad()
 {
     //    QList<Community*> items = COMMUNITYCTL->getCommunityList();
-    traced;
+    tracein;
     if (mCommDept != nullptr) {
         logd("Load person list of department");
         mCommDept->dump();
@@ -187,7 +187,7 @@ ErrCode UIDepartmentPersonListView::onLoad()
     //    foreach (Community* item, items) {
     //        mItemList.append(static_cast<DbModel*>(item));
     //    }
-    tracede;
+    traceout;
     return ErrNone;
 }
 
@@ -200,20 +200,20 @@ void UIDepartmentPersonListView::setCommDept(CommunityDept *commDept)
 
 void UIDepartmentPersonListView::initHeader()
 {
-    traced;
+    tracein;
     mHeader.append(tr("ID"));
     mHeader.append(tr("Tên"));
     mHeader.append(tr("Vai trò"));
     mHeader.append(tr("Nhiệm kỳ"));
 }
 
-void UIDepartmentPersonListView::updateItem(DbModel *item, UITableItem *tblItem)
+void UIDepartmentPersonListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
 {
-    traced;
+    tracein;
     PersonDept* model = (PersonDept*) item;
     tblItem->addValue(QString("%1").arg(item->dbId()));
     tblItem->addValue(model->personName());
     tblItem->addValue(model->roleName());
     tblItem->addValue(model->courseName());
-    tracede;
+    traceout;
 }

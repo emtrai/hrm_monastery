@@ -34,6 +34,8 @@
 #define DATE_FORMAT_YMD "Y/M/D"
 #define DATE_FORMAT_DMY "D/M/Y"
 #define DEFAULT_CSV_FIELD_SPLIT ':'
+#define DEFAULT_FORMAT_YMD DATE_FORMAT_DMY
+#define DEFAULT_FORMAT_MD DATE_FORMAT_DM
 
 //TODO: change default split to '|'? '|' is not common used like ','
 #define DEFAULT_CSV_ITEM_SPLIT ','
@@ -106,7 +108,7 @@ do { \
 //        }\
 //    } \
 //} while (0)
-#define SET_DATE_VAL_FROM_WIDGET(widget,func) SET_DATE_FORMAT_VAL_FROM_WIDGET(widget, func, DATE_FORMAT_YMD)
+#define SET_DATE_VAL_FROM_WIDGET(widget,func) SET_DATE_FORMAT_VAL_FROM_WIDGET(widget, func, DEFAULT_FORMAT_YMD)
 
 
 #define SET_VAL_FROM_CBOX(widget,func, functxt) \
@@ -265,8 +267,8 @@ public:
     * M/D
     */
     // TODO: default for const QString is ok or not??? can set it ???
-    static qint64 dateFromString(const QString& date, const QString& format = "YYYY/MM/DD", bool *isOk = nullptr);
-    static QString date2String(qint64 date, const QString& format = "YYYY/MM/DD", bool* isOk = nullptr);
+    static qint64 dateFromString(const QString& date, const QString& format = DEFAULT_FORMAT_YMD, bool *isOk = nullptr);
+    static QString date2String(qint64 date, const QString& format = DEFAULT_FORMAT_YMD, bool* isOk = nullptr);
     static void date2ymd(qint64 date, int* day = nullptr,
                             int* month = nullptr, int* year = nullptr);
 
@@ -325,7 +327,7 @@ public:
 template<class T>
 bool Utils::isSameList(const QList<T>& l1, const QList<T>& l2)
 {
-    traced;
+    tracein;
     bool ret = false;
     logd("compare l1 cnt=%d l2 cnt=%d", l1.count(), l2.count());
     if (l1.count() != l2.count()) {
@@ -345,7 +347,7 @@ bool Utils::isSameList(const QList<T>& l1, const QList<T>& l2)
         }
     }
     logd("is same list: %d", ret);
-    tracede;
+    traceout;
     return ret;
 }
 #endif // UTILS_H

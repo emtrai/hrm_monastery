@@ -28,7 +28,7 @@ static void getListExportTypeName(QHash<int, QString>* list)
 {
     static bool initialized = false;
     static QHash<int, QString> s_ExportTypeName;
-    traced;
+    tracein;
     logd("initialized = %d", initialized);
     if (!initialized) {
         logd("not init initExportTypeName, init it");
@@ -42,12 +42,12 @@ static void getListExportTypeName(QHash<int, QString>* list)
         initialized = true;
     }
     *list = s_ExportTypeName;
-    tracede;
+    traceout;
 }
 
 ErrCode getExportTypeName(uint32_t exportTypes, QHash<int, QString>& exportTypeName)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     QHash<int, QString> list;
     getListExportTypeName(&list);
@@ -65,7 +65,7 @@ ErrCode getExportTypeName(uint32_t exportTypes, QHash<int, QString>& exportTypeN
         logi("empty exportTypes"); // TODO: assert it to make if failed, as it's abnormal case
     }
     logd("exportTypeName cnt %d", exportTypeName.count());
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
@@ -75,7 +75,7 @@ QString typeToExt(ExportType type, bool *isOk)
     static bool initialized = false;
     static QHash<int, QString> s_type2String;
     QString extName;
-    traced;
+    tracein;
     logd("initialized = %d", initialized);
     if (!initialized) {
         logd("not init s_type2String, init it");
@@ -98,7 +98,7 @@ QString typeToExt(ExportType type, bool *isOk)
         if (isOk) *isOk = false;
         loge("Unknown export type: %d", type);
     }
-    tracede;
+    traceout;
     return extName;
 }
 
@@ -107,7 +107,7 @@ QString exportItem2Name(const QString &item, bool* isOk)
     static bool initialized = false;
     static QHash<QString, QString> s_item2Name;
     QString name;
-    traced;
+    tracein;
     logd("initialized = %d", initialized);
     if (!initialized) {
         logd("not init s_type2String, init it");
@@ -154,6 +154,6 @@ QString exportItem2Name(const QString &item, bool* isOk)
         if (isOk) *isOk = false;
         loge("Unknown export item: %s", STR2CHA(item));
     }
-    tracede;
+    traceout;
     return name;
 }

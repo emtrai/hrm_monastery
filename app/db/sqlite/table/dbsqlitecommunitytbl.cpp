@@ -27,6 +27,7 @@
 #include "dbsqlitetablebuilder.h"
 #include "community.h"
 #include "dbsqliteinsertbuilder.h"
+#include "dbsqliteupdatebuilder.h"
 #include <QSqlQuery>
 #include "logger.h"
 #include "errcode.h"
@@ -42,7 +43,7 @@ DbSqliteCommunityTbl::DbSqliteCommunityTbl(DbSqlite* db)
 
 QList<DbModel *> DbSqliteCommunityTbl::getListCommunitiesInArea(const QString &areaUid, int status)
 {
-    traced;
+    tracein;
     QList<DbModel *> olist;
     ErrCode ret = ErrNone;
     QHash<QString, int> fields;
@@ -51,14 +52,14 @@ QList<DbModel *> DbSqliteCommunityTbl::getListCommunitiesInArea(const QString &a
     logd("Start search area uid %s", areaUid.toStdString().c_str());
     ret = search(areaUid, fields, &Community::build, &olist, true);
     logd("ret=%d", ret);
-    tracede;
+    traceout;
     return olist;
 }
 
 
 ErrCode DbSqliteCommunityTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
 {
-    traced;
+    tracein;
     DbSqliteTbl::insertTableField(builder, item); // TODO: handle error code
     Community* cmm = (Community*) item;
     // TODO: community code: to be use later???
@@ -76,7 +77,7 @@ ErrCode DbSqliteCommunityTbl::insertTableField(DbSqliteInsertBuilder *builder, c
     builder->addValue(KFieldParentUid, cmm->parentUid());
     builder->addValue(KFieldAreaUid, cmm->areaUid());
     builder->addValue(KFieldAreaDbId, cmm->areaDbId());
-    builder->addValue(KFieldStatus, (qint32) cmm->getStatus());
+    builder->addValue(KFieldModelStatus, (qint32) cmm->getStatus());
     // TODO: update status accordingly???
     builder->addValue(KFieldCountryUid, cmm->countryUid());
     builder->addValue(KFieldChurchAddr, cmm->church());
@@ -104,7 +105,7 @@ ErrCode DbSqliteCommunityTbl::insertTableField(DbSqliteInsertBuilder *builder, c
 
 ErrCode DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     DbSqliteTbl::updateModelFromQuery(item, qry);
     Community* cmm = (Community*) item;
@@ -116,7 +117,7 @@ ErrCode DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuer
     cmm->setImgPath(qry.value(KFieldImgPath).toString());
     cmm->setLevel(qry.value(KFieldLevel).toInt());
     cmm->setParentUid(qry.value(KFieldParentUid).toString().trimmed());
-    if (!cmm->parentUid().isEmpty()) {
+    if (!cmm->parentUid().isEmpty() && cmm->parentUid() != cmm->uid()) {
         // TODO: caching data (i.e. list of person in management board) for fast accessing?
         // TODO: is it ok to call here? does it break any design?
         // as table calls directly to model handler
@@ -167,7 +168,7 @@ ErrCode DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuer
     cmm->setTel(qry.value(KFieldTel).toString());
     cmm->setEmail(qry.value(KFieldEmail).toString());
     cmm->setFeastDate(qry.value(KFieldFeastDay).toInt());
-    cmm->setStatus((DbModelStatus)qry.value(KFieldStatus).toInt());
+    cmm->setStatus((DbModelStatus)qry.value(KFieldModelStatus).toInt());
     cmm->setCurrentCEOUid(qry.value(KFieldCEOUid).toString().trimmed()); // TODO: check and set name as well
     if (!cmm->currentCEOUid().isEmpty()) {
         // TODO: caching data (i.e. list of person in management board) for fast accessing?
@@ -197,13 +198,13 @@ ErrCode DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuer
         // as table calls directly to model handler
 
     }
-    tracede;
+    traceout;
     return err;
 }
 
 QString DbSqliteCommunityTbl::getSearchQueryString(const QString &cond)
 {
-    traced;
+    tracein;
     QString queryString = QString("SELECT *, %2.%4 AS %7, %2.%5 AS %6 FROM %1 LEFT JOIN %2 ON %1.%3 = %2.%4")
                               .arg(name(), KTableArea) // 1 & 2
                               .arg(KFieldAreaUid, KFieldUid) // 3 & 4
@@ -217,6 +218,48 @@ QString DbSqliteCommunityTbl::getSearchQueryString(const QString &cond)
     return queryString;
 }
 
+ErrCode DbSqliteCommunityTbl::updateTableField(DbSqliteUpdateBuilder *builder, const QList<QString> &updateField, const DbModel *item)
+{
+    tracein;
+    ErrCode err = DbSqliteTbl::updateTableField(builder, updateField, item);
+    if (err == ErrNone) {
+        Community* comm = (Community*) item;
+        foreach (QString field, updateField) {
+            logd("Update field %s", STR2CHA(field));
+            if (field == KItemFeastDay) {
+                builder->addValue(KFieldFeastDay, comm->feastDate());
+            } else if (field == KItemArea) {
+                builder->addValue(KFieldAreaUid, comm->areaUid());
+                builder->addValue(KFieldAreaDbId, comm->areaDbId());
+            } else if (field == KItemTel) {
+                builder->addValue(KFieldTel, comm->tel());
+            } else if (field == KItemAddress) {
+                builder->addValue(KFieldAddr, comm->addr());
+            } else if (field == KItemEmail) {
+                builder->addValue(KFieldEmail, comm->email());
+            } else if (field == KItemCountry) {
+                builder->addValue(KFieldCountryUid, comm->countryUid());
+            } else if (field == KItemChurchAddress) {
+                builder->addValue(KFieldChurchAddr, comm->church());
+            } else if (field == KItemStatus) {
+                builder->addValue(KFieldModelStatus, comm->getStatus());
+            } else if (field == KItemCreateTime) {
+                builder->addValue(KFieldCreateDate, comm->createDate());
+            } else if (field == KItemParentCommunity) {
+                builder->addValue(KFieldParentUid, comm->parentUid());
+            } else if (field == KItemContact) {
+                builder->addValue(KFieldContact, comm->contact());
+            } else if (field == KItemBrief) {
+                builder->addValue(KFieldBrief, comm->brief());
+            } else {
+                logw("Field '%s' not support here", STR2CHA(field));
+            }
+        }
+    }
+    traceout;
+    return err;
+}
+
 DbModelBuilder DbSqliteCommunityTbl::mainModelBuilder()
 {
     return &Community::build;
@@ -224,7 +267,7 @@ DbModelBuilder DbSqliteCommunityTbl::mainModelBuilder()
 
 void DbSqliteCommunityTbl::addTableField(DbSqliteTableBuilder *builder)
 {
-    traced;
+    tracein;
     DbSqliteTbl::addTableField(builder);
     // TODO: community code: to be use later???
     // TODO: purpose of community code: it's human readable
@@ -251,7 +294,7 @@ void DbSqliteCommunityTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldCloseDate, INT64);
     builder->addField(KFieldFeastDay, INT64);
     builder->addField(KFieldDateFormat, TEXT);
-    builder->addField(KFieldStatus, INT32); // stop, alive, etc.
+    builder->addField(KFieldModelStatus, INT32); // stop, alive, etc.
     builder->addField(KFieldPreset, INT32); // 0: custom, 1: preset (from json)
 
     // THIS IS IMPORTANT NOTE, DON'T REMOVE IT

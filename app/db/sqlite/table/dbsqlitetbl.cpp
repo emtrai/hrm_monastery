@@ -41,7 +41,7 @@
 #include "exception.h"
 
 DbSqliteTbl::~DbSqliteTbl(){
-    traced;
+    tracein;
 }
 DbSqliteTbl::DbSqliteTbl(DbSqlite* db)
 {
@@ -86,23 +86,30 @@ void DbSqliteTbl::setVersionCode(uint32_t newVersionCode)
     mVersionCode = newVersionCode;
 }
 
-int DbSqliteTbl::getDataType(const QString &field)
+ErrCode DbSqliteTbl::getDataType(const QString &field, int& dataType)
 {
-    int ret = -1;
-    traced;
-    logd("get data type for field %s", STR2CHA(field));
-    if (this->mFieldDataTypeMap.contains(field)){
-        ret = mFieldDataTypeMap.value(field);
-    } else {
-        loge("field '%s' not exist", STR2CHA(field));
+    ErrCode err = ErrNone;
+    tracein;
+    if (field.isEmpty()) {
+        err = ErrInvalidArg;
+        loge("Invalid argument");
     }
-    tracedr(ret);
-    return ret;
+    if (err == ErrNone) {
+        logd("get data type for field %s", STR2CHA(field));
+        if (this->mFieldDataTypeMap.contains(field)){
+            dataType = mFieldDataTypeMap.value(field);
+        } else {
+            loge("field '%s' not exist", STR2CHA(field));
+            err = ErrNotExist;
+        }
+    }
+    traceret(err);
+    return err;
 }
 
 ErrCode_t DbSqliteTbl::add(DbModel *item)
 {
-    traced;
+    tracein;
     ErrCode_t err = ErrNone;
     DbSqliteUpdateBuilder* updateBuilder = nullptr;
     QSqlQuery* updateQry = nullptr;
@@ -159,7 +166,7 @@ ErrCode_t DbSqliteTbl::add(DbModel *item)
         delete updateQry;
         updateQry = nullptr;
     }
-    tracedr(err);
+    traceret(err);
     return err;
 
 }
@@ -168,35 +175,45 @@ ErrCode DbSqliteTbl::updateTableField(DbSqliteUpdateBuilder *builder,
                                       const QList<QString>& updateField,
                                       const DbModel *item)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
-    logd("Add %d field to update", updateField.count());
-    foreach (QString field, updateField) {
-        logd("Update field %s", field.toStdString().c_str());
-        if (field == KItemUid) {
-            builder->addValue(KFieldUid, item->uid());
-        } else if (field == KItemName){
-            builder->addValue(KFieldName, item->name());
-        } else if (field == KItemNameId){
-            builder->addValue(KFieldNameId, item->nameId());
+    if (!item || !builder) {
+        err = ErrInvalidArg;
+        loge("invalid argument");
+    }
+    if (err == ErrNone) {
+        logd("Add %d field to update", updateField.count());
+        foreach (QString field, updateField) {
+            logd("Update field %s", field.toStdString().c_str());
+            if (field == KItemUid) {
+                builder->addValue(KFieldUid, item->uid());
+            } else if (field == KItemName){
+                builder->addValue(KFieldName, item->name());
+            } else if (field == KItemNameId){
+                builder->addValue(KFieldNameId, item->nameId());
+            } else if (field == KItemRemark){
+                builder->addValue(KFieldRemark, item->remark());
+            }  else {
+                logw("Field '%s' not support here", STR2CHA(field));
+            }
         }
     }
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 ErrCode DbSqliteTbl::updateTableCondition(DbSqliteUpdateBuilder *builder, const DbModel *item)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     builder->addCond(KFieldUid, item->uid());
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 ErrCode DbSqliteTbl::update(DbModel *item)
 {
-    traced;
+    tracein;
     ErrCode_t err = ErrNone;
     DbSqliteUpdateBuilder* updateBuilder = nullptr;
     QSqlQuery* updateQry = nullptr;
@@ -215,7 +232,7 @@ ErrCode DbSqliteTbl::update(DbModel *item)
 
         if (err == ErrNone){
             logd("Build SQL Query and execute");
-            updateBuilder->addValue(KFieldLastUpdateItme, Utils::currentTimeMs());
+            updateBuilder->addValue(KFieldLastDbUpdateItme, Utils::currentTimeMs());
             updateQry = updateBuilder->buildSqlQuery();
             err = db()->execQuery(updateQry);
             logd("execQuery err %d", err);
@@ -235,22 +252,22 @@ ErrCode DbSqliteTbl::update(DbModel *item)
         delete updateQry;
         updateQry = nullptr;
     }
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 ErrCode DbSqliteTbl::updateUid(const DbModel *item, const QString &uid)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     // TODO:implement it
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
 ErrCode DbSqliteTbl::update(const QString &uid, const QHash<QString, FieldValue>& fieldValues)
 {
-    traced;
+    tracein;
     ErrCode_t err = ErrNone;
     DbSqliteUpdateBuilder* updateBuilder = nullptr;
     QSqlQuery* updateQry = nullptr;
@@ -268,7 +285,7 @@ ErrCode DbSqliteTbl::update(const QString &uid, const QHash<QString, FieldValue>
 
         if (err == ErrNone){
             logd("Build SQL Query and execute");
-            updateBuilder->addValue(KFieldLastUpdateItme, Utils::currentTimeMs());
+            updateBuilder->addValue(KFieldLastDbUpdateItme, Utils::currentTimeMs());
             // TODO: update history????
             updateQry = updateBuilder->buildSqlQuery();
             err = db()->execQuery(updateQry);
@@ -289,24 +306,30 @@ ErrCode DbSqliteTbl::update(const QString &uid, const QHash<QString, FieldValue>
         delete updateQry;
         updateQry = nullptr;
     }
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 ErrCode DbSqliteTbl::update(const QString &uid, const QHash<QString, QString> &inFields)
 {
     ErrCode err = ErrNone;
-    traced;
+    tracein;
     QHash<QString, FieldValue> fieldValues;
     int datatype = 0;
     logd("update for uid '%s', number of field %lld", STR2CHA(uid), inFields.size());
     TRY {
     logd("convert to field value");
     foreach (QString field, inFields.keys()) {
-        datatype = getDataType(field);
-        logd("field '%s' data type %d", STR2CHA(field), datatype);
-        QString value = inFields[field].trimmed();
-        fieldValues.insert(field, FieldValue(value, datatype));
+        err = getDataType(field, datatype);
+        if (err == ErrNone) {
+            logd("field '%s' data type %d", STR2CHA(field), datatype);
+            QString value = inFields[field].trimmed();
+            fieldValues.insert(field, FieldValue(value, datatype));
+        } else {
+            logw("get data type for field '%s' failed, err=%d", STR2CHA(field), err);
+            // FIXME: ignore error & continue, is it ok??
+            break;
+        }
     }
     if (err == ErrNone && (fieldValues.size() == 0)) {
         err = ErrNoData;
@@ -317,14 +340,14 @@ ErrCode DbSqliteTbl::update(const QString &uid, const QHash<QString, QString> &i
         err = update(uid, fieldValues);
     }
     } CATCH(err, "Failed to update '%s'", STR2CHA(uid));
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 ErrCode DbSqliteTbl::deleteSoft(DbModel *item)
 {
     ErrCode err = ErrNone;
-    traced;
+    tracein;
     // TODO: made delete condition customize/dynamic by deleteCondition
 //    QHash<QString, QString> deleteCond = deleteCondition(item);
 //    if (deleteCond.count() > 0) {
@@ -333,13 +356,13 @@ ErrCode DbSqliteTbl::deleteSoft(DbModel *item)
     QHash<QString, FieldValue> fields;
     fields.insert(KFieldDbStatus, FieldValue(QString::number(DB_RECORD_DElETED), INT32));
     err = update(item->uid(), fields);
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 ErrCode DbSqliteTbl::deleteHard(DbModel *item)
 {
-    traced;
+    tracein;
     ErrCode_t err = ErrNone;
     DbSqliteDeleteBuilder* deleteBuilder = nullptr;
     QSqlQuery* updateQry = nullptr;
@@ -367,7 +390,7 @@ ErrCode DbSqliteTbl::deleteHard(DbModel *item)
         delete updateQry;
         updateQry = nullptr;
     }
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
@@ -377,7 +400,8 @@ bool DbSqliteTbl::isExist(const DbModel *item)
     QSqlQuery qry(SQLITE->currentDb());
     bool exist = false;
     bool queryOk = false;
-    traced;
+    ErrCode err = ErrNone;
+    tracein;
     if (!item->uid().isEmpty()) {
         QString queryString = QString("SELECT COUNT(*) "
                                       "FROM %1 WHERE %2 = :uid").arg(name(), KFieldUid);
@@ -396,7 +420,10 @@ bool DbSqliteTbl::isExist(const DbModel *item)
                 if (!cond.isEmpty()) {
                     cond += " AND ";
                 }
-                datatype = getDataType(field);
+                err = getDataType(field, datatype);
+                if (err != ErrNone) {
+                    break;
+                }
                 logd("field '%s' data type %d", STR2CHA(field), datatype);
                 if (datatype == TEXT) {
                     cond += QString("lower(%1) = :%1_TEXT").arg(field);
@@ -404,36 +431,42 @@ bool DbSqliteTbl::isExist(const DbModel *item)
                     cond += QString("%1 = :%1_INT").arg(field);
                 }
             }
+            if (err == ErrNone) {
+                QString queryString = QString("SELECT * FROM %1 WHERE %2")
+                                          .arg(name(), cond);
 
-            QString queryString = QString("SELECT * FROM %1 WHERE %2")
-                                      .arg(name(), cond);
+                qry.prepare(queryString);
+                logd("Query String '%s'", queryString.toStdString().c_str());
 
-            qry.prepare(queryString);
-            logd("Query String '%s'", queryString.toStdString().c_str());
-
-            // TODO: check sql injection issue
-            foreach (QString field, inFields.keys()) {
-                // TODO: if value is empty, data may not match
-                // Check if value is empty, for string, it seem '', but for integer,
-                // check again, as this process is string format, stupid
-                datatype = getDataType(field);
-                if (datatype == TEXT) {
-                    qry.bindValue( QString(":%1_TEXT").arg(field), inFields[field].trimmed().toLower());
-                    logd("bind txt :'%s' to '%s'", STR2CHA(field),
-                         STR2CHA(inFields[field].trimmed().toLower()));
-                } else {
-                    bool ok = false;
-                    qint64 value = inFields[field].toLong(&ok);
-                    if (ok) {
-                        qry.bindValue( QString(":%1_INT").arg(field), value);
-                        logd("bind int :'%s' to '%d'", STR2CHA(field), value);
+                // TODO: check sql injection issue
+                foreach (QString field, inFields.keys()) {
+                    // TODO: if value is empty, data may not match
+                    // Check if value is empty, for string, it seem '', but for integer,
+                    // check again, as this process is string format, stupid
+                    err = getDataType(field, datatype);
+                    if (err != ErrNone) {
+                        break;
+                    }
+                    if (datatype == TEXT) {
+                        qry.bindValue( QString(":%1_TEXT").arg(field), inFields[field].trimmed().toLower());
+                        logd("bind txt :'%s_TEXT' to '%s'", STR2CHA(field),
+                             STR2CHA(inFields[field].trimmed().toLower()));
                     } else {
-                        loge("cannot convert string '%s' to int", STR2CHA(inFields[field]));
-                        queryOk = false;
+                        bool ok = false;
+                        qint64 value = inFields[field].toLong(&ok);
+                        if (ok) {
+                            qry.bindValue( QString(":%1_INT").arg(field), value);
+                            logd("bind int :'%s_INT' to '%d'", STR2CHA(field), value);
+                        } else {
+                            loge("cannot convert string '%s' to int", STR2CHA(inFields[field]));
+                            queryOk = false;
+                            err = ErrFailedConvert;
+                            break;
+                        }
                     }
                 }
             }
-            queryOk = true;
+            queryOk = (err == ErrNone);
         } else {
             loge("no field to check exist");
             queryOk = false;
@@ -466,17 +499,66 @@ bool DbSqliteTbl::isExist(const DbModel *item)
     return exist;
 }
 
+bool DbSqliteTbl::isNameidExist(const QString &nameId)
+{
+    QSqlQuery qry(SQLITE->currentDb());
+    bool exist = false;
+    bool queryOk = false;
+    tracein;
+    if (!nameId.isEmpty()) {
+        logd("nameid to check exist '%s'", STR2CHA(nameId));
+        QString queryString = QString("SELECT COUNT(*) "
+                                      "FROM %1 WHERE %2 = :nameid").arg(name(), KFieldNameId);
+        qry.prepare(queryString);
+        logd("Query String '%s'", queryString.toStdString().c_str());
+
+        // TODO: check sql injection issue
+        qry.bindValue( ":nameid", nameId);
+        queryOk = true;
+    } else {
+        queryOk = false;
+        loge("empty nameid");
+
+    }
+    logd("queryOk %d", queryOk);
+    if (queryOk) {
+        if( qry.exec() ) {
+            int rows= 0;
+            if (qry.next()) {
+                rows = qry.value(0).toInt();
+                exist = rows > 0;
+            }
+            else {
+                logd("Not found any items, query '%s'", qry.lastQuery().toStdString().c_str() );
+                exist = false;
+            }
+        } else {
+            loge( "Failed to execute %s", qry.lastQuery().toStdString().c_str() );
+            exist = false;
+        }
+    } else {
+        exist = false;
+        loge("Nothing to query");
+    }
+
+
+    logd("Exist %d", exist);
+    return exist;
+}
+
 QHash<QString, QString> DbSqliteTbl::getFieldsCheckExists(const DbModel* item)
 {
+    tracein;
     QHash<QString, QString> list;
-    list[KFieldName] = item->name(); // TODO: make as class member?
+    list[KFieldNameId] = item->nameId(); // TODO: make as class member?
+    traceout;
     return list;
 }
 
 
 ErrCode DbSqliteTbl::updateModelFromQuery(DbModel* item, const QSqlQuery& qry)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     item->setNameId(qry.value(KFieldNameId).toString());
     item->setDbId(qry.value(KFieldId).toInt());
@@ -484,10 +566,10 @@ ErrCode DbSqliteTbl::updateModelFromQuery(DbModel* item, const QSqlQuery& qry)
     item->setUid(qry.value(KFieldUid).toString());
     item->setDbHistory(qry.value(KFieldDbHistory).toString());
     item->setDbStatus(qry.value(KFieldDbStatus).toInt());
-    item->setCreatedTime(qry.value(KFieldCreateTime).toInt());
-    item->setLastUpdatedTime(qry.value(KFieldLastUpdateItme).toInt());
+    item->setDbCreatedTime(qry.value(KFieldDbCreateTime).toInt());
+    item->setLastDbUpdatedTime(qry.value(KFieldLastDbUpdateItme).toInt());
     item->setRemark(qry.value(KFieldRemark).toString());
-    tracede;
+    traceout;
     return err;
 }
 
@@ -501,7 +583,7 @@ ErrCode DbSqliteTbl::filter(int fieldId,
                         int noItems,
                         int* total)
 {
-    traced;
+    tracein;
     // TODO: implement it
     // TODO: check data typpe text vs integer
 //    DB->openDb();
@@ -558,7 +640,7 @@ ErrCode DbSqliteTbl::filter(int fieldId,
     cnt = runQuery(qry, builder, outList);
 
     logi("Found %d", cnt);
-    tracede;
+    traceout;
     return err;
 }
 
@@ -566,24 +648,34 @@ ErrCode DbSqliteTbl::updateQueryromFields(const QHash<QString, QString>& inField
                                           QSqlQuery &qry, bool isMatchAllField,
                                           QString initQueryString)
 {
-    traced;
+    tracein;
     QString cond;
     ErrCode err = ErrNone;
     int datatype = 0;
-    if (!inFields.empty()) {
+    if (inFields.empty()) {
+        loge("no field to check exist");
+        err = ErrNoData;
+    }
+    if (err == ErrNone) {
         foreach (QString field, inFields.keys()) {
             if (!cond.isEmpty()) {
                 cond += isMatchAllField?" AND ":" OR ";
             }
-            datatype = getDataType(field);
-            logd("field '%s' data type %d", STR2CHA(field), datatype);
-            if (datatype == TEXT) {
-                cond += QString("lower(%1) = :%1_TEXT").arg(field);
+            err = getDataType(field, datatype);
+            if (err == ErrNone) {
+                logd("field '%s' data type %d", STR2CHA(field), datatype);
+                if (datatype == TEXT) {
+                    cond += QString("lower(%1) = :%1_TEXT").arg(field);
+                } else {
+                    cond += QString("%1 = :%1_INT").arg(field);
+                }
             } else {
-                cond += QString("%1 = :%1_INT").arg(field);
+                loge("get data type for field '%s' failed, err=%d", STR2CHA(field), err);
+                break;
             }
         }
-
+    }
+    if (err == ErrNone) {
         QString queryString = initQueryString.isEmpty()?(QString("SELECT * FROM %1").arg(name())):initQueryString;
         queryString += " WHERE " + cond;
 
@@ -595,31 +687,33 @@ ErrCode DbSqliteTbl::updateQueryromFields(const QHash<QString, QString>& inField
             // TODO: if value is empty, data may not match
             // Check if value is empty, for string, it seem '', but for integer,
             // check again, as this process is string format, stupid
-            datatype = getDataType(field);
-            if (datatype == TEXT) {
-                qry.bindValue( QString(":%1_TEXT").arg(field), inFields[field].trimmed().toLower());
-                logd("bind txt :'%s' to '%s'", STR2CHA(field),
-                     STR2CHA(inFields[field].trimmed().toLower()));
-            } else {
-                bool ok = false;
-                qint64 value = inFields[field].toLong(&ok);
-                if (ok) {
-                    qry.bindValue( QString(":%1_INT").arg(field), value);
-                    logd("bind int :'%s' to '%lld'", STR2CHA(field), value);
+            err = getDataType(field, datatype);
+            if (err == ErrNone) {
+                if (datatype == TEXT) {
+                    qry.bindValue( QString(":%1_TEXT").arg(field), inFields[field].trimmed().toLower());
+                    logd("bind txt :'%s' to '%s'", STR2CHA(field),
+                         STR2CHA(inFields[field].trimmed().toLower()));
                 } else {
-                    loge("cannot convert string '%s' to int", STR2CHA(inFields[field]));
-                    err = ErrSqlFailed;
+                    bool ok = false;
+                    qint64 value = inFields[field].toLong(&ok);
+                    if (ok) {
+                        qry.bindValue( QString(":%1_INT").arg(field), value);
+                        logd("bind int :'%s' to '%lld'", STR2CHA(field), value);
+                    } else {
+                        loge("cannot convert string '%s' to int", STR2CHA(inFields[field]));
+                        err = ErrSqlFailed;
+                        break;
+                    }
                 }
+            } else {
+                loge("get data type for field '%s' failed, err=%d", STR2CHA(field), err);
+                break;
             }
         }
-    } else {
-        loge("no field to check exist");
-        err = ErrNoData;
     }
-
     logd("err %d", err);
 
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
@@ -632,7 +726,7 @@ ErrCode DbSqliteTbl::getListItems(const QHash<QString, QString>& inFields,
 {
     QSqlQuery qry(SQLITE->currentDb());
     ErrCode err = ErrNone;
-    traced;
+    tracein;
     err = updateQueryromFields(inFields, qry, isMatchAllField);
     int cnt = 0;
     logd("err %d", err);
@@ -655,20 +749,16 @@ ErrCode DbSqliteTbl::getListItems(const QHash<QString, QString>& inFields,
     }
     if (total) *total = cnt;
     logd("cnt=%d", cnt);
-    tracedr(err);
+    traceret(err);
     return err;
-}
-
-ErrCode DbSqliteTbl::updateFields(QHash<QString, QString> fields)
-{
-
 }
 
 int DbSqliteTbl::runQuery(QSqlQuery &qry, const DbModelBuilder& builder,
                        QList<DbModel *> *outList)
 {
-    traced;
+    tracein;
     int cnt = 0;
+    ErrCode err = ErrNone;
     if( qry.exec() )
     {
         logd("get next, isvalid=%d", qry.isValid());
@@ -681,14 +771,19 @@ int DbSqliteTbl::runQuery(QSqlQuery &qry, const DbModelBuilder& builder,
                 logd("found one build item");
                 DbModel* item = builder();
                 logd("Updae model from query");
-                updateModelFromQuery(item, qry);
-                outList->append(item); // TODO: when it cleaned up?????
+                err = updateModelFromQuery(item, qry);
+                if (err == ErrNone) {
+                    logd("add model '%s' to outlist", STR2CHA(item->toString()));
+                    outList->append(item); // TODO: when it cleaned up?????
+                } else {
+                    logw("Update model from query err=%d", err);
+                }
             }
         }
     }
     else {
-        loge( "Failed to execute %s", qry.executedQuery().toStdString().c_str() );
-        loge( "Last error %s", qry.lastError().text().toStdString().c_str() );
+        loge( "Failed to execute %s", STR2CHA(qry.executedQuery()) );
+        loge( "Last error %s", STR2CHA(qry.lastError().text()) );
     }
 
     logi("Found %d", cnt);
@@ -696,29 +791,29 @@ int DbSqliteTbl::runQuery(QSqlQuery &qry, const DbModelBuilder& builder,
     return cnt;
 }
 
-QSqlQuery *DbSqliteTbl::getAllQuery(qint64 status)
+QSqlQuery *DbSqliteTbl::getAllQuery(qint64 dbstatus)
 {
-    traced;
+    tracein;
 //    DB->openDb();
 
     QSqlQuery* qry = new QSqlQuery(SQLITE->currentDb());
-    traced;
+    tracein;
     // TODO: check record status????
-    QString queryString = getAllQueryString(status);
+    QString queryString = getAllQueryString(dbstatus);
     qry->prepare(queryString);
     logd("Query String '%s'", queryString.toStdString().c_str());
     return qry;
 }
 
-QString DbSqliteTbl::getAllQueryString(qint64 status)
+QString DbSqliteTbl::getAllQueryString(qint64 dbstatus)
 {
-    traced;
+    tracein;
     QString cond;
-    logd("status to get all query string 0x%08x", status);
-    if (status & DB_RECORD_ACTIVE) {
+    logd("status to get all query string 0x%08x", dbstatus);
+    if (dbstatus & DB_RECORD_ACTIVE) {
         cond = QString("%1.%2=%3").arg(name(), KFieldDbStatus).arg(DB_RECORD_ACTIVE);
     }
-    if (status & DB_RECORD_DElETED) {
+    if (dbstatus & DB_RECORD_DElETED) {
         if (!cond.isEmpty()) {
             cond += " OR ";
         }
@@ -726,6 +821,7 @@ QString DbSqliteTbl::getAllQueryString(qint64 status)
     }
     return getSearchQueryString(cond.isEmpty()?nullptr:cond);
 }
+
 
 DbModelBuilder DbSqliteTbl::mainModelBuilder()
 {
@@ -738,9 +834,10 @@ QList<DbModel *> DbSqliteTbl::getAll(const DbModelBuilder& builder, qint64 statu
                                      int from, int noItems, int* total)
 {
 
-    traced;
+    tracein;
     QSqlQuery* qry = getAllQuery(status);
     QList<DbModel*>list;
+    ErrCode err = ErrNone;
     // TODO: check status (delete or not, etc.0
     if( qry->exec() )
     {
@@ -752,11 +849,16 @@ QList<DbModel *> DbSqliteTbl::getAll(const DbModelBuilder& builder, qint64 statu
             item->setDbStatus(qry->value(KFieldDbStatus).toInt());
             item->setName(qry->value(KFieldName).toString());
             item->setUid(qry->value(KFieldUid).toString());
-            item->setCreatedTime(qry->value(KFieldCreateTime).toInt());
-            item->setLastUpdatedTime(qry->value(KFieldLastUpdateItme).toInt());
+            item->setDbCreatedTime(qry->value(KFieldDbCreateTime).toInt());
+            item->setLastDbUpdatedTime(qry->value(KFieldLastDbUpdateItme).toInt());
             // TODO: validate value before, i.e. toInt return ok
-            updateModelFromQuery(item, *qry);
-            list.append(item); // TODO: when it cleaned up?????
+            err = updateModelFromQuery(item, *qry);
+            if (err == ErrNone) {
+                logd("add model '%s' to outlist", STR2CHA(item->toString()));
+                list.append(item); // TODO: when it cleaned up?????
+            } else {
+                logw("Update model from query err=%d", err);
+            }
         }
     }
     else {
@@ -766,13 +868,13 @@ QList<DbModel *> DbSqliteTbl::getAll(const DbModelBuilder& builder, qint64 statu
 
     logd("Found %d", (int)list.size());
     delete qry;
-    tracede;
+    traceout;
     return list;
 }
 
 DbModel *DbSqliteTbl::getModel(qint64 dbId, const DbModelBuilder& builder)
 {
-    traced;
+    tracein;
 //    DB->openDb();
     QSqlQuery qry(SQLITE->currentDb());
     ErrCode err = ErrNone;
@@ -799,19 +901,23 @@ DbModel *DbSqliteTbl::getModel(qint64 dbId, const DbModelBuilder& builder)
         item->setDbStatus(qry.value(KFieldDbStatus).toInt());
         item->setName(qry.value(KFieldName).toString());
         item->setUid(qry.value(KFieldUid).toString());
-        item->setCreatedTime(qry.value(KFieldCreateTime).toInt());
-        item->setLastUpdatedTime(qry.value(KFieldLastUpdateItme).toInt());
-        updateModelFromQuery(item, qry);
+        item->setDbCreatedTime(qry.value(KFieldDbCreateTime).toInt());
+        item->setLastDbUpdatedTime(qry.value(KFieldLastDbUpdateItme).toInt());
+        err = updateModelFromQuery(item, qry);
     }
 
+    if (err != ErrNone && item){
+        loge("Get model failed, err=%d", err);
+        delete item;
+    }
 
-    tracede;
+    traceout;
     return item;
 }
 
 ErrCode DbSqliteTbl::checkOrCreateTable()
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     logd("Create table '%s'", name().toStdString().c_str());
     // TODO: should checktable before creating???
@@ -835,26 +941,33 @@ ErrCode DbSqliteTbl::checkOrCreateTable()
             err = ErrFailed;
         }
     }
-    tracedr(err);
+
+#ifdef DEBUG_TRACE
+    logd("mFieldDataTypeMap of '%s'", STR2CHA(name()));
+    foreach (QString field, mFieldDataTypeMap.keys()) {
+        logd("%s: %d", STR2CHA(field), mFieldDataTypeMap[field]);
+    }
+#endif
+    traceret(err);
     return err;
 }
 
 ErrCode DbSqliteTbl::onDbMigration(int oldVer, int newVer)
 {
-    traced;
+    tracein;
     return ErrNone;
 }
 
 ErrCode DbSqliteTbl::onTblMigration(int oldVer, int newVer)
 {
-    traced;
+    tracein;
     return ErrNone;
 
 }
 
 QList<QString> DbSqliteTbl::getNameFields()
 {
-    traced;
+    tracein;
     QList<QString> list;
     list.append(QString("%1.%2").arg(name(), KFieldName)); // TODO: make as class member?
     return list;
@@ -862,12 +975,12 @@ QList<QString> DbSqliteTbl::getNameFields()
 
 DbModel *DbSqliteTbl::getByUid(const QString &uid, const DbModelBuilder &builder)
 {
-    traced;
+    tracein;
     QHash<QString, int> inFields;
     QList<DbModel*> outList;
     DbModel* retDb = nullptr;
     inFields.insert(QString("%1.%2").arg(name(), KFieldUid), TEXT); // TODO: make this common with name field above???
-    logi("Search by uid '%s'", uid.toStdString().c_str());
+    logi("Search by uid '%s'", STR2CHA(uid));
     ErrCode err = ErrNone;
     err = DbSqliteTbl::search(uid, inFields, builder, &outList, true);
 
@@ -879,13 +992,13 @@ DbModel *DbSqliteTbl::getByUid(const QString &uid, const DbModelBuilder &builder
         logi("Not found uid '%s'", uid.toStdString().c_str());
         // TODO: safe to print unicode log????
     }
-    tracede;
+    traceout;
     return retDb;
 }
 
 DbModel *DbSqliteTbl::getByNameId(const QString &nameId, const DbModelBuilder &builder)
 {
-    traced;
+    tracein;
     QHash<QString, int> inFields;
     QList<DbModel*> outList;
     DbModel* retDb = nullptr;
@@ -902,7 +1015,7 @@ DbModel *DbSqliteTbl::getByNameId(const QString &nameId, const DbModelBuilder &b
         logi("Not found nameId '%s'", nameId.toStdString().c_str());
         // TODO: safe to print unicode log????
     }
-    tracede;
+    traceout;
     return retDb;
 
 }
@@ -913,7 +1026,7 @@ ErrCode DbSqliteTbl::search(const QString &keyword, QList<DbModel *> *outList,
                         int noItems,
                         int* total)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     DbModelBuilder builder = mainModelBuilder();
     if (builder != nullptr) {
@@ -927,7 +1040,7 @@ ErrCode DbSqliteTbl::search(const QString &keyword, QList<DbModel *> *outList,
 
 QHash<QString, int> DbSqliteTbl::getSearchFields()
 {
-    traced;
+    tracein;
     QHash<QString, int> list;
     list[COLUMN_NAME(name(), KFieldName)] = TEXT; // TODO: make as class member?
     return list;
@@ -939,7 +1052,7 @@ ErrCode DbSqliteTbl::search(const QString &keyword, const DbModelBuilder &builde
                         int noItems,
                         int* total)
 {
-    traced;
+    tracein;
     QHash<QString, int> inFields = getSearchFields();
     logi("Search '%s', status=%d", keyword.toStdString().c_str(), dbStatus);
     logd("from %d noItems %d", from, noItems);
@@ -949,17 +1062,17 @@ ErrCode DbSqliteTbl::search(const QString &keyword, const DbModelBuilder &builde
         logd("found %d item, total %d", outList->size(), total?*total:0);
     }
     logi("search err=%d", err);
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 QString DbSqliteTbl::toDbStatusCond(qint64 dbStatus)
 {
-    traced;
-    logd("status=0x%llx", dbStatus);
+    tracein;
+    logd("dbStatus=0x%llx", dbStatus);
     QString condStatus;
-    QList<int> statusList = DbModel::getStatusList();
-    foreach (int status, statusList) {
+    const QList<int>* statusList = DbModel::getDbStatusList();
+    foreach (int status, (*statusList)) {
         if ((status & dbStatus) != 0) {
             if (!condStatus.isEmpty()) {
                 condStatus += " OR ";
@@ -968,13 +1081,13 @@ QString DbSqliteTbl::toDbStatusCond(qint64 dbStatus)
         }
     }
     logd("Status cond string=%s", STR2CHA(condStatus));
-    tracede;
+    traceout;
     return condStatus;
 }
 
 void DbSqliteTbl::appendDbStatusCond(QString& cond, qint64 dbStatus)
 {
-    traced;
+    tracein;
     QString condStatus = toDbStatusCond(dbStatus);
     if (!condStatus.isEmpty()) {
         if (cond.isEmpty()) {
@@ -984,34 +1097,67 @@ void DbSqliteTbl::appendDbStatusCond(QString& cond, qint64 dbStatus)
         }
     }
     logd("cond with dbstatus='%s'", STR2CHA(cond));
-    tracede;
+    traceout;
 }
 
+QString DbSqliteTbl::toModelStatusCond(qint64 modelStatus)
+{
+    tracein;
+    logd("modelStatus=0x%llx", modelStatus);
+    QString condStatus;
+    const QList<int>* statusList = DbModel::getModelStatusList();
+    foreach (int status, (*statusList)) {
+        if ((status & modelStatus) != 0) {
+            if (!condStatus.isEmpty()) {
+                condStatus += " OR ";
+            }
+            condStatus += QString("(%1.%2=%3)").arg(name(), KFieldModelStatus).arg(status);
+        }
+    }
+    logd("Status cond string=%s", STR2CHA(condStatus));
+    traceout;
+    return condStatus;
+}
+
+void DbSqliteTbl::appendModelStatusCond(QString& cond, qint64 modelStatus)
+{
+    tracein;
+    QString condStatus = toDbStatusCond(modelStatus);
+    if (!condStatus.isEmpty()) {
+        if (cond.isEmpty()) {
+            cond = condStatus;
+        } else {
+            cond = QString("(%1) AND (%2)").arg(cond, condStatus);
+        }
+    }
+    logd("cond with modelStatus='%s'", STR2CHA(cond));
+    traceout;
+}
 QString DbSqliteTbl::getSearchQueryString(const QString& cond)
 {
-    traced;
+    tracein;
     return getSearchQueryStringWithTag(cond, nullptr);
 }
 
 QString DbSqliteTbl::getSearchQueryStringWithTag(const QString &cond, const QString &tag)
 {
-    traced;
+    tracein;
     QString queryString = QString("SELECT * FROM %2")
                               .arg(name());
     if (!cond.isEmpty()) {
         queryString += QString(" WHERE %1").arg(cond);
     }
     logd("queryString: %s", queryString.toStdString().c_str());
-    tracede;
+    traceout;
     return queryString;
 }
 
 QString DbSqliteTbl::getFilterQueryString(int fieldId, const QString &cond)
 {
-    traced;
+    tracein;
     UNUSED(fieldId);
     QString queryString = getSearchQueryString(cond);
-    tracede;
+    traceout;
     return queryString;
 }
 
@@ -1024,7 +1170,7 @@ ErrCode DbSqliteTbl::search(const QString& keyword, const QHash<QString, int>& i
                         int noItems,
                         int* total)
 {
-    traced;
+    tracein;
 //    DB->openDb();
     // TODO: implement it
     // TODO: exact and not exact match???
@@ -1033,7 +1179,7 @@ ErrCode DbSqliteTbl::search(const QString& keyword, const QHash<QString, int>& i
     QSqlQuery* qry = new QSqlQuery(SQLITE->currentDb());
     ErrCode err = ErrNone;
     int cnt = 0;
-    logi("Search keyword '%s', dbStatus=0x%x", keyword.toStdString().c_str(), dbStatus);
+    logi("Search keyword '%s', dbStatus=0x%x", STR2CHA(keyword), dbStatus);
     QString cond;
     foreach (QString field, inFields.keys()) {
         if (!cond.isEmpty()) {
@@ -1085,7 +1231,7 @@ ErrCode DbSqliteTbl::search(const QString& keyword, const QHash<QString, int>& i
 
     logi("Found %d", cnt);
     delete qry;
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
@@ -1098,7 +1244,7 @@ ErrCode DbSqliteTbl::search(const QHash<QString, FieldValue> &searchCond,
                         int noItems,
                         int* total)
 {
-    traced;
+    tracein;
     //    DB->openDb();
     // TODO: implement it
     // TODO: exact and not exact match???
@@ -1166,13 +1312,13 @@ ErrCode DbSqliteTbl::search(const QHash<QString, FieldValue> &searchCond,
 
 
     logi("Found %d", cnt);
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 DbSqliteTableBuilder* DbSqliteTbl::getTableBuilder()
 {
-    traced;
+    tracein;
     // TODO; support multi language
     // Common table, with name and history field, together with default one is id, uid, status, history
     DbSqliteTableBuilder* builder = DbSqliteTableBuilder::build(name());
@@ -1188,21 +1334,21 @@ DbSqliteTableBuilder* DbSqliteTbl::getTableBuilder()
 
 void DbSqliteTbl::addTableField(DbSqliteTableBuilder *builder)
 {
-    traced;
+    tracein;
     // TODO: consider to make Uid as common field???
     // i.e. uid can be hash of name, hash of 2 id in different table, etc.
     builder->addField(KFieldUid, TEXT);
     builder->addField(KFieldNameId, TEXT);
     builder->addField(KFieldName, TEXT);
     builder->addField(KFieldDbHistory, TEXT); // history of this field in db
-    builder->addField(KFieldCreateTime, INT64);
-    builder->addField(KFieldLastUpdateItme, INT64);
+    builder->addField(KFieldDbCreateTime, INT64);
+    builder->addField(KFieldLastDbUpdateItme, INT64);
     builder->addField(KFieldRemark, TEXT);
 }
 
 ErrCode DbSqliteTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
 {
-    traced;
+    tracein;
     if (!item->uid().isEmpty())
         builder->addValue(KFieldUid, item->uid());
     if (!item->nameId().isEmpty())
@@ -1217,20 +1363,20 @@ ErrCode DbSqliteTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbMo
     // TODO: timezone issue?
     // TODO: time of computer suddenly not correct/change???,
     // should store last open time than compare???
-    builder->addValue(KFieldCreateTime, Utils::currentTimeMs());
-    builder->addValue(KFieldLastUpdateItme, Utils::currentTimeMs());
+    builder->addValue(KFieldDbCreateTime, Utils::currentTimeMs());
+    builder->addValue(KFieldLastDbUpdateItme, Utils::currentTimeMs());
     builder->addValue(KFieldDbStatus, DB_RECORD_NOT_READY); // NOT ready, until we update uid
                                                             // TODO: Fix me if this is neccessary or correct
-    tracede;
+    traceout;
     return ErrNone;
 }
 
 ErrCode DbSqliteTbl::deleteCondition(DbSqliteDeleteBuilder *builder, const DbModel *item)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     builder->addCond(KFieldUid, item->uid());
-    tracedr(err);
+    traceret(err);
     return err;
 }
 

@@ -57,7 +57,7 @@ Ethnic *DlgEthnic::ethnic() const
 
 void DlgEthnic::accept()
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     QString name = ui->txtName->text().trimmed();
     QString currtex = ui->cbCountry->currentText();

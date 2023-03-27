@@ -77,7 +77,7 @@
 #define SPLIT_EMAIL_PHONE ";"
 
 #define PERSON_DISPLAY_NAME_SPLIT "-"
-#define PERSON_DISPLAY_NAME(per) QString("%1" PERSON_DISPLAY_NAME_SPLIT "%2").arg(per->personCode(), per->getFullName())
+#define PERSON_DISPLAY_NAME(per) QString("%1" PERSON_DISPLAY_NAME_SPLIT "%2").arg(per->nameId(), per->getFullName())
 
 const char* const KUiMultiComboxNameSaint = "saint";
 const char* const KUiMultiComboxNameSpecialist = "specialist";
@@ -94,7 +94,7 @@ DlgPerson::DlgPerson(QWidget *parent) :
     mIsSelfSave(true),
     mInitDone(false)
 {
-    traced;
+    tracein;
     setupUI();
 }
 
@@ -112,7 +112,7 @@ DlgPerson::~DlgPerson()
 
 void DlgPerson::on_btnImport_clicked()
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     Person* per = nullptr;
     QString fname = QFileDialog::getOpenFileName(
@@ -135,7 +135,7 @@ void DlgPerson::on_btnImport_clicked()
 
 void DlgPerson::setupUI()
 {
-    traced;
+    tracein;
     /*
      * SET UP UI
      */
@@ -223,14 +223,14 @@ void DlgPerson::setupUI()
 
 Person *DlgPerson::buildPerson()
 {
-    traced;
+    tracein;
     // TODO: backup data to restore later??
     Person* per = person();
     per->setMarkModified(true); // start marking fields which are modified
     // Image
     per->setImgPath(ui->lblImgPath->text().trimmed());
     // person code
-    per->setPersonCode(ui->txtCode->text().trimmed());
+    per->setNameId(ui->txtCode->text().trimmed());
 
     // holly uid
     QList<QVariant> saints = cbSaints->valueItems();
@@ -362,14 +362,14 @@ Person *DlgPerson::buildPerson()
 //    }
 
     per->dump();
-    tracede;
+    traceout;
     return per;
 
 }
 
 ErrCode DlgPerson::fromPerson(const Person *model)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
 
     mInitDone = false;
@@ -391,7 +391,7 @@ ErrCode DlgPerson::fromPerson(const Person *model)
         ui->lblImgPath->setText(per->imgPath());
     }
 
-    ui->txtCode->setText(per->personCode());
+    ui->txtCode->setText(per->nameId());
     ui->txtName->setText(per->getFullName());
     ui->txtBirthday->setText(Utils::date2String(per->birthday()));
 
@@ -403,7 +403,7 @@ ErrCode DlgPerson::fromPerson(const Person *model)
     }
     ui->txtSaint->setText(per->hollyName());
     // ngay bon mang
-    ui->txtFeastDay->setText(Utils::date2String(per->feastDay(), DATE_FORMAT_MD));
+    ui->txtFeastDay->setText(Utils::date2String(per->feastDay(), DEFAULT_FORMAT_MD));
     // birthday
     ui->txtBirthplace->setText(per->birthPlace());
     // TODO: country, ethinic, nationality, etc.
@@ -520,7 +520,7 @@ ErrCode DlgPerson::fromPerson(const Person *model)
     // before showing person add dialog
     Utils::setSelectItemComboxByData(ui->cbCommunity, per->communityUid());
 
-    tracedr(ret);
+    traceret(ret);
     mInitDone = true; // TODO: check setting mInitDone again, should offer api to mark init done?
     return ret;
 }
@@ -528,7 +528,7 @@ ErrCode DlgPerson::fromPerson(const Person *model)
 
 ErrCode DlgPerson::onComboxNewItem(UIMultiComboxView *ui, const QString &value, bool silent)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     logd("do silent %d", silent);
     logd("name %s", ui->name().toStdString().c_str());
@@ -588,7 +588,7 @@ ErrCode DlgPerson::onComboxNewItem(UIMultiComboxView *ui, const QString &value, 
 
 void DlgPerson::multiComboxItemUpdate(UIMultiComboxView *cb, QLineEdit* txt)
 {
-    traced;
+    tracein;
     QHash<QString, QVariant> items = cb->items();
     QString str;
     foreach (QString value, items.keys()) {
@@ -596,13 +596,13 @@ void DlgPerson::multiComboxItemUpdate(UIMultiComboxView *cb, QLineEdit* txt)
         str.append(value);
     }
     if (txt) txt->setText(str);
-    tracede;
+    traceout;
 }
 
 
 void DlgPerson::onComboxItemAdded(UIMultiComboxView *cb, const QString &name, const QVariant &value)
 {
-    traced;
+    tracein;
     logd("name %s", cb->name().toStdString().c_str());
 
 
@@ -611,12 +611,12 @@ void DlgPerson::onComboxItemAdded(UIMultiComboxView *cb, const QString &name, co
         multiComboxItemUpdate(cb, ui->txtSaint);
     }
 
-    tracede;
+    traceout;
 }
 
 void DlgPerson::onComboxItemDeleted(UIMultiComboxView *cb, const QString &name, const QVariant &value)
 {
-    traced;
+    tracein;
     logd("name %s", cb->name().toStdString().c_str());
 
 
@@ -624,17 +624,17 @@ void DlgPerson::onComboxItemDeleted(UIMultiComboxView *cb, const QString &name, 
     if (cb->name() == KUiMultiComboxNameSaint) {
         multiComboxItemUpdate(cb, ui->txtSaint);
     }
-    tracede;
+    traceout;
 }
 
 void DlgPerson::onComboxClearAll()
 {
-    traced;
+    tracein;
 }
 
 void DlgPerson::loadEdu()
 {
-    traced;
+    tracein;
     logd("Load Education");
     QList<DbModel*> list = EduCtl::getInstance()->getAllItemsFromDb();
     ui->cbEdu->clear();
@@ -646,7 +646,7 @@ void DlgPerson::loadEdu()
 
 void DlgPerson::loadSaints()
 {
-    traced;
+    tracein;
     logd("Load Saint");
     if (cbSaints == nullptr) {
 
@@ -667,7 +667,7 @@ void DlgPerson::loadSaints()
 
 void DlgPerson::loadSpecialist()
 {
-    traced;
+    tracein;
     logd("Load specialist");
     if (cbSpecialist == nullptr){
         cbSpecialist = new UIMultiComboxView(KUiMultiComboxNameSpecialist, ui->wgSaint);
@@ -686,7 +686,7 @@ void DlgPerson::loadSpecialist()
 
 void DlgPerson::loadEthnic()
 {
-    traced;
+    tracein;
 
     // Someone may have US nationality, but Ethic is Kinh, as their original is VN
     logd("Reload course");
@@ -700,7 +700,7 @@ void DlgPerson::loadEthnic()
 
 void DlgPerson::loadCountry()
 {
-    traced;
+    tracein;
 
     logd("Load country");
     QList<DbModel*> listCountry = COUNTRYCTL->getAllItemsFromDb();
@@ -716,7 +716,7 @@ void DlgPerson::loadCountry()
 #ifndef SKIP_PERSON_PROVINE
 void DlgPerson::loadProvince()
 {
-    traced;
+    tracein;
     QString countryUid = Utils::getCurrentComboxDataString(ui->cbCountry);
     ui->cbProvince->clear();
     if (!countryUid.isEmpty()){
@@ -732,7 +732,7 @@ void DlgPerson::loadProvince()
 
 void DlgPerson::loadWork()
 {
-    traced;
+    tracein;
     ui->cbWork->clear();
     QList<DbModel*> list = INSTANCE(WorkCtl)->getAllItemsFromDb();
     ui->cbWork->addItem(tr("Không xác đinh"), KUidNone);
@@ -744,7 +744,7 @@ void DlgPerson::loadWork()
 
 void DlgPerson::loadEvent(bool reloadAll)
 {
-    traced;
+    tracein;
     QTableWidget* tbl = ui->tblEvents;
     tbl->clearContents();
     tbl->model()->removeRows(0, tbl->rowCount());
@@ -787,7 +787,7 @@ void DlgPerson::loadEvent(bool reloadAll)
 
 void DlgPerson::cleanEvent()
 {
-    traced;
+    tracein;
     if (!mListPersonEvent.empty()) {
         foreach(PersonEvent* item, mListPersonEvent) {
             delete item; // TODO: is it safe????, should check if iterator is supported
@@ -798,7 +798,7 @@ void DlgPerson::cleanEvent()
 
 void DlgPerson::searchPerson(QLineEdit *wget)
 {
-    traced;
+    tracein;
     DlgSearchPerson * dlg = DlgSearchPerson::build(this);
     if (dlg == nullptr) {
         loge("Open dlg DlgAddPersonEvent fail, No memory");
@@ -817,12 +817,12 @@ void DlgPerson::searchPerson(QLineEdit *wget)
         }
     }
     delete dlg;
-    tracede;
+    traceout;
 }
 
 void DlgPerson::loadCommunity()
 {
-    traced;
+    tracein;
     logd("Load community");
     QList<DbModel*> listCommunity = COMMUNITYCTL->getAllItems();
     ui->cbCommunity->clear();
@@ -835,7 +835,7 @@ void DlgPerson::loadCommunity()
 
 void DlgPerson::loadStatus()
 {
-    traced;
+    tracein;
     ui->cbStatus->clear();
     QList<DbModel*> listItems = INSTANCE(StatusCtl)->getAllItemsFromDb(); // TODO: getAllItem??
     foreach(DbModel* item, listItems){
@@ -847,7 +847,7 @@ void DlgPerson::loadStatus()
 
 void DlgPerson::loadCourse()
 {
-    traced;
+    tracein;
     ui->cbCourse->clear();
     QList<DbModel*> listCourse = COURSECTL->getAllItemsFromDb(); // TODO: should call getAllItem???
     foreach(DbModel* item, listCourse){
@@ -858,12 +858,12 @@ void DlgPerson::loadCourse()
 
 //void DlgPerson::accept()
 //{
-//    traced;
+//    tracein;
 //}
 
 void DlgPerson::on_buttonBox_clicked( QAbstractButton * button )
 {
-    traced;
+    tracein;
     bool ok2Save = false;
     ErrCode ret = ErrNone;
     QDialogButtonBox::StandardButton btn = ui->buttonBox->standardButton( button );
@@ -918,13 +918,13 @@ void DlgPerson::on_buttonBox_clicked( QAbstractButton * button )
         logd("Do nothing, cancel");
         QDialog::close();
     }
-    tracede;
+    traceout;
 }
 
 
 void DlgPerson::on_btnEditNation_clicked()
 {
-    traced;
+    tracein;
 
     DlgCountry* dlg = new DlgCountry();
     if (dlg == nullptr) {
@@ -943,7 +943,7 @@ void DlgPerson::on_btnEditNation_clicked()
 
 void DlgPerson::on_cbCountry_currentIndexChanged(int index)
 {
-    traced;
+    tracein;
     logd("Reload provine of %s", ui->cbCountry->currentText().toStdString().c_str());
     logd("index %d", index);
 #ifndef SKIP_PERSON_PROVINE
@@ -997,7 +997,7 @@ void DlgPerson::on_btnAddCommunityHistory_clicked()
 
 void DlgPerson::on_tblClearCommunity_clicked()
 {
-    traced;
+    tracein;
 //    ui->tblCommunityList->clearContents();
 //    ui->tblCommunityList->model()->removeRows(0, ui->tblCommunityList->rowCount());
 }
@@ -1005,7 +1005,7 @@ void DlgPerson::on_tblClearCommunity_clicked()
 
 void DlgPerson::on_btnPreview_clicked()
 {
-    traced;
+    tracein;
     Person* per = buildPerson();
     QString fpath;
     INSTANCE(PersonCtl)->exportToFile(per, ExportType::EXPORT_HTML, &fpath);
@@ -1015,16 +1015,16 @@ void DlgPerson::on_btnPreview_clicked()
         viewer->setSubject("Person");
         viewer->exec();
     }
-    tracede;
+    traceout;
 }
 
 Person *DlgPerson::person(bool newone)
 {
     if (mPerson == nullptr) {
-        mPerson = new Person();
+        mPerson = (Person*) Person::build();
     } else if (newone) {
         delete mPerson;
-        mPerson = new Person();
+        mPerson = (Person*) Person::build();
     }
 
     return mPerson;
@@ -1032,7 +1032,7 @@ Person *DlgPerson::person(bool newone)
 
 DlgPerson *DlgPerson::buildDlg(QWidget *parent, Person *per, bool isNew)
 {
-    traced;
+    tracein;
     DlgPerson* dlg = nullptr;
     dlg = new DlgPerson(parent);
     dlg->setIsSelfSave(true);
@@ -1043,14 +1043,14 @@ DlgPerson *DlgPerson::buildDlg(QWidget *parent, Person *per, bool isNew)
         dlg->fromPerson(per);
     }
 
-    tracede;
+    traceout;
     return dlg;
 }
 
 
 void DlgPerson::on_btnImg_clicked()
 {
-    traced;
+    tracein;
     QString fname = QFileDialog::getOpenFileName(
         this,
         tr("Open file"),
@@ -1068,7 +1068,7 @@ void DlgPerson::on_btnImg_clicked()
 
 void DlgPerson::on_btnClearImage_clicked()
 {
-    traced;
+    tracein;
     ui->lblImg->clear();
     ui->lblImgPath->clear();
     ui->lblImg->setText("<Picture>");
@@ -1077,7 +1077,7 @@ void DlgPerson::on_btnClearImage_clicked()
 
 void DlgPerson::on_btnAddCountry_clicked()
 {
-    traced;
+    tracein;
     DlgCountry * dlg = new DlgCountry();
     if (dlg == nullptr) {
         loge("Open dlg country fail, No memory");
@@ -1094,7 +1094,7 @@ void DlgPerson::on_btnAddCountry_clicked()
 
 void DlgPerson::on_btnAddEthnic_clicked()
 {
-    traced;
+    tracein;
 
     DlgEthnic * dlg = new DlgEthnic();
     if (dlg == nullptr) {
@@ -1111,7 +1111,7 @@ void DlgPerson::on_btnAddEthnic_clicked()
 
 void DlgPerson::on_btnAddEdu_clicked()
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     bool ok = false;
     QMessageBox msgBox;
@@ -1145,7 +1145,7 @@ void DlgPerson::on_btnAddEdu_clicked()
 
 void DlgPerson::on_btnAddProvince_clicked()
 {
-    traced;
+    tracein;
 #ifndef SKIP_PERSON_PROVINE
     DlgProvince * dlg = new DlgProvince();
     if (dlg == nullptr) {
@@ -1166,13 +1166,13 @@ void DlgPerson::on_btnAddProvince_clicked()
 
 void DlgPerson::on_btnAddCommunity_clicked()
 {
-    traced;
+    tracein;
 }
 
 
 void DlgPerson::on_btnAddCourse_clicked()
 {
-    traced;
+    tracein;
 
     DlgCourse * dlg = new DlgCourse();
     if (dlg == nullptr) {
@@ -1191,7 +1191,7 @@ void DlgPerson::on_btnAddCourse_clicked()
 
 void DlgPerson::on_btnAddWork_clicked()
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     bool ok = false;
     QMessageBox msgBox;
@@ -1234,7 +1234,7 @@ void DlgPerson::setEditMode(DlgPerson::Mode newEditMode)
 
 void DlgPerson::on_btnAddEvent_clicked()
 {
-    traced;
+    tracein;
     DlgAddPersonEvent * dlg = new DlgAddPersonEvent();
     if (dlg == nullptr) {
         loge("Open dlg DlgAddPersonEvent fail, No memory");
@@ -1254,7 +1254,7 @@ void DlgPerson::on_btnAddEvent_clicked()
 
 void DlgPerson::on_btnDelEvent_clicked()
 {
-    traced;
+    tracein;
     // TODO: validate data
     QTableWidget* tbl = ui->tblEvents;
     QItemSelectionModel* selectionModel = tbl->selectionModel();
@@ -1281,11 +1281,11 @@ void DlgPerson::setIsSelfSave(bool newIsSelfSave)
 
 void DlgPerson::loadPersonCode()
 {
-    traced;
+    tracein;
 
     ui->txtCode->setText(Config::getNextPersonalCode());
 
-    tracede;
+    traceout;
 }
 
 bool DlgPerson::isNew() const
@@ -1301,53 +1301,53 @@ void DlgPerson::setIsNew(bool newIsNew)
 
 void DlgPerson::on_btnSearchJoinPIC_clicked()
 {
-    traced;
+    tracein;
     searchPerson(ui->txtJoinPIC);
-    tracede;
+    traceout;
 }
 
 
 void DlgPerson::on_btnSearchPreTrainJoinPIC_clicked()
 {
-    traced;
+    tracein;
     searchPerson(ui->txtPreTrainJoinPIC);
-    tracede;
+    traceout;
 
 }
 
 
 void DlgPerson::on_btnSearchTrainPIC_clicked()
 {
-    traced;
+    tracein;
     searchPerson(ui->txtTrainPIC);
-    tracede;
+    traceout;
 
 }
 
 
 void DlgPerson::on_btnSearchVowsCEO_clicked()
 {
-    traced;
+    tracein;
     searchPerson(ui->txtVowsCEO);
-    tracede;
+    traceout;
 
 }
 
 
 void DlgPerson::on_btnSearchEternalVowsPIC_clicked()
 {
-    traced;
+    tracein;
     searchPerson(ui->txtEternalVowsPIC);
-    tracede;
+    traceout;
 
 }
 
 
 void DlgPerson::on_btnSearchEternalVowsCEO_clicked()
 {
-    traced;
+    tracein;
     searchPerson(ui->txtEternalVowsCEO);
-    tracede;
+    traceout;
 
 }
 

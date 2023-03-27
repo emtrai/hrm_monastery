@@ -30,12 +30,12 @@
 Area::Area():DbModel(),
       mCountryDbId(0)
 {
-    traced;
+    tracein;
 }
 
 Area::~Area()
 {
-    traced;
+    tracein;
 }
 
 DbModel *Area::build()
@@ -47,14 +47,14 @@ DbModel *Area::build()
 
 void Area::clone(const DbModel *model)
 {
-    traced;
+    tracein;
     if (model) {
         DbModel::clone(model);
         copy(*(Area*)model);
     } else {
         loge("clone failed, null model");
     }
-    tracede;
+    traceout;
 }
 
 QString Area::modelName() const
@@ -101,16 +101,16 @@ DbModelHandler *Area::getDbModelHandler() const
     return DB->getModelHandler(KModelHdlArea);
 }
 
-DbModelBuilder Area::getBuilder()
+DbModelBuilder Area::getBuilder() const
 {
     return &Area::build;
 }
 
 void Area::copy(const Area &model)
 {
-    traced;
+    tracein;
     mCountryName = model.mCountryName;
     mCountryDbId = model.mCountryDbId;
     mCountryUid = model.mCountryUid;
-    tracede;
+    traceout;
 }

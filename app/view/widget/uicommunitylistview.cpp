@@ -39,27 +39,28 @@
 UICommunityListView::UICommunityListView(QWidget *parent):
     UICommonListView(parent)
 {
-    traced;
+    tracein;
 }
 
 UICommunityListView::~UICommunityListView()
 {
-    traced;
+    tracein;
 }
 
 void UICommunityListView::setupUI()
 {
-    traced;
+    tracein;
     UITableView::setupUI();
     COMMUNITYCTL->addListener(this);
-    tracede;
+    traceout;
 }
 
 void UICommunityListView::initHeader()
 {
-    traced;
+    tracein;
     UICommonListView::initHeader();
     mHeader.append(tr("Trạng thái hoạt động"));
+    mHeader.append(tr("Ngày bổn mạng"));
     mHeader.append(tr("Nhiệm vụ xã hội"));
     mHeader.append(tr("Vùng"));
     mHeader.append(tr("Tổng phụ trách"));
@@ -68,15 +69,17 @@ void UICommunityListView::initHeader()
     mHeader.append(tr("Điện thoại"));
     mHeader.append(tr("Email"));
     mHeader.append(tr("Quốc gia"));
+    mHeader.append(tr("Cộng đoàn quản lý"));
 }
 
-void UICommunityListView::updateItem(DbModel *item, UITableItem *tblItem)
+void UICommunityListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
 {
-    traced;
+    tracein;
 
-    UICommonListView::updateItem(item, tblItem);
+    UICommonListView::updateItem(item, tblItem, idx);
     Community* model = (Community*) item;
-    tblItem->addValue(DbModel::status2Name(model->getStatus()));
+    tblItem->addValue(DbModel::modelStatus2Name(model->getStatus()));
+    tblItem->addValue(Utils::date2String(model->feastDate(), DATE_FORMAT_DM));
     tblItem->addValue(model->missionNameString());
     tblItem->addValue(model->areaName());
     tblItem->addValue(model->currentCEOName());
@@ -85,28 +88,29 @@ void UICommunityListView::updateItem(DbModel *item, UITableItem *tblItem)
     tblItem->addValue(model->tel());
     tblItem->addValue(model->email());
     tblItem->addValue(model->countryName());
+    tblItem->addValue(model->parentName());
 }
 
 
 ErrCode UICommunityListView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act)
 {
-    traced;
+    tracein;
     MainWindow::showAddEditCommunity(true, nullptr, this);
     return ErrNone;
 }
 
 ErrCode UICommunityListView::onMenuActionImport(QMenu *menu, UITableMenuAction *act)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     MainWindow::showImportDlg(IMPORT_TARGET_COMMUNITY);
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
 ErrCode UICommunityListView::onMenuActionAddPerson(QMenu *menu, UITableMenuAction *act)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     QString fpath;
     if (!act){
@@ -132,25 +136,25 @@ ErrCode UICommunityListView::onMenuActionAddPerson(QMenu *menu, UITableMenuActio
         loge("add person failed, error code %d",err);
         Utils::showErrorBox(QString("Thêm nữ tu lỗi, mã lỗi: %1").arg(err));
     }
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 ErrCode UICommunityListView::onMenuActionAddDepart(QMenu *menu, UITableMenuAction *act)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNotImpl;
     // TODO: implement it
     Utils::showDlgUnderDev();
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
-void UICommunityListView::onViewItem(UITableWidgetItem *item)
+void UICommunityListView::onViewItem(UITableCellWidgetItem *item)
 {
-    traced;
+    tracein;
 
-    traced;
+    tracein;
     int idx = item->idx();
     DbModel* comm = item->itemData();
     if (comm) {
@@ -159,48 +163,16 @@ void UICommunityListView::onViewItem(UITableWidgetItem *item)
         loge("Comm obj is null");
         Utils::showErrorBox("Không có thông tin để xem");
     }
-    tracede;
+    traceout;
 }
 
-void UICommunityListView::onDeleteItem(UITableWidgetItem *item)
+
+void UICommunityListView::onEditItem(UITableCellWidgetItem *item)
 {
-    traced;
-    ErrCode err = ErrNone;
-    if (item) {
-        DbModel* comm = item->itemData();
-        bool accept = Utils::showConfirmDialog(this,
-                             tr("Xoá"), QString(tr("Bạn có muốn xóa '%1'?").arg(comm->name())), nullptr);
-        if (accept) {
-            QString msg;
-            err = comm->remove(false, &msg);
-            if (err == ErrDependency) {
-                accept = Utils::showConfirmDialog(this,
-                                                  tr("Xoá"),
-                                                  QString(tr("Lỗi:%1.Bạn có muốn tiếp tục xóa '%2'?").arg(msg, comm->name())), nullptr);
-                if (accept) {
-                    err =comm->remove(true, &msg);
-                }
-            }
-
-            if (err != ErrNone) {
-                Utils::showErrorBox(QString(tr("Lỗi, mã lỗi: %1")).arg(err));
-            } else {
-                Utils::showMsgBox(QString(tr("Đã xóa '%1'")).arg(comm->name()));
-            }
-        }
-    } else {
-        loge("Nothing to delete");
-    }
-
-    tracede;
-}
-
-void UICommunityListView::onEditItem(UITableWidgetItem *item)
-{
-    traced;
+    tracein;
     DbModel* comm = item->itemData();
     MainWindow::showAddEditCommunity(true, dynamic_cast<Community*>(comm), this);
-    tracede;
+    traceout;
 }
 
 QString UICommunityListView::getTitle()
@@ -215,26 +187,26 @@ QString UICommunityListView::getName()
 
 void UICommunityListView::onImportStart(const QString &importName, const QString &fpath, ImportType type)
 {
-    traced;
+    tracein;
     mSuspendReloadOnDbUpdate = true;
     logd("suspend reload on db update");
-    tracede;
+    traceout;
 }
 
 void UICommunityListView::onImportEnd(const QString &importName, ErrCode err, const QString &fpath, ImportType type)
 {
-    traced;
+    tracein;
     mSuspendReloadOnDbUpdate = false;
     logd("resume reload on db update");
     reload();
-    tracede;
+    traceout;
 }
 
 
 
 ErrCode UICommunityListView::onMenuActionListPerson(QMenu *menu, UITableMenuAction *act)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     Community* community = dynamic_cast<Community*>(act->getData());
     if (community != nullptr) {
@@ -247,24 +219,37 @@ ErrCode UICommunityListView::onMenuActionListPerson(QMenu *menu, UITableMenuActi
         ret = ErrNoData;
     }
 
-    tracedr(ret);
+    traceret(ret);
     return ret;
 
 }
 
 // Show lis of people in all period
-ErrCode UICommunityListView::onMenuActionListPersonHistory(QMenu *menu, UITableMenuAction *act)
+ErrCode UICommunityListView::onMenuActionListAllPerson(QMenu *menu, UITableMenuAction *act)
 {
-    traced;
-    ErrCode err = ErrNone;
-    UNDER_DEV("Danh sách nữ tu ở tất cả thời kì");
-    tracedr(err);
-    return err;
+    tracein;
+    ErrCode ret = ErrNone;
+    Community* community = dynamic_cast<Community*>(act->getData());
+    if (community != nullptr) {
+        UICommunityPersonListView* view = (UICommunityPersonListView*)UITableViewFactory::getView(ViewType::VIEW_COMMUNITY_PERSON);
+
+        logd("community to view person %s", STR2CHA(community->toString()));
+        view->setCommunity(community);
+        view->setTitle(QString(tr("Danh sách nữ tu cộng đoàn %1").arg(community->name())));
+        MainWindow::getInstance()->switchView(view);
+    } else {
+        loge("no community info");
+        ret = ErrNoData;
+        Utils::showErrorBox(tr("Vui lòng chọn cộng đoàn cần xem"));
+    }
+
+    traceret(ret);
+    return ret;
 }
 
 ErrCode UICommunityListView::onMenuActionListDepartment(QMenu *menu, UITableMenuAction *act)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     Community* community = dynamic_cast<Community*>(act->getData());
     if (community != nullptr) {
@@ -303,86 +288,94 @@ ErrCode UICommunityListView::onMenuActionListDepartment(QMenu *menu, UITableMenu
 //        loge("Invalid idx");
 //        // TODO: popup message???
 //    }
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
 ErrCode UICommunityListView::onMenuActionListManagers(QMenu *menu, UITableMenuAction *act)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNotImpl;
     Utils::showDlgUnderDev();
     // TODO: implement it
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
-QList<UITableMenuAction *> UICommunityListView::getMenuItemActions(const QMenu* menu,
-                                                                   UITableWidgetItem* item)
+QList<UITableMenuAction *> UICommunityListView::getMenuSingleSelectedItemActions(const QMenu* menu,
+                                                                   UITableCellWidgetItem* item)
 {
-    traced;
+    tracein;
 //    logd("idx %d", idx);
-    QList<UITableMenuAction*> actionList = UITableView::getMenuItemActions(menu, item);
-
+    QList<UITableMenuAction*> actionList = UITableView::getMenuSingleSelectedItemActions(menu, item);
+    // TODO: show all current active people
     actionList.append(UITableMenuAction::build(tr("Xuất danh sách nữ tu hiện tại"), this, item)
                                                ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                    return this->onMenuActionExportListPerson(m, a);
                                                }));
-    actionList.append(UITableMenuAction::build(tr("Xem danh sách nữ tu hiện tại"), this, item)
-                                              ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
-                                               return this->onMenuActionListPerson(m, a);
-                                           }));
+    // TODO: show all current active people
+//    actionList.append(UITableMenuAction::build(tr("Xem danh sách nữ tu hiện tại"), this, item)
+//                                              ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+//                                               return this->onMenuActionListPerson(m, a);
+//                                           }));
     actionList.append(UITableMenuAction::build(tr("Xem danh sách tất cả nữ tu"), this, item)
                                                                                 ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
-                                                                                    return this->onMenuActionListPersonHistory(m, a);
+                                                                                    return this->onMenuActionListAllPerson(m, a);
                                                                                 }));
     actionList.append(UITableMenuAction::build(tr("Danh sách ban"), this, item)
                                           ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                               return this->onMenuActionListDepartment(m, a);
                                           }));
-    actionList.append(UITableMenuAction::build(tr("Ban Quản Lý"), this, item)
-                                          ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
-                                              return this->onMenuActionListManagers(m, a);
-                                          }));
-    actionList.append(UITableMenuAction::build(tr("Thêm nữ tu"), this, item)
-                                                ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
-                                                    return this->onMenuActionAddPerson(m, a);
-                                                }));
-    actionList.append(UITableMenuAction::build(tr("Thêm ban"), this, item)
-                                                   ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
-                                                       return this->onMenuActionAddDepart(m, a);
-                                                   }));
+    //TODO: show managememt board of community
+//    actionList.append(UITableMenuAction::build(tr("Ban Quản Lý"), this, item)
+//                                          ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+//                                              return this->onMenuActionListManagers(m, a);
+//                                          }));
+    // TODO: directly add persone to community
+//    actionList.append(UITableMenuAction::build(tr("Thêm nữ tu"), this, item)
+//                                                ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+//                                                    return this->onMenuActionAddPerson(m, a);
+//                                                }));
+    //TODO: directly add department to community
+//    actionList.append(UITableMenuAction::build(tr("Thêm ban"), this, item)
+//                                                   ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+//                                                       return this->onMenuActionAddDepart(m, a);
+//                                                   }));
     return actionList;
 
 }
 
-QList<UITableMenuAction *> UICommunityListView::getMenuMultiItemActions(const QMenu *menu, const QList<UITableItem *> &items)
+QList<UITableMenuAction *> UICommunityListView::getMenuMultiSelectedItemActions(const QMenu *menu, const QList<UITableItem *> &items)
 {
-    traced;
-    QList<UITableMenuAction*> actionList = UITableView::getMenuMultiItemActions(menu, items);
-    actionList.append(UITableMenuAction::buildMultiItem(tr("Xuất danh sách cộng đoàn"), this, &items)
-                                                   ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
-                                                       return this->onMenuActionExportListCommunity(m, a);
-                                                   }));
-    tracede;
+    tracein;
+    QList<UITableMenuAction*> actionList = UITableView::getMenuMultiSelectedItemActions(menu, items);
+//    actionList.append(UITableMenuAction::buildMultiItem(tr("Xuất danh sách cộng đoàn"), this, &items)
+//                                                   ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+//                                                       return this->onMenuActionExportListCommunity(m, a);
+//                                                   }));
+    traceout;
     return actionList;
 }
 
 QList<UITableMenuAction *> UICommunityListView::getMenuCommonActions(const QMenu *menu)
 {
-    traced;
+    tracein;
     QList<UITableMenuAction*> actionList = UITableView::getMenuCommonActions(menu);
     actionList.append(UITableMenuAction::build(tr("Nhập từ tập tin"), this)
                                                    ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                        return this->onMenuActionImport(m, a);
                                                    }));
-                      tracede;
-                      return actionList;
+    actionList.append(UITableMenuAction::build(tr("Xuất danh sách cộng đoàn"), this)
+                                                ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                                    return this->onMenuActionExportListCommunity(m, a);
+                                                }));
+    traceout;
+    return actionList;
 }
 
 ErrCode UICommunityListView::onMenuActionExportListPerson(QMenu *menu, UITableMenuAction *act)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     QString fpath;
     if (!act){
@@ -414,15 +407,22 @@ ErrCode UICommunityListView::onMenuActionExportListPerson(QMenu *menu, UITableMe
         loge("export list person failed, error code %d",err);
         Utils::showErrorBox(QString("Xuất dữ liệu danh sách nữ tu trong cộng đoàn lỗi, mã lỗi: %1").arg(err));
     }
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 ErrCode UICommunityListView::onMenuActionExportListCommunity(QMenu *menu, UITableMenuAction *act)
 {
-    traced;
-    ErrCode err = ErrNotImpl;
-    UNDER_DEV("Xuất danh sách cộng đoàn");
+    tracein;
+    ErrCode err = ErrNone;
+    QList<DbModel*> list = COMMUNITYCTL->getAllItemsFromDb();
+    if (!list.empty()) {
+        err = MainWindow::exportListItems(&list, COMMUNITYCTL, tr("Xuất danh sách cộng đoàn"), EXPORT_XLSX);
+    } else {
+        logw("nothing to export");
+    }
+    RELEASE_LIST_DBMODEL(list);
+//    UNDER_DEV("Xuất danh sách cộng đoàn");
 //    QList<DbModel*> items;
 //    int cnt = act->itemListData(items);
 //    logd("No. selected person %d", cnt);
@@ -431,29 +431,29 @@ ErrCode UICommunityListView::onMenuActionExportListCommunity(QMenu *menu, UITabl
 //        item->dump();
 //        COMMUNITYCTL->addPerson(comm, (Person*) item);
 //    }
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 ErrCode UICommunityListView::onLoad()
 {
 //    QList<Community*> items = COMMUNITYCTL->getAllItems();
-    traced;
+    tracein;
     RELEASE_LIST_DBMODEL(mItemList);
     mItemList = COMMUNITYCTL->getAllItems();
     // TODO: loop to much, redundant, do something better?
 //    foreach (Community* item, items) {
 //        mItemList.append(dynamic_cast<DbModel*>(item));
 //    }
-    tracede;
+    traceout;
     return ErrNone;
 }
 
 ErrCode UICommunityListView::onReload()
 {
-    traced;
+    tracein;
     onLoad();
-    tracede;
+    traceout;
     return ErrNone;
 }
 

@@ -29,42 +29,42 @@
 
 MapDbModel::MapDbModel():DbModel()
 {
-    traced;
+    tracein;
 }
 
 MapDbModel::~MapDbModel()
 {
-    traced;
+    tracein;
 }
 
 MapDbModel::MapDbModel(const MapDbModel &model):DbModel((DbModel*)&model)
 {
-    traced;
+    tracein;
     copy(model);
-    tracede;
+    traceout;
 }
 
 MapDbModel::MapDbModel(const MapDbModel *model):DbModel((DbModel*) model)
 {
-    traced;
+    tracein;
     if (model) {
         copy(*model);
     } else {
         loge("contruct failed, null pointer");
     }
-    tracede;
+    traceout;
 }
 
 void MapDbModel::clone(const DbModel *model)
 {
-    traced;
+    tracein;
     if (model) {
         DbModel::clone(model);
         copy((*(MapDbModel*)model));
     } else {
         loge("clone failed, null model");
     }
-    tracede;
+    traceout;
 }
 
 DbModel *MapDbModel::buildMapModel(DbModelBuilder builder,
@@ -72,7 +72,7 @@ DbModel *MapDbModel::buildMapModel(DbModelBuilder builder,
                                    int status, qint64 startdate, qint64 enddate,
                                    const QString &remark)
 {
-    traced;
+    tracein;
     MapDbModel* model = nullptr;
     ErrCode err = ErrNone;
     if (!builder || !item1 || !item2) {
@@ -105,13 +105,13 @@ DbModel *MapDbModel::buildMapModel(DbModelBuilder builder,
         if (model) delete model;
         model = nullptr;
     }
-    tracede;
+    traceout;
     return model;
 }
 
 QString MapDbModel::buildUid(const QString *seed)
 {
-    traced;
+    tracein;
     QString tmp = uid1() + uid2();
     tmp += QString("%1").arg(startDate());
     tmp += QString("%1").arg(endDate());
@@ -230,7 +230,7 @@ void MapDbModel::setChangeHistory(const QString &newChangeHistory)
 
 void MapDbModel::copy(const MapDbModel &model)
 {
-    traced;
+    tracein;
     mUid1 = model.mUid1;
     mDbId1 = model.mDbId1;
     mUid2 = model.mUid2;
@@ -240,5 +240,5 @@ void MapDbModel::copy(const MapDbModel &model)
     mStatus = model.mStatus;
     mParentUid = model.mParentUid;
     mChangeHistory = model.mChangeHistory;
-    tracede;
+    traceout;
 }

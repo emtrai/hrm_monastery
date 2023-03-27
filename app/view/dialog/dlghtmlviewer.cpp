@@ -45,7 +45,7 @@ void dlgHtmlViewer::setSubject(const QString &value)
 
 void dlgHtmlViewer::setHtmlPath(const QString &fpath)
 {
-    traced;
+    tracein;
     ui->txtContent->clearHistory();
     ui->txtContent->clear();
 

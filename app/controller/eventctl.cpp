@@ -31,12 +31,12 @@ GET_INSTANCE_CONTROLLER_IMPL(EventCtl)
 
 EventCtl::EventCtl():ModelController(KModelHdlEvent)
 {
-    traced;
+    tracein;
 }
 
 EventCtl::~EventCtl()
 {
-    traced;
+    tracein;
 }
 
 const char *EventCtl::getPrebuiltFileName()

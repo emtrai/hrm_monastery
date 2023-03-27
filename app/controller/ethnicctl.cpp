@@ -31,13 +31,13 @@ GET_INSTANCE_CONTROLLER_IMPL(EthnicCtl)
 
 EthnicCtl::EthnicCtl():ModelController(KModelHdlEthnic)
 {
-    traced;
+    tracein;
 }
 
 // Format: name id, country name id, name[, remark]
 DbModel *EthnicCtl::buildModel(void *items, const QString &fmt)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     Ethnic* item = nullptr;
     QStringList* itemList = nullptr;
@@ -129,7 +129,7 @@ DbModel *EthnicCtl::buildModel(void *items, const QString &fmt)
             item = nullptr;
         }
     }
-    tracede;
+    traceout;
     return item;
 }
 

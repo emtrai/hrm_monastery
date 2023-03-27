@@ -30,7 +30,7 @@ class DbSqliteCommunityPersonTbl : public DbSqliteMapTbl
 {
 public:
     DbSqliteCommunityPersonTbl(DbSqlite* db);
-    QList<DbModel*> getListPerson(const QString& communityUid, int status = MODEL_ACTIVE);
+    QList<DbModel*> getListPerson(const QString& communityUid, int status = MODEL_ACTIVE, const QString* perStatusUid = nullptr);
 protected:
     virtual ErrCode updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
 

@@ -28,21 +28,23 @@
 #include <QDir>
 #include <QFile>
 
+#define MAX_LOG_LEN 128
+
 Logger* Logger::gInstance = nullptr;
 
 LogWorker::LogWorker():isRunning(false), mThead(nullptr)
 {
-    traced;
+    tracein;
 }
 LogWorker::~LogWorker() {
-    traced;
+    tracein;
     stop();
     if (mThead) delete mThead;
-    tracede;
+    traceout;
 }
 void LogWorker::doWork() {
     QString result;
-    traced;
+    tracein;
     while (isRunning) {
         mMutex.lock();
         mWait.wait(&mMutex);
@@ -57,10 +59,10 @@ void LogWorker::doWork() {
     }
 
     emit resultReady(result);
-    tracede;
+    traceout;
 }
 void LogWorker::printLog(QString log) {
-    traced;
+    tracein;
     if (isRunning) {
 //        mMutex.lock();
         mQueue.enqueue(log);
@@ -69,29 +71,29 @@ void LogWorker::printLog(QString log) {
     } else {
         loge("writing lock thread not started yet");
     }
-    tracede;
+    traceout;
 }
 
 void LogWorker::startRuning()
 {
-    traced;
+    tracein;
     isRunning = true;
     mThead = new QThread();
     moveToThread(mThead);
     connect(mThead, &QThread::finished, this, &QObject::deleteLater);
     connect(mThead, &QThread::started, this, &LogWorker::doWork);
     mThead->start();
-    tracede;
+    traceout;
 }
 
 void LogWorker::stop()
 {
-    traced;
+    tracein;
     isRunning = false;
     mWait.notify_all();
     mThead->quit();
     mThead->wait();
-    tracede;
+    traceout;
 }
 
 Logger *Logger::getInstance()
@@ -104,21 +106,21 @@ Logger *Logger::getInstance()
 
 Logger::Logger():mWorker(nullptr)
 {
-    traced;
+    tracein;
 }
 
 Logger::~Logger()
 {
-    traced;
+    tracein;
     if (mWorker) {
         delete mWorker;
     }
-    tracede;
+    traceout;
 }
 
 void Logger::doInit()
 {
-    traced;
+    tracein;
     qInstallMessageHandler(Logger::messageHandler);
     mLogFilePath = getLogFilePath();
     mLogFile.setFileName(mLogFilePath);
@@ -134,7 +136,7 @@ void Logger::doInit()
     connect(mWorker, &LogWorker::resultReady, this, &Logger::handleResults);
     mWorker->startRuning();
 //    mWorkerThread.start();
-    tracede;
+    traceout;
 }
 
 QString Logger::getLogDirPath()
@@ -178,9 +180,11 @@ void Logger::doHandleMessage(QtMsgType type, const QMessageLogContext &context, 
         break;
     }
 
+//    fprintf(stderr, "%s", log.size() < MAX_LOG_LEN?STR2CHA(log):STR2CHA(log.chopped(MAX_LOG_LEN)));
     fprintf(stderr, "%s", STR2CHA(log));
+
     if (writeFile) {
-        logd("Request to write log");
+//        logd("Request to write log");
 //        emit log2File(log);
         reqWriteLog(log);
         // TODO: why emit signal not effect???
@@ -189,19 +193,19 @@ void Logger::doHandleMessage(QtMsgType type, const QMessageLogContext &context, 
 
 void Logger::doPrintLog2File(const QString &log)
 {
-    traced;
+    tracein;
     logd("doPrintLog2File");
     // TODO: check to change file & delete old file???
     mLogFile.write(log.toUtf8());
     mLogFile.flush();
-    tracede;
+    traceout;
 }
 
 void Logger::doReqWriteLog(const QString &log)
 {
-    traced;
+//    tracein;
     mWorker->printLog(log);
-    tracede;
+//    traceout;
 }
 
 void Logger::printLog2File(const QString &log)

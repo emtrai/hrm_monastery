@@ -32,12 +32,12 @@ GET_INSTANCE_CONTROLLER_IMPL(RoleCtl)
 RoleCtl::RoleCtl():
     ModelController(KModelHdlRole)
 {
-    traced;
+    tracein;
 }
 
 RoleCtl::~RoleCtl()
 {
-    traced;
+    tracein;
 }
 
 const char *RoleCtl::getPrebuiltFileName()

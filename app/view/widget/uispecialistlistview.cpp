@@ -34,12 +34,12 @@
 UISpecialistListView::UISpecialistListView(QWidget *parent):
     UICommonListView(parent)
 {
-    traced;
+    tracein;
 }
 
 UISpecialistListView::~UISpecialistListView()
 {
-    traced;
+    tracein;
 }
 
 QString UISpecialistListView::getTitle()

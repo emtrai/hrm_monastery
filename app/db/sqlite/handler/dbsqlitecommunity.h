@@ -50,7 +50,8 @@ public:
      * @param communityUid
      * @return list of Person
      */
-    virtual QList<DbModel*> getListPerson(const QString& communityUid);
+    virtual QList<DbModel*> getListPerson(const QString& communityUid,
+                                           int modelStatus = MODEL_ACTIVE, const QString* perStatusUid = nullptr);
 
     /**
      * @brief Add person to community

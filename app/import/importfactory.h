@@ -43,6 +43,7 @@ class ImportFactory
 public:
     ImportFactory();
     static Importer* getImporter(ImportType type);
+    static ImportType importTypeFromExt(const QString& extension, bool list = false);
 
     static ErrCode importFrom(const QString& importName, IDataImporter* item,
                               const QString& fpath, ImportType type,

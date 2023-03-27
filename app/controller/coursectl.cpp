@@ -31,13 +31,13 @@ GET_INSTANCE_CONTROLLER_IMPL(CourseCtl)
 
 CourseCtl::CourseCtl():ModelController(KModelHdlCourse)
 {
-    traced;
+    tracein;
 }
 
 // Format: Name id, Name,course type, period,startdate,enddate,remark
 DbModel *CourseCtl::buildModel(void *items, const QString &fmt)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     Course* item = NULL;
     QStringList* itemList = NULL;
@@ -134,7 +134,7 @@ DbModel *CourseCtl::buildModel(void *items, const QString &fmt)
         delete item;
         item = NULL;
     }
-    tracede;
+    traceout;
     return item;
 }
 

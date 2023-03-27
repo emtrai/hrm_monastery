@@ -37,12 +37,12 @@ const qint32 DbSqliteSaintTbl::KVersionCode = VERSION_CODE(0,0,1);
 DbSqliteSaintTbl::DbSqliteSaintTbl(DbSqlite* db)
     : DbSqliteTbl(db, KTableSaint, KTableSaint, KVersionCode)
 {
-    traced;
+    tracein;
 }
 
 void DbSqliteSaintTbl::addTableField(DbSqliteTableBuilder *builder)
 {
-    traced;
+    tracein;
     DbSqliteTbl::addTableField(builder);
     builder->addField(KFieldFullName, TEXT);
     builder->addField(KFieldOriginName, TEXT);
@@ -53,7 +53,7 @@ void DbSqliteSaintTbl::addTableField(DbSqliteTableBuilder *builder)
 
 ErrCode DbSqliteSaintTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
 {
-    traced;
+    tracein;
     DbSqliteTbl::insertTableField(builder, item);
     Saint* saint = (Saint*) item;
     builder->addValue(KFieldFullName, saint->fullName());
@@ -61,13 +61,13 @@ ErrCode DbSqliteSaintTbl::insertTableField(DbSqliteInsertBuilder *builder, const
     builder->addValue(KFieldGender, saint->gender());
     builder->addValue(KFieldFeastDay, saint->feastDay());
     builder->addValue(KFieldCountry, saint->country());
-    tracede;
+    traceout;
     return ErrNone;
 }
 
 ErrCode DbSqliteSaintTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     DbSqliteTbl::updateModelFromQuery(item, qry);
     Saint* saint = (Saint*) item;
@@ -76,7 +76,7 @@ ErrCode DbSqliteSaintTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &q
     saint->setGender((Gender)qry.value(KFieldGender).toInt());
     saint->setFeastDay(qry.value(KFieldFeastDay).toInt());
     saint->setCountry(qry.value(KFieldCountry).toString());
-    tracede;
+    traceout;
     return err;
 }
 
@@ -91,7 +91,7 @@ QHash<QString, int> DbSqliteSaintTbl::getSearchFields()
 
 QList<QString> DbSqliteSaintTbl::getNameFields()
 {
-    traced;
+    tracein;
     QList<QString> list;// TODO: make as class member?
     list.append(KFieldName);
     list.append(KFieldFullName);
@@ -105,7 +105,7 @@ ErrCode DbSqliteSaintTbl::search(const QString &keyword, QList<DbModel *> *outLi
                              int noItems,
                              int* total)
 {
-    traced;
+    tracein;
     return DbSqliteTbl::search(keyword, &Saint::build, outList, dbStatus, from, noItems, total);
 }
 

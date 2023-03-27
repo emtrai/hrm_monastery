@@ -33,7 +33,7 @@ do { \
     QList<DbModel*> list; \
     int count = 0; \
     logd("Check to delete table %s", tableName); \
-    err = getListItems(itemToSearch, tableName, true, &count, &list, builder); \
+    err = getListItems(itemToSearch, tableName, false, &count, &list, builder); \
     if (err == ErrNone && count > 0) { \
         if (!force) { \
             errDependency = true; \
@@ -62,7 +62,7 @@ do { \
         } else { \
             foreach (DbModel* model, list) { \
                 logd("force delete '%s'", STR2CHA(model->toString())); \
-                tmpErr = DbSqliteModelHandler::deleteHard(model, force, msg); \
+                tmpErr = DbSqliteModelHandler::deleteHard(model, force, msg, tableName); \
                 logd("Delete result=%d", tmpErr); \
             } \
         } \
@@ -106,6 +106,8 @@ public:
      * @return
      */
     virtual ErrCode deleteHard(DbModel* model, bool force, QString* msg);
+    virtual ErrCode deleteHard(DbModel* model, bool force, QString* msg, const QString& tableName);
+    virtual ErrCode doDeleteHard(DbSqliteTbl* tbl, DbModel* model, bool force, QString* msg);
 
     /**
      * @brief Check if model exist in db
@@ -113,6 +115,8 @@ public:
      * @return true if exist, false otherwise
      */
     virtual bool exist(const DbModel* edu);
+
+    virtual bool isNameidExist(const QString& nameId, const char* modelName = nullptr);
     virtual QList<DbModel*> getAll(DbModelBuilder builder, qint64 status = DB_RECORD_ACTIVE,
                                     const char* modelName = nullptr, int from = 0,
                                     int noItems = 0, int* total = nullptr);

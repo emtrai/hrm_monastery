@@ -31,10 +31,26 @@ protected:
 public:
     virtual ~CommunityPerson();
     static DbModel* build();
-    virtual DbModelBuilder getBuilder();
+    virtual DbModelBuilder getBuilder() const;
     virtual QString modelName() const;
+
+    const QString &communityUid() const { return uid1(); }
+    void setCommunityUid(const QString &newUid1) { setUid1(newUid1); }
+
+    const QString &personUid() const { return uid2(); }
+    void setPersonUid(const QString &newUid1) { setUid2(newUid1); }
+
+    DbModel *person() const;
+    void setPerson(const DbModel *newPerson);
+
+    DbModel *community() const;
+    void setCommunity(const DbModel *newCommunity);
+
 protected:
     virtual DbModelHandler *getDbModelHandler() const;
+protected:
+    DbModel* mPerson;
+    DbModel* mCommunity;
 };
 
 #endif // COMMUNITYPERSON_H

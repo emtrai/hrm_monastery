@@ -35,7 +35,7 @@
 
 PersonDept::PersonDept()
 {
-    traced;
+    tracein;
 }
 
 DbModel *PersonDept::build()
@@ -45,7 +45,7 @@ DbModel *PersonDept::build()
     return model;
 }
 
-DbModelBuilder PersonDept::getBuilder()
+DbModelBuilder PersonDept::getBuilder() const
 {
     return &PersonDept::build;
 }
@@ -107,7 +107,7 @@ void PersonDept::setCourseName(const QString &newCourseName)
 
 void PersonDept::dump()
 {
-    traced;
+    tracein;
     DbModel::dump();
     logd("- Comm Dept Uid %s", mCommDeptUid.toStdString().c_str());
     logd("- Person Uid %s", mPersonUid.toStdString().c_str());

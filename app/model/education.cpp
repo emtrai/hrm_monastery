@@ -30,7 +30,7 @@
 
 Education::Education()
 {
-    traced;
+    tracein;
 }
 
 DbModel *Education::build()
@@ -40,7 +40,7 @@ DbModel *Education::build()
     return model;
 }
 
-DbModelBuilder Education::getBuilder()
+DbModelBuilder Education::getBuilder() const
 {
     return &Education::build;
 }

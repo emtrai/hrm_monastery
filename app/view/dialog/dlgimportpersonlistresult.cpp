@@ -26,13 +26,13 @@
 
 DlgImportPersonListResult::DlgImportPersonListResult(QWidget *parent):DlgImportListResult(parent)
 {
-    traced;
+    tracein;
 }
 
 
 void DlgImportPersonListResult::initHeader()
 {
-    traced;
+    tracein;
     mHeader.append(tr("Mã"));
     mHeader.append(tr("Tên Thánh"));
     mHeader.append(tr("Họ tên"));
@@ -52,12 +52,12 @@ QList<UIImportItem *> *DlgImportPersonListResult::getItems()
     foreach (DbModel* item, mList) {
         Person* per = (Person*)item;
         UIImportItem* wgitem = UIImportItem::build(item);
-        wgitem->addValue(per->personCode());
+        wgitem->addValue(per->nameId());
         wgitem->addValue(per->hollyName());
         wgitem->addValue(per->getFullName());
         wgitem->addValue(Utils::date2String(per->birthday()));
         wgitem->addValue(per->birthPlace());
-        wgitem->addValue(Utils::date2String(per->feastDay(), DATE_FORMAT_MD)); // seem feastday convert repeate many time, make it common????
+        wgitem->addValue(Utils::date2String(per->feastDay(), DEFAULT_FORMAT_MD)); // seem feastday convert repeate many time, make it common????
 
         wgitem->addValue(per->tel().join(";"));
         wgitem->addValue(per->email().join(";"));

@@ -32,33 +32,33 @@ DbSqliteUpdateBuilder *DbSqliteUpdateBuilder::build(const QString &tblName)
 
 DbSqliteUpdateBuilder *DbSqliteUpdateBuilder::addValue(const QString &field, const QString &value, int dataType)
 {
-    traced;
+    tracein;
     logd("add field %s, value %s", field.toStdString().c_str(), value.toStdString().c_str());
     if (!mValue.contains(field)) {
         mValue.insert(field, FieldValue(value, dataType));
     } else {
         logi("Field %s already exist", field.toStdString().c_str());
     }
-    tracede;
+    traceout;
     return this;
 }
 
 DbSqliteUpdateBuilder *DbSqliteUpdateBuilder::addValue(const QString &field, qint64 value)
 {
-    traced;
+    tracein;
     logd("add field int %s, value %d", field.toStdString().c_str(), value);
     if (!mValue.contains(field)) {
         mValue.insert(field, FieldValue(QString("%1").arg(value), INT64));
     } else {
         logi("Field %s already exist", field.toStdString().c_str());
     }
-    tracede;
+    traceout;
     return this;
 }
 
 DbSqliteUpdateBuilder *DbSqliteUpdateBuilder::addCond(const QString &field, const QString &value, int dataType)
 {
-    traced;
+    tracein;
     logd("add cond %s, value %s", field.toStdString().c_str(), value.toStdString().c_str());
     if (!mCondition.contains(field)) {
         mCondition.insert(field, FieldValue(value, dataType));
@@ -70,10 +70,10 @@ DbSqliteUpdateBuilder *DbSqliteUpdateBuilder::addCond(const QString &field, cons
 
 QSqlQuery *DbSqliteUpdateBuilder::buildSqlQuery(const QString *cond)
 {
-    traced;
+    tracein;
     QString conds;
     QString values;
-    traced;
+    tracein;
     foreach( QString field, mValue.keys() )
     {
         if (!values.isEmpty()) {
@@ -127,5 +127,5 @@ QSqlQuery *DbSqliteUpdateBuilder::buildSqlQuery(const QString *cond)
 DbSqliteUpdateBuilder::DbSqliteUpdateBuilder(const QString& name):
     mName(name)
 {
-    traced;
+    tracein;
 }

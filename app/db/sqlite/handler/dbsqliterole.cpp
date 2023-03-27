@@ -30,7 +30,7 @@
 
 DbSqliteRole::DbSqliteRole()
 {
-    traced;
+    tracein;
 }
 
 

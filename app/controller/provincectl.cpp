@@ -31,13 +31,13 @@ GET_INSTANCE_CONTROLLER_IMPL(ProvinceCtl)
 ProvinceCtl::ProvinceCtl():
     ModelController(KModelHdlProvince)
 {
-    traced;
+    tracein;
 }
 
 // Format: Country name id, Name id, Province name[, <parent province if any>]
 DbModel *ProvinceCtl::buildModel(void *items, const QString &fmt)
 {
-    traced;
+    tracein;
     Province* item = new Province();
     QStringList* itemList = (QStringList*) items;
     qint32 idx = 0;
@@ -70,7 +70,7 @@ DbModel *ProvinceCtl::buildModel(void *items, const QString &fmt)
         if (!remark.isEmpty())
             item->setRemark(remark);
     }
-    tracede;
+    traceout;
     return item;
 }
 
@@ -88,7 +88,7 @@ DbModelBuilder ProvinceCtl::getMainBuilder()
 
 const QList<Province *> *ProvinceCtl::getProvinceList(const QString &country)
 {
-    traced;
+    tracein;
     // TODO: implement it?
 //    if (mProvinceList.contains(country))
 //        return mProvinceList[country];

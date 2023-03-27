@@ -43,11 +43,11 @@ class Saint: public DbModel, public DataExporter, public IDataImporter
 {
     public:
         static DbModel* build();
-        virtual DbModelBuilder getBuilder();
+        virtual DbModelBuilder getBuilder() const;
         void init();
         void initImportFields();
         Saint();
-        virtual ErrCode onImportDataItem(const QString& importName, int importFileType,
+        virtual ErrCode onImportParseDataItem(const QString& importName, int importFileType,
                                      const QString& keyword, const QString& value,
                                      quint32 idx = 0, QList<DbModel *>* outList = nullptr);
 

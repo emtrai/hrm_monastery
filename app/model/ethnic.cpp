@@ -32,18 +32,18 @@
 
 Ethnic::Ethnic()
 {
-    traced;
+    tracein;
 }
 
 DbModel *Ethnic::build()
 {
-    traced;
+    tracein;
     Ethnic* model = new Ethnic();
     model->init();
     return model;
 }
 
-DbModelBuilder Ethnic::getBuilder()
+DbModelBuilder Ethnic::getBuilder() const
 {
     return &Ethnic::build;
 }

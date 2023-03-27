@@ -40,24 +40,24 @@ DbSqliteProvinceTbl::DbSqliteProvinceTbl():
 DbSqliteProvinceTbl::DbSqliteProvinceTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableProvince, KTableProvince, KVersionCode)
 {
-    traced;
+    tracein;
 }
 
 void DbSqliteProvinceTbl::addTableField(DbSqliteTableBuilder *builder)
 {
-    traced;
+    tracein;
     DbSqliteTbl::addTableField(builder);
     builder->addField(KFieldCountryUid, TEXT);
     builder->addField(KFieldCountryDbId, INT64); // DB ID
     builder->addField(KFieldParentDbId, INT64); // DB ID
     builder->addField(KFieldParentUid, TEXT); // DB ID
-    tracede;
+    traceout;
 }
 
 ErrCode DbSqliteProvinceTbl::insertTableField(DbSqliteInsertBuilder *builder,
                                            const DbModel *item)
 {
-    traced;
+    tracein;
     DbSqliteTbl::insertTableField(builder, item);
 
     Province* model = (Province*) item;
@@ -65,13 +65,13 @@ ErrCode DbSqliteProvinceTbl::insertTableField(DbSqliteInsertBuilder *builder,
     builder->addValue(KFieldCountryDbId, model->countryDbId());
     builder->addValue(KFieldParentDbId, model->parentDbId());
     builder->addValue(KFieldParentUid, model->parentUid());
-    tracede;
+    traceout;
     return ErrNone;
 }
 
 ErrCode DbSqliteProvinceTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     DbSqliteTbl::updateModelFromQuery(item, qry);
     Province* model = (Province*) item;
@@ -79,6 +79,6 @@ ErrCode DbSqliteProvinceTbl::updateModelFromQuery(DbModel *item, const QSqlQuery
     model->setCountryDbId(qry.value(KFieldCountryDbId).toInt());
     model->setParentDbId(qry.value(KFieldParentDbId).toInt());
     model->setParentUid(qry.value(KFieldParentUid).toString());
-    tracede;
+    traceout;
     return err;
 }

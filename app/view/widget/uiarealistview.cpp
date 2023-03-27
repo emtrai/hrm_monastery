@@ -34,39 +34,39 @@
 UIAreaListView::UIAreaListView(QWidget *parent):
     UICommonListView(parent)
 {
-    traced;
+    tracein;
 }
 
 UIAreaListView::~UIAreaListView()
 {
-    traced;
+    tracein;
 }
 
 void UIAreaListView::initHeader()
 {
-    traced;
+    tracein;
     UICommonListView::initHeader();
     mHeader.append(tr("Quốc gia"));
 }
 
-void UIAreaListView::updateItem(DbModel *item, UITableItem *tblItem)
+void UIAreaListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
 {
-    traced;
+    tracein;
 
-    UICommonListView::updateItem(item, tblItem);
+    UICommonListView::updateItem(item, tblItem, idx);
     Area* model = (Area*) item;
     tblItem->addValue(model->countryName());
 }
 
 ModelController *UIAreaListView::getController()
 {
-    traced;
+    tracein;
     return AREACTL;
 }
 
 QList<DbModel *> UIAreaListView::getListItem()
 {
-    traced;
+    tracein;
 //    return AREACTL->getAllItems();
     // TODO: temporary change to this api, should use getAllItems
     return AREACTL->getAllItems();

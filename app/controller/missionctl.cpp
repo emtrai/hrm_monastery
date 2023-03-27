@@ -30,12 +30,12 @@ GET_INSTANCE_CONTROLLER_IMPL(MissionCtl);
 
 MissionCtl::MissionCtl():ModelController(KModelHdlMission)
 {
-    traced;
+    tracein;
 }
 
 MissionCtl::~MissionCtl()
 {
-    traced;
+    tracein;
 }
 
 DbModelBuilder MissionCtl::getMainBuilder()

@@ -38,5 +38,5 @@ const qint32 DbSqliteWorkTbl::KVersionCode = VERSION_CODE(0,0,1);
 DbSqliteWorkTbl::DbSqliteWorkTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableWork, KTableWork, KVersionCode)
 {
-    traced;
+    tracein;
 }

@@ -31,7 +31,7 @@ public:
     static DbModel* build();
 
     virtual void clone(const DbModel* model);
-    virtual DbModelBuilder getBuilder();
+    virtual DbModelBuilder getBuilder() const;
     virtual QString modelName() const;
     const QString &roleUid() const;
     void setRoleUid(const QString &newRoleUid);

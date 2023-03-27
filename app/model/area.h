@@ -50,7 +50,7 @@ public:
 
 protected:
     virtual DbModelHandler* getDbModelHandler() const;
-    virtual DbModelBuilder getBuilder();
+    virtual DbModelBuilder getBuilder() const;
     void copy(const Area& model);
 private:
     QString mCountryName; // just for display, not store to db

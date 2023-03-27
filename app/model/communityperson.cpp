@@ -30,12 +30,12 @@
 
 CommunityPerson::CommunityPerson()
 {
-    traced;
+    tracein;
 }
 
 CommunityPerson::~CommunityPerson()
 {
-    traced;
+    tracein;
 }
 
 DbModel *CommunityPerson::build()
@@ -45,7 +45,7 @@ DbModel *CommunityPerson::build()
     return item;
 }
 
-DbModelBuilder CommunityPerson::getBuilder()
+DbModelBuilder CommunityPerson::getBuilder() const
 {
     return &CommunityPerson::build;
 }
@@ -60,4 +60,28 @@ QString CommunityPerson::modelName() const
 DbModelHandler *CommunityPerson::getDbModelHandler() const
 {
     return DB->getModelHandler(KModelHdlCommunity);
+}
+
+DbModel *CommunityPerson::community() const
+{
+    return mCommunity;
+}
+
+void CommunityPerson::setCommunity(const DbModel *newCommunity)
+{
+    tracein;
+    CLEAR_THEN_SET(mCommunity, newCommunity, DbModel);
+    traceout;
+}
+
+DbModel *CommunityPerson::person() const
+{
+    return mPerson;
+}
+
+void CommunityPerson::setPerson(const DbModel *newPerson)
+{
+    tracein;
+    CLEAR_THEN_SET(mPerson, newPerson, DbModel);
+    traceout;
 }

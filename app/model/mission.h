@@ -34,7 +34,7 @@ class Mission : public DbModel
 public:
     Mission();
     static DbModel *build();
-    virtual DbModelBuilder getBuilder();
+    virtual DbModelBuilder getBuilder() const;
 
 protected:
     virtual DbModelHandler *getDbModelHandler() const;

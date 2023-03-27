@@ -39,12 +39,13 @@
 #include "eductl.h""
 #include "coursectl.h"
 #include "workctl.h"
+#include "config.h"
 
 GET_INSTANCE_CONTROLLER_IMPL(PersonCtl)
 
 ErrCode PersonCtl::getListPersonInCommunity(const QString &communityUid, QList<DbModel *>& list, qint32 status)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     if (!communityUid.isEmpty()) {
         logi("get person in community uid '%s'", STR2CHA(communityUid));
@@ -53,13 +54,13 @@ ErrCode PersonCtl::getListPersonInCommunity(const QString &communityUid, QList<D
     } else {
         loge("Invalid community Uid");
     }
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 ErrCode PersonCtl::getListEvents(const QString &personUid, QList<DbModel*>& list)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     if (!personUid.isEmpty()) {
         logd("get person event of uid '%s'", STR2CHA(personUid));
@@ -72,7 +73,7 @@ ErrCode PersonCtl::getListEvents(const QString &personUid, QList<DbModel*>& list
         loge("Invalid person Uid");
         err = ErrInvalidArg;
     }
-    tracede;
+    traceout;
     return err;
 }
 
@@ -97,7 +98,7 @@ DbModel *PersonCtl::doImportOneItem(const QString& importName, int importFileTyp
             foreach (QString item, items) {
                 QString field = mImportFields[i++];
                 logd("Import field %s", field.toStdString().c_str());
-                ret = person->onImportDataItem(importName, importFileType, field, item, idx);
+                ret = person->onImportParseDataItem(importName, importFileType, field, item, idx);
             }
         } else {
             ret = ErrNoMemory;
@@ -108,7 +109,7 @@ DbModel *PersonCtl::doImportOneItem(const QString& importName, int importFileTyp
         delete person;
     }
 
-    tracedr(ret);
+    traceret(ret);
     return person;
 }
 
@@ -119,11 +120,24 @@ DbModel *PersonCtl::doImportOneItem(const QString& importName, int importFileTyp
     logd("idx = %d", idx);
     person = (Person*)Person::build();
     if (person) {
+        bool ok = false;
+        qint64 code = 0;
+        qint64 seq = DB->getCurrentPersonCodeNumber(&ok);
+        if (!ok) {
+            loge("Get sequence number failed, restart from 1");
+            seq = 0;
+        }
+        code = idx + seq + 1;
         foreach (QString field, items.keys()) {
             QString value = items.value(field);
             logd("Import field %s", field.toStdString().c_str());
             logd("Import value %s", value.toStdString().c_str());
-            ret = person->onImportDataItem(importName, importFileType, field, value, idx);
+            ret = person->onImportParseDataItem(importName, importFileType, field, value, idx);
+        }
+        if (ret == ErrNone && person->nameId().isEmpty()) {
+            // TODO: should make temp code??? to distingue with official one
+            person->setNameId(CONFIG->getNextPersonalCode(&code));
+            // TODO: numer is increased, but not save --> may cause much dummy code?
         }
     } else {
         ret = ErrNoMemory;
@@ -133,7 +147,7 @@ DbModel *PersonCtl::doImportOneItem(const QString& importName, int importFileTyp
     if (ret != ErrNone && person) {
         delete person;
     }
-    tracedr(ret);
+    traceret(ret);
     return person;
 }
 
@@ -145,7 +159,7 @@ ErrCode PersonCtl::filter(int catetoryid, qint64 opFlags,
                       int noItems,
                       int* total)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     logd("category id %d", catetoryid);
     logd("opFlags id %lld", opFlags);
@@ -266,14 +280,14 @@ ErrCode PersonCtl::filter(int catetoryid, qint64 opFlags,
 //        ret = ModelController::filter(catetoryid, opFlags, keywords, outList,
 //                                      from, noItems, total);
 //    }
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 const QString PersonCtl::exportTemplatePath(FileExporter *exporter, QString* ftype) const
 {
     QString ret;
-    traced;
+    tracein;
     if (exporter) {
         logd("exporter type %d", exporter->getExportType());
         switch (exporter->getExportType()) {
@@ -294,7 +308,7 @@ const QString PersonCtl::exportTemplatePath(FileExporter *exporter, QString* fty
 
 ErrCode PersonCtl::exportListPersonInCommunity(const QString &communityUid, ExportType exportType, const QString &fpath)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     QList<DbModel*> items;
     if (communityUid.isEmpty() || fpath.isEmpty()) {
@@ -318,7 +332,7 @@ ErrCode PersonCtl::exportListPersonInCommunity(const QString &communityUid, Expo
         }
     }
     RELEASE_LIST_DBMODEL(items);
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
@@ -336,7 +350,7 @@ PersonCtl::PersonCtl():
 
 PersonCtl::~PersonCtl()
 {
-    traced;
+    tracein;
 }
 
 DbPersonModelHandler *PersonCtl::personModelHdl()

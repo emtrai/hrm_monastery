@@ -39,12 +39,12 @@ const qint32 DbSqliteSpecialistTbl::KVersionCode = VERSION_CODE(0,0,1);
 DbSqliteSpecialistTbl::DbSqliteSpecialistTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableSpecialist, KTableSpecialist, KVersionCode)
 {
-    traced;
+    tracein;
 }
 
 ErrCode DbSqliteSpecialistTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     DbSqliteTbl::updateModelFromQuery(item, qry);
     if (item->name().isEmpty()) {
@@ -57,6 +57,6 @@ ErrCode DbSqliteSpecialistTbl::updateModelFromQuery(DbModel *item, const QSqlQue
             item->setUid(qry.value(KFieldSpecialistUid).toString());
         }
     }
-    tracede;
+    traceout;
     return err;
 }

@@ -31,7 +31,7 @@
 
 Role::Role()
 {
-    traced;
+    tracein;
 }
 DbModel *Role::build()
 {
@@ -40,7 +40,7 @@ DbModel *Role::build()
     return model;
 }
 
-DbModelBuilder Role::getBuilder()
+DbModelBuilder Role::getBuilder() const
 {
     return &Role::build;
 }

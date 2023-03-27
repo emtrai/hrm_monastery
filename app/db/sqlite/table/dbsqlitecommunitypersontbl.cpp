@@ -34,13 +34,14 @@
 #include "table/dbsqlitepersontbl.h"
 #include "dbctl.h"
 #include "dbsqlite.h"
+#include "communityperson.h"
 
 const qint32 DbSqliteCommunityPersonTbl::KVersionCode = VERSION_CODE(0,0,1);
 
 DbSqliteCommunityPersonTbl::DbSqliteCommunityPersonTbl(DbSqlite *db):
     DbSqliteMapTbl(db, KTableCommPerson, KTableCommPerson, KVersionCode)
 {
-    traced;
+    tracein;
 
     mFieldNameUid1 = KFieldCommunityUid;
     mFieldNameDbId1 = KFieldCommunityDbId;
@@ -48,21 +49,30 @@ DbSqliteCommunityPersonTbl::DbSqliteCommunityPersonTbl(DbSqlite *db):
     mFieldNameDbId2 = KFieldPersonDbId;
 }
 
-QList<DbModel *> DbSqliteCommunityPersonTbl::getListPerson(const QString &communityUid, int status)
+QList<DbModel *> DbSqliteCommunityPersonTbl::getListPerson(const QString &communityUid,
+                                                           int modelStatus, const QString* perStatusUid)
 {
-    traced;
+    tracein;
 //    DB->openDb();
     QSqlQuery qry (SQLITE->currentDb());
     qint32 cnt = 0;
+    QString cond;
+
     if (communityUid.isEmpty()){
         loge("Invalid community uid");
         return QList<DbModel*>();
     }
     logi("CommunityUid '%s'", communityUid.toStdString().c_str());
-    QString queryString = QString("SELECT * FROM %1 LEFT JOIN %2 ON %1.%3 = %2.%4 WHERE %1.%5 = :uid")
-                              .arg(KTableCommPerson, KTablePerson)
-                              .arg(KFieldPersonUid, KFieldUid, KFieldCommunityUid);
-
+    QString queryString = QString("SELECT *, %2.%3 AS %4, %2.%5 AS %6 FROM %1 LEFT JOIN %2 ON %1.%4 = %2.%3")
+                              .arg(name(), KTablePerson) // 1 & 2
+                              .arg(KFieldUid, KFieldPersonUid) // 3 & 4
+                              .arg(KFieldNameId, KFieldPersonNameId) // 5 & 6
+                              ;
+    cond = QString("%1.%5 = :uid").arg(name(), KFieldCommunityUid);
+    appendModelStatusCond(cond, modelStatus);
+    if (!cond.isEmpty()) {
+        queryString += " WHERE " + cond;
+    }
     qry.prepare(queryString);
     logd("Query String '%s'", queryString.toStdString().c_str());
 
@@ -74,27 +84,74 @@ QList<DbModel *> DbSqliteCommunityPersonTbl::getListPerson(const QString &commun
     cnt = runQuery(qry, &Person::build, &outList);
 
     logi("Found %d", cnt);
-    tracede;
+    traceout;
     return outList;
 }
 
 ErrCode DbSqliteCommunityPersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
-    DbSqliteMapTbl::updateModelFromQuery(item, qry);
     QString modelName = item->modelName();
     logd("update for map model '%s'", modelName.toStdString().c_str());
-    if (modelName == KModelNamePerson)
-    {
-        logd("update for person model");
-        DbSqlitePersonTbl* tbl = dynamic_cast<DbSqlitePersonTbl*>(DbSqlite::table(KTablePerson));
-        tbl->updateModelFromQuery(item, qry);
-
-
-    } else {
-        loge("Invalid mapp model '%s', do nothing", modelName.toStdString().c_str());
+    DbSqlitePersonTbl* tblPerson = dynamic_cast<DbSqlitePersonTbl*>(DbSqlite::table(KTablePerson));
+    DbModelHandler* commHdl = DB->getCommunityModelHandler();
+    err = DbSqliteMapTbl::updateModelFromQuery(item, qry);
+    if (err == ErrNone && !item) {
+        loge("invalid input model, it's NULL!");
+        err = ErrInvalidArg;
     }
-    tracede;
+    if (err == ErrNone && !tblPerson) {
+        err = ErrNoTable;
+        loge("not found table person");
+    }
+    if (err == ErrNone && !commHdl) {
+        err = ErrNoHandler;
+        loge("not found handler community");
+    }
+    if (err == ErrNone) {
+        if (modelName == KModelNamePerson) {
+            logd("update for person model");
+            if (tblPerson) {
+                tblPerson->updateModelFromQuery(item, qry);
+            } else {
+                err = ErrNoTable;
+                loge("not found table person");
+            }
+        } else if (modelName == KModelNameCommPerson) {
+            CommunityPerson* commPer = (CommunityPerson*)item;
+            Person* person = (Person*)Person::build();
+            if (person) {
+                tblPerson->updateModelFromQuery(person, qry);
+                commPer->setPerson(person);
+                delete person;
+            } else {
+                err = ErrNoMemory;
+                loge("no memory, cannot allocat person");
+            }
+
+            if (err == ErrNone) {
+                if (!commPer->communityUid().isEmpty()) {
+                    logd("Search community uid '%s'", STR2CHA(commPer->communityUid()));
+                    DbModel* model = commHdl->getByUid(commPer->communityUid());
+                    if (model) {
+                        logd("Found community '%s'", STR2CHA(model->toString()));
+                        commPer->setCommunity(model);
+                        delete model;
+                    } else {
+                        loge("Not found community uid '%s'", STR2CHA(commPer->communityUid()));
+                        err = ErrNotFound;
+                    }
+                } else {
+                    loge("Community uid is empty!");
+                    err = ErrNoData;
+                }
+            }
+        } else {
+            loge("Invalid mapp model '%s', do nothing", modelName.toStdString().c_str());
+            err = ErrNotSupport;
+        }
+    }
+    traceout;
     return err;
 }

@@ -57,8 +57,19 @@ public:
     virtual DbModelHandler* getSaintModelHandler() = 0;
     virtual DbModelHandler* getSpecialistModelHandler() = 0;
     virtual DbModelHandler* getCommunityModelHandler() = 0;
+    virtual DbModelHandler* getDepartmentModelHandler() = 0;
 
     virtual DbModelHandler* getModelHandler(const QString& name) = 0;
+
+    virtual quint64 getDbVersion() = 0;
+    virtual quint64 getDbVersionInMetadata(bool* ok = nullptr) = 0;
+    virtual ErrCode updateDbVersionInMetadata(qint64 value) = 0;
+    virtual ErrCode getMetadataValue(const QString& key, QString& value) = 0;
+    virtual ErrCode getMetadataValue(const QString& key, qint64& value) = 0;
+    virtual ErrCode updateMetadataValue(const QString& key, qint64 value) = 0;
+    virtual ErrCode updateMetadataValue(const QString& key, const QString& value) = 0;
+    virtual quint64 getCurrentPersonCodeNumber(bool* ok = nullptr) = 0;
+    virtual quint64 getDbSeqNumber(const QString& tblName, bool* ok = nullptr) = 0;
 };
 
 #endif // IDATABASE_H

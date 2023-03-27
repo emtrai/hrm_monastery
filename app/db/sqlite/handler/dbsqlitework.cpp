@@ -32,7 +32,7 @@ GET_INSTANCE_IMPL(DbSqliteWork)
 
 DbSqliteWork::DbSqliteWork()
 {
-    traced;
+    tracein;
 }
 
 const QString DbSqliteWork::getName()

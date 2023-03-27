@@ -39,7 +39,7 @@ DbModel *Specialist::build()
     return model;
 }
 
-DbModelBuilder Specialist::getBuilder()
+DbModelBuilder Specialist::getBuilder() const
 {
     return &Specialist::build;
 }

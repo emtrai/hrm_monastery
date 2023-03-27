@@ -70,7 +70,7 @@ protected:
      * @param ftype file type, i.e json
      * @return
      */
-    virtual ErrCode parsePrebuiltFile(const QString &fpath, const QString &ftype);
+//    virtual ErrCode parsePrebuiltFile(const QString &fpath, const QString &ftype);
 
     /**
      * @brief parse one item of prebuilt file

@@ -28,7 +28,7 @@
 
 DbSqliteProvince::DbSqliteProvince()
 {
-    traced;
+    tracein;
 }
 
 const QString DbSqliteProvince::getName()

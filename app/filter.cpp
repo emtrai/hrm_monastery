@@ -42,7 +42,7 @@ static QHash<int, QString> s_FilterOperName;
 static void initFilterOps()
 {
     static bool initialized = false;
-    traced;
+    tracein;
     logd("initialized = %d", initialized);
     if (!initialized) {
         logd("not init FilterOps, init it");
@@ -67,14 +67,14 @@ static void initFilterOps()
 
         initialized = true;
     }
-    tracede;
+    traceout;
 }
 
 QHash<int, QString> getFilterOpsList(int filterField)
 {
     quint32 ops = 0;
     QHash<int, QString> opsList;
-    traced;
+    tracein;
     initFilterOps();
     logd("FilterField %d", filterField);
     if (s_FilterOper.contains(filterField)) {
@@ -95,7 +95,7 @@ QHash<int, QString> getFilterOpsList(int filterField)
         }
     }
     logd("opsList cnt %d", opsList.count());
-    tracede;
+    traceout;
     return opsList;
 }
 
@@ -121,7 +121,7 @@ void FilterItem::setValue(const QVariant &newValue)
 
 FilterItem::FilterItem(const QString &item, const QString &keyword, const QVariant& value)
 {
-    traced;
+    tracein;
     mItem = item;
     if (!keyword.isEmpty())
         mKeyword = keyword;
@@ -131,7 +131,7 @@ FilterItem::FilterItem(const QString &item, const QString &keyword, const QVaria
         mValue = value;
     else
         logd("no value");
-    tracede;
+    traceout;
 }
 
 const QString &FilterItem::item() const

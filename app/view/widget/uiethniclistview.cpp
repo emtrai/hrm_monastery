@@ -31,12 +31,12 @@
 UIEthnicListView::UIEthnicListView(QWidget *parent):
     UICommonListView(parent)
 {
-    traced;
+    tracein;
 }
 
 UIEthnicListView::~UIEthnicListView()
 {
-    traced;
+    tracein;
 }
 
 

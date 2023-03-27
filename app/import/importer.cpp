@@ -31,7 +31,7 @@ Importer::Importer()
 ErrCode Importer::importFrom(const QString& importName, int importFileType,
                              IDataImporter *importer, const QString &fpath, QList<DbModel *>* outList)
 {
-    traced;
+    tracein;
     logd("Not support here");
     return ErrNotSupport;
 }

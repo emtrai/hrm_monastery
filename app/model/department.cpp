@@ -39,7 +39,7 @@ DbModel *Department::build()
     return model;
 }
 
-DbModelBuilder Department::getBuilder()
+DbModelBuilder Department::getBuilder() const
 {
     return &Department::build;
 }

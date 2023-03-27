@@ -41,7 +41,7 @@ const qint32 DbSqliteAreaMgrTbl::KVersionCode = VERSION_CODE(0,0,1);
 DbSqliteAreaMgrTbl::DbSqliteAreaMgrTbl(DbSqlite *db):
     DbSqliteMapTbl(db, KTableAreaPerson, KTableAreaPerson, KVersionCode)
 {
-    traced;
+    tracein;
 
     mFieldNameUid1 = KFieldAreaUid;
     mFieldNameDbId1 = KFieldAreaDbId;
@@ -51,7 +51,7 @@ DbSqliteAreaMgrTbl::DbSqliteAreaMgrTbl(DbSqlite *db):
 
 QList<DbModel *> DbSqliteAreaMgrTbl::getListPerson(const QString &areaUid, int status)
 {
-    traced;
+    tracein;
     logi("areaUid '%s'", areaUid.toStdString().c_str());
     /*
      * SELECT * FROM "KTableAreaPerson"
@@ -68,21 +68,21 @@ QList<DbModel *> DbSqliteAreaMgrTbl::getListPerson(const QString &areaUid, int s
                                                          areaUid,
                                                          status);
 
-    tracede;
+    traceout;
     return list;
 }
 
 void DbSqliteAreaMgrTbl::addTableField(DbSqliteTableBuilder *builder)
 {
-    traced;
+    tracein;
     DbSqliteMapTbl::addTableField(builder);
     builder->addField(KFieldRoleUid, TEXT);// TODO: use this????
-    tracede;
+    traceout;
 }
 
 ErrCode DbSqliteAreaMgrTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     if (!item) {
         err = ErrInvalidArg;
@@ -153,6 +153,6 @@ ErrCode DbSqliteAreaMgrTbl::updateModelFromQuery(DbModel *item, const QSqlQuery 
             if (area) delete area;
         }
     }
-    tracede;
+    traceout;
     return err;
 }

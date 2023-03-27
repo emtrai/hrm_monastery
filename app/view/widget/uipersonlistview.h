@@ -32,7 +32,7 @@ public:
     virtual ~UIPersonListView();
 protected:
     virtual ErrCode onLoad();
-    virtual void updateItem(DbModel* item, UITableItem* tblItem);
+    virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
     virtual void initHeader();
 protected:
     virtual int getViewType() { return VIEW_PERSON;}
@@ -44,21 +44,20 @@ protected:
      * @param item
      * @return
      */
-    virtual QList<UITableMenuAction*> getMenuItemActions(const QMenu* menu, UITableWidgetItem* item);
+    virtual QList<UITableMenuAction*> getMenuSingleSelectedItemActions(const QMenu* menu, UITableCellWidgetItem* item);
     /**
      * @brief get menu action list when multi item is selected
      * @param menu
      * @param items
      * @return
      */
-    virtual QList<UITableMenuAction*> getMenuMultiItemActions(const QMenu* menu, const QList<UITableItem *>& items);
+    virtual QList<UITableMenuAction*> getMenuMultiSelectedItemActions(const QMenu* menu, const QList<UITableItem *>& items);
 
     virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionImport(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onChangeCommunity(QMenu* menu, UITableMenuAction* act);
-    virtual void onViewItem(UITableWidgetItem *item);
-    virtual void onEditItem(UITableWidgetItem *item);
-    virtual void onDeleteItem(UITableWidgetItem *item);
+    virtual void onViewItem(UITableCellWidgetItem *item);
+    virtual void onEditItem(UITableCellWidgetItem *item);
     virtual QString getTitle();
 
     virtual void initFilterFields();

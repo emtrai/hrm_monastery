@@ -38,7 +38,7 @@ class Province: public DbModel
 public:
     Province();
     static DbModel *build();
-    virtual DbModelBuilder getBuilder();
+    virtual DbModelBuilder getBuilder() const;
 //    virtual QString nameid() const;
 
     qint64 parentDbId() const;

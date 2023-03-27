@@ -32,12 +32,12 @@
 UIWorkListView::UIWorkListView(QWidget *parent):
     UICommonListView(parent)
 {
-    traced;
+    tracein;
 }
 
 UIWorkListView::~UIWorkListView()
 {
-    traced;
+    tracein;
 }
 
 ModelController *UIWorkListView::getController()

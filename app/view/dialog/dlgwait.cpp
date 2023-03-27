@@ -39,7 +39,7 @@ DlgWait::~DlgWait()
 ErrCode DlgWait::show(void* data, WaitPrepare_t prepare,
                       WaitRunt_t run, WaitFinished_t finish)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     mForceCancel = false;
     mWorker = new DlgWaitWorker(this, this, data);
@@ -59,7 +59,7 @@ ErrCode DlgWait::show(void* data, WaitPrepare_t prepare,
         mWorker->start();
         this->exec();
     }
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
@@ -100,14 +100,14 @@ void DlgWait::setMessage(const QString &newMessage)
 
 void DlgWait::setProgress(int perc)
 {
-    traced;
+    tracein;
     logd("perc %d", perc);
     ui->lblProgress->setText(QString("%1 %").arg(perc));
 }
 
 void DlgWait::setProgress(int cur, int total)
 {
-    traced;
+    tracein;
     logd("cur %d total %d", cur, total);
     ui->lblProgress->setText(QString("%1 / %2").arg(cur, total));
 
@@ -115,58 +115,58 @@ void DlgWait::setProgress(int cur, int total)
 
 void DlgWait::clearProgress()
 {
-    traced;
+    tracein;
     ui->lblProgress->setText("");
 }
 
 void DlgWait::forceClose()
 {
-    traced;
+    tracein;
     mForceCancel = true;
     QDialog::close();
-    tracede;
+    traceout;
 }
 
 void DlgWait::accept()
 {
-    traced;
+    tracein;
     if (mAllowCancel || mForceCancel) QDialog::accept();
 
-    tracede;
+    traceout;
 }
 
 void DlgWait::done(int val)
 {
-    traced;
+    tracein;
     if (mAllowCancel || mForceCancel) QDialog::done(val);
 
-    tracede;
+    traceout;
 }
 
 void DlgWait::reject()
 {
-    traced;
+    tracein;
     if (mAllowCancel || mForceCancel) QDialog::reject();
 
-    tracede;
+    traceout;
 }
 
 void DlgWait::handleResult(ErrCode err, void *data, void *result)
 {
-    traced;
+    tracein;
     // TODO: should terminate thread???
     // TODO: callback is called when app is already closed???
     logd("err=%d", err);
     if (mFinishCallback) {
         mFinishCallback(err, data, result, this);
     }
-    tracede;
+    traceout;
 }
 
 DlgWaitWorker::DlgWaitWorker(QObject *parent, DlgWait* dlg, void* data):
     QThread(parent), mDlg(dlg), mRunFunc(nullptr), mData(data)
 {
-    traced;
+    tracein;
 }
 
 void DlgWaitWorker::setRunFunc(const WaitRunt_t &newRunFunc)
@@ -176,7 +176,7 @@ void DlgWaitWorker::setRunFunc(const WaitRunt_t &newRunFunc)
 
 void DlgWaitWorker::run()
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     void* result = nullptr;
     if (mRunFunc) {
@@ -184,5 +184,5 @@ void DlgWaitWorker::run()
     }
     logd("signal done");
     emit done(ret, mData, result, mDlg);
-    tracede;
+    traceout;
 }

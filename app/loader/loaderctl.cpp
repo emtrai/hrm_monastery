@@ -41,6 +41,7 @@
 #include "statusctl.h"
 #include "eventctl.h"
 #include "rolectl.h"
+#include "communitydeptctl.h"
 
 LoaderCtl* LoaderCtl::gInstance = nullptr;
 
@@ -62,19 +63,19 @@ LoaderCtl* LoaderCtl::getInstance()
 
 void LoaderCtl::add2Loader( Controller* ctl)
 {
-    traced;
+    tracein;
     mListCtl.append(ctl);
 }
 
 void LoaderCtl::add2PreLoader(Controller *ctl)
 {
-    traced;
+    tracein;
     mPreLoadListCtl.append(ctl);
 }
 
 void LoaderCtl::registerAll()
 {
-    traced;
+    tracein;
     add2PreLoader(DbCtl::getInstance());
     /* Beware, order is important*/
 //    add2Loader(Location::getInstance());
@@ -97,11 +98,12 @@ void LoaderCtl::registerAll()
     add2Loader(CommunityCtl::getInstance());
     add2Loader(RoleCtl::getInstance());
     add2Loader(PersonCtl::getInstance());
+    add2Loader(COMMUNITYDEPTCTL);
 }
 
 void LoaderCtl::runLoader(QList<Controller *> &list)
 {
-    traced;
+    tracein;
     foreach(  Controller* ctl, list ) {
         if (mListener != nullptr){
             mListener->onLoadController(ctl);
@@ -112,21 +114,21 @@ void LoaderCtl::runLoader(QList<Controller *> &list)
     // TODO: call on separate thread?
     // TODO: timeout???
 
-    tracede;
+    traceout;
 }
 
 void LoaderCtl::preLoad()
 {
-    traced;
+    tracein;
     runLoader(mPreLoadListCtl);
-    tracede;
+    traceout;
 }
 
 void LoaderCtl::onLoad()
 {
-    traced;
+    tracein;
     runLoader(mListCtl);
-    tracede;
+    traceout;
 }
 
 void LoaderCtl::setOnFinishLoadListener(LoaderListener* listener, void* data){

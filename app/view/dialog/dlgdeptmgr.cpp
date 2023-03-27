@@ -33,7 +33,7 @@ DlgDeptMgr::DlgDeptMgr(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DlgDeptMgr)
 {
-    traced;
+    tracein;
     ui->setupUi(this);
     QStringList header;
     // TODO: translation
@@ -67,7 +67,7 @@ DlgDeptMgr::~DlgDeptMgr()
 
 void DlgDeptMgr::loadCourse()
 {
-    traced;
+    tracein;
     ui->cbTerm->clear();
     QList<DbModel*> listCourse = COURSECTL->getAllItemsFromDb(); // TODO: should call getAllItem???
     foreach(DbModel* item, listCourse){
@@ -87,14 +87,14 @@ void DlgDeptMgr::loadRole()
 
 void DlgDeptMgr::showEvent(QShowEvent *event)
 {
-    traced;
+    tracein;
     QDialog::showEvent(event);
 
 }
 
 void DlgDeptMgr::accept()
 {
-    traced;
+    tracein;
     // TODO: validate data
     QTableWidget* tbl = ui->tblList;
     QItemSelectionModel* selectionModel = tbl->selectionModel();
@@ -128,7 +128,7 @@ void DlgDeptMgr::accept()
 
 void DlgDeptMgr::on_btnSearch_clicked()
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     QTableWidget* tbl = ui->tblList;
     QString name = ui->txtSearch->text().trimmed();

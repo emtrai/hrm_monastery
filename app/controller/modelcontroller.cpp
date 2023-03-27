@@ -21,29 +21,29 @@ ModelController::ModelController():
     mEnableCache(true),
     mReloadDb(false)
 {
-    traced;
+    tracein;
     mCacheItemList.clear();
-    tracede;
+    traceout;
 }
 
 ModelController::~ModelController()
 {
-    traced;
+    tracein;
     clearCacheItemList();
-    tracede;
+    traceout;
 }
 
 ModelController::ModelController(const QString& name):ModelController()
 {
-    traced;
+    tracein;
     mName = name;
     logd("construct with name=%s", STR2CHA(name));
-    tracede;
+    traceout;
 }
 
 void ModelController::init()
 {
-    traced;
+    tracein;
 
     logd("Register signal/slots");
     QObject::connect(this, SIGNAL(dataUpdate()), this, SLOT(onModelControllerDataUpdated()));
@@ -52,7 +52,7 @@ void ModelController::init()
     if (hdl) {
         hdl->addListener(this);
     }
-    tracede;
+    traceout;
 }
 
 QString ModelController::getName()
@@ -62,7 +62,7 @@ QString ModelController::getName()
 
 DbModelHandler *ModelController::getModelHandler()
 {
-    traced;
+    tracein;
     logd("Get model handler for controller using name: %s", STR2CHA(mName));
     // TODO: fix me if this is not suitble
     return DB->getModelHandler(getName());
@@ -70,7 +70,7 @@ DbModelHandler *ModelController::getModelHandler()
 
 void ModelController::addListener(OnModelControllerListener *listener)
 {
-    traced;
+    tracein;
     if (listener) {
         if (!mListeners.contains(listener)) {
             logd("Add listener '%s'", STR2CHA(listener->getName()));
@@ -81,24 +81,24 @@ void ModelController::addListener(OnModelControllerListener *listener)
     } else {
         loge("Invalid listener");
     }
-    tracede;
+    traceout;
 }
 
 void ModelController::delListener(OnModelControllerListener *listener)
 {
-    traced;
+    tracein;
     if (listener) {
         logd("Remove listener '%s'", STR2CHA(listener->getName()));
         mListeners.removeOne(listener);
     } else {
         loge("Invalid listener");
     }
-    tracede;
+    traceout;
 }
 
 QList<DbModel *> ModelController::getAllItemsFromDb(qint64 status, int from, int noItems, int* total, ErrCode* ret)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     DbModelHandler* hdl = nullptr;
     DbModelBuilder builder = nullptr;
@@ -128,13 +128,13 @@ QList<DbModel *> ModelController::getAllItemsFromDb(qint64 status, int from, int
         *ret = err;
     }
     logd("item counter = %lld", list.size());
-    tracede;
+    traceout;
     return list; // caller must free data after use, to avoid memory leakage
 }
 
 QList<DbModel *> ModelController::getAllItems(bool readFromDb, int from, int noItems, int *total)
 {
-    traced;
+    tracein;
     logd("reload %d", readFromDb);
     logd("from %d", from);
     logd("noItems %d", noItems);
@@ -183,7 +183,7 @@ QList<DbModel *> ModelController::getAllItems(bool readFromDb, int from, int noI
         list = getAllItemsFromDb(DB_RECORD_ACTIVE, from, noItems, total, &err);
     }
     logd("got %lld item", list.size());
-    tracede;
+    traceout;
     return list;
 }
 
@@ -206,7 +206,7 @@ const QString ModelController::exportHtmlPrebuiltTemplateName() const
 
 DbModel *ModelController::getModelByUid(const QString &uid)
 {
-    traced;
+    tracein;
     DbModel* model = nullptr;
     if (!uid.isEmpty()) {
         logd("get model by uid '%s'", STR2CHA(uid));
@@ -243,7 +243,7 @@ DbModel *ModelController::getModelByUid(const QString &uid)
         loge("request data from empty uid, seem something wrong");
     }
 
-    tracede;
+    traceout;
     return model;
 }
 
@@ -253,7 +253,7 @@ ErrCode ModelController::search(const QString &keyword, QList<DbModel *> *outLis
                             int* total)
 {
     ErrCode ret = ErrNone;
-    traced;
+    tracein;
     DbModelHandler *hdl = getModelHandler();
     if (hdl != nullptr) {
         ret = hdl->search(keyword, outList, DB_RECORD_ACTIVE, from, noItems, total);
@@ -263,13 +263,13 @@ ErrCode ModelController::search(const QString &keyword, QList<DbModel *> *outLis
         // TODO: should throw exception???
     }
 
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
 DbModel *ModelController::getModelByUidFromDb(const QString &uid)
 {
-    traced;
+    tracein;
     DbModel* model = nullptr;
     DbModelHandler *hdl = getModelHandler();
     logd("uid %s", uid.toStdString().c_str());
@@ -281,13 +281,13 @@ DbModel *ModelController::getModelByUidFromDb(const QString &uid)
         // TODO: should throw exception???
     }
 
-    tracede;
+    traceout;
     return model;
 }
 
 DbModel *ModelController::getModelByNameId(const QString &nameId)
 {
-    traced;
+    tracein;
     DbModel* model = nullptr;
     if (!nameId.isEmpty()) {
         logd("get model by name id '%s'", STR2CHA(nameId));
@@ -327,13 +327,13 @@ DbModel *ModelController::getModelByNameId(const QString &nameId)
         loge("request data from empty name, seem something wrong");
     }
 
-    tracede;
+    traceout;
     return model;
 }
 
 DbModel *ModelController::getModelByNameIdFromDb(const QString &nameId)
 {
-    traced;
+    tracein;
     logd("get model from name id '%s", STR2CHA(nameId));
     DbModel* model = nullptr;
     DbModelHandler *hdl = getModelHandler();
@@ -346,7 +346,7 @@ DbModel *ModelController::getModelByNameIdFromDb(const QString &nameId)
         // TODO: should throw exception???
     }
 
-    tracede;
+    traceout;
     return model;
 
 }
@@ -354,25 +354,25 @@ DbModel *ModelController::getModelByNameIdFromDb(const QString &nameId)
 ErrCode ModelController::importFromFile(const QString &importName, ImportType type,
                                         const QString &fpath, QList<DbModel *> *outList)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     logd("Import name '%s'", STR2CHA(importName));
     logd("Import fpath '%s'", STR2CHA(fpath));
     logd("ImportType %d", type);
     ret = ImportFactory::importFrom(importName, this, fpath,type, outList);
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
 void ModelController::clearCacheItemList()
 {
-    traced;
+    tracein;
     logd("clear %lld item in cache", mCacheItemList.size());
     foreach(DbModel* item, mCacheItemList.values()) {
         if (item) delete item;
     }
     mCacheItemList.clear();
-    tracede;
+    traceout;
 }
 
 ErrCode ModelController::filter(int fieldId,
@@ -385,7 +385,7 @@ ErrCode ModelController::filter(int fieldId,
                                int* total)
 {
     ErrCode ret = ErrNone;
-    traced;
+    tracein;
     DbModelHandler *hdl = getModelHandler();
     if (hdl != nullptr) {
         ret = hdl->filter(fieldId, opFlags, keywords, targetModelName, outList, DB_RECORD_ACTIVE, from, noItems, total);
@@ -394,13 +394,13 @@ ErrCode ModelController::filter(int fieldId,
         ret = ErrNoHandler;
     }
 
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
 ErrCode ModelController::getUidListFromName(const QString &name, QHash<QString, QString> *list, const char *hdlName)
 {
-    traced;
+    tracein;
     DbModelHandler* hdlr = nullptr;
     ErrCode ret = ErrNone;
     if (name.isEmpty()) {
@@ -451,13 +451,13 @@ ErrCode ModelController::getUidListFromName(const QString &name, QHash<QString, 
         }
     }
 
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
 QString ModelController::getNameFromUidList(const QStringList &uidList, const char *hdlName)
 {
-    traced;
+    tracein;
     DbModelHandler* hdlr = nullptr;
     ErrCode ret = ErrNone;
     QString name;
@@ -506,13 +506,13 @@ QString ModelController::getNameFromUidList(const QStringList &uidList, const ch
         loge("get name list for uid '%s' failed or no data, ret=%d",
              STR2CHA(uidList.join(NAME_SPLIT)), ret);
     }
-    tracedr(ret);
+    traceret(ret);
     return name;
 }
 
 QString ModelController::getNameFromUidList(const QString &uidList, const char *hdlName)
 {
-    traced;
+    tracein;
     logd("get name from uid '%s'", STR2CHA(uidList));
     return getNameFromUidList(uidList.split(NAME_SPLIT), hdlName);
 
@@ -520,14 +520,14 @@ QString ModelController::getNameFromUidList(const QString &uidList, const char *
 
 const char *ModelController::getPrebuiltFileName()
 {
-    traced;
+    tracein;
     return nullptr;
 
 }
 
 const char *ModelController::getPrebuiltFileType()
 {
-    traced;
+    tracein;
     return KFileTypeCSV; // default one
 }
 
@@ -536,7 +536,7 @@ const char *ModelController::getPrebuiltFileType()
 ErrCode ModelController::parsePrebuiltFile(const QString &fpath, const QString &ftype)
 {
     ErrCode ret = ErrNone;
-    traced;
+    tracein;
     // TODO: should we add meta field in beginning of file to know status of information???
     // i.e.: version, last update time.
     // This can be used to check/compare witl one stored in db
@@ -625,28 +625,28 @@ ErrCode ModelController::parsePrebuiltFile(const QString &fpath, const QString &
             ret = ErrNotSupport;
         }
     }
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
 void ModelController::onDbModelHandlerDataUpdate(DbModel *model, int type, ErrCode err)
 {
-    traced;
+    tracein;
     reloadDb();
     emit dataUpdate();
-    tracede;
+    traceout;
 }
 
 void ModelController::reloadDb()
 {
-    traced;
+    tracein;
     mReloadDb = true;
     // TODO: notify/emit event???
-    tracede;
+    traceout;
 }
 ErrCode ModelController::check2UpdateDbFromPrebuiltFile(const QString &name, const QString &ftype)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     QString fpath;
     logd("check update for '%s', ftype '%s'", STR2CHA(name), STR2CHA(ftype));
@@ -677,13 +677,13 @@ ErrCode ModelController::check2UpdateDbFromPrebuiltFile(const QString &name, con
             logi("Prebuilt saint file up-to-date");
         }
     }
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
 ErrCode ModelController::check2UpdateDbFromPrebuiltFile()
 {
-    traced;
+    tracein;
     logd("check 2 update for controller %s", mName.toStdString().c_str());
     ErrCode ret = ErrNone;
     QString fname = getPrebuiltFileName();
@@ -694,13 +694,13 @@ ErrCode ModelController::check2UpdateDbFromPrebuiltFile()
     } else {
         logi("Not load from prebuilt file, no prebuilt filename");
     }
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
 ErrCode ModelController::doCsvParseOneItem(const QStringList &items, void *param)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     (void) param;
     if (!items.empty()) {
@@ -726,7 +726,7 @@ ErrCode ModelController::doCsvParseOneItem(const QStringList &items, void *param
 
 DbModel *ModelController::onJsonParseOneItem(const QJsonObject &jobj, bool *ok)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     DbModel* model = allocMainModel();
     if (!model) {
@@ -740,13 +740,13 @@ DbModel *ModelController::onJsonParseOneItem(const QJsonObject &jobj, bool *ok)
     }
     logd("Parse result %d", err);
     if (ok) *ok = (err == ErrNone);
-    tracede;
+    traceout;
     return model;
 }
 
 ErrCode ModelController::onCsvParseOneItemCallback(const QStringList &items, void* caller, void *param, quint32 idx)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrFailed;
     if (caller != nullptr){
         ret = ((ModelController*)caller)->doCsvParseOneItem(items, param);
@@ -756,17 +756,17 @@ ErrCode ModelController::onCsvParseOneItemCallback(const QStringList &items, voi
 
 void ModelController::onModelControllerDataUpdated()
 {
-    traced;
+    tracein;
     foreach (OnModelControllerListener* listener, mListeners) {
         if (listener) {
             listener->onModelControllerDataUpdated();
         }
     }
-    tracede;
+    traceout;
 }
 
 ErrCode ModelController::onLoad(){
-    traced;
+    tracein;
     logd("Onload %s", mName.toStdString().c_str());
     ErrCode ret = ErrNone;
     ret = check2UpdateDbFromPrebuiltFile();
@@ -775,14 +775,14 @@ ErrCode ModelController::onLoad(){
         loge("Check & updaet db from prebuild failed, ret=%d", ret);
     }
 
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
 
 ErrCode ModelController::insertModelToCache(DbModel* model, bool clone)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     if (!model) {
         err = ErrInvalidData;
@@ -820,14 +820,14 @@ ErrCode ModelController::insertModelToCache(DbModel* model, bool clone)
             err = saveModel?ErrInvalidData:ErrNoMemory;
         }
     }
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 
 const QString ModelController::exportTemplatePath(FileExporter *exporter, QString* ftype) const
 {
-    traced;
+    tracein;
     QString fpath;
     QString templateName;
     ErrCode err = ErrNone;
@@ -863,13 +863,13 @@ const QString ModelController::exportTemplatePath(FileExporter *exporter, QStrin
         }
     }
     logd("fpath '%s'", STR2CHA(fpath));
-    tracede;
+    traceout;
     return fpath;
 }
 
 ErrCode ModelController::getExportFileName(ExportType type, QString fnameNoExt, QString *fpath)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     QString ext;
     QString fname;
@@ -891,13 +891,13 @@ ErrCode ModelController::getExportFileName(ExportType type, QString fnameNoExt, 
             *fpath = FileCtl::getTmpDataDir(fname);
         }
     }
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
 ErrCode ModelController::getExportDataString(const QString &item, const DbModel *data, QString *exportData) const
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     logd("item '%s'", STR2CHA(item));
     if (!data || !exportData || item.isEmpty()) {
@@ -909,13 +909,13 @@ ErrCode ModelController::getExportDataString(const QString &item, const DbModel 
         err = data->getExportDataString(item, exportData);
     }
     logd("Expoted data '%s", exportData?STR2CHA((*exportData)):"(null)");
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 ErrCode ModelController::exportToFile(DbModel *model, ExportType type, QString *fpath)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     logi("Export model '%s' to file, type %d",
          model?STR2CHA(model->toString()):"(unknown)", type);
@@ -934,13 +934,13 @@ ErrCode ModelController::exportToFile(DbModel *model, ExportType type, QString *
                                       *fpath, type);
     }
     // TODO: DbModel also has this function, redundant?????
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
 ErrCode ModelController::exportToFile(const QList<DbModel *>* listModel, ExportType type, QString *fpath)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     if (!listModel) {
         ret = ErrInvalidArg;
@@ -955,15 +955,15 @@ ErrCode ModelController::exportToFile(const QList<DbModel *>* listModel, ExportT
                                       *fpath, type);
     }
     // TODO: DbModel also has this function, redundant?????
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
 
-ErrCode ModelController::onImportDataItem(const QString& importName, int importFileType,
+ErrCode ModelController::onImportParseDataItem(const QString& importName, int importFileType,
                                 const QStringList &items, quint32 idx, QList<DbModel *>* outList)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     DbModel* model = doImportOneItem(importName, importFileType, items, idx);
     if (model != nullptr) {
@@ -978,16 +978,16 @@ ErrCode ModelController::onImportDataItem(const QString& importName, int importF
         // be ware the case that fist item is header!!
     }
     // TODO: handle error case
-    tracedr(ret);
+    traceret(ret);
     return ret;
 
 
 }
 
-ErrCode ModelController::onImportDataItem(const QString& importName, int importFileType,
+ErrCode ModelController::onImportParseDataItem(const QString& importName, int importFileType,
                                 const QHash<QString, QString> &items, quint32 idx, QList<DbModel *>* outList)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     DbModel* model = doImportOneItem(importName, importFileType, items, idx);
     if (model != nullptr) {
@@ -1002,7 +1002,7 @@ ErrCode ModelController::onImportDataItem(const QString& importName, int importF
         // be ware the case that fist item is header!!
     }
     // TODO: handle error case
-    tracedr(ret);
+    traceret(ret);
     return ret;
 
 }
@@ -1010,7 +1010,7 @@ ErrCode ModelController::onImportDataItem(const QString& importName, int importF
 
 DbModel* ModelController::doImportOneItem(const QString& importName, int importFileType, const QStringList &items, quint32 idx)
 {
-    traced;
+    tracein;
     loge("DEFAULT doImportOneItem, MUST BE IMPLEMENTED IN DERIVED CLASS");
     FAIL("DEFAULT doImportOneItem, MUST BE IMPLEMENTED IN DERIVED CLASS");
     // TODO: make it abstract????
@@ -1019,7 +1019,7 @@ DbModel* ModelController::doImportOneItem(const QString& importName, int importF
 
 DbModel *ModelController::doImportOneItem(const QString& importName, int importFileType, const QHash<QString, QString> &items, quint32 idx)
 {
-    traced;
+    tracein;
     loge("DEFAULT doImportOneItem, MUST BE IMPLEMENTED IN DERIVED CLASS");
     FAIL("DEFAULT doImportOneItem, MUST BE IMPLEMENTED IN DERIVED CLASS");
     // TODO: make it abstract????
@@ -1028,7 +1028,7 @@ DbModel *ModelController::doImportOneItem(const QString& importName, int importF
 
 DbModel* ModelController::allocMainModel()
 {
-    traced;
+    tracein;
     DbModel* model = NULL;
     DbModelBuilder builder = getMainBuilder();
     if (builder) {
@@ -1039,14 +1039,14 @@ DbModel* ModelController::allocMainModel()
     } else {
         loge("No main builder");
     }
-    tracede;
+    traceout;
     return model;
 }
 
 // default format: name id, name, remark
 DbModel *ModelController::buildModel(void *items, const QString &fmt)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     DbModel* item = nullptr;
     QStringList* itemList = nullptr;
@@ -1116,6 +1116,6 @@ DbModel *ModelController::buildModel(void *items, const QString &fmt)
             item = nullptr;
         }
     }
-    tracede;
+    traceout;
     return item;
 }

@@ -58,9 +58,9 @@ protected:
     Community(const Community& obj);
 public:
     virtual ~Community();
-    virtual void clone(const DbModel* per);
+    virtual void clone(const DbModel* model);
 
-    virtual DbModelBuilder getBuilder();
+    virtual DbModelBuilder getBuilder() const;
     virtual void initExportFields();
     virtual void initImportFields();
 
@@ -214,7 +214,7 @@ private:
 
     QString mAreaUid;
     qint64 mAreaDbId;
-    QString mAreaNameId;
+    QString mAreaNameId; // just for display, not store in db of community
     QString mAreaName; // just for display, not store in db of community
 
     QString mCurrentCEOName; // full name

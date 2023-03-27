@@ -30,7 +30,7 @@ UIItemButton::UIItemButton(QWidget *parent)
 }
 UIItemButton::~UIItemButton()
 {
-    traced;
+    tracein;
 }
 
 const QVariant &UIItemButton::value() const
@@ -46,6 +46,6 @@ void UIItemButton::setValue(const QVariant &newValue)
 
 void UIItemButton::reEmitClick()
 {
-    traced;
+    tracein;
     emit clicked(this, mValue);
 }

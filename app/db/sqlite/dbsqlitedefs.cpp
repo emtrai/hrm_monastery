@@ -35,7 +35,7 @@ static QMap<QString, QString> s_itemFieldMap;
 
 static void initFieldMap()
 {
-    traced;
+    tracein;
     logd("s_fieldMapInit %d", s_fieldMapInit);
     if (!s_fieldMapInit) {
         logd("Init field map");
@@ -53,13 +53,13 @@ static void initFieldMap()
         s_fieldMapInit = true;
     }
 
-    tracede;
+    traceout;
 }
 
 
 static void initItemFieldMap()
 {
-    traced;
+    tracein;
     logd("s_itemFieldMapInit %d", s_itemFieldMapInit);
     if (!s_itemFieldMapInit) {
         logd("Init item field map");
@@ -69,7 +69,7 @@ static void initItemFieldMap()
         s_fieldMapInit = true;
     }
 
-    tracede;
+    traceout;
 }
 
 QString getDateTypeString(TableFieldDatatype_t dataType){

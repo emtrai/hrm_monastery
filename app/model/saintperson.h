@@ -31,7 +31,7 @@ class SaintPerson : public DbModel
 public:
     SaintPerson();
     static DbModel* build();
-    virtual DbModelBuilder getBuilder();
+    virtual DbModelBuilder getBuilder() const;
     virtual QString buildUid(const QString* seed = nullptr);
 
     virtual QString modelName() const;

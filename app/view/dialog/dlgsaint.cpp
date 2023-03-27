@@ -57,7 +57,7 @@ DlgSaint::~DlgSaint()
 
 void DlgSaint::accept()
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     QString warning;
     QString name = ui->txtName->text().trimmed();

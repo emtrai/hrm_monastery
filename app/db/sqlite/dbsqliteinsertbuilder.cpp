@@ -102,7 +102,7 @@ DbSqliteInsertBuilder *DbSqliteInsertBuilder::build(const QString &tblName)
 DbSqliteInsertBuilder *DbSqliteInsertBuilder::addValue(
     const QString &name, const QString &value)
 {
-    traced;
+    tracein;
     logd("tble %s", mName.toStdString().c_str());
     if (!value.isEmpty()) {
         logd("addValue %s: %s", name.toStdString().c_str(), value.toStdString().c_str());
@@ -119,7 +119,7 @@ DbSqliteInsertBuilder *DbSqliteInsertBuilder::addValue(
 DbSqliteInsertBuilder *DbSqliteInsertBuilder::addValue(
     const QString &name, qint32 value)
 {
-    traced;
+    tracein;
     logd("addValue %s: %d", name.toStdString().c_str(), value);
     mFields.append(new TableInsertItem(name, value));
 
@@ -130,7 +130,7 @@ QString DbSqliteInsertBuilder::buildSqlStatement(const QString* cond)
 {
     QString fields;
     QString values;
-    traced;
+    tracein;
     foreach( TableInsertItem* item, mFields )
     {
         fields += item->name() + ",";
@@ -178,7 +178,7 @@ QSqlQuery* DbSqliteInsertBuilder::buildSqlQuery(const QString *cond)
 {
     QString fields;
     QString values;
-    traced;
+    tracein;
     foreach( TableInsertItem* item, mFields )
     {
         fields += item->name() + ",";

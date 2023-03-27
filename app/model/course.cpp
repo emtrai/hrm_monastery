@@ -31,7 +31,7 @@
 
 const QHash<int, QString> *Course::getCourseTypeNameMap()
 {
-    traced;
+    tracein;
     static bool isInited = false;
     static QHash<int, QString> map;
     if (!isInited) {
@@ -40,7 +40,7 @@ const QHash<int, QString> *Course::getCourseTypeNameMap()
         map.insert(COURSE_TYPE_OTHERS, QObject::tr("Khác"));
         isInited = true;
     }
-    tracede;
+    traceout;
     return &map;
 }
 
@@ -48,7 +48,7 @@ QString Course::courseType2Name(CourseType type)
 {
     const QHash<int, QString>* courseMap = getCourseTypeNameMap();
     QString ret;
-    traced;
+    tracein;
     logd("type %d", type);
     if (courseMap->contains(type)){
         ret = courseMap->value(type);
@@ -56,7 +56,7 @@ QString Course::courseType2Name(CourseType type)
         loge("invalid type %d", type);
         ret = QObject::tr("Không rõ"); // TODO: translate???
     }
-    tracede;
+    traceout;
     return ret;
 }
 
@@ -65,17 +65,17 @@ Course::Course():
     mEndDate(0),
     mCourseType(COURSE_TYPE_MAX)
 {
-    traced;
+    tracein;
 }
 
 Course::~Course()
 {
-    traced;
+    tracein;
 }
 
 DbModel *Course::build()
 {
-    traced;
+    tracein;
     Course* model = new Course();
     model->init();
     return model;
@@ -84,14 +84,14 @@ DbModel *Course::build()
 
 void Course::clone(const DbModel *model)
 {
-    traced;
+    tracein;
     DbModel::clone(model);
     Course* course = (Course*)model;
     setCourseType(course->courseType());
-    tracede;
+    traceout;
 }
 
-DbModelBuilder Course::getBuilder()
+DbModelBuilder Course::getBuilder() const
 {
     return &Course::build;
 }

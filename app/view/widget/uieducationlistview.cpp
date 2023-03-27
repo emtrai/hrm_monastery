@@ -32,12 +32,12 @@
 UIEducationListView::UIEducationListView(QWidget *parent):
     UICommonListView(parent)
 {
-    traced;
+    tracein;
 }
 
 UIEducationListView::~UIEducationListView()
 {
-    traced;
+    tracein;
 }
 
 ModelController *UIEducationListView::getController()

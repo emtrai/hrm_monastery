@@ -39,21 +39,21 @@ DbModel *Saint::build()
     return model;
 }
 
-DbModelBuilder Saint::getBuilder()
+DbModelBuilder Saint::getBuilder() const
 {
     return &Saint::build;
 }
 
 void Saint::init()
 {
-    traced;
+    tracein;
     initImportFields();
 }
 
 
 void Saint::initImportFields()
 {
-    traced;
+    tracein;
     // TODO: check fields like holly name, country, etc. and mark invalid field???
 
     mImportCallbacks.insert(KItemUid, [this](const QString& value){
@@ -94,11 +94,11 @@ Saint::Saint(): DbModel()
     mFeastDay = 0;
 }
 
-ErrCode Saint::onImportDataItem(const QString& importName, int importFileType,
+ErrCode Saint::onImportParseDataItem(const QString& importName, int importFileType,
                             const QString &keyword, const QString &value, quint32 idx,
                             QList<DbModel *>* outList)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     logd("importFileType %d", importFileType);
 
@@ -109,7 +109,7 @@ ErrCode Saint::onImportDataItem(const QString& importName, int importFileType,
         if (func != nullptr) ret = func(value);
     }
 
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
@@ -166,7 +166,7 @@ void Saint::setFullName(const QString &newFullName)
 
 void Saint::dump()
 {
-    traced;
+    tracein;
     DbModel::dump();
 #ifdef DEBUG_TRACE
     logd("- feastday: %d", (int)feastDay());
@@ -232,7 +232,7 @@ void Saint::setCountryUid(const QString &newCountryUid)
 
 //ErrCode Saint::save()
 //{
-//    traced;
+//    tracein;
 //    ErrCode ret = ErrNone;
 //    IDbSaint* dbSaint = DbCtl::getInstance()->dbSaint();
 //    if (dbSaint != nullptr){

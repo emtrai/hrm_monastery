@@ -36,10 +36,11 @@
 
 GET_INSTANCE_IMPL(DbSqliteCommunity)
 
+#define MAX_CHECK_DUP_TIME 1024
 
 DbSqliteCommunity::DbSqliteCommunity():DbSqliteModelHandler(KModelHdlCommunity)
 {
-    traced;
+    tracein;
 }
 
 DbSqliteTbl *DbSqliteCommunity::getMainTbl()
@@ -49,7 +50,7 @@ DbSqliteTbl *DbSqliteCommunity::getMainTbl()
 
 DbSqliteTbl *DbSqliteCommunity::getTable(const QString &modelName)
 {
-    traced;
+    tracein;
     DbSqliteTbl* tbl = nullptr;
     logd("modelname '%s'", STR2CHA(modelName));
     if (modelName.isEmpty() || modelName == KModelNameCommunity) {
@@ -61,7 +62,7 @@ DbSqliteTbl *DbSqliteCommunity::getTable(const QString &modelName)
     } else { // TODO: check & implement more??
         loge("unsupport model name '%s'", STR2CHA(modelName));
     }
-    tracede;
+    traceout;
     return tbl;
 }
 
@@ -72,9 +73,10 @@ DbModelBuilder DbSqliteCommunity::getMainBuilder()
 
 ErrCode DbSqliteCommunity::add(DbModel *model, bool notify)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     DbModelHandler* hdlDept = nullptr;
+    DbModelHandler* hdlCommDept = nullptr;
     if (!model) {
         err = ErrInvalidArg;
         loge("invalid argument");
@@ -92,25 +94,58 @@ ErrCode DbSqliteCommunity::add(DbModel *model, bool notify)
             loge("not found dept handler");
         }
     }
+    if (err == ErrNone) {
+        hdlCommDept = DbSqlite::handler(KModelHdlCommDept);
+        if (!hdlCommDept) {
+            err = ErrNoHandler;
+            loge("not found comm dept handler");
+        }
+    }
     // Add management dept to community so that we can add comminity's manager to
     if (err == ErrNone) {
+
         logd("Check to add management dept for community");
         // TODO: FIXME we're trying to fix management name id with this, but trouble
         // if it's not in json prebuilt file... TAKE CARE
         DbModel* dept = hdlDept->getByNameId(KManagementDeptNameId);
         if (dept) {
-            CommunityDept* commdept = (CommunityDept*)CommunityDept::build();
-            if (commdept) {
-                commdept->setCommunityUid(model->uid());
-                commdept->setDepartmentUid(dept->uid());
-                commdept->setStatus(MODEL_ACTIVE);
-                logi("Add dept '%s' to community '%s'", STR2CHA(dept->toString()), STR2CHA(model->toString()));
-                err = commdept->save();
-                delete commdept;
-                logd("add result=%d", err);
-            } else {
-                err = ErrNoMemory;
-                loge("no memory");
+            QString nameId;
+            int i = 0;
+            for (; i < MAX_CHECK_DUP_TIME; i++) {
+                // TODO: search if comm & dept mapping existed???
+                nameId = QString("%1_%2").arg(model->nameId(), dept->nameId());
+                if (i > 0) {
+                    nameId += QString("_%1").arg(i);
+                }
+                if (!hdlCommDept->isNameidExist(nameId)) {
+                    logd("not found name id '%s'", STR2CHA(nameId));
+                    break;
+                } else {
+                    logi("Name id '%s' existed", STR2CHA(nameId));
+                    nameId.clear();
+                }
+            }
+            if (i >= MAX_CHECK_DUP_TIME || nameId.isEmpty()) {
+                err = ErrExisted;
+                logd("not found any suitable nameid, tried %d time", i);
+            }
+            if (err == ErrNone) {
+                logd("Add mapping comm vs dept with nameid '%s'", STR2CHA(nameId));
+                CommunityDept* commdept = (CommunityDept*)CommunityDept::build();
+                if (commdept) {
+                    commdept->setNameId(nameId);
+                    commdept->setCommunityUid(model->uid());
+                    commdept->setDepartmentUid(dept->uid());
+                    commdept->setName(dept->name());
+                    commdept->setStatus(MODEL_ACTIVE);
+                    logi("Add dept '%s' to community '%s'", STR2CHA(dept->toString()), STR2CHA(model->toString()));
+                    err = commdept->save();
+                    delete commdept;
+                    logd("add result=%d", err);
+                } else {
+                    err = ErrNoMemory;
+                    loge("no memory");
+                }
             }
             delete dept;
         } else {
@@ -123,13 +158,13 @@ ErrCode DbSqliteCommunity::add(DbModel *model, bool notify)
         notifyDataChange(model, DBMODEL_CHANGE_ADD, err);
     }
 
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 ErrCode DbSqliteCommunity::deleteHard(DbModel *model, bool force, QString *msg)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     if (!model) {
         err = ErrInvalidArg;
@@ -163,15 +198,15 @@ ErrCode DbSqliteCommunity::deleteHard(DbModel *model, bool force, QString *msg)
             }
         }
     }
-    tracede;
+    traceout;
     return err;
 
 }
 
 
-QList<DbModel *> DbSqliteCommunity::getListPerson(const QString &commUid)
+QList<DbModel *> DbSqliteCommunity::getListPerson(const QString &commUid, int modelStatus, const QString* perStatusUid)
 {
-    traced;
+    tracein;
     QList<DbModel *> list;
     logd("get list person of uid '%s'", STR2CHA(commUid));
     if(!commUid.isEmpty()) {
@@ -180,14 +215,14 @@ QList<DbModel *> DbSqliteCommunity::getListPerson(const QString &commUid)
         // RISK OF INCONSITANT!!!!!!!
         DbSqliteCommunityPersonTbl* tbl = (DbSqliteCommunityPersonTbl*)DbSqlite::table(KTableCommPerson);
         if (tbl) {
-            list = tbl->getListPerson(commUid);
+            list = tbl->getListPerson(commUid, modelStatus, perStatusUid);
         } else {
             THROWEX("Not found table '%s'", KTableCommPerson);
         }
     } else {
         loge("invalid commUid '%s'", STR2CHA(commUid));
     }
-    tracede;
+    traceout;
     return list;
 }
 
@@ -197,7 +232,7 @@ ErrCode DbSqliteCommunity::addPerson2Community(const Community *comm,
                                                const QString &remark,
                                                bool notify)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     logd("Build map object");
 
@@ -242,7 +277,7 @@ ErrCode DbSqliteCommunity::addPerson2Community(const Community *comm,
         logd("notify comm '%s' for change", STR2CHA(comm->toString()));
         notifyDataChange((DbModel*)comm, DBMODEL_CHANGE_UPDATE, err);
     }
-    tracedr(err);
+    traceret(err);
     return err;
 }
 

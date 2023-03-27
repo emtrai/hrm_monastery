@@ -32,23 +32,23 @@ DbSqliteDeleteBuilder *DbSqliteDeleteBuilder::build(const QString &tblName)
 
 DbSqliteDeleteBuilder *DbSqliteDeleteBuilder::addCond(const QString &field, const QString &value, int dataType)
 {
-    traced;
+    tracein;
     logd("add field %s, value %s", field.toStdString().c_str(), value.toStdString().c_str());
     if (!mCondition.contains(field)) {
         mCondition.insert(field, FieldValue(value, dataType));
     } else {
         logi("Field %s already exist", field.toStdString().c_str());
     }
-    tracede;
+    traceout;
     return this;
 }
 
 QSqlQuery *DbSqliteDeleteBuilder::buildSqlQuery(const QString *cond)
 {
-    traced;
+    tracein;
     QString conds;
     QString values;
-    traced;
+    tracein;
 
     foreach( QString field, mCondition.keys() )
     {
@@ -84,5 +84,5 @@ QSqlQuery *DbSqliteDeleteBuilder::buildSqlQuery(const QString *cond)
 DbSqliteDeleteBuilder::DbSqliteDeleteBuilder(const QString& name):
     mName(name)
 {
-    traced;
+    tracein;
 }

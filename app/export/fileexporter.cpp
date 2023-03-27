@@ -27,12 +27,12 @@
 
 FileExporter::FileExporter()
 {
-    traced;
+    tracein;
 }
 
 ErrCode FileExporter::saveTo(const DataExporter* exporter, const QString &fpath)
 {
-    traced;
+    tracein;
     loge("Not support export here");
     ASSERT(false, "CAN NOT EXPORT HERE, MUST BE IMPLEMENTED BY DERIVED CLASS");
     return ErrNotSupport;
@@ -40,7 +40,7 @@ ErrCode FileExporter::saveTo(const DataExporter* exporter, const QString &fpath)
 
 ErrCode FileExporter::saveTo(const DataExporter* exporter, const QList<DbModel*> data, const QString &fpath)
 {
-    traced;
+    tracein;
     loge("Not support export list here");
     ASSERT(false, "CAN NOT EXPORT LIST HERE, MUST BE IMPLEMENTED BY DERIVED CLASS");
     return ErrNotSupport;

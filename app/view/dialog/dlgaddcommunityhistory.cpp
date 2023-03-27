@@ -56,7 +56,7 @@ DlgAddCommunityHistory::~DlgAddCommunityHistory()
 const Community *DlgAddCommunityHistory::getCommunity()
 {
     Community* com = nullptr;
-    traced;
+    tracein;
     logd("Reload provine of %s", ui->cbCommunity->currentText().toStdString().c_str());
     int index = ui->cbCommunity->findText(ui->cbCommunity->currentText());
     logd("index %d", index);
@@ -80,7 +80,7 @@ QString DlgAddCommunityHistory::getRemark()
 
 void DlgAddCommunityHistory::showEvent(QShowEvent *event)
 {
-    traced;
+    tracein;
     QDialog::showEvent(event);
 //    ui->buttonBox->button(QDialogButtonBox::Ok)->setDefault(false);
 
@@ -88,7 +88,7 @@ void DlgAddCommunityHistory::showEvent(QShowEvent *event)
 
 void DlgAddCommunityHistory::accept()
 {
-    traced;
+    tracein;
     QString warning;
     if (getDate() == 0) {
         logd("Invalid date, show warning");

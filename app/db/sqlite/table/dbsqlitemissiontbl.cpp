@@ -40,30 +40,30 @@ DbSqliteMissionTbl::DbSqliteMissionTbl(): DbSqliteMissionTbl(nullptr)
 DbSqliteMissionTbl::DbSqliteMissionTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableMission, KTableMission, KVersionCode)
 {
-    traced;
+    tracein;
 }
 
 void DbSqliteMissionTbl::addTableField(DbSqliteTableBuilder *builder)
 {
-    traced;
+    tracein;
     DbSqliteTbl::addTableField(builder);
 }
 
 ErrCode DbSqliteMissionTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
 {
-    traced;
+    tracein;
     DbSqliteTbl::insertTableField(builder, item);
     // TODO: remark field???
-    tracede;
+    traceout;
     return ErrNone;
 }
 
 ErrCode DbSqliteMissionTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     err = DbSqliteTbl::updateModelFromQuery(item, qry);
-    tracede;
+    traceout;
     return err;
 }
 

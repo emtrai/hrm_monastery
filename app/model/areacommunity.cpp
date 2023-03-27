@@ -31,7 +31,7 @@
 
 AreaCommunity::AreaCommunity()
 {
-    traced;
+    tracein;
 }
 
 DbModel *AreaCommunity::build()
@@ -41,7 +41,7 @@ DbModel *AreaCommunity::build()
     return item;
 }
 
-DbModelBuilder AreaCommunity::getBuilder()
+DbModelBuilder AreaCommunity::getBuilder() const
 {
     return &AreaCommunity::build;
 }

@@ -42,7 +42,7 @@ DbSqliteCourseTbl::DbSqliteCourseTbl(DbSqlite* db)
 
 void DbSqliteCourseTbl::addTableField(DbSqliteTableBuilder *builder)
 {
-    traced;
+    tracein;
     DbSqliteTbl::addTableField(builder);
     builder->addField(KFieldPeriod, TEXT);
     builder->addField(KFieldStartDate, INT64);
@@ -52,20 +52,20 @@ void DbSqliteCourseTbl::addTableField(DbSqliteTableBuilder *builder)
 
 ErrCode DbSqliteCourseTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
 {
-    traced;
+    tracein;
     DbSqliteTbl::insertTableField(builder, item); // TODO: handle error code
     Course* course = (Course*) item;
     builder->addValue(KFieldPeriod, course->name());
     builder->addValue(KFieldStartDate, course->startDate());
     builder->addValue(KFieldEndDate, course->endDate());
     builder->addValue(KFieldCourseType, course->courseType());
-    tracede;
+    traceout;
     return ErrNone;
 }
 
 ErrCode DbSqliteCourseTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     DbSqliteTbl::updateModelFromQuery(item, qry);
     Course* course = (Course*) item;
@@ -73,6 +73,6 @@ ErrCode DbSqliteCourseTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
     course->setEndDate(qry.value(KFieldEndDate).toInt());
     course->setPeriod(qry.value(KFieldPeriod).toString());
     course->setCourseType(qry.value(KFieldCourseType).toInt());
-    tracede;
+    traceout;
     return err;
 }

@@ -41,5 +41,5 @@ DbSqliteRoleTbl::DbSqliteRoleTbl():
 DbSqliteRoleTbl::DbSqliteRoleTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableRole, KTableRole, KVersionCode)
 {
-    traced;
+    tracein;
 }

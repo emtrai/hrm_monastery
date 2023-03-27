@@ -74,7 +74,7 @@ class ModelController;
             static void showOnHtmlViewer(DbModel* model, const QString& subject);
             static void showAddEditCommonModel(bool isSelfUpdate = true, DbModel* model = nullptr,
                                              CommonEditModelListener* listener = nullptr);
-            ErrCode exportListItems(const QList<DbModel*>* items, ModelController* controller,
+            static ErrCode exportListItems(const QList<DbModel*>* items, ModelController* controller,
                                     const QString& title = nullptr,
                                     quint64 exportTypeList = 0 // List of supported export type, bitwise
                                     );
@@ -82,7 +82,7 @@ class ModelController;
      void showEvent(QShowEvent *ev);
  public:
      void switchView(ViewType type, void* data = nullptr);
-     void switchView(BaseView* nextView);
+     void switchView(BaseView* nextView, bool fromStack = false);
      BaseView* getView(ViewType type);
      AppState appState() const;
      void setAppState(AppState newAppState);
@@ -91,8 +91,8 @@ class ModelController;
       * @brief Pop view from stack and show
       * @return true if there is still view exist in stack, false if no more view from stack
       */
-     bool popViewFromStackAndShow();
-     void pushViewToStack(ViewType type);
+     BaseView* popViewFromStackAndShow();
+     void pushViewToStack(BaseView* view);
 
  protected:
 
@@ -155,7 +155,7 @@ class ModelController;
      * Re-design is not good, but follow Agile, we need to make it run first, then improve later,
      * so accept re-design risk
      */
-    QStack<QWidget*> mViewStack;
+    QStack<BaseView*> mViewStack;
 
  signals:
     void load();

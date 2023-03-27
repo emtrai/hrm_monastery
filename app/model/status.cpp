@@ -30,7 +30,7 @@
 
 Status::Status()
 {
-    traced;
+    tracein;
 }
 DbModel *Status::build()
 {
@@ -39,7 +39,7 @@ DbModel *Status::build()
     return model;
 }
 
-DbModelBuilder Status::getBuilder()
+DbModelBuilder Status::getBuilder() const
 {
     return &Status::build;
 }

@@ -34,18 +34,19 @@ UICommonListView::UICommonListView(QWidget *parent):
 
 UICommonListView::~UICommonListView()
 {
-    traced;
+    tracein;
     RELEASE_LIST_DBMODEL(mItemList);
-    tracede;
+    traceout;
 }
 
 QList<UITableItem *> UICommonListView::getListItem(qint32 page, qint32 perPage, qint32 totalPages)
 {
     QList<UITableItem *> items;
-    traced;
+    tracein;
+    int idx = 0;
     foreach (DbModel* item, mItemList) {
         UITableItem* tblItem = UITableItem::build(item->clone());
-        updateItem(item, tblItem);
+        updateItem(item, tblItem, ++idx);
         items.append(tblItem);
     }
     return items;
@@ -53,26 +54,26 @@ QList<UITableItem *> UICommonListView::getListItem(qint32 page, qint32 perPage, 
 
 void UICommonListView::initHeader()
 {
-    traced;
-    mHeader.append(tr("ID"));
+    tracein;
+    mHeader.append(tr("STT"));
     mHeader.append(tr("Tên định danh"));
     mHeader.append(tr("Tên"));
     mHeader.append(tr("Ghi chú"));
-    tracede;
+    traceout;
 }
-void UICommonListView::updateItem(DbModel *item, UITableItem *tblItem)
+void UICommonListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
 {
-    traced;
-    tblItem->addValue(QString("%1").arg(item->dbId()));
+    tracein;
+    tblItem->addValue(QString("%1").arg(idx));
     tblItem->addValue(item->nameId());
     tblItem->addValue(item->name());
     tblItem->addValue(item->remark());
-    tracede;
+    traceout;
 }
 
 qint32 UICommonListView::getTotalItems()
 {
-    traced;
+    tracein;
     return mItemList.count();
 }
 
@@ -88,33 +89,33 @@ ModelController *UICommonListView::getController()
 
 ErrCode UICommonListView::onLoad()
 {
-    traced;
+    tracein;
     RELEASE_LIST_DBMODEL(mItemList);
     mItemList = getListItem();
     clearFilter();
-    tracede;
+    traceout;
     return ErrNone;
 }
 
 ErrCode UICommonListView::onReload()
 {
-    traced;
+    tracein;
     onLoad();
-    tracede;
+    traceout;
     return ErrNone;
 }
 
 void UICommonListView::initFilterFields()
 {
-    traced;
+    tracein;
     appendFilterField(FILTER_FIELD_NAME, tr("Tên"));
-    tracede;
+    traceout;
 }
 
 
 QHash<QString, QString> UICommonListView::getFilterKeywords(int fieldId, const QString &fieldText)
 {
-    traced;
+    tracein;
     logd("Query search keywords form db, field %d, %s", fieldId, fieldText.toStdString().c_str());
     QHash<QString, QString> keywords;
     QList<DbModel*> modelList;
@@ -134,14 +135,14 @@ QHash<QString, QString> UICommonListView::getFilterKeywords(int fieldId, const Q
         }
     }
     logd("found %d keywords", (int)keywords.count());
-    tracede;
+    traceout;
     return keywords;
 }
 
 
-void UICommonListView::onViewItem(UITableWidgetItem *item)
+void UICommonListView::onViewItem(UITableCellWidgetItem *item)
 {
-    traced;
+    tracein;
     int idx = item->idx();
     DbModel* comm = item->itemData();
     if (comm) {
@@ -150,20 +151,20 @@ void UICommonListView::onViewItem(UITableWidgetItem *item)
         loge("Comm obj is null");
         Utils::showErrorBox("Không có thông tin để xem");
     }
-    tracede;
+    traceout;
 }
 
-void UICommonListView::onAddItem(UITableWidgetItem *item)
+void UICommonListView::onAddItem(UITableCellWidgetItem *item)
 {
-    traced;
+    tracein;
     // TODO: handle it
     MainWindow::showAddEditCommonModel(true, nullptr, this);
-    tracede;
+    traceout;
 }
 
 void UICommonListView::onDbModelReady(ErrCode ret, DbModel *model, DlgCommonEditModel *dlg)
 {
-    traced;
+    tracein;
     if (ret == ErrNone) {
         if (model){
             model->dump();
@@ -171,12 +172,12 @@ void UICommonListView::onDbModelReady(ErrCode ret, DbModel *model, DlgCommonEdit
         onReload();
     }
 
-    tracede;
+    traceout;
 }
 
 DbModel *UICommonListView::onNewModel()
 {
-    traced;
+    tracein;
     return nullptr;
 }
 
@@ -187,11 +188,11 @@ QString UICommonListView::getName()
 
 void UICommonListView::onModelControllerDataUpdated()
 {
-    traced;
+    tracein;
     if (!mSuspendReloadOnDbUpdate) {
         reload();
     } else {
         logw("Suspend reload on data update");
     }
-    tracede;
+    traceout;
 }

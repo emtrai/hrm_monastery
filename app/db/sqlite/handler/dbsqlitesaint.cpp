@@ -32,7 +32,7 @@ DbSqliteSaint* DbSqliteSaint::gInstance = nullptr;
 DbSqliteSaint::DbSqliteSaint():DbSqliteModelHandler()
 //    mSaintTbl(nullptr)
 {
-    traced;
+    tracein;
 }
 
 DbSqliteSaint *DbSqliteSaint::getInstance()
@@ -52,7 +52,7 @@ const QString DbSqliteSaint::getName()
 
 DbModel *DbSqliteSaint::getByUid(const QString &name)
 {
-    traced;
+    tracein;
     return DbSqliteModelHandler::getByUid(name, &Saint::build);
 }
 

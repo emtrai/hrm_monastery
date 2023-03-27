@@ -53,6 +53,8 @@
 #include "table/dbsqliteareamgrtbl.h"
 #include "table/dbsqlitespecialistpersontbl.h"
 #include "table/dbsqlitecommunitydepttbl.h"
+#include "table/dbmetadatatbl.h"
+#include "table/dbsqlsequencetbl.h"
 
 #include "dbsqlitedefs.h"
 #include "dbsqliteedu.h"
@@ -90,12 +92,12 @@ DatabaseConnection::DatabaseConnection(QString uri)
     //        : mName(QString::number(QRandomGenerator::global()->generate(), 36))
     : mName(QString::number((quintptr)QThread::currentThreadId()))
 {
-    traced;
+    tracein;
     auto database = QSqlDatabase::addDatabase(DRIVER, mName);
     logd("create db connection name=%s, uri=%s", STR2CHA(mName), STR2CHA(uri));
     database.setDatabaseName(uri);
     database.open();
-    tracede;
+    traceout;
 }
 
 DatabaseConnection::~DatabaseConnection()
@@ -119,7 +121,7 @@ FieldValue::FieldValue()
 
 FieldValue::FieldValue(const FieldValue &item)
 {
-    traced;
+    tracein;
     logd("copy constructor");
     value = item.value;
     mIntValue = item.mIntValue;
@@ -128,7 +130,7 @@ FieldValue::FieldValue(const FieldValue &item)
 
 FieldValue::FieldValue(const QString &value, int dataType)
 {
-    traced;
+    tracein;
     logd("constructor");
     this->value = value;
     this->dataType = dataType;
@@ -142,7 +144,7 @@ FieldValue::FieldValue(const QString &value, int dataType)
         }
         this->mIntValue = longValue;
     }
-    tracede;
+    traceout;
 }
 
 FieldValue::FieldValue(qint64 value)
@@ -163,16 +165,18 @@ const QString &FieldValue::valueString()
 
 DbSqlite::DbSqlite()
 {
-    traced;
+    tracein;
     setupTables();
     setupModelHandler();
 }
 
 void DbSqlite::setupTables()
 {
-    traced;
+    tracein;
     // Append all tables need for db
     // TODO: append more table
+    appendTable(new DbMetadataTbl(this));
+    appendTable(new DbSqlSequenceTbl(this));
     appendTable(new DbSqlitePersonTbl(this));
     appendTable(new DbSqliteSaintTbl(this));
     appendTable(new DbSqliteEduTbl(this));
@@ -203,7 +207,7 @@ void DbSqlite::setupTables()
 
 void DbSqlite::setupModelHandler()
 {
-    traced;
+    tracein;
     appendModelHandler(new DbSqliteSpecialist());
     appendModelHandler(new DbSqliteEdu());
     appendModelHandler(new DbSqliteSaint());
@@ -214,9 +218,9 @@ void DbSqlite::setupModelHandler()
     appendModelHandler(new DbSqliteProvince());
 #endif
     appendModelHandler(new DbSqliteMission());
+    appendModelHandler(new DbSqliteDept());
     appendModelHandler(new DbSqliteCommunity());
     appendModelHandler(new DbSqliteArea());
-    appendModelHandler(new DbSqliteDept());
     appendModelHandler(new DbSqliteCourse());
     appendModelHandler(new DbSqliteWork());
     appendModelHandler(new DbSqliteStatus());
@@ -227,6 +231,16 @@ void DbSqlite::setupModelHandler()
     appendModelHandler(new DbSqliteCommunityDept());
 }
 
+DbMetadataTbl *DbSqlite::tableMetadata()
+{
+    return (DbMetadataTbl*)getTable(KTableMetadata);
+}
+
+DbSqlSequenceTbl *DbSqlite::tblSqlSequence()
+{
+    return (DbSqlSequenceTbl*)getTable(KTableSqliteSequence);
+}
+
 const QSqlDatabase &DbSqlite::db() const
 {
     return mDb;
@@ -234,7 +248,7 @@ const QSqlDatabase &DbSqlite::db() const
 
 void DbSqlite::appendTable(DbSqliteTbl *tbl)
 {
-    traced;
+    tracein;
     if (nullptr != tbl)
     {
         logd("Add table '%s'", tbl->name().toStdString().c_str());
@@ -249,7 +263,7 @@ void DbSqlite::appendTable(DbSqliteTbl *tbl)
 
 ErrCode_t DbSqlite::checkOrCreateAllTables()
 {
-    traced;
+    tracein;
     ErrCode_t err = ErrCode_t::ErrNone;
 //    err = openDb();
 //    if (err == ErrNone) {
@@ -264,20 +278,33 @@ ErrCode_t DbSqlite::checkOrCreateAllTables()
 //    } else {
 //        loge("Failed to open db for create table");
 //    }
+    QStringList tables = currentDb().tables();
+    logd("List of table: \n %s", STR2CHA(tables.join("\n")));
     foreach (QString key, mListTbl.keys())
     {
-        logd("check & create table '%s'", key.toStdString().c_str());
+        logd("check & create table '%s'", STR2CHA(key));
+
+        if (tables.contains(key)) {
+            logd("table '%s' existed", STR2CHA(key));
+        }
+        // we still need to call this function so that table can build up table fields map to get proper processing
         err = mListTbl[key]->checkOrCreateTable();
         if (err != ErrNone) // TODO: should break? return critical error????
             break;
+#ifdef DEBUG_TRACE
+        bool ok = false;
+        qint64 seq = 0;
+        seq = getDbSeqNumber(key, &ok);
+        logd("Get seq number of tbl '%s', seq = %d, ok = %d", STR2CHA(key), seq, ok);
+#endif
     }
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 void DbSqlite::appendModelHandler(DbModelHandler *hdl)
 {
-    traced;
+    tracein;
     if (nullptr != hdl)
     {
         mModelHdlList[hdl->getName()] = hdl;
@@ -292,7 +319,7 @@ void DbSqlite::appendModelHandler(DbModelHandler *hdl)
 
 DbSqliteTbl *DbSqlite::getTable(const QString &tblName)
 {
-    traced;
+    tracein;
     DbSqliteTbl* tbl = nullptr;
 
     if (mListTbl.contains(tblName)){
@@ -353,7 +380,7 @@ DbModelHandler *DbSqlite::getCountryModelHandler()
 DbModelHandler *DbSqlite::getModelHandler(const QString &name)
 {
     DbModelHandler* hdl = nullptr;
-    traced;
+    tracein;
     if (mModelHdlList.contains(name)){
         hdl = mModelHdlList[name];
     }
@@ -364,6 +391,12 @@ DbModelHandler *DbSqlite::getModelHandler(const QString &name)
     }
 
     return hdl;
+}
+
+DbModelHandler *DbSqlite::getDepartmentModelHandler()
+{
+    return getModelHandler(KModelHdlDept);
+
 }
 
 DbSqliteTbl *DbSqlite::table(const QString &tblName)
@@ -378,7 +411,7 @@ DbModelHandler *DbSqlite::handler(const QString &name)
 
 QSqlDatabase DbSqlite::currentDb()
 {
-    traced;
+    tracein;
     // TODO: handle race condition issue when access db? should use mutex???
     if (!mDatabaseConnections.hasLocalData()) {
         logd("db connection not exist, create new one");
@@ -394,6 +427,160 @@ QSqlQuery DbSqlite::createQuery()
     return QSqlQuery(currentDb());
 }
 
+quint64 DbSqlite::getDbVersion()
+{
+    return DB_VERSION;
+}
+
+quint64 DbSqlite::getDbVersionInMetadata(bool* isOk)
+{
+    tracein;
+    qint64 ver = 0;
+    ErrCode err = getMetadataValue(KMetadataKeyVersion, ver);
+    if (err == ErrNone) {
+        logd("Version = 0x%x", ver);
+    } else {
+        loge("value for key '%s' failed, err=%d", KMetadataKeyVersion, err);
+    }
+    if (isOk) *isOk = (err == ErrNone);
+    traceout;
+    return ver;
+}
+
+ErrCode DbSqlite::updateDbVersionInMetadata(qint64 value)
+{
+    tracein;
+    ErrCode err = updateMetadataValue(KMetadataKeyVersion, value);
+    traceout;
+    return err;
+}
+
+ErrCode DbSqlite::getMetadataValue(const QString& key, QString& value)
+{
+    tracein;
+    DbMetadataTbl *tbl = (DbMetadataTbl*)tableMetadata();
+    ErrCode err = ErrNone;
+    if (key.isEmpty()) {
+        err = ErrInvalidArg;
+        loge("Invalid argument");
+    }
+    if (err == ErrNone) {
+    logd("Get value for key '%s'", STR2CHA(key));
+        if (tbl) {
+            err = tbl->getMetadataValue(key, value);
+        } else {
+            err = ErrNoTable;
+            loge("not found table of Metadata");
+        }
+    }
+    traceret(err);
+    return err;
+}
+
+ErrCode DbSqlite::getMetadataValue(const QString &key, qint64 &outvalue)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    QString valueStr;
+    qint64 value = 0;
+    bool ok = false;
+    err = getMetadataValue(key, valueStr);
+    if (err == ErrNone) {
+        if (!valueStr.isEmpty()) {
+            value = valueStr.toInt(&ok);
+            if (ok) {
+                logd("value = 0x%x", value);
+                outvalue = value;
+            } else {
+                loge("convert '%s' to in failed", STR2CHA(valueStr));
+                value = 0;
+                err = ErrFailedConvert;
+            }
+        } else {
+            outvalue = 0;
+            logd("No data for key '%s'", STR2CHA(key));
+        }
+    } else {
+        loge("value for key '%s' failed, err=", STR2CHA(key), err);
+    }
+    traceret(err);
+    return err;
+}
+
+ErrCode DbSqlite::updateMetadataValue(const QString &key, qint64 value)
+{
+    tracein;
+    ErrCode err = updateMetadataValue(key, QString("%1").arg(value));
+    traceout;
+    return err;
+}
+
+ErrCode DbSqlite::updateMetadataValue(const QString &key, const QString &value)
+{
+    tracein;
+    DbMetadataTbl *tbl = (DbMetadataTbl*)tableMetadata();
+    ErrCode err = ErrNone;
+    QString currValue;
+    if (key.isEmpty()) {
+        err = ErrInvalidArg;
+        loge("Invalid argument");
+    }
+    if (err == ErrNone) {
+        logd("Get value for key '%s'", STR2CHA(key));
+        if (tbl) {
+            err = tbl->getMetadataValue(key, currValue);
+        } else {
+            err = ErrNoTable;
+            loge("not found table of Metadata");
+        }
+    }
+    if (err == ErrNone) {
+        err = tbl->updateMetadataValue(key, value);
+    } else if (err == ErrNotExist) {
+        err = tbl->addMetadataValue(key, value);
+    } else {
+        loge("Get valued failed, err=%d", err);
+    }
+    if (err != ErrNone) {
+        loge("Updated value for key '%s' failed, err = %d", STR2CHA(key), err);
+    }
+    traceret(err);
+    return err;
+}
+
+quint64 DbSqlite::getCurrentPersonCodeNumber(bool* isOk)
+{
+    tracein;
+    qint64 seq = 0;
+    seq = getDbSeqNumber(KTablePerson, isOk);
+    traceout;
+    return seq;
+}
+
+quint64 DbSqlite::getDbSeqNumber(const QString &tblName, bool *ok)
+{
+    tracein;
+    DbSqlSequenceTbl *tbl = (DbSqlSequenceTbl*)tblSqlSequence();
+    ErrCode err = ErrNone;
+    qint64 value = 0;
+    if (tblName.isEmpty()) {
+        err = ErrInvalidArg;
+        loge("Invalid argument");
+    }
+    if (err == ErrNone) {
+        logd("Get value for tblName '%s'", STR2CHA(tblName));
+        if (tbl) {
+            err = tbl->getValue(tblName, value);
+        } else {
+            err = ErrNoTable;
+            loge("not found table of seq number");
+        }
+    }
+    if (ok) *ok = (err == ErrNone);
+    traceret(value);
+    return value;
+}
+
 
 DbSqlite* DbSqlite::getInstance(){
     if (gInstance == nullptr){
@@ -404,7 +591,7 @@ DbSqlite* DbSqlite::getInstance(){
 
 
 ErrCode_t DbSqlite::loadDb(const DbInfo* dbInfo){
-    traced;
+    tracein;
     ErrCode_t err = ErrNone;
     if (dbInfo){
 
@@ -449,14 +636,38 @@ ErrCode_t DbSqlite::loadDb(const DbInfo* dbInfo){
         loge("dbinfo is NULL");
     }
 
-    tracedr(err);
+    if (err == ErrNone) {
+        bool ok = false;
+        quint64 dbVersion = getDbVersion();
+        quint64 versionInDb = getDbVersionInMetadata(&ok);
+        logi("dbversion = 0x%08x, versionInDb = 0x%08x", dbVersion, versionInDb);
+        bool updateversionindb = false;
+        if (ok) {
+            if (dbVersion == versionInDb) {
+                logi("Version is identical = 0x%08x", dbVersion);
+            } else if (versionInDb == 0){
+                updateversionindb = true;
+            } else {
+                logw("VERSION ARE DIFFERENT!! version = 0x%08x, versionInDb = 0x%08llx",
+                        dbVersion, versionInDb);
+                // TODO: NEED TO DO ANY MIGRATION????
+            }
+        } else {
+            updateversionindb = true;
+        }
+        if (updateversionindb) {
+            updateDbVersionInMetadata(dbVersion);
+        }
+    }
+
+    traceret(err);
     return err;
 }
 
 ErrCode_t DbSqlite::execQuery(const QString &sql)
 {
     ErrCode_t err = ErrNone;
-    traced;
+    tracein;
     logd("Execute query %s", sql.toStdString().c_str());
 
     // TODO: re-implement this, race condition? resource leakage???
@@ -480,7 +691,7 @@ ErrCode_t DbSqlite::execQuery(const QString &sql)
     } else {
         loge("exe query failed, open db failed %d", err);
     }
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
@@ -488,12 +699,12 @@ ErrCode_t DbSqlite::execQuery(QSqlQuery *qry)
 {
 
     ErrCode_t err = ErrNone;
-    traced;
+    tracein;
 
     startTransaction();
     err = execQueryNoTrans(qry);
     endTransaction();
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
@@ -501,7 +712,7 @@ ErrCode_t DbSqlite::execQueryNoTrans(QSqlQuery *qry)
 {
 
     ErrCode_t err = ErrNone;
-    traced;
+    tracein;
 
     if( !qry->exec() ) {
         loge( "Failed to execQuery %s", qry->executedQuery().toStdString().c_str());
@@ -510,13 +721,13 @@ ErrCode_t DbSqlite::execQueryNoTrans(QSqlQuery *qry)
     } else {
         logd( "Executed execQuery %s", qry->executedQuery().toStdString().c_str());
     }
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 ErrCode_t DbSqlite::startTransaction()
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
 //    err = openDb();
     if (err == ErrNone)
@@ -524,13 +735,13 @@ ErrCode_t DbSqlite::startTransaction()
     else
         loge("Start transaction failed, open db failed %d", err);
     // TODO: re-implement this, race condition? resource leakage???
-    tracede;
+    traceout;
     return ErrNone;
 }
 
 ErrCode_t DbSqlite::endTransaction()
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
 //    err = openDb();
     if (!currentDb().commit()){
@@ -539,13 +750,13 @@ ErrCode_t DbSqlite::endTransaction()
     }
 //    closeDb();
     // TODO: re-implement this, race condition? resource leakage???
-    tracede;
+    traceout;
     return ErrNone;
 }
 
 QSqlDatabase DbSqlite::getDbConnection()
 {
-    traced;
+    tracein;
     // Starting with Qt 5.11, sharing the same connection between threads is not allowed.
     // Use a dedicated connection for each thread requiring access to the database,
     // using the thread address as connection name.
@@ -559,7 +770,7 @@ QSqlDatabase DbSqlite::getDbConnection()
             qCritical() << "Failed to open db connection" + connName;
         }
     }
-    tracede;
+    traceout;
     return db;
 
 }

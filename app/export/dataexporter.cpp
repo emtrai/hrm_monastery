@@ -33,18 +33,18 @@
 
 DataExporter::DataExporter()
 {
-    traced;
+    tracein;
 }
 
 const QString DataExporter::exportTemplatePath(FileExporter* exporter, QString* ftype) const
 {
-    traced;
+    tracein;
     return QString();
 }
 
 ErrCode DataExporter::getListTemplateExportKeywords(FileExporter *exporter, QList<QPair<QString,QString>>& outMap) const
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
 
     QString fpath;
@@ -73,26 +73,26 @@ ErrCode DataExporter::getListTemplateExportKeywords(FileExporter *exporter, QLis
             loge("Base class support json/csv format only");
         }
     }
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 const QStringList DataExporter::getListExportKeyWord() const
 {
-    traced;
+    tracein;
     return QStringList();
 }
 
 ErrCode DataExporter::getExportDataString(const QString &item, QString* data) const
 {
-    traced;
+    tracein;
     loge("Not support here");
     return ErrNotSupport;
 }
 
 ErrCode DataExporter::getExportDataString(const QString &item, const DbModel *data, QString *exportData) const
 {
-    traced;
+    tracein;
     loge("Not support here");
     ASSERT(false, "CAN NOT GET EXPORT DATA HERE, MUST BE IMPLEMENTED BY DERIVED CLASS");
     return ErrNotSupport;
@@ -106,7 +106,7 @@ quint64 DataExporter::getExportTypeList()
 
 ErrCode DataExporter::parseJsonExportTemplate(const QString& fpath, QList<QPair<QString,QString>> &outMap) const
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
 
     QFile loadFile;
@@ -186,13 +186,13 @@ ErrCode DataExporter::parseJsonExportTemplate(const QString& fpath, QList<QPair<
         }
     }
     loadFile.close();
-    tracedr(err);
+    traceret(err);
     return err;
 }
 
 ErrCode DataExporter::parseCsvExportTemplate(const QString &fpath, QList<QPair<QString,QString>> &outMap) const
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     qint32 cnt = 0;
     QStringList items;
@@ -209,7 +209,7 @@ ErrCode DataExporter::parseCsvExportTemplate(const QString &fpath, QList<QPair<Q
         logd("parse csv file %s", fpath.toStdString().c_str());
         ret = Utils::parseCSVFile(fpath,
             [](const QStringList& items, void* caller, void* param, quint32 idx){
-                traced;
+                tracein;
                 logd("callback from lamda when parse csv file for export csv list, idx=%d", idx);
                 return ErrCancelled; // we assume 1st line is headers, so don't need to read more
             },
@@ -231,6 +231,6 @@ ErrCode DataExporter::parseCsvExportTemplate(const QString &fpath, QList<QPair<Q
             outMap.append(qMakePair(id, name));
         }
     }
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }

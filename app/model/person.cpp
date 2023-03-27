@@ -81,142 +81,141 @@ Person::Person():DbModel()
 
 Person::~Person()
 {
-    traced;
+    tracein;
     // TODO: free resource
 }
 
 void Person::clone(const DbModel *model)
 {
-    traced;
-    DbModel::clone(model);
-    Person* per = (Person*) model;
-    mPersonCode = per->personCode();
-    mFirstName = per->firstName();
-    mLastName = per->lastName();
+    tracein;
+    if (model) {
+        DbModel::clone(model);
+        Person* per = (Person*) model;
+        mFirstName = per->firstName();
+        mLastName = per->lastName();
 
-    mBirthday = per->birthday();
-    mBirthPlace = per->birthPlace();
+        mBirthday = per->birthday();
+        mBirthPlace = per->birthPlace();
 
-    mHollyName = per->hollyName();
-    mSaintUidList = per->saintUidList();
-    mSaintUidNameMap.insert(per->saintUidNameMap());
+        mHollyName = per->hollyName();
+        mSaintUidList = per->saintUidList();
+        mSaintUidNameMap.insert(per->saintUidNameMap());
 
-    mImgId = per->imgId();
-    mImgPath = per->imgPath();
+        mImgId = per->imgId();
+        mImgPath = per->imgPath();
 
-    mNationalityUid = per->nationalityUid();
-    mNationalityName = per->nationalityName();
+        mNationalityUid = per->nationalityUid();
+        mNationalityName = per->nationalityName();
 
-    mEthnicUid = per->ethnicUid();
-    mEthnicName = per->ethnicName();
+        mEthnicUid = per->ethnicUid();
+        mEthnicName = per->ethnicName();
 
-    mIdCard = per->idCard();
-    mIdCardIssuePlace = per->idCardIssuePlace();
-    mIdCardIssueDate = per->idCardIssueDate();
+        mIdCard = per->idCard();
+        mIdCardIssuePlace = per->idCardIssuePlace();
+        mIdCardIssueDate = per->idCardIssueDate();
 
-    mEduUid = per->eduUid();
-    mEduName = per->eduName();
+        mEduUid = per->eduUid();
+        mEduName = per->eduName();
 
-    mSpecialistUidList = per->specialistUidList();
+        mSpecialistUidList = per->specialistUidList();
 
-    mCourseUid = per->courseUid();
-    mCourse = per->course();
+        mCourseUid = per->courseUid();
+        mCourse = per->course();
 
-    mCountryUid = per->countryUid();
-    mCountryName = per->countryName();
-    mProvinceUid = per->provinceUid();
-    mProvinceName = per->provinceName();
-    mAddr = per->addr();
-    mChurchAddr = per->churchAddr();
-    mEmail = per->email();
-    mTel = per->tel();
-    mOtherContact = per->otherContact();
+        mCountryUid = per->countryUid();
+        mCountryName = per->countryName();
+        mProvinceUid = per->provinceUid();
+        mProvinceName = per->provinceName();
+        mAddr = per->addr();
+        mChurchAddr = per->churchAddr();
+        mEmail = per->email();
+        mTel = per->tel();
+        mOtherContact = per->otherContact();
 
-    mDadName = per->dadName();
-    mDadBirthday = per->dadBirthday();
-    mDadAddr = per->dadAddr();
+        mDadName = per->dadName();
+        mDadBirthday = per->dadBirthday();
+        mDadAddr = per->dadAddr();
 
-    mMomName = per->momName();
-    mMomBirthday = per->momBirthday();
-    mMomAddr = per->momAddr();
+        mMomName = per->momName();
+        mMomBirthday = per->momBirthday();
+        mMomAddr = per->momAddr();
 
-    mFamilyHistory = per->familyHistory();
-    mFamilyContact = per->familyContact();
+        mFamilyHistory = per->familyHistory();
+        mFamilyContact = per->familyContact();
 
-    mChristenDate = per->christenDate();
-    mChristenPlace = per->christenPlace();
+        mChristenDate = per->christenDate();
+        mChristenPlace = per->christenPlace();
 
-    mEucharistPlace = per->eucharistPlace();
-    mEucharistDate = per->eucharistDate();
+        mEucharistPlace = per->eucharistPlace();
+        mEucharistDate = per->eucharistDate();
 
-    mHollyPlace = per->hollyPlace();
-    mHollyDate = per->hollyDate();
-    // TODO:   mEducationList,    mWorkList;
-    mEducationUidList = per->educationUidList();
-    mWorkUidList = per->workUidList();
+        mHollyPlace = per->hollyPlace();
+        mHollyDate = per->hollyDate();
+        // TODO:   mEducationList,    mWorkList;
+        mEducationUidList = per->educationUidList();
+        mWorkUidList = per->workUidList();
 
-    mJoinDate = per->joinDate();
-    mJoinPICUid = per->joinPICUid();
-    mJoinPICName = per->joinPICName();
+        mJoinDate = per->joinDate();
+        mJoinPICUid = per->joinPICUid();
+        mJoinPICName = per->joinPICName();
 
-    mPreTrainJoinDate = per->preTrainJoinDate();
-    mPreTrainPICUid = per->preTrainPICUid();
-    mPreTrainPICName = per->preTrainPICName();
-    mTrainJoinDate = per->trainJoinDate();
+        mPreTrainJoinDate = per->preTrainJoinDate();
+        mPreTrainPICUid = per->preTrainPICUid();
+        mPreTrainPICName = per->preTrainPICName();
+        mTrainJoinDate = per->trainJoinDate();
 
-    mTrainPICUid = per->trainPICUid();
-    mTrainPICName = per->trainPICName();
+        mTrainPICUid = per->trainPICUid();
+        mTrainPICName = per->trainPICName();
 
-    mVowsDate = per->vowsDate();
-    mVowsCEOUid = per->vowsCEOUid();
-    mVowsCEOName = per->vowsCEOName();
+        mVowsDate = per->vowsDate();
+        mVowsCEOUid = per->vowsCEOUid();
+        mVowsCEOName = per->vowsCEOName();
 
-    mEternalVowsDate = per->eternalVowsDate();
-    mEternalVowsCEOUid = per->eternalVowsCEOUid();
-    mEternalVowsCEOName = per->eternalVowsCEOName();
-    mEternalVowsPICUid = per->eternalVowsPICUid();
-    mEternalVowsPICName = per->eternalVowsPICName();
+        mEternalVowsDate = per->eternalVowsDate();
+        mEternalVowsCEOUid = per->eternalVowsCEOUid();
+        mEternalVowsCEOName = per->eternalVowsCEOName();
+        mEternalVowsPICUid = per->eternalVowsPICUid();
+        mEternalVowsPICName = per->eternalVowsPICName();
 
-    mBankDate = per->bankDate();
-    mBankPlace = per->bankPlace();
+        mBankDate = per->bankDate();
+        mBankPlace = per->bankPlace();
 
-    mGoldenDate = per->goldenDate();
-    mGoldenPlace = per->goldenPlace();
+        mGoldenDate = per->goldenDate();
+        mGoldenPlace = per->goldenPlace();
 
-    mEternalDate = per->eternalDate();
-    mEternalPlace = per->eternalPlace();
+        mEternalDate = per->eternalDate();
+        mEternalPlace = per->eternalPlace();
 
-    mStatusUid = per->statusUid();
-    mStatusName = per->statusName();
+        mStatusUid = per->statusUid();
+        mStatusName = per->statusName();
 
-    mRetireDate = per->retireDate();
-    mRetirePlace = per->retirePlace();
+        mRetireDate = per->retireDate();
+        mRetirePlace = per->retirePlace();
 
-    mDeadDate = per->deadDate();
-    mDeadPlace = per->deadPlace();
+        mDeadDate = per->deadDate();
+        mDeadPlace = per->deadPlace();
 
-    mEventUidList = per->eventUidList();
+        mEventUidList = per->eventUidList();
 
-    mCommunityUid = per->communityUid();
-    mCommunityName = per->communityName();
-    mCurrentWorkUid = per->currentWorkUid();
-    mCurrentWorkName = per->currentWorkName();
-
-//    foreach (QString key, per.exportFields().keys()) {
-//        mExportCallbacks.insert(key, per.exportFields()[key]); // TODO: use iterator ??
-//    }
-    tracede;
+        mCommunityUid = per->communityUid();
+        mCommunityName = per->communityName();
+        mCurrentWorkUid = per->currentWorkUid();
+        mCurrentWorkName = per->currentWorkName();
+    } else {
+        loge("no model to clone");
+    }
+    traceout;
 }
 
 void Person::buildUidIfNotSet()
 {
-    traced;
+    tracein;
     // do nothing, as uild will be built later
 }
 
 QString Person::buildUid(const QString *seed)
 {
-    traced;
+    tracein;
     QString uid;
     // FIXME: there are some case that this is not suitable, i.e. info like name
     // is change, no birthday/birthplace info, etc.
@@ -241,14 +240,15 @@ DbModel* Person::build(){
     return item;
 }
 
-DbModelBuilder Person::getBuilder()
+DbModelBuilder Person::getBuilder() const
 {
     return &Person::build;
 }
 
 void Person::initExportFields()
 {
-    traced;
+    tracein;
+    DbModel::initExportFields();
     // TODO: took to much memory for this, should put in in PersonCtl????
     mExportCallbacks.insert(KItemImgPath, [this](const QString& item){
         QString imgPath = this->imgPath();
@@ -278,7 +278,7 @@ void Person::initExportFields()
         return this->hollyName();
     });
     mExportCallbacks.insert(KItemFeastDay, [this](const QString& item){
-        return Utils::date2String(this->feastDay(), DATE_FORMAT_MD);
+        return Utils::date2String(this->feastDay(), DEFAULT_FORMAT_MD);
     });
     mExportCallbacks.insert(KItemNationality, [this](const QString& item){
         return this->nationalityName();
@@ -290,7 +290,7 @@ void Person::initExportFields()
         return this->idCard();
     });
     mExportCallbacks.insert(KItemIDcardIssueDate,  [this](const QString& item){
-        return Utils::date2String(this->idCardIssueDate(), DATE_FORMAT_YMD);
+        return Utils::date2String(this->idCardIssueDate(), DEFAULT_FORMAT_YMD);
     });
     mExportCallbacks.insert(KItemIDcardIssuer,  [this](const QString& item){
         return this->idCardIssuePlace();
@@ -372,7 +372,7 @@ void Person::initExportFields()
     mExportCallbacks.insert(KItemHollyPlace, nullptr); //"holly_place";
     mExportCallbacks.insert(KItemCourse, nullptr); //"course";
     mExportCallbacks.insert(KItemJoinDate, [this](const QString& item){
-        return Utils::date2String(this->joinDate(), DATE_FORMAT_YMD);
+        return Utils::date2String(this->joinDate(), DEFAULT_FORMAT_YMD);
     }); //"join_date";
     mExportCallbacks.insert(KItemJoinPIC, [this](const QString& item){
         EXPORT_PERSON_INFO_COMMON_IMPL(item, this->joinPICUid(), this->joinPICName());
@@ -406,15 +406,12 @@ void Person::initExportFields()
 
 void Person::initImportFields()
 {
-    traced;
+    tracein;
+    DbModel::initImportFields();
     // TODO: check fields like holly name, country, etc. and mark invalid field???
 
     mImportCallbacks.insert(KItemImgPath, [this](const QString& value){this->setImgPath(value);
         return ErrNone;});
-    mImportCallbacks.insert(KItemPersonCode, [this](const QString& value){
-        this->setPersonCode(value);
-        return ErrNone;
-    });
     mImportCallbacks.insert(KItemFullName, [this](const QString& value){
         this->setNameFromFullName(value);
         return ErrNone;
@@ -656,7 +653,7 @@ ErrCode Person::commonCheckField(QString& name,
                                  const char* const itemName,
                                  int& invalidField)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
 
     loge("Check item %s", itemName);
@@ -690,12 +687,12 @@ ErrCode Person::commonCheckField(QString& name,
         }
 
     }
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 ErrCode Person::validateAllFields()
 {
-    traced;
+    tracein;
     // TODO: cached value???
     ErrCode ret = ErrNone;
     int invaidField = 0;
@@ -709,16 +706,18 @@ ErrCode Person::validateAllFields()
     // Holly name / saint list
     // Holly name to saint list
     // TODO: saint uid list to holly name???
-    QHash<QString, QString> saintUidList;
-    ret = SAINTCTL->getSaintUidListFromName(mHollyName, &saintUidList);
-    if (ret == ErrNone) {
-        mSaintUidNameMap.insert(saintUidList);
-        mSaintUidList.append(saintUidList.keys());
-    } else {
-        appendValidateResult(KItemHollyName, ErrNotFound);
-        appendValidateMsg(QString("Saint %1 not found").arg(hollyName()));
-        invaidField ++;
-        loge("Invalid holly name %s", mHollyName.toStdString().c_str());
+    if (mSaintUidList.size() == 0 && mHollyName.size() > 0) {
+        QHash<QString, QString> saintUidList;
+        ret = SAINTCTL->getSaintUidListFromName(mHollyName, &saintUidList);
+        if (ret == ErrNone) {
+            mSaintUidNameMap.insert(saintUidList);
+            mSaintUidList.append(saintUidList.keys());
+        } else {
+            appendValidateResult(KItemHollyName, ErrNotFound);
+            appendValidateMsg(QString("Saint %1 not found").arg(hollyName()));
+            invaidField ++;
+            loge("Invalid holly name %s", mHollyName.toStdString().c_str());
+        }
     }
 
     // country
@@ -748,13 +747,13 @@ ErrCode Person::validateAllFields()
 
 
 
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
 ErrCode Person::fromCSVFile(const QString &fname)
 {
-    traced;
+    tracein;
     QList<QHash<QString, QString>> items;
     QHash<QString, QString> item;
     logd("parse csv file %s", fname.toStdString().c_str());
@@ -769,9 +768,9 @@ ErrCode Person::fromCSVFile(const QString &fname)
             logd("Set name");
             setName(item.value(KCsvItemName));
         }
-        if (item.contains(KCsvItemPersonCode)){
+        if (item.contains(KCsvItemNameId)){
             logd("Set code");
-            setPersonCode(item.value(KCsvItemPersonCode));
+            setNameId(item.value(KCsvItemNameId));
         }
         if (item.contains(KCsvItemChristenDate)){
             logd("Set christenDate");
@@ -779,7 +778,7 @@ ErrCode Person::fromCSVFile(const QString &fname)
         }
     }
 
-    tracedr(ret);
+    traceret(ret);
     return ret;
 
 }
@@ -787,17 +786,6 @@ ErrCode Person::fromCSVFile(const QString &fname)
 DataExporter *Person::getExporter()
 {
     return this;
-}
-
-const QString &Person::personCode() const
-{
-    return mPersonCode;
-}
-
-void Person::setPersonCode(const QString &newPersonCode)
-{
-    CHECK_MODIFIED_THEN_SET(mPersonCode, newPersonCode, KItemPersonCode);
-//    mPersonCode = newPersonCode;
 }
 
 const QString &Person::firstName() const
@@ -837,9 +825,9 @@ void Person::setBirthday(qint64 newBirthday)
 
 void Person::setBirthday(const QString &newBirthday)
 {
-    traced;
+    tracein;
     bool isOk = false;
-    qint64 date = Utils::dateFromString(newBirthday, DATE_FORMAT_YMD, &isOk);
+    qint64 date = Utils::dateFromString(newBirthday, DEFAULT_FORMAT_YMD, &isOk);
     logd("conver '%s', isOk=%d, value %d", newBirthday.toStdString().c_str(),
          isOk, (int)date);
     if (isOk && date > 0)
@@ -910,12 +898,12 @@ void Person::setChristenDate(const QString &newChristenDate,
 
 ErrCode Person::exportTo(const QString &fpath, ExportType type)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     // TODO: implement something here
     logi("Export Person to %s", fpath.toStdString().c_str());
     ret = ExportFactory::exportTo(this, fpath, type);
-    tracedr(ret);
+    traceret(ret);
     return ret;
 
 }
@@ -932,7 +920,7 @@ const QString Person::exportTemplatePath(FileExporter* exporter, QString* ftype)
 
 ErrCode Person::prepare2Save()
 {
-    traced;
+    tracein;
     DbModelHandler* saintHdlr = nullptr;
     ErrCode ret = DbModel::prepare2Save();
     if (ret == ErrNone) {
@@ -947,7 +935,7 @@ ErrCode Person::prepare2Save()
             }
         }
     }
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
@@ -1091,7 +1079,7 @@ void Person::setNationalityName(const QString &newNationalityName)
 
 void Person::dump()
 {
-    traced;
+    tracein;
     DbModel::dump();
     logd("- FullName %s", getFullName().toStdString().c_str());
     logd("- FirstName %s", firstName().toStdString().c_str());
@@ -1100,11 +1088,11 @@ void Person::dump()
     logd("- JoinPIC Name %s", joinPICName().toStdString().c_str());
     logd("- JoinPIC Uid %s", joinPICUid().toStdString().c_str());
 }
-ErrCode Person::onImportDataItem(const QString& importName, int importFileType,
+ErrCode Person::onImportParseDataItem(const QString& importName, int importFileType,
                              const QString &keyword, const QString &value,
                              quint32 idx, QList<DbModel *>* outList)
 {
-    traced;
+    tracein;
     ErrCode ret = ErrNone;
     logd("importFileType %d", importFileType);
 
@@ -1114,15 +1102,7 @@ ErrCode Person::onImportDataItem(const QString& importName, int importFileType,
         ImportCallbackFunc func = mImportCallbacks.value(keyword);
         if (func != nullptr) ret = func(value);
     }
-    if (mPersonCode.isEmpty()) {
-        logd("No person code, auto gen");
-        // TODO: should make temp code??? to distingue with official one
-        mPersonCode = CONFIG->getNextPersonalCode();
-        // TODO: numer is increased, but not save --> may cause much dummy code?
-    }
-
-
-    tracedr(ret);
+    traceret(ret);
     return ret;
 }
 
@@ -1298,7 +1278,7 @@ void Person::setRetireDate(qint64 newRetireDate)
 
 void Person::setRetireDate(const QString &newRetireDate, const QString &format)
 {
-    traced;
+    tracein;
     setRetireDate(Utils::dateFromString(newRetireDate, format));
 }
 
@@ -1890,7 +1870,7 @@ void Person::setSpecialistNames(const QString &newSpecialists, bool parseUid)
 //    mSpecialistNameList = newSpecialists.split(split);
     // TODO: check to remove redudant, check if they're same list
 //    markItemAsModified(KItemSpeciaist);
-    traced;
+    tracein;
     QStringList list;
     foreach (QString name, newSpecialists.split(NAME_SPLIT)) {
         list.append(name.trimmed());
@@ -1911,7 +1891,7 @@ void Person::setSpecialistNames(const QString &newSpecialists, bool parseUid)
     } else {
         logd("Skip parsing specialist to uid");
     }
-    tracede;
+    traceout;
 
 }
 
@@ -1931,7 +1911,7 @@ void Person::addSpecialistUid(const QString &uid)
 
 QList<DbModel *> Person::getSpecialistList()
 {
-    traced;
+    tracein;
     QList<DbModel*> list;
     DbPersonModelHandler* hdl = dynamic_cast<DbPersonModelHandler*>(getDbModelHandler());
     if (hdl && !uid().isEmpty()) {
@@ -1939,7 +1919,7 @@ QList<DbModel *> Person::getSpecialistList()
     } else {
         loge("no DbPersonModelHandler or uid to get");
     }
-    tracede;
+    traceout;
     return list;
 }
 
@@ -2071,6 +2051,8 @@ void Person::setHollyName(const QString &newHollyName, bool parseUid)
         ErrCode ret = ErrNone;
         ret = SAINTCTL->getSaintUidListFromName(mHollyName, &uidList);
         if (ret == ErrNone) {
+            mSaintUidNameMap.clear();
+            mSaintUidList.clear();
             mSaintUidNameMap.insert(uidList);
             mSaintUidList.append(uidList.keys());
         } else {
@@ -2088,7 +2070,7 @@ const QStringList &Person::saintUidList() const
 
 QString Person::saintUidListInString()
 {
-    traced;
+    tracein;
     QString val;
     if (mSaintUidList.count() > 0){
         val = mSaintUidList.join(HOLLYNAME_SPLIT);
@@ -2106,7 +2088,7 @@ void Person::setSaintUidList(const QStringList &newSaintUidList)
 
 void Person::setSaintUidList(const QString &newSaintUidList)
 {
-    traced;
+    tracein;
     setSaintUidList(newSaintUidList.split(HOLLYNAME_SPLIT));
 }
 

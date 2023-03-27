@@ -33,7 +33,7 @@ public:
 protected:
     virtual int getViewType() { return VIEW_SAINT;}
     virtual ErrCode onLoad();
-    virtual void updateItem(DbModel* item, UITableItem* tblItem);
+    virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
     virtual void initHeader();
 
     virtual int onFilter(int catetoryid, const QString& catetory, qint64 opFlags, const QString& keywords, const QVariant *value);

@@ -37,7 +37,7 @@ DlgEditModel::~DlgEditModel()
 
 ErrCode DlgEditModel::buildModel(DbModel *model, QString& errMsg)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     if (!model){
         err = ErrInvalidArg;
@@ -69,14 +69,14 @@ ErrCode DlgEditModel::buildModel(DbModel *model, QString& errMsg)
     if (err == ErrNone){
         model->setRemark(ui->txtRemark->toPlainText().trimmed());
     }
-    tracedr(err);
+    traceret(err);
     return err;
 
 }
 
 ErrCode DlgEditModel::fromModel(const DbModel *model)
 {
-    traced;
+    tracein;
     ErrCode err = ErrNone;
     err = DlgCommonEditModel::fromModel(model);
     if (err == ErrNone) {
@@ -84,7 +84,7 @@ ErrCode DlgEditModel::fromModel(const DbModel *model)
         ui->txtNameId->setText(model->nameId());
         ui->txtRemark->setPlainText(model->remark());
     }
-    tracedr(err);
+    traceret(err);
     return err;
 }
 

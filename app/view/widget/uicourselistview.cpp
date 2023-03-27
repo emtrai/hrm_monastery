@@ -34,12 +34,12 @@
 UICourseListView::UICourseListView(QWidget *parent):
     UICommonListView(parent)
 {
-    traced;
+    tracein;
 }
 
 UICourseListView::~UICourseListView()
 {
-    traced;
+    tracein;
 }
 
 QString UICourseListView::getTitle()
@@ -59,23 +59,23 @@ QList<DbModel *> UICourseListView::getListItem()
 
 void UICourseListView::initHeader()
 {
-    traced;
+    tracein;
     mHeader.append(tr("ID"));
     mHeader.append(tr("Tên định danh"));
     mHeader.append(tr("Tên"));
     mHeader.append(tr("Loại"));
     mHeader.append(tr("Ghi chú"));
-    tracede;
+    traceout;
 }
 
-void UICourseListView::updateItem(DbModel *item, UITableItem *tblItem)
+void UICourseListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
 {
-    traced;
+    tracein;
     Course* course = (Course*)item;
     tblItem->addValue(QString("%1").arg(item->dbId()));
     tblItem->addValue(course->nameId());
     tblItem->addValue(course->name());
     tblItem->addValue(course->courseTypeName());
     tblItem->addValue(course->remark());
-    tracede;
+    traceout;
 }
