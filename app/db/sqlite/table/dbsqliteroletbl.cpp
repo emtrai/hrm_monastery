@@ -28,7 +28,7 @@
 #include <QHash>
 #include "defs.h"
 #include "logger.h"
-#include "status.h"
+#include "personstatus.h"
 #include "dbsqlitetablebuilder.h"
 #include "dbsqliteinsertbuilder.h"
 

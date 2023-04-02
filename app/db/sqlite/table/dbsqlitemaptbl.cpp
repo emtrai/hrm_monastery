@@ -174,7 +174,7 @@ QHash<QString, QString> DbSqliteMapTbl::getFieldsCheckExists(const DbModel *item
 {
     tracein;
     QHash<QString, QString> list;
-    if (!item) {
+    if (item) {
         QString modelName = item->modelName();
         int modelType = item->modelType();
         logd("modelName %s", STR2CHA(modelName));

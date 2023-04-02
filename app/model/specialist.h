@@ -28,7 +28,8 @@
 class Specialist : public DbModel
 {
         public:
-            explicit Specialist(QObject *parent = nullptr);
+            explicit Specialist();
+            virtual ~Specialist();
         public:
             static DbModel *build();
             virtual DbModelBuilder getBuilder() const;

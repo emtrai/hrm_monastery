@@ -98,12 +98,16 @@ public:
     virtual DbModelHandler *getSaintModelHandler();
     virtual DbModelHandler* getSpecialistModelHandler();
     virtual DbModelHandler* getCommunityModelHandler();
-    virtual DbSqlitePerson* getPersonModelHandler();
+    virtual DbModelHandler* getPersonModelHandler();
     virtual DbModelHandler* getMissionModelHandler();
     virtual DbModelHandler* getAreaModelHandler();
     virtual DbModelHandler* getCountryModelHandler();
     virtual DbModelHandler* getModelHandler(const QString& name);
     virtual DbModelHandler* getDepartmentModelHandler();
+    virtual DbModelHandler* getWorkModelHandler();
+    virtual DbModelHandler* getPersonStatusModelHandler();
+    virtual DbModelHandler* getCourseModelHandler();
+    virtual DbModelHandler* getEthnicModelHandler();
 
     static DbSqliteTbl* table(const QString& tblName);
     static DbModelHandler* handler(const QString& name);

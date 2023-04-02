@@ -23,7 +23,6 @@
 #define UICOMMUNITYLISTVIEW_H
 
 #include "uicommonlistview.h"
-#include "dlgcommoneditmodel.h"
 #include "importlistener.h"
 
 class UICommunityListView : public UICommonListView, public ImportListener
@@ -46,12 +45,10 @@ protected:
     virtual ErrCode onMenuActionListAllPerson(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionListDepartment(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionListManagers(QMenu* menu, UITableMenuAction* act);
-//    virtual ErrCode onMenuAction(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionImport(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionAddPerson(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionAddDepart(QMenu* menu, UITableMenuAction* act);
-//    virtual ErrCode onMenuActionView(QMenu* menu, UITableMenuAction* act);
     virtual void onViewItem(UITableCellWidgetItem *item);
     void onEditItem(UITableCellWidgetItem *item);
     virtual QString getTitle();

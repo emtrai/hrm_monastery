@@ -23,6 +23,10 @@
 #include "logger.h"
 #include "saintctl.h"
 #include "communityctl.h"
+#include "specialistctl.h"
+#include "coursectl.h"
+#include "workctl.h"
+#include "eductl.h"
 #include "filter.h"
 #include "mainwindow.h"
 
@@ -125,6 +129,18 @@ QHash<QString, QString> UICommonListView::getFilterKeywords(int fieldId, const Q
         break;
     case FILTER_FIELD_COMMUNITY:
         modelList = COMMUNITYCTL->getAllItems();
+        break;
+    case FILTER_FIELD_SPECIALIST:
+        modelList = SPECIALISTCTL->getAllItems();
+        break;
+    case FILTER_FIELD_COURSE:
+        modelList = COURSECTL->getAllItems();
+        break;
+    case FILTER_FIELD_WORK:
+        modelList = WORKCTL->getAllItems();
+        break;
+    case FILTER_FIELD_EDUCATION:
+        modelList = EDUCTL->getAllItems();
         break;
     default:
         loge("Field %d not supported", fieldId);

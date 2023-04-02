@@ -14,26 +14,32 @@
  * limitations under the License.
  *
  *
- * Filename: status.h
+ * Filename: dbsqlitestatustbl.cpp
  * Author: Anh, Ngo Huy
  * Created date:9/5/2022
  * Brief:
  */
-#ifndef STATUS_H
-#define STATUS_H
+#include "dbsqlitepersonstatustbl.h"
 
-#include <dbmodel.h>
+#include "dbsqlitedefs.h"
+#include "errcode.h"
+#include <QSqlQuery>
+#include <QSqlRecord>
+#include <QHash>
+#include "defs.h"
+#include "logger.h"
+#include "personstatus.h"
+#include "dbsqlitetablebuilder.h"
+#include "dbsqliteinsertbuilder.h"
 
-class Status : public DbModel
+
+const qint32 DbSqlitePersonStatusTbl::KVersionCode = VERSION_CODE(0,0,1);
+
+DbSqlitePersonStatusTbl::DbSqlitePersonStatusTbl():
+    DbSqlitePersonStatusTbl(nullptr)
+{}
+DbSqlitePersonStatusTbl::DbSqlitePersonStatusTbl(DbSqlite* db)
+    :DbSqliteTbl(db, KTableStatus, KTableStatus, KVersionCode)
 {
-public:
-    Status();
-    static DbModel *build();
-    virtual DbModelBuilder getBuilder() const;
-
-
-protected:
-    virtual DbModelHandler *getDbModelHandler() const;
-};
-
-#endif // STATUS_H
+    tracein;
+}

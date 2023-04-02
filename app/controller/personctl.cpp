@@ -184,26 +184,30 @@ ErrCode PersonCtl::filter(int catetoryid, qint64 opFlags,
             controller = SPECIALISTCTL;
             modelHdl = DB->getModelHandler(KModelHdlSpecialist);
             break;
-        case FILTER_FIELD_COMMUNITY:
-            controller = COMMUNITYCTL;
-            modelHdl = DB->getModelHandler(KModelHdlCommunity);
-            break;
-        case FILTER_FIELD_EDUCATION:
-            controller = EDUCTL;
-            modelHdl = DB->getModelHandler(KModelHdlEdu);
-            break;
-        case FILTER_FIELD_COURSE:
-            controller = COURSECTL;
-            modelHdl = DB->getModelHandler(KModelHdlCourse);
-            break;
-        case FILTER_FIELD_WORK:
-            controller = WORKCTL;
-            modelHdl = DB->getModelHandler(KModelHdlWork);
-            break;
+//        case FILTER_FIELD_COMMUNITY:
+//            controller = COMMUNITYCTL;
+//            modelHdl = DB->getModelHandler(KModelHdlCommunity);
+//            break;
+//        case FILTER_FIELD_EDUCATION:
+//            controller = EDUCTL;
+//            modelHdl = DB->getModelHandler(KModelHdlEdu);
+//            break;
+//        case FILTER_FIELD_COURSE:
+//            controller = COURSECTL;
+//            modelHdl = DB->getModelHandler(KModelHdlCourse);
+//            break;
+//        case FILTER_FIELD_WORK:
+//            controller = WORKCTL;
+//            modelHdl = DB->getModelHandler(KModelHdlWork);
+//            break;
         case FILTER_FIELD_NAME:
         case FILTER_FIELD_FULL_NAME:
         case FILTER_FIELD_ADDRESS:
         case FILTER_FIELD_BIRTHDAY:
+        case FILTER_FIELD_COMMUNITY:
+        case FILTER_FIELD_EDUCATION:
+        case FILTER_FIELD_COURSE:
+        case FILTER_FIELD_WORK:
             directFilter = true;
             err = ModelController::filter(catetoryid, opFlags, keywords, targetModelName, outList, from, noItems, total);
             break;
@@ -215,32 +219,68 @@ ErrCode PersonCtl::filter(int catetoryid, qint64 opFlags,
     }
     logd("directFilter=%d", directFilter);
     if (!directFilter) {
-        QList<DbModel *> models;
         if (err == ErrNone) {
-            logd("Get list of target category, via name");
-            err = controller->filter(FILTER_FIELD_NAME, FILTER_OP_CONTAIN, keywords,
-                                     nullptr, /* use main/default target model name*/
-                                     &models, from, noItems, total);
-            logd("Search ret=%d, found=%lld models", err, models.size());
-        }
-        if (err == ErrNone) {
-            logd("search model for each models");
-            foreach (DbModel* item, models) {
-                if (item) {
-                    logd("uid %s, name %s",
-                         item->uid().toStdString().c_str(),
-                         item->name().toStdString().c_str());
-                    QList<DbModel *> perList = modelHdl->getAll(KModelHdlPerson);
-                    if (perList.count() > 0) {
-                        logd("found %lld person", perList.count());
-                        outList->append(perList);
+            if (catetoryid == FILTER_FIELD_SPECIALIST) {
+                QList<DbModel *> models = controller->getAllItems(true);
+                DbSpecialistModelHandler* perspechdl = dynamic_cast<DbSpecialistModelHandler*>(modelHdl);
+                foreach (DbModel* item, models) {
+                    // TODO: improve it...
+                    if (item) {
+                        switch (opFlags) {
+                        case FILTER_OP_CONTAIN:
+                            if (!item->name().contains(keywords)) continue;
+                            break;
+                        case FILTER_OP_EQUAL:
+                            if (item->name() != keywords) continue;
+                            break;
+                        case FILTER_OP_NOT_CONTAIN:
+                            if (item->name().contains(keywords)) continue;
+                            break;
+                        case FILTER_OP_NOT_EQUAL:
+                            if (item->name() == keywords) continue;
+                            break;
+                        default:
+                            break;
+                        }
+                        logd("Get person list for specialist %s", STR2CHA(item->toString()));
+                        QList<DbModel *> perList = perspechdl->getListPerson(item->uid());
+                        if (perList.count() > 0) {
+                            logd("found %lld person", perList.count());
+                            outList->append(perList);
+                        } else {
+                            logd("not found any person");
+                        }
+                        delete item;
                     } else {
-                        logd("not found any person");
+                        // just debug log for check, ignore error
+                        logd("Error: something wrong, empty model in list");
                     }
-                    delete item;
-                } else {
-                    // just debug log for check, ignore error
-                    logd("Error: something wrong, empty model in list");
+                }
+            } else {
+                logd("Get list of target category, via name");
+                QList<DbModel *> models;
+                err = controller->filter(FILTER_FIELD_NAME, FILTER_OP_CONTAIN, keywords,
+                                         nullptr, /* use main/default target model name*/
+                                         &models, from, noItems, total);
+                logd("Search ret=%d, found=%lld models", err, models.size());
+                logd("search model for each models");
+                foreach (DbModel* item, models) {
+                    if (item) {
+                        logd("uid %s, name %s",
+                             item->uid().toStdString().c_str(),
+                             item->name().toStdString().c_str());
+                        QList<DbModel *> perList = modelHdl->getAll(KModelHdlPerson);
+                        if (perList.count() > 0) {
+                            logd("found %lld person", perList.count());
+                            outList->append(perList);
+                        } else {
+                            logd("not found any person");
+                        }
+                        delete item;
+                    } else {
+                        // just debug log for check, ignore error
+                        logd("Error: something wrong, empty model in list");
+                    }
                 }
             }
         }

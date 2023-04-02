@@ -38,7 +38,7 @@
 #include "departctl.h"
 #include "coursectl.h"
 #include "workctl.h"
-#include "statusctl.h"
+#include "personstatusctl.h"
 #include "eventctl.h"
 #include "rolectl.h"
 #include "communitydeptctl.h"
@@ -91,7 +91,7 @@ void LoaderCtl::registerAll()
     add2Loader(MissionCtl::getInstance());
     add2Loader(INSTANCE(CourseCtl));
     add2Loader(INSTANCE(WorkCtl));
-    add2Loader(INSTANCE(StatusCtl));
+    add2Loader(INSTANCE(PersonStatusCtl));
     add2Loader(INSTANCE(EventCtl));
     add2Loader(AreaCtl::getInstance());
     add2Loader(DepartCtl::getInstance());

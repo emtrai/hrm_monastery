@@ -32,6 +32,12 @@ static QHash<int, QString> s_FilterOperName;
                             (1 << FILTER_OP_CONTAIN) | \
                             (1 << FILTER_OP_NOT_CONTAIN))
 
+#define OPERATOR_FOR_STRING_CONTAIN ((1 << FILTER_OP_CONTAIN) | \
+                            (1 << FILTER_OP_NOT_CONTAIN))
+
+#define OPERATOR_FOR_STRING_EXACT ((1 << FILTER_OP_EQUAL) | \
+                            (1 << FILTER_OP_NOT_EQUAL))
+
 #define OPERATOR_FOR_INT    ((1 << FILTER_OP_EQUAL) | \
                             (1 << FILTER_OP_NOT_EQUAL) | \
                             (1 << FILTER_OP_LESS) | \
@@ -46,15 +52,17 @@ static void initFilterOps()
     logd("initialized = %d", initialized);
     if (!initialized) {
         logd("not init FilterOps, init it");
-        s_FilterOper.insert(FILTER_FIELD_NAME, OPERATOR_FOR_STRING);
-        s_FilterOper.insert(FILTER_FIELD_FULL_NAME, OPERATOR_FOR_STRING);
-        s_FilterOper.insert(FILTER_FIELD_HOLLY_NAME, OPERATOR_FOR_STRING);
+        s_FilterOper.insert(FILTER_FIELD_NAME, OPERATOR_FOR_STRING_CONTAIN);
+        s_FilterOper.insert(FILTER_FIELD_FULL_NAME, OPERATOR_FOR_STRING_CONTAIN);
+        s_FilterOper.insert(FILTER_FIELD_HOLLY_NAME, OPERATOR_FOR_STRING_CONTAIN);
         s_FilterOper.insert(FILTER_FIELD_BIRTHDAY, OPERATOR_FOR_INT);
         s_FilterOper.insert(FILTER_FIELD_ADDRESS, OPERATOR_FOR_STRING);
-        s_FilterOper.insert(FILTER_FIELD_AREA, OPERATOR_FOR_STRING);
-        s_FilterOper.insert(FILTER_FIELD_COMMUNITY, OPERATOR_FOR_STRING);
-        s_FilterOper.insert(FILTER_FIELD_EDUCATION, OPERATOR_FOR_STRING);
-        s_FilterOper.insert(FILTER_FIELD_COURSE, OPERATOR_FOR_STRING);
+        s_FilterOper.insert(FILTER_FIELD_AREA, OPERATOR_FOR_STRING_EXACT);
+        s_FilterOper.insert(FILTER_FIELD_COMMUNITY, OPERATOR_FOR_STRING_EXACT);
+        s_FilterOper.insert(FILTER_FIELD_EDUCATION, OPERATOR_FOR_STRING_EXACT);
+        s_FilterOper.insert(FILTER_FIELD_COURSE, OPERATOR_FOR_STRING_EXACT);
+        s_FilterOper.insert(FILTER_FIELD_SPECIALIST, OPERATOR_FOR_STRING_EXACT);
+        s_FilterOper.insert(FILTER_FIELD_WORK, OPERATOR_FOR_STRING_EXACT);
 
         s_FilterOperName.insert(FILTER_OP_EQUAL, QObject::tr("= / Bằng"));
         s_FilterOperName.insert(FILTER_OP_NOT_EQUAL, QObject::tr("!= / Khác"));

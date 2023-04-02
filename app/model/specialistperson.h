@@ -23,22 +23,35 @@
 #define SPECIALISTPERSON_H
 
 #include "mapdbmodel.h"
+#include "specialist.h"
 
 class SpecialistPerson : public MapDbModel
 {
 public:
     SpecialistPerson();
+    virtual ~SpecialistPerson();
     static DbModel* build();
     virtual DbModelBuilder getBuilder() const;
+
+    virtual void clone(const DbModel* model);
+    virtual DbModel* clone() const;
+
     virtual QString modelName() const;
     const QString &experienceHistory() const;
     void setExperienceHistory(const QString &newExperienceHistory);
     void setPersonUid(const QString& uid);
     void setSpecialistUid(const QString& uid);
+    QString specialistUid();
+    QString specialistName() const;
+
+    const DbModel *specialist() const;
+    void setSpecialist(const DbModel *newSpecialist);
+
 protected:
     virtual DbModelHandler *getDbModelHandler() const;
 protected:
     QString mExperienceHistory;
+    DbModel* mSpecialist;
 };
 
 #endif // SPECIALISTPERSON_H

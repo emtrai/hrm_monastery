@@ -29,7 +29,7 @@
 #include "person.h"
 #include "utils.h"
 #include "saintctl.h"
-#include "statusctl.h"
+#include "personstatusctl.h"
 
 #include <QRegularExpression>
 #include <QValidator>
@@ -66,8 +66,8 @@
 #include "coursectl.h"
 #include "work.h"
 #include "workctl.h"
-#include "status.h"
-#include "statusctl.h"
+#include "personstatus.h"
+#include "personstatusctl.h"
 #include "personevent.h"
 #include "areactl.h"
 #include "area.h"
@@ -241,7 +241,7 @@ Person *DlgPerson::buildPerson()
 
     // holly name
     per->setHollyName(ui->txtSaint->text().trimmed());
-    SET_DATE_VAL_FROM_WIDGET(ui->txtFeastDay, per->setFeastDay);
+    SET_DATE_FORMAT_VAL_FROM_WIDGET(ui->txtFeastDay, per->setFeastDay, DEFAULT_FORMAT_MD);
 
     // set name from full name
     per->setNameFromFullName(ui->txtName->text().trimmed());
@@ -264,6 +264,8 @@ Person *DlgPerson::buildPerson()
     // id card issue date
     SET_DATE_VAL_FROM_WIDGET(ui->txtIdCardDate, per->setIdCardIssueDate);
 
+    per->setIdCardIssuePlace(ui->txtIdCardPlace->text().trimmed());
+
 
     // edu name
     SET_VAL_FROM_CBOX(ui->cbEdu, per->setEduUid, per->setEduName);
@@ -277,7 +279,7 @@ Person *DlgPerson::buildPerson()
     }
     per->setSpecialistInfo(ui->txtSpecialistInfo->toPlainText().trimmed());
 
-    SET_VAL_FROM_CBOX(ui->cbCourse, per->setCourseUid, per->setCourse);
+    SET_VAL_FROM_CBOX(ui->cbCourse, per->setCourseUid, per->setCourseName);
     SET_VAL_FROM_CBOX(ui->cbCountry, per->setCountryUid, per->setCountryName);
 #ifndef SKIP_PERSON_PROVINE
     SET_VAL_FROM_CBOX(ui->cbProvince, per->setProvinceUid, per->setProvinceName);
@@ -342,7 +344,7 @@ Person *DlgPerson::buildPerson()
     SET_DATE_VAL_FROM_WIDGET(ui->txtEternalDate, per->setEternalDate);
     per->setEternalPlace(ui->txtEternalPlace->text().trimmed());
 
-    SET_VAL_FROM_CBOX(ui->cbStatus, per->setStatusUid, per->setStatusName);
+    SET_VAL_FROM_CBOX(ui->cbStatus, per->setPersonStatusUid, per->setPersonStatusName);
 
     SET_DATE_VAL_FROM_WIDGET(ui->txtRetireDate, per->setRetireDate);
     per->setRetirePlace(ui->txtRetirePlace->text().trimmed());
@@ -837,7 +839,7 @@ void DlgPerson::loadStatus()
 {
     tracein;
     ui->cbStatus->clear();
-    QList<DbModel*> listItems = INSTANCE(StatusCtl)->getAllItemsFromDb(); // TODO: getAllItem??
+    QList<DbModel*> listItems = INSTANCE(PersonStatusCtl)->getAllItemsFromDb(); // TODO: getAllItem??
     foreach(DbModel* item, listItems){
         ui->cbStatus->addItem(item->name(), item->uid());
     }

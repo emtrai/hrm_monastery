@@ -129,31 +129,92 @@ qint64 Utils::dateFromString(const QString &date, const QString &f, bool* isOk)
         qint32 year = 0, month = 0, day = 0;
 
         int idx = 0;
+        int yearIdx = -1;
+        int monthIdx = -1;
+        int dayIdx = -1;
+        int noDateItem = listDate.length();
+        QString fmt;
         logd("parse each item in date");
         foreach (QString item, listFormat){
-            if (idx >= listDate.length())
-                break;
-            ok = false;
             logd("item %s", item.toStdString().c_str());
-            logd("listDate %s", listDate[idx].toStdString().c_str());
-            if (item.simplified().startsWith("Y")){ // year
-                year = listDate[idx].toInt(&ok);
-                logd("year '%s' -> %d", STR2CHA(listDate[idx]), year);
-
-            } else if (item.simplified().startsWith("M")){
-                 // TODO: support format like Jan, January???
-                month = listDate[idx].toInt(&ok);
-                logd("month '%s' -> %d", STR2CHA(listDate[idx]), month);
-
-            }  else if (item.simplified().startsWith("D")){
-                // TODO: support format like Mon, Tuesday????
-                day = listDate[idx].toInt(&ok);
-                logd("day '%s' -> %d", STR2CHA(listDate[idx]), day);
-            }
-            if (!ok){
-                break;
+            logd("listDate %s", (idx < noDateItem)?listDate[idx].toStdString().c_str():"0");
+            if (yearIdx < 0 && item.simplified().startsWith("Y")){ // year
+                yearIdx = idx;
+                fmt += "Y";
+            } else if (monthIdx < 0 && item.simplified().startsWith("M")){
+                monthIdx = idx;
+                fmt += "M";
+            }  else if (dayIdx < 0 && item.simplified().startsWith("D")){
+                dayIdx = idx;
+                fmt += "D";
             }
             idx ++;
+        }
+        logd("fmt=%s, noDateItem=%d", STR2CHA(fmt), noDateItem);
+        logd("yearIdx=%d, monthIdx=%d, dayIdx=%d", yearIdx, monthIdx, dayIdx);
+        if (noDateItem == 1) {
+            if (fmt.contains("Y")) {
+                year = listDate[0].toInt(&ok);
+                month = day = 0;
+            } else if (fmt.contains("M")) {
+                month = listDate[0].toInt(&ok);
+                year = day = 0;
+            } else {
+                day = listDate[0].toInt(&ok);
+                year = month = 0;
+            }
+        } else if (noDateItem > 2 || fmt == "YMD" || fmt == "YM" || fmt == "MD") {
+            year = (yearIdx >= 0 && yearIdx < noDateItem)?listDate[yearIdx].toInt(&ok):0;
+            month = (monthIdx >= 0 && monthIdx < noDateItem)?listDate[monthIdx].toInt(&ok):0;
+            day = (dayIdx >= 0 && dayIdx < noDateItem)?listDate[dayIdx].toInt(&ok):0;
+        } else {
+            // DMY, MDY
+            // MY, DM
+            if (fmt == "DMY" || fmt == "MDY" || fmt == "MY") { // skip D
+                year = listDate[1].toInt(&ok);
+                month = listDate[0].toInt(&ok);
+                day = 0;
+            } else if (fmt == "MD") {
+                day = listDate[1].toInt(&ok);
+                month = listDate[0].toInt(&ok);
+                year = 0;
+            } else if (fmt == "DM") {
+                day = listDate[0].toInt(&ok);
+                month = listDate[1].toInt(&ok);
+                year = 0;
+            } else {
+                ok = false;
+            }
+//            if (yearIdx >= 0) { // has year, mean Y/M/D, D/M/Y, M/D/Y or M/Y, Y/M or Y
+//                if (noDateItem  == 1) { // year only
+//                    year = listDate[0].toInt(&ok);
+//                } else if (noDateItem  == 2) { // M/Y or Y/M
+//                    if (yearIdx == 0) {
+//                        year = listDate[0].toInt(&ok); // Y/M
+//                    } else {
+//                        year = listDate[noDateItem-1].toInt(&ok); // M/Y
+//                    }
+//                } else { // Y/M/D or D/M/Y or M/D/Y
+//                    if (yearIdx < noDateItem)
+//                        year = listDate[yearIdx].toInt(&ok);
+//                    else
+//                        year = listDate[noDateItem-1].toInt(&ok);
+//                }
+//            }asdaddasasd
+//            if (monthIdx >= 0) {
+//                if (noDateItem == 2) { // Y/M, M/Y, M/D, D/M
+//                    // 2 case: Y & M or M & D
+//                    if (yearIdx == 0) { // Y/M
+//                        month = listDate[noDateItem-1].toInt(&ok);
+//                    } else if (yearIdx > 0) {
+//                        month = listDate[0].toInt(&ok);
+//                    } else { // M/D or D/M
+//                        year = listDate[monthIdx].toInt(&ok);
+//                    }
+//                } else {
+
+//                }
+//            }
         }
         logd("year %d moth %d date %d", year, month, day);
         if (ok){
@@ -163,6 +224,39 @@ qint64 Utils::dateFromString(const QString &date, const QString &f, bool* isOk)
             loge("Invalid data/format: parse faile");
 
         }
+//        foreach (QString item, listFormat){
+//            if (idx >= listDate.length())
+//                break;
+//            ok = false;
+//            logd("item %s", item.toStdString().c_str());
+//            logd("listDate %s", listDate[idx].toStdString().c_str());
+//            if (item.simplified().startsWith("Y")){ // year
+//                year = listDate[idx].toInt(&ok);
+//                logd("year '%s' -> %d", STR2CHA(listDate[idx]), year);
+
+//            } else if (item.simplified().startsWith("M")){
+//                 // TODO: support format like Jan, January???
+//                month = listDate[idx].toInt(&ok);
+//                logd("month '%s' -> %d", STR2CHA(listDate[idx]), month);
+
+//            }  else if (item.simplified().startsWith("D")){
+//                // TODO: support format like Mon, Tuesday????
+//                day = listDate[idx].toInt(&ok);
+//                logd("day '%s' -> %d", STR2CHA(listDate[idx]), day);
+//            }
+//            if (!ok){
+//                break;
+//            }
+//            idx ++;
+//        }
+//        logd("year %d moth %d date %d", year, month, day);
+//        if (ok){
+//            ret = YMD_TO_INT(year, month, day);
+//        } else{
+//            ret = 0;
+//            loge("Invalid data/format: parse faile");
+
+//        }
     } else{
         loge("Invalid data/format: not match date and format");
     }
@@ -181,6 +275,7 @@ QString Utils::date2String(qint64 date, const QString& format, bool* isOk)
     bool foundSplit = false;
     bool ok = true;
     QString dateString;
+    logd("date=0x%x format=%s", date, STR2CHA(format));
     if (date > 0) {
         year = YEAR_FROM_INT(date);
         month = MONTH_FROM_INT(date);

@@ -14,34 +14,26 @@
  * limitations under the License.
  *
  *
- * Filename: statusctl.cpp
+ * Filename: status.h
  * Author: Anh, Ngo Huy
- * Created date:9/6/2022
+ * Created date:9/5/2022
  * Brief:
  */
-#include "statusctl.h"
+#ifndef PERSONSTATUS_H
+#define PERSONSTATUS_H
 
-#include "logger.h"
-#include "status.h"
-#include "dbctl.h"
-#include "utils.h"
-#include "defs.h"
+#include <dbmodel.h>
 
-GET_INSTANCE_CONTROLLER_IMPL(StatusCtl)
-
-StatusCtl::StatusCtl():
-    ModelController(KModelHdlStatus)
+class PersonStatus : public DbModel
 {
-    tracein;
-}
-
-const char *StatusCtl::getPrebuiltFileName()
-{
-    return KPrebuiltStatusCSVFileName;
-}
+public:
+    PersonStatus();
+    static DbModel *build();
+    virtual DbModelBuilder getBuilder() const;
 
 
-DbModelBuilder StatusCtl::getMainBuilder()
-{
-    return &Status::build;
-}
+protected:
+    virtual DbModelHandler *getDbModelHandler() const;
+};
+
+#endif // PERSONSTATUS_H

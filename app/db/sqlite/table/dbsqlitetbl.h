@@ -85,6 +85,7 @@ public:
      * @return
      */
     virtual ErrCode deleteHard(DbModel* item);
+    virtual ErrCode deleteHard(const QHash<QString, QString>& condition);
 
     virtual bool isExist(const DbModel* item);
     virtual bool isNameidExist(const QString& nameId);
@@ -199,7 +200,7 @@ protected:
     virtual void addTableField(DbSqliteTableBuilder* builder);
     virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
 
-    virtual ErrCode deleteCondition(DbSqliteDeleteBuilder *builder, const DbModel *item);
+    virtual ErrCode appendDeleteCondition(DbSqliteDeleteBuilder *builder, const DbModel *item);
 
     /**
      * @brief Update table field

@@ -34,6 +34,8 @@
 
 #include "filter.h"
 #include "utils.h"
+#include "dbsqlitespecialistpersontbl.h"
+#include "specialistperson.h"
 
 const qint32 DbSqlitePersonTbl::KVersionCode = VERSION_CODE(0,0,1);
 
@@ -77,15 +79,14 @@ void DbSqlitePersonTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldEduUid, TEXT);
     builder->addField(KFieldEduDetail, TEXT);
     builder->addField(KFieldCourseUid, TEXT);
-    builder->addField(KFieldSpecialistUid, TEXT);
+
+    builder->addField(KFieldSpecialistInfo, TEXT);
 
     builder->addField(KFieldCountryUid, TEXT);
     builder->addField(KFieldProvinceUid, TEXT);
     builder->addField(KFieldAddr, TEXT);
 
     builder->addField(KFieldCommunityUid, TEXT);
-    builder->addField(KFieldAreaUid, TEXT);
-    builder->addField(KFieldDepartmentUid, TEXT);
 
     builder->addField(KFieldChurchAddr, TEXT);
 
@@ -142,7 +143,7 @@ void DbSqlitePersonTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldEternalDate, INT64);
     builder->addField(KFieldEternalPlace, TEXT);
 
-    builder->addField(KFieldStatusUid, TEXT);
+    builder->addField(KFieldPersonStatusUid, TEXT);
 
     builder->addField(KFieldRetireDate, INT64);
     builder->addField(KFieldRetirePlace, TEXT);
@@ -194,8 +195,6 @@ ErrCode DbSqlitePersonTbl::insertTableField(DbSqliteInsertBuilder *builder, cons
     builder->addValue(KFieldContact, per->otherContact());
 
     builder->addValue(KFieldCommunityUid, per->communityUid());
-    builder->addValue(KFieldAreaUid, per->areaUid());
-    builder->addValue(KFieldDepartmentUid, per->departUid());
 
     builder->addValue(KFieldDadName, per->dadName());
     builder->addValue(KFieldDadAddr, per->dadAddr());
@@ -244,13 +243,15 @@ ErrCode DbSqlitePersonTbl::insertTableField(DbSqliteInsertBuilder *builder, cons
     builder->addValue(KFieldEternalPlace, per->eternalPlace());
 
 
-    builder->addValue(KFieldStatusUid, per->statusUid());
+    builder->addValue(KFieldPersonStatusUid, per->personStatusUid());
 
     builder->addValue(KFieldRetireDate, per->retireDate());
     builder->addValue(KFieldRetirePlace, per->retirePlace());
 
     builder->addValue(KFieldDeadDate, per->deadDate());
     builder->addValue(KFieldDeadPlace, per->deadPlace());
+
+    builder->addValue(KFieldSpecialistInfo, per->specialistInfo());
 
     // current work
     builder->addValue(KFieldWorkUid, per->currentWorkUid());
@@ -293,19 +294,98 @@ ErrCode DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
     cmm->setHollyName(qry.value(KFieldHollyName).toString());
     cmm->setSaintUidList(qry.value(KFieldSaintUid).toString());
     // TODO: reconsider should store list of saint uid in person table or make mapping table???
-    cmm->setFeastDay(qry.value(KFieldFeastDay).toString());
+    cmm->setFeastDay(qry.value(KFieldFeastDay).toInt());
 
     cmm->setNationalityUid(qry.value(KFieldNationalityUid).toString());
+    if (!cmm->nationalityUid().isEmpty()) {
+        // TODO: caching data (i.e. list of person in management board) for fast accessing?
+        // TODO: is it ok to call here? does it break any design?
+        // as table calls directly to model handler
+        DbModel* model = SQLITE->getCountryModelHandler()->getByUid(cmm->nationalityUid());
+        if (model) {
+            cmm->setNationalityName(model->name());
+            delete model;
+        } else {
+            logw("not found nationalityUid '%s'", STR2CHA(cmm->nationalityUid()));
+        }
+    }
+
     cmm->setEthnicUid(qry.value(KFieldEthnicUid).toString());
+    if (!cmm->ethnicUid().isEmpty()) {
+        // TODO: caching data (i.e. list of person in management board) for fast accessing?
+        // TODO: is it ok to call here? does it break any design?
+        // as table calls directly to model handler
+        DbModel* model = SQLITE->getEthnicModelHandler()->getByUid(cmm->ethnicUid());
+        if (model) {
+            cmm->setEthnicName(model->name());
+            delete model;
+        } else {
+            logw("not found ethnicUid '%s'", STR2CHA(cmm->ethnicUid()));
+        }
+    }
 
     cmm->setEduUid(qry.value(KFieldEduUid).toString());
     cmm->setEduDetail(qry.value(KFieldEduDetail).toString());
+    if (!cmm->eduUid().isEmpty()) {
+        // TODO: caching data (i.e. list of person in management board) for fast accessing?
+        // TODO: is it ok to call here? does it break any design?
+        // as table calls directly to model handler
+        DbModel* model = SQLITE->getEduModelHandler()->getByUid(cmm->eduUid());
+        if (model) {
+            cmm->setEduName(model->name());
+            delete model;
+        } else {
+            logw("not found eduUid '%s'", STR2CHA(cmm->eduUid()));
+        }
+    }
 
     cmm->setCourseUid(qry.value(KFieldCourseUid).toString());
-
+    if (!cmm->courseUid().isEmpty()) {
+        // TODO: caching data (i.e. list of person in management board) for fast accessing?
+        // TODO: is it ok to call here? does it break any design?
+        // as table calls directly to model handler
+        DbModel* model = SQLITE->getCourseModelHandler()->getByUid(cmm->courseUid());
+        if (model) {
+            cmm->setCourseName(model->name());
+            delete model;
+        } else {
+            logw("not found courseUid '%s'", STR2CHA(cmm->courseUid()));
+        }
+    }
     // TODO: set specialist list here????
+    DbSqliteSpecialistPersonTbl* tblspecialist = (DbSqliteSpecialistPersonTbl*)SQLITE->getTable(KTableSpecialistPerson);
+    // assume main tbl is not null, if not programming error,
+    // and require override search function
+    Q_ASSERT(tblspecialist != nullptr);
+    logd("search specialis for per uid: %s", STR2CHA(cmm->uid()));
+    QList<DbModel *> listspecialist = tblspecialist->getListSpecialist(cmm->uid());
+    logd("no specialist: %d", listspecialist.size());
+    if (listspecialist.size() > 0) {
+        foreach(DbModel* model, listspecialist) {
+            logd("model: '%s'", model?STR2CHA(model->toString()):"(null)");
+            if (model && model->modelName() == KModelNameSpecialistPerson) {
+                SpecialistPerson* perspecialist = (SpecialistPerson*) model;
+                cmm->addSpecialistUid(perspecialist->specialistUid());
+                cmm->addSpecialistName(perspecialist->specialist()->name());
+            }
+        }
+        RELEASE_LIST_DBMODEL(listspecialist);
+    }
 
     cmm->setCountryUid(qry.value(KFieldCountryUid).toString());
+    if (!cmm->countryUid().isEmpty()) {
+        // TODO: caching data (i.e. list of person in management board) for fast accessing?
+        // TODO: is it ok to call here? does it break any design?
+        // as table calls directly to model handler
+        DbModel* model = SQLITE->getCountryModelHandler()->getByUid(cmm->countryUid());
+        if (model) {
+            cmm->setCountryName(model->name());
+            delete model;
+        } else {
+            logw("not found countryUid '%s'", STR2CHA(cmm->countryUid()));
+        }
+    }
+
     cmm->setProvinceUid(qry.value(KFieldProvinceUid).toString());
     // TODO: province belong to a country, same name may exist in different company
     // it's a little complicated, comeback with this later
@@ -316,9 +396,18 @@ ErrCode DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
     cmm->setOtherContact(qry.value(KFieldContact).toString());
 
     cmm->setCommunityUid(qry.value(KFieldCommunityUid).toString());
-    cmm->setCommunityName(qry.value(KFieldCommunityName).toString());
-    cmm->setDepartUid(qry.value(KFieldDepartmentUid).toString());
-    cmm->setAreaUid(qry.value(KFieldAreaUid).toString());
+    if (!cmm->communityUid().isEmpty()) {
+        // TODO: caching data (i.e. list of person in management board) for fast accessing?
+        // TODO: is it ok to call here? does it break any design?
+        // as table calls directly to model handler
+        DbModel* model = SQLITE->getCommunityModelHandler()->getByUid(cmm->communityUid());
+        if (model) {
+            cmm->setCommunityName(model->name());
+            delete model;
+        } else {
+            logw("not found communityUid '%s'", STR2CHA(cmm->communityUid()));
+        }
+    }
     // TODO: search and set name
 
     cmm->setDadName(qry.value(KFieldDadName).toString());
@@ -343,22 +432,94 @@ ErrCode DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
 
     cmm->setJoinDate(qry.value(KFieldJoinDate).toInt());
     cmm->setJoinPICUid(qry.value(KFieldJoinPICUid).toString());
+    if (!cmm->joinPICUid().isEmpty() && cmm->joinPICUid() != cmm->uid()) {
+        // TODO: caching data (i.e. list of person in management board) for fast accessing?
+        // TODO: is it ok to call here? does it break any design?
+        // as table calls directly to model handler
+        DbModel* model = SQLITE->getPersonModelHandler()->getByUid(cmm->joinPICUid());
+        if (model) {
+            cmm->setJoinPICName(model->name());
+            delete model;
+        } else {
+            logw("not found joinPICUid '%s'", STR2CHA(cmm->joinPICUid()));
+        }
+    }
 
     cmm->setPreTrainJoinDate(qry.value(KFieldPreTrainDate).toInt());
     cmm->setPreTrainPICUid(qry.value(KFieldPreTrainPICUid).toString());
-
+    if (!cmm->preTrainPICUid().isEmpty() && cmm->preTrainPICUid() != cmm->uid()) {
+        // TODO: caching data (i.e. list of person in management board) for fast accessing?
+        // TODO: is it ok to call here? does it break any design?
+        // as table calls directly to model handler
+        DbModel* model = SQLITE->getPersonModelHandler()->getByUid(cmm->preTrainPICUid());
+        if (model) {
+            cmm->setPreTrainPICName(model->name());
+            delete model;
+        } else {
+            logw("not found preTrainPICUid '%s'", STR2CHA(cmm->preTrainPICUid()));
+        }
+    }
 
     cmm->setTrainJoinDate(qry.value(KFieldTrainDate).toInt());
     cmm->setTrainPICUid(qry.value(KFieldTrainPICUid).toString());
+    if (!cmm->trainPICUid().isEmpty() && cmm->trainPICUid() != cmm->uid()) {
+        // TODO: caching data (i.e. list of person in management board) for fast accessing?
+        // TODO: is it ok to call here? does it break any design?
+        // as table calls directly to model handler
+        DbModel* model = SQLITE->getPersonModelHandler()->getByUid(cmm->trainPICUid());
+        if (model) {
+            cmm->setTrainPICName(model->name());
+            delete model;
+        } else {
+            logw("not found trainPICUid '%s'", STR2CHA(cmm->trainPICUid()));
+        }
+    }
 
     cmm->setVowsDate(qry.value(KFieldVowsDate).toInt());
     cmm->setVowsCEOUid(qry.value(KFieldVowsCEOUid).toString());
-
+    if (!cmm->vowsCEOUid().isEmpty() && cmm->vowsCEOUid() != cmm->uid()) {
+        // TODO: caching data (i.e. list of person in management board) for fast accessing?
+        // TODO: is it ok to call here? does it break any design?
+        // as table calls directly to model handler
+        DbModel* model = SQLITE->getPersonModelHandler()->getByUid(cmm->vowsCEOUid());
+        if (model) {
+            cmm->setVowsCEOName(model->name());
+            delete model;
+        } else {
+            logw("not found vowsCEOUid '%s'", STR2CHA(cmm->vowsCEOUid()));
+        }
+    }
 
     cmm->setEternalVowsDate(qry.value(KFieldEternalVowsDate).toInt());
     cmm->setEternalVowsPICUid(qry.value(KFieldEternalVowsPICUid).toString());
-    cmm->setEternalVowsCEOUid(qry.value(KFieldEternalVowsCEOUid).toString());
+    if (!cmm->eternalVowsPICUid().isEmpty() && cmm->eternalVowsPICUid() != cmm->uid()) {
+        // TODO: caching data (i.e. list of person in management board) for fast accessing?
+        // TODO: is it ok to call here? does it break any design?
+        // as table calls directly to model handler
+        DbModel* model = SQLITE->getPersonModelHandler()->getByUid(cmm->eternalVowsPICUid());
+        if (model) {
+            cmm->setEternalVowsPICName(model->name());
+            delete model;
+        } else {
+            logw("not found eternalVowsPICUid '%s'", STR2CHA(cmm->eternalVowsPICUid()));
+        }
+    }
 
+
+
+    cmm->setEternalVowsCEOUid(qry.value(KFieldEternalVowsCEOUid).toString());
+    if (!cmm->eternalVowsCEOUid().isEmpty() && cmm->eternalVowsCEOUid() != cmm->uid()) {
+        // TODO: caching data (i.e. list of person in management board) for fast accessing?
+        // TODO: is it ok to call here? does it break any design?
+        // as table calls directly to model handler
+        DbModel* model = SQLITE->getPersonModelHandler()->getByUid(cmm->eternalVowsCEOUid());
+        if (model) {
+            cmm->setEternalVowsCEOName(model->name());
+            delete model;
+        } else {
+            logw("not found eternalVowsCEOUid '%s'", STR2CHA(cmm->eternalVowsCEOUid()));
+        }
+    }
 
     cmm->setBankDate(qry.value(KFieldBankDate).toInt());
     cmm->setBankPlace(qry.value(KFieldBankPlace).toString());
@@ -369,7 +530,19 @@ ErrCode DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
     cmm->setEternalDate(qry.value(KFieldEternalDate).toInt());
     cmm->setEternalPlace(qry.value(KFieldEternalPlace).toString());
 
-    cmm->setStatusUid(qry.value(KFieldStatusUid).toString());
+    cmm->setPersonStatusUid(qry.value(KFieldPersonStatusUid).toString());
+    if (!cmm->personStatusUid().isEmpty()) {
+        // TODO: caching data (i.e. list of person in management board) for fast accessing?
+        // TODO: is it ok to call here? does it break any design?
+        // as table calls directly to model handler
+        DbModel* model = SQLITE->getPersonStatusModelHandler()->getByUid(cmm->personStatusUid());
+        if (model) {
+            cmm->setPersonStatusName(model->name());
+            delete model;
+        } else {
+            logw("not found personStatusUid '%s'", STR2CHA(cmm->personStatusUid()));
+        }
+    }
 
     cmm->setRetireDate(qry.value(KFieldRetireDate).toInt());
     cmm->setRetirePlace(qry.value(KFieldRetirePlace).toString());
@@ -378,7 +551,19 @@ ErrCode DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
     cmm->setDeadPlace(qry.value(KFieldDeadPlace).toString());
 
     cmm->setCurrentWorkUid(qry.value(KFieldWorkUid).toString());
-
+    if (!cmm->currentWorkUid().isEmpty()) {
+        // TODO: caching data (i.e. list of person in management board) for fast accessing?
+        // TODO: is it ok to call here? does it break any design?
+        // as table calls directly to model handler
+        DbModel* model = SQLITE->getWorkModelHandler()->getByUid(cmm->currentWorkUid());
+        if (model) {
+            cmm->setCurrentWorkName(model->name());
+            delete model;
+        } else {
+            logw("not found work uid '%s'", STR2CHA(cmm->currentWorkUid()));
+        }
+    }
+    //
 
     // TODO: add field relate to list, like holly list, community, etc.
 
@@ -404,7 +589,122 @@ ErrCode DbSqlitePersonTbl::updateTableField(DbSqliteUpdateBuilder *builder,
         } else if (field == KItemHolly) {
             builder->addValue(KFieldHollyName, per->hollyName());
             builder->addValue(KFieldSaintUid, per->saintUidListInString());
+        } else if (field == KItemBirthplace) {
+            builder->addValue(KFieldBirthPlace, per->birthPlace());
+        } else if (field == KItemBirthday) {
+            builder->addValue(KFieldBirthDay, per->birthday());
+        } else if (field == KItemChristenDate) {
+            builder->addValue(KFieldChristenDate, per->christenDate());
+        } else if (field == KItemWork) {
+            builder->addValue(KFieldWorkUid, per->currentWorkUid());
+        } else if (field == KItemSpecialistInfo) {
+            builder->addValue(KFieldSpecialistInfo, per->specialistInfo());
+        } else if (field == KItemEduDetail) {
+            builder->addValue(KFieldEduDetail, per->eduDetail());
+        } else if (field == KItemNationality) {
+            builder->addValue(KFieldNationalityUid, per->nationalityUid());
+        } else if (field == KItemFeastDay) {
+            builder->addValue(KFieldFeastDay, per->feastDay());
+        } else if (field == KItemEucharistPlace) {
+            builder->addValue(KFieldEucharistPlace, per->eucharistPlace());
+        } else if (field == KItemEucharistDate) {
+            builder->addValue(KFieldEucharistDate, per->eucharistDate());
+        } else if (field == KItemOtherContact) {
+            builder->addValue(KFieldContact, per->otherContact());
+        } else if (field == KItemImg) {
+            builder->addValue(KFieldImgId, per->imgId());
+        } else if (field == KItemDeadPlace) {
+            builder->addValue(KFieldDeadPlace, per->deadPlace());
+        } else if (field == KItemDeadDate) {
+            builder->addValue(KFieldDeadDate, per->deadDate());
+        } else if (field == KItemRetirePlace) {
+            builder->addValue(KFieldRetirePlace, per->retirePlace());
+        } else if (field == KItemRetireDate) {
+            builder->addValue(KFieldRetireDate, per->retireDate());
+        } else if (field == KItemStatus) {
+            builder->addValue(KFieldPersonStatusUid, per->personStatusUid());
+        } else if (field == KItemEternalPlace) {
+            builder->addValue(KFieldEternalPlace, per->eternalPlace());
+        } else if (field == KItemEternalDate) {
+            builder->addValue(KFieldEternalDate, per->eternalDate());
+        } else if (field == KItemGoldenPlace) {
+            builder->addValue(KFieldGoldenPlace, per->goldenPlace());
+        } else if (field == KItemGoldenDate) {
+            builder->addValue(KFieldGoldenDate, per->goldenDate());
+        } else if (field == KItemBankPlace) {
+            builder->addValue(KFieldBankPlace, per->bankPlace());
+        } else if (field == KItemBankDate) {
+            builder->addValue(KFieldBankDate, per->bankDate());
+        } else if (field == KItemEternalVowsCEO) {
+            builder->addValue(KFieldEternalVowsCEOUid, per->eternalVowsCEOUid());
+        } else if (field == KItemEternalVowsPIC) {
+            builder->addValue(KFieldEternalVowsPICUid, per->eternalVowsPICUid());
+        } else if (field == KItemEternalVowsDate) {
+            builder->addValue(KFieldEternalVowsDate, per->eternalVowsDate());
+        } else if (field == KItemVowsDate) {
+            builder->addValue(KFieldVowsDate, per->vowsDate());
+        } else if (field == KItemVowsCEO) {
+            builder->addValue(KFieldVowsCEOUid, per->vowsCEOUid());
+        } else if (field == KItemTrainPIC) {
+            builder->addValue(KFieldTrainPICUid, per->trainPICUid());
+        } else if (field == KItemTrainDate) {
+            builder->addValue(KFieldTrainDate, per->trainJoinDate());
+        } else if (field == KItemPreTrainPIC) {
+            builder->addValue(KFieldPreTrainPICUid, per->preTrainPICUid());
+        } else if (field == KItemPreTrainDate) {
+            builder->addValue(KFieldPreTrainDate, per->preTrainJoinDate());
+        } else if (field == KItemJoinPIC) {
+            builder->addValue(KFieldJoinPICUid, per->joinPICUid());
+        } else if (field == KItemJoinDate) {
+            builder->addValue(KFieldJoinDate, per->joinDate());
+        } else if (field == KItemFamilyContact) {
+            builder->addValue(KFieldFamilyContact, per->familyContact());
+        } else if (field == KItemHollyDate) {
+            builder->addValue(KFieldHollyDate, per->hollyDate());
+        } else if (field == KItemHollyPlace) {
+            builder->addValue(KFieldHollyPlace, per->hollyPlace());
+        } else if (field == KItemChristenDate) {
+            builder->addValue(KFieldChristenDate, per->christenDate());
+        } else if (field == KItemChristenPlace) {
+            builder->addValue(KFieldChristenPlace, per->christenPlace());
+        } else if (field == KItemFamilyHistory) {
+            builder->addValue(KFieldFamilyHistory, per->familyHistory());
+        } else if (field == KItemMomAddr) {
+            builder->addValue(KFieldMomAddr, per->momAddr());
+        } else if (field == KItemMomBirthday) {
+            builder->addValue(KFieldMomBirthDay, per->momBirthday());
+        } else if (field == KItemMom) {
+            builder->addValue(KFieldMomName, per->momName());
+        } else if (field == KItemDadAddr) {
+            builder->addValue(KFieldDadAddr, per->dadAddr());
+        } else if (field == KItemDadBirthday) {
+            builder->addValue(KFieldDadBirthDay, per->dadBirthday());
+        } else if (field == KItemDad) {
+            builder->addValue(KFieldDadName, per->dadName());
+        } else if (field == KItemTel) {
+            builder->addValue(KFieldTel, per->tel().join(';'));
+        } else if (field == KItemEmail) {
+            builder->addValue(KFieldEmail, per->email().join(';'));
+        } else if (field == KItemChurchAddress) {
+            builder->addValue(KFieldChurchAddr, per->churchAddr());
+        } else if (field == KItemAddress) {
+            builder->addValue(KFieldAddr, per->addr());
+        } else if (field == KItemCountry) {
+            builder->addValue(KFieldCountryUid, per->countryUid());
+        } else if (field == KItemCourse) {
+            builder->addValue(KFieldCourseUid, per->courseUid());
+        } else if (field == KItemEdu) {
+            builder->addValue(KFieldEduUid, per->eduUid());
+        } else if (field == KItemIDcardIssuer) {
+            builder->addValue(KFieldIDCardIssuePlace, per->idCardIssuePlace());
+        } else if (field == KItemIDcardIssueDate) {
+            builder->addValue(KFieldIDCardIssueDate, per->idCardIssueDate());
+        } else if (field == KItemIDcard) {
+            builder->addValue(KFieldIDCard, per->idCard());
+        } else if (field == KItemEthnic) {
+            builder->addValue(KFieldEthnicUid, per->ethnicUid());
         }
+
     }
     traceret(err);
     return err;
@@ -455,21 +755,67 @@ QString DbSqlitePersonTbl::getFilterQueryString(int fieldId, const QString &cond
     tracein;
     logd("fieldId %d", fieldId);
     QString joinQuery;
+    QString selectQuery;
     switch (fieldId) {
     case FILTER_FIELD_EDUCATION:
-        joinQuery = QString("%1.%2 AS %3 LEFT JOIN %1 ON %4 = %1.%5")
+        selectQuery = QString("%1.%2 AS %3, %1.%4 AS %5, %1.%6 AS %7")
                         .arg(KTableEdu, KFieldName, KFieldEduName)
-                        .arg(KFieldEduUid, KFieldUid)
+                        .arg(KFieldUid, KFieldEduUid)
+                        .arg(KFieldNameId, KFieldEduNameId)
+            ;
+        joinQuery = QString("LEFT JOIN %2 ON %1.%4 = %2.%3")
+                        .arg(name(), KTableEdu)
+                        .arg(KFieldUid, KFieldEduUid)
+            ;
+        break;
+    case FILTER_FIELD_COMMUNITY:
+        selectQuery = QString("%1.%2 AS %7, %1.%4 AS %5, %1.%3 AS %6")
+                        .arg(KTableCommunity) // 1
+                        .arg(KFieldUid, KFieldNameId) // 2 3
+                        .arg(KFieldName, KFieldCommunityName) // 4 5
+                        .arg(KFieldCommunityNameId, KFieldCommunityUid) // 6 7
+            ;
+        joinQuery = QString("LEFT JOIN %2 ON %1.%4 = %2.%3")
+                        .arg(name(), KTableCommunity) // 1, 2
+                        .arg(KFieldUid, KFieldCommunityUid) // 3, 4
+            ;
+        break;
+    case FILTER_FIELD_COURSE:
+        selectQuery = QString("%1.%2 AS %7, %1.%4 AS %5, %1.%3 AS %6")
+                          .arg(KTableCourse) // 1
+                          .arg(KFieldUid, KFieldNameId) // 2 3
+                          .arg(KFieldName, KFieldCourseName) // 4 5
+                          .arg(KFieldCourseNameId, KFieldCourseUid) // 6 7
+            ;
+        joinQuery = QString("LEFT JOIN %2 ON %1.%4 = %2.%3")
+                        .arg(name(), KTableCourse) // 1, 2
+                        .arg(KFieldUid, KFieldCourseUid) // 3, 4
+            ;
+        break;
+    case FILTER_FIELD_WORK:
+        selectQuery = QString("%1.%2 AS %7, %1.%4 AS %5, %1.%3 AS %6")
+                          .arg(KTableWork) // 1
+                          .arg(KFieldUid, KFieldNameId) // 2 3
+                          .arg(KFieldName, KFieldWorkName) // 4 5
+                          .arg(KFieldWorkNameId, KFieldWorkUid) // 6 7
+            ;
+        joinQuery = QString("LEFT JOIN %2 ON %1.%4 = %2.%3")
+                        .arg(name(), KTableWork) // 1, 2
+                        .arg(KFieldUid, KFieldWorkUid) // 3, 4
             ;
         break;
     default: // TODO: implement more
         break;
     }
 
-    QString queryString = QString("SELECT *, (%2 || ' ' || %3) AS %4 %5  FROM %1")
+    logd("selectQuery: '%s'", STR2CHA(selectQuery));
+    logd("joinQuery: '%s'", STR2CHA(joinQuery));
+
+    QString queryString = QString("SELECT *, (%2 || ' ' || %3) AS %4 %5 FROM %1 %6")
                               .arg(name())
                               .arg(KFieldLastName, KFieldFirstName, KFieldFullName)
-                              .arg((joinQuery.isEmpty()?"":"," + joinQuery))
+                              .arg((selectQuery.isEmpty()?"":"," + selectQuery))
+                              .arg((joinQuery.isEmpty()?"":joinQuery))
         ;
     if (!cond.isEmpty()) {
         queryString += QString(" WHERE %1").arg(cond);

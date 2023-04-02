@@ -348,8 +348,8 @@ ErrCode DbSqliteTbl::deleteSoft(DbModel *item)
 {
     ErrCode err = ErrNone;
     tracein;
-    // TODO: made delete condition customize/dynamic by deleteCondition
-//    QHash<QString, QString> deleteCond = deleteCondition(item);
+    // TODO: made delete condition customize/dynamic by appendDeleteCondition
+//    QHash<QString, QString> deleteCond = appendDeleteCondition(item);
 //    if (deleteCond.count() > 0) {
 //        update(item->uid(), )
 //    }
@@ -370,8 +370,55 @@ ErrCode DbSqliteTbl::deleteHard(DbModel *item)
     logd("build delete builder");
     // TODO: check to make sure that uid does not exist?????
     deleteBuilder = DbSqliteDeleteBuilder::build(name());
-    err = deleteCondition(deleteBuilder, item);
+    err = appendDeleteCondition(deleteBuilder, item);
     if (err == ErrNone){
+        logd("Build SQL Query and execute");
+        updateQry = deleteBuilder->buildSqlQuery();
+        err = db()->execQuery(updateQry);
+        updateQry->clear();
+        logd("execQuery err %d", err);
+    } else {
+        loge("Faild to delete item in table, err=%d", err);
+    }
+
+
+    if (deleteBuilder) {
+        delete deleteBuilder;
+        deleteBuilder = nullptr;
+    }
+    if (updateQry) {
+        delete updateQry;
+        updateQry = nullptr;
+    }
+    traceret(err);
+    return err;
+}
+
+ErrCode DbSqliteTbl::deleteHard(const QHash<QString, QString> &condition)
+{
+    tracein;
+    ErrCode_t err = ErrNone;
+    DbSqliteDeleteBuilder* deleteBuilder = nullptr;
+    QSqlQuery* updateQry = nullptr;
+    if (condition.isEmpty()) {
+        err = ErrInvalidArg;
+        loge("Empty condition hash map");
+    }
+    if (err == ErrNone) {
+        logd("build delete builder");
+        // TODO: check to make sure that uid does not exist?????
+        deleteBuilder = DbSqliteDeleteBuilder::build(name());
+        if (!deleteBuilder) {
+            err = ErrNoMemory;
+            logd("lack of memory");
+        }
+    }
+    if (err == ErrNone){
+        foreach(QString field, condition.keys()) {
+            logd("Add condition '%s', value '%s'",
+                 STR2CHA(field), STR2CHA(condition[field]));
+            deleteBuilder->addCond(field, condition[field]);
+        }
         logd("Build SQL Query and execute");
         updateQry = deleteBuilder->buildSqlQuery();
         err = db()->execQuery(updateQry);
@@ -594,33 +641,42 @@ ErrCode DbSqliteTbl::filter(int fieldId,
     QString cond;
     bool isOk = false;
     QString fieldName = getFieldNameFromId(fieldId, &isOk);
+    QString field;
+    switch (fieldId) {
+    case FILTER_FIELD_NAME:
+        field = QString("%1.%2").arg(name(), fieldName);
+        break;
+    default:
+        field = fieldName;
+        break;
+    }
     if (isOk && !fieldName.isEmpty()) {
         switch (operatorId) {
         case FILTER_OP_EQUAL:
-            cond = QString("lower(%1) = :keywordexact").arg(fieldName);
+            cond = QString("lower(%1) = :keywordexact").arg(field);
             break;
         case FILTER_OP_NOT_EQUAL:
-            cond = QString("lower(%1) != :keywordexact").arg(fieldName);
+            cond = QString("lower(%1) != :keywordexact").arg(field);
             break;
 
         case FILTER_OP_CONTAIN:
-            cond = QString("lower(%1) like :keyword").arg(fieldName);
+            cond = QString("lower(%1) like :keyword").arg(field);
             break;
 
         case FILTER_OP_NOT_CONTAIN:
-            cond = QString("lower(%1) not like :keyword").arg(fieldName);
+            cond = QString("lower(%1) not like :keyword").arg(field);
             break;
         case FILTER_OP_LESS:
-            cond = QString("lower(%1) < :value").arg(fieldName);
+            cond = QString("%1 < :value").arg(field);
             break;
         case FILTER_OP_LESS_EQ:
-            cond = QString("lower(%1) <= :value").arg(fieldName);
+            cond = QString("%1 <= :value").arg(field);
             break;
         case FILTER_OP_GREATER:
-            cond = QString("lower(%1) > :value").arg(fieldName);
+            cond = QString("%1 > :value").arg(field);
             break;
         case FILTER_OP_GREATER_EQ:
-            cond = QString("lower(%1) >= :value").arg(fieldName);
+            cond = QString("%1 >= :value").arg(field);
             break;
         default:
             break;
@@ -634,7 +690,8 @@ ErrCode DbSqliteTbl::filter(int fieldId,
     logd("Query String '%s'", queryString.toStdString().c_str());
 
     // TODO: check sql injection issue
-    qry.bindValue( ":keyword", QString("%%1%").arg(keyword.trimmed().toLower()) );
+    logd("bind keyword='%s'", STR2CHA(keyword));
+    qry.bindValue( ":keyword", QString("%1%").arg(keyword.trimmed().toLower()) );
     qry.bindValue( ":keywordexact", QString("%1").arg(keyword.trimmed().toLower()) );
     qry.bindValue( ":value", QString("%1").arg(keyword.trimmed().toLower()) );
     cnt = runQuery(qry, builder, outList);
@@ -1096,7 +1153,7 @@ void DbSqliteTbl::appendDbStatusCond(QString& cond, qint64 dbStatus)
             cond = QString("(%1) AND (%2)").arg(cond, condStatus);
         }
     }
-    logd("cond with dbstatus='%s'", STR2CHA(cond));
+    logd("cond with cond='%s'", STR2CHA(cond));
     traceout;
 }
 
@@ -1176,7 +1233,7 @@ ErrCode DbSqliteTbl::search(const QString& keyword, const QHash<QString, int>& i
     // TODO: exact and not exact match???
 
 //    QSqlQuery qry(SQLITE->currentDb());
-    QSqlQuery* qry = new QSqlQuery(SQLITE->currentDb());
+    QSqlQuery qry(SQLITE->currentDb());
     ErrCode err = ErrNone;
     int cnt = 0;
     logi("Search keyword '%s', dbStatus=0x%x", STR2CHA(keyword), dbStatus);
@@ -1204,16 +1261,16 @@ ErrCode DbSqliteTbl::search(const QString& keyword, const QHash<QString, int>& i
     logd("Query cond '%s'", cond.toStdString().c_str());
     QString queryString = getSearchQueryString(cond);
 
-    qry->prepare(queryString);
+    qry.prepare(queryString);
     logd("Query String '%s'", queryString.toStdString().c_str());
     logd("Bind value '%s'", STR2CHA(keyword.trimmed().toLower()));
 
     // TODO: check sql injection issue
-    qry->bindValue( ":keyword", QString("%%1%").arg(keyword.trimmed().toLower()) );
-    qry->bindValue( ":keywordexact", QString("%1").arg(keyword.trimmed().toLower()) );
-    qry->bindValue( ":value", QString("%1").arg(keyword.trimmed().toLower()) );
+    qry.bindValue( ":keyword", QString("%%1%").arg(keyword.trimmed().toLower()) );
+    qry.bindValue( ":keywordexact", QString("%1").arg(keyword.trimmed().toLower()) );
+    qry.bindValue( ":value", QString("%1").arg(keyword.trimmed().toLower()) );
     try {
-        cnt = runQuery(*qry, builder, outList);
+        cnt = runQuery(qry, builder, outList);
     } catch(const std::runtime_error& ex) {
         loge("Runtime Exception! %s", ex.what());
         cnt = 0;
@@ -1230,7 +1287,6 @@ ErrCode DbSqliteTbl::search(const QString& keyword, const QHash<QString, int>& i
 
 
     logi("Found %d", cnt);
-    delete qry;
     traceret(err);
     return err;
 }
@@ -1371,7 +1427,7 @@ ErrCode DbSqliteTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbMo
     return ErrNone;
 }
 
-ErrCode DbSqliteTbl::deleteCondition(DbSqliteDeleteBuilder *builder, const DbModel *item)
+ErrCode DbSqliteTbl::appendDeleteCondition(DbSqliteDeleteBuilder *builder, const DbModel *item)
 {
     tracein;
     ErrCode err = ErrNone;

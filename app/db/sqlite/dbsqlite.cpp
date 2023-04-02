@@ -42,7 +42,7 @@
 #include "table/dbsqlitedeparttbl.h"
 #include "table/dbsqlitecoursetbl.h"
 #include "table/dbsqliteworktbl.h"
-#include "table/dbsqlitestatustbl.h"
+#include "table/dbsqlitepersonstatustbl.h"
 #include "table/dbsqlitepersoneventtbl.h"
 #include "table/dbsqliteeventtbl.h"
 #include "table/dbsqlitesaintpersonmaptbl.h"
@@ -70,7 +70,7 @@
 #include "dbsqlitecourse.h"
 #include "dbsqlitework.h"
 #include "dbsqliteperson.h"
-#include "dbsqlitestatus.h"
+#include "dbsqlitepersonstatus.h"
 #include "dbsqlitepersonevent.h"
 #include "dbsqliteevent.h"
 #include "dbsqliterole.h"
@@ -193,7 +193,7 @@ void DbSqlite::setupTables()
     appendTable(new DbSqliteCourseTbl(this));
     appendTable(new DbSqliteWorkTbl(this));
     appendTable(new DbSqliteRoleTbl(this));
-    appendTable(new DbSqliteStatusTbl(this));
+    appendTable(new DbSqlitePersonStatusTbl(this));
     appendTable(new DbSqlitePersonEventTbl(this));
     appendTable(new DbSqliteEventTbl(this));
     appendTable(new DbSqliteSaintPersonMapTbl(this));
@@ -223,7 +223,7 @@ void DbSqlite::setupModelHandler()
     appendModelHandler(new DbSqliteArea());
     appendModelHandler(new DbSqliteCourse());
     appendModelHandler(new DbSqliteWork());
-    appendModelHandler(new DbSqliteStatus());
+    appendModelHandler(new DbSqlitePersonStatus());
     appendModelHandler(new DbSqliteRole());
     appendModelHandler(new DbSqlitePerson());
     appendModelHandler(new DbSqliteEvent());
@@ -354,9 +354,9 @@ DbModelHandler *DbSqlite::getCommunityModelHandler()
     return getModelHandler(KModelHdlCommunity);
 }
 
-DbSqlitePerson *DbSqlite::getPersonModelHandler()
+DbModelHandler *DbSqlite::getPersonModelHandler()
 {
-    return dynamic_cast<DbSqlitePerson*>(getModelHandler(KModelHdlPerson));
+    return getModelHandler(KModelHdlPerson);
 
 }
 
@@ -396,6 +396,30 @@ DbModelHandler *DbSqlite::getModelHandler(const QString &name)
 DbModelHandler *DbSqlite::getDepartmentModelHandler()
 {
     return getModelHandler(KModelHdlDept);
+
+}
+
+DbModelHandler *DbSqlite::getWorkModelHandler()
+{
+    return getModelHandler(KModelHdlWork);
+
+}
+
+DbModelHandler *DbSqlite::getPersonStatusModelHandler()
+{
+    return getModelHandler(KModelHdlPersonStatus);
+
+}
+
+DbModelHandler *DbSqlite::getCourseModelHandler()
+{
+    return getModelHandler(KModelHdlCourse);
+
+}
+
+DbModelHandler *DbSqlite::getEthnicModelHandler()
+{
+    return getModelHandler(KModelHdlEthnic);
 
 }
 

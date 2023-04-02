@@ -30,6 +30,8 @@
 #include "dbsqliteedu.h"
 #include "dbsqlitespecialist.h"
 #include "filectl.h"
+#include "defs.h"
+
 
 DbCtl* DbCtl::gInstance = nullptr;
 
@@ -48,7 +50,7 @@ DbCtl::DbCtl()
 //        appDirPath.mkpath(appDirPath.absolutePath());
 //    }
 
-    QString dbPath = FileCtl::getAppDataDir("test.db");
+    QString dbPath = FileCtl::getAppWorkingDataDir(KDatabasename);
 
     logd("dbPath %s", dbPath.toStdString().c_str());
     dbInfo->setUri(dbPath);

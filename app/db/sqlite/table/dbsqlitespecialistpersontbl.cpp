@@ -90,7 +90,12 @@ QList<DbModel *> DbSqliteSpecialistPersonTbl::getListPerson(
                                                          KFieldSpecialistUid,/*fieldUid1Cond*/
                                                          &Person::build, /*builder*/
                                                          specialistUid, /*uid*/
-                                                         status
+                                                         status,
+                                                         QString("*, %1.%2 AS %3, %1.%4 AS %5")
+                                                             .arg(KTablePerson, KFieldNameId) // 1&2
+                                                             .arg(KFieldPersonNameId) // 3
+                                                             .arg(KFieldUid) // 4
+                                                             .arg(KFieldPersonUid) // 5
                                                          );
 
     traceout;
@@ -119,7 +124,7 @@ QList<DbModel *> DbSqliteSpecialistPersonTbl::getListSpecialist(const QString &p
                                                          KFieldSpecialistUid,/*fieldUid2Join*/
                                                          KFieldUid,/*fieldModelUid*/
                                                          KFieldPersonUid,/*fieldUid1Cond*/
-                                                         &Specialist::build, /*builder*/
+                                                         &SpecialistPerson::build, /*builder*/
                                                          personUid, /*uid*/
                                                          status,
                                                          QString("*, %1.%2 AS %3, %1.%4 AS %5")
@@ -176,10 +181,20 @@ ErrCode DbSqliteSpecialistPersonTbl::updateModelFromQuery(DbModel *item, const Q
         DbSqliteSpecialistTbl* tbl = dynamic_cast<DbSqliteSpecialistTbl*>(DbSqlite::table(KTableSpecialist));
         err = tbl->updateModelFromQuery(item, qry);
     } else if (modelName == KModelNameSpecialistPerson) {
+        logd("update model for specialist info");
+        DbSqliteSpecialistTbl* tblSpecialist = dynamic_cast<DbSqliteSpecialistTbl*>(DbSqlite::table(KTableSpecialist));
+        DbModel* specialist = Specialist::build();
+        logd("update model for specialist info");
+        err = tblSpecialist->updateModelFromQuery(specialist, qry);
+
         logd("update for specialist person model");
         err = DbSqliteMapTbl::updateModelFromQuery(item, qry);
         SpecialistPerson* model = (SpecialistPerson*) item;
+        model->setSpecialist(specialist);
         model->setExperienceHistory(qry.value(KFieldExperienceHistory).toString());
+
+        delete specialist;
+        logd("specialist name '%s'", STR2CHA(model->specialistName()));
     } else {
         loge("Invalid mapp model '%s', do nothing", modelName.toStdString().c_str());
     }

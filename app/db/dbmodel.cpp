@@ -103,6 +103,7 @@ void DbModel::clone(const DbModel *model)
 {
     tracein;
     if (model) {
+        logd("clone from model '%s'", STR2CHA(model->toString()));
         copy(*model);
     } else {
         loge("clone failed, null model");
@@ -114,6 +115,8 @@ DbModel *DbModel::clone() const
 {
     tracein;
     DbModel* model = getBuilder()(); // TODO: check builder null or not???
+
+    logd("clone new model '%s'", STR2CHA(toString()));
     model->clone((DbModel*)this);
     traceout;
     return model;
@@ -456,6 +459,29 @@ const QList<QString> &DbModel::updatedField() const
     return mUpdatedField;
 }
 
+bool DbModel::isFieldUpdated(const QString &itemField)
+{
+    tracein;
+    bool updated = false;
+    if (!itemField.isEmpty()) {
+        if (markModified()) {
+            logd("item field to be check: %s", STR2CHA(itemField));
+            if (mUpdatedField.contains(itemField)){
+                updated = true;
+            } else {
+                logw("Field '%s' is not exist", STR2CHA(itemField));
+            }
+        } else {
+            logw("Model is not enable modified flag");
+        }
+    } else {
+        logw("Invalid argument");
+    }
+    logd("updated=%d", updated);
+    traceret(updated);
+    return updated;
+}
+
 void DbModel::resetAllModifiedMark()
 {
     tracein;
@@ -510,7 +536,7 @@ ErrCode DbModel::save()
     return ret;
 }
 
-DbModel *DbModel::addUpdate(const QString &field)
+DbModel *DbModel::addFieldToBeUpdated(const QString &field)
 {
     if (!mUpdatedField.contains(field)) {
         mUpdatedField.append(field);

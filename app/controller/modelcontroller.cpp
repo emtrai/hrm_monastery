@@ -798,7 +798,7 @@ ErrCode ModelController::insertModelToCache(DbModel* model, bool clone)
         // so save back to cache
         DbModel* saveModel = nullptr;
         if (clone) {
-            model->clone();
+            saveModel = model->clone();
         } else {
             saveModel = model;
         }

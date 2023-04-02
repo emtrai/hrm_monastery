@@ -119,12 +119,13 @@ public:
     static void init();
     static void printLog2File(const QString& log);
     static void reqWriteLog(const QString& log);
+    static QString logDirPath();
 private:
     Logger();
     ~Logger();
     void doInit();
     QString getLogDirPath();
-    QString getLogFilePath();
+    QString getLogFilePath(const QString* fname = nullptr);
     void doHandleMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg);
     void doPrintLog2File(const QString& log);
     void doReqWriteLog(const QString& log);

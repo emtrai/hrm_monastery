@@ -35,6 +35,7 @@
 #include <QToolButton>
 #include <QFileDialog>
 #include <QThread>
+#include <QDesktopServices>
 
 #include "view/dialog/dlgimportpersonlistresult.h"
 #include "view/dialog/dlgimportcommunitylistresult.h"
@@ -48,6 +49,7 @@
 #include "modelcontroller.h"
 #include "personctl.h"
 #include "dlgimportexportselect.h"
+#include "backup/backupctl.h"
 
 #define ADD_MENU_ITEM(menu, func, name, iconPath) \
 do { \
@@ -930,9 +932,11 @@ void MainWindow::on_actionDept_triggered()
 void MainWindow::on_action_ExportPersonList_triggered()
 {
     tracein;
-    QList<DbModel*> list;
+    QList<DbModel*> list = PERSONCTL->getAllItemsFromDb();
 //    UNDER_DEV(tr("Xuất danh sách nữ tu ra tập tin"));
-    doExportListItems(&list, PERSONCTL, "Danh sách nữ tu", ExportType::EXPORT_XLSX | ExportType::EXPORT_CSV_LIST);
+//    doExportListItems(&list, PERSONCTL, "Danh sách nữ tu", ExportType::EXPORT_XLSX | ExportType::EXPORT_CSV_LIST);
+    doExportListItems(&list, PERSONCTL, "Danh sách nữ tu", ExportType::EXPORT_XLSX);
+    RELEASE_LIST_DBMODEL(list);
 }
 
 void MainWindow::on_action_ExportCommunityList_triggered()
@@ -941,6 +945,7 @@ void MainWindow::on_action_ExportCommunityList_triggered()
     QList<DbModel*> list = COMMUNITYCTL->getAllItemsFromDb();
 //    UNDER_DEV(tr("Xuất danh sách nữ tu ra tập tin"));
     doExportListItems(&list, COMMUNITYCTL, "Danh sách cộng đoàn", ExportType::EXPORT_XLSX);
+    RELEASE_LIST_DBMODEL(list);
 }
 
 
@@ -955,9 +960,23 @@ void MainWindow::on_action_About_triggered()
 void MainWindow::on_action_Backup_triggered()
 {
     tracein;
-    UNDER_DEV(tr("Sao lưu dữ liệu"));
+//    UNDER_DEV(tr("Sao lưu dữ liệu"));
     // TODO: implement it
-
+    QString fpath = Utils::saveFileDialog(this, tr("Sao lưu dữ liệu"),
+                                  QString("saoluu.zip"),
+                                  QString("zip (*.zip)")
+                                  );
+    if (!fpath.isEmpty()) {
+        logi("Backup file to '%s'", STR2CHA(fpath));
+        ErrCode err = BACKUP->backup(fpath);
+        logi("Backup file result=%d", err);
+        if (err == ErrNone) {
+            Utils::showMsgBox(QString(tr("Sao lưu file vào: %1")).arg(fpath));
+        } else {
+            Utils::showErrorBox(QString(tr("Sao lưu file thất bại, mã lỗi %1")).arg(err));
+        }
+    }
+    traceout;
 }
 
 
@@ -1059,5 +1078,13 @@ void MainWindow::on_actionBack_triggered()
         switchView(view, true);
     }
     traceout;
+}
+
+
+void MainWindow::on_actionLogFile_triggered()
+{
+    QString logDir = Logger::logDirPath();
+    logd("Open log dir=%s", STR2CHA(logDir));
+    QDesktopServices::openUrl(QUrl::fromLocalFile(logDir));
 }
 

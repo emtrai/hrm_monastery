@@ -39,7 +39,7 @@
 #include "communityperson.h"
 #include "saintperson.h"
 #include "specialistperson.h"
-
+#include "dbsqlite.h"
 
 GET_INSTANCE_IMPL(DbSqlitePerson)
 
@@ -48,7 +48,7 @@ DbSqlitePerson::DbSqlitePerson()
     tracein;
 }
 
-ErrCode DbSqlitePerson::add(DbModel *model, bool notifyDataChange)
+ErrCode DbSqlitePerson::add(DbModel *model, bool notify)
 {
 
     tracein;
@@ -119,6 +119,9 @@ ErrCode DbSqlitePerson::add(DbModel *model, bool notifyDataChange)
     else{
         err = ErrInvalidArg;
         loge("invalid argument");
+    }
+    if (err == ErrNone && notify) {
+        notifyDataChange(model, DBMODEL_CHANGE_ADD, err);
     }
     traceret(err);
     return err;
@@ -373,9 +376,22 @@ QList<DbModel *> DbSqlitePerson::getSpecialistList(const QString &personUid)
     // and require override search function
     Q_ASSERT(tbl != nullptr);
     QList<DbModel *> list = tbl->getListSpecialist(personUid);
-    logd("found %d", list.count());
+    QList<DbModel *> outList;
+    foreach (DbModel* model, list) {
+        if (model) {
+            if (model->modelName() == KModelNameSpecialistPerson) {
+                SpecialistPerson* specialist = (SpecialistPerson*) model;
+                if (specialist->specialist())
+                    outList.push_back(specialist->specialist()->clone());
+            } else if (model->modelName() == KModelNameSpecialist) {
+                outList.push_back(model);
+            }
+        }
+    }
+    RELEASE_LIST_DBMODEL(list);
+    logd("found %d", outList.count());
     traceout;
-    return list;
+    return outList;
 }
 
 ErrCode DbSqlitePerson::updateCommunity(const QString &personUid, const QString &communityUid)
@@ -405,6 +421,53 @@ ErrCode DbSqlitePerson::getListPersonInCommunity(const QString &communityUid, qi
     logd("Search community err=%d", err);
     traceout;
     return err;
+}
+
+ErrCode DbSqlitePerson::update(DbModel *model)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    err = DbSqliteModelHandler::update(model);
+    if (err == ErrNone && (model->modelName() == KModelNamePerson)) {
+        Person* per = (Person*) model;
+        if (per->isFieldUpdated(KItemSpecialist)) {
+            logd("field '%s' is updated", KItemSpecialist);
+            DbSqliteTbl* tbl = DbSqlite::table(KTableSpecialistPerson);
+            QHash<QString, QString> condition;
+            condition.insert(KFieldPersonUid, model->uid());
+            logd("Delete old mapping specilist vs version for person");
+            err = tbl->deleteHard(condition);
+            if (err == ErrNone) {
+                // map person specialist
+                logd("Check to add person - specialist ");
+                QStringList list = per->specialistUidList();
+                if (!list.empty()) {
+                    logd("set specialist for person, no. specialist %d", list.count());
+
+                    foreach (QString item, list) {
+                        SpecialistPerson* model = (SpecialistPerson*)SpecialistPerson::build();
+                        model->setPersonUid(per->uid());
+                        model->setSpecialistUid(item);
+                        logd("Save specialist/person, model uid '%s'", item.toStdString().c_str());
+                        err = model->save();
+                        // TODO: handle error case
+                        delete model;
+                    }
+                } else {
+                    logd("no specialist for person");
+                }
+            }
+        } else {
+            logd("field %s is not updated", KItemSpecialist);
+        }
+    }
+    traceret(err);
+    return err;
+}
+
+ErrCode DbSqlitePerson::update(DbModel *model, const QHash<QString, QString> &inFields, const QString &tableName)
+{
+    return DbSqliteModelHandler::update(model, inFields, tableName);
 }
 
 

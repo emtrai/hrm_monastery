@@ -204,6 +204,8 @@ class ModelController;
      void on_actionBack_triggered();
 
 
+     void on_actionLogFile_triggered();
+
  private:
      static MainWindow* gInstance;
 };

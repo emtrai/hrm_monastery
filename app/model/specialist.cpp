@@ -27,9 +27,14 @@
 #include "dbctl.h"
 #include "defs.h"
 
-Specialist::Specialist(QObject *parent)
+Specialist::Specialist():DbModel()
 {
+    traced;
+}
 
+Specialist::~Specialist()
+{
+    traced;
 }
 
 DbModel *Specialist::build()

@@ -51,6 +51,7 @@ public:
     MapDbModel(const MapDbModel& model);
     MapDbModel(const MapDbModel* model);
     virtual void clone(const DbModel* model);
+    virtual DbModel* clone() const;
     static DbModel* buildMapModel(DbModelBuilder builder, const DbModel* item1, const DbModel* item2,
                                   int status = MODEL_ACTIVE,
                                   qint64 startdate = 0,
@@ -58,6 +59,7 @@ public:
                                   const QString& remark = nullptr);
 
     virtual QString buildUid(const QString* seed = nullptr);
+
 
     const QString &uid1() const;
     void setUid1(const QString &newUid1);

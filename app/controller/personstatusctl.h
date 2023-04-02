@@ -19,20 +19,20 @@
  * Created date:9/6/2022
  * Brief:
  */
-#ifndef STATUSCTL_H
-#define STATUSCTL_H
+#ifndef PERSONSTATUSCTL_H
+#define PERSONSTATUSCTL_H
 
 #include "modelcontroller.h"
 #include "utils.h"
 #include <QList>
 
-class Status;
+class PersonStatus;
 
-class StatusCtl : public ModelController
+class PersonStatusCtl : public ModelController
 {
-    GET_INSTANCE_DECL(StatusCtl);
+    GET_INSTANCE_DECL(PersonStatusCtl);
 private:
-    StatusCtl();
+    PersonStatusCtl();
 protected:
     // prebuilt data file name
     virtual const char* getPrebuiltFileName();
@@ -40,4 +40,4 @@ protected:
     virtual DbModelBuilder getMainBuilder();
 };
 
-#endif // STATUSCTL_H
+#endif // PERSONSTATUSCTL_H

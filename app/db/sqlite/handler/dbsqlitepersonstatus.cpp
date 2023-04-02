@@ -14,37 +14,36 @@
  * limitations under the License.
  *
  *
- * Filename: status.cpp
+ * Filename: dbsqlitestatus.cpp
  * Author: Anh, Ngo Huy
- * Created date:9/5/2022
+ * Created date:9/6/2022
  * Brief:
  */
-#include "status.h"
+#include "dbsqlitepersonstatus.h"
 #include "logger.h"
-#include "errcode.h"
-#include "filectl.h"
-#include "utils.h"
-#include "dbctl.h"
 #include "defs.h"
-#include "dbmodel.h"
+#include "personstatus.h"
+#include "dbsqlitedefs.h"
+#include "dbsqlite.h"
 
-Status::Status()
+
+DbSqlitePersonStatus::DbSqlitePersonStatus()
 {
     tracein;
 }
-DbModel *Status::build()
+
+
+const QString DbSqlitePersonStatus::getName()
 {
-    Status* model = new Status();
-    model->init();
-    return model;
+    return KModelHdlPersonStatus;
 }
 
-DbModelBuilder Status::getBuilder() const
+DbSqliteTbl *DbSqlitePersonStatus::getMainTbl()
 {
-    return &Status::build;
+    return (DbSqliteTbl*)DbSqlite::getInstance()->getTable(KTableStatus);
 }
 
-DbModelHandler *Status::getDbModelHandler() const
+DbModelBuilder DbSqlitePersonStatus::getMainBuilder()
 {
-    return DB->getModelHandler(KModelHdlStatus);
+    return &PersonStatus::build;
 }

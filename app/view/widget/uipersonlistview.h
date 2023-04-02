@@ -23,13 +23,14 @@
 #define UIPERSONLISTVIEW_H
 
 #include "uicommonlistview.h"
-#include "person.h"
+#include "importlistener.h"
 
-class UIPersonListView : public UICommonListView
+class UIPersonListView : public UICommonListView, public ImportListener
 {
 public:
     explicit UIPersonListView(QWidget *parent = nullptr);
     virtual ~UIPersonListView();
+    virtual void setupUI();
 protected:
     virtual ErrCode onLoad();
     virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
@@ -55,6 +56,7 @@ protected:
 
     virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionImport(QMenu* menu, UITableMenuAction* act);
+    virtual ErrCode onMenuActionExportListPerson(QMenu *menu, UITableMenuAction *act);
     virtual ErrCode onChangeCommunity(QMenu* menu, UITableMenuAction* act);
     virtual void onViewItem(UITableCellWidgetItem *item);
     virtual void onEditItem(UITableCellWidgetItem *item);
@@ -67,22 +69,12 @@ protected:
                           qint64 opFlags,
                           const QString& keywords, const QVariant *value);
     virtual DbModel* onNewModel();
+    virtual QString getName();
+    virtual void onImportStart(const QString& importName, const QString& fpath, ImportType type);
+    virtual void onImportEnd(const QString& importName, ErrCode err, const QString& fpath, ImportType type);
 
 private:
     void cleanUpItem();
-//public:
-//    explicit UIPersonListView(QWidget *parent = nullptr);
-//    virtual ~UIPersonListView();
-//    quint32 currentPage() const;
-//    void setCurrentPage(quint32 newCurrentPage);
-
-//protected:
-//    virtual void importRequested(const QString& fpath);
-//private:
-//    void cleanUpItem();
-//private:
-//    quint32 mCurrentPage;
-//    quint32 mTotalPages;
 };
 
 #endif // UIPERSONLISTVIEW_H

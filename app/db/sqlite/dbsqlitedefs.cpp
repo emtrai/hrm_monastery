@@ -50,6 +50,7 @@ static void initFieldMap()
         s_fieldMap[FILTER_FIELD_EDUCATION] = KFieldEduName;
         s_fieldMap[FILTER_FIELD_SPECIALIST] = KFieldSpecialistName;
         s_fieldMap[FILTER_FIELD_MISSON] = KFieldMissionName;
+        s_fieldMap[FILTER_FIELD_COURSE] = KFieldCourseName;
         s_fieldMapInit = true;
     }
 

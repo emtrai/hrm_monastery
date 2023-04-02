@@ -67,6 +67,13 @@ void MapDbModel::clone(const DbModel *model)
     traceout;
 }
 
+DbModel *MapDbModel::clone() const
+{
+    tracein;
+    DbModel::clone();
+    traceout;
+}
+
 DbModel *MapDbModel::buildMapModel(DbModelBuilder builder,
                                    const DbModel *item1, const DbModel *item2,
                                    int status, qint64 startdate, qint64 enddate,

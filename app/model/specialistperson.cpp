@@ -29,9 +29,20 @@
 #include "dbctl.h"
 #include "dbmodel.h"
 
-SpecialistPerson::SpecialistPerson()
+SpecialistPerson::SpecialistPerson():
+    mSpecialist(nullptr)
 {
     tracein;
+}
+
+SpecialistPerson::~SpecialistPerson()
+{
+    tracein;
+    if (mSpecialist) {
+        delete mSpecialist;
+        mSpecialist = nullptr;
+    }
+    traceout;
 }
 
 DbModel *SpecialistPerson::build()
@@ -42,6 +53,36 @@ DbModel *SpecialistPerson::build()
 DbModelBuilder SpecialistPerson::getBuilder() const
 {
     return &SpecialistPerson::build;
+}
+
+void SpecialistPerson::clone(const DbModel *model)
+{
+    tracein;
+    if (model) {
+        MapDbModel::clone(model);
+        SpecialistPerson* item = (SpecialistPerson*)model;
+        if (mSpecialist) {
+            delete mSpecialist;
+            mSpecialist = nullptr;
+        }
+        if (item->specialist()) {
+            logd("clone new specialist '%s'", STR2CHA(item->specialist()->toString()));
+            mSpecialist = item->specialist()->clone();
+        }
+        mExperienceHistory = item->experienceHistory();
+    } else {
+        loge("clone failed, null model");
+    }
+    traceout;
+
+}
+
+DbModel *SpecialistPerson::clone() const
+{
+    tracein;
+    MapDbModel::clone();
+    traceout;
+
 }
 
 
@@ -55,6 +96,39 @@ DbModelHandler *SpecialistPerson::getDbModelHandler() const
 {
     return DB->getModelHandler(KModelHdlSpecialist);
 }
+
+const DbModel *SpecialistPerson::specialist() const
+{
+    return mSpecialist;
+}
+
+void SpecialistPerson::setSpecialist(const DbModel *newSpecialist)
+{
+    tracein;
+    if (mSpecialist) {
+        delete mSpecialist;
+        mSpecialist = nullptr;
+    }
+    if (newSpecialist) {
+        logd("clone new specialist '%s'", STR2CHA(newSpecialist->toString()));
+        mSpecialist = newSpecialist->clone();
+    }
+    traceout;
+}
+
+QString SpecialistPerson::specialistName() const
+{
+    tracein;
+    QString name;
+    if (mSpecialist) {
+        name = mSpecialist->name();
+    } else {
+        name = "";
+    }
+    traceout;
+    return name;
+}
+
 
 const QString &SpecialistPerson::experienceHistory() const
 {
@@ -74,4 +148,9 @@ void SpecialistPerson::setPersonUid(const QString &uid)
 void SpecialistPerson::setSpecialistUid(const QString &uid)
 {
     setUid2(uid);
+}
+
+QString SpecialistPerson::specialistUid()
+{
+    return uid2();
 }

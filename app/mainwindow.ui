@@ -113,6 +113,7 @@
     </property>
     <addaction name="action_Help"/>
     <addaction name="action_About"/>
+    <addaction name="actionLogFile"/>
    </widget>
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
@@ -353,6 +354,11 @@
    </property>
    <property name="visible">
     <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionLogFile">
+   <property name="text">
+    <string>Thư mục log</string>
    </property>
   </action>
  </widget>

@@ -41,13 +41,20 @@
 UIPersonListView::UIPersonListView(QWidget *parent):
     UICommonListView(parent)
 {
-
-
+    traced;
 }
 
 UIPersonListView::~UIPersonListView()
 {
+    traced;
+}
+
+void UIPersonListView::setupUI()
+{
     tracein;
+    UITableView::setupUI();
+    PERSONCTL->addListener(this);
+    traceout;
 }
 
 ErrCode UIPersonListView::onLoad()
@@ -92,20 +99,31 @@ ErrCode UIPersonListView::onLoad()
 void UIPersonListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
-    Person* per = (Person*) item;
-    tblItem->addValue(per->nameId());
-    tblItem->addValue(per->hollyName());
-    tblItem->addValue(per->getFullName());
-    tblItem->addValue(per->communityName());
-    tblItem->addValue(Utils::date2String(per->birthday()));
-    tblItem->addValue(per->birthPlace());
-    tblItem->addValue(Utils::date2String(per->feastDay(), DEFAULT_FORMAT_MD)); // seem feastday convert repeate many time, make it common????
+    loge("updateItem '%s'", item?STR2CHA(item->modelName()):"");
+    if (item && item->modelName() == KModelNamePerson) {
+        Person* per = (Person*) item;
+        tblItem->addValue(per->nameId());
+        tblItem->addValue(per->hollyName());
+        tblItem->addValue(per->getFullName());
+        tblItem->addValue(per->communityName());
+        tblItem->addValue(Utils::date2String(per->birthday()));
+        tblItem->addValue(per->birthPlace());
+        tblItem->addValue(Utils::date2String(per->feastDay(), DEFAULT_FORMAT_MD)); // seem feastday convert repeate many time, make it common????
 
-    tblItem->addValue(per->tel().join(";"));
-    tblItem->addValue(per->email().join(";"));
-    tblItem->addValue(per->idCard());
-    tblItem->addValue(per->idCardIssuePlace());
-
+        tblItem->addValue(per->tel().join(";"));
+        tblItem->addValue(per->email().join(";"));
+        tblItem->addValue(per->idCard());
+        tblItem->addValue(per->idCardIssuePlace());
+        tblItem->addValue(per->courseName());
+        tblItem->addValue(per->specialistNameList().join(","));
+        tblItem->addValue(per->currentWorkName());
+        tblItem->addValue(Utils::date2String(per->joinDate()));
+        tblItem->addValue(Utils::date2String(per->vowsDate()));
+        tblItem->addValue(Utils::date2String(per->eternalVowsDate()));
+    } else {
+        loge("No item found, or not expected model '%s'", item?STR2CHA(item->modelName()):"");
+    }
+    traceout;
 }
 
 void UIPersonListView::initHeader()
@@ -154,6 +172,10 @@ QList<UITableMenuAction *> UIPersonListView::getMenuCommonActions(const QMenu *m
                                                    ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                        return this->onMenuActionImport(m, a);
                                                    }));
+    actionList.append(UITableMenuAction::build(tr("Xuất danh sách nữ tu"), this)
+                                                   ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                                       return this->onMenuActionExportListPerson(m, a);
+                                                   }));
     traceout;
     return actionList;
 }
@@ -198,6 +220,22 @@ ErrCode UIPersonListView::onMenuActionImport(QMenu *menu, UITableMenuAction *act
     MainWindow::showImportDlg(IMPORT_TARGET_PERSON);
     traceret(ret);
     return ret;
+}
+
+ErrCode UIPersonListView::onMenuActionExportListPerson(QMenu *menu, UITableMenuAction *act)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    QList<DbModel*> list = PERSONCTL->getAllItemsFromDb();
+    if (!list.empty()) {
+        logd("Export %d items", list.size());
+        err = MainWindow::exportListItems(&list, PERSONCTL, tr("Xuất danh sách nữ tu"), EXPORT_XLSX);
+    } else {
+        logw("nothing to export");
+    }
+    RELEASE_LIST_DBMODEL(list);
+    traceret(err);
+    return err;
 }
 
 ErrCode UIPersonListView::onChangeCommunity(QMenu *menu, UITableMenuAction *act)
@@ -286,7 +324,7 @@ void UIPersonListView::initFilterFields()
     appendFilterField(FILTER_FIELD_COMMUNITY, tr("Cộng đoàn"));
     appendFilterField(FILTER_FIELD_HOLLY_NAME, tr("Tên Thánh"));
     appendFilterField(FILTER_FIELD_EDUCATION, tr("Học vấn"));
-    appendFilterField(FILTER_FIELD_SPECIALIST, tr("Chuyên môn"));
+//    appendFilterField(FILTER_FIELD_SPECIALIST, tr("Chuyên môn"));
     appendFilterField(FILTER_FIELD_WORK, tr("Công việc"));
     appendFilterField(FILTER_FIELD_COURSE, tr("Khoá"));
     traceout;
@@ -322,4 +360,27 @@ void UIPersonListView::cleanUpItem()
 //        delete per;
 //    }
 //    mPersonList.clear();
+}
+
+
+QString UIPersonListView::getName()
+{
+    return "UICommunityListView";
+}
+
+void UIPersonListView::onImportStart(const QString &importName, const QString &fpath, ImportType type)
+{
+    tracein;
+    mSuspendReloadOnDbUpdate = true;
+    logd("suspend reload on db update");
+    traceout;
+}
+
+void UIPersonListView::onImportEnd(const QString &importName, ErrCode err, const QString &fpath, ImportType type)
+{
+    tracein;
+    mSuspendReloadOnDbUpdate = false;
+    logd("resume reload on db update");
+    reload();
+    traceout;
 }

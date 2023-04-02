@@ -14,25 +14,34 @@
  * limitations under the License.
  *
  *
- * Filename: dbsqlitestatustbl.h
+ * Filename: statusctl.cpp
  * Author: Anh, Ngo Huy
- * Created date:9/5/2022
+ * Created date:9/6/2022
  * Brief:
  */
-#ifndef DBSQLITESTATUSTBL_H
-#define DBSQLITESTATUSTBL_H
+#include "personstatusctl.h"
 
-#include "dbsqlitetbl.h"
+#include "logger.h"
+#include "personstatus.h"
+#include "dbctl.h"
+#include "utils.h"
+#include "defs.h"
 
-class DbSqliteStatusTbl : public DbSqliteTbl
+GET_INSTANCE_CONTROLLER_IMPL(PersonStatusCtl)
+
+PersonStatusCtl::PersonStatusCtl():
+    ModelController(KModelHdlPersonStatus)
 {
-public:
-    DbSqliteStatusTbl();
-public:
-    DbSqliteStatusTbl(DbSqlite *db);
+    tracein;
+}
 
-private:
-    static const qint32 KVersionCode;
-};
+const char *PersonStatusCtl::getPrebuiltFileName()
+{
+    return KPrebuiltStatusCSVFileName;
+}
 
-#endif // DBSQLITESTATUSTBL_H
+
+DbModelBuilder PersonStatusCtl::getMainBuilder()
+{
+    return &PersonStatus::build;
+}

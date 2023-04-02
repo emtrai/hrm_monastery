@@ -29,6 +29,7 @@
 #include "utils.h"
 #include "crypto.h"
 
+
 FileCtl* FileCtl::gInstance = nullptr;
 
 FileCtl::~FileCtl()
@@ -48,6 +49,29 @@ FileCtl *FileCtl::getInstance()
 void FileCtl::init()
 {
     tracein;
+}
+
+QString FileCtl::getAppWorkingDataDir(const QString &subDir)
+{
+    QString appPath = FileCtl::getAppDataDir(KWorkingDirName);
+    QDir appDirPath(appPath);
+    logd("App path %s", appPath.toStdString().c_str());
+
+    if (!appDirPath.exists()){
+        logi("App path not exist, create new one");
+        appDirPath.mkpath(appDirPath.absolutePath());
+    }
+    if (subDir.isEmpty()){
+        return appPath;
+    }
+    else{
+        return appDirPath.filePath(subDir);
+    }
+}
+
+QString FileCtl::getAppWorkingDataDir()
+{
+    return getAppWorkingDataDir(QString());
 }
 
 QString FileCtl::getAppDataDir(const QString& subDir)
@@ -101,7 +125,7 @@ QString FileCtl::getAppInstallDir(const QString& subDir)
 
 QString FileCtl::getOrCreatePrebuiltDataDir()
 {
-    QString prebuildDataDir = FileCtl::getAppDataDir(KPrebuiltDirName);
+    QString prebuildDataDir = FileCtl::getAppWorkingDataDir(KPrebuiltDirName);
     QDir dir(prebuildDataDir);
     if (!dir.exists()){
         logi("App path not exist, create new one");

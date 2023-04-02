@@ -14,25 +14,25 @@
  * limitations under the License.
  *
  *
- * Filename: dbsqlitestatus.h
+ * Filename: dbsqlitestatustbl.h
  * Author: Anh, Ngo Huy
- * Created date:9/6/2022
+ * Created date:9/5/2022
  * Brief:
  */
-#ifndef DBSQLITESTATUS_H
-#define DBSQLITESTATUS_H
+#ifndef DBSQLITEPERSONSTATUSTBL_H
+#define DBSQLITEPERSONSTATUSTBL_H
 
-#include "dbsqlitemodelhandler.h"
+#include "dbsqlitetbl.h"
 
-class DbSqliteStatus : public DbSqliteModelHandler
+class DbSqlitePersonStatusTbl : public DbSqliteTbl
 {
 public:
-    DbSqliteStatus();
+    DbSqlitePersonStatusTbl();
+public:
+    DbSqlitePersonStatusTbl(DbSqlite *db);
 
-    virtual const QString getName();
-protected:
-    virtual DbSqliteTbl *getMainTbl();
-    virtual DbModelBuilder getMainBuilder();
+private:
+    static const qint32 KVersionCode;
 };
 
-#endif // DBSQLITESTATUS_H
+#endif // DBSQLITEPERSONSTATUSTBL_H

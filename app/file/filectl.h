@@ -32,6 +32,9 @@ public:
     static FileCtl* getInstance();
     virtual void init();
 
+    static QString getAppWorkingDataDir(const QString& subDir);
+    static QString getAppWorkingDataDir();
+
     static QString getAppDataDir(const QString& subDir);
     static QString getAppDataDir();
     static QString getTmpDataDir(const QString& subDir);

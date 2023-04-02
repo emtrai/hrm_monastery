@@ -45,7 +45,11 @@ const char* const KLanguage = "vi";
 const char* const KManagementDeptNameId = "QUAN_LY";
 
 const char* const KPrebuiltDirName = "prebuilt";
+const char* const KWorkingDirName = "data";
 const char* const KLogDirName = "log";
+const char* const KDatabasename = "db.db";
+
+
 const char* const KPrebuiltSaintCSVFileName = "saints";
 const char* const KPrebuiltCountryCSVFileName = "country";
 const char* const KPrebuiltEduCSVFileName = "edu";
@@ -72,6 +76,8 @@ const char* const KPrebuiltCommonTemplateFileName = "common_template";
 const char* const KPrebuiltCommunityExportTemplateName = "community_export_template";
 const char* const KPrebuiltDefaultExportTemplateName = "default_export_template";
 
+const char* const KControlBackupName = "backup";
+
 const char* const KModelHdlCountry = "country";
 const char* const KModelHdlEdu = "education";
 const char* const KModelHdlCommunity = "community";
@@ -86,7 +92,7 @@ const char* const KModelHdlDept = "department";
 const char* const KModelHdlCommDept = "community_dept";
 const char* const KModelHdlCourse = "course";
 const char* const KModelHdlWork = "work";
-const char* const KModelHdlStatus = "status";
+const char* const KModelHdlPersonStatus = "person_status";
 const char* const KModelHdlRole = "role";
 const char* const KModelHdlPersonEvent = "person_event";
 const char* const KModelHdlEvent = "event";
@@ -157,9 +163,9 @@ const char* const KItemOtherContact = "LIEN_LAC_KHAC";
 const char* const KItemEdu = "HOC_VAN";
 const char* const KItemEduDetail = "CHI_TIET_HOC_VAN";
 const char* const KItemEduNameId = "MA_HOC_VAN";
-const char* const KItemSpeciaist = "CHUYEN_MON";
-const char* const KItemSpeciaistInfo = "CHI_TIET_CHUYEN_MON";
-const char* const KItemSpeciaistUid = "MA_CHUYEN_MON";
+const char* const KItemSpecialist = "CHUYEN_MON";
+const char* const KItemSpecialistInfo = "CHI_TIET_CHUYEN_MON";
+const char* const KItemSpecialistUid = "MA_CHUYEN_MON";
 const char* const KItemWork = "CONG_VIEC";
 const char* const KItemWorkId = "MA_CONG_VIEC";
 const char* const KItemWorkHistory = "LICH_SU_CONG_TAC";

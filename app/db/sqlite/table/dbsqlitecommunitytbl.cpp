@@ -133,7 +133,9 @@ ErrCode DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuer
     // TODO: parent nameid, parent name???
     cmm->setAreaUid(qry.value(KFieldAreaUid).toString());
     cmm->setAreaDbId(qry.value(KFieldAreaDbId).toInt());
-    if (!cmm->areaUid().isEmpty()) {
+    if (qry.value(KFieldAreaName).isValid())
+        cmm->setAreaName(qry.value(KFieldAreaName).toString());
+    if (!cmm->areaUid().isEmpty() && cmm->areaName().isEmpty()) {
         // TODO: caching data (i.e. list of person in management board) for fast accessing?
         // TODO: is it ok to call here? does it break any design?
         // as table calls directly to model handler
@@ -162,8 +164,6 @@ ErrCode DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuer
         }
     }
     cmm->setChurch(qry.value(KFieldChurchAddr).toString());
-    if (qry.value(KFieldAreaName).isValid())
-        cmm->setAreaName(qry.value(KFieldAreaName).toString());
     cmm->setAddr(qry.value(KFieldAddr).toString());
     cmm->setTel(qry.value(KFieldTel).toString());
     cmm->setEmail(qry.value(KFieldEmail).toString());
@@ -205,11 +205,12 @@ ErrCode DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuer
 QString DbSqliteCommunityTbl::getSearchQueryString(const QString &cond)
 {
     tracein;
-    QString queryString = QString("SELECT *, %2.%4 AS %7, %2.%5 AS %6 FROM %1 LEFT JOIN %2 ON %1.%3 = %2.%4")
+    QString queryString = QString("SELECT *, %2.%4 AS %7, %2.%5 AS %6, %2.%8 AS %9 FROM %1 LEFT JOIN %2 ON %1.%3 = %2.%4")
                               .arg(name(), KTableArea) // 1 & 2
                               .arg(KFieldAreaUid, KFieldUid) // 3 & 4
                               .arg(KFieldName, KFieldAreaName) // 5 & 6
                               .arg(KFieldAreaUid) // 7
+                              .arg(KFieldNameId, KFieldAreaNameId) // 8, 9
         ;
     if (!cond.isEmpty()) {
         queryString += QString(" WHERE %1").arg(cond);

@@ -58,6 +58,11 @@ public:
     virtual DbModelHandler* getSpecialistModelHandler() = 0;
     virtual DbModelHandler* getCommunityModelHandler() = 0;
     virtual DbModelHandler* getDepartmentModelHandler() = 0;
+    virtual DbModelHandler* getWorkModelHandler() = 0;
+    virtual DbModelHandler* getCountryModelHandler() = 0;
+    virtual DbModelHandler* getPersonStatusModelHandler() = 0;
+    virtual DbModelHandler* getCourseModelHandler() = 0;
+    virtual DbModelHandler* getEthnicModelHandler() = 0;
 
     virtual DbModelHandler* getModelHandler(const QString& name) = 0;
 

@@ -8,6 +8,7 @@ CONFIG += console
 QT += sql
 QT += widgets
 QT += gui
+QT += gui-private
 
 DEFINES += FEATURE_system_sqlite=OFF
 
@@ -58,6 +59,8 @@ INCLUDEPATH += $$PWD/exception
 
 SOURCES += \
     address.cpp \
+    backup/backupctl.cpp \
+    backup/backupmetainfo.cpp \
     cache/cachectl.cpp \
     controller/areactl.cpp \
     controller/communityctl.cpp \
@@ -71,9 +74,9 @@ SOURCES += \
     controller/ethnicctl.cpp \
     controller/eventctl.cpp \
     controller/missionctl.cpp \
+    controller/personstatusctl.cpp \
     controller/provincectl.cpp \
     controller/rolectl.cpp \
-    controller/statusctl.cpp \
     controller/workctl.cpp \
     crypto/crypto.cpp \
     db/dbareamodelhandler.cpp \
@@ -96,11 +99,11 @@ SOURCES += \
     db/sqlite/handler/dbsqlitemodelhandler.cpp \
     db/sqlite/handler/dbsqliteperson.cpp \
     db/sqlite/handler/dbsqlitepersonevent.cpp \
+    db/sqlite/handler/dbsqlitepersonstatus.cpp \
     db/sqlite/handler/dbsqliteprovince.cpp \
     db/sqlite/handler/dbsqliterole.cpp \
     db/sqlite/handler/dbsqlitesaint.cpp \
     db/sqlite/handler/dbsqlitespecialist.cpp \
-    db/sqlite/handler/dbsqlitestatus.cpp \
     db/sqlite/handler/dbsqlitework.cpp \
     db/sqlite/handler/dbsqlitearea.cpp \
     db/sqlite/handler/dbsqlitecommunity.cpp \
@@ -111,6 +114,7 @@ SOURCES += \
     db/sqlite/handler/dbsqliteethnic.cpp \
     db/sqlite/handler/dbsqliteevent.cpp \
     db/sqlite/table/dbmetadatatbl.cpp \
+    db/sqlite/table/dbsqlitepersonstatustbl.cpp \
     db/sqlite/table/dbsqlsequencetbl.cpp \
     exception/exception.cpp \
     import/importlistener.cpp \
@@ -119,6 +123,7 @@ SOURCES += \
     model/areaperson.cpp \
     model/communityperson.cpp \
     model/mapdbmodel.cpp \
+    model/personstatus.cpp \
     model/specialistperson.cpp \
     db/sqlite/table/dbsqliteareamgrtbl.cpp \
     db/sqlite/table/dbsqliteareatbl.cpp \
@@ -143,7 +148,6 @@ SOURCES += \
     db/sqlite/table/dbsqlitesainttbl.cpp \
     db/sqlite/table/dbsqlitespecialistpersontbl.cpp \
     db/sqlite/table/dbsqlitespecialisttbl.cpp \
-    db/sqlite/table/dbsqlitestatustbl.cpp \
     db/sqlite/table/dbsqlitetbl.cpp \
     db/sqlite/table/dbsqliteworktbl.cpp \
     controller/eductl.cpp \
@@ -184,7 +188,6 @@ SOURCES += \
     model/saint.cpp \
     model/saintperson.cpp \
     model/specialist.cpp \
-    model/status.cpp \
     model/work.cpp \
     controller/personctl.cpp \
     report/errreporterctl.cpp \
@@ -246,6 +249,8 @@ SOURCES += \
 
 HEADERS += \
     address.h \
+    backup/backupctl.h \
+    backup/backupmetainfo.h \
     cache/cachectl.h \
     controller/areactl.h \
     controller/communityctl.h \
@@ -259,9 +264,9 @@ HEADERS += \
     controller/ethnicctl.h \
     controller/eventctl.h \
     controller/missionctl.h \
+    controller/personstatusctl.h \
     controller/provincectl.h \
     controller/rolectl.h \
-    controller/statusctl.h \
     controller/workctl.h \
     crypto/crypto.h \
     db/dbareamodelhandler.h \
@@ -293,13 +298,14 @@ HEADERS += \
     db/sqlite/handler/dbsqlitemodelhandler.h \
     db/sqlite/handler/dbsqliteperson.h \
     db/sqlite/handler/dbsqlitepersonevent.h \
+    db/sqlite/handler/dbsqlitepersonstatus.h \
     db/sqlite/handler/dbsqliteprovince.h \
     db/sqlite/handler/dbsqliterole.h \
     db/sqlite/handler/dbsqlitesaint.h \
     db/sqlite/handler/dbsqlitespecialist.h \
-    db/sqlite/handler/dbsqlitestatus.h \
     db/sqlite/handler/dbsqlitework.h \
     db/sqlite/table/dbmetadatatbl.h \
+    db/sqlite/table/dbsqlitepersonstatustbl.h \
     db/sqlite/table/dbsqlsequencetbl.h \
     exception/exception.h \
     import/importlistener.h \
@@ -309,6 +315,7 @@ HEADERS += \
     model/areaperson.h \
     model/communityperson.h \
     model/mapdbmodel.h \
+    model/personstatus.h \
     model/specialistperson.h \
     db/sqlite/table/dbsqliteareamgrtbl.h \
     db/sqlite/table/dbsqliteareatbl.h \
@@ -333,7 +340,6 @@ HEADERS += \
     db/sqlite/table/dbsqlitesainttbl.h \
     db/sqlite/table/dbsqlitespecialistpersontbl.h \
     db/sqlite/table/dbsqlitespecialisttbl.h \
-    db/sqlite/table/dbsqlitestatustbl.h \
     db/sqlite/table/dbsqlitetbl.h \
     db/sqlite/table/dbsqliteworktbl.h \
     defs.h \
@@ -375,7 +381,6 @@ HEADERS += \
     model/saint.h \
     model/saintperson.h \
     model/specialist.h \
-    model/status.h \
     model/work.h \
     controller/personctl.h \
     report/errreporterctl.h \

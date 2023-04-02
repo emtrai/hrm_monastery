@@ -117,14 +117,68 @@ Logger::~Logger()
     }
     traceout;
 }
+#define MAX_LOG_FILE (5)
+#define MAX_LOG_FILE_SIZE_MB (30)
+#define MAX_LOG_FILE_SIZE_BYTE (MAX_LOG_FILE_SIZE_MB*1024*1024)
+//#define MAX_LOG_FILE_SIZE_BYTE (100)
+
+#define LOG_FILE_NAME "log"
+#define LOG_FILE_NAME_DELIM "_"
 
 void Logger::doInit()
 {
     tracein;
     qInstallMessageHandler(Logger::messageHandler);
+    QString logDirPath = getLogDirPath();
+    logd("logDirPath=%s", STR2CHA(logDirPath));
+    QDir logDir(logDirPath);
+    QFileInfoList fileList = logDir.entryInfoList();
+    qint64 minId = 0;
+    qint64 maxId = 0;
+    qint64 logid = 0;
+    bool ok = false;
+    int cntLog = 0;
+    QString oldestFile;
+    foreach (QFileInfo finfo, fileList) {
+        logd("log file '%s' : '%s'", STR2CHA(finfo.fileName()), STR2CHA(finfo.absoluteFilePath()));
+        QStringList items = finfo.fileName().split(LOG_FILE_NAME_DELIM);
+        if (items.size() > 1) {
+            logid = items[1].toInt(&ok);
+            if (!ok) {
+                logid = 0;
+            }
+        }
+        if (logid) {
+            maxId = (logid > maxId)?logid:maxId;
+            if ((!minId || (logid < minId))) {
+                minId = logid;
+                oldestFile = finfo.absoluteFilePath();
+            }
+            cntLog++;
+        }
+    }
+    logd("minId=%d, maxId=%d, cntLog=%d", minId, maxId, cntLog);
+    logd("oldestFile=%s", STR2CHA(oldestFile));
+//    QString currLogFPath = getLogFilePath();
     mLogFilePath = getLogFilePath();
     mLogFile.setFileName(mLogFilePath);
+    qint64 sz = mLogFile.size();
+    logd("current log file size=%ld, MAX_LOG_FILE_SIZE_MB=%d", sz, MAX_LOG_FILE_SIZE_BYTE);
+    if (sz > MAX_LOG_FILE_SIZE_BYTE) {
+        QString oldLogFname = QString("%1%2%3").arg(LOG_FILE_NAME, LOG_FILE_NAME_DELIM).arg(++maxId);
+        QString oldLogFilePath = getLogFilePath(&oldLogFname);
+        logd("olLogFilePath=%s", STR2CHA(oldLogFilePath));
+        mLogFile.copy(oldLogFilePath);
+        mLogFile.resize(0);
+    }
+    if (cntLog > MAX_LOG_FILE && minId > 0) {
+        logd("Delete old file '%s'", STR2CHA(oldestFile));
+        QFile file (oldestFile);
+        file.remove();
+    }
     mLogFile.open(QIODevice::Append | QIODevice::Text);
+    QString firstLog = QString("\n--- Start Writing log at '%1' ---\n").arg(QDateTime::currentDateTime().toString());
+    mLogFile.write(firstLog.toUtf8());
     logd("open log file '%s'", STR2CHA(mLogFilePath));
 
     mWorker = new LogWorker();
@@ -149,9 +203,10 @@ QString Logger::getLogDirPath()
     return logDir;
 }
 
-QString Logger::getLogFilePath()
+QString Logger::getLogFilePath(const QString* fname)
 {
-    return QDir(getLogDirPath()).filePath(QString("log_%1").arg(QDate::currentDate().toString("yyyyMMdd")));
+//    return QDir(getLogDirPath()).filePath(QString("log_%1").arg(QDate::currentDate().toString("yyyyMMdd")));
+    return QDir(getLogDirPath()).filePath(fname?*fname:QString(LOG_FILE_NAME));
 }
 
 void Logger::doHandleMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg)
@@ -196,8 +251,10 @@ void Logger::doPrintLog2File(const QString &log)
     tracein;
     logd("doPrintLog2File");
     // TODO: check to change file & delete old file???
-    mLogFile.write(log.toUtf8());
-    mLogFile.flush();
+    if (!log.isEmpty()) {
+        mLogFile.write(log.toUtf8());
+        mLogFile.flush();
+    }
     traceout;
 }
 
@@ -216,6 +273,11 @@ void Logger::printLog2File(const QString &log)
 void Logger::reqWriteLog(const QString &log)
 {
     getInstance()->doReqWriteLog(log);
+}
+
+QString Logger::logDirPath()
+{
+    return getInstance()->getLogDirPath();
 }
 
 void Logger::init()

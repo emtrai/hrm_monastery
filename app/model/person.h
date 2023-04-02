@@ -158,6 +158,7 @@ public:
     void setSpecialistUidList(const QStringList &newSpecialistUidList);
     void setSpecialistUidList(const QString &newSpecialistUidList);
     void setSpecialistNames(const QString &newSpecialists, bool parseUid = false);
+    void addSpecialistName(const QString &newSpecialist);
     void clearSpecialistUid();
     void addSpecialistUid(const QString& uid);
     QList<DbModel *> getSpecialistList();
@@ -165,8 +166,8 @@ public:
     const QStringList &specialistNameList() const;
     void setSpecialistNameList(const QStringList &newSpecialistNameList);
 
-    const QString &course() const;
-    void setCourse(const QString &newCourse);
+    const QString &courseName() const;
+    void setCourseName(const QString &newCourse);
 
     const QString &courseUid() const;
     void setCourseUid(const QString &newCourseUid);
@@ -271,11 +272,13 @@ public:
     const QString &vowsCEOName() const;
     void setVowsCEOName(const QString &newVowsCEOName);
 
+    // tien khan
     qint64 vowsDate() const;
     void setVowsDate(qint64 newVowsDate);
     void setVowsDate(const QString& newVowsDate,
                      const QString& format = DEFAULT_FORMAT_YMD);
 
+    // vinh khan
     qint64 eternalVowsDate() const;
     void setEternalVowsDate(qint64 newEternalVowsDate);
     void setEternalVowsDate(const QString& newEternalVowsDate,
@@ -317,11 +320,11 @@ public:
     const QString &eternalPlace() const;
     void setEternalPlace(const QString &newEternalPlace);
 
-    const QString &statusUid() const;
-    void setStatusUid(const QString &newStatusUid);
+    const QString &personStatusUid() const;
+    void setPersonStatusUid(const QString &newStatusUid);
 
-    const QString &statusName() const;
-    void setStatusName(const QString &newStatusName);
+    const QString &personStatusName() const;
+    void setPersonStatusName(const QString &newStatusName);
 
     qint64 retireDate() const;
     void setRetireDate(qint64 newRetireDate);
@@ -344,19 +347,6 @@ public:
 
     const QStringList &eventUidList() const;
     void setEventUidList(const QStringList &newEventUidList);
-
-    const QList<Education *> &educationList() const;
-    void setEducationList(const QList<Education *> &newEducationList);
-
-    const QList<Work *> &workList() const;
-    void setWorkList(const QList<Work *> &newWorkList);
-
-
-    const QHash<QString, QString> &educationUidList() const;
-    void setEducationUidList(const QHash<QString, QString> &newEducationUidList);
-
-    const QHash<QString, QString> &workUidList() const;
-    void setWorkUidList(const QHash<QString, QString> &newWorkUidList);
 
     const QString &otherContact() const;
     void setOtherContact(const QString &newOtherContact);
@@ -381,18 +371,6 @@ public:
                                  const QString& value,
                                  quint32 idx = 0,
                                  QList<DbModel *>* outList = nullptr);
-
-    const QString &areaUid() const;
-    void setAreaUid(const QString &newAreaUid);
-
-    const QString &areaName() const;
-    void setAreaName(const QString &newAreaName);
-
-    const QString &departUid() const;
-    void setDepartUid(const QString &newDepartUid);
-
-    const QString &departName() const;
-    void setDepartName(const QString &newDepartName);
 
     const QString &communityUid() const;
     void setCommunityUid(const QString &newCommunityUid);
@@ -488,14 +466,6 @@ protected:
     QStringList mTel;
     QString mOtherContact;
 
-    //area
-    QString mAreaUid;
-    QString mAreaName;
-
-    //department
-    QString mDepartUid;
-    QString mDepartName;
-
 
     //community (current)
     QString mCommunityUid;
@@ -527,13 +497,6 @@ protected:
     // Them suc
     qint64 mHollyDate;
     QString mHollyPlace;
-
-
-    QHash<QString,QString> mEducationUidList;
-    QHash<QString,QString> mWorkUidList;
-
-    QList<Education*> mEducationList;
-    QList<Work*> mWorkList;
 
     // cong viec hien tai
     QString mCurrentWorkUid;
@@ -569,8 +532,8 @@ protected:
     qint64 mEternalDate; // vinh khanh
     QString mEternalPlace;
 
-    QString mStatusUid;
-    QString mStatusName;
+    QString mPersonStatusUid;
+    QString mPersonStatusName;
     qint64 mRetireDate;
     QString mRetirePlace;
     qint64 mDeadDate;

@@ -141,6 +141,9 @@ QString exportItem2Name(const QString &item, bool* isOk)
         s_item2Name.insert(KItemAddress, QObject::tr("Địa chỉ"));
         s_item2Name.insert(KItemChurchAddress, QObject::tr("Giáo xứ"));
         s_item2Name.insert(KItemEmail, QObject::tr("Email"));
+        s_item2Name.insert(KItemHollyName, QObject::tr("Tên Thánh"));
+        s_item2Name.insert(KItemBirthday, QObject::tr("Ngày sinh"));
+        s_item2Name.insert(KItemBirthplace, QObject::tr("Nơi sinh"));
 
         initialized = true;
     }

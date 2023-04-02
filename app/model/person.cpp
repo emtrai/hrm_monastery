@@ -100,6 +100,7 @@ void Person::clone(const DbModel *model)
         mHollyName = per->hollyName();
         mSaintUidList = per->saintUidList();
         mSaintUidNameMap.insert(per->saintUidNameMap());
+        mFeastDay = per->feastDay();
 
         mImgId = per->imgId();
         mImgPath = per->imgPath();
@@ -116,11 +117,13 @@ void Person::clone(const DbModel *model)
 
         mEduUid = per->eduUid();
         mEduName = per->eduName();
+        mEduDetail = per->eduDetail();
 
         mSpecialistUidList = per->specialistUidList();
+        mSpecialistInfo = per->specialistInfo();
 
         mCourseUid = per->courseUid();
-        mCourse = per->course();
+        mCourse = per->courseName();
 
         mCountryUid = per->countryUid();
         mCountryName = per->countryName();
@@ -151,9 +154,6 @@ void Person::clone(const DbModel *model)
 
         mHollyPlace = per->hollyPlace();
         mHollyDate = per->hollyDate();
-        // TODO:   mEducationList,    mWorkList;
-        mEducationUidList = per->educationUidList();
-        mWorkUidList = per->workUidList();
 
         mJoinDate = per->joinDate();
         mJoinPICUid = per->joinPICUid();
@@ -186,8 +186,8 @@ void Person::clone(const DbModel *model)
         mEternalDate = per->eternalDate();
         mEternalPlace = per->eternalPlace();
 
-        mStatusUid = per->statusUid();
-        mStatusName = per->statusName();
+        mPersonStatusUid = per->personStatusUid();
+        mPersonStatusName = per->personStatusName();
 
         mRetireDate = per->retireDate();
         mRetirePlace = per->retirePlace();
@@ -328,7 +328,7 @@ void Person::initExportFields()
         return nameid;
 //        return this->eduUid();
     }); //"edu uid";
-    mExportCallbacks.insert(KItemSpeciaist,  [this](const QString& item){
+    mExportCallbacks.insert(KItemSpecialist,  [this](const QString& item){
         logd("get specialist info to export");
         QList<DbModel*> list = this->getSpecialistList();
         QString specialist;
@@ -345,7 +345,7 @@ void Person::initExportFields()
         // TODO: free memory????
         return specialist;
     }); //"specialist";
-    mExportCallbacks.insert(KItemSpeciaistUid, [this](const QString& item){
+    mExportCallbacks.insert(KItemSpecialistUid, [this](const QString& item){
         QStringList list = this->specialistUidList();
         if (list.count() > 0)
             return list.join(",");
@@ -509,11 +509,11 @@ void Person::initImportFields()
         return ErrNone;
 //        this->setEduUid(value);
     }); //"education";
-    mImportCallbacks.insert(KItemSpeciaist, [this](const QString& value){
+    mImportCallbacks.insert(KItemSpecialist, [this](const QString& value){
         this->setSpecialistNames(value, true);
         return ErrNone;
     }); //"specialist";
-    mImportCallbacks.insert(KItemSpeciaistUid, [this](const QString& value){
+    mImportCallbacks.insert(KItemSpecialistUid, [this](const QString& value){
         this->setSpecialistUidList(value);
         return ErrNone;
     }); //"specialist";
@@ -592,7 +592,7 @@ void Person::initImportFields()
         return ErrNone;
     }); //"holly_place";
     mImportCallbacks.insert(KItemCourse, [this](const QString& value){
-        this->setCourse(value);
+        this->setCourseName(value);
         return ErrNone;
     }); //"course";
     mImportCallbacks.insert(KItemJoinDate, [this](const QString& value){
@@ -951,8 +951,7 @@ const QString &Person::currentWorkName() const
 
 void Person::setCurrentWorkName(const QString &newCurrentWorkName)
 {
-    CHECK_MODIFIED_THEN_SET(mCurrentWorkName, newCurrentWorkName, KItemWork);
-    // TODO: load work uid???
+    mCurrentWorkName = newCurrentWorkName;
 }
 
 const QString &Person::currentWorkUid() const
@@ -984,7 +983,7 @@ const QString &Person::specialistInfo() const
 
 void Person::setSpecialistInfo(const QString &newSpecialistInfo)
 {
-    CHECK_MODIFIED_THEN_SET(mSpecialistInfo, newSpecialistInfo, KItemSpeciaistInfo);
+    CHECK_MODIFIED_THEN_SET(mSpecialistInfo, newSpecialistInfo, KItemSpecialistInfo);
 //    mSpecialistInfo = newSpecialistInfo;
 }
 
@@ -1006,8 +1005,7 @@ const QString &Person::communityName() const
 
 void Person::setCommunityName(const QString &newCommunityName)
 {
-    CHECK_MODIFIED_THEN_SET(mCommunityName, newCommunityName, KItemCommunity);
-//    mCommunityName = newCommunityName;
+    mCommunityName = newCommunityName;
 }
 
 const QString &Person::communityUid() const
@@ -1020,50 +1018,6 @@ void Person::setCommunityUid(const QString &newCommunityUid)
     CHECK_MODIFIED_THEN_SET(mCommunityUid, newCommunityUid, KItemCommunity);
 //    mCommunityUid = newCommunityUid;
 //    markItemAsModified(KItemCommunity);
-}
-
-const QString &Person::departName() const
-{
-    return mDepartName;
-}
-
-void Person::setDepartName(const QString &newDepartName)
-{
-    CHECK_MODIFIED_THEN_SET(mDepartName, newDepartName, KItemDepartment);
-//    mDepartName = newDepartName;
-}
-
-const QString &Person::departUid() const
-{
-    return mDepartUid;
-}
-
-void Person::setDepartUid(const QString &newDepartUid)
-{
-    CHECK_MODIFIED_THEN_SET(mDepartUid, newDepartUid, KItemDepartment);
-//    mDepartUid = newDepartUid;
-}
-
-const QString &Person::areaName() const
-{
-    return mAreaName;
-}
-
-void Person::setAreaName(const QString &newAreaName)
-{
-    CHECK_MODIFIED_THEN_SET(mAreaName, newAreaName, KItemArea);
-//    mAreaName = newAreaName;
-}
-
-const QString &Person::areaUid() const
-{
-    return mAreaUid;
-}
-
-void Person::setAreaUid(const QString &newAreaUid)
-{
-    CHECK_MODIFIED_THEN_SET(mAreaUid, newAreaUid, KItemArea);
-//    mAreaUid = newAreaUid;
 }
 
 const QString &Person::nationalityName() const
@@ -1161,49 +1115,6 @@ void Person::setOtherContact(const QString &newOtherContact)
 //    mOtherContact = newOtherContact;
 }
 
-const QHash<QString, QString> &Person::workUidList() const
-{
-    return mWorkUidList;
-}
-
-void Person::setWorkUidList(const QHash<QString, QString> &newWorkUidList)
-{
-    mWorkUidList = newWorkUidList; // TODO: check change before set???
-    markItemAsModified(KItemWork);
-}
-
-const QHash<QString, QString> &Person::educationUidList() const
-{
-    return mEducationUidList;
-}
-
-void Person::setEducationUidList(const QHash<QString, QString> &newEducationUidList)
-{
-    mEducationUidList = newEducationUidList;
-    markItemAsModified(KItemEducation);
-}
-
-const QList<Work *> &Person::workList() const
-{
-    return mWorkList;
-}
-
-void Person::setWorkList(const QList<Work *> &newWorkList)
-{
-    mWorkList = newWorkList;
-    markItemAsModified(KItemWork);
-}
-
-const QList<Education *> &Person::educationList() const
-{
-    return mEducationList;
-}
-
-void Person::setEducationList(const QList<Education *> &newEducationList)
-{
-    mEducationList = newEducationList;
-    markItemAsModified(KItemEducation);
-}
 
 const QStringList &Person::eventUidList() const
 {
@@ -1282,26 +1193,26 @@ void Person::setRetireDate(const QString &newRetireDate, const QString &format)
     setRetireDate(Utils::dateFromString(newRetireDate, format));
 }
 
-const QString &Person::statusName() const
+const QString &Person::personStatusName() const
 {
-    return mStatusName;
+    return mPersonStatusName;
 }
 
-void Person::setStatusName(const QString &newStatusName)
+void Person::setPersonStatusName(const QString &newStatusName)
 {
-    CHECK_MODIFIED_THEN_SET(mStatusName, newStatusName, KItemStatus);
-//    mStatusName = newStatusName;
+    CHECK_MODIFIED_THEN_SET(mPersonStatusName, newStatusName, KItemStatus);
+//    mPersonStatusName = newStatusName;
 }
 
-const QString &Person::statusUid() const
+const QString &Person::personStatusUid() const
 {
-    return mStatusUid;
+    return mPersonStatusUid;
 }
 
-void Person::setStatusUid(const QString &newStatusUid)
+void Person::setPersonStatusUid(const QString &newStatusUid)
 {
-    CHECK_MODIFIED_THEN_SET(mStatusUid, newStatusUid, KItemStatus);
-//    mStatusUid = newStatusUid;
+    CHECK_MODIFIED_THEN_SET(mPersonStatusUid, newStatusUid, KItemStatus);
+//    mPersonStatusUid = newStatusUid;
 }
 
 const QString &Person::eternalPlace() const
@@ -1392,8 +1303,8 @@ const QString &Person::eternalVowsPICName() const
 
 void Person::setEternalVowsPICName(const QString &newEternalVowsName)
 {
-    CHECK_MODIFIED_THEN_SET(mEternalVowsPICName, newEternalVowsName, KItemEternalVowsCEO);
-//    mEternalVowsPICName = newEternalVowsName;
+//    CHECK_MODIFIED_THEN_SET(mEternalVowsPICName, newEternalVowsName, KItemEternalVowsCEO);
+    mEternalVowsPICName = newEternalVowsName;
 }
 
 const QString &Person::eternalVowsPICUid() const
@@ -1403,7 +1314,7 @@ const QString &Person::eternalVowsPICUid() const
 
 void Person::setEternalVowsPICUid(const QString &newEternalVowsPICUid)
 {
-    CHECK_MODIFIED_THEN_SET(mEternalVowsPICUid, newEternalVowsPICUid, KItemEternalVowsCEO);
+    CHECK_MODIFIED_THEN_SET(mEternalVowsPICUid, newEternalVowsPICUid, KItemEternalVowsPIC);
 //    mEternalVowsPICUid = newEternalVowsPICUid;
 }
 
@@ -1414,8 +1325,8 @@ const QString &Person::eternalVowsCEOName() const
 
 void Person::setEternalVowsCEOName(const QString &newEternalVowsCEOName)
 {
-    CHECK_MODIFIED_THEN_SET(mEternalVowsCEOName, newEternalVowsCEOName, KItemEternalVowsCEO);
-//    mEternalVowsCEOName = newEternalVowsCEOName;
+//    CHECK_MODIFIED_THEN_SET(mEternalVowsCEOName, newEternalVowsCEOName, KItemEternalVowsCEO);
+    mEternalVowsCEOName = newEternalVowsCEOName;
 }
 
 const QString &Person::eternalVowsCEOUid() const
@@ -1468,8 +1379,8 @@ const QString &Person::vowsCEOName() const
 
 void Person::setVowsCEOName(const QString &newVowsCEOName)
 {
-    CHECK_MODIFIED_THEN_SET(mVowsCEOName, newVowsCEOName, KItemVowsCEO);
-//    mVowsCEOName = newVowsCEOName;
+//    CHECK_MODIFIED_THEN_SET(mVowsCEOName, newVowsCEOName, KItemVowsCEO);
+    mVowsCEOName = newVowsCEOName;
 }
 
 const QString &Person::vowsCEOUid() const
@@ -1490,8 +1401,8 @@ const QString &Person::trainPICName() const
 
 void Person::setTrainPICName(const QString &newTrainPICName)
 {
-    CHECK_MODIFIED_THEN_SET(mTrainPICName, newTrainPICName, KItemTrainPIC);
-//    mTrainPICName = newTrainPICName;
+//    CHECK_MODIFIED_THEN_SET(mTrainPICName, newTrainPICName, KItemTrainPIC);
+    mTrainPICName = newTrainPICName;
 }
 
 const QString &Person::trainPICUid() const
@@ -1512,8 +1423,8 @@ const QString &Person::preTrainPICName() const
 
 void Person::setPreTrainPICName(const QString &newPreTrainPICName)
 {
-    CHECK_MODIFIED_THEN_SET(mPreTrainPICName, newPreTrainPICName, KItemPreTrainPIC);
-//    mPreTrainPICName = newPreTrainPICName;
+//    CHECK_MODIFIED_THEN_SET(mPreTrainPICName, newPreTrainPICName, KItemPreTrainPIC);
+    mPreTrainPICName = newPreTrainPICName;
 }
 
 const QString &Person::preTrainPICUid() const
@@ -1550,8 +1461,8 @@ const QString &Person::joinPICName() const
 
 void Person::setJoinPICName(const QString &newJoinPICName)
 {
-    CHECK_MODIFIED_THEN_SET(mJoinPICName, newJoinPICName, KItemJoinPIC);
-//    mJoinPICName = newJoinPICName;
+//    CHECK_MODIFIED_THEN_SET(mJoinPICName, newJoinPICName, KItemJoinPIC);
+    mJoinPICName = newJoinPICName;
 }
 
 const QString &Person::joinPICUid() const
@@ -1810,8 +1721,8 @@ const QString &Person::countryName() const
 
 void Person::setCountryName(const QString &newCountryName)
 {
-    CHECK_MODIFIED_THEN_SET(mCountryName, newCountryName, KItemCountry);
-//    mCountryName = newCountryName;
+//    CHECK_MODIFIED_THEN_SET(mCountryName, newCountryName, KItemCountry);
+    mCountryName = newCountryName;
 }
 
 const QString &Person::countryUid() const
@@ -1836,12 +1747,12 @@ void Person::setCourseUid(const QString &newCourseUid)
 //    mCourseUid = newCourseUid;
 }
 
-const QString &Person::course() const
+const QString &Person::courseName() const
 {
     return mCourse;
 }
 
-void Person::setCourse(const QString &newCourse)
+void Person::setCourseName(const QString &newCourse)
 {
     CHECK_MODIFIED_THEN_SET(mCourse, newCourse, KItemCourse);
 //    mCourse = newCourse;
@@ -1854,8 +1765,8 @@ const QStringList &Person::specialistUidList() const
 
 void Person::setSpecialistUidList(const QStringList &newSpecialistUidList)
 {
-    CHECK_MODIFIED_THEN_SET_QLIST_STRING(mSpecialistUidList, newSpecialistUidList, KItemSpeciaist);
-//    CHECK_MODIFIED_THEN_SET(mSpecialistUidList, newSpecialistUidList, KItemSpeciaist);
+    CHECK_MODIFIED_THEN_SET_QLIST_STRING(mSpecialistUidList, newSpecialistUidList, KItemSpecialist);
+//    CHECK_MODIFIED_THEN_SET(mSpecialistUidList, newSpecialistUidList, KItemSpecialist);
     //    mSpecialistUidList = newSpecialistUidList;
 }
 
@@ -1869,13 +1780,13 @@ void Person::setSpecialistNames(const QString &newSpecialists, bool parseUid)
 //    setSpecialistUidList(newSpecialists.split(NAME_SPLIT));
 //    mSpecialistNameList = newSpecialists.split(split);
     // TODO: check to remove redudant, check if they're same list
-//    markItemAsModified(KItemSpeciaist);
+//    markItemAsModified(KItemSpecialist);
     tracein;
     QStringList list;
     foreach (QString name, newSpecialists.split(NAME_SPLIT)) {
         list.append(name.trimmed());
     }
-    CHECK_MODIFIED_THEN_SET_QLIST_STRING(mSpecialistNameList, list, KItemSpeciaist);
+    CHECK_MODIFIED_THEN_SET_QLIST_STRING(mSpecialistNameList, list, KItemSpecialist);
 
     logd("parseUid %d", parseUid);
     if (parseUid){
@@ -1895,17 +1806,27 @@ void Person::setSpecialistNames(const QString &newSpecialists, bool parseUid)
 
 }
 
+void Person::addSpecialistName(const QString &newSpecialist)
+{
+    if (!mSpecialistNameList.contains(newSpecialist)) {
+        logd("Add specialist name '%s'", STR2CHA(newSpecialist));
+        mSpecialistNameList.push_back(newSpecialist);
+        markItemAsModified(KItemSpecialist);
+    }
+}
+
 void Person::clearSpecialistUid()
 {
     mSpecialistUidList.clear();
-    markItemAsModified(KItemSpeciaist);
+    markItemAsModified(KItemSpecialist);
 }
 
 void Person::addSpecialistUid(const QString &uid)
 {
     if (!mSpecialistUidList.contains(uid)) {
-        mSpecialistUidList.append(uid);
-        markItemAsModified(KItemSpeciaist);
+        logd("Add specialist uid '%s'", STR2CHA(uid));
+        mSpecialistUidList.push_back(uid);
+        markItemAsModified(KItemSpecialist);
     }
 }
 
@@ -1940,8 +1861,8 @@ const QString &Person::eduName() const
 
 void Person::setEduName(const QString &newEduName)
 {
-    CHECK_MODIFIED_THEN_SET(mEduName, newEduName, KItemEdu);
-//    mEduName = newEduName;
+//    CHECK_MODIFIED_THEN_SET(mEduName, newEduName, KItemEdu);
+    mEduName = newEduName;
 }
 
 const QString &Person::eduUid() const
@@ -2000,8 +1921,8 @@ const QString &Person::ethnicName() const
 
 void Person::setEthnicName(const QString &newEthnicName)
 {
-    CHECK_MODIFIED_THEN_SET(mEthnicName, newEthnicName, KItemEthnic);
-//    mEthnicName = newEthnicName;
+//    CHECK_MODIFIED_THEN_SET(mEthnicName, newEthnicName, KItemEthnic);
+    mEthnicName = newEthnicName;
 }
 
 const QString &Person::ethnicUid() const
@@ -2112,7 +2033,7 @@ qint64 Person::trainJoinDate() const
 
 void Person::setTrainJoinDate(qint64 newTrainJoinDate)
 {
-    mTrainJoinDate = newTrainJoinDate;
+    CHECK_MODIFIED_THEN_SET(mTrainJoinDate, newTrainJoinDate, KItemTrainDate);
 }
 
 void Person::setTrainJoinDate(const QString &newTrainJoinDate, const QString &format)

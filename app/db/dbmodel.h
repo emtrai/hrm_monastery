@@ -211,7 +211,7 @@ public:
      */
     virtual ErrCode save();
 
-    virtual DbModel* addUpdate(const QString& field);
+    virtual DbModel* addFieldToBeUpdated(const QString& field);
     /**
      * @brief Update modified info
      * @return Error code
@@ -262,6 +262,12 @@ public:
     void setLastDbUpdatedTime(qint64 newLastUpdatedTime);
 
     const QList<QString> &updatedField() const;
+
+    /**
+     * @brief Check if field is modified and should be updated
+     * @return
+     */
+    bool isFieldUpdated(const QString& itemField);
 
     /**
      * @brief Clear list of all changes marked

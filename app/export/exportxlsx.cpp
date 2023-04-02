@@ -80,6 +80,7 @@ ErrCode ExportXlsx::saveTo(const DataExporter *exporter, const QList<DbModel *> 
         logd("get header");
         int col = 1;
         int row = 1;
+        xlsx.write(row, col, QDateTime::currentDateTime().toString());
         xlsx.write(row+1, col, MARK_START_CHAR);
         foreach (auto item, keywordMap) {
             col++;
