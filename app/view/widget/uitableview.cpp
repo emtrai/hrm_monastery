@@ -316,7 +316,7 @@ QList<UITableMenuAction *> UITableView::getMenuCommonActions(const QMenu* menu)
                                 return this->onMenuActionAdd(m, a);
                           }));
 
-    actionList.append(UITableMenuAction::build(tr("Tải lại"), this)
+    actionList.append(UITableMenuAction::build(tr("Cập nhật thông tin (refresh)"), this)
                                                                ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                                    return this->onMenuActionReload(m, a);
                                                                }));
@@ -383,16 +383,28 @@ ErrCode UITableView::onMenuActionDelete(QMenu *menu, UITableMenuAction *act)
 ErrCode UITableView::onMenuActionEdit(QMenu *menu, UITableMenuAction *act)
 {
     tracein;
-    onEditItem((UITableCellWidgetItem*)act->tblItem());
+    ErrCode err = ErrNone;
+    if (act) {
+        onEditItem((UITableCellWidgetItem*)act->tblItem());
+    } else {
+        loge("Menu action is null!!!");
+        err = ErrInvalidData;
+    }
     return ErrNone;
 }
 
 ErrCode UITableView::onMenuActionView(QMenu *menu, UITableMenuAction *act)
 {
     tracein;
-    onViewItem((UITableCellWidgetItem*)act->tblItem());
+    ErrCode err = ErrNone;
+    if (act) {
+        onViewItem((UITableCellWidgetItem*)act->tblItem());
+    } else {
+        loge("Menu action is null!!!");
+        err = ErrInvalidData;
+    }
     traceout;
-    return ErrNone;
+    return err;
 
 }
 

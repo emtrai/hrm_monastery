@@ -25,6 +25,7 @@
 #include "utils.h"
 #include "logger.h"
 #include <QList>
+#include <QTemporaryFile>
 #include "dbmodel.h"
 #include "person.h"
 #include "utils.h"
@@ -188,6 +189,10 @@ QList<UITableMenuAction *> UIPersonListView::getMenuSingleSelectedItemActions(co
                                                    ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                        return this->onChangeCommunity(m, a);
                                                    }));
+    actionList.append(UITableMenuAction::build(tr("Xuất thông tin Nữ tu"), this, item)
+                                                    ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                                        return this->exportPersonInfo(m, a);
+                                                    }));
     traceout;
     return actionList;
 }
@@ -272,6 +277,67 @@ ErrCode UIPersonListView::onChangeCommunity(QMenu *menu, UITableMenuAction *act)
     return ret;
 }
 
+ErrCode UIPersonListView::exportPersonInfo(QMenu *menu, UITableMenuAction *act)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    UITableCellWidgetItem* item = nullptr;
+    Person* per = nullptr;
+    if (!act) {
+        loge("invalid argument");
+        err = ErrInvalidArg;
+    }
+    if (err == ErrNone) {
+        item = (UITableCellWidgetItem*)act->tblItem();
+        if (!item) {
+            loge("No item data");
+            err = ErrNoData;
+        }
+    }
+    if (err == ErrNone) {
+        int idx = item->idx();
+        logd("idx=%d",idx);
+        if (idx < mItemList.length()){
+            per = (Person*)mItemList.value(idx);
+            if (!per) {
+                loge("not person data");
+                err = ErrNoData;
+            }
+        } else {
+            loge("Invalid idx=%d", idx);
+            err = ErrInvalidData;
+        }
+    }
+
+    if (err == ErrNone) {
+        QTemporaryFile file;
+        QString fpath;
+        if (file.open()) {
+            fpath = file.fileName();
+            logd("export html file path='%s'", STR2CHA(fpath));
+        }
+        INSTANCE(PersonCtl)->exportToFile(per, ExportType::EXPORT_HTML, &fpath);
+        if (QFile::exists(fpath)){
+            err = Utils::saveHtmlToPdf(fpath,
+                                       Utils::UidFromName(per->getFullName(),
+                                                    UidNameConvertType::NO_VN_MARK_UPPER),
+                                        this);
+                if (err == ErrNone) {
+                    logi("Saved html path '%s' to pdf succeed", STR2CHA(fpath));
+                } else {
+                    loge("Saved html path '%s' to pdf failed, err=%d", STR2CHA(fpath), err);
+                    Utils::showErrorBox(QString(tr("Xuất dữ liệu lỗi, mã lỗi %1")).arg(err));
+                }
+        } else {
+            err = ErrNotFound;
+            loge("export to '%s', file not found", STR2CHA(fpath));
+        }
+    }
+
+    traceout;
+    return err;
+}
+
 void UIPersonListView::onViewItem(UITableCellWidgetItem *item)
 {
     tracein;
@@ -279,13 +345,24 @@ void UIPersonListView::onViewItem(UITableCellWidgetItem *item)
     logd("idx=%d",idx);
     if (idx < mItemList.length()){
         Person* per = (Person*)mItemList.value(idx);
-        QString fpath;
-        INSTANCE(PersonCtl)->exportToFile(per, ExportType::EXPORT_HTML, &fpath);
-        if (QFile::exists(fpath)){
-            dlgHtmlViewer* viewer = new dlgHtmlViewer();
-            viewer->setHtmlPath(fpath);
-            viewer->setSubject("Person");
-            viewer->exec();
+        if (per) {
+            QTemporaryFile file;
+            QString fpath;
+            if (file.open()) {
+                fpath = file.fileName();
+                logd("export html file path='%s'", STR2CHA(fpath));
+            }
+            INSTANCE(PersonCtl)->exportToFile(per, ExportType::EXPORT_HTML, &fpath);
+            if (QFile::exists(fpath)){
+                dlgHtmlViewer* viewer = new dlgHtmlViewer();
+                viewer->setHtmlPath(fpath);
+                viewer->setSubject(per->getFullName());
+                viewer->exec();
+            } else {
+                loge("html file '%s' not found", STR2CHA(fpath));
+            }
+        } else {
+            loge("not person data to view");
         }
     } else {
         loge("Invalid idx");

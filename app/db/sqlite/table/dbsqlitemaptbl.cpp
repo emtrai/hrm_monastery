@@ -98,6 +98,81 @@ QList<DbModel *> DbSqliteMapTbl::getListItems(const QString &mapTblName,
     return outList;
 }
 
+QList<DbModel *> DbSqliteMapTbl::getListItemsOfUid2(const QString &uid2, const DbModelBuilder &builder)
+{
+    tracein;
+    //    DB->openDb();
+    QSqlQuery qry(SQLITE->currentDb());
+    qint32 cnt = 0;
+    if (uid2.isEmpty()){
+        loge("Invalid uid");
+        return QList<DbModel*>();
+    }
+    logi("Get list model of uid2 '%s'", uid2.toStdString().c_str());
+    QString queryString = QString("SELECT * FROM %1 WHERE %2 = :uid")
+                              .arg(name(), getFieldNameUid2())
+        ;
+
+    qry.prepare(queryString);
+    logd("Query String '%s'", queryString.toStdString().c_str());
+
+    // TODO: check sql injection issue
+    logd("Bind uid2='%s'", STR2CHA(uid2));
+    qry.bindValue( ":uid", uid2);
+    // TODO: status check???
+    QList<DbModel *> outList;
+    cnt = runQuery(qry, builder, &outList);
+
+    logi("Found %d", cnt);
+    traceout;
+    return outList;
+}
+
+QList<DbModel *> DbSqliteMapTbl::getListItemsUids(const QString &uid1, const QString &uid2,
+                                                  const DbModelBuilder &builder)
+{
+    tracein;
+    //    DB->openDb();
+    QSqlQuery qry(SQLITE->currentDb());
+    qint32 cnt = 0;
+    if (uid2.isEmpty()){
+        loge("Invalid uid");
+        return QList<DbModel*>();
+    }
+    logi("Get list model of uid1='%s', uid2='%s'", STR2CHA(uid1), STR2CHA(uid2));
+    QString queryString = QString("SELECT * FROM %1 WHERE %2 = :uid1 AND %3 = :uid2")
+                              .arg(name(), getFieldNameUid1(), getFieldNameUid2())
+        ;
+
+    qry.prepare(queryString);
+    logd("Query String '%s'", queryString.toStdString().c_str());
+
+    // TODO: check sql injection issue
+    logd("Bind uid1='%s'", STR2CHA(uid1));
+    qry.bindValue( ":uid1", uid1);
+    logd("Bind uid2='%s'", STR2CHA(uid2));
+    qry.bindValue( ":uid2", uid2);
+    // TODO: status check???
+    QList<DbModel *> outList;
+    cnt = runQuery(qry, builder, &outList);
+
+    logi("Found %d", cnt);
+    traceout;
+    return outList;
+}
+
+ErrCode DbSqliteMapTbl::updateModelStatus(const QString &uid, int status)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    QHash<QString, QString> updateField;
+    logd("update model status %d for uid '%s'", status, STR2CHA(uid));
+    updateField.insert(KFieldModelStatus, QString::number(status));
+    err = update(uid, updateField);
+    traceret(err);
+    return err;
+}
+
 void DbSqliteMapTbl::addTableField(DbSqliteTableBuilder *builder)
 {
     tracein;
@@ -163,7 +238,7 @@ ErrCode DbSqliteMapTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry
         } else {
             loge("Invalid mapp model '%s', type %d, do nothing",
                  STR2CHA(item->modelName()), item->modelType());
-            err = ErrInvalidData;
+//            err = ErrInvalidData;
         }
     }
     traceret(err);

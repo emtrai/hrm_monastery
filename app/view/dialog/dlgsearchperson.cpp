@@ -59,7 +59,7 @@ int DlgSearchPerson::onSearch(const QString &keyword)
     clearAll();
 
     err = INSTANCE(PersonCtl)->search(keyword, &mListItems);
-    if (err == ErrNone) {
+    if (err != ErrNone) {
         loge("Search person err=%d", err);
         Utils::showErrorBox(QString(tr("Tìm kiếm lỗi, mã lỗi %1")).arg(err));
     }

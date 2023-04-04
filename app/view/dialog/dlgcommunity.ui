@@ -23,9 +23,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-66</y>
+        <y>0</y>
         <width>462</width>
-        <height>1013</height>
+        <height>1025</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -148,9 +148,6 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="QLineEdit" name="txtCode"/>
-         </item>
          <item row="12" column="0">
           <widget class="QLabel" name="label_2">
            <property name="text">
@@ -272,6 +269,20 @@
             <widget class="QLabel" name="label_19">
              <property name="text">
               <string>ngày/tháng</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="1" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_8">
+           <item>
+            <widget class="QLineEdit" name="txtCode"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnChangeNameId">
+             <property name="text">
+              <string>Đổi</string>
              </property>
             </widget>
            </item>

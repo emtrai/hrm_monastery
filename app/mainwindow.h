@@ -206,6 +206,10 @@ class ModelController;
 
      void on_actionLogFile_triggered();
 
+     void on_actionSummarizeReport_triggered();
+
+     void on_actionOrgInfo_triggered();
+
  private:
      static MainWindow* gInstance;
 };

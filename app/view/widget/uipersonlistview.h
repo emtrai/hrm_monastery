@@ -58,6 +58,7 @@ protected:
     virtual ErrCode onMenuActionImport(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionExportListPerson(QMenu *menu, UITableMenuAction *act);
     virtual ErrCode onChangeCommunity(QMenu* menu, UITableMenuAction* act);
+    virtual ErrCode exportPersonInfo(QMenu* menu, UITableMenuAction* act);
     virtual void onViewItem(UITableCellWidgetItem *item);
     virtual void onEditItem(UITableCellWidgetItem *item);
     virtual QString getTitle();

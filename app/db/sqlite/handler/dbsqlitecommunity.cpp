@@ -101,9 +101,9 @@ ErrCode DbSqliteCommunity::add(DbModel *model, bool notify)
             loge("not found comm dept handler");
         }
     }
+
     // Add management dept to community so that we can add comminity's manager to
     if (err == ErrNone) {
-
         logd("Check to add management dept for community");
         // TODO: FIXME we're trying to fix management name id with this, but trouble
         // if it's not in json prebuilt file... TAKE CARE
@@ -234,11 +234,18 @@ ErrCode DbSqliteCommunity::addPerson2Community(const Community *comm,
 {
     tracein;
     ErrCode err = ErrNone;
+    DbSqliteCommunityPersonTbl* tblCommPer = nullptr;
     logd("Build map object");
 
     if (!comm || !per) {
         err = ErrInvalidArg;
         loge("invalid argument");
+    }
+
+    tblCommPer = (DbSqliteCommunityPersonTbl*)DbSqlite::table(KTableCommPerson);
+    if (!tblCommPer) {
+        loge("not found table '%s'", KTableCommPerson);
+        err = ErrNoTable;
     }
 
     if (err == ErrNone) {
@@ -254,19 +261,43 @@ ErrCode DbSqliteCommunity::addPerson2Community(const Community *comm,
     }
 
     if (err == ErrNone) {
-        logi("Save mapping community '%s' and person '%s'",
-             STR2CHA(comm->toString()), STR2CHA(per->toString()));
-        // TODO: update status of old one?
-        CommunityPerson* mapModel = (CommunityPerson*)MapDbModel::buildMapModel(&CommunityPerson::build,
-                                                                        comm, per,
-                                                                        status, startdate,
-                                                                        enddate, remark);
-        if (mapModel) {
-            err = mapModel->save();
-            delete mapModel;
-        } else {
-            err = ErrNoMemory;
-            loge("no memory?");
+        bool newAdd = true;
+        QList<DbModel*> listCommunitiesOfPerson =
+            tblCommPer->getListItemsUids(per->uid(), comm->uid(), &CommunityPerson::build);
+        if (listCommunitiesOfPerson.size() > 0) {
+            logd("found %d community which person uid belong to, set it as active", listCommunitiesOfPerson.size());
+            foreach (DbModel* model, listCommunitiesOfPerson) {
+                newAdd = false;
+                tblCommPer->updateModelStatus(model->uid(), MODEL_ACTIVE);
+            }
+        }
+        RELEASE_LIST_DBMODEL(listCommunitiesOfPerson);
+        logd("newAdd=%d", newAdd);
+        if (newAdd) {
+            QList<DbModel*> listCommunitiesOfPerson =
+                tblCommPer->getListCommunityOfPerson(per->uid(), &CommunityPerson::build);
+            if (listCommunitiesOfPerson.size() > 0) {
+                logd("found %d community which person uid belong to currently, change status to inactive", listCommunitiesOfPerson.size());
+                foreach (DbModel* model, listCommunitiesOfPerson) {
+                    tblCommPer->updateModelStatus(model->uid(), MODEL_INACTIVE);
+                }
+            }
+            RELEASE_LIST_DBMODEL(listCommunitiesOfPerson);
+            logi("Save mapping community '%s' and person '%s'",
+                 STR2CHA(comm->toString()), STR2CHA(per->toString()));
+            // TODO: update status of old one?
+            CommunityPerson* mapModel = (CommunityPerson*)MapDbModel::buildMapModel(&CommunityPerson::build,
+                                                                            comm, per,
+                                                                            status, startdate,
+                                                                            enddate, remark);
+            if (mapModel) {
+                mapModel->setStatus(MODEL_ACTIVE); // TODO: set active here is suitable???
+                err = mapModel->save();
+                delete mapModel;
+            } else {
+                err = ErrNoMemory;
+                loge("no memory?");
+            }
         }
     }
 

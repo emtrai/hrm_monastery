@@ -64,9 +64,10 @@ void LogWorker::doWork() {
 void LogWorker::printLog(QString log) {
     tracein;
     if (isRunning) {
-//        mMutex.lock();
+        mMutex.lock();
+        logd("enqueue");
         mQueue.enqueue(log);
-//        mMutex.unlock();
+        mMutex.unlock();
         mWait.wakeAll();
     } else {
         loge("writing lock thread not started yet");

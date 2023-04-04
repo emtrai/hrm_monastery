@@ -37,8 +37,12 @@ public:
     ~dlgHtmlViewer();
     void setSubject (const QString& value);
     void setHtmlPath(const QString& fpath);
+private slots:
+    void on_btnExport_clicked();
+
 private:
     Ui::dlgHtmlViewer *ui;
+    QString mHtmlPath;
 };
 
 #endif // DLGHTMLVIEWER_H

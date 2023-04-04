@@ -34,7 +34,15 @@
 #include <QObject>
 #include <QDateTime>
 #include <QFileDialog>
+#include <QInputDialog>
 #include "dbmodel.h"
+
+#include <QTextDocument>
+#include <QtWidgets>
+#ifndef QT_NO_PRINTER
+#include <QPrinter>
+#endif
+
 
 // yymd
 #define YMD_TO_INT(y,m,d) (((y) << 16) | ((m) << 8) | (d))
@@ -701,6 +709,17 @@ bool Utils::showConfirmDialog(QWidget *parent, const QString &title, const QStri
     return ok;
 }
 
+QString Utils::showInputDialog(QWidget *parent, const QString &title, const QString &message, const QString& initInput, bool *isOk)
+{
+    tracein;
+    QString text = QInputDialog::getText(parent, title,
+                                         message, QLineEdit::Normal,
+                                         initInput, isOk);
+    logd("input text: '%s'", STR2CHA(text));
+    traceout;
+    return text;
+}
+
 ErrCode Utils::screenSize(int *w, int *h)
 {
     tracein;
@@ -839,5 +858,40 @@ QString Utils::saveFileDialog(QWidget *parent,
     logd("save to file '%s'", STR2CHA(fpath));
     traceout;
     return fpath;
+}
+
+ErrCode Utils::saveHtmlToPdf(const QString &htmlPath, const QString& initFname, QWidget *parent)
+{
+    // Export information to file
+    tracein;
+    ErrCode err = ErrNone;
+    logd("export '%s' to html", STR2CHA(htmlPath));
+    if (htmlPath.isEmpty() || !QFile::exists(htmlPath)) {
+        err = ErrInvalidArg;
+        loge("file '%s' is not exist or empty", STR2CHA(htmlPath));
+    }
+    if (err == ErrNone) {
+        QString fileName = Utils::saveFileDialog(parent, QObject::tr("Xuất dữ liệu pdf"), initFname, "PDF (*.pdf)");
+        if (!fileName.isEmpty()) {
+            if (QFileInfo(fileName).suffix().isEmpty()) { fileName.append(".pdf"); }
+
+            logd("export filename '%s'", STR2CHA(fileName));
+            QPrinter printer(QPrinter::PrinterResolution);
+            printer.setOutputFormat(QPrinter::PdfFormat);
+            printer.setPageSize(QPageSize::A4);
+            printer.setOutputFileName(fileName);
+
+            logi("Save html path '%s' to pdf '%s", STR2CHA(htmlPath), STR2CHA(fileName));
+            QTextDocument doc;
+            doc.setHtml(Utils::readAll(htmlPath));
+            doc.print(&printer);
+
+            Utils::showMsgBox(QString(QObject::tr("Xuất dữ liệu ra tập tin: %1")).arg(fileName));
+        } else {
+            loge("Can not export to pdf, file is empty or cancelled");
+        }
+    }
+    traceout;
+    return err;
 }
 

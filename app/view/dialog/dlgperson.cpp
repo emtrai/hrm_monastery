@@ -203,7 +203,7 @@ void DlgPerson::setupUI()
 #else
     ui->cbProvince->setVisible(false);
     ui->lblProvince->setVisible(false);
-    ui->btnAddProvince->setVisible(false);
+//    ui->btnAddProvince->setVisible(false);
 #endif // SKIP_PERSON_PROVINE
 
     // Community
@@ -355,6 +355,7 @@ Person *DlgPerson::buildPerson()
     // work
     logd("set work");
     SET_VAL_FROM_CBOX(ui->cbWork, per->setCurrentWorkUid, per->setCurrentWorkName);
+    per->setWorkHistory(ui->txtWorkHistory->toPlainText().trimmed());
 
     //event
 //    QList<QVariant> specialist = ui->tblEvents->item
@@ -516,6 +517,7 @@ ErrCode DlgPerson::fromPerson(const Person *model)
     // current work
     logd("load work");
     Utils::setSelectItemComboxByData(ui->cbWork, per->currentWorkUid());
+    ui->txtWorkHistory->setPlainText(per->workHistory());
 
     logd("load community");
     // TODO: handle the case that adding community dialog is shown when no community found
@@ -840,6 +842,7 @@ void DlgPerson::loadStatus()
     tracein;
     ui->cbStatus->clear();
     QList<DbModel*> listItems = INSTANCE(PersonStatusCtl)->getAllItemsFromDb(); // TODO: getAllItem??
+    ui->cbStatus->addItem(tr("Không rõ"), KUidNone);
     foreach(DbModel* item, listItems){
         ui->cbStatus->addItem(item->name(), item->uid());
     }
@@ -852,6 +855,7 @@ void DlgPerson::loadCourse()
     tracein;
     ui->cbCourse->clear();
     QList<DbModel*> listCourse = COURSECTL->getAllItemsFromDb(); // TODO: should call getAllItem???
+    ui->cbCourse->addItem(tr("Không rõ"), KUidNone);
     foreach(DbModel* item, listCourse){
         ui->cbCourse->addItem(item->name(), item->uid());
     }

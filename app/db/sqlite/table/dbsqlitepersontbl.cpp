@@ -153,6 +153,7 @@ void DbSqlitePersonTbl::addTableField(DbSqliteTableBuilder *builder)
 
     // current work
     builder->addField(KFieldWorkUid, TEXT);
+    builder->addField(KFieldWorkHistory, TEXT);
     // THIS IS IMPORTANT NOTE, DON'T REMOVE IT
     // - ANY UPDATE ON THIS, MUST UPDATE Person::clone() as well
 }
@@ -255,6 +256,7 @@ ErrCode DbSqlitePersonTbl::insertTableField(DbSqliteInsertBuilder *builder, cons
 
     // current work
     builder->addValue(KFieldWorkUid, per->currentWorkUid());
+    builder->addValue(KFieldWorkHistory, per->workHistory());
 
     // TODO: add field relate to list, like holly list, community, etc.
     return ErrNone;
@@ -438,7 +440,8 @@ ErrCode DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
         // as table calls directly to model handler
         DbModel* model = SQLITE->getPersonModelHandler()->getByUid(cmm->joinPICUid());
         if (model) {
-            cmm->setJoinPICName(model->name());
+            cmm->setJoinPICName(dynamic_cast<Person*>(model)->getFullName());
+            cmm->setJoinPICNameId(model->nameId());
             delete model;
         } else {
             logw("not found joinPICUid '%s'", STR2CHA(cmm->joinPICUid()));
@@ -453,7 +456,8 @@ ErrCode DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
         // as table calls directly to model handler
         DbModel* model = SQLITE->getPersonModelHandler()->getByUid(cmm->preTrainPICUid());
         if (model) {
-            cmm->setPreTrainPICName(model->name());
+            cmm->setPreTrainPICName(dynamic_cast<Person*>(model)->getFullName());
+            cmm->setPreTrainPICNameId(model->nameId());
             delete model;
         } else {
             logw("not found preTrainPICUid '%s'", STR2CHA(cmm->preTrainPICUid()));
@@ -468,7 +472,8 @@ ErrCode DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
         // as table calls directly to model handler
         DbModel* model = SQLITE->getPersonModelHandler()->getByUid(cmm->trainPICUid());
         if (model) {
-            cmm->setTrainPICName(model->name());
+            cmm->setTrainPICName(dynamic_cast<Person*>(model)->getFullName());
+            cmm->setTrainPICNameId(model->nameId());
             delete model;
         } else {
             logw("not found trainPICUid '%s'", STR2CHA(cmm->trainPICUid()));
@@ -483,7 +488,8 @@ ErrCode DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
         // as table calls directly to model handler
         DbModel* model = SQLITE->getPersonModelHandler()->getByUid(cmm->vowsCEOUid());
         if (model) {
-            cmm->setVowsCEOName(model->name());
+            cmm->setVowsCEOName(dynamic_cast<Person*>(model)->getFullName());
+            cmm->setVowsCEONameId(model->nameId());
             delete model;
         } else {
             logw("not found vowsCEOUid '%s'", STR2CHA(cmm->vowsCEOUid()));
@@ -498,7 +504,8 @@ ErrCode DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
         // as table calls directly to model handler
         DbModel* model = SQLITE->getPersonModelHandler()->getByUid(cmm->eternalVowsPICUid());
         if (model) {
-            cmm->setEternalVowsPICName(model->name());
+            cmm->setEternalVowsPICName(dynamic_cast<Person*>(model)->getFullName());
+            cmm->setEternalVowsPICNameId(model->nameId());
             delete model;
         } else {
             logw("not found eternalVowsPICUid '%s'", STR2CHA(cmm->eternalVowsPICUid()));
@@ -514,7 +521,8 @@ ErrCode DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
         // as table calls directly to model handler
         DbModel* model = SQLITE->getPersonModelHandler()->getByUid(cmm->eternalVowsCEOUid());
         if (model) {
-            cmm->setEternalVowsCEOName(model->name());
+            cmm->setEternalVowsCEOName(dynamic_cast<Person*>(model)->getFullName());
+            cmm->setEternalVowsCEONameId(model->nameId());
             delete model;
         } else {
             logw("not found eternalVowsCEOUid '%s'", STR2CHA(cmm->eternalVowsCEOUid()));
@@ -563,6 +571,7 @@ ErrCode DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
             logw("not found work uid '%s'", STR2CHA(cmm->currentWorkUid()));
         }
     }
+    cmm->setWorkHistory(qry.value(KFieldWorkHistory).toString());
     //
 
     // TODO: add field relate to list, like holly list, community, etc.
@@ -597,6 +606,8 @@ ErrCode DbSqlitePersonTbl::updateTableField(DbSqliteUpdateBuilder *builder,
             builder->addValue(KFieldChristenDate, per->christenDate());
         } else if (field == KItemWork) {
             builder->addValue(KFieldWorkUid, per->currentWorkUid());
+        } else if (field == KItemWorkHistory) {
+            builder->addValue(KFieldWorkHistory, per->workHistory());
         } else if (field == KItemSpecialistInfo) {
             builder->addValue(KFieldSpecialistInfo, per->specialistInfo());
         } else if (field == KItemEduDetail) {
@@ -719,7 +730,7 @@ QHash<QString, int> DbSqlitePersonTbl::getSearchFields()
     inFields[COLUMN_NAME(name(), KFieldTel)] = TEXT;
     inFields[KFieldIDCard] = TEXT;
     inFields[COLUMN_NAME(name(), KFieldAddr)] = TEXT;
-    inFields[KFieldContact] = TEXT;
+    inFields[COLUMN_NAME(name(),KFieldContact)] = TEXT;
 //    inFields[KFieldWorkName] = TEXT;
     return inFields;
 }

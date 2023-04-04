@@ -32,6 +32,7 @@
 #include "xlsxchart.h"
 #include "xlsxrichstring.h"
 #include "xlsxworkbook.h"
+#include <QColor>
 using namespace QXlsx;
 
 
@@ -86,6 +87,12 @@ ErrCode ExportXlsx::saveTo(const DataExporter *exporter, const QList<DbModel *> 
             col++;
             xlsx.write(row, col, item.second);
             xlsx.write(row+1, col, item.first);
+            QXlsx::Cell* cell = xlsx.cellAt(row, col);
+            if (cell) {
+                cell->format().setFontBold(true);
+                cell->format().setPatternBackgroundColor(Qt::gray);
+                cell->format().setPatternForegroundColor(Qt::blue);
+            }
         }
         row++;
         int idx = 0;

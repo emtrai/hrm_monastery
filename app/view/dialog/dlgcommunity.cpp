@@ -208,3 +208,34 @@ void DlgCommunity::on_btnSearchCEO_clicked()
     traceout;
 }
 
+
+void DlgCommunity::on_txtName_textChanged(const QString &arg1)
+{
+    if (!mCustomNameId) {
+        bool ok = false;
+        QString nameid = Utils::UidFromName(arg1, NO_VN_MARK_UPPER, &ok);
+        if (ok) {
+            ui->txtCode->setText(nameid);
+        } else {
+            ui->txtCode->setText("");
+        }
+    }
+}
+
+
+void DlgCommunity::on_btnChangeNameId_clicked()
+{
+    tracein;
+    QString txt = ui->txtCode->text().trimmed();
+    bool ok = false;
+    QString nameId = Utils::showInputDialog(this, tr("Định danh cộng đoàn"), tr("Nhập mã định danh cộng đoàn"), txt, &ok);
+    if (ok && !nameId.isEmpty()) {
+        mCustomNameId = true;
+        ui->txtCode->setText(nameId);
+        logd("custom name id '%s'", STR2CHA(nameId));
+    } else {
+        logd("no name id (ok=%d) or name id is empty", ok);
+    }
+    traceout;
+}
+

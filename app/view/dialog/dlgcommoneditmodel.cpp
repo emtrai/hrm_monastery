@@ -29,7 +29,8 @@
 #include "modelcontroller.h"
 
 DlgCommonEditModel::DlgCommonEditModel(QWidget *parent): QDialog(parent),
-    mModel(nullptr), mIsNew(false), mIsSelfSave(false)
+    mModel(nullptr), mIsNew(false), mIsSelfSave(false),
+    mCustomNameId(false)
 {
     tracein;
 }
@@ -212,6 +213,7 @@ ErrCode DlgCommonEditModel::fromModel(const DbModel *inModel)
     }
     DbModel* item = model();
     if (item) {
+        mCustomNameId = true;
         item->clone(inModel);
         item->validateAllFields(); // TODO: should call validate here???
         if (item == nullptr){

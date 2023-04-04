@@ -23,6 +23,7 @@
 #include "ui_dlghtmlviewer.h"
 #include "utils.h"
 #include "filectl.h"
+#include <QPushButton>
 
 dlgHtmlViewer::dlgHtmlViewer(QWidget *parent) :
     QDialog(parent),
@@ -30,7 +31,8 @@ dlgHtmlViewer::dlgHtmlViewer(QWidget *parent) :
 {
     ui->setupUi(this);
     DIALOG_SIZE_SHOW(this);
-
+    this->setWindowTitle(tr("Thông tin nữ tu"));
+    ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Thoát"));
 }
 
 dlgHtmlViewer::~dlgHtmlViewer()
@@ -50,4 +52,26 @@ void dlgHtmlViewer::setHtmlPath(const QString &fpath)
     ui->txtContent->clear();
 
     ui->txtContent->setHtml(Utils::readAll(fpath));
+    mHtmlPath = fpath;
+
+    logd("html path '%s'", STR2CHA(mHtmlPath));
+    traceout;
 }
+
+void dlgHtmlViewer::on_btnExport_clicked()
+{
+    // Export information to file
+    tracein;
+    ErrCode err = Utils::saveHtmlToPdf(mHtmlPath,
+                                       Utils::UidFromName(ui->lblSubject->text(),
+                                            UidNameConvertType::NO_VN_MARK_UPPER),
+                                       this);
+    if (err == ErrNone) {
+        logi("Saved html path '%s' to pdf succeed", STR2CHA(mHtmlPath));
+    } else {
+        loge("Saved html path '%s' to pdf failed, err=%d", STR2CHA(mHtmlPath), err);
+        Utils::showErrorBox(QString(tr("Xuất dữ liệu lỗi, mã lỗi %1")).arg(err));
+    }
+    traceout;
+}
+

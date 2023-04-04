@@ -179,6 +179,7 @@ const char* const KFieldCourseType = "course_type";
 const char* const KFieldWorkUid = "work_uid";
 const char* const KFieldWorkName = "work_name";
 const char* const KFieldWorkNameId = "work_nameid";
+const char* const KFieldWorkHistory = "work_history";
 const char* const KFieldSpecialistName = "specialist_name";
 const char* const KFieldSpecialistDbId = "specialist_dbid";
 const char* const KFieldSpecialistUid = "specialist_uid";

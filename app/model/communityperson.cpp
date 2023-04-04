@@ -28,7 +28,9 @@
 #include "dbctl.h"
 #include "dbmodel.h"
 
-CommunityPerson::CommunityPerson()
+CommunityPerson::CommunityPerson():
+    mPerson(nullptr),
+    mCommunity(nullptr)
 {
     tracein;
 }

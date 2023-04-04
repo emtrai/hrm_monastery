@@ -104,7 +104,6 @@
     </property>
     <addaction name="action_Backup"/>
     <addaction name="actionRestore"/>
-    <addaction name="actionRevert"/>
     <addaction name="actionDong_bo"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -115,8 +114,15 @@
     <addaction name="action_About"/>
     <addaction name="actionLogFile"/>
    </widget>
+   <widget class="QMenu" name="menuB_o_c_o">
+    <property name="title">
+     <string>Báo cáo</string>
+    </property>
+    <addaction name="actionSummarizeReport"/>
+   </widget>
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
+   <addaction name="menuB_o_c_o"/>
   </widget>
   <action name="action_New">
    <property name="icon">
@@ -329,11 +335,6 @@
     <string>Ban</string>
    </property>
   </action>
-  <action name="actionRevert">
-   <property name="text">
-    <string>Khôi phục</string>
-   </property>
-  </action>
   <action name="actionDong_bo">
    <property name="text">
     <string>Đồng bộ</string>
@@ -359,6 +360,11 @@
   <action name="actionLogFile">
    <property name="text">
     <string>Thư mục log</string>
+   </property>
+  </action>
+  <action name="actionSummarizeReport">
+   <property name="text">
+    <string>Tổng quan Hội dòng</string>
    </property>
   </action>
  </widget>

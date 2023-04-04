@@ -88,6 +88,20 @@ QList<DbModel *> DbSqliteCommunityPersonTbl::getListPerson(const QString &commun
     return outList;
 }
 
+QList<DbModel *> DbSqliteCommunityPersonTbl::getListCommunityOfPerson(const QString &personUid,
+                                                                      const DbModelBuilder &builder)
+{
+    traced;
+    return getListItemsOfUid2(personUid, builder);
+}
+
+QList<DbModel *> DbSqliteCommunityPersonTbl::getListItems(const QString &personUid, const QString &commuid,
+                                                                      const DbModelBuilder &builder)
+{
+    traced;
+    return getListItemsUids(commuid, personUid, builder);
+}
+
 ErrCode DbSqliteCommunityPersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     tracein;

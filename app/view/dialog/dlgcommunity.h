@@ -50,6 +50,10 @@ public:
 private slots:
     void on_btnSearchCEO_clicked();
 
+    void on_txtName_textChanged(const QString &arg1);
+
+    void on_btnChangeNameId_clicked();
+
 private:
     Ui::DlgCommunity *ui;
 };

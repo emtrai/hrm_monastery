@@ -4,15 +4,16 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = QuanLyHoiDong
 CONFIG += c++17
 
-CONFIG += console
 QT += sql
 QT += widgets
 QT += gui
 QT += gui-private
+QT += printsupport
 
 DEFINES += FEATURE_system_sqlite=OFF
 
-DEFINES += TEST_ENABLE
+CONFIG += console
+#DEFINES += TEST_ENABLE
 DEFINES += LOG_LEVEL=4
 DEFINES += DEBUG_TRACE
 DEFINES += DEBUG_LOG

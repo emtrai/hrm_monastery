@@ -109,6 +109,7 @@ protected:
     bool mIsNew; // true: add new, false: edit/update
     bool mIsSelfSave; //true: auto save on accept, false: not save
     CommonEditModelListener* mListener;
+    bool mCustomNameId;
 };
 
 #endif // DLGCOMMONEDITMODEL_H

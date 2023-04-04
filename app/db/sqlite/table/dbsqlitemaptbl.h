@@ -32,7 +32,7 @@ class DbSqliteMapTbl : public DbSqliteTbl
 public:
     DbSqliteMapTbl(DbSqlite* db);
     DbSqliteMapTbl(DbSqlite* db, const QString& baseName, const QString& name, qint32 versionCode);
-    QList<DbModel*> getListItems(const QString &mapTblName,
+    virtual QList<DbModel*> getListItems(const QString &mapTblName,
                                   const QString &modelTblName,
                                   const QString &fieldUid2Join,
                                   const QString &fieldModelUid,
@@ -41,7 +41,9 @@ public:
                                   const QString &uid,
                                   int status = MODEL_ACTIVE,
                                   const QString& selectedField = "*");
-
+    virtual QList<DbModel*> getListItemsOfUid2(const QString& uid2, const DbModelBuilder &builder);
+    virtual QList<DbModel*> getListItemsUids(const QString& uid1, const QString& uid2, const DbModelBuilder &builder);
+    virtual ErrCode updateModelStatus(const QString& uid, int status = MODEL_ACTIVE);
 protected:
     virtual void addTableField(DbSqliteTableBuilder* builder);
     virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);

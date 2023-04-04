@@ -1088,3 +1088,25 @@ void MainWindow::on_actionLogFile_triggered()
     QDesktopServices::openUrl(QUrl::fromLocalFile(logDir));
 }
 
+
+void MainWindow::on_actionSummarizeReport_triggered()
+{
+    // BAO CAO TONG QUAN HOI DONG
+    tracein;
+    // TODO: implemen this
+    UNDER_DEV(tr("Báo cáo tổng quan Hội dòng, xuất báo cáo ra tập tin"));
+
+    traceout;
+}
+
+
+void MainWindow::on_actionOrgInfo_triggered()
+{
+    // THONG TIN HOI DONG
+    tracein;
+    // TODO: implemen this
+    UNDER_DEV(tr("Xem thông tin về hội dòng: lịch sử, số lượng Cộng đoàn, Nữ tu, Tổng phụ trách, v.v.v."));
+
+    traceout;
+}
+

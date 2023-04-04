@@ -68,6 +68,7 @@ ErrCode ImportXlsx::importFrom(const QString &importName, int importFileType,
         logi("Read data from xlsx file %s", STR2CHA(fpath));
         QXlsx::Document xlsxR(fpath);
         if (xlsxR.load()) {
+            xlsxR.workbook()->setDate1904(false);
             int headCol = 1;
             int headRow = 1;
             #define STATE_FIND_ID  (0)
@@ -89,6 +90,10 @@ ErrCode ImportXlsx::importFrom(const QString &importName, int importFileType,
                         QVariant var = cell->readValue(); // read cell value (number(double), QDateTime, QString ...)
                         if (var.isValid()) {
                             value = var.toString().trimmed();
+                        }
+                        if (cell->isDateTime()) { // QXlsx read in format of YYYY/MM/DD
+                            qint32 time = Utils::dateFromString(value, "YYYY/MM/DD");
+                            value = Utils::date2String(time, DEFAULT_FORMAT_YMD);
                         }
                     }
                     logd("value='%s'", STR2CHA(value));

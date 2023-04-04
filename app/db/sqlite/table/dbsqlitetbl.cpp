@@ -1179,7 +1179,7 @@ QString DbSqliteTbl::toModelStatusCond(qint64 modelStatus)
 void DbSqliteTbl::appendModelStatusCond(QString& cond, qint64 modelStatus)
 {
     tracein;
-    QString condStatus = toDbStatusCond(modelStatus);
+    QString condStatus = toModelStatusCond(modelStatus);
     if (!condStatus.isEmpty()) {
         if (cond.isEmpty()) {
             cond = condStatus;

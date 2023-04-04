@@ -119,12 +119,12 @@ do { \
                 logd("item %s, index %d", currtxt.toStdString().c_str(), index);\
                 if (index >= 0){ \
                     QVariant value = widget->itemData(index);\
-                    if (!value.isNull()) {\
+                    if (!value.isNull() && !value.toString().isEmpty()) {\
                         func(value.toString());\
                         functxt(currtxt);\
+                    }\
                 }\
             }\
-        }\
     } while (0)
 
 // TODO: should common with above macro???
@@ -305,6 +305,7 @@ public:
     static void showErrorBox(const QString& msg);
     static void showErrorBox(int ret, const QString* msg = nullptr);
     static bool showConfirmDialog(QWidget *parent, const QString& title, const QString& message, std::function<void(void)> onAccept = nullptr);
+    static QString showInputDialog(QWidget *parent, const QString& title, const QString& message, const QString& initInput = "", bool* isOk = nullptr);
     static ErrCode screenSize(int* w=nullptr, int* h=nullptr);
     static int screenHeight();
     static int getCurrentComboxIndex(const QComboBox *cb);;
@@ -321,6 +322,7 @@ public:
                                   const QString& initFileName = QString(),
                                   const QString& filter = QString(),
                                   const QString& initDir = QString());
+    static ErrCode saveHtmlToPdf(const QString& htmlPath, const QString& initFname = "xuatdulieu", QWidget *parent = nullptr);
 };
 
 

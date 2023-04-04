@@ -396,6 +396,27 @@ public:
 
     const QHash<QString, ExportCallbackFunc > &exportFields() const;
 
+    const QString &workHistory() const;
+    void setWorkHistory(const QString &newWorkHistory);
+
+    const QString &eternalVowsPICNameId() const;
+    void setEternalVowsPICNameId(const QString &newEternalVowsPICNameId);
+
+    const QString &eternalVowsCEONameId() const;
+    void setEternalVowsCEONameId(const QString &newEternalVowsCEONameId);
+
+    const QString &vowsCEONameId() const;
+    void setVowsCEONameId(const QString &newVowsCEONameId);
+
+    const QString &preTrainPICNameId() const;
+    void setPreTrainPICNameId(const QString &newPreTrainPICNameId);
+
+    const QString &joinPICNameId() const;
+    void setJoinPICNameId(const QString &newJoinPICNameId);
+
+    const QString &trainPICNameId() const;
+    void setTrainPICNameId(const QString &newTrainPICNameId);
+
 protected:
     virtual DbModelHandler *getDbModelHandler() const;
     virtual const QString exportTemplatePath(FileExporter* exporter, QString* ftype = nullptr) const;
@@ -501,29 +522,36 @@ protected:
     // cong viec hien tai
     QString mCurrentWorkUid;
     QString mCurrentWorkName;
+    QString mWorkHistory;
 
     qint64 mJoinDate; // ngay nhap tu
     QString mJoinPICUid;
     QString mJoinPICName;
+    QString mJoinPICNameId;
 
     qint64 mPreTrainJoinDate; // ngay gia nhap Tien Tap Vien
     QString mPreTrainPICUid; // nguoi dac trac
     QString mPreTrainPICName; // nguoi dac trac
+    QString mPreTrainPICNameId; // nguoi dac trac
 
     qint64 mTrainJoinDate; // ngay gia nhap Tap Vien
     QString mTrainPICUid; // nguoi dac trac
     QString mTrainPICName; // nguoi dac trac
+    QString mTrainPICNameId; // nguoi dac trac
 
     qint64 mVowsDate; // ngay tien khan
     QString mVowsCEOUid; // chi tong phu trach
     QString mVowsCEOName; // chi tong phu trach
+    QString mVowsCEONameId; // chi tong phu trach
 
 
     qint64 mEternalVowsDate; // ngay vinh khan
     QString mEternalVowsCEOUid; // chi tong phu trach
     QString mEternalVowsCEOName;
+    QString mEternalVowsCEONameId;
     QString mEternalVowsPICUid; // nguoi dac trac
     QString mEternalVowsPICName; // nguoi dac trac
+    QString mEternalVowsPICNameId; // nguoi dac trac
 
     qint64 mBankDate; // ngan khanh
     QString mBankPlace;
