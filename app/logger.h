@@ -103,6 +103,7 @@ signals:
 private:
     QQueue<QString> mQueue;
     QMutex mMutex;
+    QMutex mMutexWrite;
     QWaitCondition mWait;
     bool isRunning;
     QThread* mThead;

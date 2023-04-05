@@ -36,6 +36,9 @@ public:
     explicit DlgAbout(QWidget *parent = nullptr);
     ~DlgAbout();
 
+private slots:
+    void on_txtLog_clicked();
+
 private:
     Ui::DlgAbout *ui;
 };

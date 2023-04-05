@@ -45,10 +45,11 @@ private:
 
 protected:
     DbModel *buildModel(void *items, const QString &fmt);
-    virtual ErrCode parsePrebuiltFile(const QString &fpath, const QString &ftype);
+//    virtual ErrCode parsePrebuiltFile(const QString &fpath, const QString &ftype);
     virtual const char* getPrebuiltFileName();
     virtual const char* getPrebuiltFileType();
 
+    virtual char  getCsvSplitItem();
 public:
     static SaintCtl *getInstance();
 

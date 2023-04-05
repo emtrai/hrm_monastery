@@ -34,7 +34,6 @@ class Specialist : public DbModel
             static DbModel *build();
             virtual DbModelBuilder getBuilder() const;
             virtual QString modelName() const;
-
         protected:
             virtual DbModelHandler *getDbModelHandler() const;
 

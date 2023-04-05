@@ -51,9 +51,11 @@ DbCtl::DbCtl()
 //    }
 
     QString dbPath = FileCtl::getAppWorkingDataDir(KDatabasename);
+    QString dbMetaPath = FileCtl::getAppWorkingDataDir(KDatabaseMetaName);
 
     logd("dbPath %s", dbPath.toStdString().c_str());
     dbInfo->setUri(dbPath);
+    dbInfo->setMetaUri(dbMetaPath);
 
 //    mDbSaint = new DbSqliteSaint();
 //    mDbCommunity = new DbSqliteCommunity();
@@ -87,7 +89,12 @@ IDatabase* DbCtl::getDb(){
 
 ErrCode DbCtl::onLoad(){
     tracein;
-    mDatabase->loadDb(dbInfo);
-    traceout;
-    return ErrNone;
+    ErrCode err = mDatabase->validateDbInfo(dbInfo);
+    if (err == ErrNone) {
+        err = mDatabase->loadDb(dbInfo);
+    } else {
+        loge("validate db info failed, err=%d", err);
+    }
+    traceret(err);
+    return err;
 }

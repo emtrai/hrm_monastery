@@ -80,6 +80,7 @@
 #include "dbdefs.h"
 #include "exception.h"
 
+
 static const QString DRIVER("QSQLITE");
 
 // TODO: enhance performance of db access via refer to https://lnj.gitlab.io/post/multithreaded-databases-with-qtsql/
@@ -282,13 +283,21 @@ ErrCode_t DbSqlite::checkOrCreateAllTables()
     logd("List of table: \n %s", STR2CHA(tables.join("\n")));
     foreach (QString key, mListTbl.keys())
     {
+        DbSqliteTbl* tbl = nullptr;
         logd("check & create table '%s'", STR2CHA(key));
 
         if (tables.contains(key)) {
             logd("table '%s' existed", STR2CHA(key));
         }
+        tbl = mListTbl[key];
+        if (!tbl) {
+            logw("Table is not exist");
+            err = ErrNotExist;
+            break;
+        }
         // we still need to call this function so that table can build up table fields map to get proper processing
-        err = mListTbl[key]->checkOrCreateTable();
+        logd("Initialize table '%s'", STR2CHA(tbl->name()));
+        err = tbl->checkOrCreateTable();
         if (err != ErrNone) // TODO: should break? return critical error????
             break;
 #ifdef DEBUG_TRACE
@@ -297,6 +306,8 @@ ErrCode_t DbSqlite::checkOrCreateAllTables()
         seq = getDbSeqNumber(key, &ok);
         logd("Get seq number of tbl '%s', seq = %d, ok = %d", STR2CHA(key), seq, ok);
 #endif
+        mMetaDbInfo.addTableVersion(key, tbl->versionCode());
+        // TODO: validate version code;
     }
     traceret(err);
     return err;
@@ -618,7 +629,6 @@ ErrCode_t DbSqlite::loadDb(const DbInfo* dbInfo){
     tracein;
     ErrCode_t err = ErrNone;
     if (dbInfo){
-
         if(QSqlDatabase::isDriverAvailable(DRIVER))
         {
 //            mDb = QSqlDatabase::addDatabase(DRIVER);
@@ -684,6 +694,40 @@ ErrCode_t DbSqlite::loadDb(const DbInfo* dbInfo){
         }
     }
 
+    if (err == ErrNone) {
+        mMetaDbInfo.saveJson(dbInfo->metaUri());
+    }
+
+    traceret(err);
+    return err;
+}
+
+ErrCode DbSqlite::validateDbInfo(const DbInfo *dbInfo)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    if (!dbInfo) {
+        err = ErrInvalidArg;
+        loge("Invalid agument");
+    }
+    if (err == ErrNone) {
+        QString metaUri = dbInfo->metaUri();
+        logi("meta uri = '%s'", STR2CHA(metaUri));
+        if (!metaUri.isEmpty()) {
+            if (!QFile::exists(metaUri)) {
+                logi("Meta db '%s' not exist, generate new one");
+                mMetaDbInfo.setAppVersion(APP_VERSION_CODE);
+                mMetaDbInfo.setAppVersionString(APP_VERSION);
+                mMetaDbInfo.setDbVersion(DB_VERSION);
+            } else {
+                logi("meta db exist, load it");
+                err = mMetaDbInfo.fromJsonFile(metaUri);
+            }
+        } else {
+            loge("invalid meta uri");
+            err = ErrInvalidData;
+        }
+    }
     traceret(err);
     return err;
 }

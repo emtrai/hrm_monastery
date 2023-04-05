@@ -210,6 +210,8 @@ class ModelController;
 
      void on_actionOrgInfo_triggered();
 
+     void on_actionDong_bo_triggered();
+
  private:
      static MainWindow* gInstance;
 };

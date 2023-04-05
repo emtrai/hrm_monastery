@@ -21,13 +21,13 @@
  */
 #include "dlgabout.h"
 #include "ui_dlgabout.h"
-
-#define _STRINGIFY(x) #x
-#define STRINGIFY(x) _STRINGIFY(x)
-
-#define VERSION STRINGIFY(_VERSION)
-
-#define _VERSION VER_MAJOR.VER_MINOR.VER_PATCH
+#include "logger.h"
+#include <QDesktopServices>
+#include <QUrl>
+#include "filectl.h"
+#include "logger.h"
+#include "utils.h"
+#include "defs.h"
 
 
 DlgAbout::DlgAbout(QWidget *parent) :
@@ -35,12 +35,24 @@ DlgAbout::DlgAbout(QWidget *parent) :
     ui(new Ui::DlgAbout)
 {
     ui->setupUi(this);
+    int h = 0;
+    int w = 0;
+    Utils::screenSize(&w, &h);
+    resize(w/2, h/2);
+    this->setWindowTitle(tr("Thông tin ứng dụng"));
+    ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Thoát"));
 
     ui->lblAppName->setText(tr("Quản lý Hội Dòng"));
     QString appInfo;
     // TODO: read somewhere????
-    appInfo += QString(tr("Phiên bản: %1\n").arg(VERSION));
-    appInfo += QString(tr("Ngày tạo: %1\n").arg(__DATE__));
+    appInfo += QString(tr("\n------ Thông tin phiên bản ------\n"));
+    appInfo += QString(tr("- Phiên bản: %1 (0x%2)\n").arg(APP_VERSION).arg(APP_VERSION_CODE, 16));
+    appInfo += QString(tr("- Ngày tạo: %1\n").arg(__DATE__));
+    appInfo += QString(tr("Phiên bản dùng thử\n")); // TODO: load release info from file???
+    appInfo += QString(tr("\n\n------ Thư mục dữ liệu ------\n"));
+    appInfo += QString(tr("- Thư mục dữ liệu cài đặt ứng dụng: \n%1\n").arg(FileCtl::getAppInstallDir()));
+    appInfo += QString(tr("- Thư mục dữ liệu ứng dụng: \n%1\n").arg(FileCtl::getAppWorkingDataDir()));
+    appInfo += QString(tr("- Thư mục log: \n%1\n").arg(Logger::logDirPath()));
     ui->txtAppInfo->setText(appInfo);
 }
 
@@ -48,3 +60,12 @@ DlgAbout::~DlgAbout()
 {
     delete ui;
 }
+
+void DlgAbout::on_txtLog_clicked()
+{
+
+    QString logDir = Logger::logDirPath();
+    logd("Open log dir=%s", STR2CHA(logDir));
+    QDesktopServices::openUrl(QUrl::fromLocalFile(logDir));
+}
+

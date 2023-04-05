@@ -32,6 +32,7 @@
 #include "dbsqlitedefs.h"
 #include "table/dbmetadatatbl.h"
 #include "table/dbsqlsequencetbl.h"
+#include "dbmetainfo.h"
 
 #define DB_VERSION_MAJOR    0
 #define DB_VERSION_MINOR    0
@@ -85,6 +86,7 @@ public:
     */
 
     virtual ErrCode_t loadDb(const DbInfo* dbInfo);
+    virtual ErrCode validateDbInfo(const DbInfo* dbInfo);
 
     virtual ErrCode_t execQuery(const QString& sql);
     virtual ErrCode_t execQuery(QSqlQuery* qry);
@@ -152,6 +154,8 @@ private:
     QSqlDatabase mDb;
     QSqlDatabase mCurrentDb; // TODO: race condition???
     QString mDbUri;
+
+    DbMetaInfo mMetaDbInfo;
 
 public:
     static DbSqlite* getInstance();

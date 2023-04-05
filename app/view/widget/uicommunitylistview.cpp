@@ -378,6 +378,7 @@ ErrCode UICommunityListView::onMenuActionExportListPerson(QMenu *menu, UITableMe
     tracein;
     ErrCode err = ErrNone;
     QString fpath;
+    Community* community = nullptr;
     if (!act){
         err = ErrInvalidArg;
         loge("export list person failed, Empty menu action");
@@ -387,23 +388,25 @@ ErrCode UICommunityListView::onMenuActionExportListPerson(QMenu *menu, UITableMe
         loge("export list person failed, action no data");
     }
     if (err == ErrNone) {
-        // TODO: select export file type, i.e. csv, xlsx, etc.
-        Community* community = dynamic_cast<Community*>(act->getData());
+        community = dynamic_cast<Community*>(act->getData());
+        if (community->uid().isEmpty()) {
+            err = ErrInvalidData;
+            loge("comunity '%s' has no uid", STR2CHA(community->toString()));
+        }
+    }
+    if (err == ErrNone) {
         logi("export people in community uid '%s'", STR2CHA(community->uid()));
-        fpath = Utils::saveFileDialog(this, QString("Xuất danh sách nữ tu"),
-                                              QString("dsach.csv"), QString("CSV (*.csv)"));
-        if (!fpath.isEmpty()) {
-            logi("export to file '%s'", STR2CHA(fpath));
-            // TODO: show progress/run on separate thread?
-            err = PERSONCTL->exportListPersonInCommunity(community->uid(), ExportType::EXPORT_CSV_LIST, fpath);
+        QList<DbModel*> items;
+        err = PERSONCTL->getListPersonInCommunity(community->uid(), items);
+        if (!items.empty()) {
+            err = MainWindow::exportListItems(&items, PERSONCTL, tr("Xuất danh sách nữ tu"), EXPORT_XLSX);
+            RELEASE_LIST_DBMODEL(items);
         } else {
-            loge("no path is specified for export");
+            logw("nothing to export");
             err = ErrNoData;
         }
     }
-    if (err == ErrNone){
-        Utils::showMsgBox(QString("Lưu vào: %1").arg(fpath));
-    } else {
+    if (err != ErrNone){
         loge("export list person failed, error code %d",err);
         Utils::showErrorBox(QString("Xuất dữ liệu danh sách nữ tu trong cộng đoàn lỗi, mã lỗi: %1").arg(err));
     }

@@ -44,6 +44,8 @@ class Saint: public DbModel, public DataExporter, public IDataImporter
     public:
         static DbModel* build();
         virtual DbModelBuilder getBuilder() const;
+        virtual void clone(const DbModel* model);
+
         void init();
         void initImportFields();
         Saint();
@@ -51,7 +53,7 @@ class Saint: public DbModel, public DataExporter, public IDataImporter
                                      const QString& keyword, const QString& value,
                                      quint32 idx = 0, QList<DbModel *>* outList = nullptr);
 
-
+        QString modelName() const;
         qint64 feastDay() const;
         void setFeastDay(qint64 newFeastDay);
         void setFeastDay(const QString& newFeastDay, const QString& f = "D-M");
@@ -78,6 +80,7 @@ class Saint: public DbModel, public DataExporter, public IDataImporter
 
     protected:
         virtual DbModelHandler *getDbModelHandler() const;
+        void copy(const Saint& model);
 
     private:
         QHash<QString, ImportCallbackFunc> mImportCallbacks;
@@ -86,7 +89,7 @@ class Saint: public DbModel, public DataExporter, public IDataImporter
         Gender mGender;
         qint64 mFeastDay; // ngay bon mang
         QString mCountry;
-        QString mCountryUid;\
+        QString mCountryUid;
 };
 
 

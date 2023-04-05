@@ -246,6 +246,7 @@ protected:
      * @return
      */
     virtual const char* getPrebuiltFileType();
+    virtual char getCsvSplitItem();
 
     /**
      * @brief insert model to cache

@@ -39,10 +39,14 @@ public:
     int fromJson(const QString& jsonString);
     QString toJsonString();
 
+    const QString &metaUri() const;
+    void setMetaUri(const QString &newMetaUri);
+
 private:
     QString mUri;
     QString mUsername;
     QString mPassword;
+    QString mMetaUri;
 
 };
 

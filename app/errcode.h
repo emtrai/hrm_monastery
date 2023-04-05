@@ -58,6 +58,8 @@ typedef enum ErrCode {
     ErrSqlFailed,
     ErrNoTable,
     ErrFailedConvert,
+    ErrIncompatible,
+    ErrMigrationRequired,
     ErrMax
     } ErrCode_t;
 

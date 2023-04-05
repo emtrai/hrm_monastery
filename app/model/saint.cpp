@@ -44,6 +44,18 @@ DbModelBuilder Saint::getBuilder() const
     return &Saint::build;
 }
 
+void Saint::clone(const DbModel *model)
+{
+    tracein;
+    if (model) {
+        DbModel::clone(model);
+        copy(*(Saint*)model);
+    } else {
+        loge("clone failed, null model");
+    }
+    traceout;
+}
+
 void Saint::init()
 {
     tracein;
@@ -113,6 +125,11 @@ ErrCode Saint::onImportParseDataItem(const QString& importName, int importFileTy
     return ret;
 }
 
+QString Saint::modelName() const
+{
+    return KModelNameSaint;
+}
+
 
 qint64 Saint::feastDay() const
 {
@@ -180,6 +197,19 @@ void Saint::dump()
 DbModelHandler *Saint::getDbModelHandler() const
 {
     return DbCtl::getInstance()->getDb()->getSaintModelHandler();
+}
+
+void Saint::copy(const Saint &model)
+{
+    tracein;
+    mImportCallbacks = model.mImportCallbacks;
+    mFullName = model.mFullName;
+    mOriginName = model.mOriginName;
+    mGender = model.mGender;
+    mFeastDay = model.mFeastDay;
+    mCountry = model.mCountry;
+    mCountryUid = model.mCountryUid;
+    traceout;
 }
 
 

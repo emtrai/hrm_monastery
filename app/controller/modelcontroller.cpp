@@ -531,6 +531,11 @@ const char *ModelController::getPrebuiltFileType()
     return KFileTypeCSV; // default one
 }
 
+char ModelController::getCsvSplitItem()
+{
+    return DEFAULT_CSV_ITEM_SPLIT;
+}
+
 
 
 ErrCode ModelController::parsePrebuiltFile(const QString &fpath, const QString &ftype)
@@ -552,7 +557,7 @@ ErrCode ModelController::parsePrebuiltFile(const QString &fpath, const QString &
         if (ftype == KFileTypeCSV) {
             ret = Utils::parseCSVFile(fpath,
                                       &ModelController::onCsvParseOneItemCallback,
-                                      this);
+                                      this, nullptr, getCsvSplitItem());
         } else if (ftype == KFileTypeJson) {
             logd("Load file %s", fpath.toStdString().c_str());
             QFile loadFile(fpath);

@@ -23,9 +23,18 @@
 #define DEFS_H
 
 
+#define _STRINGIFY(x) #x
+#define STRINGIFY(x) _STRINGIFY(x)
+
+#define APP_VERSION STRINGIFY(_APP_VERSION)
+
+#define _APP_VERSION VER_MAJOR.VER_MINOR.VER_PATCH
+
 #define UNUSED(name) (void)name;
 
-#define VERSION_CODE(major,minor,patch) (major * 1000000 + minor * 1000 + patch)
+#define VERSION_CODE(major,minor,patch) ((major << 24) | (minor << 16 )| (patch))
+
+#define APP_VERSION_CODE VERSION_CODE(VER_MAJOR,VER_MINOR,VER_PATCH)
 
 #define CSV_ITEM_SPLIT ','
 #define CSV_SUBITEM_SPLIT ';'
@@ -48,6 +57,7 @@ const char* const KPrebuiltDirName = "prebuilt";
 const char* const KWorkingDirName = "data";
 const char* const KLogDirName = "log";
 const char* const KDatabasename = "db.db";
+const char* const KDatabaseMetaName = "db.json";
 
 
 const char* const KPrebuiltSaintCSVFileName = "saints";
@@ -113,6 +123,7 @@ const char* const KModelNameAreaPerson = "area_person";
 const char* const KModelNameSpecialist = "specialist";
 const char* const KModelNameSpecialistPerson = "specialist_person";
 const char* const KModelNameCommunity = "community";
+const char* const KModelNameSaint = "saint";
 
 const char* const KDataFormatList = "QList";
 const char* const KDataFormatStringList = "QStringList";

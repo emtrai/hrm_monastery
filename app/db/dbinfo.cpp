@@ -65,3 +65,13 @@ QString DbInfo::toJsonString(){
     //TODO:
     return QString();
 }
+
+const QString &DbInfo::metaUri() const
+{
+    return mMetaUri;
+}
+
+void DbInfo::setMetaUri(const QString &newMetaUri)
+{
+    mMetaUri = newMetaUri;
+}

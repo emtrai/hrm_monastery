@@ -39,7 +39,7 @@ public:
     static QString getAppDataDir();
     static QString getTmpDataDir(const QString& subDir);
     static QString getTmpDataDir();
-    static QString getAppInstallDir(const QString& subDir);
+    static QString getAppInstallDir(const QString& subDir = nullptr);
 
     static QString getOrCreatePrebuiltDataDir();
     static QString getPrebuiltDataFile(const QString& fname);

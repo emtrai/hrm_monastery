@@ -90,6 +90,7 @@ SOURCES += \
     db/dbpersonmodelhandler.cpp \
     db/dbspecialistmodelhandler.cpp \
     db/idatabase.cpp \
+    db/sqlite/dbmetainfo.cpp \
     db/sqlite/dbsqlite.cpp \
     db/sqlite/dbsqlitedefs.cpp \
     db/sqlite/dbsqlitedeletebuilder.cpp \
@@ -281,6 +282,7 @@ HEADERS += \
     db/dbpersonmodelhandler.h \
     db/dbspecialistmodelhandler.h \
     db/idatabase.h \
+    db/sqlite/dbmetainfo.h \
     db/sqlite/dbsqlite.h \
     db/sqlite/dbsqlitedefs.h \
     db/sqlite/dbsqlitedeletebuilder.h \

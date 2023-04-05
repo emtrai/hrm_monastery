@@ -263,6 +263,7 @@ ErrCode UIPersonListView::onChangeCommunity(QMenu *menu, UITableMenuAction *act)
                 item->dump();
                 COMMUNITYCTL->addPerson2Community(comm, (Person*) item);
             }
+            reload();
             // TODO: implement this
         } else {
             logi("No community selected");

@@ -121,8 +121,8 @@
     <addaction name="actionSummarizeReport"/>
    </widget>
    <addaction name="menuTools"/>
-   <addaction name="menuHelp"/>
    <addaction name="menuB_o_c_o"/>
+   <addaction name="menuHelp"/>
   </widget>
   <action name="action_New">
    <property name="icon">
@@ -358,8 +358,14 @@
    </property>
   </action>
   <action name="actionLogFile">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Thư mục log</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionSummarizeReport">

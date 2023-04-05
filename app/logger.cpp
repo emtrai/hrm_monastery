@@ -48,14 +48,16 @@ void LogWorker::doWork() {
     while (isRunning) {
         mMutex.lock();
         mWait.wait(&mMutex);
+        mMutex.unlock();
         if (!isRunning) {
             break;
         }
-        if (!mQueue.isEmpty()) {
+        while (!mQueue.isEmpty()) {
+            mMutex.lock();
             QString log = mQueue.dequeue();
             Logger::printLog2File(log);
+            mMutex.unlock();
         }
-        mMutex.unlock();
     }
 
     emit resultReady(result);
@@ -67,8 +69,8 @@ void LogWorker::printLog(QString log) {
         mMutex.lock();
         logd("enqueue");
         mQueue.enqueue(log);
-        mMutex.unlock();
         mWait.wakeAll();
+        mMutex.unlock();
     } else {
         loge("writing lock thread not started yet");
     }
@@ -253,6 +255,7 @@ void Logger::doPrintLog2File(const QString &log)
     logd("doPrintLog2File");
     // TODO: check to change file & delete old file???
     if (!log.isEmpty()) {
+        logd("write log '%s' to logfile", STR2CHA(log));
         mLogFile.write(log.toUtf8());
         mLogFile.flush();
     }

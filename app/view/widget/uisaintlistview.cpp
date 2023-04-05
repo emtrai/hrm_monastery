@@ -54,22 +54,30 @@ ErrCode UISaintListView::onLoad()
 
 void UISaintListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
 {
-    UICommonListView::updateItem(item, tblItem, idx);
     tracein;
-    Saint* saint = (Saint*)item;
-    tblItem->addValue(saint->fullName());
-    tblItem->addValue(Utils::date2String(static_cast<Saint*>(item)->feastDay(), DEFAULT_FORMAT_MD));
-    tblItem->addValue(saint->remark());
+    if (item && item->modelName() == KModelNameSaint) {
+        Saint* saint = (Saint*)item;
+        tblItem->addValue(item->nameId());
+        tblItem->addValue(item->name());
+        tblItem->addValue(saint->fullName());
+        tblItem->addValue(Utils::date2String(saint->feastDay(), DEFAULT_FORMAT_MD));
+        tblItem->addValue(saint->remark());
+    } else {
+        logd("Invalid item");
+    }
+    traceout;
 
 }
 
 void UISaintListView::initHeader()
 {
-    UICommonListView::initHeader();
     tracein;
+    mHeader.append(tr("Tên định danh"));
+    mHeader.append(tr("Tên"));
     mHeader.append(tr("Tên đầy đủ"));
     mHeader.append(tr("Ngày bổn mạng"));
     mHeader.append(tr("Ghi chú"));
+    traceout;
 }
 
 int UISaintListView::onFilter(int catetoryid, const QString &catetory, qint64 opFlags, const QString &keywords, const QVariant *value)

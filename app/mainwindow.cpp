@@ -311,7 +311,7 @@ void MainWindow::onLoadController (Controller* ctl)
     tracein;
     logd("on load ctrl %s", ctl->getName().toStdString().c_str());
     if (mWaitDlg != nullptr) {
-        mWaitDlg->setMessage(ctl->getName());
+        mWaitDlg->setMessage(QString(tr("Khởi tạo %1")).arg(ctl->getName()));
     }
 //    QThread::msleep(500);
     traceout;
@@ -741,7 +741,7 @@ void MainWindow::onLoad()
     mAppState = APP_STATE_LOADING;
     if (!mWaitDlg)
         mWaitDlg = new DlgWait(this);
-    mWaitDlg->setMessage("Loadding");
+    mWaitDlg->setMessage(tr("Đang khởi tạo"));
     mWaitDlg->setAllowCancel(false);
     mWaitDlg->show(nullptr,
           nullptr,
@@ -1106,6 +1106,17 @@ void MainWindow::on_actionOrgInfo_triggered()
     tracein;
     // TODO: implemen this
     UNDER_DEV(tr("Xem thông tin về hội dòng: lịch sử, số lượng Cộng đoàn, Nữ tu, Tổng phụ trách, v.v.v."));
+
+    traceout;
+}
+
+
+void MainWindow::on_actionDong_bo_triggered()
+{
+    // DONG BO DU LIEU
+    tracein;
+    // TODO: implemen this
+    UNDER_DEV(tr("Đồng bộ dữ liệu (với dữ liệu được lưu trên Google Drive, vvv.)"));
 
     traceout;
 }

@@ -142,16 +142,17 @@ void DlgPerson::setupUI()
     ui->setupUi(this);
 
     DIALOG_SIZE_SHOW(this);
+    ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Thoát"));
 
 
     QStringList communityListHdr;
     // TODO: translation
-    communityListHdr.append("Id");
-    communityListHdr.append("Date");
-    communityListHdr.append("End Date");
-    communityListHdr.append("Event");
-    communityListHdr.append("Title");
-    communityListHdr.append("Remark");
+    communityListHdr.append("Mã định danh");
+    communityListHdr.append("Ngày");
+    communityListHdr.append("Ngày kết thúc");
+    communityListHdr.append("Sự kiện");
+    communityListHdr.append("Tiêu đề");
+    communityListHdr.append("Ghi chú");
     ui->tblEvents->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tblEvents->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
 

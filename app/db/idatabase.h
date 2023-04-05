@@ -50,7 +50,7 @@ public:
     * Load database
     */
     virtual ErrCode_t loadDb(const DbInfo* dbInfo) = 0;
-
+    virtual ErrCode validateDbInfo(const DbInfo* dbInfo) = 0;
 
 
     virtual DbModelHandler* getEduModelHandler() = 0;
