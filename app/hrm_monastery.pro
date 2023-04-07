@@ -20,7 +20,7 @@ DEFINES += DEBUG_LOG
 
 DEFINES += VER_MAJOR=0
 DEFINES += VER_MINOR=1
-DEFINES += VER_PATCH=1
+DEFINES += VER_PATCH=2
 
 # Supporting provine for person is quite complicated
 # as it need to sync up with country
