@@ -65,8 +65,8 @@ public:
     void setEndDate(const QString&  newEndDate,
                       const QString& format = DEFAULT_FORMAT_YMD);
 
-    int status() const;
-    void setStatus(int newStatus);
+    int modelStatus() const;
+    void setModelStatus(int newStatus);
 
     const QString &commDeptUid() const;
     void setCommDeptUid(const QString &newCommDeptUid);

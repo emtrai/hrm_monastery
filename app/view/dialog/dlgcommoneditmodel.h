@@ -26,6 +26,7 @@
 #include <QDialog>
 #include "modelcontroller.h"
 #include <QComboBox>
+#include <QLineEdit>
 
 #define DLG_BUILDER(className) \
 public: \
@@ -33,6 +34,7 @@ inline static className* build(QWidget *parent = nullptr, bool isSelfSave = true
     tracein; \
     className* dlg = nullptr; \
     dlg = new className(parent); \
+    dlg->setupUI();\
     dlg->setIsSelfSave(isSelfSave); \
     if (model != nullptr) { \
         dlg->setIsNew(false); \
@@ -103,6 +105,8 @@ protected:
     virtual bool onValidateData(QString& msg);
 
     virtual ErrCode loadList(QComboBox* cb, ModelController* ctrl);
+    virtual void onChangeNameIdTxt(QLineEdit* txt, const QString &arg1);
+    virtual void onEditnameId(QLineEdit* txt);
 protected:
 
     DbModel* mModel;

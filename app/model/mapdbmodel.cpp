@@ -102,7 +102,7 @@ DbModel *MapDbModel::buildMapModel(DbModelBuilder builder,
         model->setUid1(item1->uid());
         model->setDbId2(item2->dbId());
         model->setUid2(item2->uid());
-        model->setStatus(status);
+        model->setModelStatus(status);
         model->setStartDate(startdate);
         model->setEndDate(enddate);
         if (!remark.isEmpty())
@@ -122,7 +122,7 @@ QString MapDbModel::buildUid(const QString *seed)
     QString tmp = uid1() + uid2();
     tmp += QString("%1").arg(startDate());
     tmp += QString("%1").arg(endDate());
-    tmp += QString("%1").arg(status());
+    tmp += QString("%1").arg(modelStatus());
     if (seed) {
         tmp += *seed;
     }
@@ -195,12 +195,12 @@ void MapDbModel::setEndDate(qint64 newEndDate)
     mEndDate = newEndDate;
 }
 
-qint32 MapDbModel::status() const
+qint32 MapDbModel::modelStatus() const
 {
     return mStatus;
 }
 
-void MapDbModel::setStatus(qint32 newStatus)
+void MapDbModel::setModelStatus(qint32 newStatus)
 {
     mStatus = newStatus;
 }

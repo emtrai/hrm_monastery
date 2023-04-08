@@ -137,7 +137,7 @@ ErrCode DbSqliteCommunity::add(DbModel *model, bool notify)
                     commdept->setCommunityUid(model->uid());
                     commdept->setDepartmentUid(dept->uid());
                     commdept->setName(dept->name());
-                    commdept->setStatus(MODEL_ACTIVE);
+                    commdept->setModelStatus(MODEL_ACTIVE);
                     logi("Add dept '%s' to community '%s'", STR2CHA(dept->toString()), STR2CHA(model->toString()));
                     err = commdept->save();
                     delete commdept;
@@ -291,7 +291,7 @@ ErrCode DbSqliteCommunity::addPerson2Community(const Community *comm,
                                                                             status, startdate,
                                                                             enddate, remark);
             if (mapModel) {
-                mapModel->setStatus(MODEL_ACTIVE); // TODO: set active here is suitable???
+                mapModel->setModelStatus(MODEL_ACTIVE); // TODO: set active here is suitable???
                 err = mapModel->save();
                 delete mapModel;
             } else {

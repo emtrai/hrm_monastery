@@ -204,6 +204,7 @@ SOURCES += \
     view/dialog/dlgaddcommunityhistory.cpp \
     view/dialog/dlgaddevent.cpp \
     view/dialog/dlgaddpersonevent.cpp \
+    view/dialog/dlgcommdept.cpp \
     view/dialog/dlgcommoneditmodel.cpp \
     view/dialog/dlgcommunity.cpp \
     view/dialog/dlgcountry.cpp \
@@ -399,6 +400,7 @@ HEADERS += \
     view/dialog/dlgaddcommunityhistory.h \
     view/dialog/dlgaddevent.h \
     view/dialog/dlgaddpersonevent.h \
+    view/dialog/dlgcommdept.h \
     view/dialog/dlgcommoneditmodel.h \
     view/dialog/dlgcommunity.h \
     view/dialog/dlgcountry.h \
@@ -450,6 +452,7 @@ FORMS += \
     view/dialog/dlgaddcommunityhistory.ui \
     view/dialog/dlgaddevent.ui \
     view/dialog/dlgaddpersonevent.ui \
+    view/dialog/dlgcommdept.ui \
     view/dialog/dlgcommunity.ui \
     view/dialog/dlgcountry.ui \
     view/dialog/dlgcourse.ui \
@@ -491,6 +494,7 @@ DISTFILES += \
     res/comm_dept_vi.json \
     res/common_template.html \
     res/community_export_template_vi.json \
+    res/course_template.html \
     res/course_vi.csv \
     res/default_export_template_vi.json \
     res/department_vi.json \

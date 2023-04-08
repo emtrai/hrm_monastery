@@ -30,7 +30,7 @@ class DbSqliteCommunityPersonTbl : public DbSqliteMapTbl
 {
 public:
     DbSqliteCommunityPersonTbl(DbSqlite* db);
-    virtual QList<DbModel*> getListPerson(const QString& communityUid, int status = MODEL_ACTIVE, const QString* perStatusUid = nullptr);
+    virtual QList<DbModel*> getListPerson(const QString& communityUid, int status = MODEL_STATUS_MAX, const QString* perStatusUid = nullptr);
     virtual QList<DbModel*> getListCommunityOfPerson(const QString& personUid,
                                                       const DbModelBuilder &builder);
     virtual QList<DbModel*> getListItems(const QString& personUid, const QString& commuid,

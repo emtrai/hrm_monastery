@@ -24,6 +24,7 @@
 #include "logger.h"
 #include "errcode.h"
 #include "utils.h"
+#include "mainwindow.h"
 
 #define ITEM_CHECK (Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable)
 
@@ -208,13 +209,33 @@ ErrCode DlgImportListResult::saveItems(const QList<DbModel *> &list)
 {
     tracein;
     ErrCode ret = ErrNone;
+    ret = MainWindow::showProcessingDialog(tr("Lưu dữ liệu"), nullptr,
+        [this, list](ErrCode* err, void* data, DlgWait* dlg) {
+            int total = list.size();
+            int cnt = 0;
+            foreach (DbModel* item, list) {
+//                logd("Save %s", item->name().toStdString().c_str());
+                item->dump();
+                *err = item->save();
+                logi("save item result %d", *err);
+                cnt++;
+                if (cnt % 3 == 0){
+                    dlg->setMessage(QString(tr("Đã lưu %1 / %2")).arg(cnt, total));
+                }
+            }
+            return nullptr;
+        },
+        [this](ErrCode err, void* data, void* result, DlgWait* dlg) {
+            logd("Save result %d", err);
+            return err;
+        });
     // TODO: review this again
-    foreach (DbModel* item, list) {
-        logd("Save %s", item->name().toStdString().c_str());
-        item->dump();
-        ret = item->save();
-        logi("save item result %d", ret);
-    }
+//    foreach (DbModel* item, list) {
+//        logd("Save %s", item->name().toStdString().c_str());
+//        item->dump();
+//        ret = item->save();
+//        logi("save item result %d", ret);
+//    }
     return ErrNone; // TODO: handle error case???
 }
 

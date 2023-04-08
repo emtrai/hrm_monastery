@@ -155,7 +155,7 @@ void Community::initImportFields()
     tracein;
     DbModel::initImportFields();
     mImportCallbacks.insert(KItemStatus, [this](const QString& value){
-        this->setStatus(value.toInt()); // TODO: handle error case when convert to Int
+        this->setModelStatus(value.toInt()); // TODO: handle error case when convert to Int
         return ErrNone;
     });
     mImportCallbacks.insert(KItemCountryNameId, [this](const QString& value){
@@ -309,7 +309,7 @@ DbModelStatus Community::getStatus() const
     return mStatus;
 }
 
-void Community::setStatus(int newStatus)
+void Community::setModelStatus(int newStatus)
 {
     if ((newStatus & MODEL_STATUS_MAX) != 0) {
         mStatus = (DbModelStatus)newStatus;
@@ -343,7 +343,7 @@ qint64 Community::closeDate() const
 void Community::setCloseDate(qint64 newCloseDate)
 {
     mCloseDate = newCloseDate;
-    markItemAsModified(KItemCloseTime);
+    markItemAsModified(KItemCloseDate);
 }
 
 ErrCode Community::setCloseDateFromString(const QString &date, const QString &format)
@@ -356,7 +356,7 @@ ErrCode Community::setCloseDateFromString(const QString &date, const QString &fo
     if (!ok) {
         loge("Invalid date '%s', format '%s'", STR2CHA(date), STR2CHA(format));
     }
-    markItemAsModified(KItemCloseTime);
+    markItemAsModified(KItemCloseDate);
     traceout;
     return ok?ErrNone:ErrInvalidArg;
 }
@@ -673,7 +673,7 @@ const QString &Community::statusName() const
     return mStatusName;
 }
 
-void Community::setStatusName(const QString &newStatusName)
+void Community::setModelStatusName(const QString &newStatusName)
 {
     mStatusName = newStatusName;
 }

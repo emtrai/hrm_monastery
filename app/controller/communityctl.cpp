@@ -167,7 +167,7 @@ DbModel* CommunityCtl::onJsonParseOneItem(const QJsonObject& jobj, bool* ok )
             int status = QString(tmp).toInt(&ok);
             logd("isOK=%d, status=0x%x", ok, status);
             if (ok && ((status & MODEL_STATUS_MAX) != 0)) {
-                ret->setStatus(status);
+                ret->setModelStatus(status);
             } else {
                 err = ErrInvalidData;
                 loge("invalid status data %s", STR2CHA(tmp));
@@ -205,7 +205,7 @@ ErrCode CommunityCtl::onImportDataStart(const QString &importName, int importFil
 ErrCode CommunityCtl::getActivePersonList(const QString &communityUid, QList<DbModel*>& outList)
 {
     tracein;
-    ErrCode err = getPersonList(communityUid, outList, MODEL_ACTIVE);
+    ErrCode err = getPersonList(communityUid, outList, MODEL_STATUS_MAX);
     traceout;
     return err;
 }

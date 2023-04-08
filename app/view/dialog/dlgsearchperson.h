@@ -41,6 +41,7 @@ protected:
 
     virtual int onSearch(const QString& keyword);
     virtual void clearAll();
+    virtual int onGetAll();
     virtual DbModel* getItemAtIdx(int idx);
     virtual QString getValueOfItemAt(int idx, int col, QString header, DbModel* item);
 private:

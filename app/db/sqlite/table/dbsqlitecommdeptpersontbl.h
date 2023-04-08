@@ -28,7 +28,7 @@ class DbSqliteCommDeptPersonTbl : public DbSqliteTbl
 {
 public:
     DbSqliteCommDeptPersonTbl(DbSqlite* db);
-    QList<DbModel*> getListPerson(const QString& communityUid, int status = MODEL_ACTIVE);
+    QList<DbModel*> getListPerson(const QString& communityUid, int status = MODEL_STATUS_MAX);
 protected:
     virtual QString getSearchQueryStringWithTag(const QString& cond = nullptr, const QString& condTag = nullptr);
     virtual void addTableField(DbSqliteTableBuilder* builder);

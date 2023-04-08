@@ -51,7 +51,7 @@ public:
      * @return list of Person
      */
     virtual QList<DbModel*> getListPerson(const QString& communityUid,
-                                           int modelStatus = MODEL_ACTIVE, const QString* perStatusUid = nullptr);
+                                           int modelStatus = MODEL_STATUS_MAX, const QString* perStatusUid = nullptr);
 
     /**
      * @brief Add person to community

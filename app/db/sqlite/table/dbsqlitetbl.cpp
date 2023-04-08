@@ -462,8 +462,14 @@ bool DbSqliteTbl::isExist(const DbModel *item)
         QString cond;
         int datatype = 0;
         QHash<QString, QString> inFields = getFieldsCheckExists(item);
+
+        bool modelStatusExist = false;
         if (!inFields.empty()) {
             foreach (QString field, inFields.keys()) {
+                if (field == KFieldModelStatus) {
+                    modelStatusExist = true;
+                    continue;
+                }
                 if (!cond.isEmpty()) {
                     cond += " AND ";
                 }
@@ -478,6 +484,17 @@ bool DbSqliteTbl::isExist(const DbModel *item)
                     cond += QString("%1 = :%1_INT").arg(field);
                 }
             }
+            if (modelStatusExist) {
+                bool ok = false;
+                QString modelStatusStr = inFields.value(KFieldModelStatus);
+                int status = modelStatusStr.toInt(&ok);
+                if (ok) {
+                    appendModelStatusCond(cond, status);
+                } else {
+                    loge("convert status value failed, value '%s'", STR2CHA(modelStatusStr));
+                }
+            }
+
             if (err == ErrNone) {
                 QString queryString = QString("SELECT * FROM %1 WHERE %2")
                                           .arg(name(), cond);
@@ -1309,7 +1326,12 @@ ErrCode DbSqliteTbl::search(const QHash<QString, FieldValue> &searchCond,
     qint32 cnt = 0;
     QString cond;
     ErrCode err = ErrNone;
+    bool modelStatusExist = false;
     foreach (QString field, searchCond.keys()) {
+        if (field == KFieldModelStatus) {
+            modelStatusExist = true;
+            continue;
+        }
         if (!cond.isEmpty()) {
             if (isAndCond)
                 cond += " AND ";
@@ -1329,6 +1351,9 @@ ErrCode DbSqliteTbl::search(const QHash<QString, FieldValue> &searchCond,
         }
     }
     appendDbStatusCond(cond, dbStatus);
+    if (modelStatusExist) {
+        appendModelStatusCond(cond, searchCond.value(KFieldModelStatus).valueInt());
+    }
     //    QString queryString = QString("SELECT * FROM %1 WHERE %2")
     //                              .arg(name(), cond);
     logd("Query cond '%s'", cond.toStdString().c_str());

@@ -56,7 +56,7 @@ public:
      * @param status status of person in community, i.e. active, etc.
      * @return err code
      */
-    ErrCode getListPersonInCommunity(const QString& communityUid, QList<DbModel *>& list, qint32 status = MODEL_ACTIVE);
+    ErrCode getListPersonInCommunity(const QString& communityUid, QList<DbModel *>& list, qint32 status = MODEL_STATUS_MAX);
 
     /**
      * @brief get list event of person

@@ -143,6 +143,7 @@ void DlgPerson::setupUI()
 
     DIALOG_SIZE_SHOW(this);
     ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Thoát"));
+    ui->buttonBox->button(QDialogButtonBox::Save)->setText(tr("Lưu"));
 
 
     QStringList communityListHdr;

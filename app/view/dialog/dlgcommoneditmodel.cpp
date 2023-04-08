@@ -33,6 +33,7 @@ DlgCommonEditModel::DlgCommonEditModel(QWidget *parent): QDialog(parent),
     mCustomNameId(false)
 {
     tracein;
+
 }
 
 DlgCommonEditModel::~DlgCommonEditModel()
@@ -175,6 +176,35 @@ ErrCode DlgCommonEditModel::loadList(QComboBox *cb, ModelController *ctrl)
     RELEASE_LIST_DBMODEL(list);
     traceret(err);
     return err;
+}
+
+void DlgCommonEditModel::onChangeNameIdTxt(QLineEdit *txtNameId, const QString &arg1)
+{
+    if (!mCustomNameId) {
+        bool ok = false;
+        QString nameid = Utils::UidFromName(arg1, NO_VN_MARK_UPPER, &ok);
+        if (ok) {
+            txtNameId->setText(nameid);
+        } else {
+            txtNameId->setText("");
+        }
+    }
+}
+
+void DlgCommonEditModel::onEditnameId(QLineEdit *txtNameId)
+{
+    tracein;
+    QString txt = txtNameId->text().trimmed();
+    bool ok = false;
+    QString nameId = Utils::showInputDialog(this, tr("Mã định danh"), tr("Nhập mã định danh"), txt, &ok);
+    if (ok && !nameId.isEmpty()) {
+        mCustomNameId = true;
+        txtNameId->setText(nameId);
+        logd("custom name id '%s'", STR2CHA(nameId));
+    } else {
+        logd("no name id (ok=%d) or name id is empty", ok);
+    }
+    traceout;
 }
 
 void DlgCommonEditModel::setModel(DbModel *newModel)

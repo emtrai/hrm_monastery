@@ -31,7 +31,8 @@
 DlgSaint::DlgSaint(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DlgSaint),
-    mSaint(nullptr)
+    mSaint(nullptr),
+    mCustomNameId(false)
 {
     ui->setupUi(this);
 
@@ -128,5 +129,36 @@ Saint *DlgSaint::saint() const
 void DlgSaint::setName(const QString &name)
 {
     ui->txtName->setText(name);
+}
+
+
+void DlgSaint::on_txtName_textChanged(const QString &arg1)
+{
+    if (!mCustomNameId) {
+        bool ok = false;
+        QString nameid = Utils::UidFromName(arg1, NO_VN_MARK_UPPER, &ok);
+        if (ok) {
+            ui->txtNameId->setText(nameid);
+        } else {
+            ui->txtNameId->setText("");
+        }
+    }
+}
+
+
+void DlgSaint::on_btnChangeNameId_clicked()
+{
+    tracein;
+    QString txt = ui->txtName->text().trimmed();
+    bool ok = false;
+    QString nameId = Utils::showInputDialog(this, tr("Định danh"), tr("Nhập mã định danh"), txt, &ok);
+    if (ok && !nameId.isEmpty()) {
+        mCustomNameId = true;
+        ui->txtName->setText(nameId);
+        logd("custom name id '%s'", STR2CHA(nameId));
+    } else {
+        logd("no name id (ok=%d) or name id is empty", ok);
+    }
+    traceout;
 }
 

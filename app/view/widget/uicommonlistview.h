@@ -54,7 +54,6 @@ protected:
     virtual void onModelControllerDataUpdated();
 protected:
     QList<DbModel*> mItemList;
-    bool mSuspendReloadOnDbUpdate;
 };
 
 #endif // UICOMMONLISTVIEW_H

@@ -235,6 +235,11 @@ QString Person::modelName() const
     return KModelNamePerson;
 }
 
+const QString &Person::name() const
+{
+    return firstName();
+}
+
 DbModel* Person::build(){
     Person* item = new Person();
     item->init();

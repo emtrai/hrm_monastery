@@ -168,7 +168,7 @@ ErrCode DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuer
     cmm->setTel(qry.value(KFieldTel).toString());
     cmm->setEmail(qry.value(KFieldEmail).toString());
     cmm->setFeastDate(qry.value(KFieldFeastDay).toInt());
-    cmm->setStatus((DbModelStatus)qry.value(KFieldModelStatus).toInt());
+    cmm->setModelStatus((DbModelStatus)qry.value(KFieldModelStatus).toInt());
     cmm->setCurrentCEOUid(qry.value(KFieldCEOUid).toString().trimmed()); // TODO: check and set name as well
     if (!cmm->currentCEOUid().isEmpty()) {
         // TODO: caching data (i.e. list of person in management board) for fast accessing?

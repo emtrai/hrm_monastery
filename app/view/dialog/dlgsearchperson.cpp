@@ -23,7 +23,8 @@
 #include "logger.h"
 #include "person.h"
 #include "personctl.h"
-
+#include "mainwindow.h"
+#include "utils.h"
 
 DlgSearchPerson::~DlgSearchPerson()
 {
@@ -36,6 +37,7 @@ DlgSearchPerson *DlgSearchPerson::build(QWidget *parent, bool isMulti)
     // TODO: create factory class and move this to factory???
     DlgSearchPerson* ret = new DlgSearchPerson(parent, isMulti);
     ret->setupUi();
+    ret->enableGetAllSupport();
     traceout;
     return ret;
 }
@@ -73,6 +75,32 @@ void DlgSearchPerson::clearAll()
     DlgSearch::clearAll();
     RELEASE_LIST_DBMODEL(mListItems);
     traceout;
+}
+
+int DlgSearchPerson::onGetAll()
+{
+    tracein;
+    clearAll();
+    int cnt = 0;
+    ErrCode err = MainWindow::showProcessingDialog(tr("Đang truy vấn dữ liệu"), nullptr,
+         [this, &cnt](ErrCode* err, void* data, DlgWait* dlg) {
+            RELEASE_LIST_DBMODEL(this->mListItems);
+            this->mListItems = PERSONCTL->getAllItemsFromDb();
+            logd("get all cnt=%d", this->mListItems.count());
+            cnt = this->mListItems.count();
+            return nullptr;//nothing to return
+         },
+        [this](ErrCode err, void* data, void* result, DlgWait* dlg) {
+            logd("Search result %d", err);
+
+            return err;
+        });
+
+//    mListItems = PERSONCTL->getAllItemsFromDb();
+//    logd("get all cnt=%d", mListItems.count());
+    logd("found %d", cnt);
+    traceout;
+    return cnt;
 }
 
 DbModel *DlgSearchPerson::getItemAtIdx(int idx)

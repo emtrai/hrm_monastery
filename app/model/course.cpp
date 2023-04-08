@@ -35,7 +35,7 @@ const QHash<int, QString> *Course::getCourseTypeNameMap()
     static bool isInited = false;
     static QHash<int, QString> map;
     if (!isInited) {
-        map.insert(COURSE_TYPE_COURSE, QObject::tr("Khóa tu"));
+        map.insert(COURSE_TYPE_COURSE, QObject::tr("Lớp Khấn"));
         map.insert(COURSE_TYPE_TERM, QObject::tr("Nhiệm kỳ quản lý"));
         map.insert(COURSE_TYPE_OTHERS, QObject::tr("Khác"));
         isInited = true;
@@ -85,10 +85,55 @@ DbModel *Course::build()
 void Course::clone(const DbModel *model)
 {
     tracein;
-    DbModel::clone(model);
-    Course* course = (Course*)model;
-    setCourseType(course->courseType());
+    if (model && model->modelName() == KModelNameCourse) {
+        DbModel::clone(model);
+        Course* course = (Course*)model;
+        setCourseType(course->courseType());
+        setStartDate(course->startDate());
+        setEndDate(course->endDate());
+        setPeriod(course->period());
+    } else {
+        logd("Model is null or not course type, name '%s'", model?STR2CHA(model->name()):"null");
+    }
     traceout;
+}
+
+QString Course::modelName() const
+{
+    return KModelNameCourse;
+}
+
+void Course::initExportFields()
+{
+    tracein;
+    DbModel::initExportFields();
+    mExportCallbacks.insert(KItemPeriod, [this](const QString& item){
+        return this->period();
+    });
+    mExportCallbacks.insert(KItemType, [this](const QString& item){
+        return this->courseTypeName();
+    });
+    mExportCallbacks.insert(KItemStartDate, [this](const QString& item){
+        return Utils::date2String(this->startDate(), DEFAULT_FORMAT_YMD);
+    });
+    mExportCallbacks.insert(KItemEndDate, [this](const QString& item){
+        return Utils::date2String(this->endDate(), DEFAULT_FORMAT_YMD);
+    });
+    // TODO: implement more
+    traceout;
+}
+
+const QString Course::exportTemplatePath(FileExporter *exporter, QString *ftype) const
+{
+    tracein;
+    if (exporter) {
+        switch (exporter->getExportType()) {
+        case EXPORT_HTML:
+            return FileCtl::getPrebuiltDataFilePath(KPrebuiltCourseTemplateFileName);
+        };
+    }
+    traceout;
+    return QString();
 }
 
 DbModelBuilder Course::getBuilder() const
@@ -101,6 +146,11 @@ DbModelHandler *Course::getDbModelHandler() const
     return DB->getModelHandler(KModelHdlCourse);
 }
 
+void Course::setCourseTypeName(const QString &newCourseTypeName)
+{
+    mCourseTypeName = newCourseTypeName;
+}
+
 qint32 Course::courseType() const
 {
     return mCourseType;
@@ -108,7 +158,11 @@ qint32 Course::courseType() const
 
 QString Course::courseTypeName()
 {
-    return courseType2Name((CourseType)mCourseType);
+    if (mCourseTypeName.isEmpty()) {
+        return courseType2Name((CourseType)mCourseType);
+    } else {
+        return mCourseTypeName;
+    }
 }
 
 void Course::setCourseType(qint32 newCourseType)

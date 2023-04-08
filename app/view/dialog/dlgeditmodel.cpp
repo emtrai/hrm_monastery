@@ -22,17 +22,26 @@
 #include "dlgeditmodel.h"
 #include "ui_dlgeditmodel.h"
 #include "dbmodel.h"
+#include <QDialogButtonBox>
 
 DlgEditModel::DlgEditModel(QWidget *parent) :
     DlgCommonEditModel(parent),
     ui(new Ui::DlgEditModel)
 {
     ui->setupUi(this);
+//    ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Thoát"));
+//    ui->buttonBox->button(QDialogButtonBox::Save)->setText(tr("Lưu"));
 }
 
 DlgEditModel::~DlgEditModel()
 {
     delete ui;
+}
+
+void DlgEditModel::setupUI()
+{
+//    ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Thoát"));
+//    ui->buttonBox->button(QDialogButtonBox::Save)->setText(tr("Lưu"));
 }
 
 ErrCode DlgEditModel::buildModel(DbModel *model, QString& errMsg)

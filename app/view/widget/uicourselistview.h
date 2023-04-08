@@ -29,10 +29,15 @@ class UICourseListView : public UICommonListView
 public:
     explicit UICourseListView(QWidget *parent = nullptr);
     virtual ~UICourseListView();
+    virtual void setupUI();
 protected:
 
     virtual QString getTitle();
     virtual DbModel* onNewModel();
+    virtual void onAddItem(UITableCellWidgetItem *item);
+    virtual void onEditItem(UITableCellWidgetItem *item);
+    virtual void onDeleteItem(const QList<UITableItem *>& selectedItems);
+    virtual void onViewItem(UITableCellWidgetItem *item);
 protected:
 
     virtual int getViewType() { return VIEW_COURSE;}

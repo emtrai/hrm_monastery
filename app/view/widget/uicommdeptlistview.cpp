@@ -32,6 +32,7 @@
 #include "uidepartmentpersonlistview.h"
 #include "communitydeptctl.h"
 #include "communitydept.h"
+#include "dlgcommdept.h"
 
 UICommDeptListView::UICommDeptListView(QWidget *parent):
     UICommonListView(parent),
@@ -77,6 +78,40 @@ void UICommDeptListView::updateItem(DbModel *item, UITableItem *tblItem, int idx
 DbModel *UICommDeptListView::onNewModel()
 {
     return CommunityDept::build();
+}
+
+void UICommDeptListView::onAddItem(UITableCellWidgetItem *item)
+{
+    tracein;
+    MainWindow::showAddEditCommDept(true, mCommunity, nullptr, this);
+    traceout;
+
+}
+
+void UICommDeptListView::onEditItem(UITableCellWidgetItem *item)
+{
+    tracein;
+    if (item) {
+        DbModel* comm = item->itemData();
+        if (comm) {
+            MainWindow::showAddEditCommDept(true, mCommunity, comm, this);
+        } else {
+            loge("Edit failed, null course");
+        }
+    } else {
+        loge("Edit failed, null item");
+    }
+    traceout;
+}
+
+void UICommDeptListView::onDeleteItem(const QList<UITableItem *> &selectedItems)
+{
+    UNDER_DEV("Xóa dữ liệu");
+}
+
+void UICommDeptListView::onViewItem(UITableCellWidgetItem *item)
+{
+    UICommonListView::onViewItem(item);
 }
 
 ErrCode UICommDeptListView::onMenuActionListPerson(QMenu *menu, UITableMenuAction *act)

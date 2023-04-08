@@ -134,11 +134,11 @@ enum DB_RECORD_STATUS {
  *        then check status of db model
  */
 enum DbModelStatus{
-    MODEL_NOT_READY     = (0),
     MODEL_INACTIVE      = (1 << 0), // Map is inactive/closed/stoped
     MODEL_ACTIVE        = (1 << 1), // Map is active
     MODEL_BUILDING      = (1 << 2), // building phase, not ready
-    MODEL_STATUS_MAX    = MODEL_INACTIVE | MODEL_ACTIVE | MODEL_BUILDING
+    MODEL_NOT_READY     = (1 << 3),
+    MODEL_STATUS_MAX    = MODEL_INACTIVE | MODEL_ACTIVE | MODEL_BUILDING | MODEL_NOT_READY
 };
 
 typedef std::shared_ptr<DbModel> DbModel_sp;
@@ -164,7 +164,7 @@ protected:
 public:
     virtual ~DbModel();
     virtual void init();
-    virtual DbModelBuilder getBuilder() const const = 0;
+    virtual DbModelBuilder getBuilder() const = 0;
     // TODO: override operation ==?
 
     virtual void clone(const DbModel* model);

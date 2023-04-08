@@ -183,8 +183,23 @@ void UICommunityPersonListView::setCommunity(const Community *newCommunity)
 void UICommunityPersonListView::initHeader()
 {
     tracein;
-    mHeader.append(tr("ID"));
-    mHeader.append(tr("Tên"));
+    mHeader.append(tr("Mã"));
+    mHeader.append(tr("Tên Thánh"));
+    mHeader.append(tr("Họ tên"));
+    mHeader.append(tr("Cộng đoàn"));
+    mHeader.append(tr("Năm sinh"));
+    mHeader.append(tr("Nơi sinh"));
+    mHeader.append(tr("Ngày bổn mạng"));
+    mHeader.append(tr("Ngày Nhập Dòng"));
+    mHeader.append(tr("Ngày Tiên Khấn"));
+    mHeader.append(tr("Ngày Vĩnh Khấn"));
+    mHeader.append(tr("Lớp khấn"));
+    mHeader.append(tr("Ngày an nghỉ"));
+    mHeader.append(tr("Chuyên môn"));
+    mHeader.append(tr("Công tác xã hội"));
+    mHeader.append(tr("Điện thoại"));
+    mHeader.append(tr("Email"));
+    traceout;
 }
 
 QString UICommunityPersonListView::getTitle()
@@ -196,7 +211,28 @@ QString UICommunityPersonListView::getTitle()
 void UICommunityPersonListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
-    Person* per = (Person*) item;
-    tblItem->addValue(QString("%1").arg(item->dbId()));
-    tblItem->addValue(per->getFullName());
+    loge("updateItem '%s'", item?STR2CHA(item->modelName()):"");
+    if (item && item->modelName() == KModelNamePerson) {
+        Person* per = (Person*) item;
+        tblItem->addValue(per->nameId());
+        tblItem->addValue(per->hollyName());
+        tblItem->addValue(per->getFullName());
+        tblItem->addValue(per->communityName());
+        tblItem->addValue(Utils::date2String(per->birthday()));
+        tblItem->addValue(per->birthPlace());
+        tblItem->addValue(Utils::date2String(per->feastDay(), DEFAULT_FORMAT_MD)); // seem feastday convert repeate many time, make it common????
+
+        tblItem->addValue(Utils::date2String(per->joinDate()));
+        tblItem->addValue(Utils::date2String(per->vowsDate()));
+        tblItem->addValue(Utils::date2String(per->eternalVowsDate()));
+        tblItem->addValue(per->courseName());
+        tblItem->addValue(Utils::date2String(per->deadDate()));
+        tblItem->addValue(per->tel().join(";"));
+        tblItem->addValue(per->email().join(";"));
+        tblItem->addValue(per->specialistNameList().join(","));
+        tblItem->addValue(per->currentWorkName());
+    } else {
+        loge("No item found, or not expected model '%s'", item?STR2CHA(item->modelName()):"");
+    }
+    traceout;
 }

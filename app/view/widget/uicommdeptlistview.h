@@ -44,6 +44,10 @@ protected:
     virtual void initHeader();
     virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
     virtual DbModel* onNewModel();
+    virtual void onAddItem(UITableCellWidgetItem *item);
+    virtual void onEditItem(UITableCellWidgetItem *item);
+    virtual void onDeleteItem(const QList<UITableItem *>& selectedItems);
+    virtual void onViewItem(UITableCellWidgetItem *item);
 
 protected:
     virtual ErrCode onLoad();

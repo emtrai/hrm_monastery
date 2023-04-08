@@ -35,6 +35,7 @@ public:
     static QString getAppWorkingDataDir(const QString& subDir);
     static QString getAppWorkingDataDir();
 
+    static QString getAppLocalDataDir(const QString& subDir);
     static QString getAppDataDir(const QString& subDir);
     static QString getAppDataDir();
     static QString getTmpDataDir(const QString& subDir);

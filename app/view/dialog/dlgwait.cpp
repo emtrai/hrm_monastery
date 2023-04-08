@@ -26,7 +26,8 @@ DlgWait::DlgWait(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DlgWait),
     mWorker(nullptr),
-    mFinishCallback(nullptr)
+    mFinishCallback(nullptr),
+    mResult(ErrNone)
 {
     ui->setupUi(this);
 }
@@ -58,6 +59,7 @@ ErrCode DlgWait::show(void* data, WaitPrepare_t prepare,
         logd("start worker thread");
         mWorker->start();
         this->exec();
+        err = mResult;
     }
     traceret(err);
     return err;
@@ -158,9 +160,21 @@ void DlgWait::handleResult(ErrCode err, void *data, void *result)
     // TODO: callback is called when app is already closed???
     logd("err=%d", err);
     if (mFinishCallback) {
-        mFinishCallback(err, data, result, this);
+        err = mFinishCallback(err, data, result, this);
     }
+    setResult(err);
+    forceClose();
     traceout;
+}
+
+ErrCode DlgWait::errResult() const
+{
+    return mResult;
+}
+
+void DlgWait::setErrResult(ErrCode newResult)
+{
+    mResult = newResult;
 }
 
 DlgWaitWorker::DlgWaitWorker(QObject *parent, DlgWait* dlg, void* data):

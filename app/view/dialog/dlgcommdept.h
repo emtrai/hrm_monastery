@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Ngo Huy Anh
+ * Copyright (C) 2023 Ngo Huy Anh
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,49 +14,52 @@
  * limitations under the License.
  *
  *
- * Filename: dlgcommunity.h
+ * Filename: dlgcommdept.h
  * Author: Anh, Ngo Huy
- * Created date:7/24/2022
+ * Created date:4/8/2023
  * Brief:
  */
-#ifndef DLGCOMMUNITY_H
-#define DLGCOMMUNITY_H
+#ifndef DLGCOMMDEPT_H
+#define DLGCOMMDEPT_H
 
 #include <QDialog>
+
 #include "errcode.h"
 #include "dlgcommoneditmodel.h"
 #include <QAbstractButton>
 
+#include "community.h"
+
 namespace Ui {
-class DlgCommunity;
+class DlgCommDept;
 }
 
-class Community;
-class DlgCommunity : public DlgCommonEditModel
+
+class DlgCommDept : public DlgCommonEditModel
 {
     Q_OBJECT
-    DLG_BUILDER(DlgCommunity)
+    DLG_BUILDER(DlgCommDept)
+
 public:
-                 explicit DlgCommunity(QWidget *parent = nullptr);
-    ~DlgCommunity();
+    explicit DlgCommDept(QWidget *parent = nullptr);
+    ~DlgCommDept();
     virtual void setupUI();
     virtual ErrCode buildModel(DbModel* model, QString& errMsg);
     virtual ErrCode fromModel(const DbModel* model);
 protected:
     virtual DbModel* newModel();
-    void loadData();
+    void loadDept();
     void loadStatus();
 public:
+    DbModel *community() const;
+    void setCommunity(DbModel *newCommunity);
 
 private slots:
-    void on_btnSearchCEO_clicked();
-
-    void on_txtName_textChanged(const QString &arg1);
-
-    void on_btnChangeNameId_clicked();
+    void on_cbDept_currentIndexChanged(int index);
 
 private:
-    Ui::DlgCommunity *ui;
+    Ui::DlgCommDept *ui;
+    DbModel* mCommunity;
 };
 
-#endif // DLGCOMMUNITY_H
+#endif // DLGCOMMDEPT_H

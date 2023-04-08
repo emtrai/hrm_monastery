@@ -24,8 +24,8 @@
 
 #include "uicommonlistview.h"
 #include "importlistener.h"
-
-class UIPersonListView : public UICommonListView, public ImportListener
+#include "mainwindow.h"
+class UIPersonListView : public UICommonListView, public ImportListener, public MainWindownImportListener
 {
 public:
     explicit UIPersonListView(QWidget *parent = nullptr);
@@ -73,6 +73,9 @@ protected:
     virtual QString getName();
     virtual void onImportStart(const QString& importName, const QString& fpath, ImportType type);
     virtual void onImportEnd(const QString& importName, ErrCode err, const QString& fpath, ImportType type);
+
+    virtual void onMainWindownImportStart(ImportTarget target);
+    virtual void onMainWindownImportEnd(ImportTarget target, ErrCode err, void* importData = nullptr);
 
 private:
     void cleanUpItem();

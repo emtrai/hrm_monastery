@@ -29,7 +29,7 @@ class DbSqliteCommunityDeptTbl : public DbSqliteTbl
 {
 public:
     DbSqliteCommunityDeptTbl(DbSqlite* db);
-    QList<DbModel *> getListDept(const QString &commUid, int status = MODEL_ACTIVE);
+    QList<DbModel *> getListDept(const QString &commUid, int status = MODEL_STATUS_MAX);
 protected:
     virtual void addTableField(DbSqliteTableBuilder* builder);
     virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);

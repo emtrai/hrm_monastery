@@ -31,7 +31,7 @@ do { \
         model->setUid1(field1->uid()); \
         model->setDbId2(field2->dbId()); \
         model->setUid2(field2->uid()); \
-        model->setStatus(status); \
+        model->setModelStatus(status); \
         model->setStartDate(startdate); \
         model->setEndDate(enddate); \
         if (!remark.isEmpty()) \
@@ -53,7 +53,7 @@ public:
     virtual void clone(const DbModel* model);
     virtual DbModel* clone() const;
     static DbModel* buildMapModel(DbModelBuilder builder, const DbModel* item1, const DbModel* item2,
-                                  int status = MODEL_ACTIVE,
+                                  int status = MODEL_STATUS_MAX,
                                   qint64 startdate = 0,
                                   qint64 enddate = 0,
                                   const QString& remark = nullptr);
@@ -79,8 +79,8 @@ public:
     qint64 endDate() const;
     void setEndDate(qint64 newEndDate);
 
-    qint32 status() const;
-    void setStatus(qint32 newStatus);
+    qint32 modelStatus() const;
+    void setModelStatus(qint32 newStatus);
 
 
     const QString &parentUid() const;

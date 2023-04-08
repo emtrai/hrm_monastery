@@ -48,6 +48,9 @@ UIPersonListView::UIPersonListView(QWidget *parent):
 UIPersonListView::~UIPersonListView()
 {
     traced;
+
+    PERSONCTL->delListener(this);
+    MainWindow::removeMainWindownImportListener(this);
 }
 
 void UIPersonListView::setupUI()
@@ -55,6 +58,7 @@ void UIPersonListView::setupUI()
     tracein;
     UITableView::setupUI();
     PERSONCTL->addListener(this);
+    MainWindow::addMainWindownImportListener(this);
     traceout;
 }
 
@@ -62,39 +66,79 @@ ErrCode UIPersonListView::onLoad()
 {
     tracein;
     QList<DbModel*> items;
-    if (mFilterList.count() > 0) {
-        // TODO: multi filter items???? should limite???? what the hell is it
-        foreach (FilterItem* item, mFilterList) {
-            logd("filter item %s", STR2CHA(item->item()));
-            if (item->item() == KItemCommunity) {
-                // TODO: how about keyword? assume value only?????
-                QList<DbModel*> list;
-                ErrCode err = PERSONCTL->getListPersonInCommunity(item->value().toString(), list);
-                if (err == ErrNone) {
-                    if (list.count() > 0) {
-                        items.append(list);
+    ErrCode err = MainWindow::showProcessingDialog(tr("Đang truy vấn dữ liệu"), nullptr,
+       [this, &items](ErrCode* err, void* data, DlgWait* dlg) {
+            if (this->mFilterList.count() > 0) {
+                // TODO: multi filter items???? should limite???? what the hell is it
+                foreach (FilterItem* item, this->mFilterList) {
+                    logd("filter item %s", STR2CHA(item->item()));
+                    if (item->item() == KItemCommunity) {
+                        // TODO: how about keyword? assume value only?????
+                        QList<DbModel*> list;
+                        *err = PERSONCTL->getListPersonInCommunity(item->value().toString(), list);
+                        if (*err == ErrNone) {
+                            if (list.count() > 0) {
+                                items.append(list);
+                            }
+                        } else {
+                            loge("Get list person in community uid '%s' failed, err=%d",
+                                 STR2CHA(item->value().toString()), err);
+                        }
+                    } else {
+                        ASSERT(0, "not this filter item!!!");
                     }
-                } else {
-                    loge("Get list person in community uid '%s' failed, err=%d",
-                         STR2CHA(item->value().toString()), err);
                 }
             } else {
-                ASSERT(0, "not this filter item!!!");
+                logd("get all person");
+                items = PERSONCTL->getAllItems();
             }
-        }
-    } else {
-        logd("get all person");
-        items = PERSONCTL->getAllItems();
-    }
+            return nullptr;//nothing to return
+       },
+        [this, &items](ErrCode err, void* data, void* result, DlgWait* dlg) {
+            logd("Save result %d", err);
+            RELEASE_LIST_DBMODEL(this->mItemList);
+            // TODO: loop to much, redundant, do something better?
+            foreach (DbModel* item, items) {
+                this->mItemList.append(item);
+            }
 
-    RELEASE_LIST_DBMODEL(mItemList);
-    // TODO: loop to much, redundant, do something better?
-    foreach (DbModel* item, items) {
-        mItemList.append(item);
-    }
+            clearFilter();
+            return err;
+        });
+//    if (mFilterList.count() > 0) {
+//        // TODO: multi filter items???? should limite???? what the hell is it
+//        foreach (FilterItem* item, mFilterList) {
+//            logd("filter item %s", STR2CHA(item->item()));
+//            if (item->item() == KItemCommunity) {
+//                // TODO: how about keyword? assume value only?????
+//                QList<DbModel*> list;
+//                ErrCode err = PERSONCTL->getListPersonInCommunity(item->value().toString(), list);
+//                if (err == ErrNone) {
+//                    if (list.count() > 0) {
+//                        items.append(list);
+//                    }
+//                } else {
+//                    loge("Get list person in community uid '%s' failed, err=%d",
+//                         STR2CHA(item->value().toString()), err);
+//                }
+//            } else {
+//                ASSERT(0, "not this filter item!!!");
+//            }
+//        }
+//    } else {
+//        logd("get all person");
+//        items = PERSONCTL->getAllItems();
+//    }
 
-    clearFilter();
-    return ErrNone;
+//    RELEASE_LIST_DBMODEL(mItemList);
+//    // TODO: loop to much, redundant, do something better?
+//    foreach (DbModel* item, items) {
+//        mItemList.append(item);
+//    }
+
+//    clearFilter();
+    traceout;
+    return err;
 }
 
 void UIPersonListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
@@ -111,16 +155,15 @@ void UIPersonListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
         tblItem->addValue(per->birthPlace());
         tblItem->addValue(Utils::date2String(per->feastDay(), DEFAULT_FORMAT_MD)); // seem feastday convert repeate many time, make it common????
 
-        tblItem->addValue(per->tel().join(";"));
-        tblItem->addValue(per->email().join(";"));
-        tblItem->addValue(per->idCard());
-        tblItem->addValue(per->idCardIssuePlace());
-        tblItem->addValue(per->courseName());
-        tblItem->addValue(per->specialistNameList().join(","));
-        tblItem->addValue(per->currentWorkName());
         tblItem->addValue(Utils::date2String(per->joinDate()));
         tblItem->addValue(Utils::date2String(per->vowsDate()));
         tblItem->addValue(Utils::date2String(per->eternalVowsDate()));
+        tblItem->addValue(per->courseName());
+        tblItem->addValue(Utils::date2String(per->deadDate()));
+        tblItem->addValue(per->tel().join(";"));
+        tblItem->addValue(per->email().join(";"));
+        tblItem->addValue(per->specialistNameList().join(","));
+        tblItem->addValue(per->currentWorkName());
     } else {
         loge("No item found, or not expected model '%s'", item?STR2CHA(item->modelName()):"");
     }
@@ -137,16 +180,16 @@ void UIPersonListView::initHeader()
     mHeader.append(tr("Năm sinh"));
     mHeader.append(tr("Nơi sinh"));
     mHeader.append(tr("Ngày bổn mạng"));
-    mHeader.append(tr("Điện thoại"));
-    mHeader.append(tr("Email"));
-    mHeader.append(tr("Căn cước công dân"));
-    mHeader.append(tr("Nơi cấp CCCD"));
-    mHeader.append(tr("Khoá"));
-    mHeader.append(tr("Chuyên môn"));
-    mHeader.append(tr("Công tác xã hội"));
-    mHeader.append(tr("Ngày Nhập Tu"));
+    mHeader.append(tr("Ngày Nhập Dòng"));
     mHeader.append(tr("Ngày Tiên Khấn"));
     mHeader.append(tr("Ngày Vĩnh Khấn"));
+    mHeader.append(tr("Lớp khấn"));
+    mHeader.append(tr("Ngày an nghỉ"));
+    mHeader.append(tr("Chuyên môn"));
+    mHeader.append(tr("Công tác xã hội"));
+    mHeader.append(tr("Điện thoại"));
+    mHeader.append(tr("Email"));
+    traceout;
 }
 
 
@@ -258,11 +301,14 @@ ErrCode UIPersonListView::onChangeCommunity(QMenu *menu, UITableMenuAction *act)
             QList<DbModel*> items;
             int cnt = act->itemListData(items);
             logd("No. selected person %d", cnt);
+
+            mSuspendReloadOnDbUpdate = true;
             foreach (DbModel* item, items){
                 logd("Add person to community");
                 item->dump();
                 COMMUNITYCTL->addPerson2Community(comm, (Person*) item);
             }
+            mSuspendReloadOnDbUpdate = false;
             reload();
             // TODO: implement this
         } else {
@@ -443,7 +489,7 @@ void UIPersonListView::cleanUpItem()
 
 QString UIPersonListView::getName()
 {
-    return "UICommunityListView";
+    return "UIPersonListView";
 }
 
 void UIPersonListView::onImportStart(const QString &importName, const QString &fpath, ImportType type)
@@ -461,4 +507,15 @@ void UIPersonListView::onImportEnd(const QString &importName, ErrCode err, const
     logd("resume reload on db update");
     reload();
     traceout;
+}
+
+void UIPersonListView::onMainWindownImportStart(ImportTarget target)
+{
+    mSuspendReloadOnDbUpdate = true;
+}
+
+void UIPersonListView::onMainWindownImportEnd(ImportTarget target, ErrCode err, void *importData)
+{
+    mSuspendReloadOnDbUpdate = false;
+    reload();
 }

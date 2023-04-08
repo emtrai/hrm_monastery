@@ -26,65 +26,170 @@
 #include "errcode.h"
 #include "course.h"
 #include "coursectl.h"
+#include "mainwindow.h"
 
+#include <QDialogButtonBox>
 DlgCourse::DlgCourse(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::DlgCourse),
-    mCourse(nullptr)
+    DlgCommonEditModel(parent),
+    ui(new Ui::DlgCourse)
 {
     ui->setupUi(this);
+    loadCourseType();
 }
 
 DlgCourse::~DlgCourse()
 {
-    if (mCourse != nullptr)
-        delete mCourse;
     delete ui;
 }
 
-void DlgCourse::accept()
+void DlgCourse::setupUI()
 {
     tracein;
-    ErrCode ret = ErrNone;
-    QString name = ui->txtName->text().trimmed();
+    ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Thoát"));
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("Lưu"));
+    traceout;
+}
 
-    if (!name.isEmpty()){
-        if (mCourse == nullptr)
-            mCourse = (Course*)Course::build();
-        if (mCourse != nullptr){
-            mCourse->setName(name);
+//void DlgCourse::accept()
+//{
+//    tracein;
+//    ErrCode ret = ErrNone;
+//    QString name = ui->txtName->text().trimmed();
 
-            mCourse->setUid(Utils::UidFromName(name));
+//    if (!name.isEmpty()){
+//        if (mCourse == nullptr)
+//            mCourse = (Course*)Course::build();
+//        if (mCourse != nullptr){
+//            mCourse->setName(name);
+
+//            mCourse->setUid(Utils::UidFromName(name));
 
 
-            mCourse->setPeriod(ui->txtPeriod->text().trimmed());
-            mCourse->setStartDate(Utils::dateFromString(ui->txtStartDate->text().trimmed()));
-            mCourse->setEndDate(Utils::dateFromString(ui->txtEndDate->text().trimmed()));
-            mCourse->setRemark(ui->txtRemark->toPlainText().trimmed());
+//            mCourse->setPeriod(ui->txtPeriod->text().trimmed());
+//            mCourse->setStartDate(Utils::dateFromString(ui->txtStartDate->text().trimmed()));
+//            mCourse->setEndDate(Utils::dateFromString(ui->txtEndDate->text().trimmed()));
+//            mCourse->setRemark(ui->txtRemark->toPlainText().trimmed());
 
-            logi("Save new course to db");
-            ret = mCourse->save();
-            if (ret == ErrNone){
-                INSTANCE(CourseCtl)->reloadDb();
-            }
-        } else {
-            ret = ErrNoMemory;
-            loge("No memory");
+//            logi("Save new course to db");
+//            ret = mCourse->save();
+//            if (ret == ErrNone){
+//                INSTANCE(CourseCtl)->reloadDb();
+//            }
+//        } else {
+//            ret = ErrNoMemory;
+//            loge("No memory");
+//        }
+//    } else {
+//        ret = ErrInvalidData;
+//        loge("Name field is empty");
+//    }
+
+//    logi("Add Course, ret %d", ret);
+//    if (ret == ErrNone)
+//        QDialog::accept();
+//    else
+//        Utils::showErrorBox(QString(tr("Lỗi ! Mã lỗi %1").arg(ret)));
+
+//}
+
+//Course *DlgCourse::course() const
+//{
+//    return mCourse;
+//}
+
+ErrCode DlgCourse::buildModel(DbModel *model, QString &errMsg)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    Course* comm = (Course*) model;
+    if (!model){
+        err = ErrInvalidArg;
+        loge("Invalid arg");
+    }
+    if (err == ErrNone){
+        comm->setMarkModified(true); // start marking fields which are modified
+    }
+    if (err == ErrNone) {
+        QString name = ui->txtName->text().trimmed();
+        if (!name.isEmpty()) {
+            comm->setName(name);
+        }
+    }
+    if (err == ErrNone){
+        QString name = ui->txtNameId->text().trimmed();
+        if (!name.isEmpty()) {
+            comm->setNameId(name);
+        }
+    }
+    if (err == ErrNone){
+        SET_INT_VAL_FROM_CBOX(ui->cbCourseType, comm->setCourseType, comm->setCourseTypeName);
+    }
+    if (err == ErrNone){
+        comm->setPeriod(ui->txtPeriod->text().trimmed());
+    }
+    if (err == ErrNone){
+        SET_DATE_FORMAT_VAL_FROM_WIDGET(ui->txtStartDate, comm->setStartDate, DEFAULT_FORMAT_YMD);
+    }
+    if (err == ErrNone){
+        SET_DATE_FORMAT_VAL_FROM_WIDGET(ui->txtEndDate, comm->setEndDate, DEFAULT_FORMAT_YMD);
+    }
+    if (err == ErrNone){
+        comm->setRemark(ui->txtRemark->toPlainText().trimmed());
+    }
+    traceret(err);
+    return err;
+}
+
+ErrCode DlgCourse::fromModel(const DbModel *item)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    if (item && item->modelName() == KModelNameCourse) {
+        err = DlgCommonEditModel::fromModel(item);
+        Course* comm = (Course*)model();
+        if (err == ErrNone) {
+            ui->txtName->setText(comm->name());
+            ui->txtNameId->setText(comm->nameId()); // TODO: auto generate???
+            ui->txtPeriod->setText(comm->period());
+            Utils::setSelectItemComboxByData(ui->cbCourseType, comm->courseType());
+            ui->txtStartDate->setText(Utils::date2String(comm->startDate(), DEFAULT_FORMAT_YMD));
+            ui->txtEndDate->setText(Utils::date2String(comm->endDate(), DEFAULT_FORMAT_YMD));
+            ui->txtRemark->setPlainText(comm->remark());
         }
     } else {
-        ret = ErrInvalidData;
-        loge("Name field is empty");
+        err = ErrInvalidArg;
+        loge("null item or invalid type");
     }
-
-    logi("Add Course, ret %d", ret);
-    if (ret == ErrNone)
-        QDialog::accept();
-    else
-        Utils::showErrorBox(QString(tr("Lỗi ! Mã lỗi %1").arg(ret)));
-
+    traceret(err);
+    return err;
 }
 
-Course *DlgCourse::course() const
+DbModel *DlgCourse::newModel()
 {
-return mCourse;
+    return Course::build();
 }
+
+void DlgCourse::loadCourseType()
+{
+    tracein;
+    ui->cbCourseType->clear();
+    const QHash<int, QString>* courses = Course::getCourseTypeNameMap();
+    logd("the number of courses %lld", courses->count());
+    foreach (int key, courses->keys()) {
+        ui->cbCourseType->addItem(courses->value(key), key);
+    }
+    traceout;
+}
+
+void DlgCourse::on_btnChangeNameId_clicked()
+{
+    DlgCommonEditModel::onEditnameId(ui->txtNameId);
+}
+
+
+void DlgCourse::on_txtName_textChanged(const QString &arg1)
+{
+    DlgCommonEditModel::onChangeNameIdTxt(ui->txtNameId, arg1);
+
+}
+

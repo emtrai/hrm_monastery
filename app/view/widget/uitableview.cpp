@@ -29,6 +29,7 @@
 #include "utils.h"
 #include "filter.h"
 #include "dbmodel.h"
+#include "mainwindow.h"
 
 UITableView::UITableView(QWidget *parent) :
     QFrame(parent),
@@ -36,7 +37,8 @@ UITableView::UITableView(QWidget *parent) :
     mFpDataReq(nullptr),
     mFpTotalDataReq(nullptr),
     mItemPerPage(0),
-    mMenu(nullptr)
+    mMenu(nullptr),
+    mSuspendReloadOnDbUpdate(false)
 {
     ui->setupUi(this);
     ui->tblList->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -90,8 +92,10 @@ void UITableView::setupUI()
 void UITableView::reload()
 {
     tracein;
-    onReload();
-    onUpdatePage(1);
+    if (!mSuspendReloadOnDbUpdate) {
+        onReload();
+        onUpdatePage(1);
+    }
     traceout;
 }
 
@@ -215,6 +219,7 @@ void UITableView::onDeleteItem(const QList<UITableItem *>& selectedItems)
 {
     tracein;
     ErrCode err = ErrNone;
+    mSuspendReloadOnDbUpdate = true;
     if (selectedItems.size() > 0) {
         bool accept = Utils::showConfirmDialog(this,
                              tr("Xoá"), QString(tr("Bạn có muốn xóa '%1' mục trong '%2'? (Tất cả dữ liệu liên quan cũng sẽ bị xóa)")
@@ -224,18 +229,43 @@ void UITableView::onDeleteItem(const QList<UITableItem *>& selectedItems)
         if (accept) {
             QString msg;
             int cnt = 0;
-            foreach (UITableItem* item, selectedItems) {
-                if (item && item->data()) {
-                    DbModel* model = item->data();
-                    err = model->remove(true, &msg);
-                    if (err == ErrNone) {
-                        cnt++;
-                    } else {
-                        loge("Delete '%s' err = %d", STR2CHA(model->toString()), err);
-                        break;
+//            foreach (UITableItem* item, selectedItems) {
+//                if (item && item->data()) {
+//                    DbModel* model = item->data();
+//                    err = model->remove(true, &msg);
+//                    if (err == ErrNone) {
+//                        cnt++;
+//                    } else {
+//                        loge("Delete '%s' err = %d", STR2CHA(model->toString()), err);
+//                        break;
+//                    }
+//                }
+//            }
+            err = MainWindow::showProcessingDialog(tr("Lưu dữ liệu"), nullptr,
+               [this, &cnt, &msg, selectedItems](ErrCode* err, void* data, DlgWait* dlg) {
+                    int total = selectedItems.size();
+                    foreach (UITableItem* item, selectedItems) {
+                        if (item && item->data()) {
+                            DbModel* model = item->data();
+//                            dlg->setMessage(QString(tr("Xóa %1")).arg(model->name()));
+                            *err = model->remove(true, &msg);
+                            if (*err == ErrNone) {
+                                cnt++;
+                            } else {
+                                loge("Delete '%s' err = %d", STR2CHA(model->toString()), err);
+                                break;
+                            }
+                            if (cnt % 4 == 0) {
+                                dlg->setMessage(QString(tr("Đã xóa %1 / %2")).arg(cnt, total));
+                            }
+                        }
                     }
-                }
-            }
+                   return nullptr;
+               },
+                [this](ErrCode err, void* data, void* result, DlgWait* dlg) {
+                    logd("Save result %d", err);
+                    return err;
+                });
 
             if (err != ErrNone) {
                 Utils::showErrorBox(QString(tr("Lỗi, mã lỗi: %1")).arg(err));
@@ -245,6 +275,9 @@ void UITableView::onDeleteItem(const QList<UITableItem *>& selectedItems)
             }
         }
     }
+
+    mSuspendReloadOnDbUpdate = false;
+    reload();
     traceout;
 }
 

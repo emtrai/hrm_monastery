@@ -200,6 +200,7 @@ QString Logger::getLogDirPath()
 {
     QString logDir = FileCtl::getAppDataDir(KLogDirName);
     QDir dir(logDir);
+    logd("log dir path '%s'", STR2CHA(logDir));
     if (!dir.exists()){
         dir.mkpath(logDir);
     }

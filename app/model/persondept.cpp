@@ -163,12 +163,12 @@ void PersonDept::setCommDeptUid(const QString &newCommDeptUid)
     mCommDeptUid = newCommDeptUid;
 }
 
-int PersonDept::status() const
+int PersonDept::modelStatus() const
 {
     return mStatus;
 }
 
-void PersonDept::setStatus(int newStatus)
+void PersonDept::setModelStatus(int newStatus)
 {
     mStatus = newStatus;
 }

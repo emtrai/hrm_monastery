@@ -153,8 +153,6 @@ ErrCode UICommunityListView::onMenuActionAddDepart(QMenu *menu, UITableMenuActio
 void UICommunityListView::onViewItem(UITableCellWidgetItem *item)
 {
     tracein;
-
-    tracein;
     int idx = item->idx();
     DbModel* comm = item->itemData();
     if (comm) {

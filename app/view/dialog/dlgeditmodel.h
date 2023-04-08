@@ -37,6 +37,7 @@ class DlgEditModel : public DlgCommonEditModel
 public:
     explicit DlgEditModel(QWidget *parent = nullptr);
     virtual ~DlgEditModel();
+    virtual void setupUI();
     /**
      * @brief build data for model, using dialog/wiget data
      * @return

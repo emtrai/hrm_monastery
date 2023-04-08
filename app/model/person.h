@@ -72,6 +72,7 @@ public:
     virtual void buildUidIfNotSet();
     virtual QString buildUid(const QString* seed = nullptr);
     virtual QString modelName() const;
+    virtual const QString &name() const;
 
     const QString &firstName() const;
     void setFirstName(const QString &newFirstName);

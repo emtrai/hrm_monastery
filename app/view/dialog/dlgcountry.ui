@@ -57,12 +57,23 @@
      <item row="1" column="0">
       <widget class="QLabel" name="label_4">
        <property name="text">
-        <string>Tên ngắn (*)</string>
+        <string>Mã Định Danh (*)</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="txtShortName"/>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLineEdit" name="txtShortName"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnChange">
+         <property name="text">
+          <string>Đổi</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>

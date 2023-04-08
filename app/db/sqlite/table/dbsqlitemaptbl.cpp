@@ -199,7 +199,7 @@ ErrCode DbSqliteMapTbl::insertTableField(DbSqliteInsertBuilder *builder, const D
         builder->addValue(getFieldNameDbid1(), model->dbId1());
         builder->addValue(getFieldNameUid2(), model->uid2());
         builder->addValue(getFieldNameDbid2(), model->dbId2());
-        builder->addValue(KFieldModelStatus, model->status());
+        builder->addValue(KFieldModelStatus, model->modelStatus());
         builder->addValue(KFieldStartDate, model->startDate());
         builder->addValue(KFieldEndDate, model->endDate());
         builder->addValue(KFieldChangeHistory, model->changeHistory());
@@ -230,7 +230,7 @@ ErrCode DbSqliteMapTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry
             model->setDbId1(qry.value(getFieldNameDbid1()).toInt());
             model->setUid2(qry.value(getFieldNameUid2()).toString());
             model->setDbId2(qry.value(getFieldNameDbid2()).toInt());
-            model->setStatus(qry.value(KFieldModelStatus).toInt());
+            model->setModelStatus(qry.value(KFieldModelStatus).toInt());
             model->setStartDate(qry.value(KFieldStartDate).toInt());
             model->setEndDate(qry.value(KFieldEndDate).toInt());
             model->setChangeHistory(qry.value(KFieldChangeHistory).toString());
@@ -262,7 +262,7 @@ QHash<QString, QString> DbSqliteMapTbl::getFieldsCheckExists(const DbModel *item
             list[getFieldNameUid2()] = model->uid2();
             list[KFieldStartDate] = QString("%1").arg(model->startDate());
             list[KFieldEndDate] = QString("%1").arg(model->endDate());
-            list[KFieldModelStatus] = QString("%1").arg(model->status());
+            list[KFieldModelStatus] = QString("%1").arg(model->modelStatus());
         } else {
             THROWEX("Invalid modelName %s", STR2CHA(modelName));
         }

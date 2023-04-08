@@ -40,7 +40,7 @@ public:
      * @param status \ref DbModelStatus
      * @return AreaPerson model
      */
-    virtual QList<DbModel*> getListContactPeople(const QString& areaUid, int status = MODEL_ACTIVE);
+    virtual QList<DbModel*> getListContactPeople(const QString& areaUid, int status = MODEL_STATUS_MAX);
 
     /**
      * @brief get list of communities of area
@@ -48,7 +48,7 @@ public:
      * @param status
      * @return list of \ref Community
      */
-    virtual QList<DbModel*> getListCommunities(const QString& areaUid, int status = MODEL_ACTIVE);
+    virtual QList<DbModel*> getListCommunities(const QString& areaUid, int status = MODEL_STATUS_MAX);
 
     /**
      * @brief Add contact person to db
@@ -63,7 +63,7 @@ public:
      */
     virtual ErrCode addContactPerson(const DbModel* area,
                                      const DbModel* person,
-                                    int status = MODEL_ACTIVE,
+                                    int status = MODEL_STATUS_MAX,
                                     const QString& roleUid = nullptr,
                                     qint64 startdate = 0,
                                     qint64 enddate = 0,

@@ -109,12 +109,12 @@ void CommunityDept::setBrief(const QString &newBrief)
     mBrief = newBrief;
 }
 
-qint64 CommunityDept::status() const
+qint64 CommunityDept::modelStatus() const
 {
     return mStatus;
 }
 
-void CommunityDept::setStatus(qint64 newStatus)
+void CommunityDept::setModelStatus(qint64 newStatus)
 {
     mStatus = newStatus;
 }
@@ -123,6 +123,16 @@ DbModelHandler *CommunityDept::getDbModelHandler() const
 {
 
     return DB->getModelHandler(KModelHdlCommDept);
+}
+
+QString CommunityDept::modelStatusName() const
+{
+    return mModelStatusName;
+}
+
+void CommunityDept::setModelStatusName(const QString &newModelStatusName)
+{
+    mModelStatusName = newModelStatusName;
 }
 
 const QString &CommunityDept::communityNameId() const

@@ -27,7 +27,7 @@
     <number>0</number>
    </property>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,1">
        <property name="spacing">
@@ -49,11 +49,28 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Add</string>
+          <string>Chọn</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../icon.qrc">
+           <normaloff>:/icon/icon/icons8-ok-48.png</normaloff>:/icon/icon/icons8-ok-48.png</iconset>
          </property>
         </widget>
        </item>
       </layout>
+     </item>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="lineWidth">
+        <number>1</number>
+       </property>
+       <property name="text">
+        <string>Chọn mục cần thêm, sau đó nhấn &quot;Chọn&quot;. Để xóa mục đã chọn, nhất vào mục đã chọn bên dưới để xóa</string>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
      <item>
       <layout class="QFormLayout" name="formLayout">
@@ -72,6 +89,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../icon.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -23,6 +23,9 @@
 #define DLGCOURSE_H
 
 #include <QDialog>
+#include "errcode.h"
+#include "dlgcommoneditmodel.h"
+#include "view/widget/uitableview.h"
 
 class Course;
 
@@ -30,21 +33,29 @@ namespace Ui {
 class DlgCourse;
 }
 
-class DlgCourse : public QDialog
+class DlgCourse : public DlgCommonEditModel
 {
     Q_OBJECT
+    DLG_BUILDER(DlgCourse)
 
 public:
     explicit DlgCourse(QWidget *parent = nullptr);
     ~DlgCourse();
+    virtual void setupUI();
 
-    Course *course() const;
-
+    virtual ErrCode buildModel(DbModel* model, QString& errMsg);
+    virtual ErrCode fromModel(const DbModel* model);
 protected:
-    void accept();
+    virtual DbModel* newModel();
+    void loadCourseType();
+private slots:
+
+    void on_btnChangeNameId_clicked();
+
+    void on_txtName_textChanged(const QString &arg1);
+
 private:
     Ui::DlgCourse *ui;
-    Course* mCourse;
 };
 
 #endif // DLGCOURSE_H

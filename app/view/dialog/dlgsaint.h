@@ -47,9 +47,14 @@ private slots:
 
     void on_btnImport_clicked();
 
+    void on_txtName_textChanged(const QString &arg1);
+
+    void on_btnChangeNameId_clicked();
+
 private:
     Ui::DlgSaint *ui;
     Saint* mSaint;
+    bool mCustomNameId;
 };
 
 #endif // DLGSAINT_H

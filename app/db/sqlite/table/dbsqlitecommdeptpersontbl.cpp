@@ -142,7 +142,7 @@ ErrCode DbSqliteCommDeptPersonTbl::insertTableField(DbSqliteInsertBuilder *build
         builder->addValue(KFieldPersonUid, model->personUid());
         builder->addValue(KFieldRoleUid, model->roleUid());
         builder->addValue(KFieldCourseUid, model->courseUid());
-        builder->addValue(KFieldModelStatus, model->status());
+        builder->addValue(KFieldModelStatus, model->modelStatus());
         builder->addValue(KFieldStartDate, model->startDate());
         builder->addValue(KFieldEndDate, model->endDate());
         builder->addValue(KFieldChangeHistory, model->changeHistory());
@@ -203,7 +203,7 @@ ErrCode DbSqliteCommDeptPersonTbl::updateModelFromQuery(DbModel *item, const QSq
         }
 
 
-        model->setStatus(qry.value(KFieldModelStatus).toInt());
+        model->setModelStatus(qry.value(KFieldModelStatus).toInt());
         model->setStartDate(qry.value(KFieldStartDate).toInt());
         model->setEndDate(qry.value(KFieldEndDate).toInt());
         model->setChangeHistory(qry.value(KFieldChangeHistory).toString());

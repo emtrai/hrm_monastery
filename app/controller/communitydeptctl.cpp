@@ -133,7 +133,7 @@ CommunityDept* CommunityDeptCtl::onJsonParseOneItem(const QJsonObject& jobj, boo
             int status = QString(tmp).toInt(&ok);
             logd("isOK=%d, status=0x%x", ok, status);
             if (ok && ((status & MODEL_STATUS_MAX) != 0)) {
-                ret->setStatus(status);
+                ret->setModelStatus(status);
             } else {
                 err = ErrInvalidData;
                 loge("invalid status data %s", STR2CHA(tmp));
@@ -246,7 +246,7 @@ QList<DbModel *> CommunityDeptCtl::getListDept(const QString &communityUid, bool
     if (!communityUid.isEmpty()) {
         DbCommDeptModelHandler* modelHdl =  dynamic_cast<DbCommDeptModelHandler*>(DB->getModelHandler(KModelHdlCommDept));
         if (modelHdl) {
-            items = modelHdl->getListDept(communityUid, MODEL_ACTIVE, ok);
+            items = modelHdl->getListDept(communityUid, MODEL_STATUS_MAX, ok);
         } else {
             if (ok) *ok = false;
             loge("not found commdept handler");
@@ -265,10 +265,10 @@ const QList<DbModel *> CommunityDeptCtl::getListPerson(const QString &commDeptUi
     tracein;
     QList<DbModel *> items;
     logd("get people for commDeptUid uid='%s'", STR2CHA(commDeptUid));
-    if (commDeptUid.isEmpty()) {
+    if (!commDeptUid.isEmpty()) {
         DbCommDeptModelHandler* modelHdl =  dynamic_cast<DbCommDeptModelHandler*>(DB->getModelHandler(KModelHdlCommDept));
         if (modelHdl) {
-            items = modelHdl->getListPerson(commDeptUid, MODEL_ACTIVE, ok);
+            items = modelHdl->getListPerson(commDeptUid, MODEL_STATUS_MAX, ok);
         } else {
             if (ok) *ok = false;
             loge("not found commdept handler");

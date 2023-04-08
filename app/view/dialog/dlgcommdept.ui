@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>DlgCourse</class>
- <widget class="QDialog" name="DlgCourse">
+ <class>DlgCommDept</class>
+ <widget class="QDialog" name="DlgCommDept">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>340</height>
+    <width>603</width>
+    <height>476</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,106 +19,118 @@
      <item row="0" column="0">
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Tên khoá</string>
+        <string>Ban</string>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="txtName">
-       <property name="placeholderText">
-        <string>vd: Lớp Khấn 2002</string>
-       </property>
-      </widget>
+      <widget class="QComboBox" name="cbDept"/>
      </item>
-     <item row="3" column="0">
+     <item row="1" column="0">
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>Khoá/Nhiệm kỳ</string>
+        <string>Tên</string>
        </property>
       </widget>
      </item>
-     <item row="3" column="1">
-      <widget class="QLineEdit" name="txtPeriod">
-       <property name="placeholderText">
-        <string>vd: 2002-2006</string>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="txtName">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Định danh</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="txtNameId">
+       <property name="readOnly">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
      <item row="4" column="0">
-      <widget class="QLabel" name="label_3">
+      <widget class="QLabel" name="label_4">
        <property name="text">
-        <string>Ngày bắt đầu</string>
+        <string>Ngày thành lập</string>
        </property>
       </widget>
      </item>
      <item row="4" column="1">
-      <widget class="QLineEdit" name="txtStartDate">
+      <widget class="QLineEdit" name="txtEstablishDate">
        <property name="placeholderText">
-        <string>ngày/tháng/năm, vd: 29/02/2002</string>
+        <string>Ngày/Tháng/Năm, vd: 29/02/2022</string>
        </property>
       </widget>
      </item>
      <item row="5" column="0">
-      <widget class="QLabel" name="label_4">
+      <widget class="QLabel" name="label_5">
        <property name="text">
         <string>Ngày kết thúc</string>
        </property>
       </widget>
      </item>
-     <item row="5" column="1">
-      <widget class="QLineEdit" name="txtEndDate">
-       <property name="placeholderText">
-        <string>ngày/tháng/năm, vd: 29/02/2002</string>
+     <item row="6" column="0">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Email</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="0">
-      <widget class="QLabel" name="label_5">
+     <item row="5" column="1">
+      <widget class="QLineEdit" name="txtCloseDate">
+       <property name="placeholderText">
+        <string>Ngày/Tháng/Năm, vd: 29/02/2022</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QLineEdit" name="txtEmail"/>
+     </item>
+     <item row="7" column="0">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>Điện thoại</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="0">
+      <widget class="QLabel" name="label_8">
+       <property name="text">
+        <string>Địa chỉ</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_9">
+       <property name="text">
+        <string>Tình trạng</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QComboBox" name="cbStatus"/>
+     </item>
+     <item row="7" column="1">
+      <widget class="QLineEdit" name="txtTel"/>
+     </item>
+     <item row="9" column="0">
+      <widget class="QLabel" name="label_10">
        <property name="text">
         <string>Ghi chú</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="1">
-      <widget class="QTextEdit" name="txtRemark"/>
+     <item row="9" column="1">
+      <widget class="QPlainTextEdit" name="txtRemark"/>
      </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_6">
-       <property name="text">
-        <string>Mã định danh</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QLineEdit" name="txtNameId">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="btnChangeNameId">
-         <property name="text">
-          <string>Đổi</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="2" column="1">
-      <widget class="QComboBox" name="cbCourseType"/>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_7">
-       <property name="text">
-        <string>Loại</string>
-       </property>
-      </widget>
+     <item row="8" column="1">
+      <widget class="QPlainTextEdit" name="txtAddr"/>
      </item>
     </layout>
    </item>
@@ -128,7 +140,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
      </property>
     </widget>
    </item>
@@ -139,7 +151,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>DlgCourse</receiver>
+   <receiver>DlgCommDept</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -155,7 +167,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>DlgCourse</receiver>
+   <receiver>DlgCommDept</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

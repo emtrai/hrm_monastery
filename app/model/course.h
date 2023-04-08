@@ -23,6 +23,9 @@
 #define COURSE_H
 
 #include <dbmodel.h>
+
+#include "dataexporter.h"
+
 typedef enum CourseType {
     COURSE_TYPE_COURSE = 0, // khoa hoc
     COURSE_TYPE_TERM, // nhiem ki
@@ -41,6 +44,9 @@ public:
     virtual ~Course();
     static DbModel *build();
     virtual void clone(const DbModel* model);
+    virtual QString modelName() const;
+    virtual void initExportFields();
+    virtual const QString exportTemplatePath(FileExporter* exporter, QString* ftype = nullptr) const;
 
     virtual DbModelBuilder getBuilder() const;
     qint64 startDate() const;
@@ -56,6 +62,8 @@ public:
     QString courseTypeName();
     void setCourseType(qint32 newCourseType);
 
+    void setCourseTypeName(const QString &newCourseTypeName);
+
 protected:
     virtual DbModelHandler *getDbModelHandler() const;
 private:
@@ -63,6 +71,7 @@ private:
     qint64 mEndDate;
     QString mPeriod;
     qint32 mCourseType;
+    QString mCourseTypeName; // just for display
 };
 
 #endif // COURSE_H

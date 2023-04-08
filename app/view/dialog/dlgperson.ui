@@ -38,7 +38,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-1202</y>
+        <y>-1500</y>
         <width>679</width>
         <height>3161</height>
        </rect>
@@ -655,6 +655,9 @@
            </item>
            <item>
             <widget class="QToolButton" name="btnAddEthnic">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>Thêm</string>
              </property>
@@ -907,6 +910,9 @@
            </item>
            <item>
             <widget class="QToolButton" name="btnEditNation">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>Thêm</string>
              </property>
@@ -1093,6 +1099,9 @@
              </item>
              <item>
               <widget class="QToolButton" name="btnAddEvent">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="text">
                 <string>Thêm</string>
                </property>
@@ -1108,6 +1117,9 @@
              </item>
              <item>
               <widget class="QToolButton" name="btnDelEvent">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="text">
                 <string>Xoá</string>
                </property>

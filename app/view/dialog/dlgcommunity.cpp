@@ -53,6 +53,12 @@ DlgCommunity::~DlgCommunity()
     traceout;
 }
 
+void DlgCommunity::setupUI()
+{
+    tracein;
+    traceout;
+}
+
 ErrCode DlgCommunity::buildModel(DbModel *model, QString& errMsg)
 {
     tracein;
@@ -99,7 +105,7 @@ ErrCode DlgCommunity::buildModel(DbModel *model, QString& errMsg)
         comm->setChurch(ui->txtChurch->toPlainText().trimmed());
     }
     if (err == ErrNone){
-        SET_INT_VAL_FROM_CBOX(ui->cbStatus, comm->setStatus, comm->setStatusName);
+        SET_INT_VAL_FROM_CBOX(ui->cbStatus, comm->setModelStatus, comm->setModelStatusName);
     }
     if (err == ErrNone){
         SET_DATE_FORMAT_VAL_FROM_WIDGET(ui->txtEstablishDate, comm->setCreateDate, DEFAULT_FORMAT_YMD);

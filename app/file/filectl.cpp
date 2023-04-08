@@ -74,7 +74,18 @@ QString FileCtl::getAppWorkingDataDir()
     return getAppWorkingDataDir(QString());
 }
 
-QString FileCtl::getAppDataDir(const QString& subDir)
+QString FileCtl::getAppDataDir(const QString &subDir)
+{
+    QString fdir = getAppInstallDir(KDataDirName);
+    QDir appDirPath(fdir);
+    if (!subDir.isEmpty()) {
+        fdir = appDirPath.filePath(subDir);
+    }
+    logd("create app data dir '%s'", STR2CHA(fdir));
+    return fdir;
+}
+
+QString FileCtl::getAppLocalDataDir(const QString& subDir)
 {
 
     static QString appPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
@@ -182,7 +193,13 @@ ErrCode FileCtl::checkAndUpdatePrebuiltFile(const QString &name, bool backup)
         // TODO: do backup
         QString prebuiltDir = getOrCreatePrebuiltDataDir();
         QString newFpath = QDir(prebuiltDir).filePath(fname);
+        logd("oldpath %s", fpath.toStdString().c_str());
         logd("newFpath %s", newFpath.toStdString().c_str());
+        if (QFile::exists(newFpath)) {
+            logd("newFpath existed, remove '%s'", STR2CHA(newFpath));
+            QFile::remove(newFpath);
+        }
+
         if (!QFile::copy(fpath, newFpath)){
             ret = ErrFileWrite;
             loge("copy file %s failed", fname.toStdString().c_str());
@@ -229,7 +246,14 @@ QString FileCtl::getPrebuiltDataFile(const QString& fname)
 
 QString FileCtl::getPrebuiltDataFilePath(const QString &fname)
 {
-    return QString(":/data/%1").arg(fname);
+    logd("get prefile data file for fname '%s'", STR2CHA(fname));
+    QString fpathAtInstalLDir = getAppInstallDir(fname);
+    QString fpath;
+    logd("fpathAtInstalLDir '%s'", STR2CHA(fpathAtInstalLDir));
+    if (QFile::exists(fpathAtInstalLDir)) fpath = fpathAtInstalLDir;
+    else fpath = QString(":/data/%1").arg(fname);
+    logd("prebuild file data file fpath'%s'", STR2CHA(fpath));
+    return fpath;
 }
 
 QString FileCtl::getPrebuiltDataFileHashPath(const QString &fname)

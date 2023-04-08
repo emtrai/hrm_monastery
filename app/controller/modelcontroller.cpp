@@ -89,7 +89,7 @@ void ModelController::delListener(OnModelControllerListener *listener)
     tracein;
     if (listener) {
         logd("Remove listener '%s'", STR2CHA(listener->getName()));
-        mListeners.removeOne(listener);
+        mListeners.removeAll(listener);
     } else {
         loge("Invalid listener");
     }

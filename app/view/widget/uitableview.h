@@ -286,6 +286,7 @@ protected:
     QHash<int, QString> mFilterFields;
     QList<FilterItem*> mFilterList; // filters, OR condition?
     // TODO: should be OR or AND condition? can select???
+    bool mSuspendReloadOnDbUpdate;
 
 };
 

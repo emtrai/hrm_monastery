@@ -63,7 +63,7 @@ public:
      */
     virtual ErrCode addContactPerson(const DbModel* area,
                                      const DbModel* person,
-                                     int status = MODEL_ACTIVE,
+                                     int status = MODEL_STATUS_MAX,
                                      const QString& roleUid = nullptr,
                                      qint64 startdate = 0,
                                      qint64 enddate = 0,

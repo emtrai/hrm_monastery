@@ -52,7 +52,7 @@ QList<DbModel *> DbSqliteCommunityDeptTbl::getListDept(const QString &commUid, i
     fields.insert(KFieldCommunityUid, FieldValue(commUid));
     fields.insert(KFieldModelStatus, FieldValue(status));
     // TODO: check status???
-    logd("Start search commUid %s", commUid.toStdString().c_str());
+    logd("Start search commUid %s, status=0x%x", commUid.toStdString().c_str(), status);
     ret = search(fields, true, nullptr, &CommunityDept::build, &olist, true);
     logd("ret=%d", ret);
     traceout;
@@ -74,7 +74,7 @@ ErrCode DbSqliteCommunityDeptTbl::insertTableField(DbSqliteInsertBuilder *builde
     builder->addValue(KFieldAddr, cmm->addr());
     builder->addValue(KFieldTel, cmm->tel());
     builder->addValue(KFieldEmail, cmm->email());
-    builder->addValue(KFieldModelStatus, cmm->status());
+    builder->addValue(KFieldModelStatus, cmm->modelStatus());
     builder->addValue(KFieldBrief, cmm->brief());
     traceout;
     return ErrNone;
@@ -113,7 +113,7 @@ ErrCode DbSqliteCommunityDeptTbl::updateModelFromQuery(DbModel *item, const QSql
     cmm->setAddr(qry.value(KFieldAddr).toString());
     cmm->setTel(qry.value(KFieldTel).toString());
     cmm->setEmail(qry.value(KFieldEmail).toString());
-    cmm->setStatus(qry.value(KFieldModelStatus).toInt());
+    cmm->setModelStatus(qry.value(KFieldModelStatus).toInt());
     cmm->setBrief(qry.value(KFieldBrief).toString());
     traceout;
     return err;

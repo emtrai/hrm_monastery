@@ -83,6 +83,9 @@ public:
     void setProgress(int cur, int total);
     void clearProgress();
     void forceClose();
+    ErrCode errResult() const;
+    void setErrResult(ErrCode newResult);
+
 protected:
     virtual void accept();
     virtual void done(int);
@@ -98,6 +101,7 @@ private:
     QString mMessage;
     DlgWaitWorker* mWorker;
     WaitFinished_t mFinishCallback;
+    ErrCode mResult;
 };
 
 

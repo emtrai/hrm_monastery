@@ -31,8 +31,7 @@
 #include "mainwindow.h"
 
 UICommonListView::UICommonListView(QWidget *parent):
-    UITableView(parent),
-    mSuspendReloadOnDbUpdate(false)
+    UITableView(parent)
 {
 }
 

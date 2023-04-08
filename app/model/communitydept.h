@@ -49,8 +49,8 @@ public:
     const QString &brief() const;
     void setBrief(const QString &newBrief);
 
-    qint64 status() const;
-    void setStatus(qint64 newStatus);
+    qint64 modelStatus() const;
+    void setModelStatus(qint64 newStatus);
 
     const QString &communityUid() const;
     void setCommunityUid(const QString &newCommunityUid);
@@ -81,6 +81,9 @@ public:
     const QString &communityNameId() const;
     void setCommunityNameId(const QString &newCommunityNameId);
 
+    QString modelStatusName() const;
+    void setModelStatusName(const QString &newModelStatusName);
+
 protected:
     virtual DbModelHandler* getDbModelHandler() const;
 private:
@@ -100,6 +103,7 @@ private:
     QString mTel;
     QString mBrief;
     qint64 mStatus;
+    QString mModelStatusName;
 };
 
 #endif // COMMUNITYDEPT_H

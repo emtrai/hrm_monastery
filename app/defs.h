@@ -55,6 +55,7 @@ const char* const KManagementDeptNameId = "QUAN_LY";
 
 const char* const KPrebuiltDirName = "prebuilt";
 const char* const KWorkingDirName = "data";
+const char* const KDataDirName = ".appdata";
 const char* const KLogDirName = "log";
 const char* const KDatabasename = "db.db";
 const char* const KDatabaseMetaName = "db.json";
@@ -83,6 +84,7 @@ const char* const KPrebuiltStatusCSVFileName = "status";
 const char* const KPrebuiltEventCSVFileName = "event";
 const char* const KPrebuiltRoleCSVFileName = "role";
 const char* const KPrebuiltCommonTemplateFileName = "common_template";
+const char* const KPrebuiltCourseTemplateFileName = "course_template";
 const char* const KPrebuiltCommunityExportTemplateName = "community_export_template";
 const char* const KPrebuiltDefaultExportTemplateName = "default_export_template";
 
@@ -124,6 +126,7 @@ const char* const KModelNameSpecialist = "specialist";
 const char* const KModelNameSpecialistPerson = "specialist_person";
 const char* const KModelNameCommunity = "community";
 const char* const KModelNameSaint = "saint";
+const char* const KModelNameCourse = "course";
 
 const char* const KDataFormatList = "QList";
 const char* const KDataFormatStringList = "QStringList";
@@ -235,7 +238,10 @@ const char* const KItemMission = "SU_VU";
 const char* const KItemMissionNameId = "MA_SU_VU";
 const char* const KItemLastUpdateTime = "THOI_GIAN_CAP_NHAT_CUOI";
 const char* const KItemCreateTime = "NGAY_TAO";
-const char* const KItemCloseTime = "NGAY_KET_THUC";
+const char* const KItemStartDate = "NGAY_BAT_DAU";
+const char* const KItemEndDate = "NGAY_KET_THUC";
+const char* const KItemType = "LOAI";
+const char* const KItemPeriod = "CHU_KY";
 const char* const KItemRole = "VAI_TRO";
 const char* const KItemLevel = "CAP";
 const char* const KItemContact = "LIEN_HE";

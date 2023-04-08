@@ -41,6 +41,8 @@
 #include "view/dialog/dlgimportcommunitylistresult.h"
 #include "view/dialog/dlghtmlviewer.h"
 #include "view/dialog/dlgeditmodel.h"
+#include "view/dialog/dlgcourse.h"
+#include "view/dialog/dlgcommdept.h"
 #include "personctl.h"
 #include "dialog/dlgabout.h"
 #include "dlgwait.h"
@@ -215,6 +217,22 @@ void MainWindow::showAddEditCommonModel(bool isSelfUpdate, DbModel *model, Commo
 
 }
 
+void MainWindow::showAddEditCourse(bool isSelfUpdate, DbModel *com, CommonEditModelListener *listener)
+{
+    tracein;
+    getInstance()->doShowAddEditCourse(isSelfUpdate, com, listener);
+    traceout;
+
+}
+
+void MainWindow::showAddEditCommDept(bool isSelfUpdate, DbModel* comm, DbModel *dept, CommonEditModelListener *listener)
+{
+    tracein;
+    getInstance()->doShowAddEditCommDept(isSelfUpdate, comm, dept, listener);
+    traceout;
+
+}
+
 ErrCode MainWindow::exportListItems(const QList<DbModel *>* items,
                                     ModelController* controller,
                                     const QString& title, quint64 exportTypeList)
@@ -226,6 +244,40 @@ ErrCode MainWindow::exportListItems(const QList<DbModel *>* items,
     return err;
 }
 
+ErrCode MainWindow::showProcessingDialog(const QString& title,
+                                         WaitPrepare_t prepare,
+                                         WaitRunt_t run,
+                                         WaitFinished_t finish,
+                                         void *data)
+{
+    return getInstance()->doShowProcessingDialog(title, prepare, run, finish, data);
+}
+
+void MainWindow::addMainWindownImportListener(MainWindownImportListener *listener)
+{
+    return getInstance()->doAddMainWindownImportListener(listener);
+}
+
+void MainWindow::removeMainWindownImportListener(MainWindownImportListener *listener)
+{
+    return getInstance()->doRemoveMainWindownImportListener(listener);
+}
+
+ErrCode MainWindow::doShowProcessingDialog(const QString& title,
+                               WaitPrepare_t prepare,
+                               WaitRunt_t run,
+                               WaitFinished_t finish,
+                               void *data)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    DlgWait waitdlg(this);
+    waitdlg.setMessage(title);
+    waitdlg.setAllowCancel(false);
+    err = waitdlg.show(data, prepare, run, finish);
+    traceout;
+    return err;
+}
 void MainWindow::switchView(ViewType type, void* data)
 {
     tracein;
@@ -373,22 +425,37 @@ void MainWindow::doShowImportPerson()
         tr("Excel (*.xlsx);;CSV Files (*.csv);;All Files (*.*)"));
     // TODO: this is duplicate code, make it common please
     if (!fname.isEmpty()){
-        QList<DbModel*> list;
-        logd("Import from file %s", STR2CHA(fname));
-        ImportType type = ImportFactory::importTypeFromExt(fname, true);
-        if (type == IMPORT_XLSX || type == IMPORT_CSV_LIST || type == IMPORT_CSV) {
-            ret = PERSONCTL->importFromFile(KModelHdlPerson, type, fname, &list);
-        } else {
-            ret = ErrNotSupport;
-            loge("Import type %d not support (fname = '%s'", type, STR2CHA(fname));
-        }
-        logd("Import result %d", ret);
-        logd("No of import item %d", list.count());
-        if (ret == ErrNone) {
-            DlgImportPersonListResult* dlg = new DlgImportPersonListResult();
-            dlg->setup(list);
-            dlg->exec();
-            delete dlg; // no clean list, as dlg will take over it
+//        QList<DbModel*> list;
+        connect(this, &MainWindow::importPeople, this, &MainWindow::onImportPeople);
+        notifyMainWindownImportListenerStart(IMPORT_TARGET_PERSON);
+        ret = showProcessingDialog(tr("Nhập dữ liệu"), nullptr,
+            [this, fname](ErrCode* err, void* data, DlgWait* dlg) {
+                QList<DbModel*>*list = new QList<DbModel*>();
+                logd("Import from file %s", STR2CHA(fname));
+                ImportType type = ImportFactory::importTypeFromExt(fname, true);
+                if (type == IMPORT_XLSX || type == IMPORT_CSV_LIST || type == IMPORT_CSV) {
+                    *err = PERSONCTL->importFromFile(KModelHdlPerson, type, fname, list);
+                } else {
+                    *err = ErrNotSupport;
+                    loge("Import type %d not support (fname = '%s'", type, STR2CHA(fname));
+                }
+                return list;
+                },
+            [this, fname](ErrCode err, void* data, void* result, DlgWait* dlg) {
+                logd("Import result %d", err);
+                QList<DbModel*>* list = (QList<DbModel*>*)(result);
+                if (result) {
+                    logd("No of import item %d", list->count());
+                }
+//                dlg->forceClose();
+                if (err == ErrNone) {
+                    emit this->importPeople(err, list);
+                }
+                return err;
+            });
+        if (ret != ErrNone) {
+            loge("Failed to import, notify listener err = %d", ret);
+            notifyMainWindownImportListenerEnd(IMPORT_TARGET_PERSON, ret, nullptr);
         }
     }
     traceout;
@@ -426,6 +493,32 @@ void MainWindow::doShowAddEditCommonModel(bool isSelfUpdate, DbModel *model, Com
     logd("isSelfUpdate %d", isSelfUpdate);
     DlgEditModel* dlg = DlgEditModel::build(this, isSelfUpdate, model);
     dlg->setListener(listener);
+    dlg->exec();
+    delete dlg;
+    traceout;
+}
+
+void MainWindow::doShowAddEditCourse(bool isSelfUpdate, DbModel *model,
+                                     CommonEditModelListener *listener)
+{
+    tracein;
+    logd("isSelfUpdate %d", isSelfUpdate);
+    DlgCourse* dlg = DlgCourse::build(this, isSelfUpdate, model);
+    dlg->setListener(listener);
+    dlg->exec();
+    delete dlg;
+    traceout;
+
+}
+
+void MainWindow::doShowAddEditCommDept(bool isSelfUpdate, DbModel* comm,
+                                       DbModel *model, CommonEditModelListener *listener)
+{
+    tracein;
+    logd("isSelfUpdate %d", isSelfUpdate);
+    DlgCommDept* dlg = DlgCommDept::build(this, isSelfUpdate, model);
+    dlg->setListener(listener);
+    dlg->setCommunity(comm);
     dlg->exec();
     delete dlg;
     traceout;
@@ -583,7 +676,7 @@ void MainWindow::loadOtherMenu()
 
     ADD_ACTION_ITEM(otherMenu,
                     on_actionCourse_triggered,
-                    "Khóa",
+                    "Khóa/Nhiệm kỳ/Lớp khấn",
                     ICON_PATH("icons8-unit-80"));
 
     //    QAction* act = nullptr;
@@ -735,6 +828,63 @@ void MainWindow::pushViewToStack(BaseView* view)
     traceout;
 }
 
+void MainWindow::doAddMainWindownImportListener(MainWindownImportListener *listener)
+{
+    tracein;
+    if (listener) {
+        if (!mMainWindowImportListener.contains(listener)) {
+            logd("Add main windown listener '%s'", STR2CHA(listener->getName()));
+            mMainWindowImportListener.push_back(listener);
+        } else {
+            loge("main windown lister existed '%s'", STR2CHA(listener->getName()));
+        }
+    } else {
+        loge("Invalid listener");
+    }
+    traceout;
+}
+
+void MainWindow::doRemoveMainWindownImportListener(MainWindownImportListener *listener)
+{
+    tracein;
+    if (listener) {
+        if (mMainWindowImportListener.contains(listener)) {
+            logd("remove main windown listener '%s'", STR2CHA(listener->getName()));
+            mMainWindowImportListener.removeAll(listener);
+        } else {
+            loge("main windown lister Not existed '%s'", STR2CHA(listener->getName()));
+        }
+    } else {
+        loge("Invalid listener");
+    }
+    traceout;
+
+}
+
+void MainWindow::notifyMainWindownImportListenerStart(ImportTarget target)
+{
+    tracein;
+    foreach (MainWindownImportListener* listener, mMainWindowImportListener) {
+        if (listener) {
+            logd("Call onMainWindownImportStart target %d name '%s'", target, STR2CHA(listener->getName()));
+            listener->onMainWindownImportStart(target);
+        }
+    }
+    traceout;
+}
+
+void MainWindow::notifyMainWindownImportListenerEnd(ImportTarget target, ErrCode err, void *importData)
+{
+    tracein;
+    foreach (MainWindownImportListener* listener, mMainWindowImportListener) {
+        if (listener) {
+            logd("Call onMainWindownImportEnd target %d name '%s'", target, STR2CHA(listener->getName()));
+            listener->onMainWindownImportEnd(target, err, importData);
+        }
+    }
+    traceout;
+}
+
 void MainWindow::onLoad()
 {
     tracein;
@@ -752,13 +902,35 @@ void MainWindow::onLoad()
           },
         [this](ErrCode err, void* data, void* result, DlgWait* dlg) {
             logd("Finished, close wait dlg");
-            dlg->forceClose();
+//            dlg->forceClose();
             this->setAppState(APP_STATE_READY);
             return ErrNone;
         }
         );
 //    LoaderCtl::getInstance()->onLoad();
 //    this->setAppState(APP_STATE_READY);
+    traceout;
+}
+
+void MainWindow::onImportPeople(ErrCode err, QList<DbModel *> *list)
+{
+    tracein;
+    if (err == ErrNone && (!list || (list->size() == 0))) {
+        err = ErrNone;
+        loge("Import ok, but no data?");
+    }
+    if (err == ErrNone) {
+        DlgImportPersonListResult* dlg = new DlgImportPersonListResult();
+        dlg->setup(*list);
+        dlg->exec();
+        notifyMainWindownImportListenerEnd(IMPORT_TARGET_PERSON, err, list);
+        delete list;
+        delete dlg; // no clean list, as dlg will take over it
+    } else {
+        loge("Import failed, err=%d", err);
+        Utils::showErrorBox(QString(tr("Nhập dữ liệu lỗi, mã lỗi %1")).arg(err));
+        notifyMainWindownImportListenerEnd(IMPORT_TARGET_PERSON, err, nullptr);
+    }
     traceout;
 }
 

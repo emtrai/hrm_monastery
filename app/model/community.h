@@ -78,7 +78,7 @@ public:
     void setParentUid(const QString &newParentUid);
 
     DbModelStatus getStatus() const;
-    void setStatus(int newStatus);
+    void setModelStatus(int newStatus);
 
     qint64 closeDate() const;
     void setCloseDate(qint64 newCloseDate);
@@ -123,7 +123,7 @@ public:
 
 
     const QString &statusName() const;
-    void setStatusName(const QString &newStatusName);
+    void setModelStatusName(const QString &newStatusName);
 
     const QString &parentName();
     void setParentName(const QString &newParentName);

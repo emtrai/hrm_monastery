@@ -36,6 +36,7 @@
 #include <QStack>
 #include "view/widget/baseview.h"
 #include "view/widget/uitextbrowser.h"
+#include "dialog/dlgwait.h"
 
 QT_BEGIN_NAMESPACE
     namespace Ui { class MainWindow; }
@@ -56,7 +57,15 @@ enum AppState {
 class Person;
 class DlgWait;
 class Community;
+class Course;
 class ModelController;
+
+class MainWindownImportListener {
+public:
+    virtual QString getName() = 0;
+    virtual void onMainWindownImportStart(ImportTarget target) = 0;
+    virtual void onMainWindownImportEnd(ImportTarget target, ErrCode err, void* importData = nullptr) = 0;
+};
 
     class MainWindow : public QMainWindow, public LoaderListener
 {
@@ -74,10 +83,21 @@ class ModelController;
             static void showOnHtmlViewer(DbModel* model, const QString& subject);
             static void showAddEditCommonModel(bool isSelfUpdate = true, DbModel* model = nullptr,
                                              CommonEditModelListener* listener = nullptr);
+            static void showAddEditCourse(bool isSelfUpdate = true, DbModel* com = nullptr,
+                                             CommonEditModelListener* listener = nullptr);
+            static void showAddEditCommDept(bool isSelfUpdate = true, DbModel* comm = nullptr, DbModel* dept = nullptr,
+                                          CommonEditModelListener* listener = nullptr);
             static ErrCode exportListItems(const QList<DbModel*>* items, ModelController* controller,
                                     const QString& title = nullptr,
                                     quint64 exportTypeList = 0 // List of supported export type, bitwise
                                     );
+            static ErrCode showProcessingDialog(const QString& title,
+                                                WaitPrepare_t prepare,
+                                                WaitRunt_t run,
+                                                WaitFinished_t finish = nullptr,
+                                                void *data = nullptr);
+            static void addMainWindownImportListener(MainWindownImportListener* listener);
+            static void removeMainWindownImportListener(MainWindownImportListener* listener);
         protected:
      void showEvent(QShowEvent *ev);
  public:
@@ -95,7 +115,10 @@ class ModelController;
      void pushViewToStack(BaseView* view);
 
  protected:
-
+     void doAddMainWindownImportListener(MainWindownImportListener* listener);
+     void doRemoveMainWindownImportListener(MainWindownImportListener* listener);
+     void notifyMainWindownImportListenerStart(ImportTarget target);
+     void notifyMainWindownImportListenerEnd(ImportTarget target, ErrCode err, void* importData);
      virtual void onLoadController (Controller* ctl);
      void doShowAddEditPerson(bool isSelfUpdate = true, Person* per = nullptr, bool isNew = true);
      void doShowAddEditCommunity(bool isSelfUpdate = true, Community* com = nullptr,
@@ -104,8 +127,17 @@ class ModelController;
      void doShowImportCommunity();
      void doShowAddEditCommonModel(bool isSelfUpdate = true, DbModel* model = nullptr,
                                         CommonEditModelListener* listener = nullptr);
+     void doShowAddEditCourse(bool isSelfUpdate = true, DbModel* model = nullptr,
+                                   CommonEditModelListener* listener = nullptr);
+     void doShowAddEditCommDept(bool isSelfUpdate = true, DbModel* comm = nullptr, DbModel* model = nullptr,
+                              CommonEditModelListener* listener = nullptr);
      ErrCode doExportListItems(const QList<DbModel*>* items, ModelController* controller,
                                const QString& title = nullptr, quint64 exportTypeList = 0);
+     ErrCode doShowProcessingDialog(const QString& title,
+                                         WaitPrepare_t prepare,
+                                         WaitRunt_t run,
+                                         WaitFinished_t finish = nullptr,
+                                         void *data = nullptr);
  private:
      void loadHomePageFile();
      void loadOtherMenu();
@@ -160,8 +192,10 @@ class ModelController;
  signals:
     void load();
 
+     void importPeople(ErrCode err, QList<DbModel*>* list);
  private slots:
     void onLoad();
+     void onImportPeople(ErrCode err, QList<DbModel*>* list);
      void on_action_ImportPerson_triggered();
      void on_action_ImportPersonList_triggered();
      void on_action_ImportCommunityList_triggered();
@@ -214,5 +248,6 @@ class ModelController;
 
  private:
      static MainWindow* gInstance;
+     QList<MainWindownImportListener*> mMainWindowImportListener;
 };
 #endif // MAINWINDOW_H
