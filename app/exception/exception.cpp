@@ -27,7 +27,7 @@ MyException::MyException(const QString &msg) throw()
     mMessage.append(msg.toStdString().c_str());
 }
 
-const char *MyException::what() const _NOEXCEPT
+const char *MyException::what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW
 {
     return mMessage.data();
 }

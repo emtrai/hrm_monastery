@@ -57,7 +57,7 @@ public:
     MyException(const QString& msg) throw();
     void raise() const override { throw *this; }
     MyException *clone() const override { return new MyException(*this); }
-    virtual const char* what() const _NOEXCEPT override;
+    virtual const char* what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override;
 private:
     QByteArray mMessage;
 };

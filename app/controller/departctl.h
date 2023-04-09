@@ -27,7 +27,7 @@
 #include "department.h"
 #include <QHash>
 #include <QList>
-#include "util.h"
+#include "utils.h"
 
 #define DEPART (DepartCtl::getInstance())
 
