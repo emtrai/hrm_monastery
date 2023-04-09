@@ -64,12 +64,17 @@ void DlgCommonEditModel::setIsSelfSave(bool newIsSelfSave)
 
 DbModel *DlgCommonEditModel::model()
 {
+    tracein;
     if (!mModel) {
+        logd("call newModel");
         mModel = newModel();
     }
     if (!mModel && mListener) {
+        logd("call onNewModel from listener");
         mModel = mListener->onNewModel();
     }
+    logd("mModel=%s", mModel?STR2CHA(mModel->toString()):"(null)");
+    traceout;
     // TODO: copy or return value??? how will take over this object??? should use smart pointer????
     return mModel;
 }

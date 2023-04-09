@@ -223,6 +223,7 @@ private:
 
     QString mContact; // Other detail contact
 
+    // Nhiem vu xa hoi cua cong doan
     QStringList mMissionUid;
     QStringList mMissionName;
     QStringList mMissionNameId;

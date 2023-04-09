@@ -397,7 +397,7 @@ ErrCode Utils::parseCSVFile(const QString &filePath,
                             } else {
                                 // TODO: check this case again, should continue or break/stop??
                                 loge("Line %d is invalid? ret = %d", cnt, ret);
-                                break;
+//                                break;
                             }
                         }
                         else {

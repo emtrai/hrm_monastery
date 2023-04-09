@@ -4,7 +4,7 @@
         "nameid":"HOI_DONG_LINH_HUONG",
         "community":"HOI_DONG",
         "department":"LINH_HUONG",
-        "name":"Linh hướng",
+        "name":"Ban Linh hướng",
         "addr":"",
         "tel":"",
         "establishday":"",
@@ -18,6 +18,7 @@
         "nameid":"HOI_DONG_TRUYEN_GIAO",
         "community":"HOI_DONG",
         "department":"TRUYEN_GIAO",
+        "name":"Ban Truyền giáo",
         "addr":"",
         "tel":"",
         "establishday":"",
@@ -42,8 +43,8 @@
         "remark":""
         },
         {
-        "nameid":"CD_THANH_GIA_ON_GOI",
-        "community":"CD_THANH_GIA",
+        "nameid":"HOI_DONG_ON_GOI",
+        "community":"HOI_DONG",
         "department":"ON_GOI",
         "name":"Ban Ơn Gọi Hội Dòng",
         "addr":"",

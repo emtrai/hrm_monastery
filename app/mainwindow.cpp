@@ -384,7 +384,7 @@ void MainWindow::doShowAddEditCommunity(bool isSelfUpdate, Community *com, Commo
 {
     tracein;
     logd("isSelfUpdate %d", isSelfUpdate);
-    DlgCommunity* dlg = DlgCommunity::build(this, isSelfUpdate, (DbModel*)com);
+    DlgCommunity* dlg = DlgCommunity::build(this, isSelfUpdate, (DbModel*)com, listener);
     dlg->setListener(listener);
     dlg->exec();
     delete dlg;
@@ -422,7 +422,8 @@ void MainWindow::doShowImportPerson()
         this,
         tr("Open file"),
         FileCtl::getAppDataDir(),
-        tr("Excel (*.xlsx);;CSV Files (*.csv);;All Files (*.*)"));
+        tr("Excel (*.xlsx))"));
+//        tr("Excel (*.xlsx);;CSV Files (*.csv);;All Files (*.*)"));
     // TODO: this is duplicate code, make it common please
     if (!fname.isEmpty()){
 //        QList<DbModel*> list;
@@ -470,13 +471,14 @@ void MainWindow::doShowImportCommunity()
         this,
         tr("Open file"),
         FileCtl::getAppDataDir(),
-        tr("CSV Files (*.csv);;Excel (*.xls *.xlsx)"));
+        tr("Excel (*.xlsx)"));
+//        tr("CSV Files (*.csv);;Excel (*.xls *.xlsx)"));
     // TODO: this is duplicate code, make it common please
     if (!fname.isEmpty()){
         logd("File %s is selected", fname.toStdString().c_str());
         QList<DbModel*> list;
         logd("Import from file %s", fname.toStdString().c_str());
-        ErrCode ret = COMMUNITYCTL->importFromFile(KModelHdlCommunity, ImportType::IMPORT_CSV, fname, &list);
+        ErrCode ret = COMMUNITYCTL->importFromFile(KModelHdlCommunity, ImportType::IMPORT_XLSX, fname, &list);
         logd("Import result %d", ret);
         logd("No of import item %d", list.count());
         DlgImportCommunityListResult* dlg = new DlgImportCommunityListResult();
@@ -490,8 +492,11 @@ void MainWindow::doShowImportCommunity()
 void MainWindow::doShowAddEditCommonModel(bool isSelfUpdate, DbModel *model, CommonEditModelListener *listener)
 {
     tracein;
-    logd("isSelfUpdate %d", isSelfUpdate);
-    DlgEditModel* dlg = DlgEditModel::build(this, isSelfUpdate, model);
+    logd("isSelfUpdate %d, model '%s' listener '%s'",
+            isSelfUpdate,
+             model?STR2CHA(model->toString()):"null",
+             listener?STR2CHA(listener->getName()):"null");
+    DlgEditModel* dlg = DlgEditModel::build(this, isSelfUpdate, model, listener);
     dlg->setListener(listener);
     dlg->exec();
     delete dlg;
@@ -503,7 +508,7 @@ void MainWindow::doShowAddEditCourse(bool isSelfUpdate, DbModel *model,
 {
     tracein;
     logd("isSelfUpdate %d", isSelfUpdate);
-    DlgCourse* dlg = DlgCourse::build(this, isSelfUpdate, model);
+    DlgCourse* dlg = DlgCourse::build(this, isSelfUpdate, model, listener);
     dlg->setListener(listener);
     dlg->exec();
     delete dlg;
@@ -516,8 +521,7 @@ void MainWindow::doShowAddEditCommDept(bool isSelfUpdate, DbModel* comm,
 {
     tracein;
     logd("isSelfUpdate %d", isSelfUpdate);
-    DlgCommDept* dlg = DlgCommDept::build(this, isSelfUpdate, model);
-    dlg->setListener(listener);
+    DlgCommDept* dlg = DlgCommDept::build(this, isSelfUpdate, model, listener);
     dlg->setCommunity(comm);
     dlg->exec();
     delete dlg;
@@ -722,7 +726,7 @@ void MainWindow::loadImportMenu()
 
     ADD_MENU_ITEM(importMenu,
                   on_action_ImportPerson_triggered,
-                  "Nữ Tu",
+                  "Danh sách Nữ Tu",
                   ":/icon/icon/icons8-nun-64.png");
 
     ADD_MENU_ITEM(importMenu,
@@ -730,10 +734,10 @@ void MainWindow::loadImportMenu()
                   "Danh sách Cộng đoàn",
                   ":/icon/icon/icons8-community-64.png");
 
-    ADD_MENU_ITEM(importMenu,
-                  on_action_ImportCommunity_triggered,
-                  "Cộng đoàn",
-                  ":/icon/icon/icons8-community-64.png");
+//    ADD_MENU_ITEM(importMenu,
+//                  on_action_ImportCommunity_triggered,
+//                  "Cộng đoàn",
+//                  ":/icon/icon/icons8-community-64.png");
 
 //    mActionImportPersonList = new QAction(this);
 //    mActionImportPersonList->setObjectName(QString::fromUtf8("action_ImportPersonList"));
@@ -977,15 +981,15 @@ void MainWindow::on_action_ImportPersonList_triggered()
 void MainWindow::on_action_ImportCommunityList_triggered()
 {
     tracein;
-    UNDER_DEV(tr("Nhập danh sách Cộng Đoàn từ tập tin"));
+    MainWindow::showImportDlg(ImportTarget::IMPORT_TARGET_COMMUNITY);
     // TODO: implement it
+    traceout;
 }
 
 void MainWindow::on_action_ImportCommunity_triggered()
 {
     tracein;
-//    UNDER_DEV(tr("Nhập Cộng Đoàn từ tập tin"));
-    MainWindow::showImportDlg(ImportTarget::IMPORT_TARGET_COMMUNITY);
+    UNDER_DEV(tr("Nhập Cộng Đoàn từ tập tin"));
     // TODO: handle error case??
 
 }

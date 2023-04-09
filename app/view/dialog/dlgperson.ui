@@ -38,9 +38,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-1500</y>
-        <width>679</width>
-        <height>3161</height>
+        <y>-2093</y>
+        <width>683</width>
+        <height>2845</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -514,13 +514,6 @@
            </item>
           </layout>
          </item>
-         <item row="64" column="0">
-          <widget class="QLabel" name="label_41">
-           <property name="text">
-            <string>Giám sư</string>
-           </property>
-          </widget>
-         </item>
          <item row="27" column="0">
           <widget class="QLabel" name="label_8">
            <property name="text">
@@ -561,26 +554,7 @@
           </layout>
          </item>
          <item row="64" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout_17">
-           <item>
-            <widget class="QLineEdit" name="txtEternalVowsPIC"/>
-           </item>
-           <item>
-            <widget class="QToolButton" name="btnSearchEternalVowsPIC">
-             <property name="text">
-              <string>Tìm</string>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normalon>:/icon/icon/icons8-search-64.png</normalon>
-              </iconset>
-             </property>
-             <property name="toolButtonStyle">
-              <enum>Qt::ToolButtonTextBesideIcon</enum>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          <layout class="QHBoxLayout" name="horizontalLayout_17"/>
          </item>
          <item row="44" column="0">
           <widget class="QLabel" name="label_14">
@@ -749,7 +723,7 @@
          <item row="56" column="0">
           <widget class="QLabel" name="label_38">
            <property name="text">
-            <string>Người đặc trách</string>
+            <string>Người đặc trách nhập tu</string>
            </property>
           </widget>
          </item>
@@ -878,7 +852,7 @@
          <item row="65" column="0">
           <widget class="QLabel" name="label_29">
            <property name="text">
-            <string>Tổng Phụ Trách</string>
+            <string>Trên tay chị Tổng Phụ Trách</string>
            </property>
           </widget>
          </item>
@@ -1203,7 +1177,7 @@
          <item row="58" column="0">
           <widget class="QLabel" name="label_25">
            <property name="text">
-            <string>Người đặc trách</string>
+            <string>Người đặc trách Tiền Tập Viện</string>
            </property>
           </widget>
          </item>
@@ -1289,7 +1263,7 @@
          <item row="55" column="0">
           <widget class="QLabel" name="label_23">
            <property name="text">
-            <string>Ngày nhập tu</string>
+            <string>Ngày nhập dòng</string>
            </property>
           </widget>
          </item>
@@ -1667,7 +1641,7 @@
          <item row="62" column="0">
           <widget class="QLabel" name="label_27">
            <property name="text">
-            <string>Tổng Phụ Trách</string>
+            <string>Trên tay chị Tổng Phụ Trách</string>
            </property>
           </widget>
          </item>

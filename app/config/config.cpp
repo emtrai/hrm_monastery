@@ -65,6 +65,9 @@ QString Config::doGetNextPersonalCode(qint64* code)
         if (!ok) {
             loge("Get sequence number failed, restart from 0");
             seq = 1;
+        } else {
+            logd("Increase '%d' by one", seq);
+            seq++;
         }
     } else {
         logd("get from input");

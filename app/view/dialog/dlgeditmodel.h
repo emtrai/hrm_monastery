@@ -58,6 +58,12 @@ protected:
      */
     virtual bool onValidateData(QString& msg);
 
+private slots:
+
+    void on_txtName_textChanged(const QString &arg1);
+
+    void on_btnChangeCode_clicked();
+
 private:
     Ui::DlgEditModel *ui;
 };

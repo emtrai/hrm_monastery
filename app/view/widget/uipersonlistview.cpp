@@ -38,6 +38,7 @@
 #include "mainwindow.h"
 #include "community.h"
 #include "communityctl.h"
+#include "mainwindow.h"
 
 UIPersonListView::UIPersonListView(QWidget *parent):
     UICommonListView(parent)
@@ -303,13 +304,28 @@ ErrCode UIPersonListView::onChangeCommunity(QMenu *menu, UITableMenuAction *act)
             logd("No. selected person %d", cnt);
 
             mSuspendReloadOnDbUpdate = true;
-            foreach (DbModel* item, items){
-                logd("Add person to community");
-                item->dump();
-                COMMUNITYCTL->addPerson2Community(comm, (Person*) item);
-            }
-            mSuspendReloadOnDbUpdate = false;
-            reload();
+            ret = MainWindow::showProcessingDialog(tr("Đang đổi cộng đoàn"), nullptr,
+               [this, comm, items](ErrCode* err, void* data, DlgWait* dlg) {
+                    foreach (DbModel* item, items){
+                        logd("Add person to community");
+                        item->dump();
+                        COMMUNITYCTL->addPerson2Community(comm, (Person*) item);
+                    }
+                    return nullptr;//nothing to return
+               },
+                [this](ErrCode err, void* data, void* result, DlgWait* dlg) {
+                    logd("Save result %d", err);
+                    this->mSuspendReloadOnDbUpdate = false;
+                    reload();
+                    return err;
+                });
+//            foreach (DbModel* item, items){
+//                logd("Add person to community");
+//                item->dump();
+//                COMMUNITYCTL->addPerson2Community(comm, (Person*) item);
+//            }
+//            mSuspendReloadOnDbUpdate = false;
+//            reload();
             // TODO: implement this
         } else {
             logi("No community selected");

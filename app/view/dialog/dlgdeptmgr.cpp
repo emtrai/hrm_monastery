@@ -56,6 +56,7 @@ DlgDeptMgr::DlgDeptMgr(QWidget *parent) :
 
     loadCourse();
     loadRole();
+    loadStatus();
 }
 
 DlgDeptMgr::~DlgDeptMgr()
@@ -83,6 +84,18 @@ void DlgDeptMgr::loadRole()
     foreach(DbModel* item, list){
         ui->cbRole->addItem(item->name(), item->uid());
     }
+}
+
+void DlgDeptMgr::loadStatus()
+{
+    tracein;
+    ui->cbStatus->clear();
+    const QHash<int, QString>* statuses = DbModel::getModelStatusIdNameMap();
+    logd("the number of status %lld", statuses->count());
+    foreach (int key, statuses->keys()) {
+        ui->cbStatus->addItem(statuses->value(key), key);
+    }
+    traceout;
 }
 
 void DlgDeptMgr::showEvent(QShowEvent *event)
@@ -116,6 +129,7 @@ void DlgDeptMgr::accept()
             mSelectedPersons.append(perdep);
             SET_VAL_FROM_CBOX(ui->cbRole, perdep->setRoleUid, perdep->setRoleName);
             SET_VAL_FROM_CBOX(ui->cbTerm, perdep->setCourseUid, perdep->setCourseName);
+            SET_INT_VAL_FROM_CBOX(ui->cbStatus, perdep->setModelStatus, perdep->setModelStatusName);
             SET_DATE_VAL_FROM_WIDGET(ui->txtStartDate, perdep->setStartDate);
             SET_DATE_VAL_FROM_WIDGET(ui->txtEndDate, perdep->setEndDate);
         }

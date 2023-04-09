@@ -1,4 +1,8 @@
+#Công tác xã hội (nữ tu)
 #id,name,remark
 KHIEM_THI,Khiếm thị,Chăm sóc người khiếm thị
 TRE_MO_COI,Trẻ mồ côi, Chăm sóc trẻ mồ côi
 KHUYET_TAT,Khuyết tật,Chăm sóc người khuyết tật (đao, tự kỷ, etc.)
+DUONG_LAO,Dưỡng lão,Chăm sóc người già
+GIAO_DUC,Giáo dục/dạy học,Giáo dục, dạy học
+SUC_KHOE,Chăm sóc sức khỏe

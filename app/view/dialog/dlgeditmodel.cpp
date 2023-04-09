@@ -106,3 +106,16 @@ bool DlgEditModel::onValidateData(QString &msg)
 {
     return true;
 }
+
+
+void DlgEditModel::on_txtName_textChanged(const QString &arg1)
+{
+    this->onChangeNameIdTxt(ui->txtNameId, arg1);
+}
+
+
+void DlgEditModel::on_btnChangeCode_clicked()
+{
+    this->onEditnameId(ui->txtNameId);
+}
+

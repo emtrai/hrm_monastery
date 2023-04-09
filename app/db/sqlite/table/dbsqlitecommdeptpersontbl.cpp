@@ -101,9 +101,10 @@ QString DbSqliteCommDeptPersonTbl::getSearchQueryStringWithTag(const QString &co
 {
     tracein;
     // TODO: check with condTag????
-    QString queryString = QString("SELECT * FROM %1 LEFT JOIN %2 ON %1.%3 = %2.%4")
+    QString queryString = QString("SELECT *, %2.%5 AS %6 FROM %1 LEFT JOIN %2 ON %1.%3 = %2.%4")
                               .arg(KTableCommDepartPerson, KTablePerson) // 1 & 2
                               .arg(KFieldPersonUid, KFieldUid) // 3 & 4
+                              .arg(KFieldNameId, KFieldPersonNameId) // 5 & 6
         ;
     if (!cond.isEmpty()) {
         queryString += QString(" WHERE %1").arg(cond);
@@ -174,6 +175,7 @@ ErrCode DbSqliteCommDeptPersonTbl::updateModelFromQuery(DbModel *item, const QSq
         model->setCommDeptUid(qry.value(KFieldCommDeptUid).toString());
         model->setRoleUid(qry.value(KFieldRoleUid).toString());
         model->setPersonUid(qry.value(KFieldPersonUid).toString());
+        model->setPersonNameId(qry.value(KFieldPersonNameId).toString());
         model->setPersonName(FULLNAME(qry.value(KFieldFirstName).toString(),
                                       qry.value(KFieldLastName).toString()));
         DbModelHandler* hdl = DB->getModelHandler(KModelHdlRole);
@@ -181,6 +183,7 @@ ErrCode DbSqliteCommDeptPersonTbl::updateModelFromQuery(DbModel *item, const QSq
             DbModel* tmp = hdl->getItem(model->roleUid(), &Role::build);
             if (tmp != nullptr) {
                 model->setRoleName(tmp->name());
+                delete tmp;
             } else {
                 logi("Not found role uid");
             }
@@ -195,6 +198,7 @@ ErrCode DbSqliteCommDeptPersonTbl::updateModelFromQuery(DbModel *item, const QSq
             DbModel* tmp = hdl->getItem(model->courseUid(), &Course::build);
             if (tmp != nullptr) {
                 model->setCourseName(tmp->name());
+                delete tmp;
             } else {
                 logi("Not found course uid");
             }

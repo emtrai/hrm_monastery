@@ -504,6 +504,9 @@ bool DbSqliteTbl::isExist(const DbModel *item)
 
                 // TODO: check sql injection issue
                 foreach (QString field, inFields.keys()) {
+                    if (field == KFieldModelStatus) {
+                        continue;
+                    }
                     // TODO: if value is empty, data may not match
                     // Check if value is empty, for string, it seem '', but for integer,
                     // check again, as this process is string format, stupid
@@ -883,7 +886,7 @@ QString DbSqliteTbl::getAllQueryString(qint64 dbstatus)
 {
     tracein;
     QString cond;
-    logd("status to get all query string 0x%08x", dbstatus);
+    logd("status to get all query string 0x%x", dbstatus);
     if (dbstatus & DB_RECORD_ACTIVE) {
         cond = QString("%1.%2=%3").arg(name(), KFieldDbStatus).arg(DB_RECORD_ACTIVE);
     }
@@ -891,7 +894,7 @@ QString DbSqliteTbl::getAllQueryString(qint64 dbstatus)
         if (!cond.isEmpty()) {
             cond += " OR ";
         }
-        cond = QString("%1.%2=%3").arg(name(), KFieldDbStatus).arg(DB_RECORD_DElETED);
+        cond += QString("%1.%2=%3").arg(name(), KFieldDbStatus).arg(DB_RECORD_DElETED);
     }
     return getSearchQueryString(cond.isEmpty()?nullptr:cond);
 }
@@ -1364,6 +1367,9 @@ ErrCode DbSqliteTbl::search(const QHash<QString, FieldValue> &searchCond,
 
     // TODO: check sql injection issue
     foreach (QString field, searchCond.keys()) {
+        if (field == KFieldModelStatus) {
+            continue;
+        }
         if (searchCond.value(field).dataType == TEXT){
             logd("bind text value, field='%s', value='%s'", STR2CHA(field), STR2CHA(searchCond.value(field).valueString()));
             qry.bindValue( QString(":keyword_%1").arg(field),

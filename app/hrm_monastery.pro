@@ -12,15 +12,17 @@ QT += printsupport
 
 DEFINES += FEATURE_system_sqlite=OFF
 
-CONFIG += console
+
 #DEFINES += TEST_ENABLE
+# disable all for release
+#CONFIG += console
+#DEFINES += DEBUG_TRACE
+#DEFINES += DEBUG_LOG
 DEFINES += LOG_LEVEL=4
-DEFINES += DEBUG_TRACE
-DEFINES += DEBUG_LOG
 
 DEFINES += VER_MAJOR=0
 DEFINES += VER_MINOR=1
-DEFINES += VER_PATCH=2
+DEFINES += VER_PATCH=3
 
 # Supporting provine for person is quite complicated
 # as it need to sync up with country

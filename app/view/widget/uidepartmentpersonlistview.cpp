@@ -65,6 +65,7 @@ ErrCode UIDepartmentPersonListView::onMenuActionAdd(QMenu *menu, UITableMenuActi
                 PersonDept* dept = (PersonDept*) item;
                 if (dept != nullptr) {
                     dept->setCommDeptUid(mCommDept->uid());
+                    dept->setModelStatus(MODEL_ACTIVE);
                     dept->dump();
                     logd("Save item to db");
                     ret = dept->save();
@@ -201,19 +202,25 @@ void UIDepartmentPersonListView::setCommDept(CommunityDept *commDept)
 void UIDepartmentPersonListView::initHeader()
 {
     tracein;
-    mHeader.append(tr("ID"));
+    mHeader.append(tr("Mã Định Danh"));
     mHeader.append(tr("Tên"));
     mHeader.append(tr("Vai trò"));
+    mHeader.append(tr("Trạng thái"));
     mHeader.append(tr("Nhiệm kỳ"));
+    mHeader.append(tr("Ngày bắt đầu"));
+    mHeader.append(tr("Ngày kết thúc"));
 }
 
 void UIDepartmentPersonListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
     PersonDept* model = (PersonDept*) item;
-    tblItem->addValue(QString("%1").arg(item->dbId()));
+    tblItem->addValue(model->personNameId());
     tblItem->addValue(model->personName());
     tblItem->addValue(model->roleName());
+    tblItem->addValue(DbModel::modelStatus2Name((DbModelStatus)model->modelStatus()));
     tblItem->addValue(model->courseName());
+    tblItem->addValue(Utils::date2String(model->startDate(), DEFAULT_FORMAT_YMD));
+    tblItem->addValue(Utils::date2String(model->endDate(), DEFAULT_FORMAT_YMD));
     traceout;
 }

@@ -373,6 +373,12 @@ DbModel *CommunityCtl::doImportOneItem(const QString& importName, int importFile
                 break;
             }
         }
+        if (err == ErrNone && model->nameId().isEmpty() && !model->name().isEmpty()) {
+            QString nameid = Utils::UidFromName(model->name(), NO_VN_MARK_UPPER);
+            logd("auto buid community nameid '%s'", STR2CHA(nameid));
+            model->setNameId(nameid);
+            // TODO: numer is increased, but not save --> may cause much dummy code?
+        }
      }
 
     if (err != ErrNone) {

@@ -49,6 +49,7 @@ public:
 protected:
     void loadCourse();
     void loadRole();
+    void loadStatus();
     virtual void showEvent(QShowEvent *event);
     void accept();
 private slots:

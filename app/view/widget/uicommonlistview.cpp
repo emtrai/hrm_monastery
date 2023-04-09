@@ -177,6 +177,20 @@ void UICommonListView::onAddItem(UITableCellWidgetItem *item)
     traceout;
 }
 
+void UICommonListView::onEditItem(UITableCellWidgetItem *item)
+{
+    tracein;
+    int idx = item->idx();
+    DbModel* comm = item->itemData();
+    if (comm) {
+        MainWindow::showAddEditCommonModel(true, comm, this);
+    } else {
+        loge("Model obj is null");
+        Utils::showErrorBox("Không có thông tin để chỉnh sửa");
+    }
+    traceout;
+}
+
 void UICommonListView::onDbModelReady(ErrCode ret, DbModel *model, DlgCommonEditModel *dlg)
 {
     tracein;

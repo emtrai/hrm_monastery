@@ -1,5 +1,6 @@
 #nameid,name
-gv,Giáo viên
-bs,Bác sĩ
-yt,Y tá
-duoc,Dược
+KHONG_RO,Không rõ
+GIAO_VIEN,Giáo viên
+BAC_SI,Bác sĩ
+Y_TA,Y tá
+DUOC_SI,Dược sĩ

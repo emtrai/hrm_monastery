@@ -1,8 +1,8 @@
 #id,name,remark
-NONE,Không xác định,
+KHONG_XAC_DINH,Không xác định,
 DU_TU,Dự tu,
-NGHI,Ngừng tu,
-KHAN_TAM,Khấn tạm
-KHAN_TRON,Khấn trọn
+NGHI_TU,Ngừng tu,
+TIEN_KHAN,Tiên Khấn
+VINH_KHAN,Vĩnh Khấn
 NGHI_HUU,Nghỉ hưu
-DA_MAT,Đã mất
+AN_NGHI,Đã an nghỉ với Chúa

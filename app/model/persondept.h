@@ -35,6 +35,7 @@ public:
     PersonDept();
     static DbModel* build();
     virtual DbModelBuilder getBuilder() const;
+    virtual void clone(const DbModel* model);
 
     virtual QString toString() const;
 
@@ -80,8 +81,15 @@ public:
     const QString &personName() const;
     void setPersonName(const QString &newPersonName);
 
+    const QString &modelStatusName() const;
+    void setModelStatusName(const QString &newModelStatusName);
+
+    const QString &personNameId() const;
+    void setPersonNameId(const QString &newPersonNameId);
+
 protected:
     virtual DbModelHandler *getDbModelHandler() const;
+    void copy(const PersonDept& model);
 protected:
     QString mRoleUid;
     QString mRoleName;
@@ -89,10 +97,12 @@ protected:
     QString mCourseName;
     qint64 mStartDate;
     qint64 mEndDate;
-    int mStatus;
+    int mModelStatus;
+    QString mModelStatusName;
     QString mCommDeptUid;
     QString mPersonUid;
     QString mPersonName;
+    QString mPersonNameId;
     QString mChangeHistory;
 
 };

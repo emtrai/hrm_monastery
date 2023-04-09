@@ -82,7 +82,7 @@ ErrCode DbSqliteAreaTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qr
 QString DbSqliteAreaTbl::getSearchQueryString(const QString &cond)
 {
     tracein;
-    QString queryString = QString("SELECT *, %2.%5 AS %6, %2.%7 AS %8, %2.%4 AS %9 FROM %1 JOIN %2 ON %1.%3 = %2.%4")
+    QString queryString = QString("SELECT *, %2.%5 AS %6, %2.%7 AS %8, %2.%4 AS %9 FROM %1 LEFT JOIN %2 ON %1.%3 = %2.%4")
                               .arg(name(), KTableCountry)
                               .arg(KFieldCountryUid, KFieldUid)
                               .arg(KFieldName, KFieldCountryName)

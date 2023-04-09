@@ -47,6 +47,7 @@ protected:
     virtual QHash<QString, QString> getFilterKeywords(int fieldId, const QString& fieldText);
     virtual void onViewItem(UITableCellWidgetItem *item);
     virtual void onAddItem(UITableCellWidgetItem *item);
+    virtual void onEditItem(UITableCellWidgetItem *item);
 
     virtual void onDbModelReady(ErrCode ret, DbModel* model, DlgCommonEditModel* dlg);
     virtual DbModel* onNewModel();

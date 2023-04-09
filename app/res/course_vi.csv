@@ -1,4 +1,5 @@
 #nameid, name,coursetype, period,startdate,enddate,remark
+KHONG_XAC_DINH,Không xác định,0,,,,Không xác định khóa/lớp khấn
 1990,Khóa 1990, 0, 1990-2000,,,
 2000,Khóa 2000, 0, 2000-2010,,,
 2000,Khóa 2005, 1, 2005-2010,,,

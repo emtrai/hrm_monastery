@@ -33,7 +33,7 @@
 #include "person.h"
 #include "department.h"
 
-PersonDept::PersonDept()
+PersonDept::PersonDept():mModelStatus(0)
 {
     tracein;
 }
@@ -48,6 +48,18 @@ DbModel *PersonDept::build()
 DbModelBuilder PersonDept::getBuilder() const
 {
     return &PersonDept::build;
+}
+
+void PersonDept::clone(const DbModel *model)
+{
+    tracein;
+    DbModel::clone(model);
+    if (model && model->modelName() == KModelNamePersonDept) {
+        copy(*((PersonDept*)model));
+    } else {
+        loge("cloned failed, model is null or invalid name '%s'", model?STR2CHA(model->toString()):"null");
+    }
+    traceout;
 }
 
 QString PersonDept::toString() const
@@ -123,6 +135,44 @@ DbModelHandler *PersonDept::getDbModelHandler() const
     return DB->getModelHandler(KModelHdlCommDept); // TODO: suitable???
 }
 
+void PersonDept::copy(const PersonDept &model)
+{
+    tracein;
+    mRoleUid = model.mRoleUid;
+    mRoleName = model.mRoleName;
+    mCourseUid = model.mCourseUid;
+    mCourseName = model.mCourseName;
+    mStartDate = model.mStartDate;
+    mEndDate = model.mEndDate;
+    mModelStatusName = model.mModelStatusName;
+    mModelStatus = model.mModelStatus;
+    mCommDeptUid = model.mCommDeptUid;
+    mPersonUid = model.mPersonUid;
+    mPersonName = model.mPersonName;
+    mPersonNameId = model.mPersonNameId;
+    traceout;
+}
+
+const QString &PersonDept::personNameId() const
+{
+    return mPersonNameId;
+}
+
+void PersonDept::setPersonNameId(const QString &newPersonNameId)
+{
+    mPersonNameId = newPersonNameId;
+}
+
+const QString &PersonDept::modelStatusName() const
+{
+    return mModelStatusName;
+}
+
+void PersonDept::setModelStatusName(const QString &newModelStatusName)
+{
+    mModelStatusName = newModelStatusName;
+}
+
 const QString &PersonDept::personName() const
 {
     return mPersonName;
@@ -165,12 +215,12 @@ void PersonDept::setCommDeptUid(const QString &newCommDeptUid)
 
 int PersonDept::modelStatus() const
 {
-    return mStatus;
+    return mModelStatus;
 }
 
 void PersonDept::setModelStatus(int newStatus)
 {
-    mStatus = newStatus;
+    mModelStatus = newStatus;
 }
 
 qint64 PersonDept::endDate() const

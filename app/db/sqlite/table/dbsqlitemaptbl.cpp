@@ -78,7 +78,7 @@ QList<DbModel *> DbSqliteMapTbl::getListItems(const QString &mapTblName,
         return QList<DbModel*>();
     }
     logi("uid '%s'", uid.toStdString().c_str());
-    QString queryString = QString("SELECT %6 FROM %1 JOIN %2 ON %1.%3 = %2.%4 WHERE %1.%5 = :uid")
+    QString queryString = QString("SELECT %6 FROM %1 LEFT JOIN %2 ON %1.%3 = %2.%4 WHERE %1.%5 = :uid")
                               .arg(mapTblName, modelTblName)
                               .arg(fieldUid2Join, fieldModelUid, fieldUid1Cond)
                               .arg(selectedField)

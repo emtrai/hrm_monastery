@@ -79,7 +79,7 @@ void UICommunityListView::updateItem(DbModel *item, UITableItem *tblItem, int id
     UICommonListView::updateItem(item, tblItem, idx);
     Community* model = (Community*) item;
     tblItem->addValue(DbModel::modelStatus2Name(model->getStatus()));
-    tblItem->addValue(Utils::date2String(model->feastDate(), DATE_FORMAT_DM));
+    tblItem->addValue(Utils::date2String(model->feastDate(), DEFAULT_FORMAT_MD));
     tblItem->addValue(model->missionNameString());
     tblItem->addValue(model->areaName());
     tblItem->addValue(model->currentCEOName());

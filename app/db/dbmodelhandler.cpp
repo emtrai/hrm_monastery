@@ -147,7 +147,7 @@ void DbModelHandler::notifyDataChange(DbModel *model, int type, ErrCode err)
     tracein;
     foreach (onDbModelHandlerListener* listener, mListeners) {
         if (listener) {
-            loge("Call listener '%s'", STR2CHA(listener->getName()));
+            logi("Call listener '%s'", STR2CHA(listener->getName()));
             listener->onDbModelHandlerDataUpdate(model, type, err);
         }
     }

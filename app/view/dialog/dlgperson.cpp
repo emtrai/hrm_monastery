@@ -334,7 +334,7 @@ Person *DlgPerson::buildPerson()
     SET_VAL_FROM_TEXTBOX(ui->txtVowsCEO, KItemUid, per->setVowsCEOUid, per->setVowsCEOName);
 
     SET_DATE_VAL_FROM_WIDGET(ui->txtEternalVowsDate, per->setEternalVowsDate);
-    SET_VAL_FROM_TEXTBOX(ui->txtEternalVowsPIC, KItemUid, per->setEternalVowsPICUid, per->setEternalVowsPICName);
+//    SET_VAL_FROM_TEXTBOX(ui->txtEternalVowsPIC, KItemUid, per->setEternalVowsPICUid, per->setEternalVowsPICName);
     SET_VAL_FROM_TEXTBOX(ui->txtEternalVowsCEO, KItemUid, per->setEternalVowsCEOUid, per->setEternalVowsCEOName);
 
     SET_DATE_VAL_FROM_WIDGET(ui->txtBankDate, per->setBankDate);
@@ -493,8 +493,8 @@ ErrCode DlgPerson::fromPerson(const Person *model)
 
     ui->txtEternalVowsDate->setText(Utils::date2String(per->eternalVowsDate()));
     //cbEternalVowsPIC
-    SET_TEXTBOX_FROM_VALUE(ui->txtEternalVowsPIC, KItemUid,
-                           per->eternalVowsPICUid(), per->eternalVowsPICName());
+//    SET_TEXTBOX_FROM_VALUE(ui->txtEternalVowsPIC, KItemUid,
+//                           per->eternalVowsPICUid(), per->eternalVowsPICName());
     //cbEternalVowsCEO
     SET_TEXTBOX_FROM_VALUE(ui->txtEternalVowsCEO, KItemUid,
                            per->eternalVowsCEOUid(), per->eternalVowsCEOName());
@@ -1345,7 +1345,7 @@ void DlgPerson::on_btnSearchVowsCEO_clicked()
 void DlgPerson::on_btnSearchEternalVowsPIC_clicked()
 {
     tracein;
-    searchPerson(ui->txtEternalVowsPIC);
+//    searchPerson(ui->txtEternalVowsPIC);
     traceout;
 
 }

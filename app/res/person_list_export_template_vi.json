@@ -16,7 +16,40 @@
         "id":"NOI_SINH"
         },
         {
+        "id":"KHOA"
+        },
+        {
         "id":"NGAY_BON_MANG"
+        },
+        {
+        "id":"NGAY_GIA_NHAP"
+        },
+        {
+        "id":"NGAY_TIEN_TAP_VIEN"
+        },
+        {
+        "id":"NGAY_TAP_VIEN"
+        },
+        {
+        "id":"NGAY_TIEN_KHAN"
+        },
+        {
+        "id":"NGAY_VINH_KHAN"
+        },
+        {
+        "id":"NGAY_NGAN_KHANH"
+        },
+        {
+        "id":"NGAY_KIM_KHANH"
+        },
+        {
+        "id":"NGAY_VINH_KHANH"
+        },
+        {
+        "id":"NGAY_MAT"
+        },
+        {
+        "id":"NGAY_NGHI_HUU"
         },
         {
         "id":"DIEN_THOAI"
@@ -32,9 +65,6 @@
         },
         {
         "id":"NOI_CAP_CCCD"
-        },
-        {
-        "id":"KHOA"
         },
         {
         "id":"MA_HOC_VAN"

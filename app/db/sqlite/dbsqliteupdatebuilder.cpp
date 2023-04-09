@@ -48,7 +48,7 @@ DbSqliteUpdateBuilder *DbSqliteUpdateBuilder::addValue(const QString &field, qin
     tracein;
     logd("add field int %s, value %d", field.toStdString().c_str(), value);
     if (!mValue.contains(field)) {
-        mValue.insert(field, FieldValue(QString("%1").arg(value), INT64));
+        mValue.insert(field, FieldValue(value));
     } else {
         logi("Field %s already exist", field.toStdString().c_str());
     }

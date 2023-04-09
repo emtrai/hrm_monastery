@@ -61,7 +61,11 @@ void UICommDeptListView::initHeader()
 {
     tracein;
     UICommonListView::initHeader();
-//    mHeader.append(tr("Cộng đoàn"));
+    mHeader.append(tr("Cộng đoàn"));
+    mHeader.append(tr("Tình trạng"));
+    mHeader.append(tr("Ngày thành lập"));
+    mHeader.append(tr("Email"));
+    mHeader.append(tr("Điện thoại"));
     traceout;
 }
 
@@ -69,9 +73,11 @@ void UICommDeptListView::updateItem(DbModel *item, UITableItem *tblItem, int idx
 {
     tracein;
     UICommonListView::updateItem(item, tblItem, idx);
-//    CommunityDept* dept = (CommunityDept*)item;
-
-//    tblItem->addValue(dept->communityUid());
+    CommunityDept* dept = (CommunityDept*)item;
+    tblItem->addValue(dept->communityName());
+    tblItem->addValue(DbModel::modelStatus2Name((DbModelStatus)dept->modelStatus()));
+    tblItem->addValue(dept->email());
+    tblItem->addValue(dept->tel());
     traceout;
 }
 

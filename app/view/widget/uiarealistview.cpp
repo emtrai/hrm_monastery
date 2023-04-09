@@ -69,7 +69,7 @@ QList<DbModel *> UIAreaListView::getListItem()
     tracein;
 //    return AREACTL->getAllItems();
     // TODO: temporary change to this api, should use getAllItems
-    return AREACTL->getAllItems();
+    return AREACTL->getAllItems(true);
 }
 
 DbModel *UIAreaListView::onNewModel()

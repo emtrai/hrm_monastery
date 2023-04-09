@@ -136,7 +136,7 @@ QString exportItem2Name(const QString &item, bool* isOk)
         s_item2Name.insert(KItemIDcard, QObject::tr("Căn cước công dân"));
         s_item2Name.insert(KItemIDcardIssueDate, QObject::tr("Ngày cấp CCCD"));
         s_item2Name.insert(KItemIDcardIssuer, QObject::tr("Nơi cấp CCCD"));
-        s_item2Name.insert(KItemCourse, QObject::tr("Khóa"));
+        s_item2Name.insert(KItemCourse, QObject::tr("Khóa/Lớp khấn"));
         s_item2Name.insert(KItemEduNameId, QObject::tr("Mã học vấn"));
         s_item2Name.insert(KItemAddress, QObject::tr("Địa chỉ"));
         s_item2Name.insert(KItemChurchAddress, QObject::tr("Giáo xứ"));
@@ -144,6 +144,16 @@ QString exportItem2Name(const QString &item, bool* isOk)
         s_item2Name.insert(KItemHollyName, QObject::tr("Tên Thánh"));
         s_item2Name.insert(KItemBirthday, QObject::tr("Ngày sinh"));
         s_item2Name.insert(KItemBirthplace, QObject::tr("Nơi sinh"));
+        s_item2Name.insert(KItemJoinDate, QObject::tr("Ngày nhập tu"));
+        s_item2Name.insert(KItemPreTrainDate, QObject::tr("Ngày gia nhập Tiền Tập Viện"));
+        s_item2Name.insert(KItemTrainDate, QObject::tr("Ngày gia nhập Tập Viện"));
+        s_item2Name.insert(KItemVowsDate, QObject::tr("Ngày Tiên Khấn"));
+        s_item2Name.insert(KItemEternalVowsDate, QObject::tr("Ngày Vĩnh Khấn"));
+        s_item2Name.insert(KItemDeadDate, QObject::tr("Ngày an nghỉ"));
+        s_item2Name.insert(KItemRetireDate, QObject::tr("Ngày nghỉ hưu"));
+        s_item2Name.insert(KItemBankDate, QObject::tr("Ngày Ngân Khánh"));
+        s_item2Name.insert(KItemGoldenDate, QObject::tr("Ngày Kim khánh"));
+        s_item2Name.insert(KItemEternalDate, QObject::tr("Ngày Vĩnh khánh"));
 
         initialized = true;
     }

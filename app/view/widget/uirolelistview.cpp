@@ -41,6 +41,11 @@ UIRoleListView::~UIRoleListView()
     tracein;
 }
 
+QString UIRoleListView::getName()
+{
+    return "UIRoleListView";
+}
+
 QString UIRoleListView::getTitle()
 {
     return tr("Vai trò/vị trí");

@@ -30,6 +30,7 @@ class UIRoleListView : public UICommonListView
 public:
     explicit UIRoleListView(QWidget *parent = nullptr);
     virtual ~UIRoleListView();
+    virtual QString getName();
 protected:
 
     virtual int getViewType() { return VIEW_ROLE;}

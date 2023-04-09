@@ -3,7 +3,7 @@
         {
         "nameid":"HOI_DONG",
         "parent":"",
-        "area":"VN_NT",
+        "area":"",
         "name":"Hội dòng",
         "brief":"",
         "church":"",
@@ -15,14 +15,14 @@
         "establishday":"",
         "closeday":"",
         "status":"2",
-        "mission":"GIAO_DUC",
+        "mission":"",
         "email":"terkimsac@yahoo.com",
         "remark":""
         },
         {
         "nameid":"CD_THANH_GIA",
         "parent":"HOI_DONG",
-        "area":"VN_BMT",
+        "area":"",
         "name":"CĐ. THÁNH GIA",
         "brief":"",
         "church":"GX. THÁNH GIA",
@@ -35,13 +35,13 @@
         "closeday":"",
         "status":"2",
         "mission":"GIAO_DUC",
-        "email":"terkimsac@yahoo.com",
+        "email":"",
         "remark":""
         },
         {
         "nameid":"CD_BONAVENTURA",
         "parent":"HOI_DONG",
-        "area":"VN_BMT",
+        "area":"",
         "name":"CĐ. BONAVENTURA",
         "brief":"",
         "church":"GX. PHƯỚC HÒA",
@@ -53,7 +53,7 @@
         "establishday":"",
         "closeday":"",
         "status":"2",
-        "mission":"SUC_KHOE",
+        "mission":"Y_TE",
         "email":"mnttanhdao@yahoo.com.vn"
         }
     ]
