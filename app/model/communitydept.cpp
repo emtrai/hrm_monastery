@@ -51,6 +51,36 @@ QString CommunityDept::modelName() const
     return KModelNameCommDept;
 }
 
+void CommunityDept::clone(const DbModel *model)
+{
+    DbModel::clone(model);
+    if (model && model->modelName() == KModelNameCommDept) {
+        CommunityDept* comm = (CommunityDept*)model;
+        mDepartmentUid = comm->mDepartmentUid;
+        mDepartmentDbId = comm->mDepartmentDbId;
+        mDepartmentNameId = comm->mDepartmentNameId;
+        mDepartmentName = comm->mDepartmentName;
+        mCommunityUid = comm->mCommunityUid;
+        mCommunityNameId = comm->mCommunityNameId;
+        mCommunityDbId = comm->mCommunityDbId;
+        mCommunityName = comm->mCommunityName;
+        mEstablishDate = comm->mEstablishDate;
+        mClosedDate = comm->mClosedDate;
+        mEmail = comm->mEmail;
+        mAddr = comm->mAddr;
+        mTel = comm->mTel;
+        mBrief = comm->mBrief;
+        mStatus = comm->mStatus;
+        mModelStatusName = comm->mModelStatusName;
+    }
+}
+
+DbModel *CommunityDept::clone() const
+{
+    traced;
+    return DbModel::clone();
+}
+
 qint64 CommunityDept::establishDate() const
 {
     return mEstablishDate;

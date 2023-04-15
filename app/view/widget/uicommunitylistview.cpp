@@ -233,7 +233,6 @@ ErrCode UICommunityListView::onMenuActionListAllPerson(QMenu *menu, UITableMenuA
 
         logd("community to view person %s", STR2CHA(community->toString()));
         view->setCommunity(community);
-        view->setTitle(QString(tr("Danh sách nữ tu cộng đoàn %1").arg(community->name())));
         MainWindow::getInstance()->switchView(view);
     } else {
         loge("no community info");

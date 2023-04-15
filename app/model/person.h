@@ -418,6 +418,9 @@ public:
     const QString &trainPICNameId() const;
     void setTrainPICNameId(const QString &newTrainPICNameId);
 
+    const QString &communityNameId() const;
+    void setCommunityNameId(const QString &newCommunityNameId);
+
 protected:
     virtual DbModelHandler *getDbModelHandler() const;
     virtual const QString exportTemplatePath(FileExporter* exporter, QString* ftype = nullptr) const;
@@ -491,7 +494,8 @@ protected:
 
     //community (current)
     QString mCommunityUid;
-    QString mCommunityName;
+    QString mCommunityName; // just for display
+    QString mCommunityNameId; // just for display
 
     // dad
     QString mDadName;

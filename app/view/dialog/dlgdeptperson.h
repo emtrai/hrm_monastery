@@ -14,31 +14,36 @@
  * limitations under the License.
  *
  *
- * Filename: dlgdeptmgr.h
+ * Filename: dlgdeptperson.h
  * Author: Anh, Ngo Huy
  * Created date:10/22/2022
  * Brief:
  */
-#ifndef DLGDEPTMGR_H
-#define DLGDEPTMGR_H
+#ifndef DLGDEPTPERSON_H
+#define DLGDEPTPERSON_H
 
 #include <QDialog>
+#include "dlgcommoneditmodel.h"
 
 namespace Ui {
-class DlgDeptMgr;
+class DlgDeptPerson;
 }
 class Person;
 class PersonDept;
 class DbModel;
 
-class DlgDeptMgr : public QDialog
+class DlgDeptPerson : public DlgCommonEditModel
 {
     Q_OBJECT
+    DLG_BUILDER(DlgDeptPerson)
 
 public:
-    explicit DlgDeptMgr(QWidget *parent = nullptr);
-    ~DlgDeptMgr();
+    explicit DlgDeptPerson(QWidget *parent = nullptr);
+    ~DlgDeptPerson();
+    virtual void setupUI();
 
+    virtual ErrCode buildModel(DbModel* model, QString& errMsg);
+    virtual ErrCode fromModel(const DbModel* model);
 
     /**
      * @brief return selected item. Caller must free data after use
@@ -46,20 +51,35 @@ public:
      */
     QList<DbModel *> selectedPersons() const;
 
+//    void setCommDeptUid(const QString &newCommDeptUid);
+
+//    void setCommDept(DbModel *newCommDept);
+
+    void setCommDeptUid(const QString &newCommDeptUid);
+
+    void setCommDeptNameId(const QString &newCommDeptNameId);
+
 protected:
+    virtual DbModel* newModel();
+    virtual bool onValidateData(QString& msg);
     void loadCourse();
     void loadRole();
     void loadStatus();
-    virtual void showEvent(QShowEvent *event);
-    void accept();
+//    virtual void showEvent(QShowEvent *event);
+//    void accept();
 private slots:
     void on_btnSearch_clicked();
 
+//    void on_btnAllPeople_clicked();
+//    void updatePeopleList(const QList<DbModel*>& list);
+
 private:
-    Ui::DlgDeptMgr *ui;
+    Ui::DlgDeptPerson *ui;
     QList<DbModel*> mSelectedPersons;
     QList<DbModel*> mListPerson;
     bool mIsMultiSelection;
+    QString mCommDeptUid;
+    QString mCommDeptNameId;
 };
 
-#endif // DLGDEPTMGR_H
+#endif // DLGDEPTPERSON_H

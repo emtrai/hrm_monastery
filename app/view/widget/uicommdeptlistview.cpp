@@ -130,7 +130,9 @@ ErrCode UICommDeptListView::onMenuActionListPerson(QMenu *menu, UITableMenuActio
         UIDepartmentPersonListView* view = (UIDepartmentPersonListView*)
             UITableViewFactory::getView(ViewType::VIEW_DEPARTMENT_PERSON);
 
-        view->setCommDept(item);
+        view->setCommDept(item);;
+
+        view->setTitle(QString(tr("Thành viên phòng ban %1 cộng đoàn %2")).arg(item->departmentName(), item->communityName()));
         MainWindow::getInstance()->switchView(view);
     } else {
         loge("no department info");

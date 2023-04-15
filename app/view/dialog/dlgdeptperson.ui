@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>DlgDeptMgr</class>
- <widget class="QDialog" name="DlgDeptMgr">
+ <class>DlgDeptPerson</class>
+ <widget class="QDialog" name="DlgDeptPerson">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -29,29 +29,20 @@
         <number>0</number>
        </property>
        <item row="0" column="0">
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="label_7">
          <property name="text">
-          <string>Vai trò</string>
+          <string>Nữ tu</string>
          </property>
         </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Nhiệm kì</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QComboBox" name="cbTerm"/>
        </item>
        <item row="0" column="1">
-        <widget class="QComboBox" name="cbRole"/>
-       </item>
-       <item row="6" column="1">
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
-          <widget class="QLineEdit" name="txtSearch"/>
+          <widget class="QLineEdit" name="txtSearch">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QPushButton" name="btnSearch">
@@ -67,24 +58,64 @@
          </item>
         </layout>
        </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="label_4">
+       <item row="2" column="0">
+        <widget class="QLabel" name="label">
          <property name="text">
-          <string>Ghi chú</string>
+          <string>Vai trò</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
+       <item row="2" column="1">
+        <widget class="QComboBox" name="cbRole"/>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Nhiệm kì</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QComboBox" name="cbTerm"/>
+       </item>
+       <item row="4" column="0">
         <widget class="QLabel" name="label_3">
          <property name="text">
           <string>Trạng thái</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
+       <item row="4" column="1">
         <widget class="QComboBox" name="cbStatus"/>
        </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Ngày bắt đầu</string>
+         </property>
+        </widget>
+       </item>
        <item row="5" column="1">
+        <widget class="QLineEdit" name="txtStartDate"/>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Ngày kết thúc</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="QLineEdit" name="txtEndDate"/>
+       </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>Ghi chú</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1">
         <widget class="QPlainTextEdit" name="txtRemark">
          <property name="frameShape">
           <enum>QFrame::StyledPanel</enum>
@@ -94,30 +125,21 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_5">
-         <property name="text">
-          <string>Ngày bắt đầu</string>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="txtNameId">
+         <property name="readOnly">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_6">
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_8">
          <property name="text">
-          <string>Ngày kết thúc</string>
+          <string>Mã định danh</string>
          </property>
         </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QLineEdit" name="txtStartDate"/>
-       </item>
-       <item row="4" column="1">
-        <widget class="QLineEdit" name="txtEndDate"/>
        </item>
       </layout>
-     </item>
-     <item>
-      <widget class="QTableWidget" name="tblList"/>
      </item>
     </layout>
    </item>
@@ -138,7 +160,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>DlgDeptMgr</receiver>
+   <receiver>DlgDeptPerson</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -154,7 +176,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>DlgDeptMgr</receiver>
+   <receiver>DlgDeptPerson</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

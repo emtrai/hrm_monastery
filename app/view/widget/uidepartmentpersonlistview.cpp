@@ -29,7 +29,7 @@
 #include "communitydept.h"
 #include "communitydeptctl.h"
 #include "utils.h"
-#include "dialog/dlgdeptmgr.h"
+#include "dialog/dlgdeptperson.h"
 #include "person.h"
 #include "persondept.h"
 
@@ -44,99 +44,139 @@ UIDepartmentPersonListView::UIDepartmentPersonListView(QWidget *parent):
 UIDepartmentPersonListView::~UIDepartmentPersonListView()
 {
     tracein;
-}
-
-
-ErrCode UIDepartmentPersonListView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act)
-{
-    tracein;
-    DlgDeptMgr * dlg = new DlgDeptMgr();
-    if (dlg == nullptr) {
-        loge("Open dlg DlgDeptMgr fail, No memory");
-        return ErrNone; // TODO: open dlg??
+    if (mCommDept) {
+        delete mCommDept;
+        mCommDept = nullptr;
     }
-
-    if (dlg->exec() == QDialog::Accepted){
-        QList<DbModel*> list = dlg->selectedPersons();
-        ErrCode ret = ErrNone;
-        int cnt = 0;
-        if (list.count() > 0) {
-            foreach (DbModel* item, list) {
-                PersonDept* dept = (PersonDept*) item;
-                if (dept != nullptr) {
-                    dept->setCommDeptUid(mCommDept->uid());
-                    dept->setModelStatus(MODEL_ACTIVE);
-                    dept->dump();
-                    logd("Save item to db");
-                    ret = dept->save();
-                    logi("Save item result %d", ret); // TODO: check return value if one fail, what happend???
-                    if (ret == ErrNone){
-                        cnt ++;
-                    } else {
-                        loge("Add per %s to dep %s failed %d", dept->personName().toStdString().c_str(),
-                             dept->uid().toStdString().c_str(), ret);
-                    }
-                }
-            }
-        } else {
-            logi("Nothing selecetd");
-        }
-
-
-        logd("Add %d per", cnt);
-        if (cnt > 0) {
-            logd("reload data");
-            reload();
-        }
-
-//        QList<Person *>  list = dlg->personList();
-//        logd("Selected %d per ", list.count());
-//        int cnt = 0;
-//        if (list.count() > 0) {
-//            foreach(Person* per, list) {
-//                logd("Add per %s to comm %s ", per->getFullName().toStdString().c_str(),
-//                     community()->name().toStdString().c_str());
-//                ErrCode ret = CommunityCtl::getInstance()->addPerson2Community(community(), per);
-//                logd("Add comm vs per ret=%d", ret);
-//                if (ret == ErrNone){
-//                    cnt ++;
-//                } else {
-//                    loge("Add per %s to comm %s failed %d", per->getFullName().toStdString().c_str(),
-//                         community()->name().toStdString().c_str(), ret);
-//                }
-//            }
-//            logd("Add %d per", cnt);
-//            if (cnt > 0) {
-//                logd("reload data");
-//                reload();
-//            }
-        } else {
-            logi("Nothing to add to department");
-        }
-
-//    }
-    delete dlg;
-    return ErrNone;
-}
-
-ErrCode UIDepartmentPersonListView::onMenuActionDelete(QMenu *menu, UITableMenuAction *act)
-{
-    tracein;
-    // TODO: handle it
-    return ErrNone;
-}
-
-ErrCode UIDepartmentPersonListView::onMenuActionView(QMenu *menu, UITableMenuAction *act)
-{
-    tracein;
-    // TODO: handle it
-    return ErrNone;
 }
 
 DbModel *UIDepartmentPersonListView::onNewModel()
 {
     // TODO: handle it
     return nullptr;
+}
+
+QString UIDepartmentPersonListView::getTitle()
+{
+    tracein;
+    QString title;
+    if (mCommDept) {
+        title = QString(tr("Thành viên phòng ban %1 cộng đoàn %2")).arg(mCommDept->departmentName(), mCommDept->communityName());
+    } else {
+        loge("no common dept");
+        title = QString(tr("Thành viên phòng ban"));
+    }
+    traceout;
+    return title;
+}
+
+void UIDepartmentPersonListView::onViewItem(UITableCellWidgetItem *item)
+{
+
+}
+
+void UIDepartmentPersonListView::onAddItem(UITableCellWidgetItem *item)
+{
+    tracein;
+    DlgDeptPerson* dlg = DlgDeptPerson::build(this, true, nullptr, this);
+    dlg->setCommDeptUid(mCommDept->uid());
+    dlg->setCommDeptNameId(mCommDept->nameId());
+//    if (mCommDept) {
+//        dlg->setCommDept(mCommDept);
+//        dlg->setCommDeptUid(mCommDept->uid());
+//    }
+    dlg->exec();
+    delete dlg;
+    traceout;
+//    tracein;
+//    DlgDeptPerson * dlg = new DlgDeptPerson();
+//    if (dlg == nullptr) {
+//        loge("Open dlg DlgDeptPerson fail, No memory");
+//    }
+
+//    if (dlg->exec() == QDialog::Accepted){
+//        QList<DbModel*> list = dlg->selectedPersons();
+//        ErrCode ret = ErrNone;
+//        int cnt = 0;
+//        if (list.count() > 0) {
+//            foreach (DbModel* item, list) {
+//                PersonDept* dept = (PersonDept*) item;
+//                if (dept != nullptr) {
+//                    if (mCommDept){
+//                        dept->setCommDeptUid(mCommDept->uid());
+//                    }
+//                    dept->setModelStatus(MODEL_ACTIVE);
+//                    dept->dump();
+//                    logd("Save item to db");
+//                    ret = dept->save();
+//                    logi("Save item result %d", ret); // TODO: check return value if one fail, what happend???
+//                    if (ret == ErrNone){
+//                        cnt ++;
+//                    } else {
+//                        loge("Add per %s to dep %s failed %d", dept->personName().toStdString().c_str(),
+//                             dept->uid().toStdString().c_str(), ret);
+//                    }
+//                }
+//            }
+//        } else {
+//            logi("Nothing selecetd");
+//        }
+
+
+//        logd("Add %d per", cnt);
+//        if (cnt > 0) {
+//            logd("reload data");
+//            reload();
+//        }
+
+////        QList<Person *>  list = dlg->personList();
+////        logd("Selected %d per ", list.count());
+////        int cnt = 0;
+////        if (list.count() > 0) {
+////            foreach(Person* per, list) {
+////                logd("Add per %s to comm %s ", per->getFullName().toStdString().c_str(),
+////                     community()->name().toStdString().c_str());
+////                ErrCode ret = CommunityCtl::getInstance()->addPerson2Community(community(), per);
+////                logd("Add comm vs per ret=%d", ret);
+////                if (ret == ErrNone){
+////                    cnt ++;
+////                } else {
+////                    loge("Add per %s to comm %s failed %d", per->getFullName().toStdString().c_str(),
+////                         community()->name().toStdString().c_str(), ret);
+////                }
+////            }
+////            logd("Add %d per", cnt);
+////            if (cnt > 0) {
+////                logd("reload data");
+////                reload();
+////            }
+//        } else {
+//            logi("Nothing to add to department");
+//        }
+
+////    }
+//    delete dlg;
+}
+
+void UIDepartmentPersonListView::onEditItem(UITableCellWidgetItem *item)
+{
+    tracein;
+    DbModel* model = item->itemData();
+    if (model){
+        PersonDept* per = (PersonDept*)model;
+        DlgDeptPerson* dlg = DlgDeptPerson::build(this, true, per, this);
+        dlg->setCommDeptUid(mCommDept->uid());
+        dlg->setCommDeptNameId(mCommDept->nameId());
+//        dlg->setCommDeptUid(mCommDept->uid());
+//        dlg->setCommDept(mCommDept);
+        dlg->exec();
+        delete dlg;
+
+    } else {
+        loge("Invalid item data");
+        // TODO: popup message???
+    }
+    traceout;
 }
 
 
@@ -195,7 +235,16 @@ ErrCode UIDepartmentPersonListView::onLoad()
 
 void UIDepartmentPersonListView::setCommDept(CommunityDept *commDept)
 {
-    mCommDept = commDept;
+    tracein;
+    if (mCommDept) {
+        delete mCommDept;
+        mCommDept = nullptr;
+    }
+    if (commDept) {
+        logd("clone new one");
+        mCommDept = (CommunityDept*)commDept->clone();
+    }
+    traceout;
 }
 
 
@@ -203,6 +252,7 @@ void UIDepartmentPersonListView::initHeader()
 {
     tracein;
     mHeader.append(tr("Mã Định Danh"));
+    mHeader.append(tr("Mã Định Danh Nữ Tu"));
     mHeader.append(tr("Tên"));
     mHeader.append(tr("Vai trò"));
     mHeader.append(tr("Trạng thái"));
@@ -215,6 +265,7 @@ void UIDepartmentPersonListView::updateItem(DbModel *item, UITableItem *tblItem,
 {
     tracein;
     PersonDept* model = (PersonDept*) item;
+    tblItem->addValue(model->nameId());
     tblItem->addValue(model->personNameId());
     tblItem->addValue(model->personName());
     tblItem->addValue(model->roleName());

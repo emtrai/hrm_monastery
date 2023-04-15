@@ -15,9 +15,9 @@ DEFINES += FEATURE_system_sqlite=OFF
 
 #DEFINES += TEST_ENABLE
 # disable all for release
-#CONFIG += console
-#DEFINES += DEBUG_TRACE
-#DEFINES += DEBUG_LOG
+CONFIG += console
+DEFINES += DEBUG_TRACE
+DEFINES += DEBUG_LOG
 DEFINES += LOG_LEVEL=4
 
 DEFINES += VER_MAJOR=0
@@ -212,7 +212,7 @@ SOURCES += \
     view/dialog/dlgcountry.cpp \
     view/dialog/dlgcourse.cpp \
     view/dialog/dlgdepartment.cpp \
-    view/dialog/dlgdeptmgr.cpp \
+    view/dialog/dlgdeptperson.cpp \
     view/dialog/dlgeditmodel.cpp \
     view/dialog/dlgethnic.cpp \
     view/dialog/dlghtmlviewer.cpp \
@@ -408,7 +408,7 @@ HEADERS += \
     view/dialog/dlgcountry.h \
     view/dialog/dlgcourse.h \
     view/dialog/dlgdepartment.h \
-    view/dialog/dlgdeptmgr.h \
+    view/dialog/dlgdeptperson.h \
     view/dialog/dlgeditmodel.h \
     view/dialog/dlgethnic.h \
     view/dialog/dlghtmlviewer.h \
@@ -459,7 +459,7 @@ FORMS += \
     view/dialog/dlgcountry.ui \
     view/dialog/dlgcourse.ui \
     view/dialog/dlgdepartment.ui \
-    view/dialog/dlgdeptmgr.ui \
+    view/dialog/dlgdeptperson.ui \
     view/dialog/dlgeditmodel.ui \
     view/dialog/dlgethnic.ui \
     view/dialog/dlghtmlviewer.ui \

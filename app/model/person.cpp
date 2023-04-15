@@ -199,6 +199,7 @@ void Person::clone(const DbModel *model)
 
         mCommunityUid = per->communityUid();
         mCommunityName = per->communityName();
+        mCommunityNameId = per->communityNameId();
         mCurrentWorkUid = per->currentWorkUid();
         mCurrentWorkName = per->currentWorkName();
         mWorkHistory = per->workHistory();
@@ -384,6 +385,9 @@ void Person::initExportFields()
     }); //"work_history";
     mExportCallbacks.insert(KItemCommunity, [this](const QString& item){
         return this->communityName();
+    }); //"community";
+    mExportCallbacks.insert(KItemCommunityNameId, [this](const QString& item){
+        return this->communityNameId();
     }); //"community";
     // TODO: community history
     mExportCallbacks.insert(KItemCommunityHistory, nullptr); //"community_history";
@@ -1029,6 +1033,16 @@ ErrCode Person::prepare2Save()
     }
     traceret(ret);
     return ret;
+}
+
+const QString &Person::communityNameId() const
+{
+    return mCommunityNameId;
+}
+
+void Person::setCommunityNameId(const QString &newCommunityNameId)
+{
+    mCommunityNameId = newCommunityNameId;
 }
 
 const QString &Person::trainPICNameId() const

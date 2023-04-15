@@ -87,6 +87,9 @@ public:
     const QString &personNameId() const;
     void setPersonNameId(const QString &newPersonNameId);
 
+    const QString &commDeptNameId() const;
+    void setCommDeptNameId(const QString &newCommDeptNameId);
+
 protected:
     virtual DbModelHandler *getDbModelHandler() const;
     void copy(const PersonDept& model);
@@ -100,6 +103,7 @@ protected:
     int mModelStatus;
     QString mModelStatusName;
     QString mCommDeptUid;
+    QString mCommDeptNameId; // not store to db
     QString mPersonUid;
     QString mPersonName;
     QString mPersonNameId;

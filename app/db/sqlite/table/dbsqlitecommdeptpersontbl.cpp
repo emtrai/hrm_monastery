@@ -28,6 +28,7 @@
 #include "logger.h"
 #include "dbsqlitetablebuilder.h"
 #include "dbsqliteinsertbuilder.h"
+#include "dbsqliteupdatebuilder.h"
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QHash>
@@ -173,6 +174,16 @@ ErrCode DbSqliteCommDeptPersonTbl::updateModelFromQuery(DbModel *item, const QSq
         PersonDept* model = (PersonDept*) item;
 
         model->setCommDeptUid(qry.value(KFieldCommDeptUid).toString());
+        DbModelHandler* hdlCommDept = DB->getModelHandler(KModelHdlCommDept);
+        if (!model->commDeptUid().isEmpty()) {
+            DbModel* commDept = hdlCommDept->getByUid(model->commDeptUid());
+            if (commDept) {
+                model->setCommDeptNameId(commDept->nameId());
+                delete commDept;
+            } else {
+                loge("not found Comm Dept uid '%s'", STR2CHA(model->commDeptUid()));
+            }
+        }
         model->setRoleUid(qry.value(KFieldRoleUid).toString());
         model->setPersonUid(qry.value(KFieldPersonUid).toString());
         model->setPersonNameId(qry.value(KFieldPersonNameId).toString());
@@ -214,6 +225,39 @@ ErrCode DbSqliteCommDeptPersonTbl::updateModelFromQuery(DbModel *item, const QSq
 
     } else {
         loge("Invalid mapp model '%s', do nothing", modelName.toStdString().c_str());
+    }
+    traceout;
+    return err;
+}
+
+ErrCode DbSqliteCommDeptPersonTbl::updateTableField(DbSqliteUpdateBuilder *builder, const QList<QString> &updateField, const DbModel *item)
+{
+    tracein;
+    ErrCode err = DbSqliteTbl::updateTableField(builder, updateField, item);
+    if (err == ErrNone) {
+        PersonDept* comm = (PersonDept*) item;
+        foreach (QString field, updateField) {
+            logd("Update field %s", STR2CHA(field));
+            if (field == KItemRole) {
+                builder->addValue(KFieldRoleUid, comm->roleUid());
+            } else if (field == KItemCourse) {
+                builder->addValue(KFieldCourseUid, comm->courseUid());
+            } else if (field == KItemChangeHistory) {
+                builder->addValue(KFieldChangeHistory, comm->changeHistory());
+            } else if (field == KItemPerson) {
+                builder->addValue(KFieldPersonUid, comm->personUid());
+            } else if (field == KItemCommunityDept) {
+                builder->addValue(KFieldCommDeptUid, comm->commDeptUid());
+            } else if (field == KItemStatus) {
+                builder->addValue(KFieldModelStatus, comm->modelStatus());
+            } else if (field == KItemEndDate) {
+                builder->addValue(KFieldEndDate, comm->endDate());
+            } else if (field == KItemStartDate) {
+                builder->addValue(KFieldStartDate, comm->startDate());
+            } else {
+                logw("Field '%s' not support here", STR2CHA(field));
+            }
+        }
     }
     traceout;
     return err;

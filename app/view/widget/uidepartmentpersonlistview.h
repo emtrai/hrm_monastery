@@ -44,11 +44,12 @@ protected:
                                                                const QList<UITableItem *>& items);
     virtual ErrCode onMenuActionListPerson(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionListDepartment(QMenu* menu, UITableMenuAction* act);
-    //    virtual ErrCode onMenuAction(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onMenuActionDelete(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onMenuActionView(QMenu* menu, UITableMenuAction* act);
     virtual DbModel* onNewModel();
+    virtual QString getTitle();
+
+    virtual void onViewItem(UITableCellWidgetItem *item);
+    virtual void onAddItem(UITableCellWidgetItem *item);
+    virtual void onEditItem(UITableCellWidgetItem *item);
 
 protected:
     virtual ErrCode onLoad();

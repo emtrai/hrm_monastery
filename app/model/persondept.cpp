@@ -77,7 +77,8 @@ const QString &PersonDept::roleUid() const
 
 void PersonDept::setRoleUid(const QString &newRoleUid)
 {
-    mRoleUid = newRoleUid;
+    CHECK_MODIFIED_THEN_SET(mRoleUid, newRoleUid, KItemRole);
+//    mRoleUid = newRoleUid;
 }
 
 const QString &PersonDept::roleName() const
@@ -103,7 +104,8 @@ const QString &PersonDept::courseUid() const
 
 void PersonDept::setCourseUid(const QString &newCourseUid)
 {
-    mCourseUid = newCourseUid;
+    CHECK_MODIFIED_THEN_SET(mCourseUid, newCourseUid, KItemCourse);
+//    mCourseUid = newCourseUid;
 }
 
 const QString &PersonDept::courseName() const
@@ -147,10 +149,21 @@ void PersonDept::copy(const PersonDept &model)
     mModelStatusName = model.mModelStatusName;
     mModelStatus = model.mModelStatus;
     mCommDeptUid = model.mCommDeptUid;
+    mCommDeptNameId = model.mCommDeptNameId;
     mPersonUid = model.mPersonUid;
     mPersonName = model.mPersonName;
     mPersonNameId = model.mPersonNameId;
     traceout;
+}
+
+const QString &PersonDept::commDeptNameId() const
+{
+    return mCommDeptNameId;
+}
+
+void PersonDept::setCommDeptNameId(const QString &newCommDeptNameId)
+{
+    mCommDeptNameId = newCommDeptNameId;
 }
 
 const QString &PersonDept::personNameId() const
@@ -190,7 +203,7 @@ const QString &PersonDept::changeHistory() const
 
 void PersonDept::setChangeHistory(const QString &newChangeHistory)
 {
-    mChangeHistory = newChangeHistory;
+    CHECK_MODIFIED_THEN_SET(mChangeHistory, newChangeHistory, KItemChangeHistory);
 }
 
 const QString &PersonDept::personUid() const
@@ -200,7 +213,7 @@ const QString &PersonDept::personUid() const
 
 void PersonDept::setPersonUid(const QString &newPersonUid)
 {
-    mPersonUid = newPersonUid;
+    CHECK_MODIFIED_THEN_SET(mPersonUid, newPersonUid, KItemPerson);
 }
 
 const QString &PersonDept::commDeptUid() const
@@ -210,7 +223,7 @@ const QString &PersonDept::commDeptUid() const
 
 void PersonDept::setCommDeptUid(const QString &newCommDeptUid)
 {
-    mCommDeptUid = newCommDeptUid;
+    CHECK_MODIFIED_THEN_SET(mCommDeptUid, newCommDeptUid, KItemCommunityDept);
 }
 
 int PersonDept::modelStatus() const
@@ -220,7 +233,7 @@ int PersonDept::modelStatus() const
 
 void PersonDept::setModelStatus(int newStatus)
 {
-    mModelStatus = newStatus;
+    CHECK_MODIFIED_THEN_SET(mModelStatus, newStatus, KItemStatus);
 }
 
 qint64 PersonDept::endDate() const
@@ -230,7 +243,7 @@ qint64 PersonDept::endDate() const
 
 void PersonDept::setEndDate(qint64 newEndDate)
 {
-    mEndDate = newEndDate;
+    CHECK_MODIFIED_THEN_SET(mEndDate, newEndDate, KItemEndDate);
 }
 
 void PersonDept::setEndDate(const QString &newEndDate, const QString &format)
@@ -245,7 +258,7 @@ qint64 PersonDept::startDate() const
 
 void PersonDept::setStartDate(qint64 newStartDate)
 {
-    mStartDate = newStartDate;
+    CHECK_MODIFIED_THEN_SET(mStartDate, newStartDate, KItemStartDate);
 }
 
 void PersonDept::setStartDate(const QString &newStartDate, const QString &format)

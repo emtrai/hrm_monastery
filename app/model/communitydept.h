@@ -32,6 +32,8 @@ public:
     static DbModel *build();
     virtual DbModelBuilder getBuilder() const;
     virtual QString modelName() const;
+    virtual void clone(const DbModel* model);
+    virtual DbModel* clone() const;
 
     qint64 establishDate() const;
     void setEstablishDate(qint64 newEstablishDate);

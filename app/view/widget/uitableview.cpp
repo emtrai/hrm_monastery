@@ -43,6 +43,8 @@ UITableView::UITableView(QWidget *parent) :
     ui->setupUi(this);
     ui->tblList->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->tblList->verticalHeader()->setVisible(false);
+    ui->tblList->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->tblList->horizontalHeader()->setStretchLastSection(true);
     connect(ui->tblList, SIGNAL(customContextMenuRequested(QPoint)),
             SLOT(customMenuRequested(QPoint)));
 //    QObject::connect(ui->cbKeyword, SIGNAL(returnPressed()), this, SLOT(on_cbKeyword_returnPressed()));

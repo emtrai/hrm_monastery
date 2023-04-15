@@ -129,7 +129,7 @@ void DlgCommonEditModel::accept()
         }
         if (mListener) {
             logd("Call listener");
-            mListener->onDbModelReady(ErrNone, item, this);
+            mListener->onDbModelReady(ret, item, this);
         } else {
             logd("no listener to call");
         }

@@ -119,7 +119,7 @@ DbModel *DlgSearch::selectedItem() const
         ret = mSelectedItems[0];
     }
     traceout;
-    return ret;
+    return ret?ret->clone():nullptr;
 }
 
 bool DlgSearch::getIsMultiSelection() const

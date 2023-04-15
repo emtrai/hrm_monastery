@@ -405,6 +405,7 @@ ErrCode DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
         DbModel* model = SQLITE->getCommunityModelHandler()->getByUid(cmm->communityUid());
         if (model) {
             cmm->setCommunityName(model->name());
+            cmm->setCommunityNameId(model->nameId());
             delete model;
         } else {
             logw("not found communityUid '%s'", STR2CHA(cmm->communityUid()));
