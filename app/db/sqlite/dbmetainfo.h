@@ -33,9 +33,10 @@ public:
     void setAppVersion(qint64 version);
     void setDbVersion(qint64 version);
     void addTableVersion(const QString& tableName, qint64 version);
+    qint64 tableVersion(const QString& tableName, bool* ok = nullptr);
     QString toJson(bool* ok = nullptr) const;
     ErrCode saveJson(const QString& fpath) const;
-    ErrCode fromJsonFile(const QString& fpath) const;
+    ErrCode fromJsonFile(const QString& fpath);
     qint64 appVersion() const;
 
     qint64 dbVersion() const;

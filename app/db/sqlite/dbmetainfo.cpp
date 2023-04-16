@@ -29,6 +29,7 @@
 #include "errcode.h"
 #include "logger.h"
 #include "utils.h"
+#include "jsondefs.h"
 
 DbMetaInfo::DbMetaInfo()
 {
@@ -47,6 +48,7 @@ void DbMetaInfo::setDbVersion(qint64 version)
 
 void DbMetaInfo::addTableVersion(const QString &tableName, qint64 version)
 {
+    tracein;
     logd("Add tbl '%s', ver 0x%x", STR2CHA(tableName), version);
     if (!mListTableVersion.contains(tableName)) {
         logd("table not exist");
@@ -55,6 +57,23 @@ void DbMetaInfo::addTableVersion(const QString &tableName, qint64 version)
         logd("table existe, set new version");
         mListTableVersion[tableName] = version;
     }
+    traceout;
+}
+
+qint64 DbMetaInfo::tableVersion(const QString &tableName, bool *ok)
+{
+    tracein;
+    qint64 ver = 0;
+    if (mListTableVersion.contains(tableName)) {
+        ver = mListTableVersion[tableName];
+        logd("Tbl '%s', ver 0x%x", STR2CHA(tableName), ver);
+        if (ok) *ok = true;
+    } else {
+        logw("table '%s' not exist", STR2CHA(tableName));
+        if (ok) *ok = false;
+    }
+    traceout;
+    return ver;
 }
 
 QString DbMetaInfo::toJson(bool *ok) const
@@ -109,12 +128,60 @@ ErrCode DbMetaInfo::saveJson(const QString &fpath) const
     return err;
 }
 
-ErrCode DbMetaInfo::fromJsonFile(const QString &fpath) const
+ErrCode DbMetaInfo::fromJsonFile(const QString &fpath)
 {
     tracein;
     ErrCode err = ErrNone;
-    logd("load metada from '%s'", STR2CHA(fpath));
-    // TODO: implement it
+    logd("Load file %s", fpath.toStdString().c_str());
+    logd("Load file %s", fpath.toStdString().c_str());
+    QFile loadFile(fpath);
+    QByteArray importData;
+
+    if (!loadFile.open(QIODevice::ReadOnly)) {
+        loge("Couldn't open file %s", fpath.toStdString().c_str());
+        err = ErrFileRead;
+    }
+
+    if (err == ErrNone){
+        logd("Parse json");
+        importData = loadFile.readAll();
+        logd("importData length %d", (int)importData.length());
+        // TODO: too big data????
+        if (importData.size() == 0) {
+            err = ErrNoData;
+            loge("No data to parse");
+        }
+    }
+
+    if (err == ErrNone) {
+        QJsonDocument loadDoc = QJsonDocument::fromJson(importData);
+
+        logd("loadDoc isEmpty %d", loadDoc.isEmpty());
+        QJsonObject jRootObj = loadDoc.object();
+        JSON_GET_INT(jRootObj, JSON_APPVER, mAppVersion, 0);
+        JSON_GET_INT(jRootObj, JSON_DBVER, mDbVersion, 0);
+        JSON_GET_STR(jRootObj, JSON_APPVERSTR, mAppVersionString);
+
+        if (jRootObj.contains(JSON_TABLES) && jRootObj[JSON_TABLES].isArray()) {
+            QJsonArray jlist = jRootObj[JSON_TABLES].toArray();
+            for (int levelIndex = 0; levelIndex < jlist.size(); ++levelIndex) {
+                logd("Table idx=%d", levelIndex);
+                QJsonObject jObj = jlist[levelIndex].toObject();
+                QString tblName;
+                qint64 version = 0;
+                JSON_GET_STR(jObj, JSON_TABLE, tblName);
+                JSON_GET_INT(jObj, JSON_VERSION, version, 0);
+                if (!tblName.isEmpty()) {
+                    mListTableVersion[tblName] = version;
+                }
+            }
+        } else {
+            loge("Invalid json data, not found %s", JSON_TABLES);
+            err = ErrInvalidData;
+        }
+    }
+    loadFile.close();
+
     traceret(err);
     return err;
 }

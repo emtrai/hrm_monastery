@@ -42,6 +42,7 @@
 #ifndef QT_NO_PRINTER
 #include <QPrinter>
 #endif
+#include "mainwindow.h"
 
 
 // yymd
@@ -675,7 +676,7 @@ void Utils::showErrorBox(const QString &msg)
 {
     tracein;
     logd("Error box %s", msg.toStdString().c_str());
-    QMessageBox::critical(nullptr, "Lỗi", msg, QMessageBox::Close);
+    QMessageBox::critical(MainWindow::getInstance(), "Lỗi", msg, QMessageBox::Close);
     traceout;
 }
 
@@ -696,6 +697,7 @@ bool Utils::showConfirmDialog(QWidget *parent, const QString &title, const QStri
     tracein;
     QMessageBox::StandardButton reply;
     bool ok = false;
+    if (!parent) parent = MainWindow::getInstance();
     reply = QMessageBox::question(parent, title, message,
                                   QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::Yes) {
@@ -813,6 +815,8 @@ ErrCode Utils::setSelectItemComboxByData(QComboBox *cb, const QVariant &data)
             ret = ErrNone;
             logd("found item at %d: %s", i, data.toString().toStdString().c_str());
             break;
+        } else {
+            cb->setCurrentIndex(0);
         }
     }
     traceret(ret);

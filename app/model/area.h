@@ -48,6 +48,30 @@ public:
     QString countryName() const;
     void setCountryName(QString newCountryName);
 
+    qint64 startDate() const;
+    void setStartDate(qint64 newStartDate);
+
+    qint64 endDate() const;
+    void setEndDate(qint64 newEndDate);
+
+    qint32 modelStatus() const;
+    void setModelStatus(qint32 newModelStatus);
+
+    const QString &changeHistory() const;
+    void setChangeHistory(const QString &newChangeHistory);
+
+    const QString &tel() const;
+    void setTel(const QString &newTel);
+
+    const QString &email() const;
+    void setEmail(const QString &newEmail);
+
+    const QString &addr() const;
+    void setAddr(const QString &newAddr);
+
+    QString modelStatusName() const;
+    void setModelStatusName(QString newModelStatusName);
+
 protected:
     virtual DbModelHandler* getDbModelHandler() const;
     virtual DbModelBuilder getBuilder() const;
@@ -56,6 +80,15 @@ private:
     QString mCountryName; // just for display, not store to db
     qint64 mCountryDbId;
     QString mCountryUid;
+
+    QString mAddr;
+    QString mTel;
+    QString mEmail;
+    qint64 mStartDate;
+    qint64 mEndDate;
+    qint32 mModelStatus;
+    QString mModelStatusName; // just for display, not store to db
+    QString mChangeHistory;
 
 };
 

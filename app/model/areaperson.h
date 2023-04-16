@@ -36,24 +36,59 @@ public:
     const QString &roleUid() const;
     void setRoleUid(const QString &newRoleUid);
 
-    DbModel *person() const;
-    void setPerson(DbModel *newPerson);
-
-    DbModel *area() const;
-    void setArea(DbModel *newArea);
-
     const QString &roleName();
     void setRoleName(const QString &newRoleName);
+    const QString &courseUid() const;
+    void setCourseUid(const QString &newCourseUid);
+
+    const QString &courseName() const;
+    void setCourseName(const QString &newCourseName);
+
+    const QString &personUid() const;
+    void setPersonUid(const QString &newPersonUid);
+
+    const QString &personName() const;
+    void setPersonName(const QString &newPersonName);
+
+    const QString &areaUid() const;
+    void setAreaUid(const QString &newAreaUid);
+
+    const QString &areaName() const;
+    void setAreaName(const QString &newAreaName);
+
+    const QString &areaNameId() const;
+    void setAreaNameId(const QString &newAreaNameId);
+
+    const QString &hollyName() const;
+    void setHollyName(const QString &newHollyName);
+
+    const QString &personTel() const;
+    void setPersonTel(const QString &newPersonTel);
+
+    const QString &personEmail() const;
+    void setPersonEmail(const QString &newPersonEmail);
+
+    const QString &personNameId() const;
+    void setPersonNameId(const QString &newPersonNameId);
 
 protected:
     AreaPerson();
     virtual DbModelHandler *getDbModelHandler() const;
     void copy(const AreaPerson& model);
 protected:
+    QString mPersonUid;
+    QString mHollyName; // just for display
+    QString mPersonName; // just for display
+    QString mPersonNameId; // just for display
+    QString mPersonTel; // just for display
+    QString mPersonEmail; // just for display
+    QString mAreaUid;
+    QString mAreaName;; // just for display
+    QString mAreaNameId; // just for display
     QString mRoleUid;
-    QString mRoleName;
-    DbModel* mPerson;
-    DbModel* mArea;
+    QString mRoleName;; // just for display
+    QString mCourseUid;
+    QString mCourseName;; // just for display
 };
 
 #endif // AREAPERSON_H

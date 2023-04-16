@@ -24,10 +24,15 @@
 #include "errcode.h"
 #include "utils.h"
 #include "defs.h"
-
+#include "dbmodel.h"
 #include "dbdefs.h"
 
-MapDbModel::MapDbModel():DbModel()
+MapDbModel::MapDbModel():DbModel(),
+    mDbId1(0),
+    mDbId2(0),
+    mStartDate(0),
+    mEndDate(0),
+    mModelStatus(MODEL_INACTIVE)
 {
     tracein;
 }
@@ -69,9 +74,8 @@ void MapDbModel::clone(const DbModel *model)
 
 DbModel *MapDbModel::clone() const
 {
-    tracein;
-    DbModel::clone();
-    traceout;
+    traced;
+    return DbModel::clone();
 }
 
 DbModel *MapDbModel::buildMapModel(DbModelBuilder builder,
@@ -197,12 +201,12 @@ void MapDbModel::setEndDate(qint64 newEndDate)
 
 qint32 MapDbModel::modelStatus() const
 {
-    return mStatus;
+    return mModelStatus;
 }
 
 void MapDbModel::setModelStatus(qint32 newStatus)
 {
-    mStatus = newStatus;
+    mModelStatus = newStatus;
 }
 
 const QString &MapDbModel::parentUid() const
@@ -244,8 +248,19 @@ void MapDbModel::copy(const MapDbModel &model)
     mDbId2 = model.mDbId2;
     mStartDate = model.mStartDate;
     mEndDate = model.mEndDate;
-    mStatus = model.mStatus;
+    mModelStatus = model.mModelStatus;
+    mModelStatusName = model.mModelStatusName;
     mParentUid = model.mParentUid;
     mChangeHistory = model.mChangeHistory;
     traceout;
+}
+
+const QString &MapDbModel::modelStatusName() const
+{
+    return mModelStatusName;
+}
+
+void MapDbModel::setModelStatusName(const QString &newModelStatusName)
+{
+    mModelStatusName = newModelStatusName;
 }

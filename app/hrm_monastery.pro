@@ -206,6 +206,8 @@ SOURCES += \
     view/dialog/dlgaddcommunityhistory.cpp \
     view/dialog/dlgaddevent.cpp \
     view/dialog/dlgaddpersonevent.cpp \
+    view/dialog/dlgarea.cpp \
+    view/dialog/dlgareaperson.cpp \
     view/dialog/dlgcommdept.cpp \
     view/dialog/dlgcommoneditmodel.cpp \
     view/dialog/dlgcommunity.cpp \
@@ -228,6 +230,7 @@ SOURCES += \
     view/dialog/dlgsearchperson.cpp \
     view/dialog/dlgwait.cpp \
     view/widget/baseview.cpp \
+    view/widget/uiareacontactpeoplelistview.cpp \
     view/widget/uiarealistview.cpp \
     view/widget/uicommdeptlistview.cpp \
     view/widget/uicommonlistview.cpp \
@@ -317,6 +320,7 @@ HEADERS += \
     import/importlistener.h \
     import/importxlsx.h \
     importexportdefs.h \
+    jsondefs.h \
     model/areacommunity.h \
     model/areaperson.h \
     model/communityperson.h \
@@ -396,12 +400,15 @@ HEADERS += \
     controller/specialistctl.h \
     statistic/statistic.h \
     std.h \
+    stringdefs.h \
     test/testctl.h \
     utils.h \
     view/dialog/dlgabout.h \
     view/dialog/dlgaddcommunityhistory.h \
     view/dialog/dlgaddevent.h \
     view/dialog/dlgaddpersonevent.h \
+    view/dialog/dlgarea.h \
+    view/dialog/dlgareaperson.h \
     view/dialog/dlgcommdept.h \
     view/dialog/dlgcommoneditmodel.h \
     view/dialog/dlgcommunity.h \
@@ -424,6 +431,7 @@ HEADERS += \
     view/dialog/dlgsearchperson.h \
     view/dialog/dlgwait.h \
     view/widget/baseview.h \
+    view/widget/uiareacontactpeoplelistview.h \
     view/widget/uiarealistview.h \
     view/widget/uicommdeptlistview.h \
     view/widget/uicommonlistview.h \
@@ -454,6 +462,8 @@ FORMS += \
     view/dialog/dlgaddcommunityhistory.ui \
     view/dialog/dlgaddevent.ui \
     view/dialog/dlgaddpersonevent.ui \
+    view/dialog/dlgarea.ui \
+    view/dialog/dlgareaperson.ui \
     view/dialog/dlgcommdept.ui \
     view/dialog/dlgcommunity.ui \
     view/dialog/dlgcountry.ui \

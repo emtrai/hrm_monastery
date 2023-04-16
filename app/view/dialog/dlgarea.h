@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Ngo Huy Anh
+ * Copyright (C) 2022 Ngo Huy Anh
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,58 +14,46 @@
  * limitations under the License.
  *
  *
- * Filename: dlgeditmodel.h
+ * Filename: DlgArea.h
  * Author: Anh, Ngo Huy
- * Created date:2/16/2023
+ * Created date:7/24/2022
  * Brief:
  */
-#ifndef DLGEDITMODEL_H
-#define DLGEDITMODEL_H
+#ifndef DLGAREA_H
+#define DLGAREA_H
 
 #include <QDialog>
+#include "errcode.h"
 #include "dlgcommoneditmodel.h"
+#include <QAbstractButton>
 
 namespace Ui {
-class DlgEditModel;
+class DlgArea;
 }
 
-class DlgEditModel : public DlgCommonEditModel
+class DlgArea : public DlgCommonEditModel
 {
     Q_OBJECT
-    DLG_BUILDER(DlgEditModel)
-
+    DLG_BUILDER(DlgArea)
 public:
-    explicit DlgEditModel(QWidget *parent = nullptr);
-    virtual ~DlgEditModel();
-    virtual QDialogButtonBox* buttonBox();
-    /**
-     * @brief build data for model, using dialog/wiget data
-     * @return
-     */
+                 explicit DlgArea(QWidget *parent = nullptr);
+    ~DlgArea();
     virtual ErrCode buildModel(DbModel* model, QString& errMsg);
-    /**
-     * @brief build model from input model object
-     * @param model
-     * @return
-     */
     virtual ErrCode fromModel(const DbModel* model);
 protected:
-    virtual DbModel *newModel();
-    /**
-     * @brief Validate data of dialog
-     * @param msg: output message if validate is not ok
-     * @return
-     */
-    virtual bool onValidateData(QString& msg);
+    virtual QDialogButtonBox* buttonBox();
+    virtual DbModel* newModel();
+    void loadData();
+    void loadStatus();
+public:
 
 private slots:
-
     void on_txtName_textChanged(const QString &arg1);
 
-    void on_btnChangeCode_clicked();
+    void on_btnChangeNameId_clicked();
 
 private:
-    Ui::DlgEditModel *ui;
+    Ui::DlgArea *ui;
 };
 
-#endif // DLGEDITMODEL_H
+#endif // DLGAREA_H

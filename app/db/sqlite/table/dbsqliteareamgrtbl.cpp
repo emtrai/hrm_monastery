@@ -23,6 +23,7 @@
 #include "dbsqlite.h"
 
 #include "dbsqlitedefs.h"
+#include "dbsqliteupdatebuilder.h"
 #include "defs.h"
 #include "logger.h"
 #include "dbsqlitetablebuilder.h"
@@ -32,11 +33,29 @@
 #include <QHash>
 #include "table/dbsqlitepersontbl.h"
 #include "area.h"
+#include "areactl.h"
 #include "person.h"
 #include "areaperson.h"
 #include "rolectl.h"
+#include "role.h"
+#include "course.h"
+#include "coursectl.h"
+#include "dbctl.h"
 
-const qint32 DbSqliteAreaMgrTbl::KVersionCode = VERSION_CODE(0,0,1);
+/**
+ * VERSION 0.0.1:
+ * + KFieldAreaUid
+ * + KFieldAreaDbId
+ * + KFieldPersonUid
+ * + KFieldPersonDbId
+ * + KFieldRoleUid
+ * VERSION 0.0.2: Add:
+ * + KFieldCourseUid
+ */
+
+#define VERSION_CODE_1 VERSION_CODE(0,0,1)
+#define VERSION_CODE_2 VERSION_CODE(0,0,2)
+const qint32 DbSqliteAreaMgrTbl::KVersionCode = VERSION_CODE_2;
 
 DbSqliteAreaMgrTbl::DbSqliteAreaMgrTbl(DbSqlite *db):
     DbSqliteMapTbl(db, KTableAreaPerson, KTableAreaPerson, KVersionCode)
@@ -66,10 +85,37 @@ QList<DbModel *> DbSqliteAreaMgrTbl::getListPerson(const QString &areaUid, int s
                                                          KFieldAreaUid,
                                                          &AreaPerson::build,
                                                          areaUid,
-                                                         status);
+                                                         status,
+                                                         QString("*, %1.%2 AS %3, %1.%4 AS %5")
+                                                             .arg(KTablePerson, KFieldNameId)
+                                                             .arg(KFieldPersonNameId)
+                                                             .arg(KFieldUid)
+                                                             .arg(KFieldPersonUid));
 
     traceout;
     return list;
+}
+
+ErrCode DbSqliteAreaMgrTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
+{
+    tracein;
+    ErrCode ret = ErrNone;
+
+    ret = DbSqliteMapTbl::insertTableField(builder, item); // TODO: handle error code
+    QString modelName = item->modelName();
+    logd("model name to insert '%s'", modelName.toStdString().c_str());
+    if (modelName == KModelNameAreaPerson ) {
+        AreaPerson* model = (AreaPerson*) item;
+
+        builder->addValue(KFieldRoleUid, model->roleUid());
+        builder->addValue(KFieldCourseUid, model->courseUid());
+
+    } else {
+        ret = ErrInvalidArg;
+        loge("Invali model name '%s'", modelName.toStdString().c_str());
+    }
+    traceret(ret);
+    return ret;
 }
 
 void DbSqliteAreaMgrTbl::addTableField(DbSqliteTableBuilder *builder)
@@ -77,6 +123,10 @@ void DbSqliteAreaMgrTbl::addTableField(DbSqliteTableBuilder *builder)
     tracein;
     DbSqliteMapTbl::addTableField(builder);
     builder->addField(KFieldRoleUid, TEXT);// TODO: use this????
+
+    /* From version 0.0.2 */
+    builder->addField(KFieldCourseUid, TEXT);
+
     traceout;
 }
 
@@ -93,48 +143,10 @@ ErrCode DbSqliteAreaMgrTbl::updateModelFromQuery(DbModel *item, const QSqlQuery 
     }
     if (err == ErrNone) {
         QString modelName = item->modelName();
-        AreaPerson* areaPerson = nullptr;
-        DbModel* person = nullptr;
-        DbModel* area = nullptr;
-        logd("update for map model '%s'", STR2CHA(modelName));
         if (modelName == KModelNameAreaPerson) {
-            areaPerson = (AreaPerson*)item;
-            logd("update for person model");
-            person = Person::build();
-            area = Area::build();
-            if (!person || !area) {
-                err = ErrNoMemory;
-                loge("no memory for person or arae");
-            }
-        } else {
-            loge("Invalid mapp model '%s', do nothing", modelName.toStdString().c_str());
-            err = ErrInvalidData;
-        }
-        if (err == ErrNone) {
-            logd("Update person info");
-            DbSqlitePersonTbl* tbl = dynamic_cast<DbSqlitePersonTbl*>(DbSqlite::table(KTablePerson));
-            if (tbl) {
-                err = tbl->updateModelFromQuery(person, qry);
-            } else {
-                loge("not found table %s", KTablePerson);
-                err = ErrNotFound;
-            }
-        }
-        if (err == ErrNone) {
-            logd("update arae info");
-            DbSqlitePersonTbl* tbl = dynamic_cast<DbSqlitePersonTbl*>(DbSqlite::table(KTableArea));
-            if (tbl) {
-                err = tbl->updateModelFromQuery(area, qry);
-            } else {
-                loge("not found table %s", KTableArea);
-                err = ErrNotFound;
-            }
-        }
-
-        if (err == ErrNone) {
+            AreaPerson* areaPerson = (AreaPerson*)item;
+            DbSqlitePersonTbl* tblPerson = dynamic_cast<DbSqlitePersonTbl*>(DbSqlite::table(KTablePerson));
             areaPerson->setRoleUid(qry.value(KFieldRoleUid).toString());
-            areaPerson->setPerson(person);
-            areaPerson->setArea(area);
             if (!areaPerson->roleUid().isEmpty()){
                 logd("search role uid '%s'", STR2CHA(areaPerson->roleUid()));
                 DbModel* model = ROLECTL->getModelByUid(areaPerson->roleUid());
@@ -147,12 +159,192 @@ ErrCode DbSqliteAreaMgrTbl::updateModelFromQuery(DbModel *item, const QSqlQuery 
             } else {
                 logw("Role uid empty");
             }
+
+            areaPerson->setCourseUid(qry.value(KFieldCourseUid).toString());
+            if (!areaPerson->courseUid().isEmpty()){
+                logd("search courseUid '%s'", STR2CHA(areaPerson->courseUid()));
+                DbModel* model = COURSECTL->getModelByUid(areaPerson->courseUid());
+                if (model) {
+                    areaPerson->setCourseName(model->name());
+                    delete model;
+                } else {
+                    logw("not found courseUid '%s'", STR2CHA(areaPerson->courseUid()));
+                }
+            } else {
+                logw("courseUid empty");
+            }
+
+
+            areaPerson->setAreaUid(qry.value(KFieldAreaUid).toString());
+            if (!areaPerson->areaUid().isEmpty()){
+                logd("search areaUid '%s'", STR2CHA(areaPerson->areaUid()));
+                DbModel* model = COURSECTL->getModelByUid(areaPerson->areaUid());
+                if (model) {
+                    areaPerson->setAreaName(model->name());
+                    areaPerson->setAreaNameId(model->nameId());
+                    delete model;
+                } else {
+                    logw("not found areaUid '%s'", STR2CHA(areaPerson->areaUid()));
+                }
+            } else {
+                logw("areaUid empty");
+            }
+
+            areaPerson->setPersonUid(qry.value(KFieldPersonUid).toString());
+            Person* person = (Person*)Person::build();
+            if (person) {
+                tblPerson->updateModelFromQuery(person, qry);
+                areaPerson->setPersonName(person->fullName());
+                areaPerson->setPersonNameId(person->nameId());
+                areaPerson->setHollyName(person->hollyName());
+                // TODO: risk of no sync up data of holly name!!!
+                areaPerson->setPersonUid(person->uid());
+                areaPerson->setPersonEmail(person->emailString());
+                areaPerson->setPersonTel(person->telString());
+                delete person;
+            } else {
+                err = ErrNoMemory;
+                loge("no memory, cannot allocat person");
+            }
+
         } else {
-            loge("update db from model failed, err = %d", err);
-            if (person) delete person;
-            if (area) delete area;
+            loge("Invalid mapp model '%s', do nothing", modelName.toStdString().c_str());
+            err = ErrInvalidData;
         }
+//        AreaPerson* areaPerson = nullptr;
+//        DbModel* person = nullptr;
+//        DbModel* area = nullptr;
+//        logd("update for map model '%s'", STR2CHA(modelName));
+//        if (modelName == KModelNameAreaPerson) {
+//            areaPerson = (AreaPerson*)item;
+//            logd("update for person model");
+//            person = Person::build();
+//            area = Area::build();
+//            if (!person || !area) {
+//                err = ErrNoMemory;
+//                loge("no memory for person or arae");
+//            }
+//        } else {
+//            loge("Invalid mapp model '%s', do nothing", modelName.toStdString().c_str());
+//            err = ErrInvalidData;
+//        }
+//        if (err == ErrNone) {
+//            logd("Update person info");
+//            DbSqlitePersonTbl* tbl = dynamic_cast<DbSqlitePersonTbl*>(DbSqlite::table(KTablePerson));
+//            if (tbl) {
+//                err = tbl->updateModelFromQuery(person, qry);
+//            } else {
+//                loge("not found table %s", KTablePerson);
+//                err = ErrNotFound;
+//            }
+//        }
+//        if (err == ErrNone) {
+//            logd("update arae info");
+//            DbSqlitePersonTbl* tbl = dynamic_cast<DbSqlitePersonTbl*>(DbSqlite::table(KTableArea));
+//            if (tbl) {
+//                err = tbl->updateModelFromQuery(area, qry);
+//            } else {
+//                loge("not found table %s", KTableArea);
+//                err = ErrNotFound;
+//            }
+//        }
+
+//        if (err == ErrNone) {
+//            areaPerson->setRoleUid(qry.value(KFieldRoleUid).toString());
+//            areaPerson->setCourseUid(qry.value(KFieldCourseUid).toString());
+//            areaPerson->setPerson(person);
+//            areaPerson->setArea(area);
+//            if (!areaPerson->roleUid().isEmpty()){
+//                logd("search role uid '%s'", STR2CHA(areaPerson->roleUid()));
+//                DbModel* model = ROLECTL->getModelByUid(areaPerson->roleUid());
+//                if (model) {
+//                    areaPerson->setRoleName(model->name());
+//                    delete model;
+//                } else {
+//                    logw("not found role uid '%s'", STR2CHA(areaPerson->roleUid()));
+//                }
+//            } else {
+//                logw("Role uid empty");
+//            }
+//        } else {
+//            loge("update db from model failed, err = %d", err);
+//            if (person) delete person;
+//            if (area) delete area;
+//        }
     }
     traceout;
+    return err;
+}
+/**
+ * @brief DbSqliteAreaMgrTbl::onTblMigration
+ * @param oldVer
+ * @return
+ */
+ErrCode DbSqliteAreaMgrTbl::onTblMigration(qint64 oldVer)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    logi("tbl '%s' version upgrade, from version 0x%lx to 0x%lx", STR2CHA(mName), oldVer, mVersionCode);
+    switch (oldVer) {
+        case VERSION_CODE_1:
+        {
+            QHash<QString, TableFieldDatatype_t> columnField;
+            // From version 0.0.2
+            columnField.insert(KFieldCourseUid, TEXT);
+            loge("Add column fields");
+            err = addTableColumn(columnField);
+        }
+        break;
+        default:
+            break;
+    };
+    traceret(err);
+    return err;
+}
+
+ErrCode DbSqliteAreaMgrTbl::updateTableField(DbSqliteUpdateBuilder *builder,
+                                             const QList<QString> &updateField, const DbModel *item)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    if (!builder || !item) {
+        err = ErrInvalidArg;
+        loge("invalid arg");
+    }
+    if (err == ErrNone) {
+        err = DbSqliteMapTbl::updateTableField(builder, updateField, item);
+    }
+
+    if (err == ErrNone) {
+        if (item->modelName() == KModelNameAreaPerson) {
+            AreaPerson* comm = (AreaPerson*) item;
+            foreach (QString field, updateField) {
+                logd("Update field %s", STR2CHA(field));
+                if (field == KItemRole) {
+                    builder->addValue(KFieldRoleUid, comm->roleUid());
+                } else if (field == KItemCourse) {
+                    builder->addValue(KFieldCourseUid, comm->courseUid());
+                } else if (field == KItemChangeHistory) {
+                    builder->addValue(KFieldChangeHistory, comm->changeHistory());
+                } else if (field == KItemPerson) {
+                    builder->addValue(KFieldPersonUid, comm->personUid());
+                } else if (field == KItemArea) {
+                    builder->addValue(KFieldAreaUid, comm->areaUid());
+                } else if (field == KItemStatus) {
+                    builder->addValue(KFieldModelStatus, comm->modelStatus());
+                } else if (field == KItemEndDate) {
+                    builder->addValue(KFieldEndDate, comm->endDate());
+                } else if (field == KItemStartDate) {
+                    builder->addValue(KFieldStartDate, comm->startDate());
+                } else {
+                    logw("Field '%s' not support here", STR2CHA(field));
+                }
+            }
+        } else {
+            logw("Model name '%s' is no support",
+                 STR2CHA(item->modelName()));
+        }
+    }
+    traceret(err);
     return err;
 }

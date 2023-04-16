@@ -28,7 +28,10 @@
 
 
 Area::Area():DbModel(),
-      mCountryDbId(0)
+      mCountryDbId(0),
+      mStartDate(0),
+      mEndDate(0),
+      mModelStatus(0)
 {
     tracein;
 }
@@ -112,5 +115,99 @@ void Area::copy(const Area &model)
     mCountryName = model.mCountryName;
     mCountryDbId = model.mCountryDbId;
     mCountryUid = model.mCountryUid;
+    mAddr = model.mAddr;
+    mTel = model.mTel;
+    mEmail = model.mEmail;
+    mStartDate = model.mStartDate;
+    mEndDate = model.mEndDate;
+    mModelStatus = model.mModelStatus;
+    mChangeHistory = model.mChangeHistory;
     traceout;
+}
+
+QString Area::modelStatusName() const
+{
+    return mModelStatusName;
+}
+
+void Area::setModelStatusName(QString newModelStatusName)
+{
+    mModelStatusName = newModelStatusName;
+}
+
+const QString &Area::addr() const
+{
+    return mAddr;
+}
+
+void Area::setAddr(const QString &newAddr)
+{
+    mAddr = newAddr;
+    markItemAsModified(KItemAddress);
+}
+
+const QString &Area::email() const
+{
+    return mEmail;
+}
+
+void Area::setEmail(const QString &newEmail)
+{
+    mEmail = newEmail;
+    markItemAsModified(KItemEmail);
+}
+
+const QString &Area::tel() const
+{
+    return mTel;
+}
+
+void Area::setTel(const QString &newTel)
+{
+    mTel = newTel;
+    markItemAsModified(KItemTel);
+}
+
+const QString &Area::changeHistory() const
+{
+    return mChangeHistory;
+}
+
+void Area::setChangeHistory(const QString &newChangeHistory)
+{
+    mChangeHistory = newChangeHistory;
+    markItemAsModified(KItemChangeHistory);
+}
+
+qint32 Area::modelStatus() const
+{
+    return mModelStatus;
+}
+
+void Area::setModelStatus(qint32 newModelStatus)
+{
+    mModelStatus = newModelStatus;
+    markItemAsModified(KItemStatus);
+}
+
+qint64 Area::endDate() const
+{
+    return mEndDate;
+}
+
+void Area::setEndDate(qint64 newEndDate)
+{
+    mEndDate = newEndDate;
+    markItemAsModified(KItemEndDate);
+}
+
+qint64 Area::startDate() const
+{
+    return mStartDate;
+}
+
+void Area::setStartDate(qint64 newStartDate)
+{
+    mStartDate = newStartDate;
+     markItemAsModified(KItemStartDate);
 }

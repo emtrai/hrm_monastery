@@ -87,6 +87,8 @@ public:
                                              CommonEditModelListener* listener = nullptr);
             static void showAddEditCommDept(bool isSelfUpdate = true, DbModel* comm = nullptr, DbModel* dept = nullptr,
                                           CommonEditModelListener* listener = nullptr);
+            static void showAddEditArea(bool isSelfUpdate = true, DbModel* com = nullptr,
+                                             CommonEditModelListener* listener = nullptr);
             static ErrCode exportListItems(const QList<DbModel*>* items, ModelController* controller,
                                     const QString& title = nullptr,
                                     quint64 exportTypeList = 0 // List of supported export type, bitwise
@@ -131,6 +133,8 @@ public:
                                    CommonEditModelListener* listener = nullptr);
      void doShowAddEditCommDept(bool isSelfUpdate = true, DbModel* comm = nullptr, DbModel* model = nullptr,
                               CommonEditModelListener* listener = nullptr);
+     void doShowAddEditArea(bool isSelfUpdate = true, DbModel* model = nullptr,
+                                   CommonEditModelListener* listener = nullptr);
      ErrCode doExportListItems(const QList<DbModel*>* items, ModelController* controller,
                                const QString& title = nullptr, quint64 exportTypeList = 0);
      ErrCode doShowProcessingDialog(const QString& title,

@@ -266,21 +266,9 @@ ErrCode_t DbSqlite::checkOrCreateAllTables()
 {
     tracein;
     ErrCode_t err = ErrCode_t::ErrNone;
-//    err = openDb();
-//    if (err == ErrNone) {
-//        foreach (QString key, mListTbl.keys())
-//        {
-//            logd("check & create table '%s'", key.toStdString().c_str());
-//            err = mListTbl[key]->checkOrCreateTable();
-//            if (err != ErrNone) // TODO: should break? return critical error????
-//                break;
-//        }
-//        closeDb();
-//    } else {
-//        loge("Failed to open db for create table");
-//    }
     QStringList tables = currentDb().tables();
     logd("List of table: \n %s", STR2CHA(tables.join("\n")));
+    bool ok = false;
     foreach (QString key, mListTbl.keys())
     {
         DbSqliteTbl* tbl = nullptr;
@@ -301,12 +289,23 @@ ErrCode_t DbSqlite::checkOrCreateAllTables()
         if (err != ErrNone) // TODO: should break? return critical error????
             break;
 #ifdef DEBUG_TRACE
-        bool ok = false;
         qint64 seq = 0;
         seq = getDbSeqNumber(key, &ok);
         logd("Get seq number of tbl '%s', seq = %d, ok = %d", STR2CHA(key), seq, ok);
 #endif
-        mMetaDbInfo.addTableVersion(key, tbl->versionCode());
+        qint64 tblVer = mMetaDbInfo.tableVersion(key, &ok);
+        if (ok) {
+            if (tblVer > 0 && (tblVer != tbl->versionCode())) {
+                logi("Different version from db file and current one: 0x%lx --> 0x%lx",
+                     tblVer, tbl->versionCode());
+                err = tbl->onTblMigration(tblVer);
+            }
+        }
+        if (err == ErrNone) {
+            mMetaDbInfo.addTableVersion(key, tbl->versionCode());
+        } else {
+            loge("Something wrong when creating table, err = %d", err);
+        }
         // TODO: validate version code;
     }
     traceret(err);
@@ -629,10 +628,7 @@ ErrCode_t DbSqlite::loadDb(const DbInfo* dbInfo){
     tracein;
     ErrCode_t err = ErrNone;
     if (dbInfo){
-        if(QSqlDatabase::isDriverAvailable(DRIVER))
-        {
-//            mDb = QSqlDatabase::addDatabase(DRIVER);
-//            QString uri;
+        if(QSqlDatabase::isDriverAvailable(DRIVER)) {
             if (dbInfo->uri().isNull())
                 mDbUri = ":memory:";
             else
@@ -640,20 +636,10 @@ ErrCode_t DbSqlite::loadDb(const DbInfo* dbInfo){
 
             logd("Db connect to uri %s", mDbUri.toStdString().c_str());
 
-//            mDb.setDatabaseName(mDbUri);
             mDb = currentDb();
             logd("Feature LastInsertId %d", mDb.driver()->hasFeature(QSqlDriver::LastInsertId));
             logd("Feature Transactions %d", mDb.driver()->hasFeature(QSqlDriver::Transactions));
             logd("Feature PreparedQueries %d", mDb.driver()->hasFeature(QSqlDriver::PreparedQueries));
-
-//            if(!mDb.open()){
-//                loge("Database connect ERROR %s", mDb.lastError().text().toStdString().c_str());
-//                err = ErrFailed;
-//            }
-//            else{
-//                logi("Connected to db %s", uri.toStdString().c_str());
-//                err = ErrNone;
-//            }
 
             if (ErrNone == err){
                 err = checkOrCreateAllTables();
@@ -726,6 +712,13 @@ ErrCode DbSqlite::validateDbInfo(const DbInfo *dbInfo)
         } else {
             loge("invalid meta uri");
             err = ErrInvalidData;
+        }
+    }
+
+    if (err == ErrNone) {
+        if (mMetaDbInfo.dbVersion() != DB_VERSION) {
+            logw("DB version change, from %d to %d", mMetaDbInfo.dbVersion(), DB_VERSION);
+            // TODO: handle Db change version here
         }
     }
     traceret(err);

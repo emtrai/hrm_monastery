@@ -94,10 +94,11 @@ public:
                                     int from = 0, int noItems = 0, int* total = nullptr);
     virtual DbModel* getModel(qint64 dbId, const DbModelBuilder& builder);
 
-
+    virtual ErrCode getColumnList(QHash<QString, QString>& colList);
+    virtual ErrCode addTableColumn(const QHash<QString, TableFieldDatatype_t>& columnField);
     virtual ErrCode checkOrCreateTable();
-    virtual ErrCode onDbMigration(int oldVer, int newVer);
-    virtual ErrCode onTblMigration(int oldVer, int newVer);
+    virtual ErrCode onDbMigration(qint64 oldVer, qint64 newVer);
+    virtual ErrCode onTblMigration(qint64 oldVer);
 
     virtual QList<QString> getNameFields();
     virtual DbModel *getByUid(const QString& uid, const DbModelBuilder& builder);

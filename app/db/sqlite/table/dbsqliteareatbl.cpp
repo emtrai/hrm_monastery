@@ -31,7 +31,24 @@
 #include "dbsqlitetablebuilder.h"
 #include "dbsqliteinsertbuilder.h"
 
-const qint32 DbSqliteAreaTbl::KVersionCode = VERSION_CODE(0,0,1);
+/**
+ * VERSION 0.0.1:
+ * + KFieldCountryUid
+ * + KFieldCountryDbId
+ * VERSION 0.0.2: Add:
+ * + KFieldAddress
+ * + KFieldEmail
+ * + KFieldTel
+ * + KFieldModelStatus
+ * + KFieldStartDate
+ * + KFieldEndDate
+ * + KFieldChangeHistory
+ */
+
+#define VERSION_CODE_1 VERSION_CODE(0,0,1)
+#define VERSION_CODE_2 VERSION_CODE(0,0,2)
+
+const qint32 DbSqliteAreaTbl::KVersionCode = VERSION_CODE_2;
 
 DbSqliteAreaTbl::DbSqliteAreaTbl():
     DbSqliteAreaTbl(nullptr)
@@ -48,6 +65,15 @@ void DbSqliteAreaTbl::addTableField(DbSqliteTableBuilder *builder)
     DbSqliteTbl::addTableField(builder);
     builder->addField(KFieldCountryUid, TEXT); // DB ID
     builder->addField(KFieldCountryDbId, INT64); // DB ID
+
+    // from 0.0.2
+    builder->addField(KFieldAddr, TEXT);
+    builder->addField(KFieldEmail, TEXT);
+    builder->addField(KFieldTel, TEXT);
+    builder->addField(KFieldModelStatus, INT64);
+    builder->addField(KFieldStartDate, INT64);
+    builder->addField(KFieldEndDate, INT64);
+    builder->addField(KFieldChangeHistory, TEXT);
     traceout;
 }
 
@@ -60,6 +86,15 @@ ErrCode DbSqliteAreaTbl::insertTableField(DbSqliteInsertBuilder *builder,
     Area* model = (Area*) item;
     builder->addValue(KFieldCountryUid, model->countryUid());
     builder->addValue(KFieldCountryDbId, model->countryDbId());
+
+    builder->addValue(KFieldAddr, model->addr());
+    builder->addValue(KFieldEmail, model->email());
+    builder->addValue(KFieldTel, model->tel());
+    builder->addValue(KFieldModelStatus, model->modelStatus());
+    builder->addValue(KFieldStartDate, model->startDate());
+    builder->addValue(KFieldEndDate, model->endDate());
+    builder->addValue(KFieldChangeHistory, model->changeHistory());
+
     traceout;
     return ErrNone;
 }
@@ -68,13 +103,30 @@ ErrCode DbSqliteAreaTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qr
 {
     tracein;
     ErrCode err = ErrNone;
-    DbSqliteTbl::updateModelFromQuery(item, qry);
-    Area* model = (Area*) item;
-    model->setCountryUid(qry.value(KFieldCountryUid).toString());//TODO: load country obj
-    model->setCountryDbId(qry.value(KFieldCountryDbId).toInt());//TODO: load country obj
-    if (qry.value(KFieldCountryName).isValid())
-        model->setCountryName(qry.value(KFieldCountryName).toString());
+    if (item) {
+        DbSqliteTbl::updateModelFromQuery(item, qry);
+        if (item->modelName() == KModelNameArea) {
+            Area* model = (Area*) item;
+            model->setCountryUid(qry.value(KFieldCountryUid).toString());//TODO: load country obj
+            model->setCountryDbId(qry.value(KFieldCountryDbId).toInt());//TODO: load country obj
+            if (qry.value(KFieldCountryName).isValid()) {
+                model->setCountryName(qry.value(KFieldCountryName).toString());
+            }
 
+            model->setAddr(qry.value(KFieldAddr).toString());
+            model->setEmail(qry.value(KFieldEmail).toString());
+            model->setTel(qry.value(KFieldTel).toString());
+            model->setModelStatus(qry.value(KFieldModelStatus).toInt());
+            model->setStartDate(qry.value(KFieldStartDate).toInt());
+            model->setEndDate(qry.value(KFieldEndDate).toInt());
+            model->setChangeHistory(qry.value(KFieldChangeHistory).toString());
+        } else {
+            logw("Not support model '%s'", STR2CHA(item->modelName()));
+        }
+    } else {
+        loge("Invalid argument");
+        err = ErrInvalidArg;
+    }
     traceout;
     return err;
 }
@@ -94,4 +146,33 @@ QString DbSqliteAreaTbl::getSearchQueryString(const QString &cond)
     }
     logd("queryString: %s", queryString.toStdString().c_str());
     return queryString;
+}
+
+ErrCode DbSqliteAreaTbl::onTblMigration(qint64 oldVer)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    logi("tbl '%s' version upgrade, from version 0x%lx to 0x%lx",
+         STR2CHA(mName), oldVer, mVersionCode);
+    switch (oldVer) {
+        case VERSION_CODE_1:
+        {
+            QHash<QString, TableFieldDatatype_t> columnField;
+            // From version 0.0.2
+            columnField.insert(KFieldAddr, TEXT);
+            columnField.insert(KFieldEmail, TEXT);
+            columnField.insert(KFieldTel, TEXT);
+            columnField.insert(KFieldModelStatus, INT64);
+            columnField.insert(KFieldStartDate, INT64);
+            columnField.insert(KFieldEndDate, INT64);
+            columnField.insert(KFieldChangeHistory, TEXT);
+            loge("Add column fields");
+            err = addTableColumn(columnField);
+        }
+        break;
+        default:
+            break;
+    };
+    traceret(err);
+    return err;
 }

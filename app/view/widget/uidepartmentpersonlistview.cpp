@@ -81,81 +81,10 @@ void UIDepartmentPersonListView::onAddItem(UITableCellWidgetItem *item)
     DlgDeptPerson* dlg = DlgDeptPerson::build(this, true, nullptr, this);
     dlg->setCommDeptUid(mCommDept->uid());
     dlg->setCommDeptNameId(mCommDept->nameId());
-//    if (mCommDept) {
-//        dlg->setCommDept(mCommDept);
-//        dlg->setCommDeptUid(mCommDept->uid());
-//    }
     dlg->exec();
     delete dlg;
     traceout;
-//    tracein;
-//    DlgDeptPerson * dlg = new DlgDeptPerson();
-//    if (dlg == nullptr) {
-//        loge("Open dlg DlgDeptPerson fail, No memory");
-//    }
 
-//    if (dlg->exec() == QDialog::Accepted){
-//        QList<DbModel*> list = dlg->selectedPersons();
-//        ErrCode ret = ErrNone;
-//        int cnt = 0;
-//        if (list.count() > 0) {
-//            foreach (DbModel* item, list) {
-//                PersonDept* dept = (PersonDept*) item;
-//                if (dept != nullptr) {
-//                    if (mCommDept){
-//                        dept->setCommDeptUid(mCommDept->uid());
-//                    }
-//                    dept->setModelStatus(MODEL_ACTIVE);
-//                    dept->dump();
-//                    logd("Save item to db");
-//                    ret = dept->save();
-//                    logi("Save item result %d", ret); // TODO: check return value if one fail, what happend???
-//                    if (ret == ErrNone){
-//                        cnt ++;
-//                    } else {
-//                        loge("Add per %s to dep %s failed %d", dept->personName().toStdString().c_str(),
-//                             dept->uid().toStdString().c_str(), ret);
-//                    }
-//                }
-//            }
-//        } else {
-//            logi("Nothing selecetd");
-//        }
-
-
-//        logd("Add %d per", cnt);
-//        if (cnt > 0) {
-//            logd("reload data");
-//            reload();
-//        }
-
-////        QList<Person *>  list = dlg->personList();
-////        logd("Selected %d per ", list.count());
-////        int cnt = 0;
-////        if (list.count() > 0) {
-////            foreach(Person* per, list) {
-////                logd("Add per %s to comm %s ", per->getFullName().toStdString().c_str(),
-////                     community()->name().toStdString().c_str());
-////                ErrCode ret = CommunityCtl::getInstance()->addPerson2Community(community(), per);
-////                logd("Add comm vs per ret=%d", ret);
-////                if (ret == ErrNone){
-////                    cnt ++;
-////                } else {
-////                    loge("Add per %s to comm %s failed %d", per->getFullName().toStdString().c_str(),
-////                         community()->name().toStdString().c_str(), ret);
-////                }
-////            }
-////            logd("Add %d per", cnt);
-////            if (cnt > 0) {
-////                logd("reload data");
-////                reload();
-////            }
-//        } else {
-//            logi("Nothing to add to department");
-//        }
-
-////    }
-//    delete dlg;
 }
 
 void UIDepartmentPersonListView::onEditItem(UITableCellWidgetItem *item)

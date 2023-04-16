@@ -27,6 +27,8 @@
 #include "dbctl.h"
 #include "utils.h"
 #include "countryctl.h"
+#include "dbareamodelhandler.h"
+#include "errreporterctl.h"
 
 GET_INSTANCE_CONTROLLER_IMPL(AreaCtl)
 
@@ -38,6 +40,48 @@ AreaCtl::AreaCtl():ModelController(KModelHdlArea)
 AreaCtl::~AreaCtl()
 {
     tracein;
+}
+
+ErrCode AreaCtl::getContactPeopleList(const QString &areaUid, QList<DbModel *> &outList,
+                                      qint64 modelStatus)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    DbAreaModelHandler* hdl = nullptr;
+    QList<DbModel *> items;
+    logd("get list of person for areaUid '%s', status 0x%x", STR2CHA(areaUid), modelStatus);
+    if (areaUid.isEmpty()) {
+        err = ErrInvalidArg;
+        loge("Get person failed invalid args");
+    }
+
+    if (err == ErrNone) {
+        hdl = dynamic_cast<DbAreaModelHandler*>(DB->getModelHandler(KModelHdlArea));
+        if (!hdl) {
+            err = ErrInvalidData;
+            loge("not found handler, something was wrong");
+        }
+    }
+
+    if (err == ErrNone) {
+        items = hdl->getListContactPeople(areaUid, modelStatus);
+        if (items.size() > 0) {
+            outList.append(items);
+        } else {
+            logw("not found list person of areaUid '%s'", STR2CHA(areaUid));
+        }
+    }
+    if (err != ErrNone) {
+        loge("Get list of active person failed, err=%d", err);
+        // we don't have error code return, so report error here.
+        REPORTERRCTL->reportErr(QObject::tr("Lỗi truy vấn danh sách nữ tu liên lạc của khu vực"),
+                                err, true);
+    } else {
+        logd("Got %lld items", items.size());
+    }
+
+    traceout;
+    return err;
 }
 
 // Format: Country name id, name id, Name, remark

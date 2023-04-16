@@ -14,14 +14,14 @@
  * limitations under the License.
  *
  *
- * Filename: dlgcommunity.cpp
+ * Filename: dlgarea.cpp
  * Author: Anh, Ngo Huy
  * Created date:7/24/2022
  * Brief:
  */
-#include "dlgcommunity.h"
+#include "dlgarea.h"
 #include "communityctl.h"
-#include "ui_dlgcommunity.h"
+#include "ui_dlgarea.h"
 #include "logger.h"
 #include "errcode.h"
 #include "community.h"
@@ -33,37 +33,26 @@
 #include "dbmodel.h"
 
 
-DlgCommunity::DlgCommunity(QWidget *parent) :
+DlgArea::DlgArea(QWidget *parent) :
     DlgCommonEditModel(parent),
-    ui(new Ui::DlgCommunity)
+    ui(new Ui::DlgArea)
 {
     ui->setupUi(this);
-#ifdef TEST_ENABLE
-    ui->frmCommTestBtn->setVisible(true);
-#else
-    ui->frmCommTestBtn->setVisible(false);
-#endif //TEST_ENABLE
     loadData();
 }
 
-DlgCommunity::~DlgCommunity()
+DlgArea::~DlgArea()
 {
     tracein;
     delete ui;
     traceout;
 }
 
-void DlgCommunity::setupUI()
-{
-    tracein;
-    traceout;
-}
-
-ErrCode DlgCommunity::buildModel(DbModel *model, QString& errMsg)
+ErrCode DlgArea::buildModel(DbModel *model, QString& errMsg)
 {
     tracein;
     ErrCode err = ErrNone;
-    Community* comm = (Community*) model;
+    Area* comm = (Area*) model;
     if (!model){
         err = ErrInvalidArg;
         loge("Invalid arg");
@@ -84,12 +73,6 @@ ErrCode DlgCommunity::buildModel(DbModel *model, QString& errMsg)
         }
     }
     if (err == ErrNone){
-        SET_VAL_FROM_CBOX(ui->cbArea, comm->setAreaUid, comm->setAreaName);
-    }
-    if (err == ErrNone){
-        SET_DATE_FORMAT_VAL_FROM_WIDGET(ui->txtFeaseDay, comm->setFeastDate, DATE_FORMAT_DM);
-    }
-    if (err == ErrNone){
         comm->setAddr(ui->txtAddr->toPlainText().trimmed());
     }
     if (err == ErrNone){
@@ -102,25 +85,13 @@ ErrCode DlgCommunity::buildModel(DbModel *model, QString& errMsg)
         SET_VAL_FROM_CBOX(ui->cbCountry, comm->setCountryUid, comm->setCountryName);
     }
     if (err == ErrNone){
-        comm->setChurch(ui->txtChurch->toPlainText().trimmed());
-    }
-    if (err == ErrNone){
         SET_INT_VAL_FROM_CBOX(ui->cbStatus, comm->setModelStatus, comm->setModelStatusName);
     }
     if (err == ErrNone){
-        SET_DATE_FORMAT_VAL_FROM_WIDGET(ui->txtEstablishDate, comm->setCreateDate, DEFAULT_FORMAT_YMD);
+        SET_DATE_FORMAT_VAL_FROM_WIDGET(ui->txtStartDate, comm->setStartDate, DEFAULT_FORMAT_YMD);
     }
     if (err == ErrNone){
-        SET_VAL_FROM_CBOX(ui->cbParentCommunity, comm->setParentUid, comm->setParentName);
-    }
-    if (err == ErrNone){
-        SET_VAL_FROM_TEXTBOX(ui->txtCEO, KItemUid, comm->setCurrentCEOUid, comm->setCurrentCEOName);
-    }
-    if (err == ErrNone){
-        comm->setContact(ui->txtContact->toPlainText().trimmed());
-    }
-    if (err == ErrNone){
-        comm->setBrief(ui->txtIntro->toPlainText().trimmed());
+        SET_DATE_FORMAT_VAL_FROM_WIDGET(ui->txtEndDate, comm->setEndDate, DEFAULT_FORMAT_YMD);
     }
     if (err == ErrNone){
         comm->setRemark(ui->txtNote->toPlainText().trimmed());
@@ -129,55 +100,48 @@ ErrCode DlgCommunity::buildModel(DbModel *model, QString& errMsg)
     return err;
 }
 
-ErrCode DlgCommunity::fromModel(const DbModel *item)
+ErrCode DlgArea::fromModel(const DbModel *item)
 {
     tracein;
     ErrCode err = ErrNone;
     err = DlgCommonEditModel::fromModel(item);
-    Community* comm = (Community*)model();
+    Area* comm = (Area*)model();
     if (err == ErrNone) {
         ui->txtName->setText(comm->name());
         ui->txtCode->setText(comm->nameId()); // TODO: auto generate???
-        Utils::setSelectItemComboxByData(ui->cbArea, comm->areaUid());
-        ui->txtEstablishDate->setText(Utils::date2String(comm->createDate(), DEFAULT_FORMAT_YMD));
-        ui->txtFeaseDay->setText(Utils::date2String(comm->feastDate(), DEFAULT_FORMAT_MD));
+        ui->txtStartDate->setText(Utils::date2String(comm->startDate(), DEFAULT_FORMAT_YMD));
+        ui->txtEndDate->setText(Utils::date2String(comm->endDate(), DEFAULT_FORMAT_YMD));
         ui->txtAddr->setPlainText(comm->addr());
         Utils::setSelectItemComboxByData(ui->cbCountry, comm->countryUid());
         ui->txtTel->setText(comm->tel());
         ui->txtEmail->setPlainText(comm->email());
-        ui->txtChurch->setPlainText(comm->church());
-        Utils::setSelectItemComboxByData(ui->cbStatus, comm->getStatus());
-        // TODO: image???
-        Utils::setSelectItemComboxByData(ui->cbParentCommunity, comm->parentUid());
-        SET_TEXTBOX_FROM_VALUE(ui->txtCEO, KItemUid,
-                               comm->currentCEOUid(), comm->currentCEOName());
-
-
-        ui->txtIntro->setPlainText(comm->brief());
-        ui->txtContact->setPlainText(comm->contact());
+        Utils::setSelectItemComboxByData(ui->cbStatus, comm->modelStatus());
         ui->txtNote->setPlainText(comm->remark());
     }
     traceret(err);
     return err;
 }
 
-DbModel *DlgCommunity::newModel()
+QDialogButtonBox *DlgArea::buttonBox()
 {
-    // TODO: check model parameter???
-    return Community::build();
+    return ui->buttonBox;
 }
 
-void DlgCommunity::loadData()
+DbModel *DlgArea::newModel()
+{
+    // TODO: check model parameter???
+    return Area::build();
+}
+
+void DlgArea::loadData()
 {
     tracein;
-    loadList(ui->cbArea, AREACTL);
     loadList(ui->cbCountry, COUNTRYCTL);
-    loadList(ui->cbParentCommunity, COMMUNITYCTL);
     loadStatus();
     traceout;
 }
 
-void DlgCommunity::loadStatus()
+void DlgArea::loadStatus()
 {
     tracein;
     ui->cbStatus->clear();
@@ -190,32 +154,7 @@ void DlgCommunity::loadStatus()
 }
 
 
-void DlgCommunity::on_btnSearchCEO_clicked()
-{
-    tracein;
-    DlgSearchPerson * dlg = DlgSearchPerson::build(this);
-    if (dlg == nullptr) {
-        loge("Open dlg DlgAddPersonEvent fail, No memory");
-        return; // TODO: open dlg??
-    }
-    dlg->setIsMultiSelection(false);
-
-    if (dlg->exec() == QDialog::Accepted){
-        Person* per = (Person*)dlg->selectedItem();
-        if (per != nullptr) {
-            ui->txtCEO->setText(per->getFullName());
-            logd("setProperty %s", per->uid().toStdString().c_str());
-            ui->txtCEO->setProperty(KItemUid, per->uid());
-        } else {
-            logi("No person selected");
-        }
-    }
-    delete dlg;
-    traceout;
-}
-
-
-void DlgCommunity::on_txtName_textChanged(const QString &arg1)
+void DlgArea::on_txtName_textChanged(const QString &arg1)
 {
     tracein;
     onChangeNameIdTxt(ui->txtCode, arg1);
@@ -223,7 +162,7 @@ void DlgCommunity::on_txtName_textChanged(const QString &arg1)
 }
 
 
-void DlgCommunity::on_btnChangeNameId_clicked()
+void DlgArea::on_btnChangeNameId_clicked()
 {
     tracein;
     onEditnameId(ui->txtCode);

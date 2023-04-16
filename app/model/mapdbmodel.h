@@ -61,19 +61,19 @@ public:
     virtual QString buildUid(const QString* seed = nullptr);
 
 
-    const QString &uid1() const;
+    virtual const QString &uid1() const;
     void setUid1(const QString &newUid1);
 
-    qint64 dbId1() const;
+    virtual qint64 dbId1() const;
     void setDbId1(qint64 newDbId1);
 
     qint64 startDate() const;
     void setStartDate(qint64 newStartDate);
 
-    const QString &uid2() const;
+    virtual const QString &uid2() const;
     void setUid2(const QString &newUid2);
 
-    qint64 dbId2() const;
+    virtual qint64 dbId2() const;
     void setDbId2(qint64 newDbId2);
 
     qint64 endDate() const;
@@ -91,6 +91,9 @@ public:
 
     const QString &changeHistory() const;
     void setChangeHistory(const QString &newChangeHistory);
+    const QString &modelStatusName() const;
+    void setModelStatusName(const QString &newModelStatusName);
+
 protected:
     void copy(const MapDbModel& model);
 protected:
@@ -100,7 +103,8 @@ protected:
     qint64 mDbId2;
     qint64 mStartDate;
     qint64 mEndDate;
-    qint32 mStatus;
+    qint32 mModelStatus;
+    QString mModelStatusName; // just for display
     QString mParentUid;
     QString mChangeHistory;
 };

@@ -79,9 +79,9 @@ QList<DbModel *> DbSqliteMapTbl::getListItems(const QString &mapTblName,
     }
     logi("uid '%s'", uid.toStdString().c_str());
     QString queryString = QString("SELECT %6 FROM %1 LEFT JOIN %2 ON %1.%3 = %2.%4 WHERE %1.%5 = :uid")
-                              .arg(mapTblName, modelTblName)
-                              .arg(fieldUid2Join, fieldModelUid, fieldUid1Cond)
-                              .arg(selectedField)
+                              .arg(mapTblName, modelTblName) // 1 & 2
+                              .arg(fieldUid2Join, fieldModelUid, fieldUid1Cond) // 3 & 4 & 5
+                              .arg(selectedField) // 6
         ;
 
     qry.prepare(queryString);
@@ -292,5 +292,43 @@ const QString& DbSqliteMapTbl::getFieldNameDbid2() const
 {
     return mFieldNameDbId2;
 
+}
+
+ErrCode DbSqliteMapTbl::updateTableField(DbSqliteUpdateBuilder *builder,
+                                         const QList<QString> &updateField, const DbModel *item)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    if (!builder || !item) {
+        err = ErrInvalidArg;
+        loge("invalid arg");
+    }
+    if (err == ErrNone) {
+        err = DbSqliteTbl::updateTableField(builder, updateField, item);
+    }
+    if (err == ErrNone) {
+        if (item->modelType() == MODEL_MAP) {
+            MapDbModel* comm = (MapDbModel*) item;
+            foreach (QString field, updateField) {
+                logd("Update field %s", STR2CHA(field));
+                if (field == KItemChangeHistory) {
+                    builder->addValue(KFieldChangeHistory, comm->changeHistory());
+                }else if (field == KItemStatus) {
+                    builder->addValue(KFieldModelStatus, comm->modelStatus());
+                } else if (field == KItemEndDate) {
+                    builder->addValue(KFieldEndDate, comm->endDate());
+                } else if (field == KItemStartDate) {
+                    builder->addValue(KFieldStartDate, comm->startDate());
+                } else {
+                    logw("Field '%s' not support here", STR2CHA(field));
+                }
+            }
+        } else {
+            logw("'%s' is not a model map, current type %d",
+                 STR2CHA(item->modelName()), item->modelType());
+        }
+    }
+    traceout;
+    return err;
 }
 

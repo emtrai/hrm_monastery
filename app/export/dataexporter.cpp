@@ -30,6 +30,7 @@
 #include <QJsonArray>
 #include "exporttype.h"
 #include <QMap>
+#include "jsondefs.h"
 
 DataExporter::DataExporter()
 {

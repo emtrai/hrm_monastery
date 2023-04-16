@@ -43,6 +43,7 @@
 #include "view/dialog/dlgeditmodel.h"
 #include "view/dialog/dlgcourse.h"
 #include "view/dialog/dlgcommdept.h"
+#include "view/dialog/dlgarea.h"
 #include "personctl.h"
 #include "dialog/dlgabout.h"
 #include "dlgwait.h"
@@ -231,6 +232,13 @@ void MainWindow::showAddEditCommDept(bool isSelfUpdate, DbModel* comm, DbModel *
     getInstance()->doShowAddEditCommDept(isSelfUpdate, comm, dept, listener);
     traceout;
 
+}
+
+void MainWindow::showAddEditArea(bool isSelfUpdate, DbModel *com, CommonEditModelListener *listener)
+{
+    tracein;
+    getInstance()->doShowAddEditArea(isSelfUpdate, com, listener);
+    traceout;
 }
 
 ErrCode MainWindow::exportListItems(const QList<DbModel *>* items,
@@ -523,6 +531,16 @@ void MainWindow::doShowAddEditCommDept(bool isSelfUpdate, DbModel* comm,
     logd("isSelfUpdate %d", isSelfUpdate);
     DlgCommDept* dlg = DlgCommDept::build(this, isSelfUpdate, model, listener);
     dlg->setCommunity(comm);
+    dlg->exec();
+    delete dlg;
+    traceout;
+}
+
+void MainWindow::doShowAddEditArea(bool isSelfUpdate, DbModel *model, CommonEditModelListener *listener)
+{
+    tracein;
+    logd("isSelfUpdate %d", isSelfUpdate);
+    DlgArea* dlg = DlgArea::build(this, isSelfUpdate, model, listener);
     dlg->exec();
     delete dlg;
     traceout;

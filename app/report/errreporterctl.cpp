@@ -20,7 +20,8 @@
  * Brief:
  */
 #include "errreporterctl.h"
-
+#include "mainwindow.h"
+#include "utils.h"
 
 GET_INSTANCE_IMPL(ErrReporterCtl)
 
@@ -39,7 +40,11 @@ void ErrReporterCtl::reportErr(const QString &errMsg, ErrCode err,
                                bool delay)
 {
     // TODO: report err, show public dialog????
-    loge("%s, Mã lỗi = %d", STR2CHA(errMsg), err);
+    QString msg = QString("%1. Mã lỗi = %2").arg(errMsg).arg(err);
+    loge("%s", STR2CHA(msg));
     logd("showErrDlg %d", showErrDlg);
     logd("delay %d", delay);
+    if (showErrDlg) {
+        Utils::showErrorBox(msg);
+    }
 }

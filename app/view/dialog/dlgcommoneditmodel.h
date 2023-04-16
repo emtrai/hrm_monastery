@@ -52,6 +52,7 @@ inline static className* build(QWidget *parent = nullptr, \
 
 class DbModel;
 class DlgCommonEditModel;
+class QDialogButtonBox;
 
 class CommonEditModelListener
 {
@@ -66,6 +67,7 @@ class DlgCommonEditModel: public QDialog
 public:
     DlgCommonEditModel(QWidget *parent);
     virtual ~DlgCommonEditModel();
+    virtual void setupUI();
     virtual bool isNew() const;
     virtual void setIsNew(bool newIsNew);
 
@@ -89,6 +91,7 @@ public:
     void setModel(DbModel *newModel);
 
 protected:
+    virtual QDialogButtonBox* buttonBox();
     /**
      * @brief Create new model object, must be implemeted by derived class
      * @param model: if null, create new one completely, else create base on this

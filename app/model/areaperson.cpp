@@ -29,7 +29,7 @@
 #include "dbctl.h"
 #include "dbmodel.h"
 
-AreaPerson::AreaPerson():mArea(nullptr), mPerson(nullptr)
+AreaPerson::AreaPerson():MapDbModel()
 {
     tracein;
 }
@@ -37,8 +37,6 @@ AreaPerson::AreaPerson():mArea(nullptr), mPerson(nullptr)
 AreaPerson::~AreaPerson()
 {
     tracein;
-    if (mPerson) delete mPerson;
-    if (mArea) delete mArea;
     traceout;
 }
 
@@ -51,6 +49,7 @@ void AreaPerson::clone(const DbModel *model)
 {
     tracein;
     if (model) {
+        MapDbModel::clone(model);
         copy(*(AreaPerson*)model);
     } else {
         loge("clone failed, null model");
@@ -79,11 +78,135 @@ void AreaPerson::copy(const AreaPerson &model)
 {
     tracein;
     mRoleUid = model.mRoleUid;
-    if (mPerson) delete mPerson;
-    mPerson = model.mPerson->clone();
-    if (mArea) delete mArea;
-    mArea = model.mArea->clone();
+    mRoleName = model.mRoleName;
+    mCourseUid = model.mCourseUid;
+    mCourseName = model.mCourseName;
+    mPersonUid = model.mPersonUid;
+    mPersonName = model.mPersonName;
+    mPersonNameId = model.mPersonNameId;
+    mHollyName = model.mHollyName;
+    mPersonTel = model.mPersonTel;
+    mPersonEmail = model.mPersonEmail;
+    mAreaUid = model.mAreaUid;
+    mAreaName = model.mAreaName;
+    mAreaNameId = model.mAreaNameId;
+
     traceout;
+}
+
+const QString &AreaPerson::personNameId() const
+{
+    return mPersonNameId;
+}
+
+void AreaPerson::setPersonNameId(const QString &newPersonNameId)
+{
+    mPersonNameId = newPersonNameId;
+}
+
+const QString &AreaPerson::personEmail() const
+{
+    return mPersonEmail;
+}
+
+void AreaPerson::setPersonEmail(const QString &newPersonEmail)
+{
+    mPersonEmail = newPersonEmail;
+}
+
+const QString &AreaPerson::personTel() const
+{
+    return mPersonTel;
+}
+
+void AreaPerson::setPersonTel(const QString &newPersonTel)
+{
+    mPersonTel = newPersonTel;
+}
+
+const QString &AreaPerson::hollyName() const
+{
+    return mHollyName;
+}
+
+void AreaPerson::setHollyName(const QString &newHollyName)
+{
+    mHollyName = newHollyName;
+}
+
+const QString &AreaPerson::areaNameId() const
+{
+    return mAreaNameId;
+}
+
+void AreaPerson::setAreaNameId(const QString &newAreaNameId)
+{
+    mAreaNameId = newAreaNameId;
+}
+
+const QString &AreaPerson::areaName() const
+{
+    return mAreaName;
+}
+
+void AreaPerson::setAreaName(const QString &newAreaName)
+{
+    mAreaName = newAreaName;
+}
+
+const QString &AreaPerson::areaUid() const
+{
+    return mAreaUid;
+}
+
+void AreaPerson::setAreaUid(const QString &newAreaUid)
+{
+    mAreaUid = newAreaUid;
+    markItemAsModified(KItemArea);
+    setUid1(mAreaUid);
+}
+
+const QString &AreaPerson::personName() const
+{
+    return mPersonName;
+}
+
+void AreaPerson::setPersonName(const QString &newPersonName)
+{
+    mPersonName = newPersonName;
+}
+
+const QString &AreaPerson::personUid() const
+{
+    return mPersonUid;
+}
+
+void AreaPerson::setPersonUid(const QString &newPersonUid)
+{
+    mPersonUid = newPersonUid;
+    setUid2(mPersonUid);
+    markItemAsModified(KItemPerson);
+}
+
+const QString &AreaPerson::courseName() const
+{
+    return mCourseName;
+}
+
+void AreaPerson::setCourseName(const QString &newCourseName)
+{
+    mCourseName = newCourseName;
+}
+
+const QString &AreaPerson::courseUid() const
+{
+    return mCourseUid;
+}
+
+void AreaPerson::setCourseUid(const QString &newCourseUid)
+{
+    mCourseUid = newCourseUid;
+    markItemAsModified(KItemCourse);
 }
 
 const QString &AreaPerson::roleName()
@@ -104,27 +227,6 @@ const QString &AreaPerson::roleName()
 void AreaPerson::setRoleName(const QString &newRoleName)
 {
     mRoleName = newRoleName;
-}
-
-
-DbModel *AreaPerson::area() const
-{
-    return mArea;
-}
-
-void AreaPerson::setArea(DbModel *newArea)
-{
-    mArea = newArea;
-}
-
-DbModel *AreaPerson::person() const
-{
-    return mPerson;
-}
-
-void AreaPerson::setPerson(DbModel *newPerson)
-{
-    mPerson = newPerson;
 }
 
 const QString &AreaPerson::roleUid() const

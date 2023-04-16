@@ -34,6 +34,8 @@ class DbModel;
 class AreaCtl : public ModelController
 {
     GET_INSTANCE_DECL(AreaCtl);
+public:
+    virtual ErrCode getContactPeopleList(const QString& areaUid, QList<DbModel*>& outList, qint64 modelStatus = MODEL_STATUS_MAX);
 private:
     AreaCtl();
     virtual ~AreaCtl();

@@ -992,6 +992,90 @@ DbModel *DbSqliteTbl::getModel(qint64 dbId, const DbModelBuilder& builder)
     return item;
 }
 
+ErrCode DbSqliteTbl::getColumnList(QHash<QString, QString>& colList)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    QString sql = QString("PRAGMA table_info('%1')").arg(mName);
+    QSqlQuery qry(SQLITE->currentDb());
+    qry.prepare(sql);
+    logd("sql '%s'", STR2CHA(sql));
+    err = db()->execQuery(&qry);
+    if (err == ErrNone) {
+        if( qry.exec() ) {
+            logd("get next, isvalid=%d", qry.isValid());
+            logd("Get all number of item %d", qry.size());
+            while (qry.next()) {
+                QString name = qry.value("name").toString();
+                QString type = qry.value("type").toString();
+                colList.insert(name, type);
+                logd("name '%s', type '%s'", STR2CHA(name), STR2CHA(type));
+            }
+        }
+        else {
+            loge( "Failed to execute %s", STR2CHA(qry.executedQuery()) );
+            loge( "Last error %s", STR2CHA(qry.lastError().text()) );
+        }
+    } else {
+        loge("Execute '%s' failed, err=%d", STR2CHA(sql), err);
+    }
+    traceret(err);
+    return err;
+}
+
+ErrCode DbSqliteTbl::addTableColumn(const QHash<QString, TableFieldDatatype_t> &columnField)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    QHash<QString, QString> collist;
+    err = getColumnList(collist);
+    if (err == ErrNone) {
+        if (columnField.size() > 0) {
+            logd("Add %d column", columnField.size());
+
+            QString dataTypeString;
+            TableFieldDatatype_t dataType;
+            QString sql;
+            foreach( QString name, columnField.keys() ) {
+                if (collist.contains(name)) {
+                    logi("Column '%s' existed, skip", STR2CHA(name));
+                    continue;
+                }
+                dataType = columnField[name];
+                logd("Add column '%s', datatype %d", STR2CHA(name), dataType);
+                dataTypeString = getDateTypeString(dataType);
+                if (!dataTypeString.isEmpty()) {
+                    sql = QString("ALTER TABLE %1 ADD %2 %3 ;").arg(mName, name, dataTypeString);
+                    if (!sql.isEmpty()){
+                        logd("Sql '%s'", STR2CHA(sql));
+                        err = db()->execQuery(sql);
+                    } else{
+                        loge("Invalid sql command");
+                        err = ErrFailed;
+                    }
+                } else {
+                    err = ErrInvalidData;
+                    loge("invalid data type for column '%s', %d", STR2CHA(name), columnField[name]);
+                }
+
+                if (err == ErrNone) {
+                    if (!mFieldDataTypeMap.contains(name)) {
+                        logd("update mFieldDataTypeMap name '%s', type %d ", STR2CHA(name), dataType);
+                        mFieldDataTypeMap[name] = dataType;
+                    } else {
+                        logd("mFieldDataTypeMap name '%s' exist", STR2CHA(name));
+                    }
+                } else {
+                    loge("Alter table for column '%s' failed, err=%d", STR2CHA(name), err);
+                    break;
+                }
+            }
+        }
+    }
+    traceret(err);
+    return err;
+}
+
 ErrCode DbSqliteTbl::checkOrCreateTable()
 {
     tracein;
@@ -1029,17 +1113,20 @@ ErrCode DbSqliteTbl::checkOrCreateTable()
     return err;
 }
 
-ErrCode DbSqliteTbl::onDbMigration(int oldVer, int newVer)
+ErrCode DbSqliteTbl::onDbMigration(qint64 oldVer, qint64 newVer)
 {
     tracein;
+    loge("WARNING!!! Version of DB change from old 0x%lx to 0x%lx, but derived class not handle it!!!!!",
+         oldVer, newVer);
     return ErrNone;
 }
 
-ErrCode DbSqliteTbl::onTblMigration(int oldVer, int newVer)
+ErrCode DbSqliteTbl::onTblMigration(qint64 oldVer)
 {
     tracein;
+    loge("WARNING!!! Version of Table change from old 0x%lx to 0x%lx, but derived class not handle it!!!!!",
+         oldVer, mVersionCode);
     return ErrNone;
-
 }
 
 QList<QString> DbSqliteTbl::getNameFields()

@@ -28,8 +28,10 @@
 #include "area.h"
 #include "utils.h"
 #include "mainwindow.h"
-#include "uicommdeptlistview.h"
+#include "uiareacontactpeoplelistview.h"
 #include "uitableviewfactory.h"
+#include "stringdefs.h"
+#include "errreporterctl.h"
 
 UIAreaListView::UIAreaListView(QWidget *parent):
     UICommonListView(parent)
@@ -46,16 +48,32 @@ void UIAreaListView::initHeader()
 {
     tracein;
     UICommonListView::initHeader();
-    mHeader.append(tr("Quốc gia"));
+    mHeader.append(STR_COUNTRY);
+    mHeader.append(STR_TEL);
+    mHeader.append(STR_EMAIL);
+    mHeader.append(STR_ADDR);
 }
 
 void UIAreaListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
-
-    UICommonListView::updateItem(item, tblItem, idx);
-    Area* model = (Area*) item;
-    tblItem->addValue(model->countryName());
+    if (item) {
+        UICommonListView::updateItem(item, tblItem, idx);
+        if (item->modelName() == KModelNameArea) {
+            Area* model = (Area*) item;
+            tblItem->addValue(model->countryName());
+            tblItem->addValue(model->tel());
+            tblItem->addValue(model->email());
+            tblItem->addValue(model->addr());
+        } else {
+            loge("Not area model name, it's '%s'", STR2CHA(item->modelName()));
+            REPORTERRCTL->reportErr(tr("Dữ liệu không phù hợp"));
+        }
+    } else {
+        loge("Invalid item to update");
+        REPORTERRCTL->reportErr(tr("Không có dữ liệu để cập nhật"));
+    }
+    traceout;
 }
 
 ModelController *UIAreaListView::getController()
@@ -75,5 +93,73 @@ QList<DbModel *> UIAreaListView::getListItem()
 DbModel *UIAreaListView::onNewModel()
 {
     return Area::build();
+}
+
+void UIAreaListView::onAddItem(UITableCellWidgetItem *item)
+{
+    tracein;
+    MainWindow::showAddEditArea(true, nullptr, this);
+    traceout;
+}
+
+void UIAreaListView::onEditItem(UITableCellWidgetItem *item)
+{
+    tracein;
+    if (item) {
+        DbModel* area = item->itemData();
+        if (area) {
+            MainWindow::showAddEditArea(true, area, this);
+        } else {
+            loge("Edit failed, null area");
+        }
+    } else {
+        loge("Edit failed, null item");
+    }
+    traceout;
+}
+
+void UIAreaListView::onDeleteItem(const QList<UITableItem *> &selectedItems)
+{
+
+}
+
+void UIAreaListView::onViewItem(UITableCellWidgetItem *item)
+{
+
+}
+
+QList<UITableMenuAction *> UIAreaListView::getMenuSingleSelectedItemActions(const QMenu *menu, UITableCellWidgetItem *item)
+{
+    tracein;
+    QList<UITableMenuAction*> actionList = UITableView::getMenuSingleSelectedItemActions(menu, item);
+    actionList.append(UITableMenuAction::build(tr("Xem danh sách liên lạc"), this, item)
+                                               ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                                   return this->onMenuActionViewContactPeople(m, a);
+                                               }));
+    // TODO: export data
+    // TODO: import data
+    return actionList;
+}
+
+ErrCode UIAreaListView::onMenuActionViewContactPeople(QMenu *menu, UITableMenuAction *act)
+{
+    tracein;
+    ErrCode ret = ErrNone;
+    Area* area = dynamic_cast<Area*>(act->getData());
+    if (area != nullptr) {
+        UIAreaContactPeopleListView* view =
+                (UIAreaContactPeopleListView*)UITableViewFactory::getView(ViewType::VIEW_AREA_PERSON);
+
+        logd("area to view person %s", STR2CHA(area->toString()));
+        view->setArea(area);
+        MainWindow::getInstance()->switchView(view);
+    } else {
+        loge("no area info");
+        ret = ErrNoData;
+        Utils::showErrorBox(tr("Vui lòng chọn khu vực cần xem"));
+    }
+
+    traceret(ret);
+    return ret;
 }
 

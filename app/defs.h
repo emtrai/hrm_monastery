@@ -264,29 +264,5 @@ const char* const KCsvItemBirthDay = "NGAY_SINH";
 const char* const KCsvItemBirthPlace = "NOI_SINH";
 const char* const KCsvItemHollyName = "TEN_THANH";
 
-const char* const JSON_COMMUNITYLIST = "communities";
-const char* const JSON_ITEMS = "items";
-const char* const JSON_DEPARTMENTS = "departments";
-const char* const JSON_DEPARTMENT_NAMEID = "department";
-const char* const JSON_ID = "id";
-const char* const JSON_NAMEID = "nameid";
-const char* const JSON_CODE = "code";
-const char* const JSON_NAME = "name";
-const char* const JSON_CHURCH = "church";
-const char* const JSON_ADDR = "addr";
-const char* const JSON_TEL = "tel";
-const char* const JSON_EMAIL = "email";
-const char* const JSON_BRIEF = "brief";
-const char* const JSON_REMARK = "remark";
-const char* const JSON_STATUS = "status";
-const char* const JSON_FEASTDAY = "feastday";
-const char* const JSON_ESTABLISH = "establishday";
-const char* const JSON_CLOSEDATE = "closeday";
-const char* const JSON_COMMUNITY_UID = "community";
-const char* const JSON_AREA_UID = "areaid";
-const char* const JSON_AREA_NAMEID = "area";
-const char* const JSON_PARENT_NAMEID = "parent";
-const char* const JSON_MISSION_NAMEID = "mission";
-const char* const JSON_COUNTRY_NAMEID = "country";
 
 #endif // DEFS_H

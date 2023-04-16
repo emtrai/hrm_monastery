@@ -16,6 +16,7 @@
 #include "exporttype.h"
 #include "filectl.h"
 #include "filter.h"
+#include "jsondefs.h"
 
 ModelController::ModelController():
     mEnableCache(true),
@@ -561,6 +562,7 @@ ErrCode ModelController::parsePrebuiltFile(const QString &fpath, const QString &
         } else if (ftype == KFileTypeJson) {
             logd("Load file %s", fpath.toStdString().c_str());
             QFile loadFile(fpath);
+            QByteArray importData;
 
             if (!loadFile.open(QIODevice::ReadOnly)) {
                 loge("Couldn't open file %s", fpath.toStdString().c_str());
@@ -568,64 +570,53 @@ ErrCode ModelController::parsePrebuiltFile(const QString &fpath, const QString &
             }
 
             if (ret == ErrNone){
-                logd("Load file %s", fpath.toStdString().c_str());
-                QFile loadFile(fpath);
-                QByteArray importData;
-
-                if (!loadFile.open(QIODevice::ReadOnly)) {
-                    loge("Couldn't open file %s", fpath.toStdString().c_str());
-                    ret = ErrFileRead;
+                logd("Parse json");
+                importData = loadFile.readAll();
+                logd("importData length %d", (int)importData.length());
+                // TODO: too big data????
+                if (importData.size() == 0) {
+                    ret = ErrNoData;
+                    loge("No data to import");
                 }
-
-                if (ret == ErrNone){
-                    logd("Parse json");
-                    importData = loadFile.readAll();
-                    logd("importData length %d", (int)importData.length());
-                    // TODO: too big data????
-                    if (importData.size() == 0) {
-                        ret = ErrNoData;
-                        loge("No data to import");
-                    }
-                }
-
-                if (ret == ErrNone) {
-                    QJsonDocument loadDoc = QJsonDocument::fromJson(importData);
-
-                    logd("loadDoc isEmpty %d", loadDoc.isEmpty());
-                    QJsonObject jRootObj = loadDoc.object();
-
-                    if (jRootObj.contains(JSON_ITEMS) && jRootObj[JSON_ITEMS].isArray()) {
-                        QJsonArray jlist = jRootObj[JSON_ITEMS].toArray();
-                        for (int levelIndex = 0; levelIndex < jlist.size() && (ret == ErrNone); ++levelIndex) {
-                            logd("Import community idx=%d", levelIndex);
-                            QJsonObject jObj = jlist[levelIndex].toObject();
-                            bool ok = false;
-                            DbModel* model = onJsonParseOneItem(jObj, &ok);
-                            if (model) {
-                                if (ok && model->isValid()) {
-                                    ret = model->save();
-                                    if (ret == ErrExisted) { // already exist, mean ok
-                                        ret = ErrNone;
-                                        logw("'%s' already exist", STR2CHA(model->toString()));
-                                    }
-                                } else {
-                                    loge("Invalid '%s'", STR2CHA(model->toString()));
-                                    ret = ErrInvalidData;
-                                }
-                                delete model;
-                            } else {
-                                ret = ErrFailed;
-                                loge("parse json one item failed");
-                            }
-
-                        }
-                    } else {
-                        loge("Invalid json data, not found %s", JSON_ITEMS);
-                        ret = ErrInvalidData;
-                    }
-                }
-                loadFile.close();
             }
+
+            if (ret == ErrNone) {
+                QJsonDocument loadDoc = QJsonDocument::fromJson(importData);
+
+                logd("loadDoc isEmpty %d", loadDoc.isEmpty());
+                QJsonObject jRootObj = loadDoc.object();
+
+                if (jRootObj.contains(JSON_ITEMS) && jRootObj[JSON_ITEMS].isArray()) {
+                    QJsonArray jlist = jRootObj[JSON_ITEMS].toArray();
+                    for (int levelIndex = 0; levelIndex < jlist.size() && (ret == ErrNone); ++levelIndex) {
+                        logd("Import community idx=%d", levelIndex);
+                        QJsonObject jObj = jlist[levelIndex].toObject();
+                        bool ok = false;
+                        DbModel* model = onJsonParseOneItem(jObj, &ok);
+                        if (model) {
+                            if (ok && model->isValid()) {
+                                ret = model->save();
+                                if (ret == ErrExisted) { // already exist, mean ok
+                                    ret = ErrNone;
+                                    logw("'%s' already exist", STR2CHA(model->toString()));
+                                }
+                            } else {
+                                loge("Invalid '%s'", STR2CHA(model->toString()));
+                                ret = ErrInvalidData;
+                            }
+                            delete model;
+                        } else {
+                            ret = ErrFailed;
+                            loge("parse json one item failed");
+                        }
+
+                    }
+                } else {
+                    loge("Invalid json data, not found %s", JSON_ITEMS);
+                    ret = ErrInvalidData;
+                }
+            }
+            loadFile.close();
         } else {
             ret = ErrNotSupport;
         }

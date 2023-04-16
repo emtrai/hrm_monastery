@@ -29,6 +29,7 @@
 #include "view/widget/uidepartmentpersonlistview.h"
 #include "view/widget/uirolelistview.h"
 #include "view/widget/uiarealistview.h"
+#include "view/widget/uiareacontactpeoplelistview.h"
 #include "view/widget/uidepartmentlistview.h"
 #include "view/widget/uimissionlistview.h"
 #include "view/widget/uispecialistlistview.h"
@@ -59,6 +60,9 @@ BaseView *UITableViewFactory::getView(ViewType type, QWidget *parent )
         break;
     case VIEW_AREA:
         view = new UIAreaListView(parent);
+        break;
+    case VIEW_AREA_PERSON:
+        view = new UIAreaContactPeopleListView(parent);
         break;
     case VIEW_COMMUNITY_PERSON:
         view = new UICommunityPersonListView(parent);

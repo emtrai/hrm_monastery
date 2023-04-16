@@ -21,8 +21,13 @@
  */
 #ifndef DBSQLITEAREAMGRTBL_H
 #define DBSQLITEAREAMGRTBL_H
+#include "errcode.h"
+#include <QList>
+#include "dbsqlitemaptbl.h"
 
-#include "dbsqlitecommdeptpersontbl.h"
+class DbModel;
+class DbSqliteTableBuilder;
+class DbSqlite;
 
 class DbSqliteAreaMgrTbl : public DbSqliteMapTbl
 {
@@ -31,8 +36,14 @@ public:
     QList<DbModel*> getListPerson(const QString& areaUid, int status = MODEL_STATUS_MAX);
 
 protected:
+    ErrCode insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item);
     virtual void addTableField(DbSqliteTableBuilder* builder);
     virtual ErrCode updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
+    virtual ErrCode onTblMigration(qint64 oldVer);
+
+    virtual ErrCode updateTableField(DbSqliteUpdateBuilder* builder,
+                                     const QList<QString>& updateField,
+                                     const DbModel *item);
 private:
     static const qint32 KVersionCode;
 };

@@ -55,11 +55,10 @@ DbModel::DbModel(const DbModel &model):DbModel()
     traceout;
 }
 
-DbModel::DbModel(const DbModel *model)
+DbModel::DbModel(const DbModel *model):DbModel()
 {
     tracein;
     if (model) {
-        DbModel(*model);
         copy(*model);
     }
     traceout;

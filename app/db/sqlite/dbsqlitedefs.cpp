@@ -75,10 +75,13 @@ static void initItemFieldMap()
 
 QString getDateTypeString(TableFieldDatatype_t dataType){
     static QMap<TableFieldDatatype_t, QString> map;
-    map[TEXT] = "TEXT";
-    map[INT32] = "INTEGER";
-    map[INT64] = "INTEGER";
-
+    static bool isInit = false;
+    if (!isInit) {
+        map[TEXT] = "TEXT";
+        map[INT32] = "INTEGER";
+        map[INT64] = "INTEGER";
+        isInit = true;
+    }
     return map[dataType];
 }
 

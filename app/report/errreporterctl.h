@@ -34,7 +34,8 @@ private:
     ErrReporterCtl();
     virtual ~ErrReporterCtl();
 public:
-    void reportErr(const QString& errMsg, ErrCode err,
+    void reportErr(const QString& errMsg,
+                  ErrCode err = ErrUnknown,
                   bool showErrDlg = false, // show show error dialog
                   bool delay = false // delay true: not show dialog right now until delay = false
                   );

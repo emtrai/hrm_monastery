@@ -54,6 +54,10 @@ protected:
     virtual const QString& getFieldNameDbid1() const;
     virtual const QString& getFieldNameUid2() const;
     virtual const QString& getFieldNameDbid2() const;
+
+    virtual ErrCode updateTableField(DbSqliteUpdateBuilder* builder,
+                                     const QList<QString>& updateField,
+                                     const DbModel *item);
 protected:
     QString mFieldNameUid1;
     QString mFieldNameDbId1;

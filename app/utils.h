@@ -96,20 +96,7 @@ do { \
 } while (0)
 
 
-//#define SET_DATE_VAL_FROM_WIDGET(widget,func) \
-//do { \
-//        QString val = widget->text().trimmed();\
-//        func(0);\
-//        if (!val.isEmpty()){ \
-//            bool isOk = false;\
-//            qint64 date = Utils::dateFromString(val, DATE_FORMAT_YMD, &isOk);\
-//            if (isOk && date > 0){\
-//                func(date);\
-//        }\
-//    } \
-//} while (0)
 #define SET_DATE_VAL_FROM_WIDGET(widget,func) SET_DATE_FORMAT_VAL_FROM_WIDGET(widget, func, DEFAULT_FORMAT_YMD)
-
 
 #define SET_VAL_FROM_CBOX(widget,func, functxt) \
     do { \
@@ -194,9 +181,8 @@ do { \
     } while (0)
 
 
-#define UNUSED(param) (void)param
-
 #define STR2CHA(val) (!(val).isEmpty()?(val).toStdString().c_str():"(empty)")
+#define MODELNAME2CHA(model) (model?STR2CHA(model->modelName()):"(null)")
 
 // TODO: re-implement this one!!!!!
 #define ASSERT(cond, msg) \
@@ -210,19 +196,6 @@ do { \
 #define FAIL(msg) ASSERT(false, msg)
 
 #define FULLNAME(firstName, lastName) QString("%1 %2").arg(lastName, firstName)
-
-#define JSON_GET_TO_SET_STR(json, key ,func) \
-do { \
-        if (jobj.contains(key)){ \
-            QString tmp = jobj[key].toString().trimmed(); \
-            if (!tmp.isEmpty()) { \
-                logd("Set %s", key);\
-                func(tmp); \
-        } else {\
-                logw("%s defined but no data", key);\
-        } \
-    } \
-} while (0)
 
 #define RELEASE_LIST_DBMODEL(list) \
     do { \

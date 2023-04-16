@@ -45,16 +45,6 @@ public:
     virtual ErrCode buildModel(DbModel* model, QString& errMsg);
     virtual ErrCode fromModel(const DbModel* model);
 
-    /**
-     * @brief return selected item. Caller must free data after use
-     * @return list of PersonDept object
-     */
-    QList<DbModel *> selectedPersons() const;
-
-//    void setCommDeptUid(const QString &newCommDeptUid);
-
-//    void setCommDept(DbModel *newCommDept);
-
     void setCommDeptUid(const QString &newCommDeptUid);
 
     void setCommDeptNameId(const QString &newCommDeptNameId);
@@ -65,19 +55,12 @@ protected:
     void loadCourse();
     void loadRole();
     void loadStatus();
-//    virtual void showEvent(QShowEvent *event);
-//    void accept();
 private slots:
     void on_btnSearch_clicked();
 
-//    void on_btnAllPeople_clicked();
-//    void updatePeopleList(const QList<DbModel*>& list);
 
 private:
     Ui::DlgDeptPerson *ui;
-    QList<DbModel*> mSelectedPersons;
-    QList<DbModel*> mListPerson;
-    bool mIsMultiSelection;
     QString mCommDeptUid;
     QString mCommDeptNameId;
 };

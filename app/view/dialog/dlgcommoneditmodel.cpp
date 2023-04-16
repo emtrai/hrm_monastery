@@ -27,6 +27,10 @@
 #include "utils.h"
 #include <QString>
 #include "modelcontroller.h"
+#include <QDialogButtonBox>
+#include <QPushButton>
+#include "stringdefs.h"
+
 
 DlgCommonEditModel::DlgCommonEditModel(QWidget *parent): QDialog(parent),
     mModel(nullptr), mIsNew(false), mIsSelfSave(false),
@@ -40,6 +44,24 @@ DlgCommonEditModel::~DlgCommonEditModel()
 {
     tracein;
     if (mModel) delete mModel;
+}
+
+void DlgCommonEditModel::setupUI()
+{
+    tracein;
+    QPushButton* btn = nullptr;
+    QDialogButtonBox* btnBox = buttonBox();
+    if (btnBox) {
+        btn = btnBox->button(QDialogButtonBox::Cancel);
+        if (btn) btn->setText(STR_CANCEL);
+
+        btn = btnBox->button(QDialogButtonBox::Save);
+        if (btn) btn->setText(STR_SAVE);
+
+        btn = btnBox->button(QDialogButtonBox::Ok);
+        if (btn) btn->setText(STR_OK);
+    }
+    traceout;
 }
 
 bool DlgCommonEditModel::isNew() const
@@ -175,6 +197,7 @@ ErrCode DlgCommonEditModel::loadList(QComboBox *cb, ModelController *ctrl)
     ErrCode err = ErrNone;
     cb->clear();
     QList<DbModel*> list = ctrl->getAllItems(true);
+    cb->addItem(STR_UNKNOWN, QString());
     foreach(DbModel* item, list){
         cb->addItem(item->name(), item->uid());
     }
@@ -226,6 +249,11 @@ void DlgCommonEditModel::setModel(DbModel *newModel)
         loge("invalid new model");
     }
     traceout;
+}
+
+QDialogButtonBox *DlgCommonEditModel::buttonBox()
+{
+    return nullptr;
 }
 
 CommonEditModelListener *DlgCommonEditModel::listener() const

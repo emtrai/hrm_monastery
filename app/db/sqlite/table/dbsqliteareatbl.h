@@ -37,6 +37,7 @@ public:
 protected:
 
     virtual QString getSearchQueryString(const QString& cond = nullptr);
+    virtual ErrCode onTblMigration(qint64 oldVer);
 private:
     static const qint32 KVersionCode;
 };

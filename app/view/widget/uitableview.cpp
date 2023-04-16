@@ -525,7 +525,8 @@ void UITableView::clearFilter()
 {
     tracein;
     ui->cbKeyword->clearEditText();
-    mFilterList.clear(); // TODO: if clear here, so, how "back" function work????
+    RELEASE_LIST(mFilterList, FilterItem);
+//    mFilterList.clear(); // TODO: if clear here, so, how "back" function work????
     traceout;
 }
 

@@ -39,6 +39,7 @@
 #include "persondept.h"
 #include "communityctl.h"
 #include "departctl.h"
+#include "jsondefs.h"
 
 GET_INSTANCE_CONTROLLER_IMPL(CommunityDeptCtl)
 

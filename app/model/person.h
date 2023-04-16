@@ -90,6 +90,7 @@ public:
     ErrCode setNameFromFullName(const QString& name);
 
     QString getFullName() const;
+    QString fullName() const;
     ErrCode fromCSVFile(const QString& fname);
 
     virtual DataExporter* getExporter();
@@ -192,10 +193,12 @@ public:
     void setChurchAddr(const QString &newChurchAddr);
 
     const QStringList &email() const;
+    QString emailString();
     void setEmail(const QStringList &newEmail);
     void setEmail(const QString &newEmail);
 
     const QStringList &tel() const;
+    QString telString();
     void setTel(const QStringList &newTel);
     void setTel(const QString &newTel);
 

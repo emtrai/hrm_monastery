@@ -42,6 +42,7 @@
 
 #include "config.h"
 
+#define SPLIT_EMAIL_TEL ";"
 // TODO: show person code instead of uid?? uid should use for debug only?
 #define EXPORT_PERSON_INFO_COMMON_IMPL(item, uid, name) \
     logd("export %s", item.toStdString().c_str());\
@@ -968,9 +969,15 @@ ErrCode Person::setNameFromFullName(const QString &name)
 
 
 
-QString Person::getFullName() const{
+QString Person::getFullName() const
+{
     //TODO:check localization
     return FULLNAME(firstName(), lastName());
+}
+
+QString Person::fullName() const
+{
+    return getFullName();
 }
 
 
@@ -1809,6 +1816,11 @@ const QStringList &Person::tel() const
     return mTel;
 }
 
+QString Person::telString()
+{
+    return mTel.join(SPLIT_EMAIL_TEL);
+}
+
 void Person::setTel(const QStringList &newTel)
 {
     CHECK_MODIFIED_THEN_SET_QLIST_STRING(mTel, newTel, KItemTel);
@@ -1822,12 +1834,17 @@ void Person::setTel(const QStringList &newTel)
 
 void Person::setTel(const QString &newTel)
 {
-    setTel(newTel.split(';'));
+    setTel(newTel.split(SPLIT_EMAIL_TEL));
 }
 
 const QStringList &Person::email() const
 {
     return mEmail;
+}
+
+QString Person::emailString()
+{
+    return mEmail.join(SPLIT_EMAIL_TEL);
 }
 
 void Person::setEmail(const QStringList &newEmail)
@@ -1843,7 +1860,7 @@ void Person::setEmail(const QStringList &newEmail)
 
 void Person::setEmail(const QString &newEmail)
 {
-    setEmail(newEmail.split(';'));
+    setEmail(newEmail.split(SPLIT_EMAIL_TEL));
 }
 
 const QString &Person::churchAddr() const

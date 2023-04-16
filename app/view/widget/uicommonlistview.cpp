@@ -29,6 +29,8 @@
 #include "eductl.h"
 #include "filter.h"
 #include "mainwindow.h"
+#include "stringdefs.h"
+
 
 UICommonListView::UICommonListView(QWidget *parent):
     UITableView(parent)
@@ -58,10 +60,10 @@ QList<UITableItem *> UICommonListView::getListItem(qint32 page, qint32 perPage, 
 void UICommonListView::initHeader()
 {
     tracein;
-    mHeader.append(tr("STT"));
-    mHeader.append(tr("Tên định danh"));
-    mHeader.append(tr("Tên"));
-    mHeader.append(tr("Ghi chú"));
+    mHeader.append(STR_STT);
+    mHeader.append(STR_NAMEID);
+    mHeader.append(STR_NAME);
+    mHeader.append(STR_NOTE);
     traceout;
 }
 void UICommonListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)

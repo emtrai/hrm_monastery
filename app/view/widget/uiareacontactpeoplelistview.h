@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Ngo Huy Anh
+ * Copyright (C) 2023 Ngo Huy Anh
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,42 +14,39 @@
  * limitations under the License.
  *
  *
- * Filename: uiarealistview.h
+ * Filename: uiareacontactpeople.h
  * Author: Anh, Ngo Huy
- * Created date:10/29/2022
+ * Created date:4/16/2023
  * Brief:
  */
-#ifndef UIAREALISTVIEW_H
-#define UIAREALISTVIEW_H
+#ifndef UIAREACONTACTPEOPLELISTVIEW_H
+#define UIAREACONTACTPEOPLELISTVIEW_H
 
 #include "uicommonlistview.h"
-#include "baseview.h"
-class Area;
 
-class UIAreaListView : public UICommonListView
+class Area;
+class UIAreaContactPeopleListView : public UICommonListView
 {
 public:
-    explicit UIAreaListView(QWidget *parent = nullptr);
-    virtual ~UIAreaListView();
+    explicit UIAreaContactPeopleListView(QWidget *parent = nullptr);
+    virtual ~UIAreaContactPeopleListView();
+
+    Area *area() const;
+    void setArea(const Area *newArea);
+
 protected:
-    virtual int getViewType() { return VIEW_AREA;}
-    void initHeader();
-    void updateItem(DbModel *item, UITableItem *tblItem, int idx);
-
-    virtual ModelController* getController();
-
+    virtual int getViewType() { return VIEW_AREA_PERSON;}
+    virtual void initHeader();
+    virtual QString getTitle();
+    virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
     virtual QList<DbModel*> getListItem();
-    virtual DbModel* onNewModel();
 
     virtual void onAddItem(UITableCellWidgetItem *item);
     virtual void onEditItem(UITableCellWidgetItem *item);
     virtual void onDeleteItem(const QList<UITableItem *>& selectedItems);
     virtual void onViewItem(UITableCellWidgetItem *item);
-
-
-    virtual QList<UITableMenuAction*> getMenuSingleSelectedItemActions(const QMenu* menu,
-                                                          UITableCellWidgetItem* item);
-    virtual ErrCode onMenuActionViewContactPeople(QMenu* menu, UITableMenuAction* act);
+private:
+    Area* mArea;
 };
 
-#endif // UIAREALISTVIEW_H
+#endif // UIAREACONTACTPEOPLELISTVIEW_H

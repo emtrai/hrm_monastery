@@ -14,14 +14,14 @@
  * limitations under the License.
  *
  *
- * Filename: dlgdeptperson.cpp
+ * Filename: DlgAreaPerson.cpp
  * Author: Anh, Ngo Huy
  * Created date:10/22/2022
  * Brief:
  */
-#include "dlgdeptperson.h"
-#include "persondept.h"
-#include "ui_dlgdeptperson.h"
+#include "dlgareaperson.h".h"
+#include "areaperson.h"
+#include "ui_DlgAreaPerson.h"
 #include "logger.h"
 #include "personctl.h"
 #include "utils.h"
@@ -29,10 +29,12 @@
 #include "coursectl.h"
 #include "rolectl.h"
 #include "dialog/dlgsearchperson.h"
+#include "area.h"
 
-DlgDeptPerson::DlgDeptPerson(QWidget *parent) :
+DlgAreaPerson::DlgAreaPerson(QWidget *parent) :
     DlgCommonEditModel(parent),
-    ui(new Ui::DlgDeptPerson)
+    ui(new Ui::DlgAreaPerson),
+    mArea(nullptr)
 {
     tracein;
     ui->setupUi(this);
@@ -41,50 +43,74 @@ DlgDeptPerson::DlgDeptPerson(QWidget *parent) :
     loadStatus();
 }
 
-DlgDeptPerson::~DlgDeptPerson()
+DlgAreaPerson::~DlgAreaPerson()
 {
     delete ui;
+    if (mArea) {
+        delete mArea;
+        mArea = nullptr;
+    }
 }
 
-void DlgDeptPerson::setupUI()
+void DlgAreaPerson::setupUI()
 {
     traced;
 }
 
-ErrCode DlgDeptPerson::buildModel(DbModel *model, QString &errMsg)
+ErrCode DlgAreaPerson::buildModel(DbModel *model, QString &errMsg)
 {
     tracein;
     ErrCode err = ErrNone;
-    PersonDept* perdep = (PersonDept*) model;
-    if (!model){
+    if (!model) {
         err = ErrInvalidArg;
-        loge("Invalid arg");
+        loge("Invalid argument, null model");
     }
-    if (err == ErrNone){
-        perdep->setMarkModified(true); // start marking fields which are modified
+
+    if (err == ErrNone && !mArea) {
+        err = ErrNoData;
+        loge("No area object to be set");
     }
-    perdep->setModelStatus(MODEL_ACTIVE);
-    SET_VAL_FROM_TEXTBOX(ui->txtSearch, KItemUid, perdep->setPersonUid, perdep->setPersonName);
-    SET_VAL_FROM_CBOX(ui->cbRole, perdep->setRoleUid, perdep->setRoleName);
-    SET_VAL_FROM_CBOX(ui->cbTerm, perdep->setCourseUid, perdep->setCourseName);
-    SET_INT_VAL_FROM_CBOX(ui->cbStatus, perdep->setModelStatus, perdep->setModelStatusName);
-    SET_DATE_VAL_FROM_WIDGET(ui->txtStartDate, perdep->setStartDate);
-    SET_DATE_VAL_FROM_WIDGET(ui->txtEndDate, perdep->setEndDate);
-    QString nameid = ui->txtNameId->text().trimmed();
-    if (!nameid.isEmpty()) {
-        perdep->setNameId(nameid);
+    if (err == ErrNone && ui->txtSearch->text().isEmpty()) {
+        err = ErrNoData;
+        loge("No person is set");
+    }
+    if (err == ErrNone) {
+        AreaPerson* per = (AreaPerson*) model;
+        if (!model){
+            err = ErrInvalidArg;
+            loge("Invalid arg");
+        }
+        if (err == ErrNone){
+            per->setMarkModified(true); // start marking fields which are modified
+        }
+        per->setModelStatus(MODEL_ACTIVE);
+        per->setAreaUid(mArea->uid());
+        SET_VAL_FROM_TEXTBOX(ui->txtSearch, KItemUid, per->setPersonUid, per->setPersonName);
+        SET_VAL_FROM_CBOX(ui->cbRole, per->setRoleUid, per->setRoleName);
+        SET_VAL_FROM_CBOX(ui->cbTerm, per->setCourseUid, per->setCourseName);
+        SET_INT_VAL_FROM_CBOX(ui->cbStatus, per->setModelStatus, per->setModelStatusName);
+        SET_DATE_VAL_FROM_WIDGET(ui->txtStartDate, per->setStartDate);
+        SET_DATE_VAL_FROM_WIDGET(ui->txtEndDate, per->setEndDate);
+        QString nameid = ui->txtNameId->text().trimmed();
+        if (!nameid.isEmpty()) {
+            per->setNameId(nameid);
+        } else {
+            err = ErrNoData;
+            loge("Lack of nameId");
+        }
+    } else {
     }
     traceret(err);
     return err;
 }
 
-ErrCode DlgDeptPerson::fromModel(const DbModel *item)
+ErrCode DlgAreaPerson::fromModel(const DbModel *item)
 {
     tracein;
     ErrCode err = ErrNone;
-    if (item && item->modelName() == KModelNamePersonDept) {
+    if (item && item->modelName() == KModelNameAreaPerson) {
         err = DlgCommonEditModel::fromModel(item);
-        PersonDept* comm = (PersonDept*)model();
+        AreaPerson* comm = (AreaPerson*)model();
         if (err == ErrNone) {
             Utils::setSelectItemComboxByData(ui->cbTerm, comm->courseUid());
             Utils::setSelectItemComboxByData(ui->cbRole, comm->roleUid());
@@ -102,7 +128,7 @@ ErrCode DlgDeptPerson::fromModel(const DbModel *item)
                                            per->uid(), per->getFullName());
                     logd("found person '%s'", STR2CHA(per->toString()));
                     if (nameid.isEmpty()) {
-                        nameid = QString("%1_%2").arg(comm->commDeptNameId(), per->nameId());
+                        nameid = QString("%1_%2").arg(comm->areaNameId(), per->nameId());
                         comm->setNameId(nameid);
                     }
 
@@ -117,13 +143,13 @@ ErrCode DlgDeptPerson::fromModel(const DbModel *item)
         }
     } else {
         err = ErrInvalidArg;
-        loge("null item or invalid type");
+        loge("null item or invalid model '%s'", MODELNAME2CHA(item));
     }
     traceret(err);
     return err;
 }
 
-void DlgDeptPerson::loadCourse()
+void DlgAreaPerson::loadCourse()
 {
     tracein;
     ui->cbTerm->clear();
@@ -134,7 +160,7 @@ void DlgDeptPerson::loadCourse()
 
 }
 
-void DlgDeptPerson::loadRole()
+void DlgAreaPerson::loadRole()
 {
     ui->cbRole->clear();
     QList<DbModel*> list = INSTANCE(RoleCtl)->getAllItemsFromDb(); // TODO: getAllItem???
@@ -143,7 +169,7 @@ void DlgDeptPerson::loadRole()
     }
 }
 
-void DlgDeptPerson::loadStatus()
+void DlgAreaPerson::loadStatus()
 {
     tracein;
     ui->cbStatus->clear();
@@ -155,7 +181,7 @@ void DlgDeptPerson::loadStatus()
     traceout;
 }
 
-void DlgDeptPerson::on_btnSearch_clicked()
+void DlgAreaPerson::on_btnSearch_clicked()
 {
 
     tracein;
@@ -172,7 +198,10 @@ void DlgDeptPerson::on_btnSearch_clicked()
             ui->txtSearch->setText(per->getFullName());
             logd("setProperty %s", per->uid().toStdString().c_str());
             ui->txtSearch->setProperty(KItemUid, per->uid());
-            QString nameid = QString("%1_%2").arg(mCommDeptNameId, per->nameId());
+            QString nameid;
+            if (mArea) {
+                nameid = QString("%1_%2").arg(mArea->nameId(), per->nameId());
+            }
             ui->txtNameId->setText(nameid);
             delete per;
         } else {
@@ -183,22 +212,40 @@ void DlgDeptPerson::on_btnSearch_clicked()
     traceout;
 }
 
-void DlgDeptPerson::setCommDeptNameId(const QString &newCommDeptNameId)
+void DlgAreaPerson::setArea(Area *newArea)
 {
-    mCommDeptNameId = newCommDeptNameId;
+    tracein;
+    if (mArea) {
+        delete mArea;
+        mArea = nullptr;
+    }
+    if (newArea) {
+        mArea = (Area*)(((DbModel*)newArea)->clone());
+    }
+    traceout;
 }
 
-void DlgDeptPerson::setCommDeptUid(const QString &newCommDeptUid)
+void DlgAreaPerson::setAreaUid(const QString &id)
 {
-    mCommDeptUid = newCommDeptUid;
+    mAreaUid = id;
 }
 
-DbModel *DlgDeptPerson::newModel()
+void DlgAreaPerson::setAreaNameId(const QString &id)
 {
-    return PersonDept::build();
+    mAreaNameId = id;
 }
 
-bool DlgDeptPerson::onValidateData(QString &msg)
+QDialogButtonBox *DlgAreaPerson::buttonBox()
+{
+    return ui->buttonBox;
+}
+
+DbModel *DlgAreaPerson::newModel()
+{
+    return AreaPerson::build();
+}
+
+bool DlgAreaPerson::onValidateData(QString &msg)
 {
     tracein;
     bool isValid = true;
