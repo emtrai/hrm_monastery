@@ -231,6 +231,8 @@ ErrCode DbSqliteMapTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry
             model->setUid2(qry.value(getFieldNameUid2()).toString());
             model->setDbId2(qry.value(getFieldNameDbid2()).toInt());
             model->setModelStatus(qry.value(KFieldModelStatus).toInt());
+            model->setModelStatusName(DbModel::modelStatus2Name((DbModelStatus)model->modelStatus()));
+
             model->setStartDate(qry.value(KFieldStartDate).toInt());
             model->setEndDate(qry.value(KFieldEndDate).toInt());
             model->setChangeHistory(qry.value(KFieldChangeHistory).toString());

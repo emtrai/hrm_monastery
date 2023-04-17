@@ -33,11 +33,10 @@ public:
     virtual QString getName();
 protected:
 
+    virtual ModelController* getController();
     virtual int getViewType() { return VIEW_ROLE;}
     virtual QString getTitle();
     virtual DbModel* onNewModel();
-protected:
-    virtual ErrCode onLoad();
 };
 
 #endif // UIROLELISTVIEW_H

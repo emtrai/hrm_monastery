@@ -28,6 +28,7 @@
 #include "specialist.h"
 #include "dbctl.h"
 #include "dbspecialistmodelhandler.h"
+#include "prebuiltdefs.h"
 
 #define SPLIT ','
 

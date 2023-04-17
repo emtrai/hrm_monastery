@@ -30,6 +30,7 @@
 #include "defs.h"
 #include "filectl.h"
 #include "dbctl.h"
+#include "prebuiltdefs.h"
 
 SaintCtl *SaintCtl::gInstance = nullptr;
 

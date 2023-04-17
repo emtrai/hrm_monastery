@@ -30,6 +30,7 @@
 #include "areactl.h"
 #include "countryctl.h"
 #include "personctl.h"
+#include "prebuiltdefs.h"
 
 DbModel *Community::build()
 {
@@ -319,21 +320,6 @@ void Community::setModelStatus(int newStatus)
     logd("new mStatusName = %s", STR2CHA(mStatusName));
     markItemAsModified(KItemStatus);
 }
-
-//ErrCode_t Community::save()
-//{
-//    return DbCtl::getInstance()->dbCommunity()->add(this);
-//}
-
-//void Community::dump()
-//{
-//    tracein;
-//    QString log = QStringLiteral(
-//                      "name '%1'\n"
-//                      )
-//                      .arg(name());
-//    logd("%s", log.toStdString().c_str());
-//}
 
 qint64 Community::closeDate() const
 {

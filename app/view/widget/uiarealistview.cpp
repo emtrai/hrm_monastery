@@ -42,12 +42,22 @@ UIAreaListView::UIAreaListView(QWidget *parent):
 UIAreaListView::~UIAreaListView()
 {
     tracein;
+    AREACTL->delListener(this);
+}
+
+void UIAreaListView::setupUI()
+{
+    tracein;
+    UITableView::setupUI();
+    AREACTL->addListener(this);
+    traceout;
 }
 
 void UIAreaListView::initHeader()
 {
     tracein;
     UICommonListView::initHeader();
+    mHeader.append(STR_MODELSTATUS);
     mHeader.append(STR_COUNTRY);
     mHeader.append(STR_TEL);
     mHeader.append(STR_EMAIL);
@@ -61,6 +71,7 @@ void UIAreaListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
         UICommonListView::updateItem(item, tblItem, idx);
         if (item->modelName() == KModelNameArea) {
             Area* model = (Area*) item;
+            tblItem->addValue(model->modelStatusName());
             tblItem->addValue(model->countryName());
             tblItem->addValue(model->tel());
             tblItem->addValue(model->email());
@@ -82,13 +93,6 @@ ModelController *UIAreaListView::getController()
     return AREACTL;
 }
 
-QList<DbModel *> UIAreaListView::getListItem()
-{
-    tracein;
-//    return AREACTL->getAllItems();
-    // TODO: temporary change to this api, should use getAllItems
-    return AREACTL->getAllItems(true);
-}
 
 DbModel *UIAreaListView::onNewModel()
 {
@@ -120,12 +124,7 @@ void UIAreaListView::onEditItem(UITableCellWidgetItem *item)
 
 void UIAreaListView::onDeleteItem(const QList<UITableItem *> &selectedItems)
 {
-
-}
-
-void UIAreaListView::onViewItem(UITableCellWidgetItem *item)
-{
-
+    UNDER_DEV("Xóa dữ liệu");
 }
 
 QList<UITableMenuAction *> UIAreaListView::getMenuSingleSelectedItemActions(const QMenu *menu, UITableCellWidgetItem *item)

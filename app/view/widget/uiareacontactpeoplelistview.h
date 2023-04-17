@@ -33,6 +33,7 @@ public:
 
     Area *area() const;
     void setArea(const Area *newArea);
+    virtual void setupUI();
 
 protected:
     virtual int getViewType() { return VIEW_AREA_PERSON;}

@@ -40,6 +40,8 @@
 #include "countryctl.h"
 #include "missionctl.h"
 #include "jsondefs.h"
+#include "prebuiltdefs.h"
+
 GET_INSTANCE_CONTROLLER_IMPL(CommunityCtl)
 
 CommunityCtl::CommunityCtl():ModelController(KModelHdlCommunity)

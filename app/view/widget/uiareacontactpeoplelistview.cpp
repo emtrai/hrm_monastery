@@ -47,6 +47,7 @@ UIAreaContactPeopleListView::~UIAreaContactPeopleListView()
 {
     tracein;
     if (mArea) delete mArea;
+    AREACTL->delListener(this);
     traceout;
 }
 
@@ -72,6 +73,15 @@ void UIAreaContactPeopleListView::setArea(const Area *newArea)
     traceout;
 }
 
+void UIAreaContactPeopleListView::setupUI()
+{
+    tracein;
+    UITableView::setupUI();
+    AREACTL->addListener(this);
+    traceout;
+
+}
+
 void UIAreaContactPeopleListView::initHeader()
 {
     tracein;
@@ -82,6 +92,7 @@ void UIAreaContactPeopleListView::initHeader()
     mHeader.append(STR_TEL);
     mHeader.append(STR_EMAIL);
     mHeader.append(STR_COURSE);
+    mHeader.append(STR_MODELSTATUS);
     traceout;
 }
 
@@ -105,6 +116,7 @@ void UIAreaContactPeopleListView::updateItem(DbModel *item, UITableItem *tblItem
         tblItem->addValue(per->personTel());
         tblItem->addValue(per->personEmail());
         tblItem->addValue(per->courseName());
+        tblItem->addValue(per->modelStatusName());
     } else {
         loge("No item found, or not expected model '%s'", item?STR2CHA(item->modelName()):"");
     }

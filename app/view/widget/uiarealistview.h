@@ -31,6 +31,7 @@ class UIAreaListView : public UICommonListView
 public:
     explicit UIAreaListView(QWidget *parent = nullptr);
     virtual ~UIAreaListView();
+    virtual void setupUI();
 protected:
     virtual int getViewType() { return VIEW_AREA;}
     void initHeader();
@@ -38,13 +39,11 @@ protected:
 
     virtual ModelController* getController();
 
-    virtual QList<DbModel*> getListItem();
     virtual DbModel* onNewModel();
 
     virtual void onAddItem(UITableCellWidgetItem *item);
     virtual void onEditItem(UITableCellWidgetItem *item);
     virtual void onDeleteItem(const QList<UITableItem *>& selectedItems);
-    virtual void onViewItem(UITableCellWidgetItem *item);
 
 
     virtual QList<UITableMenuAction*> getMenuSingleSelectedItemActions(const QMenu* menu,

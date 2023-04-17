@@ -25,7 +25,8 @@
 #include "dbctl.h"
 #include "defs.h"
 #include "dbmodel.h"
-
+#include "prebuiltdefs.h"
+#include "filectl.h"
 
 Area::Area():DbModel(),
       mCountryDbId(0),
@@ -121,6 +122,7 @@ void Area::copy(const Area &model)
     mStartDate = model.mStartDate;
     mEndDate = model.mEndDate;
     mModelStatus = model.mModelStatus;
+    mModelStatusName = model.mModelStatusName;
     mChangeHistory = model.mChangeHistory;
     traceout;
 }
@@ -133,6 +135,50 @@ QString Area::modelStatusName() const
 void Area::setModelStatusName(QString newModelStatusName)
 {
     mModelStatusName = newModelStatusName;
+}
+
+const QString Area::exportTemplatePath(FileExporter *exporter, QString *ftype) const
+{
+    if (exporter) {
+        switch (exporter->getExportType()) {
+        case EXPORT_HTML:
+            return FileCtl::getPrebuiltDataFilePath(KPrebuiltAreaInfoTemplateFileName);
+        };
+    }
+    return QString();
+}
+
+void Area::initExportFields()
+{
+    tracein;
+    DbModel::initExportFields();
+    mExportCallbacks.insert(KItemCountry, [this](const QString& item){
+        return this->countryName();
+    });
+    mExportCallbacks.insert(KItemAddress, [this](const QString& item){
+        return this->addr();
+    });
+    mExportCallbacks.insert(KItemEmail, [this](const QString& item){
+        return this->email();
+    });
+    mExportCallbacks.insert(KItemTel, [this](const QString& item){
+        return this->tel();
+    });
+    mExportCallbacks.insert(KItemStartDate, [this](const QString& item){
+        return Utils::date2String(this->startDate(), DEFAULT_FORMAT_YMD);
+    });
+    mExportCallbacks.insert(KItemEndDate, [this](const QString& item){
+        return Utils::date2String(this->endDate(), DEFAULT_FORMAT_YMD);
+    });
+    mExportCallbacks.insert(KItemStatus, [this](const QString& item){
+        return this->modelStatusName();
+    });
+    mExportCallbacks.insert(KItemChangeHistory, [this](const QString& item){
+        return this->changeHistory();
+    });
+    // TODO: implement more
+    traceout;
+
 }
 
 const QString &Area::addr() const

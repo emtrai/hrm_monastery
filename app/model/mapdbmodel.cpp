@@ -186,6 +186,7 @@ qint64 MapDbModel::startDate() const
 void MapDbModel::setStartDate(qint64 newStartDate)
 {
     mStartDate = newStartDate;
+    markItemAsModified(KItemStartDate);
 }
 
 
@@ -197,6 +198,7 @@ qint64 MapDbModel::endDate() const
 void MapDbModel::setEndDate(qint64 newEndDate)
 {
     mEndDate = newEndDate;
+    markItemAsModified(KItemEndDate);
 }
 
 qint32 MapDbModel::modelStatus() const
@@ -207,6 +209,7 @@ qint32 MapDbModel::modelStatus() const
 void MapDbModel::setModelStatus(qint32 newStatus)
 {
     mModelStatus = newStatus;
+    markItemAsModified(KItemStatus);
 }
 
 const QString &MapDbModel::parentUid() const
@@ -217,6 +220,8 @@ const QString &MapDbModel::parentUid() const
 void MapDbModel::setParentUid(const QString &newParentUid)
 {
     mParentUid = newParentUid;
+
+    markItemAsModified(KItemParentCommunity);
 }
 
 QString MapDbModel::modelName() const
@@ -237,6 +242,7 @@ const QString &MapDbModel::changeHistory() const
 void MapDbModel::setChangeHistory(const QString &newChangeHistory)
 {
     mChangeHistory = newChangeHistory;
+    markItemAsModified(KItemChangeHistory);
 }
 
 void MapDbModel::copy(const MapDbModel &model)

@@ -60,34 +60,6 @@ const char* const KLogDirName = "log";
 const char* const KDatabasename = "db.db";
 const char* const KDatabaseMetaName = "db.json";
 
-
-const char* const KPrebuiltSaintCSVFileName = "saints";
-const char* const KPrebuiltCountryCSVFileName = "country";
-const char* const KPrebuiltEduCSVFileName = "edu";
-const char* const KPrebuiltSpecialistCSVFileName = "specialist";
-const char* const KPrebuiltProvinceCSVFileName = "province";
-const char* const KPrebuiltEthnicCSVFileName = "ethnic";
-const char* const KPrebuiltMissionCSVFileName = "mission";
-const char* const KPrebuiltAreaCSVFileName = "area";
-const char* const KPrebuiltDeptJsonFileName = "department";
-const char* const KPrebuiltCommunityJsonFileName = "community";
-const char* const KPrebuiltCommunityDeptJsonFileName = "comm_dept";
-const char* const KPrebuiltHomeHtmlFileName = "home";
-const char* const KPrebuiltLogoFileName = "logo.png"; // special case, need file extenstion
-const char* const KPrebuiltPersonInfoTemplateFileName = "person_info_template";
-const char* const KPrebuiltPersonListCSVTemplateFileName = "person_list_export_template";
-const char* const KPrebuiltPersonListJSONTemplateFileName = "person_list_export_template_json";
-const char* const KPrebuiltCommunityInfoTemplateFileName = "community_info_template";
-const char* const KPrebuiltCourseCSVFileName = "course";
-const char* const KPrebuiltWorkCSVFileName = "work";
-const char* const KPrebuiltStatusCSVFileName = "status";
-const char* const KPrebuiltEventCSVFileName = "event";
-const char* const KPrebuiltRoleCSVFileName = "role";
-const char* const KPrebuiltCommonTemplateFileName = "common_template";
-const char* const KPrebuiltCourseTemplateFileName = "course_template";
-const char* const KPrebuiltCommunityExportTemplateName = "community_export_template";
-const char* const KPrebuiltDefaultExportTemplateName = "default_export_template";
-
 const char* const KControlBackupName = "backup";
 
 const char* const KModelHdlCountry = "country";
@@ -191,6 +163,7 @@ const char* const KItemCommunityNameId = "MA_CONG_DOAN";
 const char* const KItemParentCommunity = "CONG_DOAN_CHA";
 const char* const KItemParentCommunityNameId = "MA_CONG_DOAN_CHA";
 const char* const KItemCommunityHistory = "LICH_SU_CONG_DOAN";
+const char* const KItemParentModel = "CHU_QUAN";
 const char* const KItemDad = "TEN_CHA"; // TODO: holly name of dad?
 const char* const KItemDadBirthday = "NGAY_SINH_CHA";
 const char* const KItemDadAddr = "DIA_CHI_CHA";

@@ -40,6 +40,7 @@
 #include "coursectl.h"
 #include "workctl.h"
 #include "config.h"
+#include "prebuiltdefs.h"
 
 GET_INSTANCE_CONTROLLER_IMPL(PersonCtl)
 

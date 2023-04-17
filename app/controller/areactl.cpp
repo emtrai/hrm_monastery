@@ -29,6 +29,7 @@
 #include "countryctl.h"
 #include "dbareamodelhandler.h"
 #include "errreporterctl.h"
+#include "prebuiltdefs.h"
 
 GET_INSTANCE_CONTROLLER_IMPL(AreaCtl)
 

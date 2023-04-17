@@ -42,6 +42,8 @@
 
 #include "config.h"
 
+#include "prebuiltdefs.h"
+
 #define SPLIT_EMAIL_TEL ";"
 // TODO: show person code instead of uid?? uid should use for debug only?
 #define EXPORT_PERSON_INFO_COMMON_IMPL(item, uid, name) \

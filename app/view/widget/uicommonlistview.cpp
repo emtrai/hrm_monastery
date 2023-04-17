@@ -84,7 +84,7 @@ qint32 UICommonListView::getTotalItems()
 
 QList<DbModel *> UICommonListView::getListItem()
 {
-    return getController()->getAllItemsFromDb();
+    return getController()->getAllItems(true);
 }
 
 ModelController *UICommonListView::getController()

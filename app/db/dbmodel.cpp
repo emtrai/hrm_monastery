@@ -31,6 +31,7 @@
 #include "person.h"
 #include "community.h"
 #include "specialist.h"
+#include "prebuiltdefs.h"
 
 DbModel::DbModel():
     mDeletable(true)

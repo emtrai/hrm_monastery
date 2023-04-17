@@ -53,6 +53,7 @@
 #include "personctl.h"
 #include "dlgimportexportselect.h"
 #include "backup/backupctl.h"
+#include "prebuiltdefs.h"
 
 #define ADD_MENU_ITEM(menu, func, name, iconPath) \
 do { \
@@ -641,10 +642,15 @@ void MainWindow::loadOtherMenu()
     // actionDummy? stupid? but it works
     ui->toolBar->insertWidget(ui->actionDummy, otherButton);
 
+//    ADD_ACTION_ITEM(otherMenu,
+//                    on_actionArea_triggered,
+//                    "Khu vực/Vùng",
+//                    ICON_PATH("icons8-earth-planet-80"));
+
     ADD_ACTION_ITEM(otherMenu,
-                    on_actionArea_triggered,
-                    "Khu vực/Vùng",
-                    ICON_PATH("icons8-earth-planet-80"));
+                    on_actionDept_triggered,
+                    "Ban",
+                    ICON_PATH("icons8-diversity-64.png"));
 
     ADD_ACTION_ITEM(otherMenu,
                     on_actionSaints_2_triggered,

@@ -17,6 +17,7 @@
 #include "filectl.h"
 #include "filter.h"
 #include "jsondefs.h"
+#include "prebuiltdefs.h"
 
 ModelController::ModelController():
     mEnableCache(true),

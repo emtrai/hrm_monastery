@@ -393,6 +393,7 @@ HEADERS += \
     model/specialist.h \
     model/work.h \
     controller/personctl.h \
+    prebuiltdefs.h \
     report/errreporterctl.h \
     report/reportctl.h \
     controller/saintctl.h \

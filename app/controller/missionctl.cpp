@@ -25,6 +25,7 @@
 #include "defs.h"
 #include "dbctl.h"
 #include "utils.h"
+#include "prebuiltdefs.h"
 
 GET_INSTANCE_CONTROLLER_IMPL(MissionCtl);
 

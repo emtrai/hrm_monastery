@@ -78,7 +78,7 @@
    <addaction name="actionSummarize"/>
    <addaction name="actionPerson"/>
    <addaction name="actionCommunity"/>
-   <addaction name="actionDept"/>
+   <addaction name="actionArea"/>
    <addaction name="actionOrgInfo"/>
    <addaction name="actionDummy"/>
    <addaction name="actionBack"/>
@@ -95,7 +95,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>24</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuTools">
@@ -255,6 +255,10 @@
    </property>
   </action>
   <action name="actionArea">
+   <property name="icon">
+    <iconset resource="icon.qrc">
+     <normaloff>:/icon/icon/icons8-earth-planet-80.png</normaloff>:/icon/icon/icons8-earth-planet-80.png</iconset>
+   </property>
    <property name="text">
     <string>Khu vực</string>
    </property>
@@ -324,15 +328,6 @@
    </property>
    <property name="visible">
     <bool>false</bool>
-   </property>
-  </action>
-  <action name="actionDept">
-   <property name="icon">
-    <iconset resource="icon.qrc">
-     <normaloff>:/icon/icon/icons8-diversity-64.png</normaloff>:/icon/icon/icons8-diversity-64.png</iconset>
-   </property>
-   <property name="text">
-    <string>Ban</string>
    </property>
   </action>
   <action name="actionDong_bo">

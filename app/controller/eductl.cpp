@@ -27,6 +27,7 @@
 #include "education.h"
 #include "dbctl.h"
 #include <QList>
+#include "prebuiltdefs.h"
 
 #define SPLIT ','
 

@@ -40,6 +40,7 @@
 #include "communityctl.h"
 #include "departctl.h"
 #include "jsondefs.h"
+#include "prebuiltdefs.h"
 
 GET_INSTANCE_CONTROLLER_IMPL(CommunityDeptCtl)
 

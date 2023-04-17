@@ -33,6 +33,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include "prebuiltdefs.h"
 
 GET_INSTANCE_CONTROLLER_IMPL(DepartCtl)
 

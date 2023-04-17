@@ -26,6 +26,7 @@
 #include <QList>
 #include "dbmodel.h"
 #include "role.h"
+#include "rolectl.h"
 #include "utils.h"
 #include "mainwindow.h"
 #include "uitableviewfactory.h"
@@ -46,6 +47,11 @@ QString UIRoleListView::getName()
     return "UIRoleListView";
 }
 
+ModelController *UIRoleListView::getController()
+{
+    return ROLECTL;
+}
+
 QString UIRoleListView::getTitle()
 {
     return tr("Vai trò/vị trí");
@@ -54,17 +60,5 @@ QString UIRoleListView::getTitle()
 DbModel *UIRoleListView::onNewModel()
 {
     return Role::build();
-}
-
-ErrCode UIRoleListView::onLoad()
-{
-    QList<DbModel*> items = ROLECTL->getAllItems();
-    tracein;
-    RELEASE_LIST_DBMODEL(mItemList);
-    // TODO: loop to much, redundant, do something better?
-    foreach (DbModel* item, items) {
-        mItemList.append(dynamic_cast<DbModel*>(item));
-    }
-    return ErrNone;
 }
 

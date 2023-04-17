@@ -26,6 +26,7 @@
 #include "filectl.h"
 #include "defs.h"
 #include "utils.h"
+#include "prebuiltdefs.h"
 
 Location* Location::gInstance = nullptr;
 

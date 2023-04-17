@@ -26,6 +26,7 @@
 #include "dbctl.h"
 #include "utils.h"
 #include "defs.h"
+#include "prebuiltdefs.h"
 
 GET_INSTANCE_CONTROLLER_IMPL(RoleCtl)
 

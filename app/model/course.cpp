@@ -28,6 +28,7 @@
 #include "dbctl.h"
 #include "defs.h"
 #include "dbmodel.h"
+#include "prebuiltdefs.h"
 
 const QHash<int, QString> *Course::getCourseTypeNameMap()
 {
