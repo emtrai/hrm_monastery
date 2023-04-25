@@ -50,6 +50,7 @@ private:
     // event
 public:
     virtual ErrCode onLoad();
+    virtual void onUnload();
 };
 
 #endif // DBCTL_H

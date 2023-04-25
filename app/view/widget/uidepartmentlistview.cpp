@@ -69,7 +69,7 @@ QList<DbModel *> UIDepartmentListView::getListItem()
     return DEPART->getAllItemsFromDb(); // TODO: getAllItem???
 }
 
-DbModel *UIDepartmentListView::onNewModel()
+DbModel *UIDepartmentListView::onNewModel(const QString& modelName)
 {
     return Department::build();
 }

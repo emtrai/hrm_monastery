@@ -42,6 +42,7 @@
 #include "eventctl.h"
 #include "rolectl.h"
 #include "communitydeptctl.h"
+#include "filectl.h"
 
 LoaderCtl* LoaderCtl::gInstance = nullptr;
 
@@ -76,6 +77,7 @@ void LoaderCtl::add2PreLoader(Controller *ctl)
 void LoaderCtl::registerAll()
 {
     tracein;
+    add2PreLoader(FileCtl::getInstance());
     add2PreLoader(DbCtl::getInstance());
     /* Beware, order is important*/
 //    add2Loader(Location::getInstance());
@@ -117,6 +119,23 @@ void LoaderCtl::runLoader(QList<Controller *> &list)
     traceout;
 }
 
+void LoaderCtl::unloadLoader(QList<Controller *> &list)
+{
+    tracein;
+    foreach(  Controller* ctl, list ) {
+        logd("unload '%s'", STR2CHA(ctl->getName()));
+        ctl->onUnload();
+        if (mListener != nullptr){
+            logd("call listener for unload");
+            mListener->onUnloadController(ctl);
+        }
+    }
+    // TODO: call on separate thread?
+    // TODO: timeout???
+
+    traceout;
+}
+
 void LoaderCtl::preLoad()
 {
     tracein;
@@ -128,6 +147,17 @@ void LoaderCtl::onLoad()
 {
     tracein;
     runLoader(mListCtl);
+    traceout;
+}
+
+void LoaderCtl::onUnload()
+{
+    tracein;
+    logi("Unload preloader");
+    unloadLoader(mPreLoadListCtl);
+
+    logi("Unload loader");
+    unloadLoader(mListCtl);
     traceout;
 }
 

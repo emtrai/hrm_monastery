@@ -80,7 +80,7 @@ ErrCode DlgCommDept::buildModel(DbModel *model, QString &errMsg)
         }
     }
     if (err == ErrNone){
-        SET_VAL_FROM_CBOX(ui->cbDept, comm->setDepartmentUid, comm->setDepartmentName);
+        SET_VAL_FROM_CBOX(ui->cbDept, comm->setDepartmentUid, comm->setDepartmentName, err);
     }
     if (mCommunity) {
         comm->setCommunityUid(mCommunity->uid());

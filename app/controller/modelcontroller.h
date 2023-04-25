@@ -313,6 +313,7 @@ protected:
     QList<OnModelControllerListener*> mListeners;
 public:
     virtual ErrCode onLoad();
+    virtual void onUnload();
 };
 
 #endif // MODELCONTROLLER_H

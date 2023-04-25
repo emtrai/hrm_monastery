@@ -776,6 +776,13 @@ ErrCode ModelController::onLoad(){
     return ret;
 }
 
+void ModelController::onUnload()
+{
+    traced;
+    logd("unload something?");
+    // TODO: unload something?
+}
+
 
 ErrCode ModelController::insertModelToCache(DbModel* model, bool clone)
 {
@@ -884,8 +891,10 @@ ErrCode ModelController::getExportFileName(ExportType type, QString fnameNoExt, 
     }
     if (ret == ErrNone) {
         fname = QString("%1.%2").arg(fnameNoExt, ext);
+        logd("fname '%s'", STR2CHA(fname));
         if (fpath && fpath->isEmpty()) {
-            *fpath = FileCtl::getTmpDataDir(fname);
+            *fpath = FileCtl::getTmpDataFile(fname);
+            logd("fpath '%s'", STR2CHA((*fpath)));
         }
     }
     traceret(ret);

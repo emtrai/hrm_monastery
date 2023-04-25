@@ -33,6 +33,9 @@ public:
     Ethnic();
     static DbModel *build();
     virtual DbModelBuilder getBuilder() const;
+    virtual QString modelName() const;
+
+    virtual void clone(const DbModel* model);
 
     qint64 countryDbId() const;
     void setCountryDbId(qint64 newCountryDbId);

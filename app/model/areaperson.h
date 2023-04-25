@@ -33,6 +33,10 @@ public:
     virtual void clone(const DbModel* model);
     virtual DbModelBuilder getBuilder() const;
     virtual QString modelName() const;
+    virtual const QString exportTemplatePath(FileExporter* exporter, QString* ftype = nullptr) const;
+    virtual void initExportFields();
+
+
     const QString &roleUid() const;
     void setRoleUid(const QString &newRoleUid);
 

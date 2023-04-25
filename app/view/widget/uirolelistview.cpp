@@ -57,7 +57,7 @@ QString UIRoleListView::getTitle()
     return tr("Vai trò/vị trí");
 }
 
-DbModel *UIRoleListView::onNewModel()
+DbModel *UIRoleListView::onNewModel(const QString& modelName)
 {
     return Role::build();
 }

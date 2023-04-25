@@ -50,7 +50,7 @@ QString UICountryListView::getTitle()
     return tr("Quốc gia");
 }
 
-DbModel *UICountryListView::onNewModel()
+DbModel *UICountryListView::onNewModel(const QString& modelName)
 {
     return Country::build();
 }

@@ -27,6 +27,7 @@
         <file alias="person_list_export_template_json">res/person_list_export_template_vi.json</file>
         <file alias="course_template">res/course_template.html</file>
         <file alias="area_info_template">res/area_info_template.html</file>
+        <file alias="area_person_info_template">res/area_person_info_template.html</file>
     </qresource>
     <qresource prefix="/template"/>
 </RCC>

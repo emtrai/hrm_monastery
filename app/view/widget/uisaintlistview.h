@@ -38,7 +38,7 @@ protected:
 
     virtual int onFilter(int catetoryid, const QString& catetory, qint64 opFlags, const QString& keywords, const QVariant *value);
 
-    virtual DbModel* onNewModel();
+    virtual DbModel* onNewModel(const QString& modelName);
 };
 
 #endif // UISAINTLISTVIEW_H

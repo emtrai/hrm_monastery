@@ -81,7 +81,7 @@ void UICommDeptListView::updateItem(DbModel *item, UITableItem *tblItem, int idx
     traceout;
 }
 
-DbModel *UICommDeptListView::onNewModel()
+DbModel *UICommDeptListView::onNewModel(const QString& modelName)
 {
     return CommunityDept::build();
 }

@@ -133,3 +133,8 @@ ErrCode Location::onLoad()
     }
     return ErrNone;
 }
+
+void Location::onUnload()
+{
+    traced;
+}

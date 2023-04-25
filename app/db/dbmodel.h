@@ -29,6 +29,7 @@
 #include "utils.h"
 #include "idataimporter.h"
 #include "dataexporter.h"
+#include "modeldefs.h"
 
 #define CLEAR_THEN_SET(curr, newModel, type) \
 do { \
@@ -111,7 +112,7 @@ typedef std::function<ErrCode(const QString&)> ImportCallbackFunc;
 /**
  * @brief parameter:field name
  */
-typedef std::function<QString(const QString&)> ExportCallbackFunc;
+typedef std::function<QString(const DbModel* model, const QString&)> ExportCallbackFunc;
 
 
 /**

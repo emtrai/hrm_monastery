@@ -27,6 +27,8 @@
 #include "utils.h"
 #include "mainwindow.h"
 #include "uitableviewfactory.h"
+#include "stringdefs.h"
+#include "modeldefs.h"
 
 UIEthnicListView::UIEthnicListView(QWidget *parent):
     UICommonListView(parent)
@@ -50,7 +52,55 @@ QString UIEthnicListView::getTitle()
     return tr("Dân tộc");
 }
 
-DbModel *UIEthnicListView::onNewModel()
+DbModel *UIEthnicListView::onNewModel(const QString& modelName)
 {
     return Ethnic::build();
+}
+
+void UIEthnicListView::initHeader()
+{
+    tracein;
+    mHeader.append(STR_NAMEID);
+    mHeader.append(STR_NAME);
+    mHeader.append(STR_COUNTRY);
+    mHeader.append(STR_NOTE);
+    traceout;
+}
+
+void UIEthnicListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
+{
+    tracein;
+    Ethnic* model = (Ethnic*)item;
+    if (model && model->modelName() == KModelNameEthnic) {
+        tblItem->addValue(model->nameId());
+        tblItem->addValue(model->name());
+        tblItem->addValue(model->countryName());
+        tblItem->addValue(model->remark());
+    } else {
+        loge("Invalid model '%s'", model?STR2CHA(model->toString()):"null");
+    }
+    traceout;
+}
+
+void UIEthnicListView::onAddItem(UITableCellWidgetItem *item)
+{
+    tracein;
+    MainWindow::showAddEditEthnic(true, nullptr, this);
+    traceout;
+}
+
+void UIEthnicListView::onEditItem(UITableCellWidgetItem *item)
+{
+    tracein;
+    if (item) {
+        DbModel* ethnic = item->itemData();
+        if (ethnic) {
+            MainWindow::showAddEditEthnic(true, ethnic, this);
+        } else {
+            loge("Edit failed, null ethnic");
+        }
+    } else {
+        loge("Edit failed, null item");
+    }
+    traceout;
 }

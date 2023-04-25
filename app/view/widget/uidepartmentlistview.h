@@ -36,7 +36,7 @@ protected:
     virtual ModelController* getController();
 
     virtual QList<DbModel*> getListItem();
-    virtual DbModel* onNewModel();
+    virtual DbModel* onNewModel(const QString& modelName);
 };
 
 #endif // UIDEPARTMENTLISTVIEW_H

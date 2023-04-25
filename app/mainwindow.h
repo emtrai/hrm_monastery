@@ -89,6 +89,8 @@ public:
                                           CommonEditModelListener* listener = nullptr);
             static void showAddEditArea(bool isSelfUpdate = true, DbModel* com = nullptr,
                                              CommonEditModelListener* listener = nullptr);
+            static void showAddEditEthnic(bool isSelfUpdate = true, DbModel* com = nullptr,
+                                             CommonEditModelListener* listener = nullptr);
             static ErrCode exportListItems(const QList<DbModel*>* items, ModelController* controller,
                                     const QString& title = nullptr,
                                     quint64 exportTypeList = 0 // List of supported export type, bitwise
@@ -100,8 +102,13 @@ public:
                                                 void *data = nullptr);
             static void addMainWindownImportListener(MainWindownImportListener* listener);
             static void removeMainWindownImportListener(MainWindownImportListener* listener);
-        protected:
-     void showEvent(QShowEvent *ev);
+protected:
+    void showEvent(QShowEvent *ev);
+    /**
+    * @brief called on closed
+    * @param event
+    */
+    void closeEvent(QCloseEvent *event);
  public:
      void switchView(ViewType type, void* data = nullptr);
      void switchView(BaseView* nextView, bool fromStack = false);
@@ -122,6 +129,7 @@ public:
      void notifyMainWindownImportListenerStart(ImportTarget target);
      void notifyMainWindownImportListenerEnd(ImportTarget target, ErrCode err, void* importData);
      virtual void onLoadController (Controller* ctl);
+     virtual void onUnloadController (Controller* ctl);
      void doShowAddEditPerson(bool isSelfUpdate = true, Person* per = nullptr, bool isNew = true);
      void doShowAddEditCommunity(bool isSelfUpdate = true, Community* com = nullptr,
                                  CommonEditModelListener* listener = nullptr);
@@ -134,6 +142,8 @@ public:
      void doShowAddEditCommDept(bool isSelfUpdate = true, DbModel* comm = nullptr, DbModel* model = nullptr,
                               CommonEditModelListener* listener = nullptr);
      void doShowAddEditArea(bool isSelfUpdate = true, DbModel* model = nullptr,
+                                   CommonEditModelListener* listener = nullptr);
+     void doShowAddEditEthnic(bool isSelfUpdate = true, DbModel* model = nullptr,
                                    CommonEditModelListener* listener = nullptr);
      ErrCode doExportListItems(const QList<DbModel*>* items, ModelController* controller,
                                const QString& title = nullptr, quint64 exportTypeList = 0);
@@ -195,10 +205,12 @@ public:
 
  signals:
     void load();
+    void unload();
 
      void importPeople(ErrCode err, QList<DbModel*>* list);
  private slots:
     void onLoad();
+    void onUnload();
      void onImportPeople(ErrCode err, QList<DbModel*>* list);
      void on_action_ImportPerson_triggered();
      void on_action_ImportPersonList_triggered();

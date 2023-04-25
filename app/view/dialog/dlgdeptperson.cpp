@@ -65,8 +65,8 @@ ErrCode DlgDeptPerson::buildModel(DbModel *model, QString &errMsg)
     }
     perdep->setModelStatus(MODEL_ACTIVE);
     SET_VAL_FROM_TEXTBOX(ui->txtSearch, KItemUid, perdep->setPersonUid, perdep->setPersonName);
-    SET_VAL_FROM_CBOX(ui->cbRole, perdep->setRoleUid, perdep->setRoleName);
-    SET_VAL_FROM_CBOX(ui->cbTerm, perdep->setCourseUid, perdep->setCourseName);
+    SET_VAL_FROM_CBOX(ui->cbRole, perdep->setRoleUid, perdep->setRoleName, err);
+    SET_VAL_FROM_CBOX(ui->cbTerm, perdep->setCourseUid, perdep->setCourseName, err);
     SET_INT_VAL_FROM_CBOX(ui->cbStatus, perdep->setModelStatus, perdep->setModelStatusName);
     SET_DATE_VAL_FROM_WIDGET(ui->txtStartDate, perdep->setStartDate);
     SET_DATE_VAL_FROM_WIDGET(ui->txtEndDate, perdep->setEndDate);
@@ -159,7 +159,7 @@ void DlgDeptPerson::on_btnSearch_clicked()
 {
 
     tracein;
-    DlgSearchPerson * dlg = DlgSearchPerson::build(this);
+    DlgSearchPerson * dlg = DlgSearchPerson::build(this, true);
     if (dlg == nullptr) {
         loge("Open dlg DlgAddPersonEvent fail, No memory");
         return; // TODO: open dlg??

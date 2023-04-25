@@ -43,5 +43,6 @@
 #define STR_COURSE      QObject::tr("Nhiệm kỳ")
 #define STR_UNKNOWN     QObject::tr("Không rõ")
 #define STR_MODELSTATUS QObject::tr("Tình trạng")
+#define STR_COUNTRY     QObject::tr("Quốc gia")
 
 #endif // STRINGDEFS_H

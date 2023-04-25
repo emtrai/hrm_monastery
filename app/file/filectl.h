@@ -25,6 +25,8 @@
 #include "controller.h"
 #include <QFile>
 #include "errcode.h"
+#include <QTemporaryDir>
+
 class FileCtl:public Controller
 {
 public:
@@ -35,11 +37,19 @@ public:
     static QString getAppWorkingDataDir(const QString& subDir);
     static QString getAppWorkingDataDir();
 
+
+
+    static QString getAppImageDataRootDir();
+    static QString getAppImageDataDir(const QString& subDir = nullptr);
+    static QString getAppPeopleImageDataDir();
+
     static QString getAppLocalDataDir(const QString& subDir);
     static QString getAppDataDir(const QString& subDir);
     static QString getAppDataDir();
-    static QString getTmpDataDir(const QString& subDir);
-    static QString getTmpDataDir();
+    QString tmpDataDir(const QString& subDir);
+    QString tmpDataFile(const QString& fname);
+    static QString getTmpDataDir(const QString& subDir = nullptr);
+    static QString getTmpDataFile(const QString& fname);
     static QString getAppInstallDir(const QString& subDir = nullptr);
 
     static QString getOrCreatePrebuiltDataDir();
@@ -62,6 +72,7 @@ public:
     static void cleanUpData();
     virtual QString getName();
     virtual ErrCode onLoad();
+    virtual void onUnload();
 
 private:
     FileCtl();
@@ -69,6 +80,7 @@ private:
 private:
     static FileCtl* gInstance;
     QString mTmpDirPath;
+    QTemporaryDir mTmpDir;
 };
 
 #endif // FILECTL_H

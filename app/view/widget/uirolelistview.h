@@ -36,7 +36,9 @@ protected:
     virtual ModelController* getController();
     virtual int getViewType() { return VIEW_ROLE;}
     virtual QString getTitle();
-    virtual DbModel* onNewModel();
+    virtual DbModel* onNewModel(const QString& modelName);
+
+
 };
 
 #endif // UIROLELISTVIEW_H

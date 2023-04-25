@@ -44,6 +44,7 @@
 #include "view/dialog/dlgcourse.h"
 #include "view/dialog/dlgcommdept.h"
 #include "view/dialog/dlgarea.h"
+#include "view/dialog/dlgethnic.h"
 #include "personctl.h"
 #include "dialog/dlgabout.h"
 #include "dlgwait.h"
@@ -149,6 +150,7 @@ MainWindow::MainWindow(QWidget *parent)
     logd("connect");
 //    QObject::connect(this, SIGNAL(load()), loader, SLOT(onLoad()));
     QObject::connect(this, SIGNAL(load()), this, SLOT(onLoad()));
+    QObject::connect(this, SIGNAL(unload()), this, SLOT(onUnload()));
 }
 
 
@@ -240,6 +242,14 @@ void MainWindow::showAddEditArea(bool isSelfUpdate, DbModel *com, CommonEditMode
     tracein;
     getInstance()->doShowAddEditArea(isSelfUpdate, com, listener);
     traceout;
+}
+
+void MainWindow::showAddEditEthnic(bool isSelfUpdate, DbModel *com, CommonEditModelListener *listener)
+{
+    tracein;
+    getInstance()->doShowAddEditEthnic(isSelfUpdate, com, listener);
+    traceout;
+
 }
 
 ErrCode MainWindow::exportListItems(const QList<DbModel *>* items,
@@ -378,6 +388,13 @@ void MainWindow::onLoadController (Controller* ctl)
     traceout;
 }
 
+void MainWindow::onUnloadController(Controller *ctl)
+{
+    tracein;
+    // TODO: unload controller???
+    traceout;
+}
+
 void MainWindow::doShowAddEditPerson(bool isSelfUpdate, Person *per, bool isNew)
 {
     tracein;
@@ -393,7 +410,7 @@ void MainWindow::doShowAddEditCommunity(bool isSelfUpdate, Community *com, Commo
 {
     tracein;
     logd("isSelfUpdate %d", isSelfUpdate);
-    DlgCommunity* dlg = DlgCommunity::build(this, isSelfUpdate, (DbModel*)com, listener);
+    DlgCommunity* dlg = DlgCommunity::build(this, isSelfUpdate, KModelNameCommunity, (DbModel*)com, listener);
     dlg->setListener(listener);
     dlg->exec();
     delete dlg;
@@ -505,7 +522,7 @@ void MainWindow::doShowAddEditCommonModel(bool isSelfUpdate, DbModel *model, Com
             isSelfUpdate,
              model?STR2CHA(model->toString()):"null",
              listener?STR2CHA(listener->getName()):"null");
-    DlgEditModel* dlg = DlgEditModel::build(this, isSelfUpdate, model, listener);
+    DlgEditModel* dlg = DlgEditModel::build(this, isSelfUpdate, nullptr, model, listener);
     dlg->setListener(listener);
     dlg->exec();
     delete dlg;
@@ -517,7 +534,7 @@ void MainWindow::doShowAddEditCourse(bool isSelfUpdate, DbModel *model,
 {
     tracein;
     logd("isSelfUpdate %d", isSelfUpdate);
-    DlgCourse* dlg = DlgCourse::build(this, isSelfUpdate, model, listener);
+    DlgCourse* dlg = DlgCourse::build(this, isSelfUpdate, nullptr, model, listener);
     dlg->setListener(listener);
     dlg->exec();
     delete dlg;
@@ -530,7 +547,7 @@ void MainWindow::doShowAddEditCommDept(bool isSelfUpdate, DbModel* comm,
 {
     tracein;
     logd("isSelfUpdate %d", isSelfUpdate);
-    DlgCommDept* dlg = DlgCommDept::build(this, isSelfUpdate, model, listener);
+    DlgCommDept* dlg = DlgCommDept::build(this, isSelfUpdate, KModelNameCommDept, model, listener);
     dlg->setCommunity(comm);
     dlg->exec();
     delete dlg;
@@ -541,7 +558,17 @@ void MainWindow::doShowAddEditArea(bool isSelfUpdate, DbModel *model, CommonEdit
 {
     tracein;
     logd("isSelfUpdate %d", isSelfUpdate);
-    DlgArea* dlg = DlgArea::build(this, isSelfUpdate, model, listener);
+    DlgArea* dlg = DlgArea::build(this, isSelfUpdate, KModelNameArea, model, listener);
+    dlg->exec();
+    delete dlg;
+    traceout;
+}
+
+void MainWindow::doShowAddEditEthnic(bool isSelfUpdate, DbModel *model, CommonEditModelListener *listener)
+{
+    tracein;
+    logd("isSelfUpdate %d", isSelfUpdate);
+    DlgEthnic* dlg = DlgEthnic::build(this, isSelfUpdate, KModelNameEthnic, model, listener);
     dlg->exec();
     delete dlg;
     traceout;
@@ -856,6 +883,17 @@ void MainWindow::pushViewToStack(BaseView* view)
     traceout;
 }
 
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    tracein;
+    // TODO: call unload directly here instead of emit?
+    // because QMainWindow::closeEvent may free resource before slot Unload is called....
+    emit unload();
+    logd("Close main window");
+    QMainWindow::closeEvent(event);
+    traceout;
+}
+
 void MainWindow::doAddMainWindownImportListener(MainWindownImportListener *listener)
 {
     tracein;
@@ -937,6 +975,14 @@ void MainWindow::onLoad()
         );
 //    LoaderCtl::getInstance()->onLoad();
 //    this->setAppState(APP_STATE_READY);
+    traceout;
+}
+
+void MainWindow::onUnload()
+{
+    tracein;
+    logd("unload from loader");
+    LoaderCtl::getInstance()->onUnload();
     traceout;
 }
 

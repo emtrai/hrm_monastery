@@ -82,7 +82,7 @@ ErrCode DlgArea::buildModel(DbModel *model, QString& errMsg)
         comm->setEmail(ui->txtEmail->toPlainText().trimmed());
     }
     if (err == ErrNone){
-        SET_VAL_FROM_CBOX(ui->cbCountry, comm->setCountryUid, comm->setCountryName);
+        SET_VAL_FROM_CBOX(ui->cbCountry, comm->setCountryUid, comm->setCountryName, err);
     }
     if (err == ErrNone){
         SET_INT_VAL_FROM_CBOX(ui->cbStatus, comm->setModelStatus, comm->setModelStatusName);

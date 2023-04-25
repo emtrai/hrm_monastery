@@ -55,50 +55,14 @@ const char* const KManagementDeptNameId = "QUAN_LY";
 
 const char* const KPrebuiltDirName = "prebuilt";
 const char* const KWorkingDirName = "data";
+const char* const KImageDirName = "image";
+const char* const KPeopleImageDirName = "people";
 const char* const KDataDirName = ".appdata";
 const char* const KLogDirName = "log";
 const char* const KDatabasename = "db.db";
 const char* const KDatabaseMetaName = "db.json";
 
 const char* const KControlBackupName = "backup";
-
-const char* const KModelHdlCountry = "country";
-const char* const KModelHdlEdu = "education";
-const char* const KModelHdlCommunity = "community";
-const char* const KModelHdlPerson = "person";
-const char* const KModelHdlSaint = "saint";
-const char* const KModelHdlSpecialist = "specialist";
-const char* const KModelHdlProvince = "province";
-const char* const KModelHdlEthnic = "ethnic";
-const char* const KModelHdlMission = "mission";
-const char* const KModelHdlArea = "area";
-const char* const KModelHdlDept = "department";
-const char* const KModelHdlCommDept = "community_dept";
-const char* const KModelHdlCourse = "course";
-const char* const KModelHdlWork = "work";
-const char* const KModelHdlPersonStatus = "person_status";
-const char* const KModelHdlRole = "role";
-const char* const KModelHdlPersonEvent = "person_event";
-const char* const KModelHdlEvent = "event";
-
-const char* const KModelNamePerson = "person";
-const char* const KModelNameArea = "area";
-const char* const KModelNamePersonEvent = "person_event";
-const char* const KModelNameSaintPerson = "saint_person";
-const char* const KModelNameCommDept = "comm_dept";
-const char* const KModelNameMapDeptMgr = "dept_mgr";
-const char* const KModelNameCommPerson = "comm_pers";
-const char* const KModelNameMap = "map_model";
-const char* const KModelNamePersonDept = "person_dept";
-const char* const KModelNameRole = "role";
-const char* const KModelNameDepartment = "department";
-const char* const KModelNameAreaComm = "area_community";
-const char* const KModelNameAreaPerson = "area_person";
-const char* const KModelNameSpecialist = "specialist";
-const char* const KModelNameSpecialistPerson = "specialist_person";
-const char* const KModelNameCommunity = "community";
-const char* const KModelNameSaint = "saint";
-const char* const KModelNameCourse = "course";
 
 const char* const KDataFormatList = "QList";
 const char* const KDataFormatStringList = "QStringList";
@@ -221,6 +185,8 @@ const char* const KItemPeriod = "CHU_KY";
 const char* const KItemRole = "VAI_TRO";
 const char* const KItemLevel = "CAP";
 const char* const KItemContact = "LIEN_HE";
+const char* const KItemTerm = "NHIEM_KY";
+const char* const KItemPersonNameId = "MA_DINH_DANH_NU_TU";
 
 // Special item name
 const char* const KItemDbStatus = "DB_STATUS";

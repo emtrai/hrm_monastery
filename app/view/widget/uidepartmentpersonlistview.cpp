@@ -50,7 +50,7 @@ UIDepartmentPersonListView::~UIDepartmentPersonListView()
     }
 }
 
-DbModel *UIDepartmentPersonListView::onNewModel()
+DbModel *UIDepartmentPersonListView::onNewModel(const QString& modelName)
 {
     // TODO: handle it
     return nullptr;
@@ -78,7 +78,7 @@ void UIDepartmentPersonListView::onViewItem(UITableCellWidgetItem *item)
 void UIDepartmentPersonListView::onAddItem(UITableCellWidgetItem *item)
 {
     tracein;
-    DlgDeptPerson* dlg = DlgDeptPerson::build(this, true, nullptr, this);
+    DlgDeptPerson* dlg = DlgDeptPerson::build(this, true, KModelNamePersonDept, nullptr, this);
     dlg->setCommDeptUid(mCommDept->uid());
     dlg->setCommDeptNameId(mCommDept->nameId());
     dlg->exec();
@@ -93,7 +93,7 @@ void UIDepartmentPersonListView::onEditItem(UITableCellWidgetItem *item)
     DbModel* model = item->itemData();
     if (model){
         PersonDept* per = (PersonDept*)model;
-        DlgDeptPerson* dlg = DlgDeptPerson::build(this, true, per, this);
+        DlgDeptPerson* dlg = DlgDeptPerson::build(this, true, KModelNamePersonDept, per, this);
         dlg->setCommDeptUid(mCommDept->uid());
         dlg->setCommDeptNameId(mCommDept->nameId());
 //        dlg->setCommDeptUid(mCommDept->uid());

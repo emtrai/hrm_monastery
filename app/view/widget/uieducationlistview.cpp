@@ -50,7 +50,7 @@ QString UIEducationListView::getTitle()
     return tr("Trình độ học vấn");
 }
 
-DbModel *UIEducationListView::onNewModel()
+DbModel *UIEducationListView::onNewModel(const QString& modelName)
 {
     return Education::build();
 }

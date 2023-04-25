@@ -34,7 +34,12 @@ protected:
     virtual int getViewType() { return VIEW_ETHNIC;}
     virtual ModelController* getController();
     virtual QString getTitle();
-    virtual DbModel* onNewModel();
+    virtual DbModel* onNewModel(const QString& modelName);
+    virtual void initHeader();
+    virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
+
+    virtual void onAddItem(UITableCellWidgetItem *item);
+    virtual void onEditItem(UITableCellWidgetItem *item);
 };
 
 #endif // UIETHNICLISTVIEW_H

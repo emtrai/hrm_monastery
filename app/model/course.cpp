@@ -108,17 +108,17 @@ void Course::initExportFields()
 {
     tracein;
     DbModel::initExportFields();
-    mExportCallbacks.insert(KItemPeriod, [this](const QString& item){
-        return this->period();
+    mExportCallbacks.insert(KItemPeriod, [](const DbModel* model, const QString& item){
+        return ((Course*)model)->period();
     });
-    mExportCallbacks.insert(KItemType, [this](const QString& item){
-        return this->courseTypeName();
+    mExportCallbacks.insert(KItemType, [](const DbModel* model, const QString& item){
+        return ((Course*)model)->courseTypeName();
     });
-    mExportCallbacks.insert(KItemStartDate, [this](const QString& item){
-        return Utils::date2String(this->startDate(), DEFAULT_FORMAT_YMD);
+    mExportCallbacks.insert(KItemStartDate, [](const DbModel* model, const QString& item){
+        return Utils::date2String(((Course*)model)->startDate(), DEFAULT_FORMAT_YMD);
     });
-    mExportCallbacks.insert(KItemEndDate, [this](const QString& item){
-        return Utils::date2String(this->endDate(), DEFAULT_FORMAT_YMD);
+    mExportCallbacks.insert(KItemEndDate, [](const DbModel* model, const QString& item){
+        return Utils::date2String(((Course*)model)->endDate(), DEFAULT_FORMAT_YMD);
     });
     // TODO: implement more
     traceout;

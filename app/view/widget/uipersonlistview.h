@@ -69,7 +69,7 @@ protected:
                           const QString& catetory,
                           qint64 opFlags,
                           const QString& keywords, const QVariant *value);
-    virtual DbModel* onNewModel();
+    virtual DbModel* onNewModel(const QString& modelName);
     virtual QString getName();
     virtual void onImportStart(const QString& importName, const QString& fpath, ImportType type);
     virtual void onImportEnd(const QString& importName, ErrCode err, const QString& fpath, ImportType type);

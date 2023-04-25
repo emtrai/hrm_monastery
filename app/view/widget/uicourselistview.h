@@ -33,7 +33,7 @@ public:
 protected:
 
     virtual QString getTitle();
-    virtual DbModel* onNewModel();
+    virtual DbModel* onNewModel(const QString& modelName);
     virtual void onAddItem(UITableCellWidgetItem *item);
     virtual void onEditItem(UITableCellWidgetItem *item);
     virtual void onDeleteItem(const QList<UITableItem *>& selectedItems);

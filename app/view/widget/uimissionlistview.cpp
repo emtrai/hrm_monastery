@@ -42,27 +42,20 @@ UIMissionListView::~UIMissionListView()
     tracein;
 }
 
+ModelController *UIMissionListView::getController()
+{
+    return MISSIONCTL;
+}
+
 
 QString UIMissionListView::getTitle()
 {
     return tr("Công tác xã hội");
 }
 
-DbModel *UIMissionListView::onNewModel()
+DbModel *UIMissionListView::onNewModel(const QString& modelName)
 {
     return Mission::build();
 }
 
-ErrCode UIMissionListView::onLoad()
-{
-    QList<DbModel*> items = MISSIONCTL->getAllItemsFromDb();
-    tracein;
-
-    RELEASE_LIST_DBMODEL(mItemList);
-    // TODO: loop to much, redundant, do something better?
-    foreach (DbModel* item, items) {
-        mItemList.append(dynamic_cast<Mission*>(item));
-    }
-    return ErrNone;
-}
 

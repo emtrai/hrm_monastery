@@ -152,29 +152,29 @@ void Area::initExportFields()
 {
     tracein;
     DbModel::initExportFields();
-    mExportCallbacks.insert(KItemCountry, [this](const QString& item){
-        return this->countryName();
+    mExportCallbacks.insert(KItemCountry, [](const DbModel* model, const QString& item){
+        return ((Area*)model)->countryName();
     });
-    mExportCallbacks.insert(KItemAddress, [this](const QString& item){
-        return this->addr();
+    mExportCallbacks.insert(KItemAddress, [](const DbModel* model, const QString& item){
+        return ((Area*)model)->addr();
     });
-    mExportCallbacks.insert(KItemEmail, [this](const QString& item){
-        return this->email();
+    mExportCallbacks.insert(KItemEmail, [](const DbModel* model, const QString& item){
+        return ((Area*)model)->email();
     });
-    mExportCallbacks.insert(KItemTel, [this](const QString& item){
-        return this->tel();
+    mExportCallbacks.insert(KItemTel, [](const DbModel* model, const QString& item){
+        return ((Area*)model)->tel();
     });
-    mExportCallbacks.insert(KItemStartDate, [this](const QString& item){
-        return Utils::date2String(this->startDate(), DEFAULT_FORMAT_YMD);
+    mExportCallbacks.insert(KItemStartDate, [](const DbModel* model, const QString& item){
+        return Utils::date2String(((Area*)model)->startDate(), DEFAULT_FORMAT_YMD);
     });
-    mExportCallbacks.insert(KItemEndDate, [this](const QString& item){
-        return Utils::date2String(this->endDate(), DEFAULT_FORMAT_YMD);
+    mExportCallbacks.insert(KItemEndDate, [](const DbModel* model, const QString& item){
+        return Utils::date2String(((Area*)model)->endDate(), DEFAULT_FORMAT_YMD);
     });
-    mExportCallbacks.insert(KItemStatus, [this](const QString& item){
-        return this->modelStatusName();
+    mExportCallbacks.insert(KItemStatus, [](const DbModel* model, const QString& item){
+        return ((Area*)model)->modelStatusName();
     });
-    mExportCallbacks.insert(KItemChangeHistory, [this](const QString& item){
-        return this->changeHistory();
+    mExportCallbacks.insert(KItemChangeHistory, [](const DbModel* model, const QString& item){
+        return ((Area*)model)->changeHistory();
     });
     // TODO: implement more
     traceout;

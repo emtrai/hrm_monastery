@@ -32,10 +32,9 @@ public:
 protected:
 
     virtual int getViewType() { return VIEW_MISSION;}
+    virtual ModelController* getController();
     virtual QString getTitle();
-    virtual DbModel* onNewModel();
-protected:
-    virtual ErrCode onLoad();
+    virtual DbModel* onNewModel(const QString& modelName);
 };
 
 #endif // UIMISSIONLISTVIEW_H

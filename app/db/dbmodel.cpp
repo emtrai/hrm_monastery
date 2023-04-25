@@ -136,20 +136,20 @@ int DbModel::modelType() const
 void DbModel::initExportFields()
 {
     tracein;
-    mExportCallbacks.insert(KItemName, [this](const QString& item){
-        return this->name();
+    mExportCallbacks.insert(KItemName, [](const DbModel* model, const QString& item){
+        return model->name();
 
     });
-    mExportCallbacks.insert(KItemNameId, [this](const QString& item){
-        return this->nameId();
+    mExportCallbacks.insert(KItemNameId, [](const DbModel* model, const QString& item){
+        return model->nameId();
 
     });
-    mExportCallbacks.insert(KItemUid, [this](const QString& item){
-        return this->uid();
+    mExportCallbacks.insert(KItemUid, [](const DbModel* model, const QString& item){
+        return model->uid();
 
     });
-    mExportCallbacks.insert(KItemRemark, [this](const QString& item){
-        return this->remark();
+    mExportCallbacks.insert(KItemRemark, [](const DbModel* model, const QString& item){
+        return model->remark();
 
     });
     traceout;
@@ -395,7 +395,9 @@ ErrCode DbModel::exportToFile(ExportType type, QString *fpath)
     tracein;
     ErrCode ret = ErrNone;
     QString fname = QString("%1.html").arg(uid());
-    *fpath = FileCtl::getTmpDataDir(fname);
+    logd("fname '%s'", STR2CHA(fname));
+    *fpath = FileCtl::getTmpDataFile(fname);
+    logd("fpath '%s'", STR2CHA((*fpath)));
     ret = ExportFactory::exportTo(getExporter(),
                                   *fpath, type);
     // TODO: how about exportTo() method??
@@ -429,7 +431,7 @@ ErrCode DbModel::getExportDataString(const QString &item, QString *data) const
     logd("item %s", item.toStdString().c_str());
     if (mExportCallbacks.contains(item)){
         ExportCallbackFunc func = mExportCallbacks.value(item);
-        if (func != nullptr) *data = func(item);
+        if (func != nullptr) *data = func(this, item);
     }
     // TODO: raise exception when error occur???
 

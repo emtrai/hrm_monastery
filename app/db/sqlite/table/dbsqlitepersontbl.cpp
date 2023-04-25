@@ -758,6 +758,7 @@ QString DbSqlitePersonTbl::getSearchQueryString(const QString &cond)
     if (!cond.isEmpty()) {
         queryString += QString(" WHERE %1").arg(cond);
     }
+    queryString += " ORDER BY name ASC ";
     logd("queryString: %s", queryString.toStdString().c_str());
     return queryString;
 }
@@ -832,6 +833,7 @@ QString DbSqlitePersonTbl::getFilterQueryString(int fieldId, const QString &cond
     if (!cond.isEmpty()) {
         queryString += QString(" WHERE %1").arg(cond);
     }
+    queryString += " ORDER BY name ASC ";
     logd("queryString: %s", queryString.toStdString().c_str());
     return queryString;
 }

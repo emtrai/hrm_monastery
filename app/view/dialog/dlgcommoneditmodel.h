@@ -32,6 +32,7 @@
 public: \
 inline static className* build(QWidget *parent = nullptr, \
                     bool isSelfSave = true, \
+                    QString modelName = nullptr, \
                     DbModel* model = nullptr, \
                     CommonEditModelListener *listener = nullptr) { \
     tracein; \
@@ -39,6 +40,7 @@ inline static className* build(QWidget *parent = nullptr, \
     dlg = new className(parent); \
     dlg->setupUI();\
     dlg->setIsSelfSave(isSelfSave); \
+    dlg->setModelName(modelName); \
     dlg->setListener(listener); \
     if (model != nullptr) { \
         dlg->setIsNew(false); \
@@ -59,7 +61,7 @@ class CommonEditModelListener
 public:
     virtual QString getName() = 0;
     virtual void onDbModelReady(ErrCode ret, DbModel* model, DlgCommonEditModel* dlg) = 0;
-    virtual DbModel* onNewModel() = 0;
+    virtual DbModel* onNewModel(const QString& modelName) = 0;
 };
 
 class DlgCommonEditModel: public QDialog
@@ -89,6 +91,8 @@ public:
     void setListener(CommonEditModelListener *newListener);
 
     void setModel(DbModel *newModel);
+
+    void setModelName(const QString &newModelName);
 
 protected:
     virtual QDialogButtonBox* buttonBox();
@@ -122,6 +126,7 @@ protected:
     bool mIsSelfSave; //true: auto save on accept, false: not save
     CommonEditModelListener* mListener;
     bool mCustomNameId;
+    QString mModelName;
 };
 
 #endif // DLGCOMMONEDITMODEL_H

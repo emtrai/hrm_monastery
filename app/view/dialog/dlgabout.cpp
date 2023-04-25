@@ -53,6 +53,7 @@ DlgAbout::DlgAbout(QWidget *parent) :
     appInfo += QString(tr("- Thư mục dữ liệu cài đặt ứng dụng: \n%1\n").arg(FileCtl::getAppInstallDir()));
     appInfo += QString(tr("- Thư mục dữ liệu ứng dụng: \n%1\n").arg(FileCtl::getAppWorkingDataDir()));
     appInfo += QString(tr("- Thư mục log: \n%1\n").arg(Logger::logDirPath()));
+    appInfo += QString(tr("- Thư mục tạm: \n%1\n").arg(FileCtl::getTmpDataDir()));
     ui->txtAppInfo->setText(appInfo);
 }
 

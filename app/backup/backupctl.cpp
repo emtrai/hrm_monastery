@@ -36,17 +36,22 @@ GET_INSTANCE_CONTROLLER_IMPL(BackupCtl)
 
 BackupCtl::BackupCtl()
 {
-
+    traced;
 }
 
 void BackupCtl::init()
 {
-
+    traced;
 }
 
 ErrCode BackupCtl::onLoad()
 {
     return ErrNone;
+}
+
+void BackupCtl::onUnload()
+{
+    traced;
 }
 
 QString BackupCtl::getName()

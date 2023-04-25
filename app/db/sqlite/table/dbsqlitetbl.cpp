@@ -36,7 +36,6 @@
 #include <QSqlError>
 #include <QHash>
 #include "filter.h"
-#include "dbctl.h"
 #include "dbsqlite.h"
 #include "exception.h"
 
@@ -496,7 +495,7 @@ bool DbSqliteTbl::isExist(const DbModel *item)
             }
 
             if (err == ErrNone) {
-                QString queryString = QString("SELECT * FROM %1 WHERE %2")
+                QString queryString = QString("SELECT * FROM %1 WHERE %2 ORDER BY NAME ASC")
                                           .arg(name(), cond);
 
                 qry.prepare(queryString);
@@ -627,9 +626,9 @@ ErrCode DbSqliteTbl::updateModelFromQuery(DbModel* item, const QSqlQuery& qry)
 {
     tracein;
     ErrCode err = ErrNone;
-    item->setNameId(qry.value(KFieldNameId).toString());
+    item->setNameId(qry.value(KFieldNameId).toString().trimmed());
     item->setDbId(qry.value(KFieldId).toInt());
-    item->setName(qry.value(KFieldName).toString());
+    item->setName(qry.value(KFieldName).toString().trimmed());
     item->setUid(qry.value(KFieldUid).toString());
     item->setDbHistory(qry.value(KFieldDbHistory).toString());
     item->setDbStatus(qry.value(KFieldDbStatus).toInt());
@@ -957,7 +956,7 @@ DbModel *DbSqliteTbl::getModel(qint64 dbId, const DbModelBuilder& builder)
     ErrCode err = ErrNone;
     DbModel* item = nullptr;
     // TODO: check record status????
-    QString queryString = QString("SELECT * FROM %1 where id=:id").arg(name());
+    QString queryString = QString("SELECT * FROM %1 where id=:id ORDER BY NAME ASC").arg(name());
     qry.prepare(queryString);
     logd("Query String '%s'", queryString.toStdString().c_str());
 
@@ -1311,6 +1310,7 @@ QString DbSqliteTbl::getSearchQueryStringWithTag(const QString &cond, const QStr
     if (!cond.isEmpty()) {
         queryString += QString(" WHERE %1").arg(cond);
     }
+    queryString += " ORDER BY name ASC ";
     logd("queryString: %s", queryString.toStdString().c_str());
     traceout;
     return queryString;

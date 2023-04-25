@@ -50,6 +50,8 @@ public:
      * @return
      */
     virtual QString getName() = 0;
+
+    virtual void onUnload() = 0;
 };
 
 #endif // CONTROLLER_H

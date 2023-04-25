@@ -457,7 +457,7 @@ ErrCode UICommunityListView::onReload()
     return ErrNone;
 }
 
-DbModel *UICommunityListView::onNewModel()
+DbModel *UICommunityListView::onNewModel(const QString& modelName)
 {
     return Community::build();
 }

@@ -74,6 +74,8 @@
 #include "departctl.h"
 #include "department.h"
 
+#include "stringdefs.h"
+
 #define SPLIT_EMAIL_PHONE ";"
 
 #define PERSON_DISPLAY_NAME_SPLIT "-"
@@ -223,11 +225,11 @@ void DlgPerson::setupUI()
     mInitDone = true;
 }
 
-Person *DlgPerson::buildPerson()
+ErrCode DlgPerson::buildPerson(Person* per)
 {
     tracein;
     // TODO: backup data to restore later??
-    Person* per = person();
+    ErrCode err = ErrNone;
     per->setMarkModified(true); // start marking fields which are modified
     // Image
     per->setImgPath(ui->lblImgPath->text().trimmed());
@@ -255,10 +257,12 @@ Person *DlgPerson::buildPerson()
     per->setBirthPlace(ui->txtBirthplace->text().trimmed());
 
     // nationality
-    SET_VAL_FROM_CBOX(ui->cbCountry, per->setNationalityUid, per->setNationalityName);
+    logd("set nationality");
+    if (err == ErrNone) SET_VAL_FROM_CBOX(ui->cbNationality, per->setNationalityUid, per->setNationalityName, err);
 
     // ethnic name
-    SET_VAL_FROM_CBOX(ui->cbEthic, per->setEthnicUid, per->setEthnicName);
+    logd("set Ethnic");
+    if (err == ErrNone) SET_VAL_FROM_CBOX(ui->cbEthic, per->setEthnicUid, per->setEthnicName, err);
 
     // id card
     per->setIdCard(ui->txtIDCard->text().trimmed());
@@ -270,7 +274,7 @@ Person *DlgPerson::buildPerson()
 
 
     // edu name
-    SET_VAL_FROM_CBOX(ui->cbEdu, per->setEduUid, per->setEduName);
+    if (err == ErrNone) SET_VAL_FROM_CBOX(ui->cbEdu, per->setEduUid, per->setEduName, err);
     per->setEduDetail(ui->txtEduDetail->toPlainText().trimmed());
 
     //specialist
@@ -281,10 +285,10 @@ Person *DlgPerson::buildPerson()
     }
     per->setSpecialistInfo(ui->txtSpecialistInfo->toPlainText().trimmed());
 
-    SET_VAL_FROM_CBOX(ui->cbCourse, per->setCourseUid, per->setCourseName);
-    SET_VAL_FROM_CBOX(ui->cbCountry, per->setCountryUid, per->setCountryName);
+    if (err == ErrNone) SET_VAL_FROM_CBOX(ui->cbCourse, per->setCourseUid, per->setCourseName, err);
+    if (err == ErrNone) SET_VAL_FROM_CBOX(ui->cbCountry, per->setCountryUid, per->setCountryName, err);
 #ifndef SKIP_PERSON_PROVINE
-    SET_VAL_FROM_CBOX(ui->cbProvince, per->setProvinceUid, per->setProvinceName);
+    if (err == ErrNone) SET_VAL_FROM_CBOX(ui->cbProvince, per->setProvinceUid, per->setProvinceName, err);
 #endif
     per->setAddr(ui->txtAddr->toPlainText().trimmed());
     per->setChurchAddr(ui->txtChurch->toPlainText().trimmed());
@@ -292,7 +296,7 @@ Person *DlgPerson::buildPerson()
     per->setTel(ui->txtPhone->text().split(SPLIT_EMAIL_PHONE));
     per->setOtherContact(ui->txtOtherContact->toPlainText().trimmed());
 
-    SET_VAL_FROM_CBOX(ui->cbCommunity, per->setCommunityUid, per->setCommunityName);
+    if (err == ErrNone) SET_VAL_FROM_CBOX(ui->cbCommunity, per->setCommunityUid, per->setCommunityName, err);
 
 
     per->setDadName(ui->txtDad->text().trimmed());
@@ -346,7 +350,7 @@ Person *DlgPerson::buildPerson()
     SET_DATE_VAL_FROM_WIDGET(ui->txtEternalDate, per->setEternalDate);
     per->setEternalPlace(ui->txtEternalPlace->text().trimmed());
 
-    SET_VAL_FROM_CBOX(ui->cbStatus, per->setPersonStatusUid, per->setPersonStatusName);
+    if (err == ErrNone) SET_VAL_FROM_CBOX(ui->cbStatus, per->setPersonStatusUid, per->setPersonStatusName, err);
 
     SET_DATE_VAL_FROM_WIDGET(ui->txtRetireDate, per->setRetireDate);
     per->setRetirePlace(ui->txtRetirePlace->text().trimmed());
@@ -356,7 +360,7 @@ Person *DlgPerson::buildPerson()
 
     // work
     logd("set work");
-    SET_VAL_FROM_CBOX(ui->cbWork, per->setCurrentWorkUid, per->setCurrentWorkName);
+    SET_VAL_FROM_CBOX(ui->cbWork, per->setCurrentWorkUid, per->setCurrentWorkName, err);
     per->setWorkHistory(ui->txtWorkHistory->toPlainText().trimmed());
 
     //event
@@ -368,7 +372,7 @@ Person *DlgPerson::buildPerson()
 
     per->dump();
     traceout;
-    return per;
+    return err;
 
 }
 
@@ -712,6 +716,8 @@ void DlgPerson::loadCountry()
     QList<DbModel*> listCountry = COUNTRYCTL->getAllItemsFromDb();
     ui->cbNationality->clear();
     ui->cbCountry->clear();
+    ui->cbNationality->addItem(STR_UNKNOWN, "");
+    ui->cbCountry->addItem(STR_UNKNOWN, "");
     foreach(DbModel* item, listCountry){
 
         ui->cbNationality->addItem(item->name(), item->uid());
@@ -903,22 +909,26 @@ void DlgPerson::on_buttonBox_clicked( QAbstractButton * button )
         if (ok2Save) {
             // TODO: check should we save here? or let caller save???
             // TODO: dialg with mode: add new, update, store directly, etc.
-            Person* per = buildPerson();
-
-            if (mIsNew) {
-                logd("Save it");
-                ret = per->save();
+            Person* per = person();
+            ret = buildPerson(per);
+            if (ret == ErrNone) {
+                if (mIsNew) {
+                    logd("Save it");
+                    ret = per->save();
+                } else {
+                    logd("Update it");
+                    ret = per->update();
+                }
+                logi("Save/Update person result %d", ret);
             } else {
-                logd("Update it");
-                ret = per->update();
+                loge("Build person err=%d", ret);
             }
-            logi("Save/Update person result %d", ret);
 
             if (ret == ErrNone) {
                 logd("Save/update ok, close dialog");
                 QDialog::accept();
             } else {
-                Utils::showErrorBox("Lỗi, không thể lưu thông tin");
+                Utils::showErrorBox(QString("Lỗi, không thể lưu thông tin, Mã lỗi %1").arg(ret));
             }
         }
 
@@ -1014,14 +1024,20 @@ void DlgPerson::on_tblClearCommunity_clicked()
 void DlgPerson::on_btnPreview_clicked()
 {
     tracein;
-    Person* per = buildPerson();
-    QString fpath;
-    INSTANCE(PersonCtl)->exportToFile(per, ExportType::EXPORT_HTML, &fpath);
-    if (QFile::exists(fpath)){
-        dlgHtmlViewer* viewer = new dlgHtmlViewer();
-        viewer->setHtmlPath(fpath);
-        viewer->setSubject("Person");
-        viewer->exec();
+    Person* per = person();
+    ErrCode ret = buildPerson(per);
+    if (ret == ErrNone) {
+        QString fpath;
+        INSTANCE(PersonCtl)->exportToFile(per, ExportType::EXPORT_HTML, &fpath);
+        if (QFile::exists(fpath)){
+            dlgHtmlViewer* viewer = new dlgHtmlViewer();
+            viewer->setHtmlPath(fpath);
+            viewer->setSubject("Person");
+            viewer->exec();
+        }
+    } else {
+        loge("Bild person failed, err=%d", ret);
+        Utils::showErrorBox(QString("Có lỗi xảy ra, mã lỗi %1").arg(ret));
     }
     traceout;
 }
@@ -1053,6 +1069,41 @@ DlgPerson *DlgPerson::buildDlg(QWidget *parent, Person *per, bool isNew)
 
     traceout;
     return dlg;
+}
+
+QString DlgPerson::getName()
+{
+    return "DlgPerson";
+}
+
+void DlgPerson::onDbModelReady(ErrCode ret, DbModel *model, DlgCommonEditModel *dlg)
+{
+    tracein;
+    logd("ret=%d", ret);
+    if (ret == ErrNone && model) {
+        if (model->modelName() == KModelNameEthnic) {
+            logd("Reload ethnic");
+            loadEthnic();
+        } else {
+            logw("not support model '%s'", STR2CHA(model->modelName()));
+        }
+    } else {
+        logw("ret=%d model=%d", ret, (model != nullptr));
+    }
+    traceout;
+}
+
+DbModel *DlgPerson::onNewModel(const QString &modelName)
+{
+    DbModel* model = nullptr;
+    tracein;
+    if (!modelName.isEmpty() && (modelName == KModelNameEthnic)) {
+        model = Ethnic::build();
+    } else {
+        logw("invalid or not support modelName '%s'", STR2CHA(modelName));
+    }
+    traceout;
+    return model;
 }
 
 
@@ -1104,7 +1155,7 @@ void DlgPerson::on_btnAddEthnic_clicked()
 {
     tracein;
 
-    DlgEthnic * dlg = new DlgEthnic();
+    DlgEthnic* dlg = DlgEthnic::build(this, true, KModelNameEthnic);
     if (dlg == nullptr) {
         loge("Open dlg ethnic fail, No memory");
         return;

@@ -28,6 +28,7 @@
 #include "defs.h"
 #include "utils.h"
 #include "crypto.h"
+#include <QTemporaryDir>
 
 
 FileCtl* FileCtl::gInstance = nullptr;
@@ -41,6 +42,7 @@ FileCtl *FileCtl::getInstance()
 {
     if (gInstance == nullptr){
         gInstance = new FileCtl();
+        gInstance->init();
     }
     return gInstance;
 
@@ -71,7 +73,46 @@ QString FileCtl::getAppWorkingDataDir(const QString &subDir)
 
 QString FileCtl::getAppWorkingDataDir()
 {
+    traced;
     return getAppWorkingDataDir(QString());
+}
+
+QString FileCtl::getAppImageDataDir(const QString &subDir)
+{
+    tracein;
+    QString imageRootDir = getAppImageDataRootDir();
+    QDir appDirPath(imageRootDir);
+    logd("imageRootDir %s", STR2CHA(imageRootDir));
+    logd("subDir %s", STR2CHA(subDir));
+    QString imgDirPath;
+    if (!appDirPath.exists()){
+        logi("imageRootDir not exist, create new one '%s'", STR2CHA(imageRootDir));
+        appDirPath.mkpath(appDirPath.absolutePath());
+    }
+    if (subDir.isEmpty()){
+        imgDirPath = imageRootDir;
+    } else {
+        imgDirPath = appDirPath.filePath(subDir);
+        QDir imgDir(imgDirPath);
+        if (!imgDir.exists()){
+            logi("imgDir not exist, create new one '%s'", STR2CHA(imgDirPath));
+            imgDir.mkpath(imgDir.absolutePath());
+        }
+    }
+    logd("imgDirPath '%s'", STR2CHA(imgDirPath));
+    traceout;
+    return imgDirPath;
+}
+
+QString FileCtl::getAppPeopleImageDataDir()
+{
+    traced;
+    return getAppImageDataDir(KPeopleImageDirName);
+}
+
+QString FileCtl::getAppImageDataRootDir()
+{
+    return getAppDataDir(KImageDirName);
 }
 
 QString FileCtl::getAppDataDir(const QString &subDir)
@@ -110,18 +151,48 @@ QString FileCtl::getAppDataDir()
     return getAppDataDir(QString());
 }
 
+QString FileCtl::tmpDataDir(const QString &subDir)
+{
+    tracein;
+    QString fpath = mTmpDir.path();
+    logd("create tmp data dir with subDir '%s'", STR2CHA(subDir));
+    if (!subDir.isEmpty()) {
+        fpath = mTmpDir.filePath(subDir);
+    }
+    QDir dir(fpath);
+    if (!dir.exists()){
+        logi("App path not exist, create new one");
+        dir.mkpath(fpath);
+    }
+    logd("create tmp data dir '%s'", STR2CHA(fpath));
+    traceout;
+    return fpath;
+}
+
+QString FileCtl::tmpDataFile(const QString &fname)
+{
+    tracein;
+    return mTmpDir.filePath(fname);
+}
+
 QString FileCtl::getTmpDataDir(const QString& subDir)
 {
     tracein;
     // TODO: implement it, this is just termprary processing
-    return getAppDataDir(subDir);
+    logd("subDir '%s'", STR2CHA(subDir));
+    QString tmpDirpath = getInstance()->tmpDataDir(subDir);
+    logd("tmpDirpath '%s'", STR2CHA(tmpDirpath));
+    return tmpDirpath;
 }
 
-QString FileCtl::getTmpDataDir()
+QString FileCtl::getTmpDataFile(const QString &fname)
 {
     tracein;
     // TODO: implement it, this is just termprary processing
-    return getAppDataDir();
+    logd("fname '%s'", STR2CHA(fname));
+    QString tmpFpath = getInstance()->tmpDataFile(fname);
+    logd("tmpFpath '%s'", STR2CHA(tmpFpath));
+    return tmpFpath;
 }
 
 QString FileCtl::getAppInstallDir(const QString& subDir)
@@ -359,5 +430,19 @@ QString FileCtl::getName()
 ErrCode FileCtl::onLoad()
 {
     tracein;
+    // create folder if any;
+    getAppDataDir();
+    getAppWorkingDataDir();
+    getAppPeopleImageDataDir();
     return ErrNone;
+}
+
+void FileCtl::onUnload()
+{
+    tracein;
+    logi("remove temp dir '%s'", STR2CHA(mTmpDir.path()));
+    if (!mTmpDir.remove()) {
+        loge("remove tmp dir '%s' failed", STR2CHA(mTmpDir.path()));
+    }
+    traceout;
 }

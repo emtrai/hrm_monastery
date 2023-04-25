@@ -41,6 +41,7 @@ const char* const KPrebuiltPersonListCSVTemplateFileName = "person_list_export_t
 const char* const KPrebuiltPersonListJSONTemplateFileName = "person_list_export_template_json";
 const char* const KPrebuiltCommunityInfoTemplateFileName = "community_info_template";
 const char* const KPrebuiltAreaInfoTemplateFileName = "area_info_template";
+const char* const KPrebuiltAreaPersonInfoTemplateFileName = "area_person_info_template";
 const char* const KPrebuiltCourseCSVFileName = "course";
 const char* const KPrebuiltWorkCSVFileName = "work";
 const char* const KPrebuiltStatusCSVFileName = "status";

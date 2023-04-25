@@ -50,7 +50,7 @@ QString UIWorkListView::getTitle()
     return tr("Trình độ học vấn");
 }
 
-DbModel *UIWorkListView::onNewModel()
+DbModel *UIWorkListView::onNewModel(const QString& modelName)
 {
     return Work::build();
 }

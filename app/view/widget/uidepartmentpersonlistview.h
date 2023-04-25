@@ -44,7 +44,7 @@ protected:
                                                                const QList<UITableItem *>& items);
     virtual ErrCode onMenuActionListPerson(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionListDepartment(QMenu* menu, UITableMenuAction* act);
-    virtual DbModel* onNewModel();
+    virtual DbModel* onNewModel(const QString& modelName);
     virtual QString getTitle();
 
     virtual void onViewItem(UITableCellWidgetItem *item);

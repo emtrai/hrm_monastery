@@ -43,7 +43,8 @@
 #include <QPrinter>
 #endif
 #include "mainwindow.h"
-
+#include "modelcontroller.h"
+#include "stringdefs.h"
 
 // yymd
 #define YMD_TO_INT(y,m,d) (((y) << 16) | ((m) << 8) | (d))
@@ -821,6 +822,44 @@ ErrCode Utils::setSelectItemComboxByData(QComboBox *cb, const QVariant &data)
     }
     traceret(ret);
     return ret;
+}
+
+ErrCode Utils::buildComboxFromModel(QComboBox *cb, const QList<DbModel *> &modelList)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    if (!cb) {
+        err = ErrInvalidArg;
+        loge("Invalid argumet");
+    }
+    if (err == ErrNone) {
+        cb->clear();
+        cb->addItem(STR_UNKNOWN, "");
+        foreach (DbModel* item, modelList) {
+            cb->addItem(item->name(), item->uid());
+
+        }
+    }
+
+    traceret(err);
+    return err;
+}
+
+ErrCode Utils::buildComboxFromModel(QComboBox *cb, ModelController *controller)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    if (!controller) {
+        err = ErrInvalidArg;
+        loge("invalid argument");
+    }
+    if (err == ErrNone) {
+        QList<DbModel *> list = controller->getAllItems();
+        err = buildComboxFromModel(cb, list);
+        RELEASE_LIST_DBMODEL(list);
+    }
+    traceret(err);
+    return err;
 }
 
 

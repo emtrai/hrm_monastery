@@ -260,105 +260,105 @@ void Person::initExportFields()
     tracein;
     DbModel::initExportFields();
     // TODO: took to much memory for this, should put in in PersonCtl????
-    mExportCallbacks.insert(KItemImgPath, [this](const QString& item){
-        QString imgPath = this->imgPath();
+    mExportCallbacks.insert(KItemImgPath, [](const DbModel* model, const QString& item){
+        QString imgPath = ((Person*)model)->imgPath();
         if (imgPath.isEmpty()){
             imgPath = ":/icon/icon/unknown.png";
         }
         return imgPath;
     });
-    mExportCallbacks.insert(KItemFullName, [this](const QString& item){
+    mExportCallbacks.insert(KItemFullName, [](const DbModel* model, const QString& item){
         QString name;
-        if (!this->lastName().isEmpty()){
-            name = this->lastName();
+        if (!((Person*)model)->lastName().isEmpty()){
+            name = ((Person*)model)->lastName();
         }
         if (!name.isEmpty()){
             name += ",";
         }
-        name += this->firstName();
+        name += ((Person*)model)->firstName();
         return name;
 
     });
-    mExportCallbacks.insert(KItemBirthday, [this](const QString& item){
-        return Utils::date2String(this->birthday());});
-    mExportCallbacks.insert(KItemBirthplace, [this](const QString& item){
-        return this->birthPlace();
+    mExportCallbacks.insert(KItemBirthday, [](const DbModel* model, const QString& item){
+        return Utils::date2String(((Person*)model)->birthday());});
+    mExportCallbacks.insert(KItemBirthplace, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->birthPlace();
     });
-    mExportCallbacks.insert(KItemHollyName, [this](const QString& item){
-        return this->hollyName();
+    mExportCallbacks.insert(KItemHollyName, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->hollyName();
     });
-    mExportCallbacks.insert(KItemFeastDay, [this](const QString& item){
-        return Utils::date2String(this->feastDay(), DEFAULT_FORMAT_MD);
+    mExportCallbacks.insert(KItemFeastDay, [](const DbModel* model, const QString& item){
+        return Utils::date2String(((Person*)model)->feastDay(), DEFAULT_FORMAT_MD);
     });
-    mExportCallbacks.insert(KItemNationality, [this](const QString& item){
-        return this->nationalityName();
+    mExportCallbacks.insert(KItemNationality, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->nationalityName();
     });
-    mExportCallbacks.insert(KItemEthnic, [this](const QString& item){
-        return this->ethnicName();
+    mExportCallbacks.insert(KItemEthnic, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->ethnicName();
     });
-    mExportCallbacks.insert(KItemIDcard, [this](const QString& item){
-        return this->idCard();
+    mExportCallbacks.insert(KItemIDcard, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->idCard();
     });
-    mExportCallbacks.insert(KItemIDcardIssueDate,  [this](const QString& item){
-        return Utils::date2String(this->idCardIssueDate(), DEFAULT_FORMAT_YMD);
+    mExportCallbacks.insert(KItemIDcardIssueDate,  [](const DbModel* model, const QString& item){
+        return Utils::date2String(((Person*)model)->idCardIssueDate(), DEFAULT_FORMAT_YMD);
     });
-    mExportCallbacks.insert(KItemIDcardIssuer,  [this](const QString& item){
-        return this->idCardIssuePlace();
+    mExportCallbacks.insert(KItemIDcardIssuer,  [](const DbModel* model, const QString& item){
+        return ((Person*)model)->idCardIssuePlace();
     });
-    mExportCallbacks.insert(KItemStatus, [this](const QString& item){
-        return this->personStatusName();
+    mExportCallbacks.insert(KItemStatus, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->personStatusName();
     });
-    mExportCallbacks.insert(KItemRetireDate, [this](const QString& item){
-        return Utils::date2String(this->retireDate(), DEFAULT_FORMAT_YMD);
+    mExportCallbacks.insert(KItemRetireDate, [](const DbModel* model, const QString& item){
+        return Utils::date2String(((Person*)model)->retireDate(), DEFAULT_FORMAT_YMD);
     });
-    mExportCallbacks.insert(KItemRetirePlace, [this](const QString& item){
-        return this->retirePlace();
+    mExportCallbacks.insert(KItemRetirePlace, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->retirePlace();
     }); //"retire_place";
-    mExportCallbacks.insert(KItemDeadDate, [this](const QString& item){
-        return Utils::date2String(this->deadDate(), DEFAULT_FORMAT_YMD);
+    mExportCallbacks.insert(KItemDeadDate, [](const DbModel* model, const QString& item){
+        return Utils::date2String(((Person*)model)->deadDate(), DEFAULT_FORMAT_YMD);
     }); //"dead_date";
-    mExportCallbacks.insert(KItemDeadPlace, [this](const QString& item){
-        return this->deadPlace();
+    mExportCallbacks.insert(KItemDeadPlace, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->deadPlace();
     }); //"dead_place";
-    mExportCallbacks.insert(KItemCountry, [this](const QString& item){
-        return this->countryName();
+    mExportCallbacks.insert(KItemCountry, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->countryName();
     }); //"country";
-    mExportCallbacks.insert(KItemProvince, [this](const QString& item){
-        return this->provinceName();
+    mExportCallbacks.insert(KItemProvince, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->provinceName();
     }); //"province";
-    mExportCallbacks.insert(KItemAddress, [this](const QString& item){
-        return this->addr();
+    mExportCallbacks.insert(KItemAddress, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->addr();
     }); //"address";
-    mExportCallbacks.insert(KItemChurchAddress, [this](const QString& item){
-        return this->churchAddr();
+    mExportCallbacks.insert(KItemChurchAddress, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->churchAddr();
     }); //"church_addr";
-    mExportCallbacks.insert(KItemTel, [this](const QString& item){
-        return this->tel().join(";");
+    mExportCallbacks.insert(KItemTel, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->tel().join(";");
     }); //"telephone";
-    mExportCallbacks.insert(KItemEmail, [this](const QString& item){
-        return this->email().join(";");
+    mExportCallbacks.insert(KItemEmail, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->email().join(";");
     }); //"email";
-    mExportCallbacks.insert(KItemOtherContact, [this](const QString& item){
-        return this->otherContact();
+    mExportCallbacks.insert(KItemOtherContact, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->otherContact();
     }); //"othercontact";
-    mExportCallbacks.insert(KItemEdu, [this](const QString& item){
-        return this->eduName();
+    mExportCallbacks.insert(KItemEdu, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->eduName();
     }); //"education";
-    mExportCallbacks.insert(KItemEduNameId, [this](const QString& item){
-        DbModel* model = EDUCTL->getModelByUid(this->eduUid());
+    mExportCallbacks.insert(KItemEduNameId, [](const DbModel* model, const QString& item){
+        DbModel* edu = EDUCTL->getModelByUid(((Person*)model)->eduUid());
         QString nameid;
-        if (model) {
-            nameid = model->nameId();
-            delete model;
+        if (edu) {
+            nameid = edu->nameId();
+            delete edu;
         } else {
-            loge("Not found edu uid %s", STR2CHA(this->eduUid()));
+            loge("Not found edu uid %s", STR2CHA(((Person*)model)->eduUid()));
         }
         return nameid;
-//        return this->eduUid();
+//        return ((Person*)model)->eduUid();
     }); //"edu uid";
-    mExportCallbacks.insert(KItemSpecialist,  [this](const QString& item){
+    mExportCallbacks.insert(KItemSpecialist,  [](const DbModel* model, const QString& item){
         logd("get specialist info to export");
-        QList<DbModel*> list = this->getSpecialistList();
+        QList<DbModel*> list = ((Person*)model)->getSpecialistList();
         QString specialist;
         if (list.count() > 0) {
             foreach (DbModel* item, list) {
@@ -373,129 +373,129 @@ void Person::initExportFields()
         // TODO: free memory????
         return specialist;
     }); //"specialist";
-    mExportCallbacks.insert(KItemSpecialistUid, [this](const QString& item){
-        QStringList list = this->specialistUidList();
+    mExportCallbacks.insert(KItemSpecialistUid, [](const DbModel* model, const QString& item){
+        QStringList list = ((Person*)model)->specialistUidList();
         if (list.count() > 0)
             return list.join(",");
         else
             return QString();
     }); //"specialist uid";
-    mExportCallbacks.insert(KItemWork, [this](const QString& item){
-        return this->currentWorkName();
+    mExportCallbacks.insert(KItemWork, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->currentWorkName();
     }); //"work";
-    mExportCallbacks.insert(KItemWorkHistory, [this](const QString& item){
-        return this->workHistory();
+    mExportCallbacks.insert(KItemWorkHistory, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->workHistory();
     }); //"work_history";
-    mExportCallbacks.insert(KItemCommunity, [this](const QString& item){
-        return this->communityName();
+    mExportCallbacks.insert(KItemCommunity, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->communityName();
     }); //"community";
-    mExportCallbacks.insert(KItemCommunityNameId, [this](const QString& item){
-        return this->communityNameId();
+    mExportCallbacks.insert(KItemCommunityNameId, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->communityNameId();
     }); //"community";
     // TODO: community history
     mExportCallbacks.insert(KItemCommunityHistory, nullptr); //"community_history";
-    mExportCallbacks.insert(KItemDad, [this](const QString& item){
-        return this->dadName();
+    mExportCallbacks.insert(KItemDad, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->dadName();
     }); //"dad";
-    mExportCallbacks.insert(KItemDadBirthday, [this](const QString& item){
-        return Utils::date2String(this->dadBirthday(), DEFAULT_FORMAT_YMD);
+    mExportCallbacks.insert(KItemDadBirthday, [](const DbModel* model, const QString& item){
+        return Utils::date2String(((Person*)model)->dadBirthday(), DEFAULT_FORMAT_YMD);
     }); //"dad_birthday";
-    mExportCallbacks.insert(KItemDadAddr, [this](const QString& item){
-        return this->dadAddr();
+    mExportCallbacks.insert(KItemDadAddr, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->dadAddr();
     }); //"dad_addr";
-    mExportCallbacks.insert(KItemMom, [this](const QString& item){
-        return this->momName();
+    mExportCallbacks.insert(KItemMom, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->momName();
     }); //"mom";
-    mExportCallbacks.insert(KItemMomBirthday, [this](const QString& item){
-        return Utils::date2String(this->momBirthday(), DEFAULT_FORMAT_YMD);
+    mExportCallbacks.insert(KItemMomBirthday, [](const DbModel* model, const QString& item){
+        return Utils::date2String(((Person*)model)->momBirthday(), DEFAULT_FORMAT_YMD);
     }); //"mom_birthday";
-    mExportCallbacks.insert(KItemMomAddr, [this](const QString& item){
-        return this->momAddr();
+    mExportCallbacks.insert(KItemMomAddr, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->momAddr();
     }); //"mom_addr";
-    mExportCallbacks.insert(KItemFamilyHistory, [this](const QString& item){
-        return this->familyHistory();
+    mExportCallbacks.insert(KItemFamilyHistory, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->familyHistory();
     }); //"family_history";
-    mExportCallbacks.insert(KItemFamilyContact, [this](const QString& item){
-        return this->familyContact();
+    mExportCallbacks.insert(KItemFamilyContact, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->familyContact();
     }); //"family_contact";
-    mExportCallbacks.insert(KItemChristenDate, [this](const QString& item){
-        return Utils::date2String(this->christenDate(), DEFAULT_FORMAT_YMD);
+    mExportCallbacks.insert(KItemChristenDate, [](const DbModel* model, const QString& item){
+        return Utils::date2String(((Person*)model)->christenDate(), DEFAULT_FORMAT_YMD);
     }); //"christen_date";
-    mExportCallbacks.insert(KItemChristenPlace, [this](const QString& item){
-        return this->christenPlace();
+    mExportCallbacks.insert(KItemChristenPlace, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->christenPlace();
     }); //"christen_place";
-    mExportCallbacks.insert(KItemEucharistDate, [this](const QString& item){
-        return Utils::date2String(this->eucharistDate(), DEFAULT_FORMAT_YMD);
+    mExportCallbacks.insert(KItemEucharistDate, [](const DbModel* model, const QString& item){
+        return Utils::date2String(((Person*)model)->eucharistDate(), DEFAULT_FORMAT_YMD);
     }); //"eucharist_date";
-    mExportCallbacks.insert(KItemEucharistPlace, [this](const QString& item){
-        return this->eucharistPlace();
+    mExportCallbacks.insert(KItemEucharistPlace, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->eucharistPlace();
     }); //"eucharist_place";
-    mExportCallbacks.insert(KItemHollyDate, [this](const QString& item){
-        return Utils::date2String(this->hollyDate(), DEFAULT_FORMAT_MD);
+    mExportCallbacks.insert(KItemHollyDate, [](const DbModel* model, const QString& item){
+        return Utils::date2String(((Person*)model)->hollyDate(), DEFAULT_FORMAT_MD);
     }); //"holly_date";
-    mExportCallbacks.insert(KItemHollyPlace, [this](const QString& item){
-        return this->hollyPlace();
+    mExportCallbacks.insert(KItemHollyPlace, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->hollyPlace();
     }); //"holly_place";
-    mExportCallbacks.insert(KItemCourse, [this](const QString& item){
-        return this->courseName();
+    mExportCallbacks.insert(KItemCourse, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->courseName();
     }); //"course";
-    mExportCallbacks.insert(KItemJoinDate, [this](const QString& item){
-        return Utils::date2String(this->joinDate(), DEFAULT_FORMAT_YMD);
+    mExportCallbacks.insert(KItemJoinDate, [](const DbModel* model, const QString& item){
+        return Utils::date2String(((Person*)model)->joinDate(), DEFAULT_FORMAT_YMD);
     }); //"join_date";
-    mExportCallbacks.insert(KItemJoinPIC, [this](const QString& item){
-        EXPORT_PERSON_INFO_COMMON_IMPL(item, this->joinPICNameId(), this->joinPICName());
+    mExportCallbacks.insert(KItemJoinPIC, [](const DbModel* model, const QString& item){
+        EXPORT_PERSON_INFO_COMMON_IMPL(item, ((Person*)model)->joinPICNameId(), ((Person*)model)->joinPICName());
 //        QString val;
-//        if (!this->joinPICUid().isEmpty()) {
-//            QString("%1 (%2...)").arg(this->joinPICName(), this->joinPICUid().left(8));
+//        if (!((Person*)model)->joinPICUid().isEmpty()) {
+//            QString("%1 (%2...)").arg(((Person*)model)->joinPICName(), ((Person*)model)->joinPICUid().left(8));
 //            logd("Join PIC %s", val.toStdString().c_str());
 //        }
 //        // TODO: show person code instead of uid?? uid should use for debug only?
 //        return val;
     }); //"join_pic";
-    mExportCallbacks.insert(KItemPreTrainDate, [this](const QString& item){
-        return Utils::date2String(this->preTrainJoinDate(), DEFAULT_FORMAT_YMD);
+    mExportCallbacks.insert(KItemPreTrainDate, [](const DbModel* model, const QString& item){
+        return Utils::date2String(((Person*)model)->preTrainJoinDate(), DEFAULT_FORMAT_YMD);
     }); //"pre_train_date";
-    mExportCallbacks.insert(KItemPreTrainPIC, [this](const QString& item){
-        EXPORT_PERSON_INFO_COMMON_IMPL(item, this->preTrainPICNameId(), this->preTrainPICName());
+    mExportCallbacks.insert(KItemPreTrainPIC, [](const DbModel* model, const QString& item){
+        EXPORT_PERSON_INFO_COMMON_IMPL(item, ((Person*)model)->preTrainPICNameId(), ((Person*)model)->preTrainPICName());
     }); //"pre_train_pic";
-    mExportCallbacks.insert(KItemTrainDate, [this](const QString& item){
-        return Utils::date2String(this->trainJoinDate(), DEFAULT_FORMAT_YMD);
+    mExportCallbacks.insert(KItemTrainDate, [](const DbModel* model, const QString& item){
+        return Utils::date2String(((Person*)model)->trainJoinDate(), DEFAULT_FORMAT_YMD);
     }); //"train_date";
-    mExportCallbacks.insert(KItemTrainPIC, [this](const QString& item){
-        EXPORT_PERSON_INFO_COMMON_IMPL(item, this->trainPICNameId(), this->trainPICName());
+    mExportCallbacks.insert(KItemTrainPIC, [](const DbModel* model, const QString& item){
+        EXPORT_PERSON_INFO_COMMON_IMPL(item, ((Person*)model)->trainPICNameId(), ((Person*)model)->trainPICName());
     }); //"train_pic";
-    mExportCallbacks.insert(KItemVowsDate, [this](const QString& item){
-        return Utils::date2String(this->vowsDate(), DEFAULT_FORMAT_YMD);
+    mExportCallbacks.insert(KItemVowsDate, [](const DbModel* model, const QString& item){
+        return Utils::date2String(((Person*)model)->vowsDate(), DEFAULT_FORMAT_YMD);
     }); //"vows_date";
-    mExportCallbacks.insert(KItemVowsCEO, [this](const QString& item){
-        EXPORT_PERSON_INFO_COMMON_IMPL(item, this->vowsCEONameId(), this->vowsCEOName());
+    mExportCallbacks.insert(KItemVowsCEO, [](const DbModel* model, const QString& item){
+        EXPORT_PERSON_INFO_COMMON_IMPL(item, ((Person*)model)->vowsCEONameId(), ((Person*)model)->vowsCEOName());
     }); //"vows_ceo";
-    mExportCallbacks.insert(KItemEternalVowsDate, [this](const QString& item){
-        return Utils::date2String(this->eternalVowsDate(), DEFAULT_FORMAT_YMD);
+    mExportCallbacks.insert(KItemEternalVowsDate, [](const DbModel* model, const QString& item){
+        return Utils::date2String(((Person*)model)->eternalVowsDate(), DEFAULT_FORMAT_YMD);
     }); //"eternal_vows_date";
-    mExportCallbacks.insert(KItemEternalVowsCEO, [this](const QString& item){
-        EXPORT_PERSON_INFO_COMMON_IMPL(item, this->eternalVowsCEONameId(), this->eternalVowsCEOName());
+    mExportCallbacks.insert(KItemEternalVowsCEO, [](const DbModel* model, const QString& item){
+        EXPORT_PERSON_INFO_COMMON_IMPL(item, ((Person*)model)->eternalVowsCEONameId(), ((Person*)model)->eternalVowsCEOName());
     }); //"eternal_vows_ceo";
-    mExportCallbacks.insert(KItemEternalVowsPIC, [this](const QString& item){
-        EXPORT_PERSON_INFO_COMMON_IMPL(item, this->eternalVowsPICNameId(), this->eternalVowsPICName());
+    mExportCallbacks.insert(KItemEternalVowsPIC, [](const DbModel* model, const QString& item){
+        EXPORT_PERSON_INFO_COMMON_IMPL(item, ((Person*)model)->eternalVowsPICNameId(), ((Person*)model)->eternalVowsPICName());
     }); //"eternal_vows_pic";
-    mExportCallbacks.insert(KItemBankDate, [this](const QString& item){
-        return Utils::date2String(this->bankDate(), DEFAULT_FORMAT_YMD);
+    mExportCallbacks.insert(KItemBankDate, [](const DbModel* model, const QString& item){
+        return Utils::date2String(((Person*)model)->bankDate(), DEFAULT_FORMAT_YMD);
     }); //"bank_date";
-    mExportCallbacks.insert(KItemBankPlace, [this](const QString& item){
-        return this->bankPlace();
+    mExportCallbacks.insert(KItemBankPlace, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->bankPlace();
     }); //"bank_place";
-    mExportCallbacks.insert(KItemGoldenDate, [this](const QString& item){
-        return Utils::date2String(this->goldenDate(), DEFAULT_FORMAT_YMD);
+    mExportCallbacks.insert(KItemGoldenDate, [](const DbModel* model, const QString& item){
+        return Utils::date2String(((Person*)model)->goldenDate(), DEFAULT_FORMAT_YMD);
     }); //"golden_date";
-    mExportCallbacks.insert(KItemGoldenPlace, [this](const QString& item){
-        return this->goldenPlace();
+    mExportCallbacks.insert(KItemGoldenPlace, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->goldenPlace();
     }); //"golden_place";
-    mExportCallbacks.insert(KItemEternalDate, [this](const QString& item){
-        return Utils::date2String(this->eternalDate(), DEFAULT_FORMAT_YMD);
+    mExportCallbacks.insert(KItemEternalDate, [](const DbModel* model, const QString& item){
+        return Utils::date2String(((Person*)model)->eternalDate(), DEFAULT_FORMAT_YMD);
     }); //"eternal_date";
-    mExportCallbacks.insert(KItemEternalPlace, [this](const QString& item){
-        return this->eternalPlace();
+    mExportCallbacks.insert(KItemEternalPlace, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->eternalPlace();
     }); //"eternal_place";
 
 }

@@ -59,6 +59,7 @@ public:
                                   const QString& remark = nullptr);
 
     virtual QString buildUid(const QString* seed = nullptr);
+    virtual void initExportFields();
 
 
     virtual const QString &uid1() const;

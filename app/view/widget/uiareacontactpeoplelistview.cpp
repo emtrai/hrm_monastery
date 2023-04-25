@@ -34,6 +34,7 @@
 #include "areaperson.h"
 #include "errreporterctl.h"
 #include "stringdefs.h"
+#include "mainwindow.h"
 
 UIAreaContactPeopleListView::UIAreaContactPeopleListView(QWidget *parent):
     UICommonListView(parent),
@@ -146,7 +147,7 @@ QList<DbModel *> UIAreaContactPeopleListView::getListItem()
 void UIAreaContactPeopleListView::onAddItem(UITableCellWidgetItem *item)
 {
     tracein;
-    DlgAreaPerson* dlg = DlgAreaPerson::build(this, true, nullptr, this);
+    DlgAreaPerson* dlg = DlgAreaPerson::build(this, true, KModelNameAreaPerson, nullptr, this);
     dlg->setArea(mArea);
     dlg->exec();
     delete dlg;
@@ -159,7 +160,7 @@ void UIAreaContactPeopleListView::onEditItem(UITableCellWidgetItem *item)
     if (item) {
         DbModel* model = item->itemData();
         if (model) {
-            DlgAreaPerson* dlg = DlgAreaPerson::build(this, true, model, this);
+            DlgAreaPerson* dlg = DlgAreaPerson::build(this, true, KModelNameAreaPerson, model, this);
             dlg->setArea(mArea);
             dlg->exec();
             delete dlg;
@@ -179,6 +180,15 @@ void UIAreaContactPeopleListView::onDeleteItem(const QList<UITableItem *> &selec
 
 void UIAreaContactPeopleListView::onViewItem(UITableCellWidgetItem *item)
 {
-
+    tracein;
+    int idx = item->idx();
+    DbModel* comm = item->itemData();
+    if (comm) {
+        MainWindow::showOnHtmlViewer(comm, tr("Vùng"));
+    } else {
+        loge("Comm obj is null");
+        Utils::showErrorBox("Không có thông tin để xem");
+    }
+    traceout;
 }
 

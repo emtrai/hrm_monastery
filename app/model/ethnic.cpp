@@ -30,7 +30,7 @@
 #include "dbmodel.h"
 
 
-Ethnic::Ethnic()
+Ethnic::Ethnic():DbModel()
 {
     tracein;
 }
@@ -46,6 +46,26 @@ DbModel *Ethnic::build()
 DbModelBuilder Ethnic::getBuilder() const
 {
     return &Ethnic::build;
+}
+
+QString Ethnic::modelName() const
+{
+    return KModelNameEthnic;
+}
+
+void Ethnic::clone(const DbModel *model)
+{
+    tracein;
+    DbModel::clone(model);
+    if (model && model->modelName() == KModelNameEthnic) {
+        Ethnic* ethnic = (Ethnic*)model;
+        mCountryUid = ethnic->mCountryUid;
+        mCountryDbId = ethnic->mCountryDbId;
+        mCountryName = ethnic->mCountryName;
+    } else {
+        loge("null or invald model name '%s'", model?STR2CHA(model->modelName()):"null");
+    }
+    traceout;
 }
 
 qint64 Ethnic::countryDbId() const
@@ -81,4 +101,5 @@ const QString &Ethnic::countryUid() const
 void Ethnic::setCountryUid(const QString &newCountryUid)
 {
     mCountryUid = newCountryUid;
+    markItemAsModified(KItemCountry);
 }

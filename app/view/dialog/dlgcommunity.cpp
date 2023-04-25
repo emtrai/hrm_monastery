@@ -84,7 +84,7 @@ ErrCode DlgCommunity::buildModel(DbModel *model, QString& errMsg)
         }
     }
     if (err == ErrNone){
-        SET_VAL_FROM_CBOX(ui->cbArea, comm->setAreaUid, comm->setAreaName);
+        SET_VAL_FROM_CBOX(ui->cbArea, comm->setAreaUid, comm->setAreaName, err);
     }
     if (err == ErrNone){
         SET_DATE_FORMAT_VAL_FROM_WIDGET(ui->txtFeaseDay, comm->setFeastDate, DATE_FORMAT_DM);
@@ -99,7 +99,7 @@ ErrCode DlgCommunity::buildModel(DbModel *model, QString& errMsg)
         comm->setEmail(ui->txtEmail->toPlainText().trimmed());
     }
     if (err == ErrNone){
-        SET_VAL_FROM_CBOX(ui->cbCountry, comm->setCountryUid, comm->setCountryName);
+        SET_VAL_FROM_CBOX(ui->cbCountry, comm->setCountryUid, comm->setCountryName, err);
     }
     if (err == ErrNone){
         comm->setChurch(ui->txtChurch->toPlainText().trimmed());
@@ -111,7 +111,7 @@ ErrCode DlgCommunity::buildModel(DbModel *model, QString& errMsg)
         SET_DATE_FORMAT_VAL_FROM_WIDGET(ui->txtEstablishDate, comm->setCreateDate, DEFAULT_FORMAT_YMD);
     }
     if (err == ErrNone){
-        SET_VAL_FROM_CBOX(ui->cbParentCommunity, comm->setParentUid, comm->setParentName);
+        SET_VAL_FROM_CBOX(ui->cbParentCommunity, comm->setParentUid, comm->setParentName, err);
     }
     if (err == ErrNone){
         SET_VAL_FROM_TEXTBOX(ui->txtCEO, KItemUid, comm->setCurrentCEOUid, comm->setCurrentCEOName);
@@ -193,7 +193,7 @@ void DlgCommunity::loadStatus()
 void DlgCommunity::on_btnSearchCEO_clicked()
 {
     tracein;
-    DlgSearchPerson * dlg = DlgSearchPerson::build(this);
+    DlgSearchPerson * dlg = DlgSearchPerson::build(this, true);
     if (dlg == nullptr) {
         loge("Open dlg DlgAddPersonEvent fail, No memory");
         return; // TODO: open dlg??

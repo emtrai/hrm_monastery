@@ -98,19 +98,22 @@ do { \
 
 #define SET_DATE_VAL_FROM_WIDGET(widget,func) SET_DATE_FORMAT_VAL_FROM_WIDGET(widget, func, DEFAULT_FORMAT_YMD)
 
-#define SET_VAL_FROM_CBOX(widget,func, functxt) \
+#define SET_VAL_FROM_CBOX(widget,func, functxt, err) \
     do { \
             QString currtxt = widget->currentText().trimmed();\
             if (!currtxt.isEmpty()){ \
                 int index = widget->findText(currtxt);\
-                logd("item %s, index %d", currtxt.toStdString().c_str(), index);\
+                logd("item '%s', index %d", STR2CHA(currtxt), index);\
                 if (index >= 0){ \
                     QVariant value = widget->itemData(index);\
-                    if (!value.isNull() && !value.toString().isEmpty()) {\
+                    if (!value.isNull()) {\
                         func(value.toString());\
                         functxt(currtxt);\
                     }\
-                }\
+                } else { \
+                    loge("item '%s' not found", STR2CHA(currtxt));\
+                    err = ErrNotFound; \
+                } \
             }\
     } while (0)
 
@@ -221,6 +224,7 @@ enum UidNameConvertType {
 
 class QComboBox;
 class DbModel;
+class ModelController;
 class Utils
 {
 public:
@@ -285,6 +289,8 @@ public:
     static QString getCurrentComboxDataString(const QComboBox *cb, bool *isOk = nullptr);
     static ErrCode getCurrentComboxDataString(const QComboBox *cb, QString* data, QString* name = nullptr);
     static ErrCode setSelectItemComboxByData(QComboBox *cb, const QVariant& data);
+    static ErrCode buildComboxFromModel(QComboBox *cb, const QList<DbModel*>& modelList);
+    static ErrCode buildComboxFromModel(QComboBox *cb, ModelController* controller);
     static void showDlgUnderDev(const QString& info = nullptr);
 
     template<class T>

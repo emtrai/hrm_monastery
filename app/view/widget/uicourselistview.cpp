@@ -56,7 +56,7 @@ QString UICourseListView::getTitle()
     return tr("Khóa/Nhiệm Kỳ/Lớp Khấn");
 }
 
-DbModel *UICourseListView::onNewModel()
+DbModel *UICourseListView::onNewModel(const QString& modelName)
 {
     return Course::build();
 }
@@ -127,12 +127,16 @@ void UICourseListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
     Course* course = (Course*)item;
-    tblItem->addValue(course->nameId());
-    tblItem->addValue(course->name());
-    tblItem->addValue(course->courseTypeName());
-    tblItem->addValue(course->period());
-    tblItem->addValue(Utils::date2String(course->startDate(), DEFAULT_FORMAT_YMD));
-    tblItem->addValue(Utils::date2String(course->endDate(), DEFAULT_FORMAT_YMD));
-    tblItem->addValue(course->remark());
+    if (course && course->modelName() == KModelNameCourse) {
+        tblItem->addValue(course->nameId());
+        tblItem->addValue(course->name());
+        tblItem->addValue(course->courseTypeName());
+        tblItem->addValue(course->period());
+        tblItem->addValue(Utils::date2String(course->startDate(), DEFAULT_FORMAT_YMD));
+        tblItem->addValue(Utils::date2String(course->endDate(), DEFAULT_FORMAT_YMD));
+        tblItem->addValue(course->remark());
+    } else {
+        loge("Invalid course '%s'", course?STR2CHA(course->toString()):"null");
+    }
     traceout;
 }

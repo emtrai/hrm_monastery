@@ -393,6 +393,7 @@ HEADERS += \
     model/specialist.h \
     model/work.h \
     controller/personctl.h \
+    modeldefs.h \
     prebuiltdefs.h \
     report/errreporterctl.h \
     report/reportctl.h \
@@ -503,6 +504,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 DISTFILES += \
     license.template \
     res/Saints.csv \
+    res/area_person_info_template.html \
     res/area_vi.csv \
     res/comm_dept_vi.json \
     res/common_template.html \

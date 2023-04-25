@@ -39,7 +39,7 @@ protected:
 
     virtual ModelController* getController();
 
-    virtual DbModel* onNewModel();
+    virtual DbModel* onNewModel(const QString& modelName);
 
     virtual void onAddItem(UITableCellWidgetItem *item);
     virtual void onEditItem(UITableCellWidgetItem *item);

@@ -373,12 +373,12 @@ ErrCode UIPersonListView::exportPersonInfo(QMenu *menu, UITableMenuAction *act)
     }
 
     if (err == ErrNone) {
-        QTemporaryFile file;
+//        QTemporaryFile file;
         QString fpath;
-        if (file.open()) {
-            fpath = file.fileName();
-            logd("export html file path='%s'", STR2CHA(fpath));
-        }
+//        if (file.open()) {
+//            fpath = file.fileName();
+//            logd("export html file path='%s'", STR2CHA(fpath));
+//        }
         INSTANCE(PersonCtl)->exportToFile(per, ExportType::EXPORT_HTML, &fpath);
         if (QFile::exists(fpath)){
             err = Utils::saveHtmlToPdf(fpath,
@@ -409,12 +409,12 @@ void UIPersonListView::onViewItem(UITableCellWidgetItem *item)
     if (idx < mItemList.length()){
         Person* per = (Person*)mItemList.value(idx);
         if (per) {
-            QTemporaryFile file;
+//            QTemporaryFile file;
             QString fpath;
-            if (file.open()) {
-                fpath = file.fileName();
-                logd("export html file path='%s'", STR2CHA(fpath));
-            }
+//            if (file.open()) {
+//                fpath = file.fileName();
+//                logd("export html file path='%s'", STR2CHA(fpath));
+//            }
             INSTANCE(PersonCtl)->exportToFile(per, ExportType::EXPORT_HTML, &fpath);
             if (QFile::exists(fpath)){
                 dlgHtmlViewer* viewer = new dlgHtmlViewer();
@@ -485,7 +485,7 @@ int UIPersonListView::onFilter(int catetoryid,
     return mItemList.count();
 }
 
-DbModel *UIPersonListView::onNewModel()
+DbModel *UIPersonListView::onNewModel(const QString& modelName)
 {
     return Person::build();
 }

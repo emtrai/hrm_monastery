@@ -53,6 +53,7 @@ private:
 public:
     virtual QString getName();
     virtual ErrCode onLoad();
+    virtual void onUnload();
 };
 
 #endif // LOCATION_H

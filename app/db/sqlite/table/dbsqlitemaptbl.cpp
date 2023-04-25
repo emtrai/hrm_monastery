@@ -109,7 +109,7 @@ QList<DbModel *> DbSqliteMapTbl::getListItemsOfUid2(const QString &uid2, const D
         return QList<DbModel*>();
     }
     logi("Get list model of uid2 '%s'", uid2.toStdString().c_str());
-    QString queryString = QString("SELECT * FROM %1 WHERE %2 = :uid")
+    QString queryString = QString("SELECT * FROM %1 WHERE %2 = :uid ORDER BY NAME ASC")
                               .arg(name(), getFieldNameUid2())
         ;
 
@@ -140,7 +140,7 @@ QList<DbModel *> DbSqliteMapTbl::getListItemsUids(const QString &uid1, const QSt
         return QList<DbModel*>();
     }
     logi("Get list model of uid1='%s', uid2='%s'", STR2CHA(uid1), STR2CHA(uid2));
-    QString queryString = QString("SELECT * FROM %1 WHERE %2 = :uid1 AND %3 = :uid2")
+    QString queryString = QString("SELECT * FROM %1 WHERE %2 = :uid1 AND %3 = :uid2 ORDER BY NAME ASC")
                               .arg(name(), getFieldNameUid1(), getFieldNameUid2())
         ;
 

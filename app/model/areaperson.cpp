@@ -28,6 +28,8 @@
 #include "utils.h"
 #include "dbctl.h"
 #include "dbmodel.h"
+#include "filectl.h"
+#include "prebuiltdefs.h"
 
 AreaPerson::AreaPerson():MapDbModel()
 {
@@ -42,7 +44,9 @@ AreaPerson::~AreaPerson()
 
 DbModel *AreaPerson::build()
 {
-    return new AreaPerson();
+    AreaPerson* item = new AreaPerson();
+    item->init();
+    return item;
 }
 
 void AreaPerson::clone(const DbModel *model)
@@ -66,6 +70,49 @@ DbModelBuilder AreaPerson::getBuilder() const
 QString AreaPerson::modelName() const
 {
     return KModelNameAreaPerson;
+}
+
+const QString AreaPerson::exportTemplatePath(FileExporter *exporter, QString *ftype) const
+{
+    traced;
+    if (exporter) {
+        switch (exporter->getExportType()) {
+        case EXPORT_HTML:
+            return FileCtl::getPrebuiltDataFilePath(KPrebuiltAreaPersonInfoTemplateFileName);
+        };
+    }
+    return QString();
+}
+
+void AreaPerson::initExportFields()
+{
+    tracein;
+    MapDbModel::initExportFields();
+    mExportCallbacks.insert(KItemPersonNameId, [](const DbModel* model, const QString& item){
+        return ((AreaPerson*)model)->personNameId();
+    });
+    mExportCallbacks.insert(KItemArea, [](const DbModel* model, const QString& item){
+        return ((AreaPerson*)model)->areaName();
+    });
+    mExportCallbacks.insert(KItemHollyName, [](const DbModel* model, const QString& item){
+        return ((AreaPerson*)model)->hollyName();
+    });
+    mExportCallbacks.insert(KItemFullName, [](const DbModel* model, const QString& item){
+        return ((AreaPerson*)model)->personName();
+    });
+    mExportCallbacks.insert(KItemRole, [](const DbModel* model, const QString& item){
+        return ((AreaPerson*)model)->roleName();
+    });
+    mExportCallbacks.insert(KItemTerm, [](const DbModel* model, const QString& item){
+        return ((AreaPerson*)model)->courseName();
+    });
+    mExportCallbacks.insert(KItemEmail, [](const DbModel* model, const QString& item){
+        return ((AreaPerson*)model)->personEmail();
+    });
+    mExportCallbacks.insert(KItemTel, [](const DbModel* model, const QString& item){
+        return ((AreaPerson*)model)->personTel();
+    });
+    traceout;
 }
 
 

@@ -60,7 +60,7 @@ protected:
 protected:
     virtual ErrCode onLoad();
     virtual ErrCode onReload();
-    virtual DbModel* onNewModel();
+    virtual DbModel* onNewModel(const QString& modelName);
 };
 
 

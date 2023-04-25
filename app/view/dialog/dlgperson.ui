@@ -38,7 +38,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-2093</y>
+        <y>-420</y>
         <width>683</width>
         <height>2845</height>
        </rect>
@@ -623,7 +623,7 @@
            <item>
             <widget class="QComboBox" name="cbEthic">
              <property name="editable">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
             </widget>
            </item>

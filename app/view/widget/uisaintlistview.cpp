@@ -102,7 +102,7 @@ int UISaintListView::onFilter(int catetoryid, const QString &catetory, qint64 op
     return mItemList.size();
 }
 
-DbModel *UISaintListView::onNewModel()
+DbModel *UISaintListView::onNewModel(const QString& modelName)
 {
     return Saint::build();
 }

@@ -178,7 +178,7 @@ ErrCode DbSqliteAreaMgrTbl::updateModelFromQuery(DbModel *item, const QSqlQuery 
             areaPerson->setAreaUid(qry.value(KFieldAreaUid).toString());
             if (!areaPerson->areaUid().isEmpty()){
                 logd("search areaUid '%s'", STR2CHA(areaPerson->areaUid()));
-                DbModel* model = COURSECTL->getModelByUid(areaPerson->areaUid());
+                DbModel* model = AREACTL->getModelByUid(areaPerson->areaUid());
                 if (model) {
                     areaPerson->setAreaName(model->name());
                     areaPerson->setAreaNameId(model->nameId());

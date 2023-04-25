@@ -86,8 +86,8 @@ ErrCode DlgAreaPerson::buildModel(DbModel *model, QString &errMsg)
         per->setModelStatus(MODEL_ACTIVE);
         per->setAreaUid(mArea->uid());
         SET_VAL_FROM_TEXTBOX(ui->txtSearch, KItemUid, per->setPersonUid, per->setPersonName);
-        SET_VAL_FROM_CBOX(ui->cbRole, per->setRoleUid, per->setRoleName);
-        SET_VAL_FROM_CBOX(ui->cbTerm, per->setCourseUid, per->setCourseName);
+        SET_VAL_FROM_CBOX(ui->cbRole, per->setRoleUid, per->setRoleName, err);
+        SET_VAL_FROM_CBOX(ui->cbTerm, per->setCourseUid, per->setCourseName, err);
         SET_INT_VAL_FROM_CBOX(ui->cbStatus, per->setModelStatus, per->setModelStatusName);
         SET_DATE_VAL_FROM_WIDGET(ui->txtStartDate, per->setStartDate);
         SET_DATE_VAL_FROM_WIDGET(ui->txtEndDate, per->setEndDate);
@@ -185,7 +185,7 @@ void DlgAreaPerson::on_btnSearch_clicked()
 {
 
     tracein;
-    DlgSearchPerson * dlg = DlgSearchPerson::build(this);
+    DlgSearchPerson * dlg = DlgSearchPerson::build(this, true);
     if (dlg == nullptr) {
         loge("Open dlg DlgAddPersonEvent fail, No memory");
         return; // TODO: open dlg??

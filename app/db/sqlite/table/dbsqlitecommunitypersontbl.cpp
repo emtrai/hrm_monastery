@@ -73,6 +73,7 @@ QList<DbModel *> DbSqliteCommunityPersonTbl::getListPerson(const QString &commun
     if (!cond.isEmpty()) {
         queryString += " WHERE " + cond;
     }
+    queryString += " ORDER BY name ASC";
     qry.prepare(queryString);
     logd("Query String '%s'", queryString.toStdString().c_str());
 

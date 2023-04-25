@@ -44,6 +44,15 @@ UICommonListView::~UICommonListView()
     traceout;
 }
 
+void UICommonListView::setupUI()
+{
+    tracein;
+    UITableView::setupUI();
+    ModelController* ctl = getController();
+    if (ctl) ctl->addListener(this);
+    traceout;
+}
+
 QList<UITableItem *> UICommonListView::getListItem(qint32 page, qint32 perPage, qint32 totalPages)
 {
     QList<UITableItem *> items;
@@ -160,13 +169,18 @@ QHash<QString, QString> UICommonListView::getFilterKeywords(int fieldId, const Q
 void UICommonListView::onViewItem(UITableCellWidgetItem *item)
 {
     tracein;
-    int idx = item->idx();
-    DbModel* comm = item->itemData();
-    if (comm) {
-        MainWindow::showOnHtmlViewer(comm, getTitle());
+    if (item) {
+        int idx = item->idx();
+        DbModel* comm = item->itemData();
+        if (comm) {
+            MainWindow::showOnHtmlViewer(comm, getTitle());
+        } else {
+            loge("Comm obj is null");
+            Utils::showErrorBox("Không có thông tin để xem");
+        }
     } else {
-        loge("Comm obj is null");
-        Utils::showErrorBox("Không có thông tin để xem");
+        loge("no data to view");
+        Utils::showErrorBox(tr("Lỗi, không có dữ liệu hiện thị"));
     }
     traceout;
 }
@@ -206,7 +220,7 @@ void UICommonListView::onDbModelReady(ErrCode ret, DbModel *model, DlgCommonEdit
     traceout;
 }
 
-DbModel *UICommonListView::onNewModel()
+DbModel *UICommonListView::onNewModel(const QString& modelName)
 {
     tracein;
     return nullptr;

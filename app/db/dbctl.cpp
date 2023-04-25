@@ -98,3 +98,9 @@ ErrCode DbCtl::onLoad(){
     traceret(err);
     return err;
 }
+
+void DbCtl::onUnload()
+{
+    traced;
+    // TODO: unload db controller??
+}

@@ -37,6 +37,7 @@ typedef void (*OnFinishLoadListener_t)(int result, void* data);
 class LoaderListener {
 public:
     virtual void onLoadController (Controller* ctl) = 0;
+    virtual void onUnloadController (Controller* ctl) = 0;
 };
 
 class LoaderCtl: public QObject
@@ -53,6 +54,7 @@ private:
     void add2PreLoader(Controller* ctl);
     void registerAll();
     void runLoader(QList<Controller*>& list);
+    void unloadLoader(QList<Controller*>& list);
 private:
     static LoaderCtl* gInstance;
 
@@ -67,6 +69,7 @@ private:
 public:
     virtual void preLoad();
     virtual void onLoad();
+    virtual void onUnload();
 };
 
 #endif // LOADERCTL_H

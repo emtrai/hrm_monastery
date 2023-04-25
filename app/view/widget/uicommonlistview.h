@@ -34,6 +34,7 @@ class UICommonListView : public UITableView, public CommonEditModelListener, pub
 public:
     explicit UICommonListView(QWidget *parent = nullptr);
     virtual ~UICommonListView();
+    virtual void setupUI();
 protected:
     virtual QList<UITableItem*> getListItem(qint32 page, qint32 perPage, qint32 totalPages);
     virtual qint32 getTotalItems();
@@ -50,7 +51,7 @@ protected:
     virtual void onEditItem(UITableCellWidgetItem *item);
 
     virtual void onDbModelReady(ErrCode ret, DbModel* model, DlgCommonEditModel* dlg);
-    virtual DbModel* onNewModel();
+    virtual DbModel* onNewModel(const QString& modelName);
     virtual QString getName();
     virtual void onModelControllerDataUpdated();
 protected:

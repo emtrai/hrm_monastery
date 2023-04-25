@@ -93,7 +93,7 @@ DbModel *DlgCommonEditModel::model()
     }
     if (!mModel && mListener) {
         logd("call onNewModel from listener");
-        mModel = mListener->onNewModel();
+        mModel = mListener->onNewModel(mModelName);
     }
     logd("mModel=%s", mModel?STR2CHA(mModel->toString()):"(null)");
     traceout;
@@ -235,6 +235,11 @@ void DlgCommonEditModel::onEditnameId(QLineEdit *txtNameId)
     traceout;
 }
 
+void DlgCommonEditModel::setModelName(const QString &newModelName)
+{
+    mModelName = newModelName;
+}
+
 void DlgCommonEditModel::setModel(DbModel *newModel)
 {
     tracein;
@@ -279,9 +284,6 @@ ErrCode DlgCommonEditModel::fromModel(const DbModel *inModel)
         mCustomNameId = true;
         item->clone(inModel);
         item->validateAllFields(); // TODO: should call validate here???
-        if (item == nullptr){
-            ret = ErrInvalidArg; // TODO: should raise assert instead???
-        }
     } else {
         ret = ErrNoData;
         loge("No db model found");

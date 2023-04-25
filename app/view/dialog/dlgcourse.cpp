@@ -50,53 +50,6 @@ void DlgCourse::setupUI()
     traceout;
 }
 
-//void DlgCourse::accept()
-//{
-//    tracein;
-//    ErrCode ret = ErrNone;
-//    QString name = ui->txtName->text().trimmed();
-
-//    if (!name.isEmpty()){
-//        if (mCourse == nullptr)
-//            mCourse = (Course*)Course::build();
-//        if (mCourse != nullptr){
-//            mCourse->setName(name);
-
-//            mCourse->setUid(Utils::UidFromName(name));
-
-
-//            mCourse->setPeriod(ui->txtPeriod->text().trimmed());
-//            mCourse->setStartDate(Utils::dateFromString(ui->txtStartDate->text().trimmed()));
-//            mCourse->setEndDate(Utils::dateFromString(ui->txtEndDate->text().trimmed()));
-//            mCourse->setRemark(ui->txtRemark->toPlainText().trimmed());
-
-//            logi("Save new course to db");
-//            ret = mCourse->save();
-//            if (ret == ErrNone){
-//                INSTANCE(CourseCtl)->reloadDb();
-//            }
-//        } else {
-//            ret = ErrNoMemory;
-//            loge("No memory");
-//        }
-//    } else {
-//        ret = ErrInvalidData;
-//        loge("Name field is empty");
-//    }
-
-//    logi("Add Course, ret %d", ret);
-//    if (ret == ErrNone)
-//        QDialog::accept();
-//    else
-//        Utils::showErrorBox(QString(tr("Lỗi ! Mã lỗi %1").arg(ret)));
-
-//}
-
-//Course *DlgCourse::course() const
-//{
-//    return mCourse;
-//}
-
 ErrCode DlgCourse::buildModel(DbModel *model, QString &errMsg)
 {
     tracein;

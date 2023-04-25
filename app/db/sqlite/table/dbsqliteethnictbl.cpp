@@ -31,6 +31,7 @@
 #include "ethnic.h"
 #include "dbsqlitetablebuilder.h"
 #include "dbsqliteinsertbuilder.h"
+#include "dbsqliteupdatebuilder.h"
 
 const qint32 DbSqliteEthnicTbl::KVersionCode = VERSION_CODE(0,0,1);
 
@@ -71,9 +72,9 @@ ErrCode DbSqliteEthnicTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
     ErrCode err = ErrNone;
     DbSqliteTbl::updateModelFromQuery(item, qry);
     Ethnic* model = (Ethnic*) item;
-    model->setCountryUid(qry.value(KFieldCountryUid).toString());
+    model->setCountryUid(qry.value(KFieldCountryUid).toString().trimmed());
     model->setCountryDbId(qry.value(KFieldCountryDbId).toInt());
-    model->setCountryName(qry.value(KFieldCountryName).toString());
+    model->setCountryName(qry.value(KFieldCountryName).toString().trimmed());
     traceout;
     return err;
 }
@@ -90,6 +91,41 @@ QString DbSqliteEthnicTbl::getSearchQueryString(const QString &cond)
     if (!cond.isEmpty()) {
         queryString += QString(" WHERE %1").arg(cond);
     }
+    queryString += " ORDER BY name ASC";
     logd("queryString: %s", queryString.toStdString().c_str());
     return queryString;
+}
+
+ErrCode DbSqliteEthnicTbl::updateTableField(DbSqliteUpdateBuilder *builder, const QList<QString> &updateField, const DbModel *item)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    if (!builder || !item) {
+        err = ErrInvalidArg;
+        loge("invalid arg");
+    }
+    if (err == ErrNone) {
+        err = DbSqliteTbl::updateTableField(builder, updateField, item);
+    }
+
+    if (err == ErrNone) {
+        if (item->modelName() == KModelNameEthnic) {
+            Ethnic* comm = (Ethnic*) item;
+            foreach (QString field, updateField) {
+                logd("Update field %s", STR2CHA(field));
+                if (field == KItemCountry) {
+                    builder->addValue(KFieldCountryUid, comm->countryUid());
+
+                } else {
+                    logw("Field '%s' not support here", STR2CHA(field));
+                }
+            }
+        } else {
+            logw("Model name '%s' is no support",
+                 STR2CHA(item->modelName()));
+        }
+    }
+    traceret(err);
+    return err;
+
 }

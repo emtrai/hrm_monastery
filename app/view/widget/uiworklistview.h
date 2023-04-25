@@ -35,7 +35,7 @@ protected:
     virtual int getViewType() { return VIEW_WORK;}
     virtual ModelController* getController();
     virtual QString getTitle();
-    virtual DbModel* onNewModel();
+    virtual DbModel* onNewModel(const QString& modelName);
 };
 
 #endif // UIWORKLISTVIEW_H

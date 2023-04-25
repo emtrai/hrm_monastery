@@ -23,24 +23,32 @@
 #define DLGETHNIC_H
 
 #include <QDialog>
+#include "dlgcommoneditmodel.h"
 class Ethnic;
 
 namespace Ui {
 class DlgEthnic;
 }
 
-class DlgEthnic : public QDialog
+class DlgEthnic : public DlgCommonEditModel
 {
     Q_OBJECT
+    DLG_BUILDER(DlgEthnic)
 
 public:
     explicit DlgEthnic(QWidget *parent = nullptr);
     ~DlgEthnic();
 
-    Ethnic *ethnic() const;
-
+    virtual ErrCode buildModel(DbModel* model, QString& errMsg);
+    virtual ErrCode fromModel(const DbModel* model);
 protected:
-    void accept();
+    virtual DbModel* newModel();
+    void loadCountry();
+private slots:
+    void on_txtName_textChanged(const QString &arg1);
+
+    void on_txtChange_clicked();
+
 private:
     Ui::DlgEthnic *ui;
     Ethnic* mEthnic;

@@ -26,74 +26,108 @@
 #include "errcode.h"
 #include "ethnic.h"
 #include "countryctl.h"
+#include "stringdefs.h"
+#include "modeldefs.h"
+
 
 DlgEthnic::DlgEthnic(QWidget *parent) :
-    QDialog(parent),
+    DlgCommonEditModel(parent),
     ui(new Ui::DlgEthnic),
     mEthnic(nullptr)
 {
     ui->setupUi(this);
-
-    QList<DbModel *> list = COUNTRYCTL->getAllItemsFromDb();
-    foreach (DbModel* item, list) {
-        ui->cbCountry->addItem(item->name(), item->dbId());
-
-    }
+    loadCountry();
 }
 
 DlgEthnic::~DlgEthnic()
 {
-    if (mEthnic != nullptr){
-        delete mEthnic;
-        mEthnic = nullptr;
-    }
     delete ui;
 }
 
-Ethnic *DlgEthnic::ethnic() const
-{
-    return mEthnic;
-}
-
-void DlgEthnic::accept()
+ErrCode DlgEthnic::buildModel(DbModel *model, QString &errMsg)
 {
     tracein;
-    ErrCode ret = ErrNone;
-    QString name = ui->txtName->text().trimmed();
-    QString currtex = ui->cbCountry->currentText();
-    qint64 countryDbId = 0;
-    if (!currtex.isEmpty()){
-        int index = ui->cbCountry->findText(currtex);
-        logd("index %d", index);
-        if (index > 0){
-            countryDbId = ui->cbCountry->itemData(index).toInt();
+    ErrCode err = ErrNone;
+    Ethnic* comm = (Ethnic*) model;
+    if (!model){
+        err = ErrInvalidArg;
+        loge("Invalid arg");
+    }
+    if (err == ErrNone){
+        comm->setMarkModified(true); // start marking fields which are modified
+    }
+    if (err == ErrNone) {
+        QString name = ui->txtName->text().trimmed();
+        if (!name.isEmpty()) {
+            comm->setName(name);
         }
     }
-    if (!name.isEmpty() && (countryDbId >= 0)){
-        if (mEthnic == nullptr)
-            mEthnic = new Ethnic();
-        if (mEthnic != nullptr){
-            mEthnic->setName(name);
+    if (err == ErrNone){
+        QString name = ui->txtNameId->text().trimmed();
+        if (!name.isEmpty()) {
+            comm->setNameId(name);
+        }
+    }
+    if (err == ErrNone){
+        SET_VAL_FROM_CBOX(ui->cbCountry, comm->setCountryUid, comm->setCountryName, err);
+    }
+    if (err == ErrNone){
+        comm->setRemark(ui->txtRemark->toPlainText().trimmed());
+    }
+    traceret(err);
+    return err;
 
-            mEthnic->setUid(Utils::UidFromName(name + QString("%1").arg(countryDbId)));
+}
 
-
-            mEthnic->setCountryDbId(countryDbId);
-
-            logi("Save new country to db");
-            ret = mEthnic->save();
-        } else {
-            ret = ErrNoMemory;
-            loge("No memory");
+ErrCode DlgEthnic::fromModel(const DbModel *item)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    if (item && item->modelName() == KModelNameEthnic) {
+        err = DlgCommonEditModel::fromModel(item);
+        Ethnic* comm = (Ethnic*)model();
+        if (!comm) {
+            err = ErrNoData;
+            loge("allocate model failed");
+        }
+        if (err == ErrNone) {
+            ui->txtName->setText(comm->name());
+            ui->txtNameId->setText(comm->nameId());
+            Utils::setSelectItemComboxByData(ui->cbCountry, comm->countryUid());
+            ui->txtRemark->setPlainText(comm->remark());
         }
     } else {
-        ret = ErrInvalidData;
-        loge("Name field is empty");
+        err = ErrInvalidArg;
+        loge("null item or invalid type");
     }
+    traceret(err);
+    return err;
 
-    logi("Add Ethnic, ret %d", ret);
-    if (ret == ErrNone)
-        QDialog::accept();
-    else
-        Utils::showErrorBox(QString(tr("Lỗi ! Mã lỗi %1").arg(ret)));
 }
+
+DbModel *DlgEthnic::newModel()
+{
+    return Ethnic::build();
+
+}
+
+void DlgEthnic::loadCountry()
+{
+    tracein;
+    Utils::buildComboxFromModel(ui->cbCountry, COUNTRYCTL);
+    traceout;
+}
+
+void DlgEthnic::on_txtName_textChanged(const QString &arg1)
+{
+    DlgCommonEditModel::onChangeNameIdTxt(ui->txtNameId, arg1);
+
+}
+
+
+void DlgEthnic::on_txtChange_clicked()
+{
+    DlgCommonEditModel::onEditnameId(ui->txtNameId);
+
+}
+

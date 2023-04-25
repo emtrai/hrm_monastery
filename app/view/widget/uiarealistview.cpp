@@ -94,7 +94,7 @@ ModelController *UIAreaListView::getController()
 }
 
 
-DbModel *UIAreaListView::onNewModel()
+DbModel *UIAreaListView::onNewModel(const QString& modelName)
 {
     return Area::build();
 }

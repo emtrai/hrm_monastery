@@ -43,6 +43,7 @@ public:
      * @return
      */
     virtual ErrCode onLoad();
+    virtual void onUnload();
 
     /**
      * @brief Name of controller
