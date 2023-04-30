@@ -60,6 +60,9 @@ typedef enum ErrCode {
     ErrFailedConvert,
     ErrIncompatible,
     ErrMigrationRequired,
+    ErrLoadFailed,
+    ErrOperatorFailed,
+    ErrSaveFailed,
     ErrMax
     } ErrCode_t;
 

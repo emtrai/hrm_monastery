@@ -121,6 +121,7 @@ SOURCES += \
     db/sqlite/table/dbsqlitepersonstatustbl.cpp \
     db/sqlite/table/dbsqlsequencetbl.cpp \
     exception/exception.cpp \
+    image/imagectl.cpp \
     import/importlistener.cpp \
     import/importxlsx.cpp \
     model/areacommunity.cpp \
@@ -317,6 +318,8 @@ HEADERS += \
     db/sqlite/table/dbsqlitepersonstatustbl.h \
     db/sqlite/table/dbsqlsequencetbl.h \
     exception/exception.h \
+    image/imagectl.h \
+    imagedefs.h \
     import/importlistener.h \
     import/importxlsx.h \
     importexportdefs.h \

@@ -150,12 +150,12 @@ void DlgPerson::setupUI()
 
     QStringList communityListHdr;
     // TODO: translation
-    communityListHdr.append("Mã định danh");
-    communityListHdr.append("Ngày");
-    communityListHdr.append("Ngày kết thúc");
-    communityListHdr.append("Sự kiện");
-    communityListHdr.append("Tiêu đề");
-    communityListHdr.append("Ghi chú");
+    communityListHdr.append(STR_NAMEID);
+    communityListHdr.append(STR_DATE);
+    communityListHdr.append(STR_ENDDATE);
+    communityListHdr.append(STR_EVENT);
+    communityListHdr.append(STR_TITLE);
+    communityListHdr.append(STR_NOTE);
     ui->tblEvents->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tblEvents->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
 

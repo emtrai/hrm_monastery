@@ -26,23 +26,33 @@
 #define STR_OK          QObject::tr("Đồng ý")
 #define STR_CANCEL      QObject::tr("Hủy")
 #define STR_SAVE        QObject::tr("Lưu")
+
 #define STR_ADDR        QObject::tr("Địa chỉ")
 #define STR_TEL         QObject::tr("Điện thoại")
 #define STR_EMAIL       QObject::tr("Email")
+
 #define STR_COUNTRY     QObject::tr("Quốc gia")
+
+#define STR_STT         QObject::tr("STT")
+
 #define STR_NAMEID      QObject::tr("Tên định danh")
 #define STR_PERSON_NAMEID QObject::tr("Tên định danh Nữ tu")
-#define STR_STT         QObject::tr("STT")
 #define STR_NAME        QObject::tr("Tên")
-#define STR_NOTE        QObject::tr("Ghi chú")
 #define STR_HOLLYNAME   QObject::tr("Tên Thánh")
 #define STR_FULLNAME    QObject::tr("Họ tên")
+
+#define STR_NOTE        QObject::tr("Ghi chú")
+
 #define STR_COMMUNITY   QObject::tr("Cộng đoàn")
 #define STR_ROLE        QObject::tr("Vai trò")
 #define STR_UNKNOWN     QObject::tr("Không rõ")
 #define STR_COURSE      QObject::tr("Nhiệm kỳ")
 #define STR_UNKNOWN     QObject::tr("Không rõ")
 #define STR_MODELSTATUS QObject::tr("Tình trạng")
-#define STR_COUNTRY     QObject::tr("Quốc gia")
+
+#define STR_DATE        QObject::tr("Ngày")
+#define STR_ENDDATE     QObject::tr("Ngày kết thúc")
+#define STR_EVENT     QObject::tr("Sự kiện")
+#define STR_TITLE     QObject::tr("Tiêu đề")
 
 #endif // STRINGDEFS_H
