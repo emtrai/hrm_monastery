@@ -25,7 +25,6 @@
 #include <QObject>
 #include <QString>
 #include <QSet>
-#include "address.h"
 #include "errcode.h"
 
 #include <QList>
@@ -33,7 +32,7 @@
 #include <QMap>
 #include "dbmodel.h"
 #include "dataexporter.h"
-#include "idataimporter.h"
+#include "image.h"
 #include "utils.h"
 #include <functional>
 #include <iostream>
@@ -102,8 +101,9 @@ public:
 
     virtual ErrCode exportTo(const QString &fpath, ExportType type);
 
-    const QString &imgPath() const;
-    void setImgPath(const QString &newImgPath);
+    QString imgPath() const;
+    QString thumbImgPath() const;
+    ErrCode setImgPath(const QString &newImgPath);
 
     qint64 trainJoinDate() const;
     void setTrainJoinDate(qint64 newTrainJoinDate);
@@ -346,7 +346,7 @@ public:
     const QString &deadPlace() const;
     void setDeadPlace(const QString &newDeadPlace);
 
-    const QString &imgId() const;
+    QString imgId() const;
     void setImgId(const QString &newImgId);
 
     const QStringList &eventUidList() const;
@@ -424,6 +424,10 @@ public:
     const QString &communityNameId() const;
     void setCommunityNameId(const QString &newCommunityNameId);
 
+    virtual ErrCode save();
+    virtual ErrCode update(bool allFields = false);
+    virtual ErrCode remove(bool force = false, QString* msg = nullptr);
+
 protected:
     virtual DbModelHandler *getDbModelHandler() const;
     virtual const QString exportTemplatePath(FileExporter* exporter, QString* ftype = nullptr) const;
@@ -445,7 +449,7 @@ protected:
     qint64 mFeastDay;
 
     QString mImgId;
-    QString mImgPath;
+    Image mImage;
 
     // nationality
     QString mNationalityUid;
@@ -576,6 +580,7 @@ protected:
     QString mDeadPlace; // noi chon cat
 
     QStringList mEventUidList;
+
 };
 
 #endif // PEOPLE_H

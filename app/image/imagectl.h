@@ -51,9 +51,13 @@ public:
     virtual QString getName();
 
     virtual void onUnload();
+    QString getImageDirPath(const QString& subDir = nullptr);
 public:
-    ErrCode createThumbImage(const QString& fullPath, const QString& thumbPath = nullptr,
-                            int height = IMG_THUMB_H, int width = IMG_THUMB_W);
+    ErrCode createThumbImage(const QString& fullPath, QString& thumbPath,
+                            int height = IMG_THUMB_H, int width = IMG_THUMB_W,
+                         const QString& format = DEFAULT_IMAGE_FORMAT);
+    ErrCode convertImage(const QString& fullPath, const QString& finalPath = nullptr,
+                         const QString& format = DEFAULT_IMAGE_FORMAT);
 };
 
 #endif // IMAGECTL_H

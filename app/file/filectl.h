@@ -37,6 +37,7 @@ public:
     static QString getAppWorkingDataDir(const QString& subDir);
     static QString getAppWorkingDataDir();
 
+    static ErrCode copyFile(const QString& src, const QString& dest, bool force = false);
 
 
     static QString getAppImageDataRootDir();

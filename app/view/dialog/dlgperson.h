@@ -147,6 +147,7 @@ private slots:
 
     void on_btnSearchEternalVowsCEO_clicked();
 
+
 private:
     Person* mPerson;
     UIMultiComboxView *cbSaints;

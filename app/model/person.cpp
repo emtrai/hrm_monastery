@@ -43,6 +43,7 @@
 #include "config.h"
 
 #include "prebuiltdefs.h"
+#include "imagedefs.h"
 
 #define SPLIT_EMAIL_TEL ";"
 // TODO: show person code instead of uid?? uid should use for debug only?
@@ -105,8 +106,7 @@ void Person::clone(const DbModel *model)
         mSaintUidNameMap.insert(per->saintUidNameMap());
         mFeastDay = per->feastDay();
 
-        mImgId = per->imgId();
-        mImgPath = per->imgPath();
+        mImage.copy(per->mImage);
 
         mNationalityUid = per->nationalityUid();
         mNationalityName = per->nationalityName();
@@ -1054,6 +1054,49 @@ void Person::setCommunityNameId(const QString &newCommunityNameId)
     mCommunityNameId = newCommunityNameId;
 }
 
+ErrCode Person::save()
+{
+    tracein;
+    ErrCode err = DbModel::save();
+    if (err == ErrNone && !mImage.fullImgPath().isEmpty()) {
+        logd("save image");
+        err = mImage.save();
+        if (err != ErrNone) {
+            loge("Save image, failed, err=%d", err);
+            err = ErrNone; // TODO: handle error case?
+        }
+    }
+    traceret(err);
+    return err;
+}
+
+ErrCode Person::update(bool allFields)
+{
+    tracein;
+    ErrCode err = DbModel::update(allFields);
+    if (err == ErrNone && isFieldUpdated(KItemImg)) {
+        logd("update image");
+        err = mImage.save();
+        if (err != ErrNone) {
+            loge("Save image, failed, err=%d", err);
+            err = ErrNone; // TODO: handle error case?
+        }
+    }
+    traceret(err);
+    return err;
+
+}
+
+ErrCode Person::remove(bool force, QString *msg)
+{
+    tracein;
+    ErrCode err = DbModel::remove(force, msg);
+    // TODO: remove image file
+    traceret(err);
+    return err;
+
+}
+
 const QString &Person::trainPICNameId() const
 {
     return mTrainPICNameId;
@@ -1312,14 +1355,22 @@ void Person::setEventUidList(const QStringList &newEventUidList)
     markItemAsModified(KItemEvent);
 }
 
-const QString &Person::imgId() const
+QString Person::imgId() const
 {
-    return mImgId;
+    return mImage.uid();
 }
 
 void Person::setImgId(const QString &newImgId)
 {
-    CHECK_MODIFIED_THEN_SET(mImgId, newImgId, KItemImg);
+    tracein;
+//    CHECK_MODIFIED_THEN_SET(mImgId, newImgId, KItemImg);
+    ErrCode err = mImage.loadImageFromUid(newImgId, IMG_TAG_PEOPLE);
+    if (err == ErrNone) {
+        markItemAsModified(KItemImg);
+    } else {
+        loge("load image from uid '%s' failed", STR2CHA(newImgId));
+    }
+    traceout;
 //    mImgId = newImgId;
 }
 
@@ -2236,12 +2287,28 @@ void Person::setTrainJoinDate(const QString &newTrainJoinDate, const QString &fo
     setTrainJoinDate(Utils::dateFromString(newTrainJoinDate, format));
 }
 
-const QString &Person::imgPath() const
+QString Person::imgPath() const
 {
-    return mImgPath;
+    return mImage.fullImgPath();
 }
 
-void Person::setImgPath(const QString &newImgPath)
+QString Person::thumbImgPath() const
 {
-    mImgPath = newImgPath;
+    return mImage.thumbImgPath();
+}
+
+ErrCode Person::setImgPath(const QString &newImgPath)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    if (!newImgPath.isEmpty() && mImage.fullImgPath() != newImgPath) {
+        err = mImage.loadImage(newImgPath, IMG_TAG_PEOPLE);
+        if (err == ErrNone) {
+            markItemAsModified(KItemImg);
+        }
+    } else {
+        logw("nothing to set, newImgPath is empty? or not change? '%s'", STR2CHA(newImgPath));
+    }
+    traceret(err);
+    return err;
 }

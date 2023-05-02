@@ -50,6 +50,9 @@ catch (MyException& ex) { \
     ret = ErrException; \
 }
 
+#ifdef Q_OS_WIN
+#define _NOEXCEPT _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW
+#endif
 
 class MyException : public QException
 {
@@ -57,7 +60,8 @@ public:
     MyException(const QString& msg) throw();
     void raise() const override { throw *this; }
     MyException *clone() const override { return new MyException(*this); }
-    virtual const char* what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override;
+
+    virtual const char* what() const _NOEXCEPT override;
 private:
     QByteArray mMessage;
 };

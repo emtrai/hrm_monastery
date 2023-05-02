@@ -145,7 +145,7 @@ ErrCode UIPersonListView::onLoad()
 void UIPersonListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
-    loge("updateItem '%s'", item?STR2CHA(item->modelName()):"");
+    logd("updateItem '%s'", item?STR2CHA(item->modelName()):"");
     if (item && item->modelName() == KModelNamePerson) {
         Person* per = (Person*) item;
         tblItem->addValue(per->nameId());

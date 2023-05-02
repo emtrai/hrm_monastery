@@ -25,6 +25,8 @@
 #include "utils.h"
 #include <QFile>
 #include <QImage>
+#include "filectl.h"
+#include <QFileInfo>
 
 GET_INSTANCE_CONTROLLER_IMPL(ImageCtl);
 
@@ -59,14 +61,21 @@ void ImageCtl::onUnload()
     traced;
 }
 
-ErrCode ImageCtl::createThumbImage(const QString &fullPath, const QString &thumbPath,
-                                  int height, int width)
+QString ImageCtl::getImageDirPath(const QString &subDir)
+{
+    logd("subDir '%s'", STR2CHA(subDir));
+    return FileCtl::getAppImageDataDir(subDir);
+}
+
+ErrCode ImageCtl::createThumbImage(const QString &fullPath, QString &thumbPath,
+                                int height, int width, const QString& format)
 {
     tracein;
     ErrCode err = ErrNone;
     QString path = thumbPath;
     QImage img;
     QImage thumbImg;
+    QFileInfo fileInfo;
     if (fullPath.isEmpty()) {
         err = ErrInvalidArg;
         loge("invalid fullpath");
@@ -75,8 +84,9 @@ ErrCode ImageCtl::createThumbImage(const QString &fullPath, const QString &thumb
         loge("File '%s' not exist", STR2CHA(fullPath));
     }
     if (err == ErrNone) {
+        fileInfo.setFile(fullPath);
         if (thumbPath.isEmpty()) {
-            path = QString("%1.thumb").arg(fullPath);
+            path = THUMB_IMG_PATH(fullPath);
         }
         logd("fullPath '%s'", STR2CHA(fullPath));
         logd("path '%s'", STR2CHA(path));
@@ -99,8 +109,52 @@ ErrCode ImageCtl::createThumbImage(const QString &fullPath, const QString &thumb
 
     if (err == ErrNone) {
         logi("Save thumb image to '%s'", STR2CHA(path));
-        if (!thumbImg.save(path)) {
+        if (!thumbImg.save(path, STR2CHA(format))) {
             loge("Save thumb img '%s' failed", STR2CHA(path));
+            err = ErrSaveFailed;
+        }
+    }
+    if (err == ErrNone) {
+        thumbPath = path;
+    }
+    traceret(err);
+    return err;
+}
+
+ErrCode ImageCtl::convertImage(const QString &fullPath, const QString &finalPath, const QString &format)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    QString path = finalPath;
+    QImage img;
+    if (fullPath.isEmpty()) {
+        err = ErrInvalidArg;
+        loge("invalid fullpath");
+    } else if (!QFile::exists(fullPath)) {
+        err = ErrNotExist;
+        loge("File '%s' not exist", STR2CHA(fullPath));
+    }
+    if (err == ErrNone) {
+        if (finalPath.isEmpty()) {
+            path = QString("%1.%2").arg(fullPath, format);
+        }
+        logd("fullPath '%s'", STR2CHA(fullPath));
+        logd("path '%s'", STR2CHA(path));
+    }
+    if (err == ErrNone && (fullPath == path)) {
+        err = ErrExisted;
+        loge("same file, nothing to do");
+    }
+
+    if (err == ErrNone && !img.load(fullPath)) {
+        err = ErrLoadFailed;
+        loge("load image '%s' failed", STR2CHA(fullPath));
+    }
+
+    if (err == ErrNone) {
+        logi("Save '%s' image to '%s'", STR2CHA(format), STR2CHA(path));
+        if (!img.save(path, format.toStdString().c_str())) {
+            loge("Save '%s' img '%s' failed", STR2CHA(format), STR2CHA(path));
             err = ErrSaveFailed;
         }
     }

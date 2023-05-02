@@ -77,6 +77,37 @@ QString FileCtl::getAppWorkingDataDir()
     return getAppWorkingDataDir(QString());
 }
 
+ErrCode FileCtl::copyFile(const QString &src, const QString &dest, bool force)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    logd("copy file src '%s'", STR2CHA(src));
+    logd("copy file dest '%s'", STR2CHA(dest));
+    logd("force '%d'", force);
+    if (dest.isEmpty()) {
+        err = ErrInvalidArg;
+        loge("dest is empty");
+    }
+    if (err == ErrNone && (src.isEmpty() || !QFile::exists(src))) {
+        err = ErrNotFound;
+        loge("src is empty or not found '%s'", STR2CHA(src));
+    }
+    if (err == ErrNone && force && QFile::exists(dest)) {
+        if (!QFile::remove(dest)) {
+            err = ErrFileOp;
+            loge("removed file '%s' failed, cannot copy", STR2CHA(dest));
+        } else {
+            logd("dest file existed, forced removing it first");
+        }
+    }
+    if (err == ErrNone && !QFile::copy(src, dest)) {
+        err = ErrFileOp;
+        loge("copy file '%s' to '%s' failed", STR2CHA(src), STR2CHA(dest));
+    }
+    traceret(err);
+    return err;
+}
+
 QString FileCtl::getAppImageDataDir(const QString &subDir)
 {
     tracein;

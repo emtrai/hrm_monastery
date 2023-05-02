@@ -54,6 +54,7 @@ INCLUDEPATH += $$PWD/export
 INCLUDEPATH += $$PWD/import
 INCLUDEPATH += $$PWD/report
 INCLUDEPATH += $$PWD/exception
+INCLUDEPATH += $$PWD/image
 #QT_NO_DEBUG_OUTPUT
 
 # You can make your code fail to compile if it uses deprecated APIs.
@@ -121,6 +122,7 @@ SOURCES += \
     db/sqlite/table/dbsqlitepersonstatustbl.cpp \
     db/sqlite/table/dbsqlsequencetbl.cpp \
     exception/exception.cpp \
+    image/image.cpp \
     image/imagectl.cpp \
     import/importlistener.cpp \
     import/importxlsx.cpp \
@@ -318,6 +320,7 @@ HEADERS += \
     db/sqlite/table/dbsqlitepersonstatustbl.h \
     db/sqlite/table/dbsqlsequencetbl.h \
     exception/exception.h \
+    image/image.h \
     image/imagectl.h \
     imagedefs.h \
     import/importlistener.h \

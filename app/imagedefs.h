@@ -28,4 +28,10 @@
 
 #define IMG_CTL_NAME "imgctl"
 
+#define IMG_TAG_PEOPLE "people" // WARNING: any change on this may impact to location to store image!!!
+
+#define DEFAULT_IMAGE_FORMAT "png"
+
+#define THUMB_IMG_PATH(fullPath) QString("%1.thumb").arg(fullPath)
+
 #endif // IMAGEDEFS_H

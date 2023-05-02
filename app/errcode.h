@@ -63,6 +63,7 @@ typedef enum ErrCode {
     ErrLoadFailed,
     ErrOperatorFailed,
     ErrSaveFailed,
+    ErrFileOp,
     ErrMax
     } ErrCode_t;
 

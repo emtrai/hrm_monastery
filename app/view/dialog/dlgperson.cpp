@@ -75,6 +75,8 @@
 #include "department.h"
 
 #include "stringdefs.h"
+#include "image.h"
+#include "imagedefs.h"
 
 #define SPLIT_EMAIL_PHONE ";"
 
@@ -1121,6 +1123,8 @@ void DlgPerson::on_btnImg_clicked()
         QPixmap p(fname);
         ui->lblImg->setPixmap(p.scaledToHeight( ui->lblImg->height()));
         ui->lblImgPath->setText(fname);
+        Image img;
+        img.loadImage(fname, IMG_TAG_PEOPLE);
     }
 }
 
@@ -1409,4 +1413,6 @@ void DlgPerson::on_btnSearchEternalVowsCEO_clicked()
     traceout;
 
 }
+
+
 
