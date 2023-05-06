@@ -78,6 +78,7 @@ Person::Person():DbModel()
     , mEternalDate(0)
     , mRetireDate(0)
     , mDeadDate(0)
+    , mIsDeleteImg(false)
 {
     init();
 }
@@ -106,7 +107,9 @@ void Person::clone(const DbModel *model)
         mSaintUidNameMap.insert(per->saintUidNameMap());
         mFeastDay = per->feastDay();
 
+        mImgId = per->mImgId;
         mImage.copy(per->mImage);
+        mIsDeleteImg = per->mIsDeleteImg;
 
         mNationalityUid = per->nationalityUid();
         mNationalityName = per->nationalityName();
@@ -1074,12 +1077,17 @@ ErrCode Person::update(bool allFields)
 {
     tracein;
     ErrCode err = DbModel::update(allFields);
-    if (err == ErrNone && isFieldUpdated(KItemImg)) {
-        logd("update image");
-        err = mImage.save();
-        if (err != ErrNone) {
-            loge("Save image, failed, err=%d", err);
-            err = ErrNone; // TODO: handle error case?
+    if (err == ErrNone && (isFieldUpdated(KItemImg) || allFields)) {
+        if (!mIsDeleteImg) {
+            logd("update image");
+            err = mImage.save();
+            if (err != ErrNone) {
+                loge("Save image, failed, err=%d", err);
+                err = ErrNone; // TODO: handle error case?
+            }
+        } else {
+            logd("remove image");
+            mImage.remove(true);
         }
     }
     traceret(err);
@@ -1091,7 +1099,10 @@ ErrCode Person::remove(bool force, QString *msg)
 {
     tracein;
     ErrCode err = DbModel::remove(force, msg);
-    // TODO: remove image file
+    if (err == ErrNone) {
+        logd("remove image");
+        mImage.remove(true);
+    }
     traceret(err);
     return err;
 
@@ -1355,23 +1366,37 @@ void Person::setEventUidList(const QStringList &newEventUidList)
     markItemAsModified(KItemEvent);
 }
 
-QString Person::imgId() const
+QString Person::imgId()
 {
-    return mImage.uid();
+    if (!mIsDeleteImg) {
+        return mImgId.isEmpty()?mImage.uid():mImgId;
+    } else {
+        return "";
+    }
 }
 
 void Person::setImgId(const QString &newImgId)
 {
     tracein;
-//    CHECK_MODIFIED_THEN_SET(mImgId, newImgId, KItemImg);
-    ErrCode err = mImage.loadImageFromUid(newImgId, IMG_TAG_PEOPLE);
-    if (err == ErrNone) {
-        markItemAsModified(KItemImg);
+    CHECK_MODIFIED_THEN_SET(mImgId, newImgId, KItemImg);
+    if (!mImgId.isEmpty()) {
+        ErrCode err = mImage.loadImageFromUid(newImgId, IMG_TAG_PEOPLE);
+        if (err == ErrNone) {
+            markItemAsModified(KItemImg);
+        } else {
+            loge("load image from uid '%s' failed", STR2CHA(newImgId));
+        }
     } else {
-        loge("load image from uid '%s' failed", STR2CHA(newImgId));
+        logw("img id is empty, nothing to load");
+        // TODO: remove existing file???
     }
     traceout;
-//    mImgId = newImgId;
+    //    mImgId = newImgId;
+}
+
+void Person::markImageDelete()
+{
+    mIsDeleteImg = true;
 }
 
 const QString &Person::deadPlace() const

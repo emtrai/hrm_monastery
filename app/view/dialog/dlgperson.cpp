@@ -232,9 +232,16 @@ ErrCode DlgPerson::buildPerson(Person* per)
     tracein;
     // TODO: backup data to restore later??
     ErrCode err = ErrNone;
+    QString imgPath = ui->lblImgPath->text().trimmed();
     per->setMarkModified(true); // start marking fields which are modified
     // Image
-    per->setImgPath(ui->lblImgPath->text().trimmed());
+    if (imgPath.isEmpty()) {
+        per->setImgId("");
+        per->markImageDelete();
+    } else {
+        per->setImgPath(imgPath);
+        // FIXME: image is not updated in person list view after changing image
+    }
     // person code
     per->setNameId(ui->txtCode->text().trimmed());
 

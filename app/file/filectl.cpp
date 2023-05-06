@@ -30,6 +30,7 @@
 #include "crypto.h"
 #include <QTemporaryDir>
 
+#define DELETED_IMG_NAME(fileName) QString("del_%1").arg(fileName)
 
 FileCtl* FileCtl::gInstance = nullptr;
 
@@ -103,6 +104,38 @@ ErrCode FileCtl::copyFile(const QString &src, const QString &dest, bool force)
     if (err == ErrNone && !QFile::copy(src, dest)) {
         err = ErrFileOp;
         loge("copy file '%s' to '%s' failed", STR2CHA(src), STR2CHA(dest));
+    }
+    traceret(err);
+    return err;
+}
+
+ErrCode FileCtl::removeFile(const QString &fpath, bool markRemove)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    logd("remove '%s', markRemove %d", STR2CHA(fpath), markRemove);
+    if (!fpath.isEmpty() && QFile::exists(fpath)) {
+        if (!markRemove) {
+            if (!QFile::remove(fpath)) {
+                loge("remove fpath '%s' failed", STR2CHA(fpath));
+                err = ErrFileOp;
+            }
+        } else {
+            QFileInfo fileInfo(fpath);
+            QDir dir = fileInfo.absoluteDir();
+            QString removeName = DELETED_IMG_NAME(fileInfo.fileName());
+            QString removeFpath = dir.filePath(removeName);
+            loge("rename fpath '%s' to '%s'",
+                 STR2CHA(fpath), STR2CHA(removeFpath));
+            if (!QFile::rename(fpath, removeFpath)) {
+                err = ErrFileOp;
+                loge("rename fpath '%s' to '%s' failed",
+                     STR2CHA(fpath), STR2CHA(removeFpath));
+            }
+        }
+    } else {
+        err = ErrInvalidArg;
+        loge("Invalid argument, '%s' is null or not exist", STR2CHA(fpath));
     }
     traceret(err);
     return err;

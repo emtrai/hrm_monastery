@@ -45,7 +45,7 @@ public:
      * @return
      */
     ErrCode save();
-    void remove();
+    void remove(bool markRemove = false);
     QString tag() const;
     void setTag(const QString &newTags);
 

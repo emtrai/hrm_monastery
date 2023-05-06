@@ -346,8 +346,9 @@ public:
     const QString &deadPlace() const;
     void setDeadPlace(const QString &newDeadPlace);
 
-    QString imgId() const;
+    QString imgId();
     void setImgId(const QString &newImgId);
+    void markImageDelete();
 
     const QStringList &eventUidList() const;
     void setEventUidList(const QStringList &newEventUidList);
@@ -449,6 +450,7 @@ protected:
     qint64 mFeastDay;
 
     QString mImgId;
+    bool mIsDeleteImg;
     Image mImage;
 
     // nationality

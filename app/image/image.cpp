@@ -85,6 +85,9 @@ ErrCode Image::loadImage(const QString &fullPath, const QString& tag)
                 if (!QFile::exists(finalFilePath)) {
                     logi("convert '%s' to '%s', format '%s'",
                          STR2CHA(fullPath), STR2CHA(tmpFilePath), DEFAULT_IMAGE_FORMAT);
+                    // TODO: converting image may take time, especially if image is big
+                    // and user's PC has low performance, so should add progress bar to
+                    // do it async
                     err = IMGCTL->convertImage(fullPath, tmpFilePath, DEFAULT_IMAGE_FORMAT);
                     found = true;
                 } else {
@@ -213,21 +216,18 @@ ErrCode Image::save()
     return err;
 }
 
-void Image::remove()
+void Image::remove(bool markRemove)
 {
     tracein;
     removeTmp();
-    if (!mThumbImgPath.isEmpty()) {
-        logi("remove mThumbImgPath '%s' ", STR2CHA(mThumbImgPath));
-        if (!QFile::remove(mThumbImgPath)) {
-            loge("remove mThumbImgPath '%s' failed", STR2CHA(mThumbImgPath));
-        }
+    logd("markRemove %d", markRemove);
+    if (FileCtl::removeFile(mThumbImgPath, markRemove) != ErrNone) {
+        loge("remove mThumbImgPath '%s' failed, markRemove %d",
+             STR2CHA(mThumbImgPath), markRemove);
     }
-    if (!mFullImgPath.isEmpty()) {
-        logi("remove mFullImgPath '%s' ", STR2CHA(mFullImgPath));
-        if (!QFile::remove(mFullImgPath)) {
-            loge("remove mFullImgPath '%s' failed", STR2CHA(mFullImgPath));
-        }
+    if (FileCtl::removeFile(mFullImgPath, markRemove) != ErrNone) {
+        loge("remove mFullImgPath '%s' failed, markRemove %d",
+             STR2CHA(mFullImgPath), markRemove);
     }
     traceout;
 

@@ -165,6 +165,8 @@ void UIPersonListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
         tblItem->addValue(per->email().join(";"));
         tblItem->addValue(per->specialistNameList().join(","));
         tblItem->addValue(per->currentWorkName());
+
+        // TODO: show thumb image??? if support, need to verify performance
     } else {
         loge("No item found, or not expected model '%s'", item?STR2CHA(item->modelName()):"");
     }
