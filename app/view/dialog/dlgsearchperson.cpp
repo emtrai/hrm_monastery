@@ -29,6 +29,8 @@
 DlgSearchPerson::~DlgSearchPerson()
 {
     tracein;
+    clearAll();
+    traceout;
 }
 
 DlgSearchPerson *DlgSearchPerson::build(QWidget *parent, bool isMulti)

@@ -82,13 +82,21 @@ ErrCode DbSqlitePerson::add(DbModel *model, bool notify)
 
                 foreach (QString item, saintList) {
                     SaintPerson* saint = (SaintPerson*)SaintPerson::build();
-                    saint->setPersonDbId(per->dbId());
-                    saint->setPersonUid(per->uid());
-                    saint->setSaintUid(item);
-                    logd("Save saint/person, saint uid '%s'", item.toStdString().c_str());
-                    err = saint->save();
-                    // TODO: handle error case
-                    delete saint;
+                    if (saint) {
+                        saint->setPersonDbId(per->dbId());
+                        saint->setPersonUid(per->uid());
+                        saint->setSaintUid(item);
+                        logd("Save saint/person, saint uid '%s'", item.toStdString().c_str());
+                        err = saint->save();
+                        if (err != ErrNone) {
+                            loge("Save saint-person '%s' failed, err=%d",
+                                 STR2CHA(saint->toString()), err);
+                        }
+                        // TODO: handle error case
+                        delete saint;
+                    } else {
+                        loge("Create saint person faield,no memory");
+                    }
                 }
             } else {
                 logd("no saint for person");
@@ -101,18 +109,45 @@ ErrCode DbSqlitePerson::add(DbModel *model, bool notify)
                 logd("set specialist for person, no. specialist %d", list.count());
 
                 foreach (QString item, list) {
-                    SpecialistPerson* model = (SpecialistPerson*)SpecialistPerson::build();
-                    model->setPersonUid(per->uid());
-                    model->setSpecialistUid(item);
-                    logd("Save specialist/person, model uid '%s'", item.toStdString().c_str());
-                    err = model->save();
-                    // TODO: handle error case
-                    delete model;
+                    SpecialistPerson* spelistPerson = (SpecialistPerson*)SpecialistPerson::build();
+                    if (spelistPerson) {
+                        spelistPerson->setPersonUid(per->uid());
+                        spelistPerson->setSpecialistUid(item);
+                        logd("Save specialist/person, model uid '%s'", STR2CHA(spelistPerson->toString()));
+                        err = spelistPerson->save();
+                        if (err != ErrNone) {
+                            loge("Save specialist-person '%s' failed, err=%d",
+                                 STR2CHA(model->toString()), err);
+                        }
+                        // TODO: handle error case
+                        delete spelistPerson;
+                    } else {
+                        loge("Create SpecialistPerson faield,no memory");
+                    }
                 }
             } else {
                 logd("no specialist for person");
             }
 
+            // person event
+            logd("Save person event");
+            const QList<DbModel*> events = per->personEventList();
+            if (!events.empty()) {
+                foreach (DbModel* item, events) {
+                    PersonEvent* event = (PersonEvent*)item;
+                    if (event) {
+                        event->setPersonUid(per->uid());
+                        logd("Save person event '%s'", STR2CHA(event->toString()));
+                        err = event->save();
+                        if (err != ErrNone) {
+                            loge("Save event-person '%s' failed, err=%d",
+                                 STR2CHA(model->toString()), err);
+                        }
+                    } else {
+                        loge("invalid person event, null value");
+                    }
+                }
+            }
 
         }
     }
@@ -460,6 +495,113 @@ ErrCode DbSqlitePerson::update(DbModel *model)
         } else {
             logd("field %s is not updated", KItemSpecialist);
         }
+
+
+        if (per->isFieldUpdated(KItemPersonEvent) && per->personEventListUpdated()) {
+            // person event
+            logd("Update person event");
+            QList<DbModel*> currentEvents;
+            err = getListEvents(per->uid(), currentEvents);
+            const QHash<QString, DbModel*> events = per->personEventMap();
+            if (err == ErrNone) {
+                if (currentEvents.empty()) {
+                    if (!events.empty()) {
+                        logi("current list of person event empty, "
+                             "but updated list has: add all as new");
+                        foreach (DbModel* item, events.values()) {
+                            PersonEvent* event = (PersonEvent*)item;
+                            if (event) {
+                                event->setPersonUid(per->uid());
+                                logd("Save person event '%s'", STR2CHA(event->toString()));
+                                err = event->save();
+                                if (err != ErrNone) {
+                                    loge("Save event-person '%s' failed, err=%d",
+                                         STR2CHA(model->toString()), err);
+                                }
+                            } else {
+                                loge("invalid person event, null value");
+                            }
+                        }
+                    } else {
+                        logi("all empty, nothing to update person event");
+                    }
+                } else {
+                    if (events.empty()) {
+                        logi("update list empty, remove all current events");
+                        foreach (DbModel* item, currentEvents) {
+                            PersonEvent* event = (PersonEvent*)item;
+                            if (event) {
+                                event->setPersonUid(per->uid());
+                                logd("remove person event '%s'", STR2CHA(event->toString()));
+                                err = event->remove();
+                                if (err != ErrNone) {
+                                    loge("remove event-person '%s' failed, err=%d",
+                                         STR2CHA(model->toString()), err);
+                                }
+                            } else {
+                                loge("invalid person event, null value");
+                            }
+                        }
+                    } else {
+                        QList<QString> keyList;
+                        DbModel* updateEvent = nullptr;
+                        logi("Check current event with update event to save it");
+                        foreach(DbModel* currentEvent, currentEvents) {
+                            updateEvent = nullptr;
+                            logd("currentEvent '%s'", MODELSTR2CHA(currentEvent));
+                            if (events.contains(currentEvent->nameId())) {
+                                logd("current event nameid '%s' exist in updated event",
+                                     STR2CHA(currentEvent->nameId()));
+                                updateEvent = events.value(currentEvent->nameId());
+                                if (updateEvent) {
+                                    logd("copy data from update event '%s' to current event '%s'",
+                                         MODELSTR2CHA(updateEvent), MODELSTR2CHA(currentEvent));
+                                    currentEvent->setMarkModified(true);
+                                    err = currentEvent->copyData(updateEvent);
+                                    if (err == ErrNone) {
+                                        err = currentEvent->update(true);
+                                    } else {
+                                        loge("failed to copy update data, out");
+                                        break;
+                                    }
+                                }
+                            } else {
+                                logd("current event not exist in updated one, delete it '%s'",
+                                     MODELSTR2CHA(currentEvent));
+                                err = currentEvent->remove();
+                            }
+                            if (err == ErrNone) {
+                                logd("add '%s' to keyList", STR2CHA(currentEvent->nameId()));
+                                keyList.append(currentEvent->nameId());
+                            } else {
+                                break;
+                            }
+                        }
+                        if (err == ErrNone) {
+                            logd("check if all keys in upated event are updated");
+                            foreach(QString key, events.keys()) {
+                                if (!keyList.contains(key)) {
+                                    logd("key '%s' to exist yet, save as new data");
+                                    DbModel* newModel = events.value(key);
+                                    if (newModel) {
+                                        err = newModel->save();
+                                    } else {
+                                        loge("newModel with key '%s' is empty",
+                                             STR2CHA(key));
+                                        err = ErrNoData;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            logi("not update person even, maybe person is not updated"
+                 "isFieldUpdated=%d personEventListUpdated=%d",
+                 per->isFieldUpdated(KItemPersonEvent), per->personEventListUpdated());
+        }
     }
     traceret(err);
     return err;
@@ -493,6 +635,8 @@ DbSqliteTbl *DbSqlitePerson::getTable(const QString &modelName)
     logd("modelname '%s'", modelName.toStdString().c_str());
     if (modelName == KModelNamePerson || modelName.isEmpty()) {
         tbl = DbSqlite::table(KTablePerson);
+    } else if (modelName == KModelNamePersonEvent) { // TODO: check & implement more??
+        tbl = DbSqlite::table(KTablePersonEvent);
     } else { // TODO: check & implement more??
         tbl = getMainTbl();
     }

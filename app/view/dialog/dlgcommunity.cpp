@@ -227,6 +227,9 @@ void DlgCommunity::on_btnChangeNameId_clicked()
 {
     tracein;
     onEditnameId(ui->txtCode);
+    if (ui->txtCode->text().length() == 0) { // custome nameid is null, make it auto generate
+        onChangeNameIdTxt(ui->txtCode, ui->txtName->text());
+    }
     traceout;
 }
 

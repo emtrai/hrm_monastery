@@ -45,6 +45,7 @@ PersonEvent::PersonEvent(const PersonEvent *model):
     setPersonUid(model->personUid());
     setEventUid(model->eventUid());
     setEventName(model->eventName());
+    traceout;
 }
 
 DbModel *PersonEvent::build()
@@ -62,6 +63,49 @@ DbModelBuilder PersonEvent::getBuilder() const
 QString PersonEvent::modelName() const
 {
     return KModelNamePersonEvent;
+}
+
+void PersonEvent::clone(const DbModel *model)
+{
+    tracein;
+    if (model && model->modelName() == KModelNamePersonEvent) {
+        DbModel::clone(model);
+        PersonEvent* event = (PersonEvent*)model;
+        mDate = event->mDate;
+        mEndDate = event->mEndDate;
+        mEventUid = event->mEventUid;
+        mEventName = event->mEventName;
+        mPersonUid = event->mPersonUid;
+    } else {
+        logd("Model is null or not person event type, name '%s'",
+             model?STR2CHA(model->name()):"null");
+    }
+    traceout;
+}
+
+ErrCode PersonEvent::copyData(const DbModel *model)
+{
+    tracein;
+    ErrCode err = DbModel::copyData(model);
+    if (err == ErrNone) {
+        if (model && model->modelName() == KModelNamePersonEvent) {
+            PersonEvent* event = (PersonEvent*) model;
+            mDate = event->mDate;
+            markItemAsModified(KItemDate);
+            mEndDate = event->mEndDate;
+            markItemAsModified(KItemEndDate);
+            mEventUid = event->mEventUid;
+            markItemAsModified(KItemEvent);
+            mEventName = event->mEventName;// just for display
+            mPersonUid = event->mPersonUid;
+            markItemAsModified(KItemPerson);
+        } else {
+            loge("invalid event model '%s'", MODELSTR2CHA(model));
+            err = ErrInvalidData;
+        }
+    }
+    traceret(err);
+    return err;
 }
 void PersonEvent::buildUidIfNotSet()
 {
@@ -83,6 +127,21 @@ DbModelHandler *PersonEvent::getDbModelHandler() const
     return DB->getModelHandler(KModelHdlPerson);
 }
 
+QString PersonEvent::personName() const
+{
+    return mPersonName;
+}
+
+void PersonEvent::setPersonName(const QString &newPersonName)
+{
+    mPersonName = newPersonName;
+}
+
+QString PersonEvent::toString() const
+{
+    return QString("%1:%2").arg(DbModel::toString(),Utils::date2String(date()));
+}
+
 qint64 PersonEvent::endDate() const
 {
     return mEndDate;
@@ -90,7 +149,8 @@ qint64 PersonEvent::endDate() const
 
 void PersonEvent::setEndDate(qint64 newEndDate)
 {
-    mEndDate = newEndDate;
+//    mEndDate = newEndDate;
+    CHECK_MODIFIED_THEN_SET(mEndDate, newEndDate, KItemEndDate);
 }
 
 const QString &PersonEvent::eventName() const
@@ -110,7 +170,8 @@ const QString &PersonEvent::eventUid() const
 
 void PersonEvent::setEventUid(const QString &newEventUid)
 {
-    mEventUid = newEventUid;
+//    mEventUid = newEventUid;
+    CHECK_MODIFIED_THEN_SET(mEventUid, newEventUid, KItemEvent);
 }
 
 const QString &PersonEvent::personUid() const
@@ -120,7 +181,8 @@ const QString &PersonEvent::personUid() const
 
 void PersonEvent::setPersonUid(const QString &newPersonUid)
 {
-    mPersonUid = newPersonUid;
+//    mPersonUid = newPersonUid;
+    CHECK_MODIFIED_THEN_SET(mPersonUid, newPersonUid, KItemPerson);
 }
 
 qint64 PersonEvent::date() const
@@ -130,6 +192,7 @@ qint64 PersonEvent::date() const
 
 void PersonEvent::setDate(qint64 newDate)
 {
-    mDate = newDate;
+//    mDate = newDate;
+    CHECK_MODIFIED_THEN_SET(mDate, newDate, KItemDate);
 }
 

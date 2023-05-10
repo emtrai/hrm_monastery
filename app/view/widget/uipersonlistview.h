@@ -57,6 +57,7 @@ protected:
     virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionImport(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionExportListPerson(QMenu *menu, UITableMenuAction *act);
+    virtual ErrCode onMenuActionViewPersonEvent(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onChangeCommunity(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode exportPersonInfo(QMenu* menu, UITableMenuAction* act);
     virtual void onViewItem(UITableCellWidgetItem *item);
@@ -77,6 +78,7 @@ protected:
     virtual void onMainWindownImportStart(ImportTarget target);
     virtual void onMainWindownImportEnd(ImportTarget target, ErrCode err, void* importData = nullptr);
 
+    virtual QString getMainModelName();
 private:
     void cleanUpItem();
 };

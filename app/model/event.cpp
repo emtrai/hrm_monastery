@@ -42,6 +42,11 @@ DbModelBuilder Event::getBuilder() const
     return &Event::build;
 }
 
+QString Event::modelName() const
+{
+    return KModelNameEvent;
+}
+
 
 DbModelHandler *Event::getDbModelHandler() const
 {

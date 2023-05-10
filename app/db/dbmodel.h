@@ -171,6 +171,12 @@ public:
     virtual void clone(const DbModel* model);
     virtual DbModel* clone() const;
 
+    /**
+     * @brief Copy data only, except identity such as uid, nameid, dbid
+     * @param model
+     */
+    virtual ErrCode copyData(const DbModel* model);
+
     virtual QString modelName() const;
     virtual int modelType() const;
 

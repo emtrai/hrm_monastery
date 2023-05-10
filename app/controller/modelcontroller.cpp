@@ -48,7 +48,8 @@ void ModelController::init()
     tracein;
 
     logd("Register signal/slots");
-    QObject::connect(this, SIGNAL(dataUpdate()), this, SLOT(onModelControllerDataUpdated()));
+    QObject::connect(this, SIGNAL(dataUpdate(const DbModel *model)),
+                     this, SLOT(onModelControllerDataUpdated(const DbModel *model)));
 
     DbModelHandler* hdl = getModelHandler();
     if (hdl) {
@@ -630,7 +631,7 @@ void ModelController::onDbModelHandlerDataUpdate(DbModel *model, int type, ErrCo
 {
     tracein;
     reloadDb();
-    emit dataUpdate();
+    emit dataUpdate(model);
     traceout;
 }
 
@@ -702,9 +703,14 @@ ErrCode ModelController::doCsvParseOneItem(const QStringList &items, void *param
     (void) param;
     if (!items.empty()) {
         DbModel* model = buildModel((void*)&items, KDataFormatStringList);
-        if ((model != nullptr) && model->isValid()){
+        if ((model != nullptr) && model->isValid()) {
             logi("Save model '%s'", STR2CHA(model->toString()));
             ret = model->save();
+            logd("save ret = %d", ret);
+            if (ret == ErrExisted) {
+                logw("'%s' already exist, skip", STR2CHA(model->toString()));
+                ret = ErrNone;
+            }
         }
         else{
             ret = ErrInvalidData;
@@ -751,12 +757,12 @@ ErrCode ModelController::onCsvParseOneItemCallback(const QStringList &items, voi
     return ret;
 }
 
-void ModelController::onModelControllerDataUpdated()
+void ModelController::onModelControllerDataUpdated(const DbModel *model)
 {
     tracein;
     foreach (OnModelControllerListener* listener, mListeners) {
         if (listener) {
-            listener->onModelControllerDataUpdated();
+            listener->onModelControllerDataUpdated(model);
         }
     }
     traceout;

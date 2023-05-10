@@ -28,6 +28,7 @@
 #include "dbsqlitetablebuilder.h"
 #include "course.h"
 #include "dbsqliteinsertbuilder.h"
+#include "dbsqliteupdatebuilder.h"
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QHash>
@@ -75,4 +76,48 @@ ErrCode DbSqliteCourseTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
     course->setCourseType(qry.value(KFieldCourseType).toInt());
     traceout;
     return err;
+}
+
+ErrCode DbSqliteCourseTbl::updateTableField(DbSqliteUpdateBuilder *builder, const QList<QString> &updateField, const DbModel *item)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    if (!builder || !item) {
+        err = ErrInvalidArg;
+        loge("invalid arg");
+    }
+    if (err == ErrNone) {
+        err = DbSqliteTbl::updateTableField(builder, updateField, item);
+    }
+
+    if (err == ErrNone) {
+        if (item->modelName() == KModelNameCourse) {
+            Course* comm = (Course*) item;
+            foreach (QString field, updateField) {
+                logd("Update field %s", STR2CHA(field));
+                if (field == KItemStartDate) {
+                    builder->addValue(KFieldStartDate, comm->startDate());
+
+                } else if (field == KItemEndDate) {
+                    builder->addValue(KFieldEndDate, comm->endDate());
+
+                } else if (field == KItemPeriod) {
+                    builder->addValue(KFieldPeriod, comm->period());
+
+                } else if (field == KItemCourseType) {
+                    builder->addValue(KFieldCourseType, comm->courseType());
+
+                } else {
+                    logw("Field '%s' not support here", STR2CHA(field));
+                }
+            }
+        } else {
+            logw("Model name '%s' is no support",
+                 STR2CHA(item->modelName()));
+        }
+    }
+    traceret(err);
+    return err;
+
+
 }

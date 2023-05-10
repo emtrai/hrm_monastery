@@ -144,6 +144,7 @@ const char* const KItemEucharistPlace = "NOI_THANH_THE";
 const char* const KItemHollyDate = "NGAY_THEM_SU";
 const char* const KItemHollyPlace = "NOI_THEM_SUC";
 const char* const KItemCourse = "KHOA";
+const char* const KItemCourseType = "LOAI_KHOA"; // course type like nhiem ky, nam tu, khoa tu, etc.
 const char* const KItemJoinDate = "NGAY_GIA_NHAP";
 const char* const KItemJoinPIC = "PHU_TRACH_GIA_NHAP";
 const char* const KItemPreTrainDate = "NGAY_TIEN_TAP_VIEN";
@@ -187,6 +188,8 @@ const char* const KItemLevel = "CAP";
 const char* const KItemContact = "LIEN_HE";
 const char* const KItemTerm = "NHIEM_KY";
 const char* const KItemPersonNameId = "MA_DINH_DANH_NU_TU";
+const char* const KItemPersonEvent= "SU_KIEN_NU_TU";
+const char* const KItemDate= "NGAY_THANG";
 
 // Special item name
 const char* const KItemDbStatus = "DB_STATUS";

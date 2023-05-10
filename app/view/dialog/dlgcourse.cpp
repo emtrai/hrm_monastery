@@ -137,6 +137,9 @@ void DlgCourse::loadCourseType()
 void DlgCourse::on_btnChangeNameId_clicked()
 {
     DlgCommonEditModel::onEditnameId(ui->txtNameId);
+    if (ui->txtNameId->text().length() == 0) { // custome nameid is null, make it auto generate
+        onChangeNameIdTxt(ui->txtNameId, ui->txtName->text());
+    }
 }
 
 

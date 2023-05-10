@@ -56,7 +56,11 @@ public:
                                 QList<DbModel*>& list,
                                 const QString* eventUid = nullptr,
                                 qint64 date = 0); // TODO; should support enddate???
-public:
+protected:
+    virtual ErrCode updateTableField(DbSqliteUpdateBuilder* builder,
+                                     const QList<QString>& updateField,
+                                     const DbModel *item);
+private:
     static const qint32 KVersionCode;
 };
 

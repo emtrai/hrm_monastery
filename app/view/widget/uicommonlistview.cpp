@@ -231,11 +231,22 @@ QString UICommonListView::getName()
     return "UICommonListView";
 }
 
-void UICommonListView::onModelControllerDataUpdated()
+QString UICommonListView::getMainModelName()
+{
+    return "";
+}
+
+void UICommonListView::onModelControllerDataUpdated(const DbModel *model)
 {
     tracein;
+    logd("update model '%s'", model?MODELSTR2CHA(model):"(null)");
     if (!mSuspendReloadOnDbUpdate) {
-        reload();
+        QString mainModelName = getMainModelName();
+        logd("main model name '%s'", STR2CHA(mainModelName));
+        if (mainModelName.isEmpty() || (model && mainModelName == model->modelName())) {
+            logd("reload");
+            reload();
+        }
     } else {
         logw("Suspend reload on data update");
     }

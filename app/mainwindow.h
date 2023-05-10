@@ -152,6 +152,10 @@ protected:
                                          WaitRunt_t run,
                                          WaitFinished_t finish = nullptr,
                                          void *data = nullptr);
+
+     ErrCode doShowAddPersonEvent(bool isSelfUpdate = true, DbModel* person = nullptr,
+                                  DbModel* model = nullptr,
+                                  CommonEditModelListener* listener = nullptr);
  private:
      void loadHomePageFile();
      void loadOtherMenu();
@@ -261,6 +265,8 @@ protected:
      void on_actionOrgInfo_triggered();
 
      void on_actionDong_bo_triggered();
+
+     void on_actionNew_PersonEvent_triggered();
 
  private:
      static MainWindow* gInstance;

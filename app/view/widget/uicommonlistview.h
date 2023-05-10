@@ -53,7 +53,8 @@ protected:
     virtual void onDbModelReady(ErrCode ret, DbModel* model, DlgCommonEditModel* dlg);
     virtual DbModel* onNewModel(const QString& modelName);
     virtual QString getName();
-    virtual void onModelControllerDataUpdated();
+    virtual QString getMainModelName();
+    virtual void onModelControllerDataUpdated(const DbModel *model);
 protected:
     QList<DbModel*> mItemList;
 };

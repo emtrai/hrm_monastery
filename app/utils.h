@@ -42,6 +42,8 @@
 #define CSV_LIST_ITEM_SPLIT '|'
 #define NAME_ITEM_SPLIT ','
 
+#define SPECIAL_CHAR "`~!@#$%^&*()_-+={[}]|\\:;\"\'<,>.?/"
+
 // TODO: just create empty object, is there any other better way???
 #define EMPTY_QSTRING QString()
 // TODO: is there any better way???
@@ -185,6 +187,7 @@ do { \
 
 
 #define STR2CHA(val) (!(val).isEmpty()?(val).toStdString().c_str():"(empty)")
+#define MODELSTR2CHA(model) (model?STR2CHA(model->toString()):"(null)")
 #define MODELNAME2CHA(model) (model?STR2CHA(model->modelName()):"(null)")
 
 // TODO: re-implement this one!!!!!
@@ -210,6 +213,12 @@ do { \
     Utils::clearListModel<T>(list); \
     } while(0)
 
+
+#define RELEASE_HASH(list, K, T) \
+    do { \
+        Utils::clearListModel<K, T>(list); \
+    } while(0)
+
 typedef ErrCode (*func_one_csv_item_t)(const QStringList& items, void* caller, void* param);
 typedef ErrCode (*func_one_csv_item_complete_t)(const QHash<QString, QString>& items, void* caller, void* param);
 typedef ErrCode (*func_one_csv_field_t)(const QString& key, const QString& value, void* caller, void* param);
@@ -232,6 +241,15 @@ public:
     static void clearListModel(QList<T*>& list)
     {
         foreach (T* model, list) {
+            if  (model) delete model;
+        }
+        list.clear();
+    }
+    template<class K, class T>
+    static void clearListModel(QHash<K, T*>& list)
+    {
+        foreach (K key, list.keys()) {
+            T* model = list.value(key);
             if  (model) delete model;
         }
         list.clear();
@@ -276,11 +294,14 @@ public:
     static QString getPrebuiltFileByLang(const QString& prebuiltName, bool lang = true);
     static QString UidFromName(const QString& name, UidNameConvertType type = SIMPLIFY_UPPER, bool* isOk = nullptr);
     static QString removeVietnameseSign(const QString& vietnameseString);
+    static QString removeSpecialChar(const QString& string,
+                                     const QString& replacement = nullptr,
+                                     const QString& specialChar = SPECIAL_CHAR);
     static QString readAll(const QString& fpath);
 
     static void showMsgBox(const QString& msg);
     static void showErrorBox(const QString& msg);
-    static void showErrorBox(int ret, const QString* msg = nullptr);
+    static void showErrorBox(int ret, const QString& msg = nullptr);
     static bool showConfirmDialog(QWidget *parent, const QString& title, const QString& message, std::function<void(void)> onAccept = nullptr);
     static QString showInputDialog(QWidget *parent, const QString& title, const QString& message, const QString& initInput = "", bool* isOk = nullptr);
     static ErrCode screenSize(int* w=nullptr, int* h=nullptr);
@@ -288,7 +309,7 @@ public:
     static int getCurrentComboxIndex(const QComboBox *cb);;
     static QString getCurrentComboxDataString(const QComboBox *cb, bool *isOk = nullptr);
     static ErrCode getCurrentComboxDataString(const QComboBox *cb, QString* data, QString* name = nullptr);
-    static ErrCode setSelectItemComboxByData(QComboBox *cb, const QVariant& data);
+    static ErrCode setSelectItemComboxByData(QComboBox *cb, const QVariant& data, int* index = nullptr);
     static ErrCode buildComboxFromModel(QComboBox *cb, const QList<DbModel*>& modelList);
     static ErrCode buildComboxFromModel(QComboBox *cb, ModelController* controller);
     static void showDlgUnderDev(const QString& info = nullptr);

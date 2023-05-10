@@ -40,7 +40,6 @@ class DlgAreaPerson : public DlgCommonEditModel
 public:
     explicit DlgAreaPerson(QWidget *parent = nullptr);
     ~DlgAreaPerson();
-    virtual void setupUI();
 
     virtual ErrCode buildModel(DbModel* model, QString& errMsg);
     virtual ErrCode fromModel(const DbModel* model);

@@ -36,7 +36,7 @@ class DlgSearch : public QDialog
     Q_OBJECT
 public:
 
-    ~DlgSearch();
+    virtual ~DlgSearch();
 
     bool getIsMultiSelection() const;
     void setIsMultiSelection(bool newIsMultiSelection);

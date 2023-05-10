@@ -29,7 +29,7 @@ class Person;
 class DlgSearchPerson : public DlgSearch
 {
 public:
-    ~DlgSearchPerson();
+    virtual ~DlgSearchPerson();
     static DlgSearchPerson* build(QWidget *parent = nullptr, bool isMulti = false);
 protected:
     DlgSearchPerson(QWidget *parent = nullptr, bool isMulti = false);

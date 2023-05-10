@@ -38,7 +38,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>-1559</y>
         <width>679</width>
         <height>3135</height>
        </rect>
@@ -1074,7 +1074,7 @@
              <item>
               <widget class="QToolButton" name="btnAddEvent">
                <property name="enabled">
-                <bool>false</bool>
+                <bool>true</bool>
                </property>
                <property name="text">
                 <string>Thêm</string>
@@ -1092,7 +1092,7 @@
              <item>
               <widget class="QToolButton" name="btnDelEvent">
                <property name="enabled">
-                <bool>false</bool>
+                <bool>true</bool>
                </property>
                <property name="text">
                 <string>Xoá</string>
@@ -1100,6 +1100,21 @@
                <property name="icon">
                 <iconset>
                  <normalon>:/icon/icon/icons8-delete-64 (1).png</normalon>
+                </iconset>
+               </property>
+               <property name="toolButtonStyle">
+                <enum>Qt::ToolButtonTextBesideIcon</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="btnModifyEvent">
+               <property name="text">
+                <string>Sửa</string>
+               </property>
+               <property name="icon">
+                <iconset>
+                 <normalon>:/icon/icon/icons8-create-64.png</normalon>
                 </iconset>
                </property>
                <property name="toolButtonStyle">

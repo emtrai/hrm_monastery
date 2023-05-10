@@ -248,6 +248,7 @@ SOURCES += \
     view/widget/uiitembutton.cpp \
     view/widget/uimissionlistview.cpp \
     view/widget/uimulticomboxview.cpp \
+    view/widget/uipersoneventlistview.cpp \
     view/widget/uipersonlistview.cpp \
     view/widget/uirolelistview.cpp \
     view/widget/uisaintlistview.cpp \
@@ -454,6 +455,7 @@ HEADERS += \
     view/widget/uiitembutton.h \
     view/widget/uimissionlistview.h \
     view/widget/uimulticomboxview.h \
+    view/widget/uipersoneventlistview.h \
     view/widget/uipersonlistview.h \
     view/widget/uirolelistview.h \
     view/widget/uisaintlistview.h \

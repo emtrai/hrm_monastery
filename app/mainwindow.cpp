@@ -45,6 +45,7 @@
 #include "view/dialog/dlgcommdept.h"
 #include "view/dialog/dlgarea.h"
 #include "view/dialog/dlgethnic.h"
+#include "view/dialog/dlgaddpersonevent.h"
 #include "personctl.h"
 #include "dialog/dlgabout.h"
 #include "dlgwait.h"
@@ -296,6 +297,22 @@ ErrCode MainWindow::doShowProcessingDialog(const QString& title,
     err = waitdlg.show(data, prepare, run, finish);
     traceout;
     return err;
+}
+
+ErrCode MainWindow::doShowAddPersonEvent(bool isSelfUpdate, DbModel* person, DbModel *model, CommonEditModelListener *listener)
+{
+    tracein;
+    logd("isSelfUpdate %d", isSelfUpdate);
+    logd("Set person '%s'", MODELSTR2CHA(person));
+    logd("Set model '%s'", MODELSTR2CHA(model));
+    DlgAddPersonEvent* dlg = DlgAddPersonEvent::build(this, isSelfUpdate,
+                                                      KModelNamePersonEvent, model, listener);
+    if (person) {
+        dlg->setPerson((Person*)person);
+    }
+    dlg->exec();
+    delete dlg;
+    traceout;
 }
 void MainWindow::switchView(ViewType type, void* data)
 {
@@ -643,8 +660,14 @@ void MainWindow::loadOtherAddMenu()
 
     ADD_ACTION_ITEM(otherMenu,
                     on_actionNew_Community_triggered,
-                    "Cộng đoàn",
+                    "Thêm cộng đoàn",
                     ICON_PATH("icons8-community-64"));
+
+
+    ADD_ACTION_ITEM(otherMenu,
+                    on_actionNew_PersonEvent_triggered,
+                    "Thêm Sự kiện cho Nữ tu",
+                    ICON_PATH("icons8-add-64"));
 
 
 
@@ -1364,6 +1387,13 @@ void MainWindow::on_actionDong_bo_triggered()
     // TODO: implemen this
     UNDER_DEV(tr("Đồng bộ dữ liệu (với dữ liệu được lưu trên Google Drive, vvv.)"));
 
+    traceout;
+}
+
+void MainWindow::on_actionNew_PersonEvent_triggered()
+{
+    tracein;
+    doShowAddPersonEvent();
     traceout;
 }
 

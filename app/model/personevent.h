@@ -34,7 +34,12 @@ public:
     static DbModel *build();
     virtual DbModelBuilder getBuilder() const;
     virtual QString modelName() const;
-
+    virtual void clone(const DbModel* model);
+    /**
+     * @brief Copy data only, except identity such as uid, nameid, dbid
+     * @param model
+     */
+    virtual ErrCode copyData(const DbModel* model);
     virtual void buildUidIfNotSet();
 
     qint64 date() const;
@@ -52,14 +57,19 @@ public:
     qint64 endDate() const;
     void setEndDate(qint64 newEndDate);
 
+    QString personName() const;
+    void setPersonName(const QString &newPersonName);
+    virtual QString toString() const;
+
 protected:
     virtual DbModelHandler *getDbModelHandler() const;
 private:
     qint64 mDate;
     qint64 mEndDate;
     QString mEventUid;
-    QString mEventName;
+    QString mEventName; // for display only
     QString mPersonUid;
+    QString mPersonName; // for display only
 };
 
 #endif // PERSONEVENT_H

@@ -457,6 +457,15 @@ bool DbSqliteTbl::isExist(const DbModel *item)
         // TODO: check sql injection issue
         qry.bindValue( ":uid", item->uid() );
         queryOk = true;
+    } else if (!item->nameId().isEmpty()) {
+        QString queryString = QString("SELECT COUNT(*) "
+                                      "FROM %1 WHERE %2 = :nameid").arg(name(), KFieldNameId);
+        qry.prepare(queryString);
+        logd("Query String '%s'", queryString.toStdString().c_str());
+
+        // TODO: check sql injection issue
+        qry.bindValue( ":nameid", item->nameId() );
+        queryOk = true;
     } else {
         QString cond;
         int datatype = 0;
@@ -626,15 +635,21 @@ ErrCode DbSqliteTbl::updateModelFromQuery(DbModel* item, const QSqlQuery& qry)
 {
     tracein;
     ErrCode err = ErrNone;
-    item->setNameId(qry.value(KFieldNameId).toString().trimmed());
-    item->setDbId(qry.value(KFieldId).toInt());
-    item->setName(qry.value(KFieldName).toString().trimmed());
-    item->setUid(qry.value(KFieldUid).toString());
-    item->setDbHistory(qry.value(KFieldDbHistory).toString());
-    item->setDbStatus(qry.value(KFieldDbStatus).toInt());
-    item->setDbCreatedTime(qry.value(KFieldDbCreateTime).toInt());
-    item->setLastDbUpdatedTime(qry.value(KFieldLastDbUpdateItme).toInt());
-    item->setRemark(qry.value(KFieldRemark).toString());
+    if (!item) {
+        err = ErrInvalidArg;
+        loge("invalid arg");
+    }
+    if (err == ErrNone) {
+        item->setNameId(qry.value(KFieldNameId).toString().trimmed());
+        item->setDbId(qry.value(KFieldId).toInt());
+        item->setName(qry.value(KFieldName).toString().trimmed());
+        item->setUid(qry.value(KFieldUid).toString());
+        item->setDbHistory(qry.value(KFieldDbHistory).toString());
+        item->setDbStatus(qry.value(KFieldDbStatus).toInt());
+        item->setDbCreatedTime(qry.value(KFieldDbCreateTime).toInt());
+        item->setLastDbUpdatedTime(qry.value(KFieldLastDbUpdateItme).toInt());
+        item->setRemark(qry.value(KFieldRemark).toString());
+    }
     traceout;
     return err;
 }

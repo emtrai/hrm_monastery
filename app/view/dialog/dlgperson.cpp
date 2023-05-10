@@ -110,7 +110,7 @@ DlgPerson::~DlgPerson()
         delete cbSaints;
     if (cbSpecialist)
         delete cbSpecialist;
-
+    RELEASE_LIST_DBMODEL(mListPersonEvent);
     delete ui;
 }
 
@@ -150,25 +150,25 @@ void DlgPerson::setupUI()
     ui->buttonBox->button(QDialogButtonBox::Save)->setText(tr("Lưu"));
 
 
-    QStringList communityListHdr;
+    QStringList eventListHdr;
     // TODO: translation
-    communityListHdr.append(STR_NAMEID);
-    communityListHdr.append(STR_DATE);
-    communityListHdr.append(STR_ENDDATE);
-    communityListHdr.append(STR_EVENT);
-    communityListHdr.append(STR_TITLE);
-    communityListHdr.append(STR_NOTE);
+    eventListHdr.append(STR_NAMEID);
+    eventListHdr.append(STR_EVENT);
+    eventListHdr.append(STR_TITLE);
+    eventListHdr.append(STR_DATE);
+    eventListHdr.append(STR_ENDDATE);
+    eventListHdr.append(STR_NOTE);
     ui->tblEvents->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tblEvents->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
 
     ui->tblEvents->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
 
     ui->tblEvents->setShowGrid(true);
-    ui->tblEvents->setColumnCount(communityListHdr.count());
+    ui->tblEvents->setColumnCount(eventListHdr.count());
 //    ui->tblCommunityList->setMinimumWidth(500);
     ui->tblEvents->setMinimumHeight(200);
 
-    ui->tblEvents->setHorizontalHeaderLabels(communityListHdr);
+    ui->tblEvents->setHorizontalHeaderLabels(eventListHdr);
 
     // Call connect here may cause call is called twice, it's because
     // Qt check func name, if it's in format on_buttonBox_clicked --> auto register slot
@@ -222,9 +222,18 @@ void DlgPerson::setupUI()
     loadWork();
 
     // load Event
-    loadEvent(true);
+//    loadEvent();
 
     mInitDone = true;
+}
+
+Person *DlgPerson::getPerson()
+{
+    tracein;
+    Person* per = person();
+    buildPerson(per);
+    traceout;
+    return per;
 }
 
 ErrCode DlgPerson::buildPerson(Person* per)
@@ -378,7 +387,10 @@ ErrCode DlgPerson::buildPerson(Person* per)
 //    foreach (QVariant id, specialist){
 //        per->addSpecialistUid(id.toString());
 //    }
-
+    if (mListPersonEvent.size() > 0) {
+        per->setPersonEventList(mListPersonEvent);
+    }
+    logd("build person '%s'", STR2CHA(per->toString()));
     per->dump();
     traceout;
     return err;
@@ -538,6 +550,29 @@ ErrCode DlgPerson::fromPerson(const Person *model)
     // TODO: handle the case that adding community dialog is shown when no community found
     // before showing person add dialog
     Utils::setSelectItemComboxByData(ui->cbCommunity, per->communityUid());
+
+    logd("load person event");
+    const QList<DbModel*> events = per->personEventList();
+    if (!events.empty()) {
+        RELEASE_LIST_DBMODEL(mListPersonEvent);
+        foreach (DbModel* item, events) {
+            if (item) {
+                DbModel* event = item->clone();
+                if (event) {
+                    mListPersonEvent.append(event);
+                } else {
+                    logw("failed to clone event item, no memory");
+                }
+            } else {
+                logw("invalid event items");
+            }
+        }
+    }
+    if (!mListPersonEvent.empty()) {
+        loadEvent();
+    } else {
+        logd("no event to load");
+    }
 
     traceret(ret);
     mInitDone = true; // TODO: check setting mInitDone again, should offer api to mark init done?
@@ -775,10 +810,11 @@ void DlgPerson::loadEvent(bool reloadAll)
         Person* per = person();
         if (per != nullptr) {
             QList<DbModel*> list;
+            RELEASE_LIST_DBMODEL(mListPersonEvent);
             ErrCode err = INSTANCE(PersonCtl)->getListEvents(per->uid(), list);
             if (err == ErrNone) {
                 foreach(DbModel* item, list){
-                    mListPersonEvent.append((PersonEvent*)item);
+                    mListPersonEvent.append(item);
                 }
             } else {
                 loge("Get list event of person uid '%s' failed, err", STR2CHA(per->uid()), err);
@@ -791,15 +827,16 @@ void DlgPerson::loadEvent(bool reloadAll)
     qint32 idx = tbl->rowCount();
     logd("idx=%d", idx);
     logd("mListPersonEvent cnt=%d", mListPersonEvent.count());
-    foreach (PersonEvent* event, mListPersonEvent) {
+    foreach (DbModel* model, mListPersonEvent) {
+        PersonEvent* event = (PersonEvent*)model;
         col = 0;
         logd("idx=%d", idx);
         tbl->insertRow(idx);
-        tbl->setItem(idx, col++, new QTableWidgetItem(event->uid()));
-        tbl->setItem(idx, col++, new QTableWidgetItem(Utils::date2String(event->date())));
-        tbl->setItem(idx, col++, new QTableWidgetItem(Utils::date2String(event->endDate())));
+        tbl->setItem(idx, col++, new QTableWidgetItem(event->nameId()));
         tbl->setItem(idx, col++, new QTableWidgetItem(event->eventName()));
         tbl->setItem(idx, col++, new QTableWidgetItem(event->name()));
+        tbl->setItem(idx, col++, new QTableWidgetItem(Utils::date2String(event->date())));
+        tbl->setItem(idx, col++, new QTableWidgetItem(Utils::date2String(event->endDate())));
         tbl->setItem(idx, col++, new QTableWidgetItem(event->remark()));
         idx++;
     }
@@ -809,12 +846,8 @@ void DlgPerson::loadEvent(bool reloadAll)
 void DlgPerson::cleanEvent()
 {
     tracein;
-    if (!mListPersonEvent.empty()) {
-        foreach(PersonEvent* item, mListPersonEvent) {
-            delete item; // TODO: is it safe????, should check if iterator is supported
-        }
-        mListPersonEvent.clear();
-    }
+    RELEASE_LIST_DBMODEL(mListPersonEvent);
+    traceout;
 }
 
 void DlgPerson::searchPerson(QLineEdit *wget)
@@ -1305,20 +1338,23 @@ void DlgPerson::setEditMode(DlgPerson::Mode newEditMode)
 void DlgPerson::on_btnAddEvent_clicked()
 {
     tracein;
-    DlgAddPersonEvent * dlg = new DlgAddPersonEvent();
+    DlgAddPersonEvent * dlg = DlgAddPersonEvent::build(this, false, nullptr);
     if (dlg == nullptr) {
         loge("Open dlg DlgAddPersonEvent fail, No memory");
         return;
     }
 
+    dlg->setPerson(getPerson());
     if (dlg->exec() == QDialog::Accepted){
-        PersonEvent* event = dlg->personEvent();
+        DbModel* event = dlg->model();
         if (event != nullptr) {
-            mListPersonEvent.append(new PersonEvent(event));
+            logd("Add event to list '%s'", STR2CHA(event->toString()));
+            mListPersonEvent.append(event->clone());
         }
         loadEvent();
     }
     delete dlg;
+    traceout;
 }
 
 
@@ -1330,11 +1366,18 @@ void DlgPerson::on_btnDelEvent_clicked()
     QItemSelectionModel* selectionModel = tbl->selectionModel();
     QModelIndexList selection = selectionModel->selectedRows();
     // Multiple rows can be selected
+    QList<DbModel*> toDel;
     for(int i=0; i< selection.count(); i++)
     {
         QModelIndex index = selection.at(i);
+        DbModel* model = mListPersonEvent.at(index.row());
+        if (model) {
+            logd("Delete event '%s'", STR2CHA(model->toString()));
+            toDel.append(model);
+        }
         mListPersonEvent.removeAt(index.row());
     }
+    RELEASE_LIST_DBMODEL(toDel);
     loadEvent();
 }
 
@@ -1422,4 +1465,49 @@ void DlgPerson::on_btnSearchEternalVowsCEO_clicked()
 }
 
 
+
+
+void DlgPerson::on_btnModifyEvent_clicked()
+{
+    tracein;
+    // TODO: validate data
+    QTableWidget* tbl = ui->tblEvents;
+    QItemSelectionModel* selectionModel = tbl->selectionModel();
+    QModelIndexList selection = selectionModel->selectedRows();
+    // Multiple rows can be selected
+    DbModel* model = nullptr;
+    for(int i=0; i< selection.count(); i++)
+    {
+        QModelIndex index = selection.at(i);
+        model = mListPersonEvent.at(index.row());
+        if (model) {
+            break;
+        }
+    }
+
+    if (model) {
+        DlgAddPersonEvent * dlg = DlgAddPersonEvent::build(this, false, model->modelName(), model);
+        if (dlg == nullptr) {
+            loge("Open dlg DlgAddPersonEvent fail, No memory");
+            return;
+        }
+
+        dlg->setPerson(getPerson());
+        if (dlg->exec() == QDialog::Accepted){
+            DbModel* event = dlg->model();
+            if (event != nullptr) {
+                logd("copy data from '%s'", STR2CHA(event->toString()));
+                model->setMarkModified(true);
+                model->copyData(event);
+            } else {
+                logw("something was wrong, invalid data");
+            }
+            loadEvent();
+        }
+        delete dlg;
+    } else {
+        loge("no person event model to modify");
+    }
+    traceout;
+}
 

@@ -36,14 +36,18 @@ DlgCommonEditModel::DlgCommonEditModel(QWidget *parent): QDialog(parent),
     mModel(nullptr), mIsNew(false), mIsSelfSave(false),
     mCustomNameId(false)
 {
-    tracein;
+    traced;
 
 }
 
 DlgCommonEditModel::~DlgCommonEditModel()
 {
     tracein;
-    if (mModel) delete mModel;
+    if (mModel) {
+        delete mModel;
+        mModel = nullptr;
+    }
+    traceout;
 }
 
 void DlgCommonEditModel::setupUI()
@@ -224,13 +228,19 @@ void DlgCommonEditModel::onEditnameId(QLineEdit *txtNameId)
     tracein;
     QString txt = txtNameId->text().trimmed();
     bool ok = false;
-    QString nameId = Utils::showInputDialog(this, tr("Mã định danh"), tr("Nhập mã định danh"), txt, &ok);
+    QString nameId = Utils::showInputDialog(this, tr("Mã định danh"),
+                                            tr("Nhập mã định danh. \
+\nSau khi nhập, mã định danh sẽ cố định, không tự động tao theo dữ liệu nhập.\
+\nĐể mã định danh tự động tạo theo giá trị nhập, xóa toàn bộ và chọn Đồng ý"),
+                                            txt, &ok);
     if (ok && !nameId.isEmpty()) {
         mCustomNameId = true;
         txtNameId->setText(nameId);
         logd("custom name id '%s'", STR2CHA(nameId));
     } else {
         logd("no name id (ok=%d) or name id is empty", ok);
+        mCustomNameId = false;
+        txtNameId->setText("");
     }
     traceout;
 }

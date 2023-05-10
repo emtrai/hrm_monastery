@@ -31,11 +31,22 @@
 #include "personstatus.h"
 #include "dbsqlitetablebuilder.h"
 #include "dbsqliteinsertbuilder.h"
+#include "dbsqliteupdatebuilder.h"
 #include "personevent.h"
 #include "dbctl.h"
 #include "dbsqlite.h"
 
-const qint32 DbSqlitePersonEventTbl::KVersionCode = VERSION_CODE(0,0,1);
+/**
+ * VERSION 0.0.1:
+ * + KFieldDate
+ * + KFieldEndDate
+ * + KFieldEventUid
+ * + KFieldPersonId
+ */
+
+#define VERSION_CODE_1 VERSION_CODE(0,0,1)
+
+const qint32 DbSqlitePersonEventTbl::KVersionCode = VERSION_CODE_1;
 
 DbSqlitePersonEventTbl::DbSqlitePersonEventTbl():
     DbSqlitePersonEventTbl(nullptr)
@@ -58,6 +69,7 @@ void DbSqlitePersonEventTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldDate, INT64);
     builder->addField(KFieldEndDate, INT64);
     builder->addField(KFieldEventUid, TEXT);
+    // person id instead of person uid, due to silly mistake so cannot change... f*c* me
     builder->addField(KFieldPersonId, TEXT);
     traceout;
 }
@@ -82,14 +94,32 @@ ErrCode DbSqlitePersonEventTbl::updateModelFromQuery(DbModel *item, const QSqlQu
 {
     tracein;
     ErrCode err = ErrNone;
-    DbSqliteTbl::updateModelFromQuery(item, qry);
-    PersonEvent* model = (PersonEvent*) item;
-    model->setName(qry.value(KFieldName).toString());
-    model->setPersonUid(qry.value(KFieldPersonId).toString());
-    model->setEventUid(qry.value(KFieldEventUid).toString());
-    model->setDate(qry.value(KFieldDate).toInt());
-    model->setEndDate(qry.value(KFieldEndDate).toInt());
-    traceout;
+    if (!item) {
+        err = ErrInvalidArg;
+        loge("invalid arg");
+    }
+    if (err == ErrNone) {
+        err = DbSqliteTbl::updateModelFromQuery(item, qry);
+    }
+    if (err == ErrNone) {
+        PersonEvent* model = (PersonEvent*) item;
+        if (qry.value(KFieldPersonEventUid).isValid()) {
+            model->setUid(qry.value(KFieldPersonEventUid).toString());
+        }
+        if (qry.value(KFieldPersonEventNameId).isValid()) {
+            model->setNameId(qry.value(KFieldPersonEventNameId).toString());
+        }
+        model->setName(qry.value(KFieldName).toString());
+        model->setPersonUid(qry.value(KFieldPersonId).toString());
+        model->setEventUid(qry.value(KFieldEventUid).toString());
+        model->setEventName(qry.value(KFieldEventName).toString());
+        model->setDate(qry.value(KFieldDate).toInt());
+        model->setEndDate(qry.value(KFieldEndDate).toInt());
+    }
+    if (err == ErrNone) {
+        logd("updated for model '%s'", STR2CHA(item->toString()));
+    }
+    traceret(err);
     return err;
 }
 
@@ -99,12 +129,21 @@ ErrCode DbSqlitePersonEventTbl::getListEvents(const QString &personUid,
                                                             qint64 date)
 {
     tracein;
-//    DB->openDb();
     QSqlQuery qry(SQLITE->currentDb());
     ErrCode ret = ErrNone;
     tracein;
-    QString queryString = QString("SELECT * "
-                                  "FROM %1").arg(name());
+    QString queryString = QString("SELECT *, "
+                                  "%2.%5 AS %6, "
+                                  "%1.%4 AS %7, "
+                                  "%1.%8 AS %9, "
+                                  "%2.%8 AS %10 "
+                                  "FROM %1 LEFT JOIN %2 ON %1.%3 = %2.%4")
+                              .arg(name(), KTableEvent) //1 & 2
+                              .arg(KFieldEventUid, KFieldUid) //3 & 4
+                              .arg(KFieldName, KFieldEventName) //5 & 6
+                              .arg(KFieldPersonEventUid, KFieldNameId) //7 & 8
+                              .arg(KFieldPersonEventNameId, KFieldEventNameId) //9 & 10
+                                ;
     bool hasEid = false;
     bool hasDate = false;
 
@@ -119,6 +158,7 @@ ErrCode DbSqlitePersonEventTbl::getListEvents(const QString &personUid,
             condString += QString("AND %1 = :date").arg(KFieldDate);
             hasDate = true;
         }
+        appendDbStatusCond(condString, DB_RECORD_ACTIVE);
         if (!condString.isEmpty())
             queryString += " WHERE " + condString;
 
@@ -137,15 +177,20 @@ ErrCode DbSqlitePersonEventTbl::getListEvents(const QString &personUid,
         {
             while (qry.next()) {
                 PersonEvent* item = (PersonEvent*)PersonEvent::build();
-                item->setDbId(qry.value(KFieldId).toInt());
-                item->setDbStatus(qry.value(KFieldDbStatus).toInt());
-                item->setName(qry.value(KFieldName).toString());
-                item->setUid(qry.value(KFieldUid).toString());
-                item->setPersonUid(qry.value(KFieldPersonId).toString());
-                item->setEventUid(qry.value(KFieldEventId).toString());
-                item->setDate(qry.value(KFieldDate).toInt());
-                item->setEndDate(qry.value(KFieldEndDate).toInt());
-                list.append(item); // TODO: when it cleaned up?????
+                ErrCode tmpret = updateModelFromQuery(item, qry);
+                if (tmpret == ErrNone) {
+    //                item->setDbId(qry.value(KFieldId).toInt());
+    //                item->setDbStatus(qry.value(KFieldDbStatus).toInt());
+    //                item->setName(qry.value(KFieldName).toString());
+    //                item->setUid(qry.value(KFieldUid).toString());
+    //                item->setPersonUid(qry.value(KFieldPersonId).toString());
+    //                item->setEventUid(qry.value(KFieldEventId).toString());
+    //                item->setDate(qry.value(KFieldDate).toInt());
+    //                item->setEndDate(qry.value(KFieldEndDate).toInt());
+                    list.append(item); // TODO: when it cleaned up?????
+                } else {
+                    loge("faield to update for item ret=%d", tmpret);
+                }
             }
         }
         else {
@@ -162,4 +207,47 @@ ErrCode DbSqlitePersonEventTbl::getListEvents(const QString &personUid,
     logd("ret %d", ret);
     traceret(ret);
     return ret;
+}
+
+ErrCode DbSqlitePersonEventTbl::updateTableField(DbSqliteUpdateBuilder *builder, const QList<QString> &updateField, const DbModel *item)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    if (!builder || !item) {
+        err = ErrInvalidArg;
+        loge("invalid arg");
+    }
+    if (err == ErrNone) {
+        err = DbSqliteTbl::updateTableField(builder, updateField, item);
+    }
+
+    if (err == ErrNone) {
+        if (item->modelName() == KModelNamePersonEvent) {
+            PersonEvent* comm = (PersonEvent*) item;
+            foreach (QString field, updateField) {
+                logd("Update field %s", STR2CHA(field));
+                if (field == KItemEvent) {
+                    builder->addValue(KFieldEventUid, comm->eventUid());
+
+                } else if (field == KItemEndDate) {
+                    builder->addValue(KFieldEndDate, comm->endDate());
+
+                } else if (field == KItemPerson) {
+                    builder->addValue(KFieldPersonId, comm->personUid());
+
+                } else if (field == KItemDate) {
+                    builder->addValue(KFieldDate, comm->date());
+
+                } else {
+                    logw("Field '%s' not support here", STR2CHA(field));
+                }
+            }
+        } else {
+            logw("Model name '%s' is no support",
+                 STR2CHA(item->modelName()));
+        }
+    }
+    traceret(err);
+    return err;
+
 }

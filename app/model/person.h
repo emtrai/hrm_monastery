@@ -41,6 +41,7 @@ class Education;
 class Work;
 class Person;
 class ModelController;
+class PersonEvent;
 
 typedef QString *GET_DATA_FUNC();
 
@@ -90,6 +91,7 @@ public:
 
     QString getFullName() const;
     QString fullName() const;
+    QString displayName();
     ErrCode fromCSVFile(const QString& fname);
 
     virtual DataExporter* getExporter();
@@ -352,6 +354,7 @@ public:
 
     const QStringList &eventUidList() const;
     void setEventUidList(const QStringList &newEventUidList);
+    void addEventUid(const QString &eventUid);
 
     const QString &otherContact() const;
     void setOtherContact(const QString &newOtherContact);
@@ -429,7 +432,21 @@ public:
     virtual ErrCode update(bool allFields = false);
     virtual ErrCode remove(bool force = false, QString* msg = nullptr);
 
+    virtual const QList<DbModel *> personEventList(bool reload = false);
+    /**
+     * @brief personEventMap
+     * @param reload
+     * @return map of key is nameid & dbmodel
+     */
+    virtual const QHash<QString, DbModel *> personEventMap(bool reload = false);
+    virtual void setPersonEventList(const QList<DbModel *> &newPersonEventList);
+    virtual ErrCode addPersonEvent(const DbModel* event);
+    virtual ErrCode delPersonEvent(const DbModel* event);
+
+    bool personEventListUpdated() const;
+
 protected:
+    virtual void check2ReloadPersonEventList(bool reload = false);
     virtual DbModelHandler *getDbModelHandler() const;
     virtual const QString exportTemplatePath(FileExporter* exporter, QString* ftype = nullptr) const;
 
@@ -582,7 +599,8 @@ protected:
     QString mDeadPlace; // noi chon cat
 
     QStringList mEventUidList;
-
+    QHash<QString, DbModel*> mPersonEventList;
+    bool mPersonEventListUpdated;
 };
 
 #endif // PEOPLE_H

@@ -580,6 +580,7 @@ QString Utils::UidFromName(const QString &name, UidNameConvertType type, bool* i
     QString normalize = name.simplified();
     QString uid;
     logd("conver type %d", type);
+    logd("name %s", STR2CHA(name));
     switch (type){
     case HASH_NAME:
         logd("Calc uid from name with hash");
@@ -589,7 +590,8 @@ QString Utils::UidFromName(const QString &name, UidNameConvertType type, bool* i
         uid = normalize.toUpper();
         break;
     case NO_VN_MARK_UPPER:
-        uid = removeVietnameseSign(normalize.replace(' ', '_').toUpper());
+        uid = removeVietnameseSign(normalize.toUpper());
+        uid = removeSpecialChar(uid, "_");
         break;
     default:
         loge("Not support type %d", type);
@@ -648,7 +650,39 @@ QString Utils::removeVietnameseSign(const QString &vietnameseString)
         for (int j = 0; j < VNSigns[i].length(); j++)
             finalString = finalString.replace(VNSigns[i][j], VNSigns[0][i - 1]);
 
+    logd("vietnameseString '%s' -> finalString '%s'",
+         STR2CHA(vietnameseString), STR2CHA(finalString));
+    traceout;
+    return finalString;
+}
+
+QString Utils::removeSpecialChar(const QString &string, const QString &replacement, const QString &specialChar)
+{
+    tracein;
+    QString finalString;
+    int numEle = string.length();
+    logd("numEle '%d'", numEle);
+    logd("string '%s'", STR2CHA(string));
+    logd("replacement '%s'", STR2CHA(replacement));
+    logd("specialChar '%s'", STR2CHA(specialChar));
+    bool isSpecial = false;
+    for (int i = 0; i < numEle; i++) {
+        isSpecial = false;
+        for (int j = 0; j < specialChar.length(); j++) {
+            if (string[i] == specialChar[j]) {
+                if (!replacement.isEmpty()) {
+                    finalString += replacement;
+                }
+                isSpecial = true;
+                break;
+            }
+        }
+        if (!isSpecial) {
+            finalString += string[i];
+        }
+    }
     logd("finalString '%s'", finalString.toStdString().c_str());
+    traceout;
     return finalString;
 }
 
@@ -681,12 +715,12 @@ void Utils::showErrorBox(const QString &msg)
     traceout;
 }
 
-void Utils::showErrorBox(int ret, const QString *msg)
+void Utils::showErrorBox(int ret, const QString& msg)
 {
     tracein;
     QString errMsg;
-    if (msg != nullptr) {
-        errMsg.append(*msg);
+    if (!msg.isEmpty()) {
+        errMsg.append(msg);
         errMsg.append("\n");
     }
     errMsg.append(QString("Lỗi ! Mã lỗi %1").arg(ret)); // TODO: translation
@@ -801,7 +835,7 @@ ErrCode Utils::getCurrentComboxDataString(const QComboBox *cb, QString *data, QS
     return ret;
 }
 
-ErrCode Utils::setSelectItemComboxByData(QComboBox *cb, const QVariant &data)
+ErrCode Utils::setSelectItemComboxByData(QComboBox *cb, const QVariant &data, int* index)
 {
     tracein;
     int cnt = cb->count();
@@ -815,6 +849,7 @@ ErrCode Utils::setSelectItemComboxByData(QComboBox *cb, const QVariant &data)
             cb->setCurrentIndex(i);
             ret = ErrNone;
             logd("found item at %d: %s", i, data.toString().toStdString().c_str());
+            if (index) *index = i;
             break;
         } else {
             cb->setCurrentIndex(0);

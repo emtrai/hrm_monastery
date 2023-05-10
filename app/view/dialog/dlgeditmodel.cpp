@@ -117,5 +117,8 @@ void DlgEditModel::on_txtName_textChanged(const QString &arg1)
 void DlgEditModel::on_btnChangeCode_clicked()
 {
     this->onEditnameId(ui->txtNameId);
+    if (ui->txtNameId->text().length() == 0) { // custome nameid is null, make it auto generate
+        onChangeNameIdTxt(ui->txtNameId, ui->txtName->text());
+    }
 }
 

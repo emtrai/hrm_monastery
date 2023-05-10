@@ -52,11 +52,6 @@ DlgAreaPerson::~DlgAreaPerson()
     }
 }
 
-void DlgAreaPerson::setupUI()
-{
-    traced;
-}
-
 ErrCode DlgAreaPerson::buildModel(DbModel *model, QString &errMsg)
 {
     tracein;

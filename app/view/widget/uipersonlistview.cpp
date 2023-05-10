@@ -32,6 +32,7 @@
 #include "view/dialog/dlgimportpersonlistresult.h"
 #include "view/dialog/dlghtmlviewer.h"
 #include "view/dialog/dlgsearchcommunity.h"
+#include "view/widget/uipersoneventlistview.h"
 #include <QFile>
 #include "filter.h"
 #include "dlgperson.h"
@@ -235,6 +236,10 @@ QList<UITableMenuAction *> UIPersonListView::getMenuSingleSelectedItemActions(co
                                                    ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                        return this->onChangeCommunity(m, a);
                                                    }));
+    actionList.append(UITableMenuAction::build(tr("Xem thông tin sự kiện"), this, item)
+                                                   ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                                       return this->onMenuActionViewPersonEvent(m, a);
+                                                   }));
     actionList.append(UITableMenuAction::build(tr("Xuất thông tin Nữ tu"), this, item)
                                                     ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                         return this->exportPersonInfo(m, a);
@@ -338,6 +343,28 @@ ErrCode UIPersonListView::onChangeCommunity(QMenu *menu, UITableMenuAction *act)
     // TODO: update history of person/community??
     // TODO: update event of person???
     delete dlg;
+    traceret(ret);
+    return ret;
+}
+
+ErrCode UIPersonListView::onMenuActionViewPersonEvent(QMenu *menu, UITableMenuAction *act)
+{
+    tracein;
+    ErrCode ret = ErrNone;
+    Person* person = dynamic_cast<Person*>(act->getData());
+    if (person != nullptr) {
+        UIPersonEventListView* view =
+            (UIPersonEventListView*)UITableViewFactory::getView(ViewType::VIEW_PERSON_EVENT);
+
+        logd("view event of person %s", STR2CHA(person->toString()));
+        view->setPerson(person);
+        MainWindow::getInstance()->switchView(view);
+    } else {
+        loge("no person event info");
+        ret = ErrNoData;
+        Utils::showErrorBox(tr("Vui lòng chọn cộng đoàn cần xem"));
+    }
+
     traceret(ret);
     return ret;
 }
@@ -536,4 +563,9 @@ void UIPersonListView::onMainWindownImportEnd(ImportTarget target, ErrCode err, 
 {
     mSuspendReloadOnDbUpdate = false;
     reload();
+}
+
+QString UIPersonListView::getMainModelName()
+{
+    return KModelNamePerson;
 }

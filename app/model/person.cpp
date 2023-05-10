@@ -44,6 +44,8 @@
 
 #include "prebuiltdefs.h"
 #include "imagedefs.h"
+#include "personevent.h"
+#include "personctl.h"
 
 #define SPLIT_EMAIL_TEL ";"
 // TODO: show person code instead of uid?? uid should use for debug only?
@@ -79,6 +81,7 @@ Person::Person():DbModel()
     , mRetireDate(0)
     , mDeadDate(0)
     , mIsDeleteImg(false)
+    , mPersonEventListUpdated(false)
 {
     init();
 }
@@ -88,6 +91,8 @@ Person::~Person()
 {
     tracein;
     // TODO: free resource
+
+    RELEASE_HASH(mPersonEventList, QString, DbModel);
 }
 
 void Person::clone(const DbModel *model)
@@ -209,6 +214,10 @@ void Person::clone(const DbModel *model)
         mCurrentWorkUid = per->currentWorkUid();
         mCurrentWorkName = per->currentWorkName();
         mWorkHistory = per->workHistory();
+
+        mEventUidList = per->eventUidList();
+        setPersonEventList(per->personEventList());
+        mPersonEventListUpdated = per->mPersonEventListUpdated;
     } else {
         loge("no model to clone");
     }
@@ -985,6 +994,11 @@ QString Person::fullName() const
     return getFullName();
 }
 
+QString Person::displayName()
+{
+    return QString("%1 %2").arg(hollyName(), fullName());
+}
+
 
 qint64 Person::christenDate() const
 {
@@ -1045,6 +1059,118 @@ ErrCode Person::prepare2Save()
     }
     traceret(ret);
     return ret;
+}
+
+bool Person::personEventListUpdated() const
+{
+    return mPersonEventListUpdated;
+}
+
+void Person::check2ReloadPersonEventList(bool reload)
+{
+    tracein;
+    logd("mPersonEventListUpdated %d", mPersonEventListUpdated);
+    logd("reload %d", reload);
+    if (!mPersonEventListUpdated || reload) {
+        QList<DbModel*> list;
+        ErrCode err = PERSONCTL->getListEvents(uid(), list);
+        if (err == ErrNone) {
+            setPersonEventList(list);
+            logd("no of person event %ld", mPersonEventList.size());
+        } else {
+            loge("failed to load person event ret = %d", err);
+        }
+    }
+    traceout;
+}
+
+const QList<DbModel *> Person::personEventList(bool reload)
+{
+    tracein;
+    check2ReloadPersonEventList(reload);
+    traceout;
+    return mPersonEventList.values();
+}
+
+const QHash<QString, DbModel *> Person::personEventMap(bool reload)
+{
+    tracein;
+    check2ReloadPersonEventList(reload);
+    traceout;
+    return mPersonEventList;
+}
+
+void Person::setPersonEventList(const QList<DbModel *> &newPersonEventList)
+{
+    tracein;
+    RELEASE_HASH(mPersonEventList, QString, DbModel);
+    foreach (DbModel* model, newPersonEventList) {
+        addPersonEvent(model);
+    }
+    traceout;
+}
+
+ErrCode Person::addPersonEvent(const DbModel *event)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    if (event) {
+        logd("clone event '%s'", STR2CHA(event->toString()));
+        DbModel* newEvent = event->clone();
+        if (newEvent) {
+            mPersonEventList.insert(newEvent->nameId(), newEvent);
+            markItemAsModified(KItemPersonEvent);
+            mPersonEventListUpdated = true;
+        } else {
+            err = ErrNoMemory;
+            loge("failed to allocate memory for new event '%s'", STR2CHA(event->toString()));
+        }
+    } else {
+        loge("No event to add");
+        err = ErrInvalidArg;
+    }
+    traceret(err);
+    return err;
+}
+
+ErrCode Person::delPersonEvent(const DbModel *event)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    if (!event) {
+        loge("invalid argument");
+        err = ErrInvalidArg;
+    }
+    if (err == ErrNone && mPersonEventList.size() > 0) {
+        int idx = 0;
+        DbModel* item = nullptr;
+        QString foundKey;
+        foreach (QString key, mPersonEventList.keys()) {
+            DbModel* item = mPersonEventList.value(key);
+            if (item) {
+                if (!event->uid().isEmpty() &&
+                    (event->uid() == item->uid())) {
+                    foundKey = key;
+                    break;
+                } else if (event->nameId() == item->nameId()) {
+                    foundKey = key;
+                    break;
+                }
+            }
+        }
+        logd("idx=%d", idx);
+        if (!foundKey.isEmpty()) {
+            if (item) {
+                logd("deleted item '%s'", STR2CHA(item->toString()));
+                delete item;
+            }
+            logd("Remove foundKey=%s", STR2CHA(foundKey));
+            mPersonEventList.remove(foundKey);
+            mPersonEventListUpdated = true;
+        }
+    }
+    traceret(err);
+    return err;
 }
 
 const QString &Person::communityNameId() const
@@ -1364,6 +1490,11 @@ void Person::setEventUidList(const QStringList &newEventUidList)
 {
     mEventUidList = newEventUidList;
     markItemAsModified(KItemEvent);
+}
+
+void Person::addEventUid(const QString &eventUid)
+{
+    mEventUidList.append(eventUid);
 }
 
 QString Person::imgId()

@@ -80,7 +80,7 @@ ErrCode DbSqliteModelHandler::update(DbModel *model)
             err = tbl->update(model);
         } else {
             err = ErrNotExist;
-            loge("model %s not exist", model->name().toStdString().c_str());
+            loge("model %s not exist", MODELSTR2CHA(model));
         }
     }
     else{

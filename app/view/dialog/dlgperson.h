@@ -67,6 +67,7 @@ class DlgPerson : public QDialog, public UIMultiComboxViewListener, public Commo
 
              private:
                 void setupUI();
+                Person *getPerson();
                 ErrCode buildPerson(Person* person);
                 ErrCode fromPerson(const Person* person);
                 void multiComboxItemUpdate(UIMultiComboxView *cb, QLineEdit* txt = nullptr);
@@ -148,13 +149,15 @@ private slots:
     void on_btnSearchEternalVowsCEO_clicked();
 
 
+    void on_btnModifyEvent_clicked();
+
 private:
     Person* mPerson;
     UIMultiComboxView *cbSaints;
     UIMultiComboxView *cbSpecialist;
     DlgPerson::Mode mEditMode;
 
-    QList<PersonEvent*> mListPersonEvent;
+    QList<DbModel*> mListPersonEvent;
     bool mIsNew; // true: add new, false: edit/update
     bool mIsSelfSave; //true: auto save on accept, false: not save
     bool mInitDone;

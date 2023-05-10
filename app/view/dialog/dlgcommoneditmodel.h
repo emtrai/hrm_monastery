@@ -93,6 +93,12 @@ public:
     void setModel(DbModel *newModel);
 
     void setModelName(const QString &newModelName);
+    /**
+     * @brief return current model object, create new if not created yes
+     * @return model. Caller must clone this if want to keep for later processing
+     *         as returned one will be freed when dialog is closed
+     */
+    virtual DbModel* model();
 
 protected:
     virtual QDialogButtonBox* buttonBox();
@@ -102,11 +108,6 @@ protected:
      * @return
      */
     virtual DbModel* newModel() = 0;
-    /**
-     * @brief return current model object, create new if not created yes
-     * @return
-     */
-    virtual DbModel* model();
 
     virtual void accept();
     /**

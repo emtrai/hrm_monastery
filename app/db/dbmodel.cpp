@@ -82,6 +82,7 @@ void DbModel::copy(const DbModel &model)
     mUpdateAllFields = model.updateAllFields();
     mExportCallbacks = model.mExportCallbacks;
     mImportCallbacks = model.mImportCallbacks;
+    mUpdatedField = model.mUpdatedField;
     traceout;
 }
 
@@ -120,6 +121,36 @@ DbModel *DbModel::clone() const
     model->clone((DbModel*)this);
     traceout;
     return model;
+}
+
+ErrCode DbModel::copyData(const DbModel *model)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    if (model) {
+        mName = model->name();
+        markItemAsModified(KItemName);
+        mRemark = model->remark();
+        markItemAsModified(KItemRemark);
+//        mDeletable = model->mDeletable;
+//        mDbId = model->dbId();
+//        mUid = model->uid();
+//        mNameId = model->nameId();
+//        mDbStatus = model->dbStatus();
+//        mDbHistory = model->dbHistory();
+//        mDbCreatedTime = model->dbCreatedTime();
+//        mLastDbUpdatedTime = model->lastDbUpdatedTime();
+//        mMarkModified = model->markModified();
+//        mUpdateAllFields = model->updateAllFields();
+//        mExportCallbacks = model->mExportCallbacks;
+//        mImportCallbacks = model->mImportCallbacks;
+//        mUpdatedField = model->mUpdatedField;
+    } else {
+        loge("copy data failed, empty model");
+        err = ErrInvalidArg;
+    }
+    traceret(err);
+    return err;
 }
 
 
@@ -213,22 +244,6 @@ QString DbModel::modelStatus2Name(DbModelStatus status)
 const QList<int>* DbModel::getModelStatusList()
 {
     tracein;
-    static bool isInitiedDbStatus = false;
-    static QList<int> dbstatusList;
-    if (!isInitiedDbStatus) {
-        dbstatusList.push_back(DB_RECORD_NOT_READY);
-        dbstatusList.push_back(DB_RECORD_ACTIVE);
-        dbstatusList.push_back(DB_RECORD_DElETED);
-        isInitiedDbStatus = true;
-    }
-    // TODO: make it as static to load once only???
-    traceout;
-    return &dbstatusList;
-}
-
-const QList<int>* DbModel::getDbStatusList()
-{
-    tracein;
     static bool isInitiedStatus = false;
     static QList<int> statusList;
     if (!isInitiedStatus) {
@@ -241,6 +256,22 @@ const QList<int>* DbModel::getDbStatusList()
     // TODO: make it as static to load once only???
     traceout;
     return &statusList;
+}
+
+const QList<int>* DbModel::getDbStatusList()
+{
+    tracein;
+    static bool isInitiedDbStatus = false;
+    static QList<int> dbstatusList;
+    if (!isInitiedDbStatus) {
+        dbstatusList.push_back(DB_RECORD_NOT_READY);
+        dbstatusList.push_back(DB_RECORD_ACTIVE);
+        dbstatusList.push_back(DB_RECORD_DElETED);
+        isInitiedDbStatus = true;
+    }
+    // TODO: make it as static to load once only???
+    traceout;
+    return &dbstatusList;
 }
 
 DbModelBuilder DbModel::getBuilderByModelName(const QString& modelName)
@@ -671,6 +702,7 @@ void DbModel::dump()
     logd("- modelName %s", modelName().toStdString().c_str());
     logd("- DbId %lld", dbId());
     logd("- Uid %s", uid().toStdString().c_str());
+    logd("- NameId %s", nameId().toStdString().c_str());
     logd("- Name %s", name().toStdString().c_str());
     logd("- mDbCreatedTime %s", Utils::timeMsToDatestring(dbCreatedTime()).toStdString().c_str());
     logd("- mLastDbUpdatedTime %s", Utils::timeMsToDatestring(lastDbUpdatedTime()).toStdString().c_str());

@@ -29,85 +29,293 @@
 #include "utils.h"
 #include "eventctl.h"
 #include "event.h"
+#include "person.h"
+#include "dlgsearchperson.h"
 
 DlgAddPersonEvent::DlgAddPersonEvent(QWidget *parent) :
-    QDialog(parent),
+    DlgCommonEditModel(parent),
     ui(new Ui::DlgAddPersonEvent),
-    mPersonEvent(nullptr)
+    mPerson(nullptr),
+    mEvent(nullptr)
 {
     tracein;
     ui->setupUi(this);
-
-    QList<DbModel*> eventList = INSTANCE(EventCtl)->getAllItemsFromDb(); // TODO: getAllItem???
-
-    ui->cbEvent->clear();
-    foreach(DbModel* item, eventList){
-        ui->cbEvent->addItem(item->name(), item->uid());
-    }
-
+    loadEvent();
 }
 
 DlgAddPersonEvent::~DlgAddPersonEvent()
 {
     tracein;
     delete ui;
-
-    if (mPersonEvent != nullptr) {
-        delete mPersonEvent;
-        mPersonEvent = nullptr;
+    if (mPerson != nullptr) {
+        delete mPerson;
+        mPerson = nullptr;
     }
+    if (mEvent != nullptr) {
+        delete mEvent;
+        mEvent = nullptr;
+    }
+    RELEASE_LIST_DBMODEL(mEventList);
+    traceout;
 }
 
-
-void DlgAddPersonEvent::accept()
+ErrCode DlgAddPersonEvent::buildModel(DbModel *model, QString &errMsg)
 {
     tracein;
-    ErrCode ret = ErrNone;
-    QString name = ui->txtTitle->text().trimmed();
-    QString date = ui->txtDate->text().trimmed();
-    QString endDate = ui->txtEndDate->text().trimmed();
-    QString remark = ui->txtRemark->toPlainText().trimmed();
-    QString eventName;
-    QString eventUid;
-    ret = Utils::getCurrentComboxDataString(ui->cbEvent, &eventUid, &eventName);
-    logd("get combox data ret %d", ret);
-    if ((ret == ErrNone) && !name.isEmpty() && !eventUid.isEmpty()){
-        logd("Setup Person");
-        if (mPersonEvent == nullptr)
-            mPersonEvent = new PersonEvent();
-        if (mPersonEvent != nullptr){
-            mPersonEvent->setName(name); // TODO: validate info
-
-            if (!eventUid.isEmpty())
-                mPersonEvent->setEventUid(eventUid);
-            if (!date.isEmpty())
-                mPersonEvent->setDate(Utils::dateFromString(date));
-
-            if (!endDate.isEmpty())
-                mPersonEvent->setEndDate(Utils::dateFromString(endDate));
-
-            mPersonEvent->setRemark(remark);
-
-            if (!eventName.isEmpty())
-                mPersonEvent->setEventName(eventName);
-
-        } else {
-            ret = ErrNoMemory;
-            loge("No memory");
-        }
-    } else {
-        if (ret == ErrNone) ret = ErrInvalidData;
-        loge("Title or event field is empty, or event error return %d", ret);
+    ErrCode err = ErrNone;
+    if (!model) {
+        err = ErrInvalidArg;
+        loge("Invalid argument, null model");
     }
 
-    logi("Make PersonEvent, ret %d", ret);
-    if (ret == ErrNone)
-        QDialog::accept();
-    else
-        Utils::showErrorBox(ret);
+    if (err == ErrNone && !mPerson) {
+        err = ErrNoData;
+        loge("No person object to be set");
+    }
+    if (err == ErrNone) {
+        PersonEvent * per = (PersonEvent*) model;
+        if (err == ErrNone){
+            per->setMarkModified(true); // start marking fields which are modified
+        }
+        per->setName(ui->txtTitle->text().trimmed());
+        SET_VAL_FROM_TEXTBOX(ui->txtPersonName, KItemPerson, per->setPersonUid, per->setPersonName);
+        SET_VAL_FROM_CBOX(ui->cbEvent, per->setEventUid, per->setEventName, err);
+        SET_DATE_VAL_FROM_WIDGET(ui->txtDate, per->setDate);
+        SET_DATE_VAL_FROM_WIDGET(ui->txtEndDate, per->setEndDate);
+        QString nameid = ui->txtNameId->text().trimmed();
+        if (!nameid.isEmpty()) {
+            per->setNameId(nameid);
+        } else {
+            err = ErrNoData;
+            loge("Lack of nameId");
+        }
+        QString remark = ui->txtRemark->toPlainText().trimmed();
+        if (!remark.isEmpty()) {
+            per->setRemark(remark);
+        }
+    }
+    traceret(err);
+    return err;
+
 }
 
-PersonEvent *DlgAddPersonEvent::personEvent() const
+ErrCode DlgAddPersonEvent::fromModel(const DbModel *item)
 {
-    return mPersonEvent;
+    tracein;
+    ErrCode err = ErrNone;
+    if (item && item->modelName() == KModelNamePersonEvent) {
+        err = DlgCommonEditModel::fromModel(item);
+        PersonEvent* comm = (PersonEvent*)model();
+        if (err == ErrNone) {
+            if (!comm->eventUid().isEmpty()) {
+                setSelectedEvent(comm->eventUid());
+            }
+            Utils::setSelectItemComboxByData(ui->cbEvent, comm->eventUid());
+            ui->txtTitle->setText(comm->name());
+            ui->txtDate->setText(Utils::date2String(comm->date(), DEFAULT_FORMAT_YMD));
+            ui->txtEndDate->setText(Utils::date2String(comm->endDate(), DEFAULT_FORMAT_YMD));
+            ui->txtRemark->setPlainText(comm->remark());
+            ui->btnSearch->setEnabled(false); // not allow to change person
+            QString nameid = comm->nameId();
+            if (!comm->personUid().isEmpty()) {
+                logd("Search person uid '%s'", STR2CHA(comm->personUid()));
+                Person* per = (Person*)PERSONCTL->getModelByUid(comm->personUid());
+                if (per) {
+                    setPerson(per);
+                    delete per;
+                } else {
+                    loge("Not found person uid '%s'", STR2CHA(comm->personUid()));
+                }
+            } else {
+                loge("No person uid");
+            }
+            if (nameid.isEmpty()) {
+                updateNameId();
+            }
+            ui->txtNameId->setText(nameid);
+        }
+    } else {
+        err = ErrInvalidArg;
+        loge("null item or invalid model '%s'", MODELNAME2CHA(item));
+    }
+    traceret(err);
+    return err;
+
 }
+
+void DlgAddPersonEvent::setSelectedEvent(int index)
+{
+    tracein;
+    logd("set selected idx %d", index);
+    if (index >= 0 && index < mEventList.size()) {
+        QVariant value = ui->cbEvent->itemData(index);
+        if (!value.isNull()) {
+            DbModel* event = mEventList.at(index);
+            if (event != nullptr) {
+                if (event->uid() == value.toString()) {
+                    if (mEvent) delete mEvent;
+                    mEvent = (Event*)event->clone();
+                    updateNameId();
+                } else {
+                    loge("something went wrong, list uid '%s' not match with cb uid '%s'",
+                         STR2CHA(event->toString()),
+                         STR2CHA(value.toString())
+                         );
+                }
+            }
+        }
+    } else {
+        loge("invalid index %d", index);
+    }
+    traceout;
+}
+
+void DlgAddPersonEvent::updateNameId()
+{
+    QString nameId = mPerson?mPerson->nameId():"KHONG";
+    nameId += "_";
+    nameId += mEvent?mEvent->nameId():"KHONG";
+    nameId += "_";
+    nameId += ui->txtDate->text();
+    DlgCommonEditModel::onChangeNameIdTxt(ui->txtNameId, nameId);
+}
+
+bool DlgAddPersonEvent::onValidateData(QString &msg)
+{
+    tracein;
+    bool isValid = true;
+    if (mModel) {
+        PersonEvent* event = (PersonEvent*)mModel;
+        if (event->nameId().isEmpty()) {
+            msg += tr("Thiếu mã định danh.");
+            isValid = false;
+            logw("lack name id");
+        }
+        if (event->date() == 0) {
+            msg += tr("Thiếu ngày/tháng");
+            isValid = false;
+            logw("lack date");
+        }
+    } else {
+        logw("no model to check");
+        isValid = false;
+    }
+    logd("is valid %d", isValid);
+    // TODO: implement this????
+    // TODO do we need this? or just implement on buildModel are enough??
+    traceout;
+    return isValid;
+}
+
+void DlgAddPersonEvent::loadEvent()
+{
+    tracein;
+    RELEASE_LIST_DBMODEL(mEventList);
+    mEventList = INSTANCE(EventCtl)->getAllItems(); // TODO: getAllItem???
+    logd("the number of eventList %lld", mEventList.count());
+    ui->cbEvent->clear();
+
+    if (mEventList.size() > 0) {
+        foreach(DbModel* item, mEventList){
+            ui->cbEvent->addItem(item->name(), item->uid());
+            // TODO: data is sorted???
+        }
+        ui->cbEvent->setCurrentIndex(0);
+        setSelectedEvent(0);
+    } else {
+        logi("Not data to load");
+    }
+    traceout;
+}
+
+void DlgAddPersonEvent::setSelectedEvent(const QString &eventUid)
+{
+    tracein;
+    int index = -1;
+    ErrCode err = Utils::setSelectItemComboxByData(ui->cbEvent, eventUid, &index);
+    if (err == ErrNone && index >= 0) {
+        logd("event idx = %d", index);
+        setSelectedEvent(index);
+    } else {
+        loge("set event failed, err = %d", err);
+    }
+    traceout;
+}
+
+QDialogButtonBox *DlgAddPersonEvent::buttonBox()
+{
+    return ui->buttonBox;
+}
+
+DbModel *DlgAddPersonEvent::newModel()
+{
+    return PersonEvent::build();
+}
+
+void DlgAddPersonEvent::on_btnSearch_clicked()
+{
+    tracein;
+    DlgSearchPerson * dlg = DlgSearchPerson::build(this, true);
+    if (dlg == nullptr) {
+        loge("Open dlg DlgAddPersonEvent fail, No memory");
+        return; // TODO: open dlg??
+    }
+    dlg->setIsMultiSelection(false);
+
+    if (dlg->exec() == QDialog::Accepted){
+        Person* per = (Person*)dlg->selectedItem();
+        if (per != nullptr) {
+            setPerson(per);
+            delete per;
+        } else {
+            logi("No person selected");
+        }
+    }
+    delete dlg;
+    traceout;
+}
+
+
+void DlgAddPersonEvent::on_btnChangeNameId_clicked()
+{
+    DlgCommonEditModel::onEditnameId(ui->txtNameId);
+    if (ui->txtNameId->text().length() == 0) { // custome nameid is null, make it auto generate
+        updateNameId();
+    }
+}
+
+void DlgAddPersonEvent::on_txtDate_textChanged(const QString &arg1)
+{
+    updateNameId();
+}
+
+
+void DlgAddPersonEvent::on_cbEvent_currentIndexChanged(int index)
+{
+    tracein;
+    setSelectedEvent(index);
+    traceout;
+}
+
+void DlgAddPersonEvent::setPerson(Person *newPerson)
+{
+    tracein;
+    if (mPerson) {
+        delete mPerson;
+        mPerson = nullptr;
+    }
+    if (newPerson) {
+        logd("clone new person");
+        mPerson = (Person*)(((DbModel*)newPerson)->clone());
+        ui->txtPersonName->setText(mPerson->displayName());
+        ui->lblNameId->setText(mPerson->nameId());
+        logd("setProperty %s", mPerson->uid().toStdString().c_str());
+        ui->txtPersonName->setProperty(KItemPerson, mPerson->uid());
+        ui->btnSearch->setEnabled(false); // not allow to change person info
+        updateNameId();
+    } else {
+        logw("no person is set");
+    }
+    traceout;
+}
+

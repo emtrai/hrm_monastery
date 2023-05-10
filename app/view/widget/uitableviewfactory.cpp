@@ -39,6 +39,7 @@
 #include "view/widget/uiethniclistview.h"
 #include "view/widget/uicourselistview.h"
 #include "view/widget/uitextbrowser.h"
+#include "view/widget/uipersoneventlistview.h"
 
 BaseView *UITableViewFactory::getView(ViewType type, QWidget *parent )
 {
@@ -99,6 +100,9 @@ BaseView *UITableViewFactory::getView(ViewType type, QWidget *parent )
         break;
     case VIEW_COURSE:
         view = new UICourseListView(parent);
+        break;
+    case VIEW_PERSON_EVENT:
+        view = new UIPersonEventListView(parent);
         break;
     default:
         break;

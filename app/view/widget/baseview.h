@@ -44,6 +44,7 @@ enum ViewType {
     VIEW_ETHNIC,
     VIEW_COURSE,
     VIEW_SUMMARY,
+    VIEW_PERSON_EVENT,
     VIEW_MAX,
     };
 

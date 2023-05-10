@@ -169,6 +169,7 @@ QString Course::courseTypeName()
 void Course::setCourseType(qint32 newCourseType)
 {
     mCourseType = newCourseType;
+    CHECK_MODIFIED_THEN_SET(mCourseType, newCourseType, KItemCourseType);
 }
 
 
@@ -179,7 +180,8 @@ const QString &Course::period() const
 
 void Course::setPeriod(const QString &newPeriod)
 {
-    mPeriod = newPeriod;
+//    mPeriod = newPeriod;
+    CHECK_MODIFIED_THEN_SET(mPeriod, newPeriod, KItemPeriod);
 }
 
 qint64 Course::endDate() const
@@ -189,7 +191,8 @@ qint64 Course::endDate() const
 
 void Course::setEndDate(qint64 newEndDate)
 {
-    mEndDate = newEndDate;
+//    mEndDate = newEndDate;
+    CHECK_MODIFIED_THEN_SET(mEndDate, newEndDate, KItemEndDate);
 }
 
 qint64 Course::startDate() const
@@ -199,5 +202,6 @@ qint64 Course::startDate() const
 
 void Course::setStartDate(qint64 newStartDate)
 {
-    mStartDate = newStartDate;
+//    mStartDate = newStartDate;
+    CHECK_MODIFIED_THEN_SET(mStartDate, newStartDate, KItemStartDate);
 }

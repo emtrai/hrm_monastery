@@ -24,28 +24,53 @@
 
 #include <QDialog>
 #include <QHash>
+#include "dlgcommoneditmodel.h"
 class PersonEvent;
 class Event;
+class Person;
 
 namespace Ui {
 class DlgAddPersonEvent;
 }
 
-class DlgAddPersonEvent : public QDialog
+class DlgAddPersonEvent : public DlgCommonEditModel
 {
     Q_OBJECT
+    DLG_BUILDER(DlgAddPersonEvent)
 
 public:
     explicit DlgAddPersonEvent(QWidget *parent = nullptr);
     ~DlgAddPersonEvent();
 
-    PersonEvent *personEvent() const;
+    virtual ErrCode buildModel(DbModel* model, QString& errMsg);
+    virtual ErrCode fromModel(const DbModel* model);
+
+    void loadEvent();
+
+    void setSelectedEvent(const QString& eventUid);
+    void setPerson(Person *newPerson);
 
 protected:
-    void accept();
+    virtual QDialogButtonBox* buttonBox();
+    virtual DbModel* newModel();
+
+    void setSelectedEvent(int index);
+    void updateNameId();
+    virtual bool onValidateData(QString& msg);
+private slots:
+    void on_btnSearch_clicked();
+
+    void on_btnChangeNameId_clicked();
+
+    void on_txtDate_textChanged(const QString &arg1);
+
+    void on_cbEvent_currentIndexChanged(int index);
+
 private:
     Ui::DlgAddPersonEvent *ui;
-    PersonEvent* mPersonEvent;
+    Person* mPerson;
+    Event* mEvent;
+    QList<DbModel*> mEventList;
 };
 
 #endif // DLGADDPERSONEVENT_H

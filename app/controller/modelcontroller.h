@@ -20,7 +20,7 @@ class DbModelHandler;
 class OnModelControllerListener {
 public:
     virtual QString getName() = 0;
-    virtual void onModelControllerDataUpdated() = 0;
+    virtual void onModelControllerDataUpdated(const DbModel *model) = 0;
 };
 
 class ModelController: public QObject, public Controller,
@@ -301,9 +301,9 @@ protected:
 private:
     static ErrCode onCsvParseOneItemCallback(const QStringList& items, void* caller, void* param, quint32 idx);
 signals:
-    void dataUpdate();
+    void dataUpdate(const DbModel *model);
 protected slots:
-    void onModelControllerDataUpdated();
+    void onModelControllerDataUpdated(const DbModel *model);
 protected:
     QString mName;
     bool mEnableCache;
