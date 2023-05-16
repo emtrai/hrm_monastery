@@ -82,6 +82,7 @@ void UITableView::setupUI()
     ui->tblList->setMinimumHeight(500);
 
     ui->tblList->setHorizontalHeaderLabels(getHeader());
+    ui->tblList->verticalHeader()->setVisible(true);
 
     setTitle(getTitle());
 
@@ -811,7 +812,8 @@ void UITableView::on_btnFilter_clicked()
 UITableMenuAction::UITableMenuAction(QObject *parent):
     QAction(parent),
     mTblCellItem(nullptr),
-    mMenuType(MENU_ACTION_NORMAL)
+    mMenuType(MENU_ACTION_NORMAL),
+    isMultiSelectedItem(false)
 {
 
 }
@@ -853,6 +855,7 @@ UITableMenuAction *UITableMenuAction::build(const QString &text, QObject *parent
     else
         logd("item is null");
     menu->setTblCellItem(item);
+    menu->setIsMultiSelectedItem(false);
     traceout;
     return menu;
 }
@@ -869,6 +872,7 @@ UITableMenuAction *UITableMenuAction::buildMultiItem(const QString &text, QObjec
     } else {
         logd("Not UITableItem to add");
     }
+    menu->setIsMultiSelectedItem(true);
     traceout;
     return menu;
 }
@@ -887,6 +891,12 @@ const QList<UITableItem *> &UITableMenuAction::itemList() const
     return mItemList;
 }
 
+/**
+ * @brief Get item data (model).
+ *        NOTE: Data is cloned, so caller MUST FREE after use (i.e. use RELEASE_LIST_DBMODEL)
+ * @param outList
+ * @return the number of item
+ */
 int UITableMenuAction::itemListData(QList<DbModel *>&outList)
 {
     tracein;
@@ -902,6 +912,16 @@ int UITableMenuAction::itemListData(QList<DbModel *>&outList)
     }
     traceret(outList.count());
     return outList.count();
+}
+
+bool UITableMenuAction::getIsMultiSelectedItem() const
+{
+    return isMultiSelectedItem;
+}
+
+void UITableMenuAction::setIsMultiSelectedItem(bool newIsMultiSelectedItem)
+{
+    isMultiSelectedItem = newIsMultiSelectedItem;
 }
 
 const std::function<ErrCode (QMenu *, UITableMenuAction *)> &UITableMenuAction::callback() const

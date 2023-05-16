@@ -129,13 +129,24 @@ public:
 
     static UITableMenuAction* buildSeparateAction();
     const QList<UITableItem *> &itemList() const;
+    /**
+     * @brief Get item data (model).
+     *        NOTE: Data is cloned, so caller MUST FREE after use (i.e. use RELEASE_LIST_DBMODEL)
+     * @param outList
+     * @return the number of item
+     */
     int itemListData(QList<DbModel *>&outList);
+    bool getIsMultiSelectedItem() const;
+
+protected:
+    void setIsMultiSelectedItem(bool newIsMultiSelectedItem);
 
 private:
     UITableCellWidgetItem* mTblCellItem;
     QList<UITableItem*> mItemList;
     std::function<ErrCode(QMenu* menu, UITableMenuAction* act)> mCallback;
     UITableMenuActionType mMenuType;
+    bool isMultiSelectedItem;
 };
 
 class UITableView : public QFrame, public BaseView

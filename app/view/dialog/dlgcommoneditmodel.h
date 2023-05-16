@@ -33,7 +33,7 @@ public: \
 inline static className* build(QWidget *parent = nullptr, \
                     bool isSelfSave = true, \
                     QString modelName = nullptr, \
-                    DbModel* model = nullptr, \
+                    const DbModel* model = nullptr, \
                     CommonEditModelListener *listener = nullptr) { \
     tracein; \
     className* dlg = nullptr; \
@@ -93,14 +93,15 @@ public:
     void setModel(DbModel *newModel);
 
     void setModelName(const QString &newModelName);
+    virtual const DbModel* getModel() const;
+
+protected:
     /**
      * @brief return current model object, create new if not created yes
      * @return model. Caller must clone this if want to keep for later processing
      *         as returned one will be freed when dialog is closed
      */
     virtual DbModel* model();
-
-protected:
     virtual QDialogButtonBox* buttonBox();
     /**
      * @brief Create new model object, must be implemeted by derived class
@@ -118,7 +119,7 @@ protected:
     virtual bool onValidateData(QString& msg);
 
     virtual ErrCode loadList(QComboBox* cb, ModelController* ctrl);
-    virtual void onChangeNameIdTxt(QLineEdit* txt, const QString &arg1);
+    virtual void onChangeNameIdTxt(QLineEdit* txt, const QString &arg1, bool direct = true);
     virtual void onEditnameId(QLineEdit* txt);
 protected:
 

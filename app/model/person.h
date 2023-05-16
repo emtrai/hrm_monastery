@@ -57,7 +57,7 @@ public:
      * @param result of validate for each field Field:ErrCode
      * @return ErrNone on ok, ErrInvalidData if data is invalid, other error code otherwhise
      */
-    virtual ErrCode validateAllFields();
+    virtual ErrCode validateAllFields(bool checkExist = false);
 private:
     Person();
     ErrCode commonCheckField(QString& name,

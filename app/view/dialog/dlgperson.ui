@@ -38,7 +38,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-1559</y>
+        <y>-1635</y>
         <width>679</width>
         <height>3135</height>
        </rect>
@@ -1051,7 +1051,11 @@
          <item row="37" column="1">
           <layout class="QVBoxLayout" name="verticalLayout_11">
            <item>
-            <widget class="QTableWidget" name="tblEvents"/>
+            <widget class="QTableWidget" name="tblEvents">
+             <property name="editTriggers">
+              <set>QAbstractItemView::NoEditTriggers</set>
+             </property>
+            </widget>
            </item>
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_15">

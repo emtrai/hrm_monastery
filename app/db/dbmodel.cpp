@@ -730,11 +730,16 @@ DataExporter *DbModel::getExporter()
     return this;
 }
 
-ErrCode DbModel::validateAllFields()
+ErrCode DbModel::validateAllFields(bool checkExist)
 {
     tracein;
-    logi("Should be implemented by derived class");
-    return ErrNone;
+    ErrCode err = ErrNone;
+    if (checkExist && isExist()) {
+        err = ErrExisted;
+        logd("already existed");
+    }
+    traceret(err);
+    return err;
 }
 
 bool DbModel::isExist()

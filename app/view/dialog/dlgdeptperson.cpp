@@ -161,7 +161,7 @@ void DlgDeptPerson::on_btnSearch_clicked()
     tracein;
     DlgSearchPerson * dlg = DlgSearchPerson::build(this, true);
     if (dlg == nullptr) {
-        loge("Open dlg DlgAddPersonEvent fail, No memory");
+        loge("Open dlg DlgDeptPerson fail, No memory");
         return; // TODO: open dlg??
     }
     dlg->setIsMultiSelection(false);

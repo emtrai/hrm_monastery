@@ -152,6 +152,23 @@ do { \
     }\
 } while (0)
 
+#define SET_VAL_FROM_EDITBOX(widget, itemName, func, functxt) \
+do { \
+        logd("SET_VAL_FROM_EDITBOX, itemName %s", itemName);\
+        QString currtxt = widget->toPlainText().trimmed();\
+        if (!currtxt.isEmpty()){ \
+            logd("currtxt %s", currtxt.toStdString().c_str());\
+            QVariant value = widget->property(itemName);\
+            if (!value.isNull()) {\
+                logd("value %s", value.toString().toStdString().c_str());\
+                func(value.toString());\
+                functxt(currtxt);\
+        } else {\
+                logd("%s has no data", itemName);\
+        }\
+    }\
+} while (0)
+
 #define SET_TEXTBOX_FROM_VALUE(wget, itemName, value, txt) \
 do { \
     logd("SET_TEXTBOX_FROM_VALUE, itemName %s", itemName);\
@@ -204,9 +221,7 @@ do { \
 #define FULLNAME(firstName, lastName) QString("%1 %2").arg(lastName, firstName)
 
 #define RELEASE_LIST_DBMODEL(list) \
-    do { \
-        Utils::clearListModel<DbModel>(list); \
-    } while(0)
+    RELEASE_LIST(list, DbModel)
 
 #define RELEASE_LIST(list, T) \
     do { \

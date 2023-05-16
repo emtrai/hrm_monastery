@@ -55,6 +55,48 @@ DbModel *PersonEvent::build()
     return model;
 }
 
+QString PersonEvent::makeNameId(const QString &perNameId, const QString &eventNameId, const QString& date)
+{
+    tracein;
+    bool ok = false;
+    QString nameId = perNameId.isEmpty()?"KHONG":perNameId;
+    nameId += "_";
+    nameId += eventNameId.isEmpty()?"KHONG":eventNameId;
+    if (!date.isEmpty()) {
+        nameId += "_";
+        nameId += date;
+    }
+    logd("nameId '%s'", STR2CHA(nameId));
+    nameId = Utils::UidFromName(nameId, NO_VN_MARK_UPPER, &ok);
+    if (!ok) {
+        nameId.clear();
+    }
+    logd("nameid '%s'", STR2CHA(nameId));
+    traceout;
+    return nameId;
+}
+
+ErrCode PersonEvent::buildNameId(const QString &perNameId, const QString &eventNameId, const QString &date)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    QString dateString = date;
+    if (dateString.isEmpty() && mDate > 0) {
+        dateString = Utils::date2String(mDate);
+    }
+    QString nameId = makeNameId(perNameId,
+                                eventNameId,
+                                dateString);
+    if (!nameId.isEmpty()) {
+        setNameId(nameId);
+    } else {
+        err = ErrFailed;
+        loge("Failed to build name id for '%s'", MODELSTR2CHA(this));
+    }
+    traceret(err);
+    return err;
+}
+
 DbModelBuilder PersonEvent::getBuilder() const
 {
     return &PersonEvent::build;
@@ -139,7 +181,7 @@ void PersonEvent::setPersonName(const QString &newPersonName)
 
 QString PersonEvent::toString() const
 {
-    return QString("%1:%2").arg(DbModel::toString(),Utils::date2String(date()));
+    return QString("%1:%2:%3").arg(DbModel::toString(),Utils::date2String(date()), STR2CHA(eventName()));
 }
 
 qint64 PersonEvent::endDate() const

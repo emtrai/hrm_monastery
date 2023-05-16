@@ -29,7 +29,7 @@
      <item row="0" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QLineEdit" name="txtPersonName">
+        <widget class="QPlainTextEdit" name="txtPersonName">
          <property name="readOnly">
           <bool>true</bool>
          </property>
@@ -43,13 +43,6 @@
         </widget>
        </item>
       </layout>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLabel" name="lblNameId">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
      </item>
      <item row="2" column="0">
       <widget class="QLabel" name="label">
@@ -125,6 +118,13 @@
      </item>
      <item row="7" column="1">
       <widget class="QPlainTextEdit" name="txtRemark"/>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="lblNameId">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

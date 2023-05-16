@@ -32,6 +32,7 @@
 #include "view/dialog/dlgimportpersonlistresult.h"
 #include "view/dialog/dlghtmlviewer.h"
 #include "view/dialog/dlgsearchcommunity.h"
+#include "view/dialog/dlgaddpersonevent.h"
 #include "view/widget/uipersoneventlistview.h"
 #include <QFile>
 #include "filter.h"
@@ -40,6 +41,8 @@
 #include "community.h"
 #include "communityctl.h"
 #include "mainwindow.h"
+#include "personevent.h"
+#include "event.h"
 
 UIPersonListView::UIPersonListView(QWidget *parent):
     UICommonListView(parent)
@@ -240,6 +243,10 @@ QList<UITableMenuAction *> UIPersonListView::getMenuSingleSelectedItemActions(co
                                                    ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                        return this->onMenuActionViewPersonEvent(m, a);
                                                    }));
+    actionList.append(UITableMenuAction::build(tr("Thêm thông tin sự kiện"), this, item)
+                                                    ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                                        return this->onMenuActionAddPersonEvent(m, a);
+                                                    }));
     actionList.append(UITableMenuAction::build(tr("Xuất thông tin Nữ tu"), this, item)
                                                     ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                         return this->exportPersonInfo(m, a);
@@ -256,6 +263,10 @@ QList<UITableMenuAction *> UIPersonListView::getMenuMultiSelectedItemActions(con
                                                    ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                        return this->onChangeCommunity(m, a);
                                                    }));
+    actionList.append(UITableMenuAction::buildMultiItem(tr("Thêm thông tin sự kiện"), this, &items)
+                                                 ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                                     return this->onMenuActionAddPersonEvent(m, a);
+                                                 }));
     traceout;
     return actionList;
 }
@@ -367,6 +378,39 @@ ErrCode UIPersonListView::onMenuActionViewPersonEvent(QMenu *menu, UITableMenuAc
 
     traceret(ret);
     return ret;
+}
+
+ErrCode UIPersonListView::onMenuActionAddPersonEvent(QMenu *menu, UITableMenuAction *act)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    QList<DbModel*> perList;
+    if (!act) {
+        err = ErrInvalidArg;
+        loge("invalid menu action");
+    }
+    if (err == ErrNone && !(act->itemList().size() > 0)) {
+        err = ErrNoData;
+        loge("no item data to handle");
+    }
+    if (err == ErrNone) {
+        logd("is multi select %d", act->getIsMultiSelectedItem());
+        logd("no selected item %ld", act->itemList().size());
+        int cnt = act->itemListData(perList);
+        logd("no person %d", cnt);
+        if (cnt <= 0) {
+            err = ErrNoData;
+            loge("no person data to handle");
+        }
+    }
+    if (err == ErrNone) {
+        logd("update person event from blank");
+        err = updatePersonEvent(perList);
+    }
+    RELEASE_LIST_DBMODEL(perList);
+
+    traceret(err);
+    return err;
 }
 
 ErrCode UIPersonListView::exportPersonInfo(QMenu *menu, UITableMenuAction *act)
@@ -568,4 +612,107 @@ void UIPersonListView::onMainWindownImportEnd(ImportTarget target, ErrCode err, 
 QString UIPersonListView::getMainModelName()
 {
     return KModelNamePerson;
+}
+
+ErrCode UIPersonListView::updatePersonEvent(const QList<DbModel *>& perList, const PersonEvent *event)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    DlgAddPersonEvent* dlg = nullptr;
+    QList<PersonEvent*> perEventList;
+    if (perList.empty()) {
+        err = ErrInvalidArg;
+        loge("invalid perList input");
+    }
+    if (err == ErrNone) {
+        dlg = DlgAddPersonEvent::build(this, false, KModelNamePersonEvent, event);
+        if (!dlg) {
+            err = ErrNoMemory;
+            loge("no memory");
+        }
+    }
+    if (err == ErrNone) {
+        dlg->setEvenInfoOnly(&perList);
+        if (dlg->exec() == QDialog::Accepted) {
+            // TODO something
+            PersonEvent* perEvent = (PersonEvent*)dlg->getModel();
+            Event* event = (Event*)dlg->getSelectedEvent();
+            if (perEvent && event) {
+                foreach (DbModel* per, perList) {
+                    if (per) {
+                        PersonEvent* tmp = (PersonEvent* )(((DbModel*)perEvent)->clone());
+                        if (tmp) {
+                            tmp->setPersonUid(per->uid());
+                            tmp->buildNameId(per->nameId(), event->nameId());
+                            perEventList.append(tmp);
+                        } else {
+                            err = ErrNoMemory;
+                            loge("failed to clone person event, no memory");
+                            break;
+                        }
+                    } else {
+                        logw("something strange, null value in list");
+                        //TODO: break for error???
+                    }
+                }
+
+            } else {
+                loge("event %d or perEvent %d is null",
+                     (perEvent==nullptr), (event==nullptr));
+            }
+        }
+    }
+    if (err == ErrNone && perEventList.size() == 0) {
+        err = ErrNoData;
+        loge("not event data to add");
+    }
+
+    if (err == ErrNone) {
+        foreach(PersonEvent* perEvent, perEventList) {
+            if (perEvent) {
+                logd("validate perEvent '%s'", MODELSTR2CHA(perEvent));
+                err = perEvent->validateAllFields(true);
+                if (err == ErrNone) {
+                    continue;
+                } else if (err == ErrExisted) {
+                    loge("Event '%s' already existed", MODELSTR2CHA(perEvent));
+                    break;
+                } else {
+                    loge("Event '%s' validateAllFields failed, err = %d",
+                         MODELSTR2CHA(perEvent), err);
+                    break;
+                }
+            } else {
+                logw("something went wrong, event was null");
+                err = ErrInvalidData;
+                break;
+            }
+        }
+    }
+
+    if (err == ErrNone) {
+        foreach(PersonEvent* perEvent, perEventList) {
+            if (perEvent) {
+                logd("Save for perEvent '%s'", MODELSTR2CHA(perEvent));
+                err = perEvent->save();
+                if (err != ErrNone) {
+                    loge("Event '%s' save failed, err = %d",
+                         MODELSTR2CHA(perEvent), err);
+                    break;
+                }
+            } else {
+                logw("something went wrong, event was null");
+                err = ErrInvalidData;
+                break;
+            }
+        }
+    }
+    //    verity/validate info
+    //            save info
+//    delete info
+    RELEASE_LIST(perEventList, PersonEvent);
+    if (dlg) delete dlg;
+
+    traceret(err);
+    return err;
 }

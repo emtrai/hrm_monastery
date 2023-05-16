@@ -36,7 +36,8 @@ DlgAddPersonEvent::DlgAddPersonEvent(QWidget *parent) :
     DlgCommonEditModel(parent),
     ui(new Ui::DlgAddPersonEvent),
     mPerson(nullptr),
-    mEvent(nullptr)
+    mEvent(nullptr),
+    mEvenInfoOnly(false)
 {
     tracein;
     ui->setupUi(this);
@@ -68,26 +69,30 @@ ErrCode DlgAddPersonEvent::buildModel(DbModel *model, QString &errMsg)
         loge("Invalid argument, null model");
     }
 
-    if (err == ErrNone && !mPerson) {
-        err = ErrNoData;
-        loge("No person object to be set");
-    }
+//    if (err == ErrNone && !mPerson) {
+//        err = ErrNoData;
+//        loge("No person object to be set");
+//    }
     if (err == ErrNone) {
         PersonEvent * per = (PersonEvent*) model;
         if (err == ErrNone){
             per->setMarkModified(true); // start marking fields which are modified
         }
         per->setName(ui->txtTitle->text().trimmed());
-        SET_VAL_FROM_TEXTBOX(ui->txtPersonName, KItemPerson, per->setPersonUid, per->setPersonName);
         SET_VAL_FROM_CBOX(ui->cbEvent, per->setEventUid, per->setEventName, err);
         SET_DATE_VAL_FROM_WIDGET(ui->txtDate, per->setDate);
         SET_DATE_VAL_FROM_WIDGET(ui->txtEndDate, per->setEndDate);
-        QString nameid = ui->txtNameId->text().trimmed();
-        if (!nameid.isEmpty()) {
-            per->setNameId(nameid);
+        if (!mEvenInfoOnly) {
+            SET_VAL_FROM_EDITBOX(ui->txtPersonName, KItemPerson, per->setPersonUid, per->setPersonName);
+            QString nameid = ui->txtNameId->text().trimmed();
+            if (!nameid.isEmpty()) {
+                per->setNameId(nameid);
+            } else {
+                err = ErrNoData;
+                loge("Lack of nameId");
+            }
         } else {
-            err = ErrNoData;
-            loge("Lack of nameId");
+            logd("Event info only, skip person & name id setting");
         }
         QString remark = ui->txtRemark->toPlainText().trimmed();
         if (!remark.isEmpty()) {
@@ -116,23 +121,27 @@ ErrCode DlgAddPersonEvent::fromModel(const DbModel *item)
             ui->txtEndDate->setText(Utils::date2String(comm->endDate(), DEFAULT_FORMAT_YMD));
             ui->txtRemark->setPlainText(comm->remark());
             ui->btnSearch->setEnabled(false); // not allow to change person
-            QString nameid = comm->nameId();
-            if (!comm->personUid().isEmpty()) {
-                logd("Search person uid '%s'", STR2CHA(comm->personUid()));
-                Person* per = (Person*)PERSONCTL->getModelByUid(comm->personUid());
-                if (per) {
-                    setPerson(per);
-                    delete per;
+            if (!mEvenInfoOnly) {
+                QString nameid = comm->nameId();
+                if (!comm->personUid().isEmpty()) {
+                    logd("Search person uid '%s'", STR2CHA(comm->personUid()));
+                    Person* per = (Person*)PERSONCTL->getModelByUid(comm->personUid());
+                    if (per) {
+                        setPerson(per);
+                        delete per;
+                    } else {
+                        loge("Not found person uid '%s'", STR2CHA(comm->personUid()));
+                    }
                 } else {
-                    loge("Not found person uid '%s'", STR2CHA(comm->personUid()));
+                    loge("No person uid");
                 }
+                if (nameid.isEmpty()) {
+                    updateNameId();
+                }
+                ui->txtNameId->setText(nameid);
             } else {
-                loge("No person uid");
+                logd("event info only, no name id nor person");
             }
-            if (nameid.isEmpty()) {
-                updateNameId();
-            }
-            ui->txtNameId->setText(nameid);
         }
     } else {
         err = ErrInvalidArg;
@@ -172,12 +181,23 @@ void DlgAddPersonEvent::setSelectedEvent(int index)
 
 void DlgAddPersonEvent::updateNameId()
 {
-    QString nameId = mPerson?mPerson->nameId():"KHONG";
-    nameId += "_";
-    nameId += mEvent?mEvent->nameId():"KHONG";
-    nameId += "_";
-    nameId += ui->txtDate->text();
-    DlgCommonEditModel::onChangeNameIdTxt(ui->txtNameId, nameId);
+    tracein;
+    if (!mEvenInfoOnly) {
+        QString nameId = PersonEvent::makeNameId(
+            mPerson?mPerson->nameId():"KHONG",
+            mEvent?mEvent->nameId():"KHONG",
+            ui->txtDate->text());
+//        QString nameId = mPerson?mPerson->nameId():"KHONG";
+//        nameId += "_";
+//        nameId += mEvent?mEvent->nameId():"KHONG";
+//        nameId += "_";
+//        nameId += ui->txtDate->text();
+        DlgCommonEditModel::onChangeNameIdTxt(ui->txtNameId, nameId, true);
+    } else {
+        logd("event info only, skip setting name id");
+        DlgCommonEditModel::onChangeNameIdTxt(ui->txtNameId, "");
+    }
+    traceout;
 }
 
 bool DlgAddPersonEvent::onValidateData(QString &msg)
@@ -186,7 +206,7 @@ bool DlgAddPersonEvent::onValidateData(QString &msg)
     bool isValid = true;
     if (mModel) {
         PersonEvent* event = (PersonEvent*)mModel;
-        if (event->nameId().isEmpty()) {
+        if (event->nameId().isEmpty() && !mEvenInfoOnly) {
             msg += tr("Thiếu mã định danh.");
             isValid = false;
             logw("lack name id");
@@ -278,44 +298,87 @@ void DlgAddPersonEvent::on_btnSearch_clicked()
 
 void DlgAddPersonEvent::on_btnChangeNameId_clicked()
 {
-    DlgCommonEditModel::onEditnameId(ui->txtNameId);
-    if (ui->txtNameId->text().length() == 0) { // custome nameid is null, make it auto generate
-        updateNameId();
+    if (!mEvenInfoOnly) {
+        DlgCommonEditModel::onEditnameId(ui->txtNameId);
+        if (ui->txtNameId->text().length() == 0) { // custome nameid is null, make it auto generate
+            updateNameId();
+        }
+    } else {
+        logw("event infor only, this event should not occur");
     }
 }
 
 void DlgAddPersonEvent::on_txtDate_textChanged(const QString &arg1)
 {
-    updateNameId();
+    if (!mEvenInfoOnly) {
+        updateNameId();
+    }
 }
 
 
 void DlgAddPersonEvent::on_cbEvent_currentIndexChanged(int index)
 {
     tracein;
-    setSelectedEvent(index);
+    if (!mEvenInfoOnly) {
+        setSelectedEvent(index);
+    }
     traceout;
 }
 
-void DlgAddPersonEvent::setPerson(Person *newPerson)
+void DlgAddPersonEvent::setEvenInfoOnly(const QList<DbModel*>* listPerson)
 {
     tracein;
-    if (mPerson) {
-        delete mPerson;
-        mPerson = nullptr;
-    }
-    if (newPerson) {
-        logd("clone new person");
-        mPerson = (Person*)(((DbModel*)newPerson)->clone());
-        ui->txtPersonName->setText(mPerson->displayName());
-        ui->lblNameId->setText(mPerson->nameId());
-        logd("setProperty %s", mPerson->uid().toStdString().c_str());
-        ui->txtPersonName->setProperty(KItemPerson, mPerson->uid());
-        ui->btnSearch->setEnabled(false); // not allow to change person info
-        updateNameId();
-    } else {
-        logw("no person is set");
+    mEvenInfoOnly = true;
+    logd("event info only, skip change name and search person");
+    ui->btnChangeNameId->setEnabled(false);
+    ui->btnSearch->setEnabled(false);
+    ui->txtNameId->setText("");
+    ui->txtNameId->setEnabled(false);
+    if (listPerson && listPerson->size() > 0) {
+        logd("set list person");
+        foreach (DbModel* item, *listPerson) {
+            Person* per = (Person*) item;
+            if (per) {
+                ui->txtPersonName->appendPlainText(per->displayName());
+            } else {
+                logw("something went wrong, person should not null here!!");
+            }
+        }
     }
     traceout;
+}
+
+const Event *DlgAddPersonEvent::getSelectedEvent() const
+{
+    return mEvent;
+}
+
+ErrCode DlgAddPersonEvent::setPerson(Person *newPerson)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    if (!mEvenInfoOnly) {
+        if (mPerson) {
+            delete mPerson;
+            mPerson = nullptr;
+        }
+        if (newPerson) {
+            logd("clone new person");
+            mPerson = (Person*)(((DbModel*)newPerson)->clone());
+            ui->txtPersonName->setPlainText(mPerson->displayName());
+    //        ui->lblNameId->setText(mPerson->nameId());
+            logd("setProperty %s", mPerson->uid().toStdString().c_str());
+            ui->txtPersonName->setProperty(KItemPerson, mPerson->uid());
+            ui->btnSearch->setEnabled(false); // not allow to change person info
+            updateNameId();
+        } else {
+            logw("no person is set");
+        }
+    } else {
+        err = ErrNotSupport;
+        loge("Event info only, no person set");
+    }
+    traceout;
+    return err;
 }
 

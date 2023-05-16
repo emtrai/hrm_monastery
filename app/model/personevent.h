@@ -32,6 +32,8 @@ public:
     PersonEvent();
     PersonEvent(const PersonEvent* model);
     static DbModel *build();
+    static QString makeNameId(const QString& perNameId, const QString& eventNameId, const QString& date);
+    ErrCode buildNameId(const QString& perNameId, const QString& eventNameId, const QString& date = nullptr);
     virtual DbModelBuilder getBuilder() const;
     virtual QString modelName() const;
     virtual void clone(const DbModel* model);

@@ -801,62 +801,62 @@ ErrCode Person::commonCheckField(QString& name,
     traceret(ret);
     return ret;
 }
-ErrCode Person::validateAllFields()
+ErrCode Person::validateAllFields(bool checkExist)
 {
     tracein;
     // TODO: cached value???
-    ErrCode ret = ErrNone;
-    int invaidField = 0;
-    DbModelHandler* personHdlr = this->getDbModelHandler();
-    if (personHdlr == nullptr) {
-        loge("Invalid Person handler");
-        return ErrFailed;
-    }
+    ErrCode ret = DbModel::validateAllFields(checkExist);
+    if (ret == ErrNone) {
+        int invaidField = 0;
+        DbModelHandler* personHdlr = this->getDbModelHandler();
+        if (personHdlr == nullptr) {
+            loge("Invalid Person handler");
+            return ErrFailed;
+        }
 
-//        ret = checkAndUpdateSaintListFromHollyName();
-    // Holly name / saint list
-    // Holly name to saint list
-    // TODO: saint uid list to holly name???
-    if (mSaintUidList.size() == 0 && mHollyName.size() > 0) {
-        QHash<QString, QString> saintUidList;
-        ret = SAINTCTL->getSaintUidListFromName(mHollyName, &saintUidList);
-        if (ret == ErrNone) {
-            mSaintUidNameMap.insert(saintUidList);
-            mSaintUidList.append(saintUidList.keys());
-        } else {
-            appendValidateResult(KItemHollyName, ErrNotFound);
-            appendValidateMsg(QString("Saint %1 not found").arg(hollyName()));
-            invaidField ++;
-            loge("Invalid holly name %s", mHollyName.toStdString().c_str());
+    //        ret = checkAndUpdateSaintListFromHollyName();
+        // Holly name / saint list
+        // Holly name to saint list
+        // TODO: saint uid list to holly name???
+        if (mSaintUidList.size() == 0 && mHollyName.size() > 0) {
+            QHash<QString, QString> saintUidList;
+            ret = SAINTCTL->getSaintUidListFromName(mHollyName, &saintUidList);
+            if (ret == ErrNone) {
+                mSaintUidNameMap.insert(saintUidList);
+                mSaintUidList.append(saintUidList.keys());
+            } else {
+                appendValidateResult(KItemHollyName, ErrNotFound);
+                appendValidateMsg(QString("Saint %1 not found").arg(hollyName()));
+                invaidField ++;
+                loge("Invalid holly name %s", mHollyName.toStdString().c_str());
+            }
+        }
+
+        // country
+        ret = commonCheckField(mCountryName, mCountryUid, COUNTRYCTL, KItemCountry, invaidField);
+
+
+        // TODO: check logic again, all empty mean valid, should have field must has data???????
+
+        // nationality
+        ret = commonCheckField(mNationalityName, mNationalityUid, COUNTRYCTL, KItemNationality, invaidField);
+        // TODO: same ethnic name, but different country???
+        ret = commonCheckField(mEthnicName, mEthnicUid, ETHNIC, KItemEthnic, invaidField);
+        ret = commonCheckField(mEduName, mEduUid, EDUCTL, KItemEdu, invaidField);
+        ret = commonCheckField(mCourse, mCourseUid, COURSECTL, KItemCourse, invaidField);
+
+        // TODO: province: check with country??? as province belong to a country
+    #ifndef SKIP_PERSON_PROVINE
+        ret = commonCheckField(mProvinceName, mProvinceUid, PROVINCE, KItemProvince, invaidField);
+    #endif
+        ret = commonCheckField(mCurrentWorkName, mCurrentWorkUid, WORKCTL, KItemWork, invaidField);
+        ret = commonCheckField(mCommunityName, mCommunityUid, COMMUNITYCTL, KItemCommunity, invaidField);
+
+        if (invaidField > 0) {
+            loge("%d invalid field", invaidField);
+            ret = ErrInvalidData;
         }
     }
-
-    // country
-    ret = commonCheckField(mCountryName, mCountryUid, COUNTRYCTL, KItemCountry, invaidField);
-
-
-    // TODO: check logic again, all empty mean valid, should have field must has data???????
-
-    // nationality
-    ret = commonCheckField(mNationalityName, mNationalityUid, COUNTRYCTL, KItemNationality, invaidField);
-    // TODO: same ethnic name, but different country???
-    ret = commonCheckField(mEthnicName, mEthnicUid, ETHNIC, KItemEthnic, invaidField);
-    ret = commonCheckField(mEduName, mEduUid, EDUCTL, KItemEdu, invaidField);
-    ret = commonCheckField(mCourse, mCourseUid, COURSECTL, KItemCourse, invaidField);
-
-    // TODO: province: check with country??? as province belong to a country
-#ifndef SKIP_PERSON_PROVINE
-    ret = commonCheckField(mProvinceName, mProvinceUid, PROVINCE, KItemProvince, invaidField);
-#endif
-    ret = commonCheckField(mCurrentWorkName, mCurrentWorkUid, WORKCTL, KItemWork, invaidField);
-    ret = commonCheckField(mCommunityName, mCommunityUid, COMMUNITYCTL, KItemCommunity, invaidField);
-
-    if (invaidField > 0) {
-        loge("%d invalid field", invaidField);
-        ret = ErrInvalidData;
-    }
-
-
 
     traceret(ret);
     return ret;

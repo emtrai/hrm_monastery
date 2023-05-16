@@ -105,12 +105,83 @@ DbModel *DlgCommonEditModel::model()
     return mModel;
 }
 
+const DbModel *DlgCommonEditModel::getModel() const
+{
+    return mModel;
+}
+
+//void DlgCommonEditModel::accept()
+//{
+//    tracein;
+//    QString errMsg;
+//    ErrCode ret = ErrNone;
+//    bool ok2Save = false;
+//    logd("build model to save/return");
+//    DbModel* item = model();
+//    if (item) {
+//        ret = buildModel(item, errMsg);
+//    } else {
+//        loge("accept failed, no memory??");
+//        ret = ErrNoMemory;
+//    }
+
+//    if (ret == ErrNone) {
+//        ok2Save = onValidateData(errMsg);
+//        logd("ok2save %d", ok2Save);
+//        if (!ok2Save) {
+//            if (errMsg.isEmpty()) {
+//                errMsg = QString("Có dữ liệu lỗi, vui lòng kiểm ra lại"); // TODO: should use "tr" or make it translatable???
+//            }
+//            loge("invalid data, err msg %s", STR2CHA(errMsg));
+//            Utils::showErrorBox(errMsg);
+//            ret = ErrInvalidData;
+//        }
+//    }
+
+//    if (ret == ErrNone) {
+//        if (mIsSelfSave) {
+//            if (mIsNew) {
+//                logd("Save it");
+//                ret = item->save();
+//            } else {
+//                logd("Update it");
+//                ret = item->update();
+//            }
+//            logi("Save/Update result %d", ret);
+
+//            if (ret == ErrNone) {
+//                logi("Save/update '%s' ok , close dialog", STR2CHA(item->toString()));
+//                Utils::showMsgBox(QString(tr("Đã lưu %1")).arg(item->name()));
+//            } else {
+//                Utils::showErrorBox("Lỗi, không thể lưu thông tin");
+//            }
+//        } else {
+//            logd("not mIsSelfSave, just call accept");
+//        }
+//        if (mListener) {
+//            logd("Call listener");
+//            mListener->onDbModelReady(ret, item, this);
+//        } else {
+//            logd("no listener to call");
+//        }
+//    } else {
+//        Utils::showErrorBox("Lỗi, không thể tạo dữ liệu");
+//        ret = ErrBuildDataFailed;
+//    }
+//    if (ret == ErrNone) {
+//        QDialog::accept();
+//    }
+//    traceret(ret);
+//}
+
+
 void DlgCommonEditModel::accept()
 {
     tracein;
     QString errMsg;
     ErrCode ret = ErrNone;
     bool ok2Save = false;
+
     logd("build model to save/return");
     DbModel* item = model();
     if (item) {
@@ -133,8 +204,8 @@ void DlgCommonEditModel::accept()
         }
     }
 
-    if (ret == ErrNone) {
-        if (mIsSelfSave) {
+    if (mIsSelfSave) {
+        if (ret == ErrNone) {
             if (mIsNew) {
                 logd("Save it");
                 ret = item->save();
@@ -150,25 +221,24 @@ void DlgCommonEditModel::accept()
             } else {
                 Utils::showErrorBox("Lỗi, không thể lưu thông tin");
             }
+            if (mListener) {
+                logd("Call listener");
+                mListener->onDbModelReady(ret, item, this);
+            } else {
+                logd("no listener to call");
+            }
         } else {
-            logd("not mIsSelfSave, just call accept");
-        }
-        if (mListener) {
-            logd("Call listener");
-            mListener->onDbModelReady(ret, item, this);
-        } else {
-            logd("no listener to call");
+            Utils::showErrorBox("Lỗi, không thể tạo dữ liệu");
+            ret = ErrBuildDataFailed;
         }
     } else {
-        Utils::showErrorBox("Lỗi, không thể tạo dữ liệu");
-        ret = ErrBuildDataFailed;
+        logd("not mIsSelfSave, just call accept");
     }
     if (ret == ErrNone) {
         QDialog::accept();
     }
     traceret(ret);
 }
-
 bool DlgCommonEditModel::onValidateData(QString &msg)
 {
     tracein;
@@ -210,11 +280,17 @@ ErrCode DlgCommonEditModel::loadList(QComboBox *cb, ModelController *ctrl)
     return err;
 }
 
-void DlgCommonEditModel::onChangeNameIdTxt(QLineEdit *txtNameId, const QString &arg1)
+void DlgCommonEditModel::onChangeNameIdTxt(QLineEdit *txtNameId, const QString &arg1, bool direct)
 {
     if (!mCustomNameId) {
         bool ok = false;
-        QString nameid = Utils::UidFromName(arg1, NO_VN_MARK_UPPER, &ok);
+        QString nameid;
+        if (direct) {
+            ok = true;
+            nameid = arg1;
+        } else {
+            nameid = Utils::UidFromName(arg1, NO_VN_MARK_UPPER, &ok);
+        }
         if (ok) {
             txtNameId->setText(nameid);
         } else {

@@ -1346,7 +1346,7 @@ void DlgPerson::on_btnAddEvent_clicked()
 
     dlg->setPerson(getPerson());
     if (dlg->exec() == QDialog::Accepted){
-        DbModel* event = dlg->model();
+        const DbModel* event = dlg->getModel();
         if (event != nullptr) {
             logd("Add event to list '%s'", STR2CHA(event->toString()));
             mListPersonEvent.append(event->clone());
@@ -1494,7 +1494,7 @@ void DlgPerson::on_btnModifyEvent_clicked()
 
         dlg->setPerson(getPerson());
         if (dlg->exec() == QDialog::Accepted){
-            DbModel* event = dlg->model();
+            const DbModel* event = dlg->getModel();
             if (event != nullptr) {
                 logd("copy data from '%s'", STR2CHA(event->toString()));
                 model->setMarkModified(true);

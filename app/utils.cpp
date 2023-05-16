@@ -307,23 +307,27 @@ QString Utils::date2String(qint64 date, const QString& format, bool* isOk)
         if (foundSplit) {
             logd("split: '%s'", STR2CHA(QString(split)));
             int idx = 0;
+            QString val;
             foreach (QString item, listFormat){
 
                 // if 0, still print out 0 so that parsing later can work normally
                 // TODO: should let empty instead? impact to convert string to int
                 if (item.simplified().startsWith("Y")) { // year
-                    dateString += QString::number(year);
+                    if (year > 0) val = QString::number(year);
                 } else if (item.simplified().startsWith("M")) {
-                    dateString += QString::number(month);
+                    if (month > 0) val = QString::number(month);
                 }  else if (item.simplified().startsWith("D")) {
-                    dateString += QString::number(day);
+                    if (day > 0) val = QString::number(day);
                 } else {
                     ok = false;
                     loge("invalid format '%s'", STR2CHA(item));
                     break;
                 }
                 idx++;
-                if (idx < listFormat.size() && !dateString.isEmpty()) {
+                if (!val.isEmpty()) {
+                    dateString += val;
+                }
+                if (idx < listFormat.size() && !dateString.isEmpty() && !val.isEmpty()) {
                     dateString += split;
                 }
             }

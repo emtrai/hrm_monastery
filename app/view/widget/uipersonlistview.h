@@ -25,6 +25,9 @@
 #include "uicommonlistview.h"
 #include "importlistener.h"
 #include "mainwindow.h"
+
+class PersonEvent;
+
 class UIPersonListView : public UICommonListView, public ImportListener, public MainWindownImportListener
 {
 public:
@@ -58,6 +61,7 @@ protected:
     virtual ErrCode onMenuActionImport(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionExportListPerson(QMenu *menu, UITableMenuAction *act);
     virtual ErrCode onMenuActionViewPersonEvent(QMenu* menu, UITableMenuAction* act);
+    virtual ErrCode onMenuActionAddPersonEvent(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onChangeCommunity(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode exportPersonInfo(QMenu* menu, UITableMenuAction* act);
     virtual void onViewItem(UITableCellWidgetItem *item);
@@ -79,6 +83,8 @@ protected:
     virtual void onMainWindownImportEnd(ImportTarget target, ErrCode err, void* importData = nullptr);
 
     virtual QString getMainModelName();
+
+    virtual ErrCode updatePersonEvent(const QList<DbModel*>& perList, const PersonEvent* event = nullptr);
 private:
     void cleanUpItem();
 };

@@ -48,7 +48,10 @@ public:
     void loadEvent();
 
     void setSelectedEvent(const QString& eventUid);
-    void setPerson(Person *newPerson);
+    ErrCode setPerson(Person *newPerson);
+
+    void setEvenInfoOnly(const QList<DbModel*>* listPerson = nullptr);
+    const Event* getSelectedEvent() const;
 
 protected:
     virtual QDialogButtonBox* buttonBox();
@@ -71,6 +74,7 @@ private:
     Person* mPerson;
     Event* mEvent;
     QList<DbModel*> mEventList;
+    bool mEvenInfoOnly;
 };
 
 #endif // DLGADDPERSONEVENT_H
