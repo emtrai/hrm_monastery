@@ -201,7 +201,7 @@ void DlgCommunity::on_btnSearchCEO_clicked()
     dlg->setIsMultiSelection(false);
 
     if (dlg->exec() == QDialog::Accepted){
-        Person* per = (Person*)dlg->selectedItem();
+        const Person* per = (const Person*)dlg->selectedItem();
         if (per != nullptr) {
             ui->txtCEO->setText(per->getFullName());
             logd("setProperty %s", per->uid().toStdString().c_str());

@@ -110,7 +110,7 @@ const QList<DbModel *> &DlgSearch::selectedItems() const
     return mSelectedItems;
 }
 
-DbModel *DlgSearch::selectedItem() const
+const DbModel *DlgSearch::selectedItem() const
 {
     DbModel* ret = nullptr;
     tracein;
@@ -119,7 +119,7 @@ DbModel *DlgSearch::selectedItem() const
         ret = mSelectedItems[0];
     }
     traceout;
-    return ret?ret->clone():nullptr;
+    return ret;
 }
 
 bool DlgSearch::getIsMultiSelection() const

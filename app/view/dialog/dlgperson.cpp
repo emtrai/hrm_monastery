@@ -861,7 +861,7 @@ void DlgPerson::searchPerson(QLineEdit *wget)
     dlg->setIsMultiSelection(false);
 
     if (dlg->exec() == QDialog::Accepted){
-        Person* per = (Person*)dlg->selectedItem();
+        const Person* per = (const Person*)dlg->selectedItem();
         if (per != nullptr) {
             wget->setText(per->getFullName());
             logd("setProperty %s", per->uid().toStdString().c_str());
@@ -884,7 +884,7 @@ void DlgPerson::loadCommunity()
     foreach(DbModel* item, listCommunity){
         ui->cbCommunity->addItem(item->name(), item->uid());
     }
-
+    traceout;
 }
 
 void DlgPerson::loadStatus()

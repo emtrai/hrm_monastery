@@ -188,7 +188,7 @@ void DlgAreaPerson::on_btnSearch_clicked()
     dlg->setIsMultiSelection(false);
 
     if (dlg->exec() == QDialog::Accepted){
-        Person* per = (Person*)dlg->selectedItem();
+        const Person* per = (const Person*)dlg->selectedItem();
         if (per != nullptr) {
             ui->txtSearch->setText(per->getFullName());
             logd("setProperty %s", per->uid().toStdString().c_str());
@@ -198,7 +198,6 @@ void DlgAreaPerson::on_btnSearch_clicked()
                 nameid = QString("%1_%2").arg(mArea->nameId(), per->nameId());
             }
             ui->txtNameId->setText(nameid);
-            delete per;
         } else {
             logi("No person selected");
         }

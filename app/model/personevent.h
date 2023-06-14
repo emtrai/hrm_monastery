@@ -46,12 +46,14 @@ public:
 
     qint64 date() const;
     void setDate(qint64 newDate);
+    void setDate(const QString& newDate, const QString& format=DEFAULT_FORMAT_YMD);
 
     const QString &personUid() const;
     void setPersonUid(const QString &newPersonUid);
 
     const QString &eventUid() const;
     void setEventUid(const QString &newEventUid);
+    ErrCode setEventNameId(const QString &nameId);
 
     const QString &eventName() const;
     void setEventName(const QString &newEventName);

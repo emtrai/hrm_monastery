@@ -35,6 +35,7 @@
 #include <QDateTime>
 #include <QFileDialog>
 #include <QInputDialog>
+#include <QObject>
 #include "dbmodel.h"
 
 #include <QTextDocument>
@@ -75,6 +76,11 @@ QString Utils::timeMsToDatestring(qint64 timeMs, const QString &format)
     logd("time in string %s", time.toStdString().c_str());
     traceout;
     return time;
+}
+
+QString Utils::currentTimeToDatestring(const QString &format)
+{
+    return timeMsToDatestring(currentTimeMs(), format);
 }
 
 Gender Utils::genderFromString(const QString &gender)
@@ -731,17 +737,25 @@ void Utils::showErrorBox(int ret, const QString& msg)
     showErrorBox(errMsg);
 }
 
-bool Utils::showConfirmDialog(QWidget *parent, const QString &title, const QString &message, std::function<void(void)> onAccept)
+bool Utils::showConfirmDialog(QWidget *parent, const QString &title,
+                              const QString &message,
+                              std::function<void(int)> onFinished)
 {
     tracein;
-    QMessageBox::StandardButton reply;
     bool ok = false;
     if (!parent) parent = MainWindow::getInstance();
-    reply = QMessageBox::question(parent, title, message,
-                                  QMessageBox::Yes|QMessageBox::No);
+    QMessageBox msgBox;
+    msgBox.setText(title);
+    msgBox.setInformativeText(message);
+    msgBox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::Yes);
+    msgBox.setParent(parent);
+    int reply = msgBox.exec();
+//    reply = QMessageBox::question(parent, title, message,
+//                                  QMessageBox::Yes|QMessageBox::No);
+    if (onFinished) onFinished(reply);
     if (reply == QMessageBox::Yes) {
         ok = true;
-        if (onAccept) onAccept();
     } else {
         logd("selected no");
         ok = false;

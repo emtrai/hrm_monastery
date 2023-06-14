@@ -204,7 +204,7 @@ ErrCode CommunityCtl::onImportDataStart(const QString &importName, int importFil
     return ErrNone;
 }
 
-ErrCode CommunityCtl::getActivePersonList(const QString &communityUid, QList<DbModel*>& outList)
+ErrCode CommunityCtl::getActivePersonList(const QString &communityUid, QList<Person*>& outList)
 {
     tracein;
     ErrCode err = getPersonList(communityUid, outList, MODEL_STATUS_MAX);
@@ -212,12 +212,13 @@ ErrCode CommunityCtl::getActivePersonList(const QString &communityUid, QList<DbM
     return err;
 }
 
-ErrCode CommunityCtl::getPersonList(const QString &communityUid, QList<DbModel *> &outList, qint64 modelStatus)
+ErrCode CommunityCtl::getPersonList(const QString &communityUid,
+                                    QList<Person *> &outList, qint64 modelStatus)
 {
     tracein;
     ErrCode err = ErrNone;
     DbCommunityModelHandler* hdl = nullptr;
-    QList<DbModel *> items;
+    QList<Person *> items;
     logd("get list of person for community uid '%s', status 0x%x", STR2CHA(communityUid), modelStatus);
     if (communityUid.isEmpty()) {
         err = ErrInvalidArg;

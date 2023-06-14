@@ -27,7 +27,7 @@
 #include "personevent.h"
 
 class Specialist;
-
+class CommunityPerson;
 class DbPersonModelHandler
 {
 public:
@@ -52,6 +52,7 @@ public:
     // risk of inconsistant data
     // this function will try to get list of person in community using data (communityuid) in person table
     virtual ErrCode getListPersonInCommunity(const QString& communityUid, qint32 status, QList<DbModel*>& list) = 0;
+    virtual ErrCode getListCommunitesOfPerson(const QString& perUid, qint32 modelStatus, QList<CommunityPerson*>& list) = 0;
 };
 
 #endif // DBPERSONMODELHANDLER_H

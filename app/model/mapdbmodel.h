@@ -92,7 +92,7 @@ public:
 
     const QString &changeHistory() const;
     void setChangeHistory(const QString &newChangeHistory);
-    const QString &modelStatusName() const;
+    QString modelStatusName();
     void setModelStatusName(const QString &newModelStatusName);
 
 protected:

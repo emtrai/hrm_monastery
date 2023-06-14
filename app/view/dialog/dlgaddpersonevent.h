@@ -48,7 +48,7 @@ public:
     void loadEvent();
 
     void setSelectedEvent(const QString& eventUid);
-    ErrCode setPerson(Person *newPerson);
+    ErrCode setPerson(const Person *newPerson);
 
     void setEvenInfoOnly(const QList<DbModel*>* listPerson = nullptr);
     const Event* getSelectedEvent() const;

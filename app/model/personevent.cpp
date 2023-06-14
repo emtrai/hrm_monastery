@@ -27,6 +27,7 @@
 #include "dbctl.h"
 #include "defs.h"
 #include "dbmodel.h"
+#include "eventctl.h"
 
 PersonEvent::PersonEvent():
     mDate(0),
@@ -216,6 +217,24 @@ void PersonEvent::setEventUid(const QString &newEventUid)
     CHECK_MODIFIED_THEN_SET(mEventUid, newEventUid, KItemEvent);
 }
 
+ErrCode PersonEvent::setEventNameId(const QString &nameId)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    logd("Search event name id '%s'", STR2CHA(nameId));
+    DbModel* model = EVENTCTL->getModelByNameId(nameId);
+    if (model) {
+        setEventUid(model->uid());
+        setEventName(model->name());
+        delete model;
+    } else {
+        loge("Not found event name id '%s'", STR2CHA(nameId));
+        err = ErrNotFound;
+    }
+    traceout;
+    return err;
+}
+
 const QString &PersonEvent::personUid() const
 {
     return mPersonUid;
@@ -234,7 +253,12 @@ qint64 PersonEvent::date() const
 
 void PersonEvent::setDate(qint64 newDate)
 {
-//    mDate = newDate;
+    //    mDate = newDate;
     CHECK_MODIFIED_THEN_SET(mDate, newDate, KItemDate);
+}
+
+void PersonEvent::setDate(const QString &newDate, const QString& format)
+{
+    setDate(Utils::dateFromString(newDate, format));
 }
 

@@ -29,6 +29,7 @@
 
 class DbSqliteCommunityTbl;
 class Community;
+class Person;
 
 class DbSqliteCommunity : public DbSqliteModelHandler, public DbCommunityModelHandler
 {
@@ -50,7 +51,7 @@ public:
      * @param communityUid
      * @return list of Person
      */
-    virtual QList<DbModel*> getListPerson(const QString& communityUid,
+    virtual QList<Person*> getListPerson(const QString& communityUid,
                                            int modelStatus = MODEL_STATUS_MAX, const QString* perStatusUid = nullptr);
 
     /**

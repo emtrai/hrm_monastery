@@ -27,6 +27,8 @@
 #include "utils.h"
 #include "dbctl.h"
 #include "dbmodel.h"
+#include "person.h"
+#include "community.h"
 
 CommunityPerson::CommunityPerson():
     mPerson(nullptr),
@@ -38,6 +40,9 @@ CommunityPerson::CommunityPerson():
 CommunityPerson::~CommunityPerson()
 {
     tracein;
+    FREE_PTR(mPerson);
+    FREE_PTR(mCommunity);
+    traceout;
 }
 
 DbModel *CommunityPerson::build()
@@ -58,32 +63,68 @@ QString CommunityPerson::modelName() const
     return KModelNameCommPerson;
 }
 
+void CommunityPerson::clone(const DbModel *model)
+{
+    tracein;
+    if (model) {
+        MapDbModel::clone(model);
+        if (model->modelName() == modelName()) {
+            CommunityPerson* commper = (CommunityPerson*) model;
+            CLEAR_THEN_SET(mPerson, commper->person(), Person);
+            CLEAR_THEN_SET(mCommunity, commper->community(), Community);
+        }
+    }
+    traceout;
+}
+
+void CommunityPerson::setCommunityUid(const QString &newUid1)
+{
+    if (newUid1 != uid1()) {
+        setUid1(newUid1);
+        markItemAsModified(KItemCommunity);
+    }
+}
+
+void CommunityPerson::setPersonUid(const QString &newUid1)
+{
+    if (newUid1 != uid2()) {
+        setUid2(newUid1);
+        markItemAsModified(KItemPerson);
+    }
+}
+
 
 DbModelHandler *CommunityPerson::getDbModelHandler() const
 {
     return DB->getModelHandler(KModelHdlCommunity);
 }
 
-DbModel *CommunityPerson::community() const
+Community *CommunityPerson::community() const
 {
     return mCommunity;
 }
 
-void CommunityPerson::setCommunity(const DbModel *newCommunity)
+void CommunityPerson::setCommunity(const Community *newCommunity)
 {
     tracein;
-    CLEAR_THEN_SET(mCommunity, newCommunity, DbModel);
+    CLEAR_THEN_SET(mCommunity, newCommunity, Community);
+    if (mCommunity && communityUid().isEmpty()) {
+        setCommunityUid(mCommunity->uid());
+    }
     traceout;
 }
 
-DbModel *CommunityPerson::person() const
+Person *CommunityPerson::person() const
 {
     return mPerson;
 }
 
-void CommunityPerson::setPerson(const DbModel *newPerson)
+void CommunityPerson::setPerson(const Person *newPerson)
 {
     tracein;
-    CLEAR_THEN_SET(mPerson, newPerson, DbModel);
+    CLEAR_THEN_SET(mPerson, newPerson, Person);
+    if (mPerson && personUid().isEmpty()) {
+        setPersonUid(mPerson->uid());
+    }
     traceout;
 }

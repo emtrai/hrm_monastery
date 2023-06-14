@@ -1266,6 +1266,7 @@ QString DbSqliteTbl::toDbStatusCond(qint64 dbStatus)
 void DbSqliteTbl::appendDbStatusCond(QString& cond, qint64 dbStatus)
 {
     tracein;
+    logd("append db status 0x%llx to cond", dbStatus);
     QString condStatus = toDbStatusCond(dbStatus);
     if (!condStatus.isEmpty()) {
         if (cond.isEmpty()) {
@@ -1300,6 +1301,7 @@ QString DbSqliteTbl::toModelStatusCond(qint64 modelStatus)
 void DbSqliteTbl::appendModelStatusCond(QString& cond, qint64 modelStatus)
 {
     tracein;
+    logd("append model status 0x%llx to cond", modelStatus);
     QString condStatus = toModelStatusCond(modelStatus);
     if (!condStatus.isEmpty()) {
         if (cond.isEmpty()) {

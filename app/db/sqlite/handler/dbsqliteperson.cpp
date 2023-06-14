@@ -26,6 +26,7 @@
 #include "dbsqlitedefs.h"
 #include "dbsqlite.h"
 #include "dbsqlitepersonevent.h"
+#include "table/dbsqlitecommunitypersontbl.h"
 #include "table/dbsqlitepersoneventtbl.h"
 #include "table/dbsqlitespecialistpersontbl.h"
 #include "personevent.h"
@@ -40,6 +41,7 @@
 #include "saintperson.h"
 #include "specialistperson.h"
 #include "dbsqlite.h"
+#include "exception.h"
 
 GET_INSTANCE_IMPL(DbSqlitePerson)
 
@@ -454,6 +456,45 @@ ErrCode DbSqlitePerson::getListPersonInCommunity(const QString &communityUid, qi
     logd("Search wit community uid %s", STR2CHA(communityUid));
     err = tbl->search(communityUid, inFields, &Person::build, &list, true);
     logd("Search community err=%d", err);
+    traceout;
+    return err;
+}
+
+ErrCode DbSqlitePerson::getListCommunitesOfPerson(const QString &perUid,
+                                                  qint32 modelStatus, QList<CommunityPerson *> &list)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    logd("get list community of person uid '%s'", STR2CHA(perUid));
+    if(!perUid.isEmpty()) {
+        DbSqliteCommunityPersonTbl* tbl = (DbSqliteCommunityPersonTbl*)DbSqlite::table(KTableCommPerson);
+        if (tbl) {
+            list = tbl->getListCommunityOfPerson(perUid, modelStatus);
+        } else {
+            loge("Not found table '%s'", KTableCommPerson);
+            err = ErrNoTable;
+        }
+    } else {
+        loge("invalid perUid '%s'", STR2CHA(perUid));
+        err = ErrInvalidArg;
+    }
+    if (err == ErrNone) {
+        logd("found %d item, let get community", list.size());
+        foreach (CommunityPerson* item, list) {
+            if (item) {
+                logd("get community id '%s'", STR2CHA(item->communityUid()));
+                DbModel* community = DB->getCommunityModelHandler()->getByUid(item->communityUid());
+                if (community) {
+                    logd("set community '%s'", MODELSTR2CHA(community));
+                    item->setCommunity((Community*)community);
+                } else {
+                    logw("not found community id '%s' on db", STR2CHA(item->communityUid()));
+                }
+            } else {
+                logw("something stupid occurs, null in list????");
+            }
+        }
+    }
     traceout;
     return err;
 }

@@ -27,11 +27,12 @@ enum ViewType {
     NONE = 0,
     VIEW_TEXT_BROWSER,
     VIEW_PERSON,
+    VIEW_PERSON_COMMUNITY_LIST, // list of communities of person
     VIEW_SAINT,
     VIEW_COMMUNITY,
     VIEW_AREA,
     VIEW_AREA_PERSON,
-    VIEW_COMMUNITY_PERSON,
+    VIEW_COMMUNITY_PERSON_LIST, // list of people of community
     VIEW_COMMUNITY_DEPT,
     VIEW_DEPARTMENT,
     VIEW_DEPARTMENT_PERSON,

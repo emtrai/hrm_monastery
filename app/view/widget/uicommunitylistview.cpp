@@ -229,7 +229,7 @@ ErrCode UICommunityListView::onMenuActionListAllPerson(QMenu *menu, UITableMenuA
     ErrCode ret = ErrNone;
     Community* community = dynamic_cast<Community*>(act->getData());
     if (community != nullptr) {
-        UICommunityPersonListView* view = (UICommunityPersonListView*)UITableViewFactory::getView(ViewType::VIEW_COMMUNITY_PERSON);
+        UICommunityPersonListView* view = (UICommunityPersonListView*)UITableViewFactory::getView(ViewType::VIEW_COMMUNITY_PERSON_LIST);
 
         logd("community to view person %s", STR2CHA(community->toString()));
         view->setCommunity(community);
@@ -274,7 +274,7 @@ ErrCode UICommunityListView::onMenuActionListDepartment(QMenu *menu, UITableMenu
 //            loge("no uid");
 //            return;
 //        }
-//        UICommunityPersonListView* view = (UICommunityPersonListView*)UITableViewFactory::getView(ViewType::VIEW_COMMUNITY_PERSON);
+//        UICommunityPersonListView* view = (UICommunityPersonListView*)UITableViewFactory::getView(ViewType::VIEW_PEOPLE_IN_COMMUNITY);
 
 //        logd("community uid %s", uid.toStdString().c_str());
 //        //        view->setCommunityUid(uid);

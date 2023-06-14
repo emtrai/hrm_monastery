@@ -32,7 +32,7 @@ MapDbModel::MapDbModel():DbModel(),
     mDbId2(0),
     mStartDate(0),
     mEndDate(0),
-    mModelStatus(MODEL_INACTIVE)
+    mModelStatus(0)
 {
     tracein;
 }
@@ -205,8 +205,10 @@ qint64 MapDbModel::startDate() const
 
 void MapDbModel::setStartDate(qint64 newStartDate)
 {
-    mStartDate = newStartDate;
-    markItemAsModified(KItemStartDate);
+    if (mStartDate != newStartDate) {
+        mStartDate = newStartDate;
+        markItemAsModified(KItemStartDate);
+    }
 }
 
 
@@ -217,8 +219,10 @@ qint64 MapDbModel::endDate() const
 
 void MapDbModel::setEndDate(qint64 newEndDate)
 {
-    mEndDate = newEndDate;
-    markItemAsModified(KItemEndDate);
+    if (mEndDate != newEndDate) {
+        mEndDate = newEndDate;
+        markItemAsModified(KItemEndDate);
+    }
 }
 
 qint32 MapDbModel::modelStatus() const
@@ -228,8 +232,10 @@ qint32 MapDbModel::modelStatus() const
 
 void MapDbModel::setModelStatus(qint32 newStatus)
 {
-    mModelStatus = newStatus;
-    markItemAsModified(KItemStatus);
+    if (mModelStatus != newStatus) {
+        mModelStatus = newStatus;
+        markItemAsModified(KItemStatus);
+    }
 }
 
 const QString &MapDbModel::parentUid() const
@@ -239,9 +245,10 @@ const QString &MapDbModel::parentUid() const
 
 void MapDbModel::setParentUid(const QString &newParentUid)
 {
-    mParentUid = newParentUid;
-
-    markItemAsModified(KItemParentCommunity);
+    if (mParentUid != newParentUid) {
+        mParentUid = newParentUid;
+        markItemAsModified(KItemParentCommunity);
+    }
 }
 
 QString MapDbModel::modelName() const
@@ -261,8 +268,10 @@ const QString &MapDbModel::changeHistory() const
 
 void MapDbModel::setChangeHistory(const QString &newChangeHistory)
 {
-    mChangeHistory = newChangeHistory;
-    markItemAsModified(KItemChangeHistory);
+    if (mChangeHistory != newChangeHistory) {
+        mChangeHistory = newChangeHistory;
+        markItemAsModified(KItemChangeHistory);
+    }
 }
 
 void MapDbModel::copy(const MapDbModel &model)
@@ -281,9 +290,13 @@ void MapDbModel::copy(const MapDbModel &model)
     traceout;
 }
 
-const QString &MapDbModel::modelStatusName() const
+QString MapDbModel::modelStatusName()
 {
-    return mModelStatusName;
+    QString statusName = mModelStatusName;
+    if (mModelStatusName.isEmpty() && mModelStatus != 0) {
+        statusName = DbModel::modelStatus2Name((DbModelStatus)mModelStatus);
+    }
+    return statusName;
 }
 
 void MapDbModel::setModelStatusName(const QString &newModelStatusName)

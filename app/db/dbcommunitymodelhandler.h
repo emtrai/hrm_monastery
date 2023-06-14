@@ -33,7 +33,7 @@ class DbCommunityModelHandler
 {
 public:
 
-    virtual QList<DbModel*> getListPerson(const QString& uid, int modelStatus = MODEL_STATUS_MAX, const QString* perStatusUid = nullptr) = 0;
+    virtual QList<Person*> getListPerson(const QString& uid, int modelStatus = MODEL_STATUS_MAX, const QString* perStatusUid = nullptr) = 0;
     virtual ErrCode addPerson2Community(const Community *comm,
                                         const Person* per,
                                       int status = 0,

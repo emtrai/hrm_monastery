@@ -283,10 +283,9 @@ void DlgAddPersonEvent::on_btnSearch_clicked()
     dlg->setIsMultiSelection(false);
 
     if (dlg->exec() == QDialog::Accepted){
-        Person* per = (Person*)dlg->selectedItem();
+        const Person* per = (const Person*)dlg->selectedItem();
         if (per != nullptr) {
             setPerson(per);
-            delete per;
         } else {
             logi("No person selected");
         }
@@ -353,7 +352,7 @@ const Event *DlgAddPersonEvent::getSelectedEvent() const
     return mEvent;
 }
 
-ErrCode DlgAddPersonEvent::setPerson(Person *newPerson)
+ErrCode DlgAddPersonEvent::setPerson(const Person *newPerson)
 {
     tracein;
     ErrCode err = ErrNone;

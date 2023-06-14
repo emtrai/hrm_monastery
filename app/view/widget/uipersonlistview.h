@@ -27,9 +27,11 @@
 #include "mainwindow.h"
 
 class PersonEvent;
+class QMessageBox;
 
 class UIPersonListView : public UICommonListView, public ImportListener, public MainWindownImportListener
 {
+    Q_OBJECT
 public:
     explicit UIPersonListView(QWidget *parent = nullptr);
     virtual ~UIPersonListView();
@@ -61,8 +63,9 @@ protected:
     virtual ErrCode onMenuActionImport(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionExportListPerson(QMenu *menu, UITableMenuAction *act);
     virtual ErrCode onMenuActionViewPersonEvent(QMenu* menu, UITableMenuAction* act);
+    virtual ErrCode onMenuActionViewCommunity(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionAddPersonEvent(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onChangeCommunity(QMenu* menu, UITableMenuAction* act);
+    virtual ErrCode onMenuActionChangeCommunity(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode exportPersonInfo(QMenu* menu, UITableMenuAction* act);
     virtual void onViewItem(UITableCellWidgetItem *item);
     virtual void onEditItem(UITableCellWidgetItem *item);
@@ -87,6 +90,17 @@ protected:
     virtual ErrCode updatePersonEvent(const QList<DbModel*>& perList, const PersonEvent* event = nullptr);
 private:
     void cleanUpItem();
+//    void onConfirmChangeCommunity(const QList<DbModel *> & perList, const Community * comm);
+    ErrCode onConfirmAddPersonEventChangeCommunity(const QList<DbModel *> & perList,
+                                                const Community * comm);
+    ErrCode onConfirmAddHistoryCommunity(const QList<DbModel *> & perList,
+                                                const Community * comm);
+
+signals:
+    void changeCommunityDone(ErrCode err, QList<DbModel*>, Community*, bool, bool);
+    void confirmChangeCommunity(const QList<DbModel *> & perList, const Community * comm);
+private slots:
+    void onChangeCommunityDone(ErrCode err, QList<DbModel*>, Community*, bool, bool);
 };
 
 #endif // UIPERSONLISTVIEW_H

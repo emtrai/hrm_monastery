@@ -37,6 +37,8 @@
 #define DEFAULT_FORMAT_YMD DATE_FORMAT_DMY
 #define DEFAULT_FORMAT_MD DATE_FORMAT_DM
 
+#define QT_DATE_FORMAT_DMY "dd/MM/yyy"
+
 //TODO: change default split to '|'? '|' is not common used like ','
 #define DEFAULT_CSV_ITEM_SPLIT ','
 #define CSV_LIST_ITEM_SPLIT '|'
@@ -220,8 +222,6 @@ do { \
 
 #define FULLNAME(firstName, lastName) QString("%1 %2").arg(lastName, firstName)
 
-#define RELEASE_LIST_DBMODEL(list) \
-    RELEASE_LIST(list, DbModel)
 
 #define RELEASE_LIST(list, T) \
     do { \
@@ -229,10 +229,21 @@ do { \
     } while(0)
 
 
+#define RELEASE_LIST_DBMODEL(list) \
+    RELEASE_LIST(list, DbModel)
+
 #define RELEASE_HASH(list, K, T) \
     do { \
         Utils::clearListModel<K, T>(list); \
     } while(0)
+
+#define FREE_PTR(ptr) \
+do { \
+    if (ptr) { \
+        delete ptr; \
+        ptr = nullptr; \
+    } \
+} while(0)
 
 typedef ErrCode (*func_one_csv_item_t)(const QStringList& items, void* caller, void* param);
 typedef ErrCode (*func_one_csv_item_complete_t)(const QHash<QString, QString>& items, void* caller, void* param);
@@ -271,6 +282,7 @@ public:
     }
     static qint64 currentTimeMs();
     static QString timeMsToDatestring(qint64 timMs, const QString& format = "yyyy/MM/dd hh:mm:ss");
+    static QString currentTimeToDatestring(const QString& format = QT_DATE_FORMAT_DMY);
     static Gender genderFromString(const QString& gender);
     /**
     * Y/M/D
@@ -317,7 +329,8 @@ public:
     static void showMsgBox(const QString& msg);
     static void showErrorBox(const QString& msg);
     static void showErrorBox(int ret, const QString& msg = nullptr);
-    static bool showConfirmDialog(QWidget *parent, const QString& title, const QString& message, std::function<void(void)> onAccept = nullptr);
+    static bool showConfirmDialog(QWidget *parent, const QString& title,
+                                  const QString& message, std::function<void(int)> onFinished = nullptr);
     static QString showInputDialog(QWidget *parent, const QString& title, const QString& message, const QString& initInput = "", bool* isOk = nullptr);
     static ErrCode screenSize(int* w=nullptr, int* h=nullptr);
     static int screenHeight();

@@ -28,6 +28,7 @@
 #include "dbmodel.h"
 #include <QHash>
 #include "dbsqlitedefs.h"
+#include "logger.h"
 
 class DbSqlite;
 class DbSqliteTableBuilder;
@@ -216,6 +217,21 @@ protected:
                                      const DbModel *item);
     virtual int runQuery(QSqlQuery& qry, const DbModelBuilder& builder,
                       QList<DbModel *> *outList = nullptr);
+    template<class T>
+    int runQueryT(QSqlQuery& qry, const DbModelBuilder& builder,
+                          QList<T *>& outList) {
+        tracein;
+        QList<DbModel *> list;
+        int cnt = runQuery(qry, builder, &list);
+        if (cnt > 0 && list.size() > 0) {
+            foreach(DbModel* item, list) {
+                outList.append((T*)item);
+            }
+            // append, not free
+        }
+        traceout;
+        return cnt;
+    }
     virtual QString getSearchQueryString(const QString& cond = nullptr);
     virtual QString getSearchQueryStringWithTag(const QString& cond = nullptr, const QString& tag = nullptr);
     virtual QString getFilterQueryString(int fieldId, const QString& cond = nullptr);

@@ -102,6 +102,7 @@ public:
     // risk of inconsistant data
     // this function will try to get list of person in community using data (communityuid) in person table
     virtual ErrCode getListPersonInCommunity(const QString& communityUid, qint32 status, QList<DbModel*>& list);
+    virtual ErrCode getListCommunitesOfPerson(const QString& perUid, qint32 modelStatus, QList<CommunityPerson*>& list);
 
     virtual ErrCode update(DbModel* model);
     virtual ErrCode update(DbModel* model, const QHash<QString, QString> &inFields, const QString& tableName);

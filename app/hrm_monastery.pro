@@ -214,6 +214,7 @@ SOURCES += \
     view/dialog/dlgcommdept.cpp \
     view/dialog/dlgcommoneditmodel.cpp \
     view/dialog/dlgcommunity.cpp \
+    view/dialog/dlgconfirmupdatepeoplecomm.cpp \
     view/dialog/dlgcountry.cpp \
     view/dialog/dlgcourse.cpp \
     view/dialog/dlgdepartment.cpp \
@@ -226,6 +227,7 @@ SOURCES += \
     view/dialog/dlgimportlistresult.cpp \
     view/dialog/dlgimportpersonlistresult.cpp \
     view/dialog/dlgperson.cpp \
+    view/dialog/dlgpersoncomm.cpp \
     view/dialog/dlgprovince.cpp \
     view/dialog/dlgsaint.cpp \
     view/dialog/dlgsearch.cpp \
@@ -248,6 +250,7 @@ SOURCES += \
     view/widget/uiitembutton.cpp \
     view/widget/uimissionlistview.cpp \
     view/widget/uimulticomboxview.cpp \
+    view/widget/uipersoncommunitylistview.cpp \
     view/widget/uipersoneventlistview.cpp \
     view/widget/uipersonlistview.cpp \
     view/widget/uirolelistview.cpp \
@@ -320,6 +323,7 @@ HEADERS += \
     db/sqlite/table/dbmetadatatbl.h \
     db/sqlite/table/dbsqlitepersonstatustbl.h \
     db/sqlite/table/dbsqlsequencetbl.h \
+    eventdefs.h \
     exception/exception.h \
     image/image.h \
     image/imagectl.h \
@@ -421,6 +425,7 @@ HEADERS += \
     view/dialog/dlgcommdept.h \
     view/dialog/dlgcommoneditmodel.h \
     view/dialog/dlgcommunity.h \
+    view/dialog/dlgconfirmupdatepeoplecomm.h \
     view/dialog/dlgcountry.h \
     view/dialog/dlgcourse.h \
     view/dialog/dlgdepartment.h \
@@ -433,6 +438,7 @@ HEADERS += \
     view/dialog/dlgimportlistresult.h \
     view/dialog/dlgimportpersonlistresult.h \
     view/dialog/dlgperson.h \
+    view/dialog/dlgpersoncomm.h \
     view/dialog/dlgprovince.h \
     view/dialog/dlgsaint.h \
     view/dialog/dlgsearch.h \
@@ -455,6 +461,7 @@ HEADERS += \
     view/widget/uiitembutton.h \
     view/widget/uimissionlistview.h \
     view/widget/uimulticomboxview.h \
+    view/widget/uipersoncommunitylistview.h \
     view/widget/uipersoneventlistview.h \
     view/widget/uipersonlistview.h \
     view/widget/uirolelistview.h \
@@ -476,6 +483,7 @@ FORMS += \
     view/dialog/dlgareaperson.ui \
     view/dialog/dlgcommdept.ui \
     view/dialog/dlgcommunity.ui \
+    view/dialog/dlgconfirmupdatepeoplecomm.ui \
     view/dialog/dlgcountry.ui \
     view/dialog/dlgcourse.ui \
     view/dialog/dlgdepartment.ui \
@@ -486,6 +494,7 @@ FORMS += \
     view/dialog/dlgimportexportselect.ui \
     view/dialog/dlgimportlistresult.ui \
     view/dialog/dlgperson.ui \
+    view/dialog/dlgpersoncomm.ui \
     view/dialog/dlgprovince.ui \
     view/dialog/dlgsaint.ui \
     view/dialog/dlgsearch.ui \

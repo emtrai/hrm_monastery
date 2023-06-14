@@ -26,13 +26,16 @@
 #include <QList>
 
 class Person;
+class CommunityPerson;
 class DbSqliteCommunityPersonTbl : public DbSqliteMapTbl
 {
 public:
     DbSqliteCommunityPersonTbl(DbSqlite* db);
-    virtual QList<DbModel*> getListPerson(const QString& communityUid, int status = MODEL_STATUS_MAX, const QString* perStatusUid = nullptr);
-    virtual QList<DbModel*> getListCommunityOfPerson(const QString& personUid,
-                                                      const DbModelBuilder &builder);
+    virtual QList<Person*> getListPerson(const QString& communityUid, int status = MODEL_STATUS_MAX, const QString* perStatusUid = nullptr);
+    virtual QList<CommunityPerson*> getListCommunityOfPerson(const QString& personUid,
+                                                      int modelStatus = MODEL_STATUS_MAX);
+    virtual QList<CommunityPerson*> getListPersonOfCommunity(const QString& community,
+                                                              int modelStatus = MODEL_STATUS_MAX);
     virtual QList<DbModel*> getListItems(const QString& personUid, const QString& commuid,
                                           const DbModelBuilder &builder);
 

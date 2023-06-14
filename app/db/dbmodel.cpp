@@ -32,6 +32,7 @@
 #include "community.h"
 #include "specialist.h"
 #include "prebuiltdefs.h"
+#include "stringdefs.h"
 
 DbModel::DbModel():
     mDeletable(true)
@@ -45,6 +46,7 @@ DbModel::DbModel():
 
 {
     tracein;
+    mRefCnt.storeRelease(0);
 //    init(); // TODO: should call init here?
 }
 
@@ -153,6 +155,20 @@ ErrCode DbModel::copyData(const DbModel *model)
     return err;
 }
 
+void DbModel::incRef()
+{
+    mRefCnt.ref();
+    logd("mRefCnt %d", mRefCnt.loadAcquire());
+}
+
+void DbModel::decRef()
+{
+    if (mRefCnt > 0) {
+        mRefCnt.deref();
+    }
+    logd("mRefCnt %d", mRefCnt.loadAcquire());
+}
+
 
 QString DbModel::modelName() const
 {
@@ -235,7 +251,7 @@ QString DbModel::modelStatus2Name(DbModelStatus status)
         ret = statuses->value(status);
     } else {
         loge("invalid status %d", status);
-        ret = "Không rõ"; // TODO: translate???
+        ret = STR_UNKNOWN; // TODO: translate???
     }
     traceout;
     return ret;
@@ -599,6 +615,11 @@ ErrCode DbModel::update(bool allFields)
 bool DbModel::allowRemove(QString* msg)
 {
     return mDeletable;
+}
+
+quint32 DbModel::refCnt() const
+{
+    return mRefCnt;
 }
 
 bool DbModel::updateAllFields() const

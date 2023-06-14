@@ -41,6 +41,8 @@ ErrCode DlgWait::show(void* data, WaitPrepare_t prepare,
                       WaitRunt_t run, WaitFinished_t finish)
 {
     tracein;
+    // TODO: multiple threads can be created, but only on dialog should be created
+    // to avoid flicking when wait dialog show multiple time for multiple purpose
     ErrCode err = ErrNone;
     mForceCancel = false;
     mWorker = new DlgWaitWorker(this, this, data);

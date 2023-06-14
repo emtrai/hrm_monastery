@@ -49,7 +49,7 @@ DbSqliteCommunityPersonTbl::DbSqliteCommunityPersonTbl(DbSqlite *db):
     mFieldNameDbId2 = KFieldPersonDbId;
 }
 
-QList<DbModel *> DbSqliteCommunityPersonTbl::getListPerson(const QString &communityUid,
+QList<Person *> DbSqliteCommunityPersonTbl::getListPerson(const QString &communityUid,
                                                            int modelStatus, const QString* perStatusUid)
 {
     tracein;
@@ -60,7 +60,7 @@ QList<DbModel *> DbSqliteCommunityPersonTbl::getListPerson(const QString &commun
 
     if (communityUid.isEmpty()){
         loge("Invalid community uid");
-        return QList<DbModel*>();
+        return QList<Person*>();
     }
     logi("CommunityUid '%s'", communityUid.toStdString().c_str());
     QString queryString = QString("SELECT *, %2.%3 AS %4, %2.%5 AS %6 FROM %1 LEFT JOIN %2 ON %1.%4 = %2.%3")
@@ -81,19 +81,52 @@ QList<DbModel *> DbSqliteCommunityPersonTbl::getListPerson(const QString &commun
     qry.bindValue( ":uid", communityUid);
     // TODO: add query status
 //    qry.bindValue( ":status", status); // TODO: support multiple status???
-    QList<DbModel *> outList;
-    cnt = runQuery(qry, &Person::build, &outList);
+    QList<Person *> outList;
+    cnt = runQueryT<Person>(qry, &Person::build, outList);
 
     logi("Found %d", cnt);
     traceout;
     return outList;
 }
 
-QList<DbModel *> DbSqliteCommunityPersonTbl::getListCommunityOfPerson(const QString &personUid,
-                                                                      const DbModelBuilder &builder)
+QList<CommunityPerson *> DbSqliteCommunityPersonTbl::getListCommunityOfPerson(const QString &personUid,
+                                                                      int modelStatus)
 {
-    traced;
-    return getListItemsOfUid2(personUid, builder);
+    tracein;
+    logd("get community of personUid '%s', status 0x%x", STR2CHA(personUid), modelStatus);
+    QList<DbModel*> list = getListItemsUids(nullptr, personUid, &CommunityPerson::build, modelStatus);
+    QList<CommunityPerson*> outList;
+    logd("found %d", list.size());
+    if (list.size() > 0) {
+        foreach (DbModel* item, list) {
+            if (item) {
+                logd("item '%s'", MODELSTR2CHA(item));
+                outList.append((CommunityPerson*)item);
+            } else {
+                logw("something stupid, null item in list!!!");
+            }
+        }
+    } else {
+        logi("not found community of per uid '%s' in list", STR2CHA(personUid));
+    }
+    traceout;
+    return outList;
+}
+
+QList<CommunityPerson *> DbSqliteCommunityPersonTbl::getListPersonOfCommunity(const QString &community, int modelStatus)
+{
+    tracein;
+    logd("get person of community '%s'", STR2CHA(community));
+    QList<DbModel*> list = getListItemsUids(community, nullptr, &CommunityPerson::build, modelStatus);
+    QList<CommunityPerson*> outList;
+    logd("found %d", list.size());
+    if (list.size() > 0) {
+        foreach (DbModel* item, list) {
+            outList.append((CommunityPerson*)item);
+        }
+    }
+    traceout;
+    return outList;
 }
 
 QList<DbModel *> DbSqliteCommunityPersonTbl::getListItems(const QString &personUid, const QString &commuid,
@@ -151,7 +184,7 @@ ErrCode DbSqliteCommunityPersonTbl::updateModelFromQuery(DbModel *item, const QS
                     DbModel* model = commHdl->getByUid(commPer->communityUid());
                     if (model) {
                         logd("Found community '%s'", STR2CHA(model->toString()));
-                        commPer->setCommunity(model);
+                        commPer->setCommunity((Community*)model);
                         delete model;
                     } else {
                         loge("Not found community uid '%s'", STR2CHA(commPer->communityUid()));

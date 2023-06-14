@@ -41,9 +41,13 @@ public:
                                   const QString &uid,
                                   int status = MODEL_STATUS_MAX,
                                   const QString& selectedField = "*");
-    virtual QList<DbModel*> getListItemsOfUid2(const QString& uid2, const DbModelBuilder &builder);
-    virtual QList<DbModel*> getListItemsUids(const QString& uid1, const QString& uid2, const DbModelBuilder &builder);
-    virtual ErrCode updateModelStatus(const QString& uid, int status = MODEL_STATUS_MAX);
+//    virtual QList<DbModel*> getListItemsOfUid2(const QString& uid2,
+//                                                const DbModelBuilder &builder,
+//                                                int modelStatus = MODEL_STATUS_MAX);
+    virtual QList<DbModel*> getListItemsUids(const QString& uid1, const QString& uid2,
+                                              const DbModelBuilder &builder,
+                                              int modelStatus = MODEL_STATUS_MAX);
+    virtual ErrCode updateModelStatusInDb(const QString& uid, int status = MODEL_STATUS_MAX);
 protected:
     virtual void addTableField(DbSqliteTableBuilder* builder);
     virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);

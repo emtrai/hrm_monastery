@@ -30,6 +30,12 @@
 #include "idataimporter.h"
 #include "dataexporter.h"
 #include "modeldefs.h"
+#include <QAtomicInt>
+
+#define CLONE_MODEL(model, type) (model?((type*)((DbModel*)model)->clone()):nullptr)
+#define CLONE_LIST(list, type) DbModel::cloneListModel<type>(list)
+#define CLONE_LIST_DBMODEL(list) CLONE_LIST(list, DbModel)
+#define CLONE_LIST_FROM_DBMODEL(list, type) DbModel::cloneListFromDbModelList<type>(list)
 
 #define CLEAR_THEN_SET(curr, newModel, type) \
 do { \
@@ -157,6 +163,34 @@ public:
     static const QList<int>* getModelStatusList();
     static const QList<int>* getDbStatusList();
     static DbModelBuilder getBuilderByModelName(const QString& modelName);
+    template<class T>
+    static QList<T*> cloneListModel(const QList<T*>& list)
+    {
+        QList<T*> outList;
+        foreach (T* model, list) {
+            if  (model) {
+                T* item = ((T*)((DbModel*)model)->clone());
+                if (item) {
+                    outList.append(item);
+                }
+            }
+        }
+        return outList;
+    }
+    template<class T>
+    static QList<T*> cloneListFromDbModelList(const QList<DbModel*>& list)
+    {
+        QList<T*> outList;
+        foreach (DbModel* model, list) {
+            if  (model) {
+                T* item = (T*)(model->clone());
+                if (item) {
+                    outList.append(item);
+                }
+            }
+        }
+        return outList;
+    }
 protected:
     DbModel();
     DbModel(const DbModel& model);
@@ -176,7 +210,8 @@ public:
      * @param model
      */
     virtual ErrCode copyData(const DbModel* model);
-
+    virtual void incRef();
+    virtual void decRef();
     virtual QString modelName() const;
     virtual int modelType() const;
 
@@ -300,6 +335,8 @@ public:
 
     bool updateAllFields() const;
 
+    quint32 refCnt() const;
+
 protected:
     virtual DbModelHandler* getDbModelHandler() const = 0;
     virtual ErrCode prepare2Save();
@@ -336,6 +373,7 @@ protected:
     // TODO: time calculated from 1970 will be reset on 2038!!
     qint64 mDbCreatedTime; // time in ms, since epoc time (1970)
     qint64 mLastDbUpdatedTime; // time in ms, since epoc time (1970)
+    QAtomicInt mRefCnt;
 };
 
 #endif // DBMODEL_H

@@ -34,6 +34,7 @@ class Person;
 class Event;
 class DbPersonModelHandler;
 class PersonEvent;
+class CommunityPerson;
 
 #define PERSONCTL PersonCtl::getInstance()
 
@@ -57,6 +58,9 @@ public:
      * @return err code
      */
     ErrCode getListPersonInCommunity(const QString& communityUid, QList<DbModel *>& list, qint32 status = MODEL_STATUS_MAX);
+    ErrCode getListCommunityOfPerson(const QString& perUid,
+                                     QList<CommunityPerson *>& list,
+                                     qint32 status = MODEL_STATUS_MAX);
 
     /**
      * @brief get list event of person

@@ -123,7 +123,7 @@ protected:
      BaseView* popViewFromStackAndShow();
      void pushViewToStack(BaseView* view);
 
- protected:
+ public:
      void doAddMainWindownImportListener(MainWindownImportListener* listener);
      void doRemoveMainWindownImportListener(MainWindownImportListener* listener);
      void notifyMainWindownImportListenerStart(ImportTarget target);
@@ -156,6 +156,9 @@ protected:
      ErrCode doShowAddPersonEvent(bool isSelfUpdate = true, DbModel* person = nullptr,
                                   DbModel* model = nullptr,
                                   CommonEditModelListener* listener = nullptr);
+//     ErrCode doShowAddPersonCommEvent(bool isSelfUpdate = true, DbModel* person = nullptr,
+//                                  DbModel* model = nullptr,
+//                                  CommonEditModelListener* listener = nullptr);
  private:
      void loadHomePageFile();
      void loadOtherMenu();

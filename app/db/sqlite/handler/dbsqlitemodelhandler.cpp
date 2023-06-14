@@ -50,8 +50,7 @@ ErrCode DbSqliteModelHandler::add(DbModel *model, bool notify)
         DbSqliteTbl* tbl = getTable(model->modelName());
         if (!tbl->isExist(model)){
             err = tbl->add(model);
-        }
-        else{
+        } else{
             err = ErrExisted;
             loge("Model %s already exist", model->name().toStdString().c_str());
         }

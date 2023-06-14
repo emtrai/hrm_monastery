@@ -98,60 +98,85 @@ QList<DbModel *> DbSqliteMapTbl::getListItems(const QString &mapTblName,
     return outList;
 }
 
-QList<DbModel *> DbSqliteMapTbl::getListItemsOfUid2(const QString &uid2, const DbModelBuilder &builder)
-{
-    tracein;
-    //    DB->openDb();
-    QSqlQuery qry(SQLITE->currentDb());
-    qint32 cnt = 0;
-    if (uid2.isEmpty()){
-        loge("Invalid uid");
-        return QList<DbModel*>();
-    }
-    logi("Get list model of uid2 '%s'", uid2.toStdString().c_str());
-    QString queryString = QString("SELECT * FROM %1 WHERE %2 = :uid ORDER BY NAME ASC")
-                              .arg(name(), getFieldNameUid2())
-        ;
+//QList<DbModel *> DbSqliteMapTbl::getListItemsOfUid2(const QString &uid2,
+//                                                    const DbModelBuilder &builder,
+//                                                    int modelStatus)
+//{
+//    tracein;
+//    //    DB->openDb();
+//    QSqlQuery qry(SQLITE->currentDb());
+//    qint32 cnt = 0;
+//    QString cond;
+//    if (uid2.isEmpty()){
+//        loge("Invalid uid");
+//        return QList<DbModel*>();
+//    }
+//    cond = QString("%1 = :uid").arg(getFieldNameUid2());
+//    appendModelStatusCond(cond, modelStatus);
+//    logi("Get list model of uid2 '%s'", uid2.toStdString().c_str());
+//    QString queryString = QString("SELECT * FROM %1 WHERE %2 ORDER BY NAME ASC")
+//                              .arg(name(), cond)
+//        ;
+//    qry.prepare(queryString);
+//    logd("Query String '%s'", queryString.toStdString().c_str());
 
-    qry.prepare(queryString);
-    logd("Query String '%s'", queryString.toStdString().c_str());
+//    // TODO: check sql injection issue
+//    logd("Bind uid2='%s'", STR2CHA(uid2));
+//    qry.bindValue( ":uid", uid2);
+//    // TODO: status check???
+//    QList<DbModel *> outList;
+//    cnt = runQuery(qry, builder, &outList);
 
-    // TODO: check sql injection issue
-    logd("Bind uid2='%s'", STR2CHA(uid2));
-    qry.bindValue( ":uid", uid2);
-    // TODO: status check???
-    QList<DbModel *> outList;
-    cnt = runQuery(qry, builder, &outList);
-
-    logi("Found %d", cnt);
-    traceout;
-    return outList;
-}
+//    logi("Found %d", cnt);
+//    traceout;
+//    return outList;
+//    traced;
+//    return getListItemsUids(nullptr, uid2, builder, modelStatus);
+//}
 
 QList<DbModel *> DbSqliteMapTbl::getListItemsUids(const QString &uid1, const QString &uid2,
-                                                  const DbModelBuilder &builder)
+                                                  const DbModelBuilder &builder,
+                                                  int modelStatus)
 {
     tracein;
     //    DB->openDb();
     QSqlQuery qry(SQLITE->currentDb());
     qint32 cnt = 0;
-    if (uid2.isEmpty()){
-        loge("Invalid uid");
-        return QList<DbModel*>();
-    }
+    QString uid1Cond;
+    QString uid2Cond;
+    QString cond;
     logi("Get list model of uid1='%s', uid2='%s'", STR2CHA(uid1), STR2CHA(uid2));
-    QString queryString = QString("SELECT * FROM %1 WHERE %2 = :uid1 AND %3 = :uid2 ORDER BY NAME ASC")
-                              .arg(name(), getFieldNameUid1(), getFieldNameUid2())
+    if (!uid1.isEmpty()){
+        uid1Cond = QString(":uid1 = %1").arg(getFieldNameUid1());
+    } else {
+        uid1Cond = "1";
+    }
+    if (!uid2.isEmpty()){
+        uid2Cond = QString(":uid2 = %1").arg(getFieldNameUid2());
+    } else {
+        uid2Cond = "1";
+    }
+    logi("uid1Cond='%s', uid2Cond='%s'", STR2CHA(uid1Cond), STR2CHA(uid2Cond));
+
+    cond = QString("%1 AND %2").arg(uid1Cond, uid2Cond);
+    appendModelStatusCond(cond, modelStatus);
+    logi("cond='%s'", STR2CHA(cond));
+    QString queryString = QString("SELECT * FROM %1 WHERE %2 ORDER BY NAME ASC")
+                              .arg(name(), cond)
         ;
 
     qry.prepare(queryString);
     logd("Query String '%s'", queryString.toStdString().c_str());
 
     // TODO: check sql injection issue
-    logd("Bind uid1='%s'", STR2CHA(uid1));
-    qry.bindValue( ":uid1", uid1);
-    logd("Bind uid2='%s'", STR2CHA(uid2));
-    qry.bindValue( ":uid2", uid2);
+    if (!uid1.isEmpty()){
+        logd("Bind uid1='%s'", STR2CHA(uid1));
+        qry.bindValue( ":uid1", uid1);
+    }
+    if (!uid2.isEmpty()){
+        logd("Bind uid2='%s'", STR2CHA(uid2));
+        qry.bindValue( ":uid2", uid2);
+    }
     // TODO: status check???
     QList<DbModel *> outList;
     cnt = runQuery(qry, builder, &outList);
@@ -161,7 +186,7 @@ QList<DbModel *> DbSqliteMapTbl::getListItemsUids(const QString &uid1, const QSt
     return outList;
 }
 
-ErrCode DbSqliteMapTbl::updateModelStatus(const QString &uid, int status)
+ErrCode DbSqliteMapTbl::updateModelStatusInDb(const QString &uid, int status)
 {
     tracein;
     ErrCode err = ErrNone;

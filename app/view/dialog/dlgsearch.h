@@ -48,7 +48,7 @@ public:
     virtual void clearSelectedItem();
 
     virtual const QList<DbModel *> &selectedItems() const;
-    virtual DbModel* selectedItem() const;
+    virtual const DbModel* selectedItem() const;
 
 protected:
 

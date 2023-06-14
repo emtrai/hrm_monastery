@@ -180,7 +180,10 @@ void Logger::doInit()
         file.remove();
     }
     mLogFile.open(QIODevice::Append | QIODevice::Text);
-    QString firstLog = QString("\n--- Start Writing log at '%1' ---\n").arg(QDateTime::currentDateTime().toString());
+    QString firstLog = QString("\n--- Start Writing log at '%1', appver %2 ---\n")
+                           .arg(QDateTime::currentDateTime().toString())
+                           .arg(APP_VERSION)
+                            ;
     mLogFile.write(firstLog.toUtf8());
     logd("open log file '%s'", STR2CHA(mLogFilePath));
 

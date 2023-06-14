@@ -59,6 +59,21 @@ ErrCode PersonCtl::getListPersonInCommunity(const QString &communityUid, QList<D
     return err;
 }
 
+ErrCode PersonCtl::getListCommunityOfPerson(const QString &perUid, QList<CommunityPerson *> &list, qint32 status)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    if (!perUid.isEmpty()) {
+        logi("get community of person uid '%s'", STR2CHA(perUid));
+        err = personModelHdl()->getListCommunitesOfPerson(perUid, status, list);
+        logd("found %lld item", list.size());
+    } else {
+        loge("Invalid perUid");
+    }
+    traceret(err);
+    return err;
+}
+
 ErrCode PersonCtl::getListEvents(const QString &personUid, QList<DbModel*>& list)
 {
     tracein;

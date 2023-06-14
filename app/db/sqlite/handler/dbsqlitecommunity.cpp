@@ -81,8 +81,8 @@ ErrCode DbSqliteCommunity::add(DbModel *model, bool notify)
         err = ErrInvalidArg;
         loge("invalid argument");
     }
+    logi("Add model '%s' to db", MODELSTR2CHA(model));
     if (err == ErrNone) {
-        logi("Add model '%s' to db", STR2CHA(model->toString()));
         err = DbSqliteModelHandler::add(model, false);
         logd("add model res=%d", err);
     }
@@ -103,7 +103,7 @@ ErrCode DbSqliteCommunity::add(DbModel *model, bool notify)
     }
 
     // Add management dept to community so that we can add comminity's manager to
-    if (err == ErrNone) {
+    if (err == ErrNone && model->modelName() == KModelNameCommunity) {
         logd("Check to add management dept for community");
         // TODO: FIXME we're trying to fix management name id with this, but trouble
         // if it's not in json prebuilt file... TAKE CARE
@@ -152,6 +152,8 @@ ErrCode DbSqliteCommunity::add(DbModel *model, bool notify)
             logw("not found dept '%s' for community", KManagementDeptNameId);
         }
     }
+    // TODO: add comm per?
+
     // TODO: well, if adding comm to db ok, but update comm and management dept failed
     // what should we do next???
     if (err == ErrNone && notify) {
@@ -204,10 +206,10 @@ ErrCode DbSqliteCommunity::deleteHard(DbModel *model, bool force, QString *msg)
 }
 
 
-QList<DbModel *> DbSqliteCommunity::getListPerson(const QString &commUid, int modelStatus, const QString* perStatusUid)
+QList<Person *> DbSqliteCommunity::getListPerson(const QString &commUid, int modelStatus, const QString* perStatusUid)
 {
     tracein;
-    QList<DbModel *> list;
+    QList<Person *> list;
     logd("get list person of uid '%s'", STR2CHA(commUid));
     if(!commUid.isEmpty()) {
         // Get from commumity&person mapping table, how about community uid info in person tble??
@@ -268,21 +270,21 @@ ErrCode DbSqliteCommunity::addPerson2Community(const Community *comm,
             logd("found %d community which person uid belong to, set it as active", listCommunitiesOfPerson.size());
             foreach (DbModel* model, listCommunitiesOfPerson) {
                 newAdd = false;
-                tblCommPer->updateModelStatus(model->uid(), MODEL_ACTIVE);
+                tblCommPer->updateModelStatusInDb(model->uid(), MODEL_ACTIVE);
             }
         }
         RELEASE_LIST_DBMODEL(listCommunitiesOfPerson);
         logd("newAdd=%d", newAdd);
         if (newAdd) {
-            QList<DbModel*> listCommunitiesOfPerson =
-                tblCommPer->getListCommunityOfPerson(per->uid(), &CommunityPerson::build);
+            QList<CommunityPerson*> listCommunitiesOfPerson =
+                tblCommPer->getListCommunityOfPerson(per->uid());
             if (listCommunitiesOfPerson.size() > 0) {
                 logd("found %d community which person uid belong to currently, change status to inactive", listCommunitiesOfPerson.size());
-                foreach (DbModel* model, listCommunitiesOfPerson) {
-                    tblCommPer->updateModelStatus(model->uid(), MODEL_INACTIVE);
+                foreach (CommunityPerson* model, listCommunitiesOfPerson) {
+                    tblCommPer->updateModelStatusInDb(model->uid(), MODEL_INACTIVE);
                 }
             }
-            RELEASE_LIST_DBMODEL(listCommunitiesOfPerson);
+            RELEASE_LIST(listCommunitiesOfPerson, CommunityPerson);
             logi("Save mapping community '%s' and person '%s'",
                  STR2CHA(comm->toString()), STR2CHA(per->toString()));
             // TODO: update status of old one?

@@ -149,10 +149,12 @@ ErrCode UICommunityPersonListView::onLoad()
     if (mCommunity != nullptr) {
         setTitle(getTitle());
         logd("Load person list of community '%s'", STR2CHA(mCommunity->toString()));
-        QList<DbModel*> items;
+        QList<Person*> items;
         err = COMMUNITYCTL->getPersonList(mCommunity->uid(), items);
         RELEASE_LIST_DBMODEL(mItemList);
-        mItemList.append(items);
+        foreach (Person* per, items) {
+            mItemList.append((DbModel*)per); // TODO: convert it to Person????
+        }
     } else {
         loge("Nothing to load");
     }

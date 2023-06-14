@@ -26,6 +26,8 @@
 #define STR_OK          QObject::tr("Đồng ý")
 #define STR_CANCEL      QObject::tr("Hủy")
 #define STR_SAVE        QObject::tr("Lưu")
+#define STR_IGNORE      QObject::tr("Bỏ qua")
+#define STR_HELP        QObject::tr("Giúp đỡ")
 
 #define STR_ADDR        QObject::tr("Địa chỉ")
 #define STR_TEL         QObject::tr("Điện thoại")
@@ -47,12 +49,13 @@
 #define STR_ROLE        QObject::tr("Vai trò")
 #define STR_UNKNOWN     QObject::tr("Không rõ")
 #define STR_COURSE      QObject::tr("Nhiệm kỳ")
-#define STR_UNKNOWN     QObject::tr("Không rõ")
 #define STR_MODELSTATUS QObject::tr("Tình trạng")
 
 #define STR_DATE        QObject::tr("Ngày")
+#define STR_STARTDATE        QObject::tr("Ngày bắt đầu")
 #define STR_ENDDATE     QObject::tr("Ngày kết thúc")
 #define STR_EVENT     QObject::tr("Sự kiện")
 #define STR_TITLE     QObject::tr("Tiêu đề")
+#define STR_CHANGE_COMMUNITY     QObject::tr("Đổi cộng đoàn")
 
 #endif // STRINGDEFS_H

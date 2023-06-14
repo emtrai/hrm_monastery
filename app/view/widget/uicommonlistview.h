@@ -55,6 +55,13 @@ protected:
     virtual QString getName();
     virtual QString getMainModelName();
     virtual void onModelControllerDataUpdated(const DbModel *model);
+    template<class T>
+    void setListItem(const QList<T*>& list){
+        RELEASE_LIST_DBMODEL(mItemList);
+        foreach(T* item, list) {
+            mItemList.append((DbModel*) item);
+        }
+    }
 protected:
     QList<DbModel*> mItemList;
 };

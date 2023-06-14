@@ -64,6 +64,12 @@ void DlgCommonEditModel::setupUI()
 
         btn = btnBox->button(QDialogButtonBox::Ok);
         if (btn) btn->setText(STR_OK);
+
+        btn = btnBox->button(QDialogButtonBox::Ignore);
+        if (btn) btn->setText(STR_IGNORE);
+
+        btn = btnBox->button(QDialogButtonBox::Help);
+        if (btn) btn->setText(STR_HELP);
     }
     traceout;
 }
@@ -234,10 +240,11 @@ void DlgCommonEditModel::accept()
     } else {
         logd("not mIsSelfSave, just call accept");
     }
+    logd("ret=%d", ret);
     if (ret == ErrNone) {
         QDialog::accept();
     }
-    traceret(ret);
+    traceout;
 }
 bool DlgCommonEditModel::onValidateData(QString &msg)
 {
