@@ -37,11 +37,11 @@
 
 #define STR_STT         QObject::tr("STT")
 
-#define STR_NAMEID      QObject::tr("Tên định danh")
-#define STR_PERSON_NAMEID QObject::tr("Tên định danh Nữ tu")
-#define STR_NAME        QObject::tr("Tên")
-#define STR_HOLLYNAME   QObject::tr("Tên Thánh")
-#define STR_FULLNAME    QObject::tr("Họ tên")
+#define STR_NAMEID          QObject::tr("Tên định danh")
+#define STR_PERSON_NAMEID   QObject::tr("Tên định danh Nữ tu")
+#define STR_NAME            QObject::tr("Tên")
+#define STR_HOLLYNAME       QObject::tr("Tên Thánh")
+#define STR_FULLNAME        QObject::tr("Họ tên")
 
 #define STR_NOTE        QObject::tr("Ghi chú")
 
@@ -50,6 +50,7 @@
 #define STR_UNKNOWN     QObject::tr("Không rõ")
 #define STR_COURSE      QObject::tr("Nhiệm kỳ")
 #define STR_MODELSTATUS QObject::tr("Tình trạng")
+#define STR_STATUS      QObject::tr("Trạng thái")
 
 #define STR_DATE        QObject::tr("Ngày")
 #define STR_STARTDATE        QObject::tr("Ngày bắt đầu")

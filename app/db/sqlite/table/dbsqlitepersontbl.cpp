@@ -272,6 +272,15 @@ ErrCode DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &
     // TODO: separate into short info and full info, to avoid consume too much memory?
     // TODO: paging to avoid too much memory?
     Person* cmm = (Person*) item;
+    if (!qry.isNull(KFieldPersonDbId)) {
+        qint64 dbId = 0;
+        bool ok = false;
+        dbId = qry.value(KFieldPersonDbId).toLongLong(&ok);
+        logd("dbId %lld, ok %d", dbId, ok);
+        if (ok) {
+            cmm->setDbId(dbId);
+        }
+    }
     if (!qry.isNull(KFieldPersonUid)) {
         cmm->setUid(qry.value(KFieldPersonUid).toString());
     }

@@ -32,6 +32,7 @@
 #define COMMUNITYCTL (CommunityCtl::getInstance())
 
 class Person;
+class CommunityPerson;
 
 class CommunityCtl: public ModelController
 {
@@ -49,6 +50,7 @@ public:
      */
     ErrCode getActivePersonList(const QString& communityUid, QList<Person*>& outList);
     ErrCode getPersonList(const QString& communityUid, QList<Person*>& outList, qint64 modelStatus = MODEL_STATUS_MAX);
+    ErrCode getListCommunityPerson(const QString& communityUid, QList<CommunityPerson*>& outList, qint64 modelStatus = MODEL_STATUS_MAX);
 
     /**
      * @brief Add person to community

@@ -113,18 +113,50 @@ QList<CommunityPerson *> DbSqliteCommunityPersonTbl::getListCommunityOfPerson(co
     return outList;
 }
 
-QList<CommunityPerson *> DbSqliteCommunityPersonTbl::getListPersonOfCommunity(const QString &community, int modelStatus)
+QList<CommunityPerson *> DbSqliteCommunityPersonTbl::getListCommunityPerson(
+                                        const QString &communityUid, int modelStatus)
 {
     tracein;
-    logd("get person of community '%s'", STR2CHA(community));
-    QList<DbModel*> list = getListItemsUids(community, nullptr, &CommunityPerson::build, modelStatus);
-    QList<CommunityPerson*> outList;
-    logd("found %d", list.size());
-    if (list.size() > 0) {
-        foreach (DbModel* item, list) {
-            outList.append((CommunityPerson*)item);
-        }
+    QSqlQuery qry(SQLITE->currentDb());
+    qint32 cnt = 0;
+    QString cond;
+    logd("Get list model of communityUid='%s'", STR2CHA(communityUid));
+    if (!communityUid.isEmpty()){
+        cond = QString("%1.%2 = :communityUid").arg(name(), getFieldNameUid1());
+    } else {
+        cond = "1";
     }
+    appendModelStatusCond(cond, modelStatus);
+    logi("cond='%s'", STR2CHA(cond));
+    QString queryString = QString("SELECT *, %2.%5 AS %6, %2.%7 AS %8, "
+                                  "%2.%9 AS %10, %2.%11 AS %12 "
+                                  "FROM %1 LEFT JOIN %2 ON %1.%4 = %2.%5 "
+                                  "WHERE %3 ORDER BY NAME ASC")
+                                .arg(name(), KTablePerson, cond) // 1, 2, 3
+                                .arg(getFieldNameUid2(), KFieldUid, KFieldPersonUid) // 4, 5, 6
+                                .arg(KFieldNameId, KFieldPersonNameId) // 7, 8
+                                .arg(KFieldId, KFieldPersonDbId) // 9, 10
+                                .arg(KFieldRemark, KFieldPersonRemark) // 11, 12
+        ;
+
+    qry.prepare(queryString);
+    logd("Query String '%s'", queryString.toStdString().c_str());
+
+    // TODO: check sql injection issue
+    if (!communityUid.isEmpty()){
+        logd("Bind communityUid='%s'", STR2CHA(communityUid));
+        qry.bindValue( ":communityUid", communityUid);
+    }
+    // TODO: status check???
+    QList<DbModel *> items;
+    QList<CommunityPerson *> outList;
+    cnt = runQuery(qry, &CommunityPerson::build, &items);
+
+    logi("Found %d", cnt);
+    if (cnt > 0) {
+        outList = CLONE_LIST_FROM_DBMODEL(items, CommunityPerson);
+    }
+    RELEASE_LIST_DBMODEL(items);
     traceout;
     return outList;
 }

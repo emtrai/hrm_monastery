@@ -53,6 +53,7 @@ public:
      */
     virtual QList<Person*> getListPerson(const QString& communityUid,
                                            int modelStatus = MODEL_STATUS_MAX, const QString* perStatusUid = nullptr);
+    virtual QList<CommunityPerson*> getListCommunityPerson(const QString& commUid, int modelStatus = MODEL_STATUS_MAX, const QString* perStatusUid = nullptr);
 
     /**
      * @brief Add person to community

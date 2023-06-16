@@ -281,6 +281,7 @@ void DlgAddPersonEvent::on_btnSearch_clicked()
         return; // TODO: open dlg??
     }
     dlg->setIsMultiSelection(false);
+    // TODO: support multi selection for person
 
     if (dlg->exec() == QDialog::Accepted){
         const Person* per = (const Person*)dlg->selectedItem();

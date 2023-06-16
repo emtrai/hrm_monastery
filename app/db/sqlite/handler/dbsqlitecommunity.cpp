@@ -228,6 +228,29 @@ QList<Person *> DbSqliteCommunity::getListPerson(const QString &commUid, int mod
     return list;
 }
 
+QList<CommunityPerson *> DbSqliteCommunity::getListCommunityPerson(const QString &commUid, int modelStatus, const QString *perStatusUid)
+{
+    tracein;
+    QList<CommunityPerson *> list;
+    logd("get list person of uid '%s'", STR2CHA(commUid));
+    if(!commUid.isEmpty()) {
+        // Get from commumity&person mapping table, how about community uid info in person tble??
+        // TODO: need to sync information with communityuid on person table
+        // RISK OF INCONSITANT!!!!!!!
+        DbSqliteCommunityPersonTbl* tbl = (DbSqliteCommunityPersonTbl*)DbSqlite::table(KTableCommPerson);
+        if (tbl) {
+            list = tbl->getListCommunityPerson(commUid, modelStatus);
+        } else {
+            THROWEX("Not found table '%s'", KTableCommPerson);
+        }
+    } else {
+        loge("invalid commUid '%s'", STR2CHA(commUid));
+    }
+    traceout;
+    return list;
+
+}
+
 ErrCode DbSqliteCommunity::addPerson2Community(const Community *comm,
                                                const Person *per, int status,
                                                qint64 startdate, qint64 enddate,

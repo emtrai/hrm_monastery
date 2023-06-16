@@ -29,6 +29,8 @@
 #include "communityctl.h"
 #include "utils.h"
 #include "dialog/dlgsearchperson.h"
+#include "stringdefs.h"
+#include "communityperson.h"
 
 UICommunityPersonListView::UICommunityPersonListView(QWidget *parent):
     UICommonListView(parent),
@@ -149,10 +151,10 @@ ErrCode UICommunityPersonListView::onLoad()
     if (mCommunity != nullptr) {
         setTitle(getTitle());
         logd("Load person list of community '%s'", STR2CHA(mCommunity->toString()));
-        QList<Person*> items;
-        err = COMMUNITYCTL->getPersonList(mCommunity->uid(), items);
+        QList<CommunityPerson*> items;
+        err = COMMUNITYCTL->getListCommunityPerson(mCommunity->uid(), items);
         RELEASE_LIST_DBMODEL(mItemList);
-        foreach (Person* per, items) {
+        foreach (CommunityPerson* per, items) {
             mItemList.append((DbModel*)per); // TODO: convert it to Person????
         }
     } else {
@@ -188,7 +190,8 @@ void UICommunityPersonListView::initHeader()
     mHeader.append(tr("Mã"));
     mHeader.append(tr("Tên Thánh"));
     mHeader.append(tr("Họ tên"));
-    mHeader.append(tr("Cộng đoàn"));
+    mHeader.append(tr("Cộng đoàn hiện tại"));
+    mHeader.append(STR_STATUS);
     mHeader.append(tr("Năm sinh"));
     mHeader.append(tr("Nơi sinh"));
     mHeader.append(tr("Ngày bổn mạng"));
@@ -213,13 +216,28 @@ QString UICommunityPersonListView::getTitle()
 void UICommunityPersonListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
+    CommunityPerson* commper = nullptr;
+    Person* per  = nullptr;
+    ErrCode err = ErrNone;
+    if (!item || item->modelName() != KModelNameCommPerson) {
+        err = ErrInvalidArg;
+        loge("invalid item '%s'", MODELSTR2CHA(item));
+    }
     loge("updateItem '%s'", item?STR2CHA(item->modelName()):"");
-    if (item && item->modelName() == KModelNamePerson) {
-        Person* per = (Person*) item;
+    if (err == ErrNone) {
+        commper = (CommunityPerson*) item;
+        per = (Person*) commper->person();
+        if (!per) {
+            loge("no person object in communitypersom");
+            err = ErrInvalidData;
+        }
+    }
+    if (err == ErrNone) {
         tblItem->addValue(per->nameId());
         tblItem->addValue(per->hollyName());
         tblItem->addValue(per->getFullName());
         tblItem->addValue(per->communityName());
+        tblItem->addValue(commper->modelStatusName());
         tblItem->addValue(Utils::date2String(per->birthday()));
         tblItem->addValue(per->birthPlace());
         tblItem->addValue(Utils::date2String(per->feastDay(), DEFAULT_FORMAT_MD)); // seem feastday convert repeate many time, make it common????
@@ -233,8 +251,9 @@ void UICommunityPersonListView::updateItem(DbModel *item, UITableItem *tblItem, 
         tblItem->addValue(per->email().join(";"));
         tblItem->addValue(per->specialistNameList().join(","));
         tblItem->addValue(per->currentWorkName());
-    } else {
-        loge("No item found, or not expected model '%s'", item?STR2CHA(item->modelName()):"");
     }
+    logd("err = %d", err);
+    // TODO: show dialog/report issue when invalid info?
+
     traceout;
 }
