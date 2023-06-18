@@ -30,6 +30,7 @@
 #include <QDialogButtonBox>
 #include <QPushButton>
 #include "stringdefs.h"
+#include "dialogutils.h"
 
 
 DlgCommonEditModel::DlgCommonEditModel(QWidget *parent): QDialog(parent),
@@ -139,7 +140,7 @@ const DbModel *DlgCommonEditModel::getModel() const
 //                errMsg = QString("Có dữ liệu lỗi, vui lòng kiểm ra lại"); // TODO: should use "tr" or make it translatable???
 //            }
 //            loge("invalid data, err msg %s", STR2CHA(errMsg));
-//            Utils::showErrorBox(errMsg);
+//            DialogUtils::showErrorBox(errMsg);
 //            ret = ErrInvalidData;
 //        }
 //    }
@@ -157,9 +158,9 @@ const DbModel *DlgCommonEditModel::getModel() const
 
 //            if (ret == ErrNone) {
 //                logi("Save/update '%s' ok , close dialog", STR2CHA(item->toString()));
-//                Utils::showMsgBox(QString(tr("Đã lưu %1")).arg(item->name()));
+//                DialogUtils::showMsgBox(QString(tr("Đã lưu %1")).arg(item->name()));
 //            } else {
-//                Utils::showErrorBox("Lỗi, không thể lưu thông tin");
+//                DialogUtils::showErrorBox("Lỗi, không thể lưu thông tin");
 //            }
 //        } else {
 //            logd("not mIsSelfSave, just call accept");
@@ -171,7 +172,7 @@ const DbModel *DlgCommonEditModel::getModel() const
 //            logd("no listener to call");
 //        }
 //    } else {
-//        Utils::showErrorBox("Lỗi, không thể tạo dữ liệu");
+//        DialogUtils::showErrorBox("Lỗi, không thể tạo dữ liệu");
 //        ret = ErrBuildDataFailed;
 //    }
 //    if (ret == ErrNone) {
@@ -205,7 +206,7 @@ void DlgCommonEditModel::accept()
                 errMsg = QString("Có dữ liệu lỗi, vui lòng kiểm ra lại"); // TODO: should use "tr" or make it translatable???
             }
             loge("invalid data, err msg %s", STR2CHA(errMsg));
-            Utils::showErrorBox(errMsg);
+            DialogUtils::showErrorBox(errMsg);
             ret = ErrInvalidData;
         }
     }
@@ -223,9 +224,9 @@ void DlgCommonEditModel::accept()
 
             if (ret == ErrNone) {
                 logi("Save/update '%s' ok , close dialog", STR2CHA(item->toString()));
-                Utils::showMsgBox(QString(tr("Đã lưu %1")).arg(item->name()));
+                DialogUtils::showMsgBox(QString(tr("Đã lưu %1")).arg(item->name()));
             } else {
-                Utils::showErrorBox("Lỗi, không thể lưu thông tin");
+                DialogUtils::showErrorBox("Lỗi, không thể lưu thông tin");
             }
             if (mListener) {
                 logd("Call listener");
@@ -234,7 +235,7 @@ void DlgCommonEditModel::accept()
                 logd("no listener to call");
             }
         } else {
-            Utils::showErrorBox("Lỗi, không thể tạo dữ liệu");
+            DialogUtils::showErrorBox("Lỗi, không thể tạo dữ liệu");
             ret = ErrBuildDataFailed;
         }
     } else {
@@ -311,7 +312,7 @@ void DlgCommonEditModel::onEditnameId(QLineEdit *txtNameId)
     tracein;
     QString txt = txtNameId->text().trimmed();
     bool ok = false;
-    QString nameId = Utils::showInputDialog(this, tr("Mã định danh"),
+    QString nameId = DialogUtils::showInputDialog(this, tr("Mã định danh"),
                                             tr("Nhập mã định danh. \
 \nSau khi nhập, mã định danh sẽ cố định, không tự động tao theo dữ liệu nhập.\
 \nĐể mã định danh tự động tạo theo giá trị nhập, xóa toàn bộ và chọn Đồng ý"),

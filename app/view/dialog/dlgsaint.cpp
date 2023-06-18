@@ -26,7 +26,9 @@
 #include "country.h"
 #include "countryctl.h"
 #include "utils.h"
+#include "datetimeutils.h"
 #include "saint.h"
+#include "dialogutils.h"
 
 DlgSaint::DlgSaint(QWidget *parent) :
     QDialog(parent),
@@ -72,7 +74,7 @@ void DlgSaint::accept()
     qint64 feastday = 0;
     if (!dateStr.isEmpty()) {
         bool isOk = false;
-        feastday = Utils::dateFromString(dateStr, DATE_FORMAT_DM, &isOk);
+        feastday = DatetimeUtils::dateFromString(dateStr, DATE_FORMAT_DM, &isOk);
         logd("feastday %s -> %d", dateStr.toStdString().c_str(), feastday);
         if (!isOk || (feastday <= 0)) {
             warning += tr("Sai ngày bổn mạng (định dạng ngày/tháng");
@@ -110,7 +112,7 @@ void DlgSaint::accept()
             QDialog::accept();
         }
     } else {
-        Utils::showErrorBox(warning);
+        DialogUtils::showErrorBox(warning);
     }
 
 }
@@ -151,7 +153,7 @@ void DlgSaint::on_btnChangeNameId_clicked()
     tracein;
     QString txt = ui->txtName->text().trimmed();
     bool ok = false;
-    QString nameId = Utils::showInputDialog(this, tr("Định danh"), tr("Nhập mã định danh"), txt, &ok);
+    QString nameId = DialogUtils::showInputDialog(this, tr("Định danh"), tr("Nhập mã định danh"), txt, &ok);
     if (ok && !nameId.isEmpty()) {
         mCustomNameId = true;
         ui->txtName->setText(nameId);

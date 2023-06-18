@@ -24,6 +24,7 @@
 
 #include "person.h"
 #include "dbmodel.h"
+#include "datetimeutils.h"
 
 class Community;
 class Department;

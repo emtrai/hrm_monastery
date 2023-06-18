@@ -28,9 +28,11 @@
 #include "dbmodel.h"
 #include "course.h"
 #include "utils.h"
+#include "datetimeutils.h"
 #include "mainwindow.h"
 #include "uitableviewfactory.h"
 #include "coursectl.h"
+#include "dialogutils.h"
 
 UICourseListView::UICourseListView(QWidget *parent):
     UICommonListView(parent)
@@ -100,7 +102,7 @@ void UICourseListView::onViewItem(UITableCellWidgetItem *item)
         MainWindow::showOnHtmlViewer(comm, tr("Khóa/Nhiệm Kỳ/Lớp Khấn"));
     } else {
         loge("Model obj is null");
-        Utils::showErrorBox("Không có thông tin để xem");
+        DialogUtils::showErrorBox("Không có thông tin để xem");
     }
     traceout;
 }
@@ -132,8 +134,8 @@ void UICourseListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
         tblItem->addValue(course->name());
         tblItem->addValue(course->courseTypeName());
         tblItem->addValue(course->period());
-        tblItem->addValue(Utils::date2String(course->startDate(), DEFAULT_FORMAT_YMD));
-        tblItem->addValue(Utils::date2String(course->endDate(), DEFAULT_FORMAT_YMD));
+        tblItem->addValue(DatetimeUtils::date2String(course->startDate(), DEFAULT_FORMAT_YMD));
+        tblItem->addValue(DatetimeUtils::date2String(course->endDate(), DEFAULT_FORMAT_YMD));
         tblItem->addValue(course->remark());
     } else {
         loge("Invalid course '%s'", course?STR2CHA(course->toString()):"null");

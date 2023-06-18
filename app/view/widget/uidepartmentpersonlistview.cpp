@@ -29,6 +29,7 @@
 #include "communitydept.h"
 #include "communitydeptctl.h"
 #include "utils.h"
+#include "datetimeutils.h"
 #include "dialog/dlgdeptperson.h"
 #include "person.h"
 #include "persondept.h"
@@ -200,7 +201,7 @@ void UIDepartmentPersonListView::updateItem(DbModel *item, UITableItem *tblItem,
     tblItem->addValue(model->roleName());
     tblItem->addValue(DbModel::modelStatus2Name((DbModelStatus)model->modelStatus()));
     tblItem->addValue(model->courseName());
-    tblItem->addValue(Utils::date2String(model->startDate(), DEFAULT_FORMAT_YMD));
-    tblItem->addValue(Utils::date2String(model->endDate(), DEFAULT_FORMAT_YMD));
+    tblItem->addValue(DatetimeUtils::date2String(model->startDate(), DEFAULT_FORMAT_YMD));
+    tblItem->addValue(DatetimeUtils::date2String(model->endDate(), DEFAULT_FORMAT_YMD));
     traceout;
 }

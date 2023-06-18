@@ -24,6 +24,7 @@
 #include "errcode.h"
 #include "dbctl.h"
 #include "utils.h"
+#include "datetimeutils.h"
 #include "filectl.h"
 #include "dataexporter.h"
 #include "exportfactory.h"
@@ -248,7 +249,7 @@ void PersonDept::setEndDate(qint64 newEndDate)
 
 void PersonDept::setEndDate(const QString &newEndDate, const QString &format)
 {
-    setEndDate(Utils::dateFromString(newEndDate, format));
+    setEndDate(DatetimeUtils::dateFromString(newEndDate, format));
 }
 
 qint64 PersonDept::startDate() const
@@ -263,5 +264,5 @@ void PersonDept::setStartDate(qint64 newStartDate)
 
 void PersonDept::setStartDate(const QString &newStartDate, const QString &format)
 {
-    setStartDate(Utils::dateFromString(newStartDate, format));
+    setStartDate(DatetimeUtils::dateFromString(newStartDate, format));
 }

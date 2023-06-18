@@ -28,6 +28,7 @@
 #include "personctl.h"
 #include "person.h"
 #include "utils.h"
+#include "datetimeutils.h"
 #include "saintctl.h"
 #include "personstatusctl.h"
 
@@ -77,6 +78,7 @@
 #include "stringdefs.h"
 #include "image.h"
 #include "imagedefs.h"
+#include "dialogutils.h"
 
 #define SPLIT_EMAIL_PHONE ";"
 
@@ -423,7 +425,7 @@ ErrCode DlgPerson::fromPerson(const Person *model)
 
     ui->txtCode->setText(per->nameId());
     ui->txtName->setText(per->getFullName());
-    ui->txtBirthday->setText(Utils::date2String(per->birthday()));
+    ui->txtBirthday->setText(DatetimeUtils::date2String(per->birthday()));
 
     // cbSaints
     // TODO: fix issue of show saint adding dialog if name is not exist in list
@@ -433,7 +435,7 @@ ErrCode DlgPerson::fromPerson(const Person *model)
     }
     ui->txtSaint->setText(per->hollyName());
     // ngay bon mang
-    ui->txtFeastDay->setText(Utils::date2String(per->feastDay(), DEFAULT_FORMAT_MD));
+    ui->txtFeastDay->setText(DatetimeUtils::date2String(per->feastDay(), DEFAULT_FORMAT_MD));
     // birthday
     ui->txtBirthplace->setText(per->birthPlace());
     // TODO: country, ethinic, nationality, etc.
@@ -444,7 +446,7 @@ ErrCode DlgPerson::fromPerson(const Person *model)
 
     // id card
     ui->txtIDCard->setText(per->idCard());
-    ui->txtIdCardDate->setText(Utils::date2String(per->idCardIssueDate()));
+    ui->txtIdCardDate->setText(DatetimeUtils::date2String(per->idCardIssueDate()));
     ui->txtIdCardPlace->setText(per->idCardIssuePlace());
     // cbEdu
     Utils::setSelectItemComboxByData(ui->cbEdu, per->eduUid());
@@ -473,50 +475,50 @@ ErrCode DlgPerson::fromPerson(const Person *model)
     ui->txtOtherContact->setPlainText(per->otherContact());
 
     ui->txtDad->setText(per->dadName());
-    ui->txtDadBirth->setText(Utils::date2String(per->dadBirthday()));
+    ui->txtDadBirth->setText(DatetimeUtils::date2String(per->dadBirthday()));
     ui->txtDadAddr->setText(per->dadAddr());
 
     ui->txtMom->setText(per->momName());
-    ui->txtMonBirth->setText(Utils::date2String(per->momBirthday()));
+    ui->txtMonBirth->setText(DatetimeUtils::date2String(per->momBirthday()));
     ui->txtMonAddr->setText(per->momAddr());
 
     ui->txtFamilyHistory->setPlainText(per->familyHistory());
     ui->txtFamilyContact->setPlainText(per->familyContact());
 
     // ngay rua toi
-    ui->txtChristenDate->setText(Utils::date2String(per->christenDate()));
+    ui->txtChristenDate->setText(DatetimeUtils::date2String(per->christenDate()));
     ui->txtChristenPlace->setText(per->christenPlace());
 
     // bi tich thanh the
-    ui->txtEucharisDate->setText(Utils::date2String(per->eucharistDate()));
+    ui->txtEucharisDate->setText(DatetimeUtils::date2String(per->eucharistDate()));
     ui->txtEucharistPlace->setText(per->eucharistPlace());
 
     // bi tich them suc
-    ui->txtHollyDate->setText(Utils::date2String(per->hollyDate()));
+    ui->txtHollyDate->setText(DatetimeUtils::date2String(per->hollyDate()));
     ui->txtHollyPlace->setText(per->hollyPlace());
 
     // ngay nhap tu
-    ui->txtJoinDate->setText(Utils::date2String(per->joinDate()));
+    ui->txtJoinDate->setText(DatetimeUtils::date2String(per->joinDate()));
     SET_TEXTBOX_FROM_VALUE(ui->txtJoinPIC, KItemUid, per->joinPICUid(), per->joinPICName());
     //cbJoinPIC (nguoi dac trach)
 
     // ngay gia nhap tien tap vien
-    ui->txtPreTrainJoinDate->setText(Utils::date2String(per->preTrainJoinDate()));
+    ui->txtPreTrainJoinDate->setText(DatetimeUtils::date2String(per->preTrainJoinDate()));
     //cbPreTrainJoinPIC
     SET_TEXTBOX_FROM_VALUE(ui->txtPreTrainJoinPIC, KItemUid,
                            per->preTrainPICUid(), per->preTrainPICName());
 
-    ui->txtTrainJoinDate->setText(Utils::date2String(per->trainJoinDate()));
+    ui->txtTrainJoinDate->setText(DatetimeUtils::date2String(per->trainJoinDate()));
     //cbTrainPIC
     SET_TEXTBOX_FROM_VALUE(ui->txtTrainPIC, KItemUid,
                            per->trainPICUid(), per->trainPICName());
 
-    ui->txtVowsDate->setText(Utils::date2String(per->vowsDate()));
+    ui->txtVowsDate->setText(DatetimeUtils::date2String(per->vowsDate()));
     //cbVowsCEO
     SET_TEXTBOX_FROM_VALUE(ui->txtVowsCEO, KItemUid,
                            per->vowsCEOUid(), per->vowsCEOName());
 
-    ui->txtEternalVowsDate->setText(Utils::date2String(per->eternalVowsDate()));
+    ui->txtEternalVowsDate->setText(DatetimeUtils::date2String(per->eternalVowsDate()));
     //cbEternalVowsPIC
 //    SET_TEXTBOX_FROM_VALUE(ui->txtEternalVowsPIC, KItemUid,
 //                           per->eternalVowsPICUid(), per->eternalVowsPICName());
@@ -524,21 +526,21 @@ ErrCode DlgPerson::fromPerson(const Person *model)
     SET_TEXTBOX_FROM_VALUE(ui->txtEternalVowsCEO, KItemUid,
                            per->eternalVowsCEOUid(), per->eternalVowsCEOName());
 
-    ui->txtBankDate->setText(Utils::date2String(per->bankDate()));
+    ui->txtBankDate->setText(DatetimeUtils::date2String(per->bankDate()));
     ui->txtBankPlace->setText(per->bankPlace());
 
-    ui->txtGoldenDate->setText(Utils::date2String(per->goldenDate()));
+    ui->txtGoldenDate->setText(DatetimeUtils::date2String(per->goldenDate()));
     ui->txtGoldenPlace->setText(per->goldenPlace());
 
-    ui->txtEternalDate->setText(Utils::date2String(per->eternalDate()));
+    ui->txtEternalDate->setText(DatetimeUtils::date2String(per->eternalDate()));
     ui->txtEternalPlace->setText(per->eternalPlace());
 
     // cbStatus
 
-    ui->txtRetireDate->setText(Utils::date2String(per->retireDate()));
+    ui->txtRetireDate->setText(DatetimeUtils::date2String(per->retireDate()));
     ui->txtRetirePlace->setText(per->retirePlace());
 
-    ui->txtDeadDate->setText(Utils::date2String(per->deadDate()));
+    ui->txtDeadDate->setText(DatetimeUtils::date2String(per->deadDate()));
     ui->txtDeadPlace->setText(per->deadPlace());
 
     // current work
@@ -835,8 +837,8 @@ void DlgPerson::loadEvent(bool reloadAll)
         tbl->setItem(idx, col++, new QTableWidgetItem(event->nameId()));
         tbl->setItem(idx, col++, new QTableWidgetItem(event->eventName()));
         tbl->setItem(idx, col++, new QTableWidgetItem(event->name()));
-        tbl->setItem(idx, col++, new QTableWidgetItem(Utils::date2String(event->date())));
-        tbl->setItem(idx, col++, new QTableWidgetItem(Utils::date2String(event->endDate())));
+        tbl->setItem(idx, col++, new QTableWidgetItem(DatetimeUtils::date2String(event->date())));
+        tbl->setItem(idx, col++, new QTableWidgetItem(DatetimeUtils::date2String(event->endDate())));
         tbl->setItem(idx, col++, new QTableWidgetItem(event->remark()));
         idx++;
     }
@@ -970,7 +972,7 @@ void DlgPerson::on_buttonBox_clicked( QAbstractButton * button )
                 logd("Save/update ok, close dialog");
                 QDialog::accept();
             } else {
-                Utils::showErrorBox(QString("Lỗi, không thể lưu thông tin, Mã lỗi %1").arg(ret));
+                DialogUtils::showErrorBox(QString("Lỗi, không thể lưu thông tin, Mã lỗi %1").arg(ret));
             }
         }
 
@@ -1045,7 +1047,7 @@ void DlgPerson::on_btnAddCommunityHistory_clicked()
 //            tbl->insertRow(idx);
 //            qint32 col = 0;
 //            tbl->setItem(idx, col++, new QTableWidgetItem(QString("%1").arg(comm->dbId())));
-//            tbl->setItem(idx, col++, new QTableWidgetItem(Utils::date2String(date)));
+//            tbl->setItem(idx, col++, new QTableWidgetItem(DatetimeUtils::date2String(date)));
 //            tbl->setItem(idx, col++, new QTableWidgetItem(name));
 //            tbl->setItem(idx, col++, new QTableWidgetItem(w.getRemark()));
 
@@ -1079,7 +1081,7 @@ void DlgPerson::on_btnPreview_clicked()
         }
     } else {
         loge("Bild person failed, err=%d", ret);
-        Utils::showErrorBox(QString("Có lỗi xảy ra, mã lỗi %1").arg(ret));
+        DialogUtils::showErrorBox(QString("Có lỗi xảy ra, mã lỗi %1").arg(ret));
     }
     traceout;
 }

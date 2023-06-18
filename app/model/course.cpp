@@ -25,6 +25,7 @@
 #include "province.h"
 #include "filectl.h"
 #include "utils.h"
+#include "datetimeutils.h"
 #include "dbctl.h"
 #include "defs.h"
 #include "dbmodel.h"
@@ -115,10 +116,10 @@ void Course::initExportFields()
         return ((Course*)model)->courseTypeName();
     });
     mExportCallbacks.insert(KItemStartDate, [](const DbModel* model, const QString& item){
-        return Utils::date2String(((Course*)model)->startDate(), DEFAULT_FORMAT_YMD);
+        return DatetimeUtils::date2String(((Course*)model)->startDate(), DEFAULT_FORMAT_YMD);
     });
     mExportCallbacks.insert(KItemEndDate, [](const DbModel* model, const QString& item){
-        return Utils::date2String(((Course*)model)->endDate(), DEFAULT_FORMAT_YMD);
+        return DatetimeUtils::date2String(((Course*)model)->endDate(), DEFAULT_FORMAT_YMD);
     });
     // TODO: implement more
     traceout;

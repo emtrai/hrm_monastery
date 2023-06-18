@@ -29,6 +29,7 @@
 #include "country.h"
 #include "countryctl.h"
 #include "view/dialog/dlgcountry.h"
+#include "dialogutils.h"
 
 DlgProvince::DlgProvince(QWidget *parent) :
     QDialog(parent),
@@ -110,7 +111,7 @@ void DlgProvince::accept()
     if (ret == ErrNone)
         QDialog::accept();
     else
-        Utils::showErrorBox(QString(tr("Lỗi ! Mã lỗi %1").arg(ret)));
+        DialogUtils::showErrorBox(QString(tr("Lỗi ! Mã lỗi %1").arg(ret)));
 }
 
 void DlgProvince::on_btnAddCountry_clicked()

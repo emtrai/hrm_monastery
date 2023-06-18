@@ -24,7 +24,7 @@
 #include "view/widget/uipersonlistview.h"
 #include "view/widget/uisaintlistview.h"
 #include "view/widget/uicommunitylistview.h"
-#include "view/widget/uicommunitypersonlistview.h"
+#include "view/widget/uipeopleincommunitylistview.h"
 #include "view/widget/uicommdeptlistview.h"
 #include "view/widget/uidepartmentpersonlistview.h"
 #include "view/widget/uirolelistview.h"
@@ -40,7 +40,7 @@
 #include "view/widget/uicourselistview.h"
 #include "view/widget/uitextbrowser.h"
 #include "view/widget/uipersoneventlistview.h"
-#include "view/widget/uipersoncommunitylistview.h"
+#include "view/widget/uicommunitiesofpersonlistview.h"
 
 BaseView *UITableViewFactory::getView(ViewType type, QWidget *parent )
 {
@@ -67,10 +67,10 @@ BaseView *UITableViewFactory::getView(ViewType type, QWidget *parent )
         view = new UIAreaContactPeopleListView(parent);
         break;
     case VIEW_COMMUNITY_PERSON_LIST:
-        view = new UICommunityPersonListView(parent);
+        view = new UIPeopleInCommunityListView(parent);
         break;
     case VIEW_PERSON_COMMUNITY_LIST:
-        view = new UIPersonCommunityListView(parent);
+        view = new UICommunitiesOfPersonListView(parent);
         break;
     case VIEW_DEPARTMENT:
         view = new UIDepartmentListView(parent);

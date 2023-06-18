@@ -22,6 +22,7 @@
 #include "errreporterctl.h"
 #include "mainwindow.h"
 #include "utils.h"
+#include "dialogutils.h"
 
 GET_INSTANCE_IMPL(ErrReporterCtl)
 
@@ -45,6 +46,6 @@ void ErrReporterCtl::reportErr(const QString &errMsg, ErrCode err,
     logd("showErrDlg %d", showErrDlg);
     logd("delay %d", delay);
     if (showErrDlg) {
-        Utils::showErrorBox(msg);
+        DialogUtils::showErrorBox(msg);
     }
 }

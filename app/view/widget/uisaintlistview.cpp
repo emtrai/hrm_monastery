@@ -26,6 +26,7 @@
 #include "dbmodel.h"
 #include "saint.h"
 #include "utils.h"
+#include "datetimeutils.h"
 
 UISaintListView::UISaintListView(QWidget *parent):
     UICommonListView(parent)
@@ -60,7 +61,7 @@ void UISaintListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
         tblItem->addValue(item->nameId());
         tblItem->addValue(item->name());
         tblItem->addValue(saint->fullName());
-        tblItem->addValue(Utils::date2String(saint->feastDay(), DEFAULT_FORMAT_MD));
+        tblItem->addValue(DatetimeUtils::date2String(saint->feastDay(), DEFAULT_FORMAT_MD));
         tblItem->addValue(saint->remark());
     } else {
         logd("Invalid item");

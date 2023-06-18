@@ -210,7 +210,7 @@ public:
      * @param model
      */
     virtual ErrCode copyData(const DbModel* model);
-    virtual void incRef();
+    virtual void incRef(); // TODO: change to use reference counter to avoid overhead when clone
     virtual void decRef();
     virtual QString modelName() const;
     virtual int modelType() const;

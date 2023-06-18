@@ -69,6 +69,7 @@ void CommunityPerson::clone(const DbModel *model)
     if (model) {
         MapDbModel::clone(model);
         if (model->modelName() == modelName()) {
+            logd("clone person & community");
             CommunityPerson* commper = (CommunityPerson*) model;
             CLEAR_THEN_SET(mPerson, commper->person(), Person);
             CLEAR_THEN_SET(mCommunity, commper->community(), Community);

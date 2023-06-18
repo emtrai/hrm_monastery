@@ -23,6 +23,7 @@
 #include "dbmodel.h"
 #include "person.h"
 #include "utils.h"
+#include "datetimeutils.h"
 
 DlgImportPersonListResult::DlgImportPersonListResult(QWidget *parent):DlgImportListResult(parent)
 {
@@ -55,9 +56,9 @@ QList<UIImportItem *> *DlgImportPersonListResult::getItems()
         wgitem->addValue(per->nameId());
         wgitem->addValue(per->hollyName());
         wgitem->addValue(per->getFullName());
-        wgitem->addValue(Utils::date2String(per->birthday()));
+        wgitem->addValue(DatetimeUtils::date2String(per->birthday()));
         wgitem->addValue(per->birthPlace());
-        wgitem->addValue(Utils::date2String(per->feastDay(), DEFAULT_FORMAT_MD)); // seem feastday convert repeate many time, make it common????
+        wgitem->addValue(DatetimeUtils::date2String(per->feastDay(), DEFAULT_FORMAT_MD)); // seem feastday convert repeate many time, make it common????
 
         wgitem->addValue(per->tel().join(";"));
         wgitem->addValue(per->email().join(";"));

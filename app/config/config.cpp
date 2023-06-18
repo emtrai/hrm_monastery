@@ -75,7 +75,7 @@ QString Config::doGetNextPersonalCode(qint64* code)
     }
 
     // TODO: this is just dummy persone code, IMPLEMENT IT AGAIN
-//    int id = Utils::currentTimeMs(qint64 code);
+//    int id = DatetimeUtils::currentTimeMs(qint64 code);
     logd("seq %d", seq);
 //    QString code = "MS" + QString::number(id).rightJustified(8, '0');
     QString id = QString("%1%2").arg(mConfigKeyValue.value("codeprefix"),

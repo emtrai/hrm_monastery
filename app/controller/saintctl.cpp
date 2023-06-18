@@ -25,6 +25,7 @@
 #include "config.h"
 #include "saint.h"
 #include "utils.h"
+#include "datetimeutils.h"
 #include <QFile>
 #include <QDate>
 #include "defs.h"
@@ -125,7 +126,7 @@ DbModel *SaintCtl::buildModel(void *params, const QString &fmt)
 
     // memory date
     if (ret == ErrNone) {
-        qint64 date = Utils::dateFromString(items->at(idx++).simplified(),DEFAULT_FORMAT_MD);
+        qint64 date = DatetimeUtils::dateFromString(items->at(idx++).simplified(),DEFAULT_FORMAT_MD);
         if (date > 0){
             saint->setFeastDay(date);
         }

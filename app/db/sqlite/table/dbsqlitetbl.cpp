@@ -38,6 +38,7 @@
 #include "filter.h"
 #include "dbsqlite.h"
 #include "exception.h"
+#include "datetimeutils.h"
 
 DbSqliteTbl::~DbSqliteTbl(){
     tracein;
@@ -231,7 +232,7 @@ ErrCode DbSqliteTbl::update(DbModel *item)
 
         if (err == ErrNone){
             logd("Build SQL Query and execute");
-            updateBuilder->addValue(KFieldLastDbUpdateItme, Utils::currentTimeMs());
+            updateBuilder->addValue(KFieldLastDbUpdateItme, DatetimeUtils::currentTimeMs());
             updateQry = updateBuilder->buildSqlQuery();
             err = db()->execQuery(updateQry);
             logd("execQuery err %d", err);
@@ -284,7 +285,7 @@ ErrCode DbSqliteTbl::update(const QString &uid, const QHash<QString, FieldValue>
 
         if (err == ErrNone){
             logd("Build SQL Query and execute");
-            updateBuilder->addValue(KFieldLastDbUpdateItme, Utils::currentTimeMs());
+            updateBuilder->addValue(KFieldLastDbUpdateItme, DatetimeUtils::currentTimeMs());
             // TODO: update history????
             updateQry = updateBuilder->buildSqlQuery();
             err = db()->execQuery(updateQry);
@@ -1554,8 +1555,8 @@ ErrCode DbSqliteTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbMo
     // TODO: timezone issue?
     // TODO: time of computer suddenly not correct/change???,
     // should store last open time than compare???
-    builder->addValue(KFieldDbCreateTime, Utils::currentTimeMs());
-    builder->addValue(KFieldLastDbUpdateItme, Utils::currentTimeMs());
+    builder->addValue(KFieldDbCreateTime, DatetimeUtils::currentTimeMs());
+    builder->addValue(KFieldLastDbUpdateItme, DatetimeUtils::currentTimeMs());
     builder->addValue(KFieldDbStatus, DB_RECORD_NOT_READY); // NOT ready, until we update uid
                                                             // TODO: Fix me if this is neccessary or correct
     traceout;

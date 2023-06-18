@@ -24,6 +24,7 @@
 #include "errcode.h"
 #include "dbctl.h"
 #include "utils.h"
+#include "datetimeutils.h"
 #include "filectl.h"
 #include "dataexporter.h"
 #include "exportfactory.h"
@@ -292,7 +293,7 @@ void Person::initExportFields()
 
     });
     mExportCallbacks.insert(KItemBirthday, [](const DbModel* model, const QString& item){
-        return Utils::date2String(((Person*)model)->birthday());});
+        return DatetimeUtils::date2String(((Person*)model)->birthday());});
     mExportCallbacks.insert(KItemBirthplace, [](const DbModel* model, const QString& item){
         return ((Person*)model)->birthPlace();
     });
@@ -300,7 +301,7 @@ void Person::initExportFields()
         return ((Person*)model)->hollyName();
     });
     mExportCallbacks.insert(KItemFeastDay, [](const DbModel* model, const QString& item){
-        return Utils::date2String(((Person*)model)->feastDay(), DEFAULT_FORMAT_MD);
+        return DatetimeUtils::date2String(((Person*)model)->feastDay(), DEFAULT_FORMAT_MD);
     });
     mExportCallbacks.insert(KItemNationality, [](const DbModel* model, const QString& item){
         return ((Person*)model)->nationalityName();
@@ -312,7 +313,7 @@ void Person::initExportFields()
         return ((Person*)model)->idCard();
     });
     mExportCallbacks.insert(KItemIDcardIssueDate,  [](const DbModel* model, const QString& item){
-        return Utils::date2String(((Person*)model)->idCardIssueDate(), DEFAULT_FORMAT_YMD);
+        return DatetimeUtils::date2String(((Person*)model)->idCardIssueDate(), DEFAULT_FORMAT_YMD);
     });
     mExportCallbacks.insert(KItemIDcardIssuer,  [](const DbModel* model, const QString& item){
         return ((Person*)model)->idCardIssuePlace();
@@ -321,13 +322,13 @@ void Person::initExportFields()
         return ((Person*)model)->personStatusName();
     });
     mExportCallbacks.insert(KItemRetireDate, [](const DbModel* model, const QString& item){
-        return Utils::date2String(((Person*)model)->retireDate(), DEFAULT_FORMAT_YMD);
+        return DatetimeUtils::date2String(((Person*)model)->retireDate(), DEFAULT_FORMAT_YMD);
     });
     mExportCallbacks.insert(KItemRetirePlace, [](const DbModel* model, const QString& item){
         return ((Person*)model)->retirePlace();
     }); //"retire_place";
     mExportCallbacks.insert(KItemDeadDate, [](const DbModel* model, const QString& item){
-        return Utils::date2String(((Person*)model)->deadDate(), DEFAULT_FORMAT_YMD);
+        return DatetimeUtils::date2String(((Person*)model)->deadDate(), DEFAULT_FORMAT_YMD);
     }); //"dead_date";
     mExportCallbacks.insert(KItemDeadPlace, [](const DbModel* model, const QString& item){
         return ((Person*)model)->deadPlace();
@@ -410,7 +411,7 @@ void Person::initExportFields()
         return ((Person*)model)->dadName();
     }); //"dad";
     mExportCallbacks.insert(KItemDadBirthday, [](const DbModel* model, const QString& item){
-        return Utils::date2String(((Person*)model)->dadBirthday(), DEFAULT_FORMAT_YMD);
+        return DatetimeUtils::date2String(((Person*)model)->dadBirthday(), DEFAULT_FORMAT_YMD);
     }); //"dad_birthday";
     mExportCallbacks.insert(KItemDadAddr, [](const DbModel* model, const QString& item){
         return ((Person*)model)->dadAddr();
@@ -419,7 +420,7 @@ void Person::initExportFields()
         return ((Person*)model)->momName();
     }); //"mom";
     mExportCallbacks.insert(KItemMomBirthday, [](const DbModel* model, const QString& item){
-        return Utils::date2String(((Person*)model)->momBirthday(), DEFAULT_FORMAT_YMD);
+        return DatetimeUtils::date2String(((Person*)model)->momBirthday(), DEFAULT_FORMAT_YMD);
     }); //"mom_birthday";
     mExportCallbacks.insert(KItemMomAddr, [](const DbModel* model, const QString& item){
         return ((Person*)model)->momAddr();
@@ -431,19 +432,19 @@ void Person::initExportFields()
         return ((Person*)model)->familyContact();
     }); //"family_contact";
     mExportCallbacks.insert(KItemChristenDate, [](const DbModel* model, const QString& item){
-        return Utils::date2String(((Person*)model)->christenDate(), DEFAULT_FORMAT_YMD);
+        return DatetimeUtils::date2String(((Person*)model)->christenDate(), DEFAULT_FORMAT_YMD);
     }); //"christen_date";
     mExportCallbacks.insert(KItemChristenPlace, [](const DbModel* model, const QString& item){
         return ((Person*)model)->christenPlace();
     }); //"christen_place";
     mExportCallbacks.insert(KItemEucharistDate, [](const DbModel* model, const QString& item){
-        return Utils::date2String(((Person*)model)->eucharistDate(), DEFAULT_FORMAT_YMD);
+        return DatetimeUtils::date2String(((Person*)model)->eucharistDate(), DEFAULT_FORMAT_YMD);
     }); //"eucharist_date";
     mExportCallbacks.insert(KItemEucharistPlace, [](const DbModel* model, const QString& item){
         return ((Person*)model)->eucharistPlace();
     }); //"eucharist_place";
     mExportCallbacks.insert(KItemHollyDate, [](const DbModel* model, const QString& item){
-        return Utils::date2String(((Person*)model)->hollyDate(), DEFAULT_FORMAT_MD);
+        return DatetimeUtils::date2String(((Person*)model)->hollyDate(), DEFAULT_FORMAT_MD);
     }); //"holly_date";
     mExportCallbacks.insert(KItemHollyPlace, [](const DbModel* model, const QString& item){
         return ((Person*)model)->hollyPlace();
@@ -452,7 +453,7 @@ void Person::initExportFields()
         return ((Person*)model)->courseName();
     }); //"course";
     mExportCallbacks.insert(KItemJoinDate, [](const DbModel* model, const QString& item){
-        return Utils::date2String(((Person*)model)->joinDate(), DEFAULT_FORMAT_YMD);
+        return DatetimeUtils::date2String(((Person*)model)->joinDate(), DEFAULT_FORMAT_YMD);
     }); //"join_date";
     mExportCallbacks.insert(KItemJoinPIC, [](const DbModel* model, const QString& item){
         EXPORT_PERSON_INFO_COMMON_IMPL(item, ((Person*)model)->joinPICNameId(), ((Person*)model)->joinPICName());
@@ -465,25 +466,25 @@ void Person::initExportFields()
 //        return val;
     }); //"join_pic";
     mExportCallbacks.insert(KItemPreTrainDate, [](const DbModel* model, const QString& item){
-        return Utils::date2String(((Person*)model)->preTrainJoinDate(), DEFAULT_FORMAT_YMD);
+        return DatetimeUtils::date2String(((Person*)model)->preTrainJoinDate(), DEFAULT_FORMAT_YMD);
     }); //"pre_train_date";
     mExportCallbacks.insert(KItemPreTrainPIC, [](const DbModel* model, const QString& item){
         EXPORT_PERSON_INFO_COMMON_IMPL(item, ((Person*)model)->preTrainPICNameId(), ((Person*)model)->preTrainPICName());
     }); //"pre_train_pic";
     mExportCallbacks.insert(KItemTrainDate, [](const DbModel* model, const QString& item){
-        return Utils::date2String(((Person*)model)->trainJoinDate(), DEFAULT_FORMAT_YMD);
+        return DatetimeUtils::date2String(((Person*)model)->trainJoinDate(), DEFAULT_FORMAT_YMD);
     }); //"train_date";
     mExportCallbacks.insert(KItemTrainPIC, [](const DbModel* model, const QString& item){
         EXPORT_PERSON_INFO_COMMON_IMPL(item, ((Person*)model)->trainPICNameId(), ((Person*)model)->trainPICName());
     }); //"train_pic";
     mExportCallbacks.insert(KItemVowsDate, [](const DbModel* model, const QString& item){
-        return Utils::date2String(((Person*)model)->vowsDate(), DEFAULT_FORMAT_YMD);
+        return DatetimeUtils::date2String(((Person*)model)->vowsDate(), DEFAULT_FORMAT_YMD);
     }); //"vows_date";
     mExportCallbacks.insert(KItemVowsCEO, [](const DbModel* model, const QString& item){
         EXPORT_PERSON_INFO_COMMON_IMPL(item, ((Person*)model)->vowsCEONameId(), ((Person*)model)->vowsCEOName());
     }); //"vows_ceo";
     mExportCallbacks.insert(KItemEternalVowsDate, [](const DbModel* model, const QString& item){
-        return Utils::date2String(((Person*)model)->eternalVowsDate(), DEFAULT_FORMAT_YMD);
+        return DatetimeUtils::date2String(((Person*)model)->eternalVowsDate(), DEFAULT_FORMAT_YMD);
     }); //"eternal_vows_date";
     mExportCallbacks.insert(KItemEternalVowsCEO, [](const DbModel* model, const QString& item){
         EXPORT_PERSON_INFO_COMMON_IMPL(item, ((Person*)model)->eternalVowsCEONameId(), ((Person*)model)->eternalVowsCEOName());
@@ -492,19 +493,19 @@ void Person::initExportFields()
         EXPORT_PERSON_INFO_COMMON_IMPL(item, ((Person*)model)->eternalVowsPICNameId(), ((Person*)model)->eternalVowsPICName());
     }); //"eternal_vows_pic";
     mExportCallbacks.insert(KItemBankDate, [](const DbModel* model, const QString& item){
-        return Utils::date2String(((Person*)model)->bankDate(), DEFAULT_FORMAT_YMD);
+        return DatetimeUtils::date2String(((Person*)model)->bankDate(), DEFAULT_FORMAT_YMD);
     }); //"bank_date";
     mExportCallbacks.insert(KItemBankPlace, [](const DbModel* model, const QString& item){
         return ((Person*)model)->bankPlace();
     }); //"bank_place";
     mExportCallbacks.insert(KItemGoldenDate, [](const DbModel* model, const QString& item){
-        return Utils::date2String(((Person*)model)->goldenDate(), DEFAULT_FORMAT_YMD);
+        return DatetimeUtils::date2String(((Person*)model)->goldenDate(), DEFAULT_FORMAT_YMD);
     }); //"golden_date";
     mExportCallbacks.insert(KItemGoldenPlace, [](const DbModel* model, const QString& item){
         return ((Person*)model)->goldenPlace();
     }); //"golden_place";
     mExportCallbacks.insert(KItemEternalDate, [](const DbModel* model, const QString& item){
-        return Utils::date2String(((Person*)model)->eternalDate(), DEFAULT_FORMAT_YMD);
+        return DatetimeUtils::date2String(((Person*)model)->eternalDate(), DEFAULT_FORMAT_YMD);
     }); //"eternal_date";
     mExportCallbacks.insert(KItemEternalPlace, [](const DbModel* model, const QString& item){
         return ((Person*)model)->eternalPlace();
@@ -938,7 +939,7 @@ void Person::setBirthday(const QString &newBirthday)
 {
     tracein;
     bool isOk = false;
-    qint64 date = Utils::dateFromString(newBirthday, DEFAULT_FORMAT_YMD, &isOk);
+    qint64 date = DatetimeUtils::dateFromString(newBirthday, DEFAULT_FORMAT_YMD, &isOk);
     logd("conver '%s', isOk=%d, value %d", newBirthday.toStdString().c_str(),
          isOk, (int)date);
     if (isOk && date > 0)
@@ -1014,7 +1015,7 @@ void Person::setChristenDate(qint64 newChristenDate)
 void Person::setChristenDate(const QString &newChristenDate,
                              const QString& format)
 {
-    mChristenDate = Utils::dateFromString(newChristenDate,format);
+    mChristenDate = DatetimeUtils::dateFromString(newChristenDate,format);
     logd("mChristenDate %s -> %d", newChristenDate.toStdString().c_str(), (int)mChristenDate);
 }
 
@@ -1439,7 +1440,7 @@ void Person::setFeastDay(qint64 newFeastDay)
 void Person::setFeastDay(const QString &newFeastDay,
                          const QString& format)
 {
-    setFeastDay(Utils::dateFromString(newFeastDay, format));
+    setFeastDay(DatetimeUtils::dateFromString(newFeastDay, format));
 }
 
 const QString &Person::eucharistPlace() const
@@ -1466,7 +1467,7 @@ void Person::setEucharistDate(qint64 newEucharistDate)
 
 void Person::setEucharistDate(const QString &newEucharistDate, const QString &format)
 {
-    setEucharistDate(Utils::dateFromString(newEucharistDate, format));
+    setEucharistDate(DatetimeUtils::dateFromString(newEucharistDate, format));
 }
 
 const QString &Person::otherContact() const
@@ -1554,7 +1555,7 @@ void Person::setDeadDate(qint64 newDeadDate)
 
 void Person::setDeadDate(const QString &newDeadDate, const QString &format)
 {
-    setDeadDate(Utils::dateFromString(newDeadDate, format));
+    setDeadDate(DatetimeUtils::dateFromString(newDeadDate, format));
 }
 
 const QString &Person::retirePlace() const
@@ -1582,7 +1583,7 @@ void Person::setRetireDate(qint64 newRetireDate)
 void Person::setRetireDate(const QString &newRetireDate, const QString &format)
 {
     tracein;
-    setRetireDate(Utils::dateFromString(newRetireDate, format));
+    setRetireDate(DatetimeUtils::dateFromString(newRetireDate, format));
 }
 
 const QString &Person::personStatusName() const
@@ -1631,7 +1632,7 @@ void Person::setEternalDate(qint64 newEternalDate)
 
 void Person::setEternalDate(const QString &newEternalDate, const QString &format)
 {
-    setEternalDate(Utils::dateFromString(newEternalDate, format));
+    setEternalDate(DatetimeUtils::dateFromString(newEternalDate, format));
 }
 
 const QString &Person::goldenPlace() const
@@ -1658,7 +1659,7 @@ void Person::setGoldenDate(qint64 newGoldenDate)
 
 void Person::setGoldenDate(const QString &newGoldenDate, const QString &format)
 {
-    setGoldenDate(Utils::dateFromString(newGoldenDate, format));
+    setGoldenDate(DatetimeUtils::dateFromString(newGoldenDate, format));
 }
 
 const QString &Person::bankPlace() const
@@ -1685,7 +1686,7 @@ void Person::setBankDate(qint64 newBankDate)
 
 void Person::setBankDate(const QString &newBankDate, const QString &format)
 {
-    setBankDate(Utils::dateFromString(newBankDate, format));
+    setBankDate(DatetimeUtils::dateFromString(newBankDate, format));
 }
 
 const QString &Person::eternalVowsPICName() const
@@ -1745,7 +1746,7 @@ void Person::setEternalVowsDate(qint64 newEternalVowsDate)
 
 void Person::setEternalVowsDate(const QString &newEternalVowsDate, const QString &format)
 {
-    setEternalVowsDate(Utils::dateFromString(newEternalVowsDate, format));
+    setEternalVowsDate(DatetimeUtils::dateFromString(newEternalVowsDate, format));
 }
 
 qint64 Person::vowsDate() const
@@ -1761,7 +1762,7 @@ void Person::setVowsDate(qint64 newVowsDate)
 
 void Person::setVowsDate(const QString &newVowsDate, const QString &format)
 {
-    setVowsDate(Utils::dateFromString(newVowsDate, format));
+    setVowsDate(DatetimeUtils::dateFromString(newVowsDate, format));
 }
 
 const QString &Person::vowsCEOName() const
@@ -1843,7 +1844,7 @@ void Person::setPreTrainJoinDate(qint64 newPreTrainJoinDate)
 
 void Person::setPreTrainJoinDate(const QString &newPreTrainJoinDate, const QString &format)
 {
-    setPreTrainJoinDate(Utils::dateFromString(newPreTrainJoinDate, format));
+    setPreTrainJoinDate(DatetimeUtils::dateFromString(newPreTrainJoinDate, format));
 }
 
 const QString &Person::joinPICName() const
@@ -1881,7 +1882,7 @@ void Person::setJoinDate(qint64 newJoinDate)
 
 void Person::setJoinDate(const QString &newJoinDate, const QString &format)
 {
-    setJoinDate(Utils::dateFromString(newJoinDate, format));
+    setJoinDate(DatetimeUtils::dateFromString(newJoinDate, format));
 }
 
 const QString &Person::familyContact() const
@@ -1908,7 +1909,7 @@ void Person::setHollyDate(qint64 newHollyDate)
 
 void Person::setHollyDate(const QString &newHollyDate, const QString &format)
 {
-    setHollyDate(Utils::dateFromString(newHollyDate, format));
+    setHollyDate(DatetimeUtils::dateFromString(newHollyDate, format));
 }
 
 const QString &Person::hollyPlace() const
@@ -1968,7 +1969,7 @@ void Person::setMomBirthday(qint64 newMomBirthday)
 
 void Person::setMomBirthday(const QString &newMomBirthday, const QString &format)
 {
-    setMomBirthday(Utils::dateFromString(newMomBirthday, format));
+    setMomBirthday(DatetimeUtils::dateFromString(newMomBirthday, format));
 }
 
 const QString &Person::momName() const
@@ -2006,7 +2007,7 @@ void Person::setDadBirthday(qint64 newDadBirthday)
 
 void Person::setDadBirthday(const QString &newDadBirthday, const QString &format)
 {
-    setDadBirthday(Utils::dateFromString(newDadBirthday, format));
+    setDadBirthday(DatetimeUtils::dateFromString(newDadBirthday, format));
 }
 
 const QString &Person::dadName() const
@@ -2302,7 +2303,7 @@ void Person::setIdCardIssueDate(qint64 newIdCardIssueDate)
 
 void Person::setIdCardIssueDate(const QString &newIdCardIssueDate)
 {
-    setIdCardIssueDate(Utils::dateFromString(newIdCardIssueDate));
+    setIdCardIssueDate(DatetimeUtils::dateFromString(newIdCardIssueDate));
 }
 
 const QString &Person::idCard() const
@@ -2440,7 +2441,7 @@ void Person::setTrainJoinDate(qint64 newTrainJoinDate)
 
 void Person::setTrainJoinDate(const QString &newTrainJoinDate, const QString &format)
 {
-    setTrainJoinDate(Utils::dateFromString(newTrainJoinDate, format));
+    setTrainJoinDate(DatetimeUtils::dateFromString(newTrainJoinDate, format));
 }
 
 QString Person::imgPath() const

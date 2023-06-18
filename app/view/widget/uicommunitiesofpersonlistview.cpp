@@ -19,7 +19,7 @@
  * Created date:5/20/2023
  * Brief:
  */
-#include "uipersoncommunitylistview.h"
+#include "uicommunitiesofpersonlistview.h"
 
 #include "logger.h"
 #include <QList>
@@ -30,11 +30,13 @@
 #include "communityperson.h"
 #include "personctl.h"
 #include "utils.h"
+#include "datetimeutils.h"
 #include "dialog/dlgpersoncomm.h"
 #include "stringdefs.h"
 #include "mainwindow.h"
+#include "dialogutils.h"
 
-UIPersonCommunityListView::UIPersonCommunityListView(QWidget *parent):
+UICommunitiesOfPersonListView::UICommunitiesOfPersonListView(QWidget *parent):
     UICommonListView(parent),
     mPerson(nullptr)
 {
@@ -42,20 +44,20 @@ UIPersonCommunityListView::UIPersonCommunityListView(QWidget *parent):
 }
 
 
-UIPersonCommunityListView::~UIPersonCommunityListView()
+UICommunitiesOfPersonListView::~UICommunitiesOfPersonListView()
 {
     tracein;
     FREE_PTR(mPerson);
     traceout;
 }
 
-void UIPersonCommunityListView::loadCommunityPerson(const QString &communityUid, bool isActive)
+void UICommunitiesOfPersonListView::loadCommunityPerson(const QString &communityUid, bool isActive)
 {
     tracein;
 
 }
 
-ErrCode UIPersonCommunityListView::onMenuActionListPerson(QMenu *menu, UITableMenuAction *act)
+ErrCode UICommunitiesOfPersonListView::onMenuActionListPerson(QMenu *menu, UITableMenuAction *act)
 {
     tracein;
 
@@ -63,19 +65,19 @@ ErrCode UIPersonCommunityListView::onMenuActionListPerson(QMenu *menu, UITableMe
 
 }
 
-ErrCode UIPersonCommunityListView::onMenuActionListDepartment(QMenu *menu, UITableMenuAction *act)
+ErrCode UICommunitiesOfPersonListView::onMenuActionListDepartment(QMenu *menu, UITableMenuAction *act)
 {
     tracein;
     return ErrNone;
 
 }
 
-void UIPersonCommunityListView::onViewItem(UITableCellWidgetItem *item)
+void UICommunitiesOfPersonListView::onViewItem(UITableCellWidgetItem *item)
 {
 
 }
 
-void UIPersonCommunityListView::onAddItem(UITableCellWidgetItem *item)
+void UICommunitiesOfPersonListView::onAddItem(UITableCellWidgetItem *item)
 {
     tracein;
     ErrCode err = ErrNone;
@@ -90,14 +92,14 @@ void UIPersonCommunityListView::onAddItem(UITableCellWidgetItem *item)
     }
     dlg->exec();
     if (err != ErrNone) {
-        Utils::showErrorBox(err, tr("Lỗi thêm dữ liệu Cộng đoàn"));
+        DialogUtils::showErrorBox(err, tr("Lỗi thêm dữ liệu Cộng đoàn"));
     }
     if (dlg) delete dlg;
     traceout;
 
 }
 
-void UIPersonCommunityListView::onEditItem(UITableCellWidgetItem *item)
+void UICommunitiesOfPersonListView::onEditItem(UITableCellWidgetItem *item)
 {
     ErrCode err = ErrNone;
     DlgPersonCommunity* dlg = nullptr;
@@ -107,6 +109,7 @@ void UIPersonCommunityListView::onEditItem(UITableCellWidgetItem *item)
         loge("Edit failed, null item");
         err = ErrInvalidArg;
     }
+    // TODO: change this like one in UIPeopleInCommunityListView
     if (err == ErrNone) {
         model = item->itemData();
         if (!model || model->modelName() != KModelNameCommPerson) {
@@ -127,13 +130,13 @@ void UIPersonCommunityListView::onEditItem(UITableCellWidgetItem *item)
     }
     dlg->exec();
     if (err != ErrNone) {
-        Utils::showErrorBox(err, tr("Lỗi chỉnh sửa dữ liệu Cộng đoàn"));
+        DialogUtils::showErrorBox(err, tr("Lỗi chỉnh sửa dữ liệu Cộng đoàn"));
     }
     if (dlg) delete dlg;
     traceout;
 }
 
-QList<UITableMenuAction *> UIPersonCommunityListView::getMenuMultiSelectedItemActions(const QMenu *menu,
+QList<UITableMenuAction *> UICommunitiesOfPersonListView::getMenuMultiSelectedItemActions(const QMenu *menu,
                                                                               const QList<UITableItem *>& items)
 {
     tracein;
@@ -152,7 +155,7 @@ QList<UITableMenuAction *> UIPersonCommunityListView::getMenuMultiSelectedItemAc
 
 }
 
-ErrCode UIPersonCommunityListView::onLoad()
+ErrCode UICommunitiesOfPersonListView::onLoad()
 {
     tracein;
     ErrCode err = ErrNone;
@@ -170,12 +173,12 @@ ErrCode UIPersonCommunityListView::onLoad()
     return err;
 }
 
-const Person *UIPersonCommunityListView::person() const
+const Person *UICommunitiesOfPersonListView::person() const
 {
     return mPerson;
 }
 
-ErrCode UIPersonCommunityListView::setPerson(const Person *per)
+ErrCode UICommunitiesOfPersonListView::setPerson(const Person *per)
 {
     tracein;
     ErrCode err = ErrNone;
@@ -193,7 +196,7 @@ ErrCode UIPersonCommunityListView::setPerson(const Person *per)
     return err;
 }
 
-void UIPersonCommunityListView::initHeader()
+void UICommunitiesOfPersonListView::initHeader()
 {
     tracein;
     mHeader.append(STR_COMMUNITY);
@@ -203,14 +206,14 @@ void UIPersonCommunityListView::initHeader()
     traceout;
 }
 
-QString UIPersonCommunityListView::getTitle()
+QString UICommunitiesOfPersonListView::getTitle()
 {
 
     return QString(tr("Danh sách Cộng đoàn của Nữ tu : %1"))
         .arg(mPerson?mPerson->displayName():STR_UNKNOWN);
 }
 
-void UIPersonCommunityListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
+void UICommunitiesOfPersonListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
     loge("updateItem '%s'", MODELSTR2CHA(item));
@@ -221,8 +224,8 @@ void UIPersonCommunityListView::updateItem(DbModel *item, UITableItem *tblItem, 
         if (comm) {
             logd("community to to show '%s'", MODELSTR2CHA(comm));
             tblItem->addValue(comm->nameId());
-            tblItem->addValue(Utils::date2String(commper->startDate(), DEFAULT_FORMAT_YMD));
-            tblItem->addValue(Utils::date2String(commper->endDate(), DEFAULT_FORMAT_MD));
+            tblItem->addValue(DatetimeUtils::date2String(commper->startDate(), DEFAULT_FORMAT_YMD));
+            tblItem->addValue(DatetimeUtils::date2String(commper->endDate(), DEFAULT_FORMAT_MD));
             tblItem->addValue(commper->modelStatusName());
         } else {
             loge("Invalid community");

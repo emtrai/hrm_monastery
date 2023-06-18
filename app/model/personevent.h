@@ -24,6 +24,7 @@
 
 #include <QObject>
 #include <dbmodel.h>
+#include "datetimeutils.h"
 
 class PersonEvent : public DbModel
 {

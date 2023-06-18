@@ -31,6 +31,7 @@
 #include "communityctl.h"
 #include "dialog/dlgsearchperson.h"
 #include "dbmodel.h"
+#include "datetimeutils.h"
 
 
 DlgCommunity::DlgCommunity(QWidget *parent) :
@@ -139,8 +140,8 @@ ErrCode DlgCommunity::fromModel(const DbModel *item)
         ui->txtName->setText(comm->name());
         ui->txtCode->setText(comm->nameId()); // TODO: auto generate???
         Utils::setSelectItemComboxByData(ui->cbArea, comm->areaUid());
-        ui->txtEstablishDate->setText(Utils::date2String(comm->createDate(), DEFAULT_FORMAT_YMD));
-        ui->txtFeaseDay->setText(Utils::date2String(comm->feastDate(), DEFAULT_FORMAT_MD));
+        ui->txtEstablishDate->setText(DatetimeUtils::date2String(comm->createDate(), DEFAULT_FORMAT_YMD));
+        ui->txtFeaseDay->setText(DatetimeUtils::date2String(comm->feastDate(), DEFAULT_FORMAT_MD));
         ui->txtAddr->setPlainText(comm->addr());
         Utils::setSelectItemComboxByData(ui->cbCountry, comm->countryUid());
         ui->txtTel->setText(comm->tel());

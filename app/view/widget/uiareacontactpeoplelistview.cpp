@@ -35,6 +35,7 @@
 #include "errreporterctl.h"
 #include "stringdefs.h"
 #include "mainwindow.h"
+#include "dialogutils.h"
 
 UIAreaContactPeopleListView::UIAreaContactPeopleListView(QWidget *parent):
     UICommonListView(parent),
@@ -187,7 +188,7 @@ void UIAreaContactPeopleListView::onViewItem(UITableCellWidgetItem *item)
         MainWindow::showOnHtmlViewer(comm, tr("Vùng"));
     } else {
         loge("Comm obj is null");
-        Utils::showErrorBox("Không có thông tin để xem");
+        DialogUtils::showErrorBox("Không có thông tin để xem");
     }
     traceout;
 }

@@ -30,6 +30,7 @@
 #include "filter.h"
 #include "dbmodel.h"
 #include "mainwindow.h"
+#include "dialogutils.h"
 
 UITableView::UITableView(QWidget *parent) :
     QFrame(parent),
@@ -224,7 +225,7 @@ void UITableView::onDeleteItem(const QList<UITableItem *>& selectedItems)
     ErrCode err = ErrNone;
     mSuspendReloadOnDbUpdate = true;
     if (selectedItems.size() > 0) {
-        bool accept = Utils::showConfirmDialog(this,
+        bool accept = DialogUtils::showConfirmDialog(this,
                              tr("Xoá"), QString(tr("Bạn có muốn xóa '%1' mục trong '%2'? (Tất cả dữ liệu liên quan cũng sẽ bị xóa)")
                                                            .arg(selectedItems.size())
                                                            .arg(getTitle())
@@ -271,10 +272,10 @@ void UITableView::onDeleteItem(const QList<UITableItem *>& selectedItems)
                 });
 
             if (err != ErrNone) {
-                Utils::showErrorBox(QString(tr("Lỗi, mã lỗi: %1")).arg(err));
+                DialogUtils::showErrorBox(QString(tr("Lỗi, mã lỗi: %1")).arg(err));
             } else {
                 logi("Deleted %d item", cnt);
-                Utils::showMsgBox(QString(tr("Đã xóa '%1' mục")).arg(cnt));
+                DialogUtils::showMsgBox(QString(tr("Đã xóa '%1' mục")).arg(cnt));
             }
         }
     }

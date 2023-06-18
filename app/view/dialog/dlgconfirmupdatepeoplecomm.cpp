@@ -31,6 +31,7 @@
 #include "utils.h"
 #include "person.h"
 #include "community.h"
+#include "dialogutils.h"
 
 DlgConfirmUpdatePeopleComm::DlgConfirmUpdatePeopleComm(QWidget *parent) :
     QDialog(parent),
@@ -65,7 +66,7 @@ void DlgConfirmUpdatePeopleComm::on_buttonBox_clicked(QAbstractButton *button)
         break;
     case QDialogButtonBox::StandardButton::Help:
         // TODO: implement this
-        Utils::showDlgUnderDev(tr("Giúp đỡ phần xác nhận cập nhật cộng đoàn"));
+        UNDER_DEV(tr("Giúp đỡ phần xác nhận cập nhật cộng đoàn"));
         QDialog::close();
         break;
     case QDialogButtonBox::StandardButton::Cancel:
@@ -123,7 +124,7 @@ void DlgConfirmUpdatePeopleComm::setCommunity(const Community *newCommunity)
                 QString(tr("Bạn có muốn đổi thành cộng đoàn '%1' cho các Nữ tu?"))
                     .arg(mCommunity->name()));
         } else {
-            Utils::showErrorBox(tr("Lỗi hết bộ nhớ"));
+            DialogUtils::showErrorBox(tr("Lỗi hết bộ nhớ"));
             loge("No memory to allocat community");
         }
     }

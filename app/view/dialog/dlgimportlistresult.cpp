@@ -25,6 +25,7 @@
 #include "errcode.h"
 #include "utils.h"
 #include "mainwindow.h"
+#include "dialogutils.h"
 
 #define ITEM_CHECK (Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable)
 
@@ -264,7 +265,7 @@ void DlgImportListResult::accept()
     if (ret == ErrNone)
         QDialog::accept();
     else
-        Utils::showErrorBox(QString(tr("Lỗi ! Mã lỗi %1").arg(ret)));
+        DialogUtils::showErrorBox(QString(tr("Lỗi ! Mã lỗi %1").arg(ret)));
 }
 
 

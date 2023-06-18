@@ -28,8 +28,10 @@
 #include "person.h"
 #include "personctl.h"
 #include "utils.h"
+#include "datetimeutils.h"
 #include "dialog/dlgaddpersonevent.h"
 #include "stringdefs.h"
+#include "dialogutils.h"
 
 UIPersonEventListView::UIPersonEventListView(QWidget *parent):
     UICommonListView(parent),
@@ -125,8 +127,8 @@ void UIPersonEventListView::updateItem(DbModel *item, UITableItem *tblItem, int 
         tblItem->addValue(per->nameId());
         tblItem->addValue(per->eventName());
         tblItem->addValue(per->name());
-        tblItem->addValue(Utils::date2String(per->date()));
-        tblItem->addValue(Utils::date2String(per->endDate()));
+        tblItem->addValue(DatetimeUtils::date2String(per->date()));
+        tblItem->addValue(DatetimeUtils::date2String(per->endDate()));
         tblItem->addValue(per->remark());
     } else {
         loge("No item found, or not expected model '%s'", MODELSTR2CHA(item));
@@ -183,7 +185,7 @@ void UIPersonEventListView::onEditItem(UITableCellWidgetItem *item)
         delete dlg;
     }
     if (err != ErrNone) {
-        Utils::showErrorBox((int)err, QString(tr("Không thể chỉnh sửa sự kiện")));
+        DialogUtils::showErrorBox((int)err, QString(tr("Không thể chỉnh sửa sự kiện")));
     }
     traceout;
 }

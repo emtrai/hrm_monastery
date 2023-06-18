@@ -24,6 +24,7 @@
 #include "utils.h"
 #include "filectl.h"
 #include <QPushButton>
+#include "dialogutils.h"
 
 dlgHtmlViewer::dlgHtmlViewer(QWidget *parent) :
     QDialog(parent),
@@ -70,7 +71,7 @@ void dlgHtmlViewer::on_btnExport_clicked()
         logi("Saved html path '%s' to pdf succeed", STR2CHA(mHtmlPath));
     } else {
         loge("Saved html path '%s' to pdf failed, err=%d", STR2CHA(mHtmlPath), err);
-        Utils::showErrorBox(QString(tr("Xuất dữ liệu lỗi, mã lỗi %1")).arg(err));
+        DialogUtils::showErrorBox(QString(tr("Xuất dữ liệu lỗi, mã lỗi %1")).arg(err));
     }
     traceout;
 }

@@ -29,15 +29,7 @@
 #include <QHash>
 #include <QChar>
 
-#define DATE_FORMAT_MD "M/D"
-#define DATE_FORMAT_DM "D/M"
-#define DATE_FORMAT_YMD "Y/M/D"
-#define DATE_FORMAT_DMY "D/M/Y"
 #define DEFAULT_CSV_FIELD_SPLIT ':'
-#define DEFAULT_FORMAT_YMD DATE_FORMAT_DMY
-#define DEFAULT_FORMAT_MD DATE_FORMAT_DM
-
-#define QT_DATE_FORMAT_DMY "dd/MM/yyy"
 
 //TODO: change default split to '|'? '|' is not common used like ','
 #define DEFAULT_CSV_ITEM_SPLIT ','
@@ -84,23 +76,6 @@ do { \
         QString val = widget->text().trimmed();\
         func(val);\
 } while (0)
-
-
-#define SET_DATE_FORMAT_VAL_FROM_WIDGET(widget,func, format) \
-do { \
-        QString val = widget->text().trimmed();\
-        func(0);\
-        if (!val.isEmpty()){ \
-            bool isOk = false;\
-            qint64 date = Utils::dateFromString(val, format, &isOk);\
-            if (isOk && date > 0){\
-                func(date);\
-        }\
-    } \
-} while (0)
-
-
-#define SET_DATE_VAL_FROM_WIDGET(widget,func) SET_DATE_FORMAT_VAL_FROM_WIDGET(widget, func, DEFAULT_FORMAT_YMD)
 
 #define SET_VAL_FROM_CBOX(widget,func, functxt, err) \
     do { \
@@ -186,8 +161,6 @@ do { \
 
 #define ICON_ROOT_PATH ":/icon/icon"
 #define ICON_PATH(name) ICON_ROOT_PATH "/" name
-
-#define UNDER_DEV(...) Utils::showDlgUnderDev(__VA_ARGS__)
 
 #define GET_VAL_INT_FROM_CB(widget, out) \
     do { \
@@ -280,19 +253,11 @@ public:
         }
         list.clear();
     }
-    static qint64 currentTimeMs();
-    static QString timeMsToDatestring(qint64 timMs, const QString& format = "yyyy/MM/dd hh:mm:ss");
-    static QString currentTimeToDatestring(const QString& format = QT_DATE_FORMAT_DMY);
     static Gender genderFromString(const QString& gender);
     /**
     * Y/M/D
     * M/D
     */
-    // TODO: default for const QString is ok or not??? can set it ???
-    static qint64 dateFromString(const QString& date, const QString& format = DEFAULT_FORMAT_YMD, bool *isOk = nullptr);
-    static QString date2String(qint64 date, const QString& format = DEFAULT_FORMAT_YMD, bool* isOk = nullptr);
-    static void date2ymd(qint64 date, int* day = nullptr,
-                            int* month = nullptr, int* year = nullptr);
 
 //    static ErrCode parseCSVFile(const QString& filePath,
 //                            func_one_csv_item_t cb = nullptr,
@@ -326,12 +291,6 @@ public:
                                      const QString& specialChar = SPECIAL_CHAR);
     static QString readAll(const QString& fpath);
 
-    static void showMsgBox(const QString& msg);
-    static void showErrorBox(const QString& msg);
-    static void showErrorBox(int ret, const QString& msg = nullptr);
-    static bool showConfirmDialog(QWidget *parent, const QString& title,
-                                  const QString& message, std::function<void(int)> onFinished = nullptr);
-    static QString showInputDialog(QWidget *parent, const QString& title, const QString& message, const QString& initInput = "", bool* isOk = nullptr);
     static ErrCode screenSize(int* w=nullptr, int* h=nullptr);
     static int screenHeight();
     static int getCurrentComboxIndex(const QComboBox *cb);;
@@ -340,16 +299,10 @@ public:
     static ErrCode setSelectItemComboxByData(QComboBox *cb, const QVariant& data, int* index = nullptr);
     static ErrCode buildComboxFromModel(QComboBox *cb, const QList<DbModel*>& modelList);
     static ErrCode buildComboxFromModel(QComboBox *cb, ModelController* controller);
-    static void showDlgUnderDev(const QString& info = nullptr);
 
     template<class T>
     static bool isSameList(const QList<T>& l1, const QList<T>& l2);
 
-    static QString saveFileDialog(QWidget *parent = nullptr,
-                                  const QString& title = QString(),
-                                  const QString& initFileName = QString(),
-                                  const QString& filter = QString(),
-                                  const QString& initDir = QString());
     static ErrCode saveHtmlToPdf(const QString& htmlPath, const QString& initFname = "xuatdulieu", QWidget *parent = nullptr);
 };
 

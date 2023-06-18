@@ -23,6 +23,7 @@
 #include "personctl.h"
 #include "specialistctl.h"
 #include "utils.h"
+#include "datetimeutils.h"
 #include "logger.h"
 #include <QList>
 #include <QTemporaryFile>
@@ -35,7 +36,7 @@
 #include "view/dialog/dlgsearchcommunity.h"
 #include "view/dialog/dlgaddpersonevent.h"
 #include "view/widget/uipersoneventlistview.h"
-#include "view/widget/uipersoncommunitylistview.h"
+#include "view/widget/uicommunitiesofpersonlistview.h"
 #include <QFile>
 #include "filter.h"
 #include "dlgperson.h"
@@ -49,6 +50,7 @@
 #include "stringdefs.h"
 #include "dlgpersoncomm.h"
 #include "dlgconfirmupdatepeoplecomm.h"
+#include "dialogutils.h"
 
 UIPersonListView::UIPersonListView(QWidget *parent):
     UICommonListView(parent)
@@ -167,15 +169,15 @@ void UIPersonListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
         tblItem->addValue(per->hollyName());
         tblItem->addValue(per->getFullName());
         tblItem->addValue(per->communityName());
-        tblItem->addValue(Utils::date2String(per->birthday()));
+        tblItem->addValue(DatetimeUtils::date2String(per->birthday()));
         tblItem->addValue(per->birthPlace());
-        tblItem->addValue(Utils::date2String(per->feastDay(), DEFAULT_FORMAT_MD)); // seem feastday convert repeate many time, make it common????
+        tblItem->addValue(DatetimeUtils::date2String(per->feastDay(), DEFAULT_FORMAT_MD)); // seem feastday convert repeate many time, make it common????
 
-        tblItem->addValue(Utils::date2String(per->joinDate()));
-        tblItem->addValue(Utils::date2String(per->vowsDate()));
-        tblItem->addValue(Utils::date2String(per->eternalVowsDate()));
+        tblItem->addValue(DatetimeUtils::date2String(per->joinDate()));
+        tblItem->addValue(DatetimeUtils::date2String(per->vowsDate()));
+        tblItem->addValue(DatetimeUtils::date2String(per->eternalVowsDate()));
         tblItem->addValue(per->courseName());
-        tblItem->addValue(Utils::date2String(per->deadDate()));
+        tblItem->addValue(DatetimeUtils::date2String(per->deadDate()));
         tblItem->addValue(per->tel().join(";"));
         tblItem->addValue(per->email().join(";"));
         tblItem->addValue(per->specialistNameList().join(","));
@@ -392,7 +394,7 @@ ErrCode UIPersonListView::onMenuActionChangeCommunity(QMenu *menu, UITableMenuAc
                             }, nullptr);
                 }
             } else {
-                Utils::showMsgBox(tr("Danh sách nữ tu trống)"));
+                DialogUtils::showMsgBox(tr("Danh sách nữ tu trống)"));
                 ret = ErrNoData;
             }
             RELEASE_LIST_DBMODEL(items);
@@ -425,7 +427,7 @@ ErrCode UIPersonListView::onMenuActionViewPersonEvent(QMenu *menu, UITableMenuAc
     } else {
         loge("no person event info");
         ret = ErrNoData;
-        Utils::showErrorBox(tr("Vui lòng chọn cộng đoàn cần xem"));
+        DialogUtils::showErrorBox(tr("Vui lòng chọn cộng đoàn cần xem"));
     }
 
     traceret(ret);
@@ -438,7 +440,7 @@ ErrCode UIPersonListView::onMenuActionViewCommunity(QMenu *menu, UITableMenuActi
     ErrCode ret = ErrNone;
     Person* per = dynamic_cast<Person*>(act->getData());
     if (per != nullptr) {
-        UIPersonCommunityListView* view = (UIPersonCommunityListView*)
+        UICommunitiesOfPersonListView* view = (UICommunitiesOfPersonListView*)
             UITableViewFactory::getView(ViewType::VIEW_PERSON_COMMUNITY_LIST);
 
         logd("person to view community %s", MODELSTR2CHA(per));
@@ -447,7 +449,7 @@ ErrCode UIPersonListView::onMenuActionViewCommunity(QMenu *menu, UITableMenuActi
     } else {
         loge("no per info");
         ret = ErrNoData;
-        Utils::showErrorBox(tr("Vui lòng chọn Nữ tu cần xem"));
+        DialogUtils::showErrorBox(tr("Vui lòng chọn Nữ tu cần xem"));
     }
 
     traceret(ret);
@@ -536,7 +538,7 @@ ErrCode UIPersonListView::exportPersonInfo(QMenu *menu, UITableMenuAction *act)
                     logi("Saved html path '%s' to pdf succeed", STR2CHA(fpath));
                 } else {
                     loge("Saved html path '%s' to pdf failed, err=%d", STR2CHA(fpath), err);
-                    Utils::showErrorBox(QString(tr("Xuất dữ liệu lỗi, mã lỗi %1")).arg(err));
+                    DialogUtils::showErrorBox(QString(tr("Xuất dữ liệu lỗi, mã lỗi %1")).arg(err));
                 }
         } else {
             err = ErrNotFound;
@@ -755,7 +757,7 @@ ErrCode UIPersonListView::onConfirmAddHistoryCommunity(const QList<DbModel *> &p
 
     if (err != ErrNone) {
         logd("Add community history failed, err=%d", err);
-        Utils::showErrorBox(err, tr("Lỗi thêm dữ liệu Cộng đoàn"));
+        DialogUtils::showErrorBox(err, tr("Lỗi thêm dữ liệu Cộng đoàn"));
     }
     if (dlg) delete dlg;
     traceret(err);
@@ -780,7 +782,7 @@ void UIPersonListView::onChangeCommunityDone(ErrCode err,
         reload();
     } else {
         loge("Change community failed, err=%d", err);
-        Utils::showErrorBox(err, QString(tr("Đổi cộng đoàn %1 thất bại")).arg(comm->name()));
+        DialogUtils::showErrorBox(err, QString(tr("Đổi cộng đoàn %1 thất bại")).arg(comm->name()));
     }
     if (err == ErrNone && addEvent) {
         logd("Add person event");

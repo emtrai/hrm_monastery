@@ -25,6 +25,8 @@
 #include "personctl.h"
 #include "mainwindow.h"
 #include "utils.h"
+#include "datetimeutils.h"
+#include "dialogutils.h"
 
 DlgSearchPerson::~DlgSearchPerson()
 {
@@ -65,7 +67,7 @@ int DlgSearchPerson::onSearch(const QString &keyword)
     err = INSTANCE(PersonCtl)->search(keyword, &mListItems);
     if (err != ErrNone) {
         loge("Search person err=%d", err);
-        Utils::showErrorBox(QString(tr("Tìm kiếm lỗi, mã lỗi %1")).arg(err));
+        DialogUtils::showErrorBox(QString(tr("Tìm kiếm lỗi, mã lỗi %1")).arg(err));
     }
     traceout;
     return mListItems.count();
@@ -154,7 +156,7 @@ QString DlgSearchPerson::getValueOfItemAt(int idx, int col, QString header, DbMo
             val = per->getFullName();
             break;
         case 3:
-            val = Utils::date2String(per->birthday());
+            val = DatetimeUtils::date2String(per->birthday());
             break;
         case 4:
             val = per->birthPlace();

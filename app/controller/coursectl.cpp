@@ -25,6 +25,7 @@
 #include "course.h"
 #include "dbctl.h"
 #include "utils.h"
+#include "datetimeutils.h"
 #include "defs.h"
 #include "prebuiltdefs.h"
 
@@ -114,13 +115,13 @@ DbModel *CourseCtl::buildModel(void *items, const QString &fmt)
     if (err == ErrNone) {
         QString startDate = itemList->at(idx++).trimmed();
         if (!startDate.isEmpty())
-            item->setStartDate(Utils::dateFromString(startDate));
+            item->setStartDate(DatetimeUtils::dateFromString(startDate));
     }
 
     if (err == ErrNone) {
         QString endDate = itemList->at(idx++).trimmed();
         if (!endDate.isEmpty())
-            item->setEndDate(Utils::dateFromString(endDate));
+            item->setEndDate(DatetimeUtils::dateFromString(endDate));
     }
 
     if (err == ErrNone) {

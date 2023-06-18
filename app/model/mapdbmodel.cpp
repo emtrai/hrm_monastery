@@ -23,6 +23,7 @@
 #include "logger.h"
 #include "errcode.h"
 #include "utils.h"
+#include "datetimeutils.h"
 #include "defs.h"
 #include "dbmodel.h"
 #include "dbdefs.h"
@@ -142,10 +143,10 @@ void MapDbModel::initExportFields()
     tracein;
     DbModel::initExportFields();
     mExportCallbacks.insert(KItemStartDate, [](const DbModel* model, const QString& item){
-        return Utils::date2String(((MapDbModel*)model)->startDate(), DEFAULT_FORMAT_YMD);
+        return DatetimeUtils::date2String(((MapDbModel*)model)->startDate(), DEFAULT_FORMAT_YMD);
     });
     mExportCallbacks.insert(KItemEndDate, [](const DbModel* model, const QString& item){
-        return Utils::date2String(((MapDbModel*)model)->endDate(), DEFAULT_FORMAT_YMD);
+        return DatetimeUtils::date2String(((MapDbModel*)model)->endDate(), DEFAULT_FORMAT_YMD);
     });
     mExportCallbacks.insert(KItemStatus, [](const DbModel* model, const QString& item){
         return ((MapDbModel*)model)->modelStatusName();

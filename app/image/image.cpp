@@ -28,6 +28,7 @@
 #include <QFile>
 #include <QDir>
 #include "filectl.h"
+#include "datetimeutils.h"
 
 #define MAX_LOOP_FIND_UID 100
 Image::Image()
@@ -254,7 +255,7 @@ QString Image::buildUid(const QString fpath, const QString &seed)
         uuidStr += "_" + fpath;
     }
     logd("Add time");
-    uuidStr += QString("_%1").arg(Utils::currentTimeMs());
+    uuidStr += QString("_%1").arg(DatetimeUtils::currentTimeMs());
     logd("uuidStr '%s'", STR2CHA(uuidStr));
     finalUid = Crypto::hashString(uuidStr);
     logd("finalUid '%s'", STR2CHA(finalUid));

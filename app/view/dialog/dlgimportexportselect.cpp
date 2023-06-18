@@ -25,6 +25,7 @@
 #include "utils.h"
 #include <QFileDialog>
 #include "filectl.h"
+#include "dialogutils.h"
 
 DlgImportExportSelect::DlgImportExportSelect(QWidget *parent) :
     QDialog(parent),
@@ -117,13 +118,13 @@ void DlgImportExportSelect::accept()
             mSelectedExportType = (ExportType)type;
         } else {
             loge("Selected data is invalid");
-            Utils::showErrorBox(tr("Định dạng nhập/xuất không đúng"));
+            DialogUtils::showErrorBox(tr("Định dạng nhập/xuất không đúng"));
             err = ErrInvalidData;
 
         }
     } else {
         loge("no selected data");
-        Utils::showErrorBox(tr("Định dạng nhập/xuất không có"));
+        DialogUtils::showErrorBox(tr("Định dạng nhập/xuất không có"));
         err = ErrNoData;
     }
 
@@ -132,14 +133,14 @@ void DlgImportExportSelect::accept()
         ext = typeToExt(mSelectedExportType, &ok);
         if (!ok) {
             loge("Not found suitable extension for type %d", mSelectedExportType);
-            Utils::showErrorBox(tr("Không tìm thấy định dạng tập tin phù hợp"));
+            DialogUtils::showErrorBox(tr("Không tìm thấy định dạng tập tin phù hợp"));
             err = ErrInvalidData;
         }
     }
     if (err == ErrNone) {
         logd("extension %s", STR2CHA(ext));
         if (mIsExport) {
-            mPath = Utils::saveFileDialog(this, mTitle,
+            mPath = DialogUtils::saveFileDialog(this, mTitle,
                                           QString("xuatdulieu.%1").arg(ext),
                                           QString("%1 (*.%2)").arg(ext.toUpper(), ext)
                                           );

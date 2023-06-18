@@ -22,6 +22,7 @@
 #include "communitydept.h"
 
 #include "utils.h"
+#include "datetimeutils.h"
 #include "dbctl.h"
 #include "defs.h"
 #include "dbmodel.h"
@@ -95,7 +96,7 @@ void CommunityDept::setEstablishDateFromString(const QString &date, const QStrin
 {
     tracein;
     logd("create date string '%s'", date.toStdString().c_str());
-    mEstablishDate = Utils::dateFromString(date, format);
+    mEstablishDate = DatetimeUtils::dateFromString(date, format);
     logd("mEstablishDate %ll", mEstablishDate);
 }
 
@@ -199,7 +200,7 @@ void CommunityDept::setClosedDateFromString(const QString &date, const QString &
 {
     tracein;
     logd("close date string '%s'", date.toStdString().c_str());
-    mClosedDate = Utils::dateFromString(date, format);
+    mClosedDate = DatetimeUtils::dateFromString(date, format);
     logd("mClosedDate %ll", mClosedDate);
 }
 

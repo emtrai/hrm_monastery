@@ -24,13 +24,12 @@
 #include "ui_dlgarea.h"
 #include "logger.h"
 #include "errcode.h"
-#include "community.h"
 #include "areactl.h"
 #include "area.h"
 #include "countryctl.h"
-#include "communityctl.h"
 #include "dialog/dlgsearchperson.h"
 #include "dbmodel.h"
+#include "datetimeutils.h"
 
 
 DlgArea::DlgArea(QWidget *parent) :
@@ -109,8 +108,8 @@ ErrCode DlgArea::fromModel(const DbModel *item)
     if (err == ErrNone) {
         ui->txtName->setText(comm->name());
         ui->txtCode->setText(comm->nameId()); // TODO: auto generate???
-        ui->txtStartDate->setText(Utils::date2String(comm->startDate(), DEFAULT_FORMAT_YMD));
-        ui->txtEndDate->setText(Utils::date2String(comm->endDate(), DEFAULT_FORMAT_YMD));
+        ui->txtStartDate->setText(DatetimeUtils::date2String(comm->startDate(), DEFAULT_FORMAT_YMD));
+        ui->txtEndDate->setText(DatetimeUtils::date2String(comm->endDate(), DEFAULT_FORMAT_YMD));
         ui->txtAddr->setPlainText(comm->addr());
         Utils::setSelectItemComboxByData(ui->cbCountry, comm->countryUid());
         ui->txtTel->setText(comm->tel());

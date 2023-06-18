@@ -26,6 +26,7 @@
 #include <QList>
 #include "community.h"
 #include "utils.h"
+#include "datetimeutils.h"
 #include <QPushButton>
 #include "dbmodel.h"
 
@@ -70,7 +71,7 @@ const Community *DlgAddCommunityHistory::getCommunity()
 
 qint64 DlgAddCommunityHistory::getDate()
 {
-    return Utils::dateFromString(ui->txtDate->text());
+    return DatetimeUtils::dateFromString(ui->txtDate->text());
 }
 
 QString DlgAddCommunityHistory::getRemark()

@@ -25,6 +25,7 @@
 #include <QString>
 #include <QStringLiteral>
 #include "utils.h"
+#include "datetimeutils.h"
 #include "crypto.h"
 
 #include "dbctl.h"
@@ -143,7 +144,7 @@ void Saint::setFeastDay(qint64 newFeastDay)
 
 void Saint::setFeastDay(const QString &newFeastDay, const QString& f)
 {
-    setFeastDay(Utils::dateFromString(newFeastDay, f));
+    setFeastDay(DatetimeUtils::dateFromString(newFeastDay, f));
 }
 
 Gender Saint::gender() const
@@ -250,7 +251,7 @@ void Saint::setCountryUid(const QString &newCountryUid)
 //    logd("- FullName %s", fullName().toStdString().c_str());
 //    logd("- gender %d", gender());
 //    logd("- feastDay %lld (%s)", feastDay(),
-//         Utils::date2String(feastDay(), QString()).toStdString().c_str());
+//         DatetimeUtils::date2String(feastDay(), QString()).toStdString().c_str());
 //#endif //DEBUG_TRACE
 
 //}

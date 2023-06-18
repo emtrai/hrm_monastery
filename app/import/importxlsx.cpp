@@ -24,6 +24,7 @@
 #include "logger.h"
 #include "defs.h"
 #include "utils.h"
+#include "datetimeutils.h"
 #include <QRegularExpression>
 #include <QRegularExpressionMatchIterator>
 #include "filectl.h"
@@ -92,8 +93,8 @@ ErrCode ImportXlsx::importFrom(const QString &importName, int importFileType,
                             value = var.toString().trimmed();
                         }
                         if (cell->isDateTime()) { // QXlsx read in format of YYYY/MM/DD
-                            qint32 time = Utils::dateFromString(value, "YYYY/MM/DD");
-                            value = Utils::date2String(time, DEFAULT_FORMAT_YMD);
+                            qint32 time = DatetimeUtils::dateFromString(value, "YYYY/MM/DD");
+                            value = DatetimeUtils::date2String(time, DEFAULT_FORMAT_YMD);
                         }
                     }
                     logd("value='%s'", STR2CHA(value));

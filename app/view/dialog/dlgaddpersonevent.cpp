@@ -27,6 +27,7 @@
 #include "errcode.h"
 #include "personevent.h"
 #include "utils.h"
+#include "datetimeutils.h"
 #include "eventctl.h"
 #include "event.h"
 #include "person.h"
@@ -117,8 +118,8 @@ ErrCode DlgAddPersonEvent::fromModel(const DbModel *item)
             }
             Utils::setSelectItemComboxByData(ui->cbEvent, comm->eventUid());
             ui->txtTitle->setText(comm->name());
-            ui->txtDate->setText(Utils::date2String(comm->date(), DEFAULT_FORMAT_YMD));
-            ui->txtEndDate->setText(Utils::date2String(comm->endDate(), DEFAULT_FORMAT_YMD));
+            ui->txtDate->setText(DatetimeUtils::date2String(comm->date(), DEFAULT_FORMAT_YMD));
+            ui->txtEndDate->setText(DatetimeUtils::date2String(comm->endDate(), DEFAULT_FORMAT_YMD));
             ui->txtRemark->setPlainText(comm->remark());
             ui->btnSearch->setEnabled(false); // not allow to change person
             if (!mEvenInfoOnly) {

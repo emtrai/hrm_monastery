@@ -24,6 +24,7 @@
 #include "dbctl.h"
 #include "logger.h"
 #include "utils.h"
+#include "datetimeutils.h"
 #include "filectl.h"
 #include "communityctl.h"
 #include "dbmodel.h"
@@ -97,13 +98,13 @@ void Community::initExportFields()
         return ((Community*)model)->tel();
     });
     mExportCallbacks.insert(KItemEstablishDate, [](const DbModel* model, const QString& item){
-        return Utils::date2String(((Community*)model)->createDate(), DEFAULT_FORMAT_YMD);
+        return DatetimeUtils::date2String(((Community*)model)->createDate(), DEFAULT_FORMAT_YMD);
     });
     mExportCallbacks.insert(KItemCloseDate, [](const DbModel* model, const QString& item){
-        return Utils::date2String(((Community*)model)->closeDate(), DEFAULT_FORMAT_YMD);
+        return DatetimeUtils::date2String(((Community*)model)->closeDate(), DEFAULT_FORMAT_YMD);
     });
     mExportCallbacks.insert(KItemFeastDay, [](const DbModel* model, const QString& item){
-        return Utils::date2String(((Community*)model)->feastDate(), DEFAULT_FORMAT_MD);
+        return DatetimeUtils::date2String(((Community*)model)->feastDate(), DEFAULT_FORMAT_MD);
     });
     mExportCallbacks.insert(KItemOtherContact, [](const DbModel* model, const QString& item){
         return ((Community*)model)->contact();
@@ -264,7 +265,7 @@ ErrCode Community::setCreateDateFromString(const QString &date, const QString &f
     tracein;
     logd("create date string '%s'", date.toStdString().c_str());
     bool ok = false;
-    mCreateDate = Utils::dateFromString(date, format, &ok);
+    mCreateDate = DatetimeUtils::dateFromString(date, format, &ok);
     logd("mCreateDate %ll", mCreateDate);
     if (!ok) {
         loge("Invalid date '%s', format '%s'", STR2CHA(date), STR2CHA(format));
@@ -337,7 +338,7 @@ ErrCode Community::setCloseDateFromString(const QString &date, const QString &fo
     tracein;
     bool ok = false;
     logd("close date string '%s'", date.toStdString().c_str());
-    mCloseDate = Utils::dateFromString(date, format, &ok);
+    mCloseDate = DatetimeUtils::dateFromString(date, format, &ok);
     logd("mCloseDate %ll", mCloseDate);
     if (!ok) {
         loge("Invalid date '%s', format '%s'", STR2CHA(date), STR2CHA(format));
@@ -735,7 +736,7 @@ ErrCode Community::setFeastDateFromString(const QString &date, const QString &fo
     tracein;
     bool ok = false;
     logd("mFeastDate date string '%s'", date.toStdString().c_str());
-    mFeastDate = Utils::dateFromString(date, format, &ok);
+    mFeastDate = DatetimeUtils::dateFromString(date, format, &ok);
     logd("mFeastDate %ll", mFeastDate);
     if (!ok) {
         loge("Invalid date '%s', format '%s'", STR2CHA(date), STR2CHA(format));
@@ -761,7 +762,7 @@ void Community::dump()
     logd("- Uid %s", uid().toStdString().c_str());
     logd("- Name %s", name().toStdString().c_str());
     logd("- Addr %s", addr().toStdString().c_str());
-    logd("- Feastday %s", Utils::date2String(mFeastDate).toStdString().c_str());
+    logd("- Feastday %s", DatetimeUtils::date2String(mFeastDate).toStdString().c_str());
     logd("- CEO Uid %s", currentCEOUid().toStdString().c_str());
     logd("- Aread uid %s", areaUid().toStdString().c_str());
     logd("- Aread name %s", areaName().toStdString().c_str());

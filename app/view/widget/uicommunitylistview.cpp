@@ -26,8 +26,9 @@
 #include "dbmodel.h"
 #include "community.h"
 #include "utils.h"
+#include "datetimeutils.h"
 #include "mainwindow.h"
-#include "uicommunitypersonlistview.h"
+#include "uipeopleincommunitylistview.h"
 #include "uicommdeptlistview.h"
 #include "uitableviewfactory.h"
 #include "uipersonlistview.h"
@@ -35,6 +36,7 @@
 #include <QFileDialog>
 #include "personctl.h"
 #include "person.h"
+#include "dialogutils.h"
 
 UICommunityListView::UICommunityListView(QWidget *parent):
     UICommonListView(parent)
@@ -79,7 +81,7 @@ void UICommunityListView::updateItem(DbModel *item, UITableItem *tblItem, int id
     UICommonListView::updateItem(item, tblItem, idx);
     Community* model = (Community*) item;
     tblItem->addValue(DbModel::modelStatus2Name(model->getStatus()));
-    tblItem->addValue(Utils::date2String(model->feastDate(), DEFAULT_FORMAT_MD));
+    tblItem->addValue(DatetimeUtils::date2String(model->feastDate(), DEFAULT_FORMAT_MD));
     tblItem->addValue(model->missionNameString());
     tblItem->addValue(model->areaName());
     tblItem->addValue(model->currentCEOName());
@@ -134,7 +136,7 @@ ErrCode UICommunityListView::onMenuActionAddPerson(QMenu *menu, UITableMenuActio
     }
     if (err != ErrNone){
         loge("add person failed, error code %d",err);
-        Utils::showErrorBox(QString("Thêm nữ tu lỗi, mã lỗi: %1").arg(err));
+        DialogUtils::showErrorBox(QString("Thêm nữ tu lỗi, mã lỗi: %1").arg(err));
     }
     traceret(err);
     return err;
@@ -145,7 +147,7 @@ ErrCode UICommunityListView::onMenuActionAddDepart(QMenu *menu, UITableMenuActio
     tracein;
     ErrCode err = ErrNotImpl;
     // TODO: implement it
-    Utils::showDlgUnderDev();
+    UNDER_DEV();
     traceret(err);
     return err;
 }
@@ -159,7 +161,7 @@ void UICommunityListView::onViewItem(UITableCellWidgetItem *item)
         MainWindow::showOnHtmlViewer(comm, tr("Cộng đoàn"));
     } else {
         loge("Comm obj is null");
-        Utils::showErrorBox("Không có thông tin để xem");
+        DialogUtils::showErrorBox("Không có thông tin để xem");
     }
     traceout;
 }
@@ -229,7 +231,7 @@ ErrCode UICommunityListView::onMenuActionListAllPerson(QMenu *menu, UITableMenuA
     ErrCode ret = ErrNone;
     Community* community = dynamic_cast<Community*>(act->getData());
     if (community != nullptr) {
-        UICommunityPersonListView* view = (UICommunityPersonListView*)UITableViewFactory::getView(ViewType::VIEW_COMMUNITY_PERSON_LIST);
+        UIPeopleInCommunityListView* view = (UIPeopleInCommunityListView*)UITableViewFactory::getView(ViewType::VIEW_COMMUNITY_PERSON_LIST);
 
         logd("community to view person %s", STR2CHA(community->toString()));
         view->setCommunity(community);
@@ -237,7 +239,7 @@ ErrCode UICommunityListView::onMenuActionListAllPerson(QMenu *menu, UITableMenuA
     } else {
         loge("no community info");
         ret = ErrNoData;
-        Utils::showErrorBox(tr("Vui lòng chọn cộng đoàn cần xem"));
+        DialogUtils::showErrorBox(tr("Vui lòng chọn cộng đoàn cần xem"));
     }
 
     traceret(ret);
@@ -293,7 +295,7 @@ ErrCode UICommunityListView::onMenuActionListManagers(QMenu *menu, UITableMenuAc
 {
     tracein;
     ErrCode err = ErrNotImpl;
-    Utils::showDlgUnderDev();
+    UNDER_DEV();
     // TODO: implement it
     traceret(err);
     return err;
@@ -405,7 +407,7 @@ ErrCode UICommunityListView::onMenuActionExportListPerson(QMenu *menu, UITableMe
     }
     if (err != ErrNone){
         loge("export list person failed, error code %d",err);
-        Utils::showErrorBox(QString("Xuất dữ liệu danh sách nữ tu trong cộng đoàn lỗi, mã lỗi: %1").arg(err));
+        DialogUtils::showErrorBox(QString("Xuất dữ liệu danh sách nữ tu trong cộng đoàn lỗi, mã lỗi: %1").arg(err));
     }
     traceret(err);
     return err;

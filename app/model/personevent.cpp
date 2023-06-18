@@ -24,6 +24,7 @@
 #include "errcode.h"
 #include "filectl.h"
 #include "utils.h"
+#include "datetimeutils.h"
 #include "dbctl.h"
 #include "defs.h"
 #include "dbmodel.h"
@@ -83,7 +84,7 @@ ErrCode PersonEvent::buildNameId(const QString &perNameId, const QString &eventN
     ErrCode err = ErrNone;
     QString dateString = date;
     if (dateString.isEmpty() && mDate > 0) {
-        dateString = Utils::date2String(mDate);
+        dateString = DatetimeUtils::date2String(mDate);
     }
     QString nameId = makeNameId(perNameId,
                                 eventNameId,
@@ -182,7 +183,7 @@ void PersonEvent::setPersonName(const QString &newPersonName)
 
 QString PersonEvent::toString() const
 {
-    return QString("%1:%2:%3").arg(DbModel::toString(),Utils::date2String(date()), STR2CHA(eventName()));
+    return QString("%1:%2:%3").arg(DbModel::toString(),DatetimeUtils::date2String(date()), STR2CHA(eventName()));
 }
 
 qint64 PersonEvent::endDate() const
@@ -259,6 +260,6 @@ void PersonEvent::setDate(qint64 newDate)
 
 void PersonEvent::setDate(const QString &newDate, const QString& format)
 {
-    setDate(Utils::dateFromString(newDate, format));
+    setDate(DatetimeUtils::dateFromString(newDate, format));
 }
 

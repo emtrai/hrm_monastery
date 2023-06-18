@@ -35,6 +35,7 @@
 #include "dbsqlite.h"
 #include "utils.h"
 #include <QSqlError>
+#include "datetimeutils.h"
 
 const qint32 DbMetadataTbl::KVersionCode = VERSION_CODE(0,0,1);
 
@@ -139,8 +140,8 @@ ErrCode DbMetadataTbl::addMetadataValue(const QString &key, const QString &value
         logi("Add metadata '%s':'%s'", STR2CHA(key), STR2CHA(value));
         builder->addValue(KFieldKey, key);
         builder->addValue(KFieldValue, value);
-        builder->addValue(KFieldDbCreateTime, Utils::currentTimeMs());
-        builder->addValue(KFieldLastDbUpdateItme, Utils::currentTimeMs());
+        builder->addValue(KFieldDbCreateTime, DatetimeUtils::currentTimeMs());
+        builder->addValue(KFieldLastDbUpdateItme, DatetimeUtils::currentTimeMs());
         logd("build Insert sql query");
         qry = builder->buildSqlQuery();
         if (!qry) {
@@ -188,7 +189,7 @@ ErrCode DbMetadataTbl::updateMetadataValue(const QString &key, const QString &va
         logi("Update metadata '%s':'%s'", STR2CHA(key), STR2CHA(value));
         builder->addValue(KFieldKey, key);
         builder->addValue(KFieldValue, value);
-        builder->addValue(KFieldLastDbUpdateItme, Utils::currentTimeMs());
+        builder->addValue(KFieldLastDbUpdateItme, DatetimeUtils::currentTimeMs());
 
         logd("build Update sql query");
         updateQry = builder->buildSqlQuery();

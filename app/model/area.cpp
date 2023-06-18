@@ -22,6 +22,7 @@
 #include "area.h"
 
 #include "utils.h"
+#include "datetimeutils.h"
 #include "dbctl.h"
 #include "defs.h"
 #include "dbmodel.h"
@@ -165,10 +166,10 @@ void Area::initExportFields()
         return ((Area*)model)->tel();
     });
     mExportCallbacks.insert(KItemStartDate, [](const DbModel* model, const QString& item){
-        return Utils::date2String(((Area*)model)->startDate(), DEFAULT_FORMAT_YMD);
+        return DatetimeUtils::date2String(((Area*)model)->startDate(), DEFAULT_FORMAT_YMD);
     });
     mExportCallbacks.insert(KItemEndDate, [](const DbModel* model, const QString& item){
-        return Utils::date2String(((Area*)model)->endDate(), DEFAULT_FORMAT_YMD);
+        return DatetimeUtils::date2String(((Area*)model)->endDate(), DEFAULT_FORMAT_YMD);
     });
     mExportCallbacks.insert(KItemStatus, [](const DbModel* model, const QString& item){
         return ((Area*)model)->modelStatusName();

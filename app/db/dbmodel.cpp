@@ -33,6 +33,7 @@
 #include "specialist.h"
 #include "prebuiltdefs.h"
 #include "stringdefs.h"
+#include "datetimeutils.h"
 
 DbModel::DbModel():
     mDeletable(true)
@@ -355,7 +356,7 @@ void DbModel::buildUidIfNotSet()
 QString DbModel::buildUid(const QString* seed)
 {
     tracein;
-    QString value = QString("%1%2%3").arg(nameId(), name()).arg(Utils::currentTimeMs());
+    QString value = QString("%1%2%3").arg(nameId(), name()).arg(DatetimeUtils::currentTimeMs());
     if (seed != nullptr) {
         value += "_" + *seed;
     }
@@ -725,8 +726,8 @@ void DbModel::dump()
     logd("- Uid %s", uid().toStdString().c_str());
     logd("- NameId %s", nameId().toStdString().c_str());
     logd("- Name %s", name().toStdString().c_str());
-    logd("- mDbCreatedTime %s", Utils::timeMsToDatestring(dbCreatedTime()).toStdString().c_str());
-    logd("- mLastDbUpdatedTime %s", Utils::timeMsToDatestring(lastDbUpdatedTime()).toStdString().c_str());
+    logd("- mDbCreatedTime %s", DatetimeUtils::timeMsToDatestring(dbCreatedTime()).toStdString().c_str());
+    logd("- mLastDbUpdatedTime %s", DatetimeUtils::timeMsToDatestring(lastDbUpdatedTime()).toStdString().c_str());
 #endif //DEBUG_TRACE
 }
 

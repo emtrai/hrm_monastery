@@ -24,6 +24,7 @@
 #include "logger.h"
 #include "utils.h"
 #include "dbmodel.h"
+#include "dialogutils.h"
 
 DlgSearch::DlgSearch(QWidget *parent, bool isMulti) :
     QDialog(parent),
@@ -55,6 +56,7 @@ DlgSearch::~DlgSearch()
     tracein;
     clearAll();
     delete ui;
+    traceout;
 }
 
 
@@ -90,7 +92,7 @@ void DlgSearch::on_btnSearch_clicked()
 //        }
 //    } else {
 //        loge("Nothing to search");
-//        Utils::showErrorBox(tr("Nhập tên để tìm")); // TODO: translation
+//        DialogUtils::showErrorBox(tr("Nhập tên để tìm")); // TODO: translation
 //    }
     tracein;
     if (!keyword.isEmpty()) {
@@ -100,7 +102,7 @@ void DlgSearch::on_btnSearch_clicked()
         });
     } else {
         loge("Nothing to search");
-        Utils::showErrorBox(tr("Nhập tên để tìm")); // TODO: translation
+        DialogUtils::showErrorBox(tr("Nhập tên để tìm")); // TODO: translation
     }
     traceout;
 }

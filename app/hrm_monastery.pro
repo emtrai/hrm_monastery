@@ -83,6 +83,7 @@ SOURCES += \
     controller/rolectl.cpp \
     controller/workctl.cpp \
     crypto/crypto.cpp \
+    datetimeutils.cpp \
     db/dbareamodelhandler.cpp \
     db/dbcommdepatmodelhandler.cpp \
     db/dbcommunitymodelhandler.cpp \
@@ -121,6 +122,7 @@ SOURCES += \
     db/sqlite/table/dbmetadatatbl.cpp \
     db/sqlite/table/dbsqlitepersonstatustbl.cpp \
     db/sqlite/table/dbsqlsequencetbl.cpp \
+    dialogutils.cpp \
     exception/exception.cpp \
     image/image.cpp \
     image/imagectl.cpp \
@@ -239,8 +241,8 @@ SOURCES += \
     view/widget/uiarealistview.cpp \
     view/widget/uicommdeptlistview.cpp \
     view/widget/uicommonlistview.cpp \
+    view/widget/uicommunitiesofpersonlistview.cpp \
     view/widget/uicommunitylistview.cpp \
-    view/widget/uicommunitypersonlistview.cpp \
     view/widget/uicountrylistview.cpp \
     view/widget/uicourselistview.cpp \
     view/widget/uidepartmentlistview.cpp \
@@ -250,7 +252,7 @@ SOURCES += \
     view/widget/uiitembutton.cpp \
     view/widget/uimissionlistview.cpp \
     view/widget/uimulticomboxview.cpp \
-    view/widget/uipersoncommunitylistview.cpp \
+    view/widget/uipeopleincommunitylistview.cpp \
     view/widget/uipersoneventlistview.cpp \
     view/widget/uipersonlistview.cpp \
     view/widget/uirolelistview.cpp \
@@ -284,6 +286,7 @@ HEADERS += \
     controller/rolectl.h \
     controller/workctl.h \
     crypto/crypto.h \
+    datetimeutils.h \
     db/dbareamodelhandler.h \
     db/dbcommdepatmodelhandler.h \
     db/dbcommunitymodelhandler.h \
@@ -323,6 +326,7 @@ HEADERS += \
     db/sqlite/table/dbmetadatatbl.h \
     db/sqlite/table/dbsqlitepersonstatustbl.h \
     db/sqlite/table/dbsqlsequencetbl.h \
+    dialogutils.h \
     eventdefs.h \
     exception/exception.h \
     image/image.h \
@@ -450,8 +454,8 @@ HEADERS += \
     view/widget/uiarealistview.h \
     view/widget/uicommdeptlistview.h \
     view/widget/uicommonlistview.h \
+    view/widget/uicommunitiesofpersonlistview.h \
     view/widget/uicommunitylistview.h \
-    view/widget/uicommunitypersonlistview.h \
     view/widget/uicountrylistview.h \
     view/widget/uicourselistview.h \
     view/widget/uidepartmentlistview.h \
@@ -461,7 +465,7 @@ HEADERS += \
     view/widget/uiitembutton.h \
     view/widget/uimissionlistview.h \
     view/widget/uimulticomboxview.h \
-    view/widget/uipersoncommunitylistview.h \
+    view/widget/uipeopleincommunitylistview.h \
     view/widget/uipersoneventlistview.h \
     view/widget/uipersonlistview.h \
     view/widget/uirolelistview.h \

@@ -22,6 +22,7 @@
 #include "dlgcourse.h"
 #include "ui_dlgcourse.h"
 #include "utils.h"
+#include "datetimeutils.h"
 #include "logger.h"
 #include "errcode.h"
 #include "course.h"
@@ -105,8 +106,8 @@ ErrCode DlgCourse::fromModel(const DbModel *item)
             ui->txtNameId->setText(comm->nameId()); // TODO: auto generate???
             ui->txtPeriod->setText(comm->period());
             Utils::setSelectItemComboxByData(ui->cbCourseType, comm->courseType());
-            ui->txtStartDate->setText(Utils::date2String(comm->startDate(), DEFAULT_FORMAT_YMD));
-            ui->txtEndDate->setText(Utils::date2String(comm->endDate(), DEFAULT_FORMAT_YMD));
+            ui->txtStartDate->setText(DatetimeUtils::date2String(comm->startDate(), DEFAULT_FORMAT_YMD));
+            ui->txtEndDate->setText(DatetimeUtils::date2String(comm->endDate(), DEFAULT_FORMAT_YMD));
             ui->txtRemark->setPlainText(comm->remark());
         }
     } else {

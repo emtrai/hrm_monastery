@@ -25,6 +25,7 @@
 #include "logger.h"
 #include "personctl.h"
 #include "utils.h"
+#include "datetimeutils.h"
 #include "person.h"
 #include "coursectl.h"
 #include "rolectl.h"
@@ -110,8 +111,8 @@ ErrCode DlgAreaPerson::fromModel(const DbModel *item)
             Utils::setSelectItemComboxByData(ui->cbTerm, comm->courseUid());
             Utils::setSelectItemComboxByData(ui->cbRole, comm->roleUid());
             Utils::setSelectItemComboxByData(ui->cbStatus, comm->modelStatus());
-            ui->txtStartDate->setText(Utils::date2String(comm->startDate(), DEFAULT_FORMAT_YMD));
-            ui->txtEndDate->setText(Utils::date2String(comm->endDate(), DEFAULT_FORMAT_YMD));
+            ui->txtStartDate->setText(DatetimeUtils::date2String(comm->startDate(), DEFAULT_FORMAT_YMD));
+            ui->txtEndDate->setText(DatetimeUtils::date2String(comm->endDate(), DEFAULT_FORMAT_YMD));
             ui->txtRemark->setPlainText(comm->remark());
             ui->btnSearch->setEnabled(false); // not allow to change person
             QString nameid = comm->nameId();

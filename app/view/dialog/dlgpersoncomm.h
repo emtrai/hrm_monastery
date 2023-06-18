@@ -39,7 +39,6 @@ class DlgPersonCommunity : public DlgCommonEditModel
 {
     Q_OBJECT
     DLG_BUILDER(DlgPersonCommunity)
-
 public:
     explicit DlgPersonCommunity(QWidget *parent = nullptr);
     ~DlgPersonCommunity();
@@ -75,6 +74,11 @@ public:
     ErrCode setCommunityPerson(const CommunityPerson* commPer);
     ErrCode appendPerson(const Person* person);
 
+public:
+    static ErrCode addListPeopleToCommunity(QWidget *parent,
+                                            const Community* comm,
+                                            const QList<Person*>& perList);
+    static ErrCode updateCommunityPerson(QWidget *parent, const CommunityPerson* model);
 protected:
     virtual QDialogButtonBox* buttonBox();
     virtual DbModel* newModel();

@@ -34,6 +34,7 @@
 #include "dataexporter.h"
 #include "image.h"
 #include "utils.h"
+#include "datetimeutils.h"
 #include <functional>
 #include <iostream>
 

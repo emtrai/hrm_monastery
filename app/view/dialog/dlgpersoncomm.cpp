@@ -31,6 +31,9 @@
 #include "person.h"
 #include "dlgsearchperson.h"
 #include "exception.h"
+#include "datetimeutils.h"
+#include "dialogutils.h"
+
 
 DlgPersonCommunity::DlgPersonCommunity(QWidget *parent) :
     DlgCommonEditModel(parent),
@@ -41,8 +44,8 @@ DlgPersonCommunity::DlgPersonCommunity(QWidget *parent) :
     ui->setupUi(this);
     loadCommunity();
     loadModelStatus();
-    ui->txtStartDate->setText(Utils::currentTimeToDatestring());
-    ui->txtEndDate->setText(Utils::currentTimeToDatestring());
+    ui->txtStartDate->setText(DatetimeUtils::currentTimeToDatestring());
+    ui->txtEndDate->setText(DatetimeUtils::currentTimeToDatestring());
 }
 
 DlgPersonCommunity::~DlgPersonCommunity()
@@ -85,10 +88,10 @@ ErrCode DlgPersonCommunity::fromModel(const DbModel *item)
     if (err == ErrNone) {
 //    THROWEX("not support from model here");
         if (comm->startDate() > 0) {
-            ui->txtStartDate->setText(Utils::date2String(comm->startDate()));
+            ui->txtStartDate->setText(DatetimeUtils::date2String(comm->startDate()));
         }
         if (comm->endDate() > 0) {
-            ui->txtEndDate->setText(Utils::date2String(comm->endDate()));
+            ui->txtEndDate->setText(DatetimeUtils::date2String(comm->endDate()));
         }
         setModelStatus(comm->modelStatus());
         setCommunityPerson(comm);
@@ -111,6 +114,11 @@ void DlgPersonCommunity::loadModelStatus()
     const QHash<int, QString>* statuses = DbModel::getModelStatusIdNameMap();
     logd("the number of status %lld", statuses->count());
     foreach (int key, statuses->keys()) {
+        if (key == MODEL_ACTIVE) {
+            // changing status will cause some complicated processing, so not allow to set here
+            // TODO: support to change model status
+            continue;
+        }
         ui->cbModelStatus->addItem(statuses->value(key), key);
     }
     traceout;
@@ -175,6 +183,7 @@ ErrCode DlgPersonCommunity::appendPerson(const Person *person)
         }
     }
     if (err == ErrNone) {
+        logd("add '%s' to person list", MODELSTR2CHA(clone));
         mPersonList.append(clone);
         ui->txtPeople->appendPlainText(clone->displayName());
         ui->btnSearchPeople->setEnabled(false);
@@ -197,15 +206,16 @@ void DlgPersonCommunity::accept()
     QString errMsg;
     ErrCode err = ErrNone;
     bool ok2Save = false;
-    int modelStatus = getModelStatus();
+    bool ok = false;
+    int modelStatus = getModelStatus(&ok);
     QString remark = ui->txtRemark->toPlainText();
-    int startDate = Utils::dateFromString(ui->txtStartDate->text());
-    int endDate = Utils::dateFromString(ui->txtEndDate->text());
+    int startDate = DatetimeUtils::dateFromString(ui->txtStartDate->text());
+    int endDate = DatetimeUtils::dateFromString(ui->txtEndDate->text());
     logd("model status = 0x%x", modelStatus);
     logd("community '%s'", MODELSTR2CHA(mCommunity));
     logd("startDate = 0x%x", startDate);
     logd("endDate = 0x%x", endDate);
-    if (err == ErrNone && modelStatus == 0) {
+    if (err == ErrNone && (modelStatus == 0 || !ok)) {
         loge("invalid model status");
         err = ErrInvalidData;
         errMsg = tr("Trạng thái không đúng");
@@ -252,6 +262,11 @@ void DlgPersonCommunity::accept()
                     logd("Save it");
                     err = commper->save();
                 } else {
+                    commper->setMarkModified(true);
+                    commper->setStartDate(startDate);
+                    commper->setEndDate(endDate);
+                    commper->setModelStatus(modelStatus);
+                    commper->setRemark(remark);
                     logd("Update it");
                     err = commper->update();
                 }
@@ -265,9 +280,9 @@ void DlgPersonCommunity::accept()
             }
             if (err == ErrNone) {
                 logi("Save/update ok , close dialog");
-                Utils::showMsgBox(tr("Lưu thành công"));
+                DialogUtils::showMsgBox(tr("Lưu thành công"));
             } else {
-                Utils::showErrorBox(QString(tr("Lỗi, không thể lưu thông tin, mã lỗi %1 ('%2')"))
+                DialogUtils::showErrorBox(QString(tr("Lỗi, không thể lưu thông tin, mã lỗi %1 ('%2')"))
                                         .arg(err).arg(errMsg));
             }
             if (mListener) {
@@ -302,9 +317,7 @@ void DlgPersonCommunity::updateModelStatus(int status)
         ui->lblStartDateNote->setStyleSheet(QStringLiteral("QLabel{color: rgb(0, 0, 0);}"));
         ui->lblEndDateNote->setStyleSheet(QStringLiteral("QLabel{color: rgb(0, 0, 0);}"));
     }
-    // changing status will cause some complicated processing, so not allow to set here
-    // TODO: support to change model status
-    ui->cbModelStatus->setDisabled(true);
+//    ui->cbModelStatus->setDisabled(true);
     traceout;
 }
 
@@ -390,6 +403,7 @@ ErrCode DlgPersonCommunity::setCommunityPerson(const CommunityPerson *commPer)
 {
     tracein;
     ErrCode err = ErrNone;
+    CommunityPerson* newCommPer = nullptr;
     logd("commper '%s'", MODELSTR2CHA(commPer));
     if (mIsNew) {
         loge("not allow to set if dialog is created for new item");
@@ -401,7 +415,7 @@ ErrCode DlgPersonCommunity::setCommunityPerson(const CommunityPerson *commPer)
     }
     if (err == ErrNone) {
         RELEASE_LIST(mCommunityPersonList, CommunityPerson);
-        CommunityPerson* newCommPer = CLONE_MODEL(commPer, CommunityPerson);
+        newCommPer = CLONE_MODEL(commPer, CommunityPerson);
         if (newCommPer) {
             mCommunityPersonList.append(newCommPer);
         } else {
@@ -409,10 +423,89 @@ ErrCode DlgPersonCommunity::setCommunityPerson(const CommunityPerson *commPer)
             err = ErrNoMemory;
         }
     }
+
+    if (err == ErrNone) {
+        logd("set community");
+        setCommunity(newCommPer->community());
+        logd("append person");
+        appendPerson(commPer->person());
+    } else {
+        FREE_PTR(newCommPer);
+    }
+
     // not allow to change persone nor community, just edit other data
     ui->btnSearchPeople->setEnabled(false);
     ui->cbCommunity->setEnabled(false);
     traceret(err);
     return err;
 }
+
+
+ErrCode DlgPersonCommunity::addListPeopleToCommunity(QWidget *parent,
+                                                     const Community *comm,
+                                                     const QList<Person *> &perList)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    DlgPersonCommunity* dlg = nullptr;
+    if (!comm || perList.empty()) {
+        err = ErrInvalidArg;
+        loge("cannot add comm history, invalid arg");
+    }
+    if (err == ErrNone && (dlg = DlgPersonCommunity::build(parent)) == nullptr) {
+        loge("Cannot create/build dialog, no memory?");
+        err = ErrNoMemory;
+    }
+    if (err == ErrNone) {
+        err = dlg->setPersonList<Person>(perList);
+    }
+    if (err == ErrNone) {
+        logd("set comm '%s'", MODELSTR2CHA(comm));
+        dlg->setCommunity(comm);
+    }
+
+    if (err == ErrNone) {
+        dlg->exec();
+    }
+
+    if (err != ErrNone) {
+        logd("Add community history failed, err=%d", err);
+        DialogUtils::showErrorBox(err, tr("Lỗi thêm dữ liệu Cộng đoàn"));
+    }
+    if (dlg) delete dlg;
+    traceret(err);
+    return err;
+}
+
+ErrCode DlgPersonCommunity::updateCommunityPerson(QWidget *parent,
+                                                  const CommunityPerson *model)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    DlgPersonCommunity* dlg = nullptr;
+    if (!model) {
+        err = ErrInvalidArg;
+        loge("Invalid argument");
+    }
+
+    if (err == ErrNone) {
+        dlg = DlgPersonCommunity::build(parent, true, KModelNameCommPerson, model);
+        if (!dlg) {
+            loge("Cannot create/build dialog, no memory?");
+            err = ErrNoMemory;
+        }
+    }
+    if (err == ErrNone) {
+        if (dlg->exec() != QDialog::Accepted) {
+            err = ErrCancelled;
+            logd("cancel");
+        }
+    } else {
+        DialogUtils::showErrorBox(err, tr("Lỗi chỉnh sửa dữ liệu Cộng đoàn - Nữ tu"));
+    }
+    FREE_PTR(dlg);
+    traceret(err);
+    return err;
+}
+
 

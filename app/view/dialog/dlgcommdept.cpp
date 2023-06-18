@@ -29,6 +29,7 @@
 #include "dbmodel.h"
 #include <QDialogButtonBox>
 #include <QPushButton>
+#include "datetimeutils.h"
 
 DlgCommDept::DlgCommDept(QWidget *parent) :
     DlgCommonEditModel(parent),
@@ -124,8 +125,8 @@ ErrCode DlgCommDept::fromModel(const DbModel *item)
         ui->txtName->setText(comm->name());
         ui->txtNameId->setText(comm->nameId()); // TODO: auto generate???
         Utils::setSelectItemComboxByData(ui->cbDept, comm->departmentUid());
-        ui->txtEstablishDate->setText(Utils::date2String(comm->establishDate(), DEFAULT_FORMAT_YMD));
-        ui->txtCloseDate->setText(Utils::date2String(comm->closedDate(), DEFAULT_FORMAT_YMD));
+        ui->txtEstablishDate->setText(DatetimeUtils::date2String(comm->establishDate(), DEFAULT_FORMAT_YMD));
+        ui->txtCloseDate->setText(DatetimeUtils::date2String(comm->closedDate(), DEFAULT_FORMAT_YMD));
         ui->txtAddr->setPlainText(comm->addr());
         ui->txtTel->setText(comm->tel());
         ui->txtEmail->setText(comm->email());

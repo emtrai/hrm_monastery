@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Ngo Huy Anh
+ * Copyright (C) 2023 Ngo Huy Anh
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,50 +14,53 @@
  * limitations under the License.
  *
  *
- * Filename: uicommunitypersonlistview.h
+ * Filename: uipersoncommunitylistview.h
  * Author: Anh, Ngo Huy
- * Created date:10/10/2022
+ * Created date:5/20/2023
  * Brief:
  */
-#ifndef UICOMMUNITYPERSONLISTVIEW_H
-#define UICOMMUNITYPERSONLISTVIEW_H
+#ifndef UICOMMUNITIESOFPERSONLISTVIEW_H
+#define UICOMMUNITIESOFPERSONLISTVIEW_H
 
 #include "uicommonlistview.h"
 
-class Community;
+class Person;
 
 /**
- * @brief List of people in community
+ * @brief List of communities of person
  */
-class UICommunityPersonListView : public UICommonListView
+class UICommunitiesOfPersonListView : public UICommonListView
 {
 public:
-    explicit UICommunityPersonListView(QWidget *parent = nullptr);
-    virtual ~UICommunityPersonListView();
+    explicit UICommunitiesOfPersonListView(QWidget *parent = nullptr);
+    virtual ~UICommunitiesOfPersonListView();
     void loadCommunityPerson(const QString& communityUid, bool isActive = true);
 
-    Community *community() const;
-    void setCommunity(const Community *newCommunity);
+    /**
+     * @brief Caller must not free this after use, if want to change/free, clone it
+     * @return
+     */
+    const Person *person() const;
+    ErrCode setPerson(const Person *per);
 
 protected:
-    virtual int getViewType() { return VIEW_COMMUNITY_PERSON_LIST;}
+    virtual int getViewType() { return VIEW_PERSON_COMMUNITY_LIST;}
     virtual void initHeader();
     virtual QString getTitle();
     virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
 
     virtual QList<UITableMenuAction*> getMenuMultiSelectedItemActions(const QMenu *menu,
-                                                               const QList<UITableItem *>& items);
+                                                                       const QList<UITableItem *>& items);
     virtual ErrCode onMenuActionListPerson(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionListDepartment(QMenu* menu, UITableMenuAction* act);
-//    virtual ErrCode onMenuAction(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onMenuActionDelete(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onMenuActionView(QMenu* menu, UITableMenuAction* act);
+    virtual void onViewItem(UITableCellWidgetItem *item);
+    virtual void onAddItem(UITableCellWidgetItem *item);
+    virtual void onEditItem(UITableCellWidgetItem *item);
 
 protected:
     virtual ErrCode onLoad();
 private:
-    Community* mCommunity;
+    Person* mPerson;
 };
 
-#endif // UICOMMUNITYPERSONLISTVIEW_H
+#endif // UICOMMUNITIESOFPERSONLISTVIEW_H

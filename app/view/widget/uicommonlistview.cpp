@@ -30,6 +30,7 @@
 #include "filter.h"
 #include "mainwindow.h"
 #include "stringdefs.h"
+#include "dialogutils.h"
 
 
 UICommonListView::UICommonListView(QWidget *parent):
@@ -176,11 +177,11 @@ void UICommonListView::onViewItem(UITableCellWidgetItem *item)
             MainWindow::showOnHtmlViewer(comm, getTitle());
         } else {
             loge("Comm obj is null");
-            Utils::showErrorBox("Không có thông tin để xem");
+            DialogUtils::showErrorBox("Không có thông tin để xem");
         }
     } else {
         loge("no data to view");
-        Utils::showErrorBox(tr("Lỗi, không có dữ liệu hiện thị"));
+        DialogUtils::showErrorBox(tr("Lỗi, không có dữ liệu hiện thị"));
     }
     traceout;
 }
@@ -202,7 +203,7 @@ void UICommonListView::onEditItem(UITableCellWidgetItem *item)
         MainWindow::showAddEditCommonModel(true, comm, this);
     } else {
         loge("Model obj is null");
-        Utils::showErrorBox("Không có thông tin để chỉnh sửa");
+        DialogUtils::showErrorBox("Không có thông tin để chỉnh sửa");
     }
     traceout;
 }

@@ -33,6 +33,7 @@
 #include "communitydeptctl.h"
 #include "communitydept.h"
 #include "dlgcommdept.h"
+#include "dialogutils.h"
 
 UICommDeptListView::UICommDeptListView(QWidget *parent):
     UICommonListView(parent),

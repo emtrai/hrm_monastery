@@ -56,6 +56,7 @@
 #include "dlgimportexportselect.h"
 #include "backup/backupctl.h"
 #include "prebuiltdefs.h"
+#include "dialogutils.h"
 
 #define ADD_MENU_ITEM(menu, func, name, iconPath) \
 do { \
@@ -1025,7 +1026,7 @@ void MainWindow::onImportPeople(ErrCode err, QList<DbModel *> *list)
         delete dlg; // no clean list, as dlg will take over it
     } else {
         loge("Import failed, err=%d", err);
-        Utils::showErrorBox(QString(tr("Nhập dữ liệu lỗi, mã lỗi %1")).arg(err));
+        DialogUtils::showErrorBox(QString(tr("Nhập dữ liệu lỗi, mã lỗi %1")).arg(err));
         notifyMainWindownImportListenerEnd(IMPORT_TARGET_PERSON, err, nullptr);
     }
     traceout;
@@ -1231,7 +1232,7 @@ void MainWindow::on_action_Backup_triggered()
     tracein;
 //    UNDER_DEV(tr("Sao lưu dữ liệu"));
     // TODO: implement it
-    QString fpath = Utils::saveFileDialog(this, tr("Sao lưu dữ liệu"),
+    QString fpath = DialogUtils::saveFileDialog(this, tr("Sao lưu dữ liệu"),
                                   QString("saoluu.zip"),
                                   QString("zip (*.zip)")
                                   );
@@ -1240,9 +1241,9 @@ void MainWindow::on_action_Backup_triggered()
         ErrCode err = BACKUP->backup(fpath);
         logi("Backup file result=%d", err);
         if (err == ErrNone) {
-            Utils::showMsgBox(QString(tr("Sao lưu file vào: %1")).arg(fpath));
+            DialogUtils::showMsgBox(QString(tr("Sao lưu file vào: %1")).arg(fpath));
         } else {
-            Utils::showErrorBox(QString(tr("Sao lưu file thất bại, mã lỗi %1")).arg(err));
+            DialogUtils::showErrorBox(QString(tr("Sao lưu file thất bại, mã lỗi %1")).arg(err));
         }
     }
     traceout;

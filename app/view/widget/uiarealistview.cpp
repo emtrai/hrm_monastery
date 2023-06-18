@@ -32,6 +32,7 @@
 #include "uitableviewfactory.h"
 #include "stringdefs.h"
 #include "errreporterctl.h"
+#include "dialogutils.h"
 
 UIAreaListView::UIAreaListView(QWidget *parent):
     UICommonListView(parent)
@@ -155,7 +156,7 @@ ErrCode UIAreaListView::onMenuActionViewContactPeople(QMenu *menu, UITableMenuAc
     } else {
         loge("no area info");
         ret = ErrNoData;
-        Utils::showErrorBox(tr("Vui lòng chọn khu vực cần xem"));
+        DialogUtils::showErrorBox(tr("Vui lòng chọn khu vực cần xem"));
     }
 
     traceret(ret);
