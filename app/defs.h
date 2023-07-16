@@ -62,8 +62,6 @@ const char* const KLogDirName = "log";
 const char* const KDatabasename = "db.db";
 const char* const KDatabaseMetaName = "db.json";
 
-const char* const KControlBackupName = "backup";
-
 const char* const KDataFormatList = "QList";
 const char* const KDataFormatStringList = "QStringList";
 const char* const KDataFormatJson = "QJson";
@@ -99,6 +97,7 @@ const char* const KItemIDcard = "CAN_CUOC_CONG_DAN";
 const char* const KItemIDcardIssueDate = "NGAY_CAP_CCCD";
 const char* const KItemIDcardIssuer = "NOI_CAP_CCCD";
 const char* const KItemStatus = "TINH_TRANG";
+const char* const KItemStatusId = "MA_TINH_TRANG";
 const char* const KItemRetireDate = "NGAY_NGHI_HUU";
 const char* const KItemRetirePlace = "NOI_NGHI_HUU";
 const char* const KItemDeadDate = "NGAY_MAT";
@@ -184,10 +183,13 @@ const char* const KItemEndDate = "NGAY_KET_THUC";
 const char* const KItemType = "LOAI";
 const char* const KItemPeriod = "CHU_KY";
 const char* const KItemRole = "VAI_TRO";
+const char* const KItemRoleNameId = "MA_VAI_TRO";
 const char* const KItemLevel = "CAP";
 const char* const KItemContact = "LIEN_HE";
 const char* const KItemTerm = "NHIEM_KY";
+const char* const KItemTermNameId = "MA_NHIEM_KY";
 const char* const KItemPersonNameId = "MA_DINH_DANH_NU_TU";
+const char* const KItemPersonName = "TEN_NU_TU";
 const char* const KItemPersonEvent= "SU_KIEN_NU_TU";
 const char* const KItemDate= "NGAY_THANG";
 

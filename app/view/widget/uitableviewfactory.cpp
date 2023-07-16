@@ -66,10 +66,10 @@ BaseView *UITableViewFactory::getView(ViewType type, QWidget *parent )
     case VIEW_AREA_PERSON:
         view = new UIAreaContactPeopleListView(parent);
         break;
-    case VIEW_COMMUNITY_PERSON_LIST:
+    case VIEW_PEOPLE_IN_COMMUNITY_LIST:
         view = new UIPeopleInCommunityListView(parent);
         break;
-    case VIEW_PERSON_COMMUNITY_LIST:
+    case VIEW_COMMUNITIES_OF_PERSON_LIST:
         view = new UICommunitiesOfPersonListView(parent);
         break;
     case VIEW_DEPARTMENT:

@@ -23,6 +23,7 @@
 #include "exporttype.h"
 #include "logger.h"
 #include "utils.h"
+#include "stringdefs.h"
 
 static void getListExportTypeName(QHash<int, QString>* list)
 {
@@ -154,6 +155,18 @@ QString exportItem2Name(const QString &item, bool* isOk)
         s_item2Name.insert(KItemBankDate, QObject::tr("Ngày Ngân Khánh"));
         s_item2Name.insert(KItemGoldenDate, QObject::tr("Ngày Kim khánh"));
         s_item2Name.insert(KItemEternalDate, QObject::tr("Ngày Vĩnh khánh"));
+        s_item2Name.insert(KItemPersonNameId, QObject::tr("Mã định danh Nữ tu"));
+        s_item2Name.insert(KItemPersonEvent, QObject::tr("Sự kiện Nữ tu"));
+        s_item2Name.insert(KItemDate, QObject::tr("Ngày"));
+        s_item2Name.insert(KItemTerm, STR_TERM);
+        s_item2Name.insert(KItemTermNameId, STR_TERM_ID);
+        s_item2Name.insert(KItemContact, STR_CONTACT);
+        s_item2Name.insert(KItemLevel, QObject::tr("Cấp"));
+        s_item2Name.insert(KItemRole, STR_ROLE);
+        s_item2Name.insert(KItemRoleNameId, STR_ROLE_ID);
+        s_item2Name.insert(KItemEndDate, STR_ENDDATE);
+        s_item2Name.insert(KItemStartDate, STR_STARTDATE);
+        s_item2Name.insert(KItemStatusId, STR_STATUS_ID);
 
         initialized = true;
     }

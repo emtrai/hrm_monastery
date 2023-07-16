@@ -72,12 +72,12 @@ ErrCode UICommunitiesOfPersonListView::onMenuActionListDepartment(QMenu *menu, U
 
 }
 
-void UICommunitiesOfPersonListView::onViewItem(UITableCellWidgetItem *item)
+ErrCode UICommunitiesOfPersonListView::onViewItem(UITableCellWidgetItem *item)
 {
-
+    return ErrNoData;
 }
 
-void UICommunitiesOfPersonListView::onAddItem(UITableCellWidgetItem *item)
+ErrCode UICommunitiesOfPersonListView::onAddItem(UITableCellWidgetItem *item)
 {
     tracein;
     ErrCode err = ErrNone;
@@ -96,7 +96,7 @@ void UICommunitiesOfPersonListView::onAddItem(UITableCellWidgetItem *item)
     }
     if (dlg) delete dlg;
     traceout;
-
+    return err;
 }
 
 void UICommunitiesOfPersonListView::onEditItem(UITableCellWidgetItem *item)

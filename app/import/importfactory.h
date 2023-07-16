@@ -27,15 +27,9 @@
 #include <QList>
 #include "importlistener.h"
 #include "importer.h"
+#include "importtype.h"
 
 class DbModel;
-
-enum ImportTarget {
-    IMPORT_TARGET_PERSON = 0,
-    IMPORT_TARGET_COMMUNITY,
-
-    IMPORT_TARGET_MAX
-};
 
 class ImportFactory
 {

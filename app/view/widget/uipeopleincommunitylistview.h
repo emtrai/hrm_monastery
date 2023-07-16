@@ -39,7 +39,7 @@ public:
     void setCommunity(const Community *newCommunity);
 
 protected:
-    virtual int getViewType() { return VIEW_COMMUNITY_PERSON_LIST;}
+    virtual int getViewType() { return VIEW_PEOPLE_IN_COMMUNITY_LIST;}
     virtual void initHeader();
     virtual QString getTitle();
     virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
@@ -48,8 +48,8 @@ protected:
                                                                const QList<UITableItem *>& items);
 //    virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
     virtual void onEditItem(UITableCellWidgetItem *item);
-    virtual void onDeleteItem(const QList<UITableItem *>& selectedItems);
-    virtual void onAddItem(UITableCellWidgetItem *item);
+    virtual ErrCode onDeleteItem(const QList<UITableItem *>& selectedItems);
+    virtual ErrCode onAddItem(UITableCellWidgetItem *item);
 
 protected:
     virtual ErrCode onLoad();

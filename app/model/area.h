@@ -72,7 +72,10 @@ public:
     QString modelStatusName() const;
     void setModelStatusName(QString newModelStatusName);
 
-    virtual const QString exportTemplatePath(FileExporter* exporter, QString* ftype = nullptr) const;
+    virtual ErrCode exportTemplatePath(FileExporter* exporter,
+                                       const QString& name,
+                                       QString& fpath,
+                                       QString* ftype = nullptr) const;
 
     virtual void initExportFields();
 protected:

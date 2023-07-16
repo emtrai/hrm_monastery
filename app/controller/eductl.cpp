@@ -28,13 +28,14 @@
 #include "dbctl.h"
 #include <QList>
 #include "prebuiltdefs.h"
+#include "controllerdefs.h"
 
 #define SPLIT ','
 
 
 GET_INSTANCE_CONTROLLER_IMPL(EduCtl);
 
-EduCtl::EduCtl():ModelController(KModelHdlEdu)
+EduCtl::EduCtl():ModelController(KControllerEdu, KModelHdlEdu)
 {
     tracein;
 }

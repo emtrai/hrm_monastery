@@ -142,6 +142,26 @@ public:
     virtual DbModel *getByNameId(const QString& nameId, const DbModelBuilder& builder);
     virtual DbModel *getByNameId(const QString& nameId);
 
+    /**
+     * @brief Get model by name, incasensitive
+     * @param name
+     * @param builder
+     * @param firstOrLastMatch true if first match, false if last match
+     * @return
+     */
+    virtual DbModel *getByName(const QString& name,
+                               const DbModelBuilder& builder,
+                               bool firstOrLastMatch = true);
+
+    /**
+     * @brief Get model by name, incasensitive
+     * @param name
+     * @param builder
+     * @param firstOrLastMatch true if first match, false if last match
+     * @return
+     */
+    virtual DbModel *getByName(const QString& name, bool firstOrLastMatch = true);
+
     void addListener(onDbModelHandlerListener* listener);
     void delListener(onDbModelHandlerListener* listener);
 protected:

@@ -27,10 +27,11 @@
 #include "utils.h"
 #include "defs.h"
 #include "prebuiltdefs.h"
+#include "controllerdefs.h"
 
 GET_INSTANCE_CONTROLLER_IMPL(EventCtl)
 
-EventCtl::EventCtl():ModelController(KModelHdlEvent)
+EventCtl::EventCtl():ModelController(KControllerEvent, KModelHdlEvent)
 {
     tracein;
 }

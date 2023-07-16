@@ -42,7 +42,7 @@ protected:
     virtual QString getTitle();
     virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
 
-    virtual void onAddItem(UITableCellWidgetItem *item);
+    virtual ErrCode onAddItem(UITableCellWidgetItem *item);
     virtual void onEditItem(UITableCellWidgetItem *item);
 
 protected:

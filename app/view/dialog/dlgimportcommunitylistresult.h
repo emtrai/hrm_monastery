@@ -30,7 +30,7 @@ public:
     DlgImportCommunityListResult(QWidget *parent = nullptr);
 protected:
     virtual void initHeader();
-    virtual QList<UIImportItem*>* getItems();
+    virtual QList<UIImportItem*> getItems(bool* ok = nullptr);
 };
 
 #endif // DLGIMPORTCOMMUNITYLISTRESULT_H

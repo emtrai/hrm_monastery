@@ -62,7 +62,7 @@ void DlgPersonCommunity::setupUI()
 {
     tracein;
     DlgCommonEditModel::setupUI();
-    setModelStatus(MODEL_ACTIVE);
+    setModelStatus(MODEL_STATUS_ACTIVE);
     traceout;
 }
 
@@ -114,7 +114,7 @@ void DlgPersonCommunity::loadModelStatus()
     const QHash<int, QString>* statuses = DbModel::getModelStatusIdNameMap();
     logd("the number of status %lld", statuses->count());
     foreach (int key, statuses->keys()) {
-        if (key == MODEL_ACTIVE) {
+        if (key == MODEL_STATUS_ACTIVE) {
             // changing status will cause some complicated processing, so not allow to set here
             // TODO: support to change model status
             continue;
@@ -306,7 +306,7 @@ void DlgPersonCommunity::updateModelStatus(int status)
 {
     tracein;
     logd("status 0x%x", status);
-    if (status & MODEL_ACTIVE) {
+    if (status & MODEL_STATUS_ACTIVE) {
         ui->lblStartDateNote->setText(tr("Ngày bắt đầu ở cộng đoàn mới"));
         ui->lblEndDateNote->setText(tr("Ngày kết thúc ở cộng đoàn hiện tại"));
         ui->lblStartDateNote->setStyleSheet(QStringLiteral("QLabel{color: rgb(255, 0, 0);}"));

@@ -26,11 +26,12 @@
 #include "dbctl.h"
 #include "utils.h"
 #include "prebuiltdefs.h"
+#include "controllerdefs.h"
 
 GET_INSTANCE_CONTROLLER_IMPL(ProvinceCtl)
 
 ProvinceCtl::ProvinceCtl():
-    ModelController(KModelHdlProvince)
+    ModelController(KControllerProvince, KModelHdlProvince)
 {
     tracein;
 }

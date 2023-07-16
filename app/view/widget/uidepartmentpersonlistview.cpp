@@ -71,12 +71,13 @@ QString UIDepartmentPersonListView::getTitle()
     return title;
 }
 
-void UIDepartmentPersonListView::onViewItem(UITableCellWidgetItem *item)
+ErrCode UIDepartmentPersonListView::onViewItem(UITableCellWidgetItem *item)
 {
-
+    traced;
+    return ErrNoData;
 }
 
-void UIDepartmentPersonListView::onAddItem(UITableCellWidgetItem *item)
+ErrCode UIDepartmentPersonListView::onAddItem(UITableCellWidgetItem *item)
 {
     tracein;
     DlgDeptPerson* dlg = DlgDeptPerson::build(this, true, KModelNamePersonDept, nullptr, this);
@@ -85,7 +86,7 @@ void UIDepartmentPersonListView::onAddItem(UITableCellWidgetItem *item)
     dlg->exec();
     delete dlg;
     traceout;
-
+    return ErrNone;
 }
 
 void UIDepartmentPersonListView::onEditItem(UITableCellWidgetItem *item)

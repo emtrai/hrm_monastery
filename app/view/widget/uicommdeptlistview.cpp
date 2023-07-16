@@ -87,12 +87,12 @@ DbModel *UICommDeptListView::onNewModel(const QString& modelName)
     return CommunityDept::build();
 }
 
-void UICommDeptListView::onAddItem(UITableCellWidgetItem *item)
+ErrCode UICommDeptListView::onAddItem(UITableCellWidgetItem *item)
 {
     tracein;
     MainWindow::showAddEditCommDept(true, mCommunity, nullptr, this);
     traceout;
-
+    return ErrNone;
 }
 
 void UICommDeptListView::onEditItem(UITableCellWidgetItem *item)
@@ -111,14 +111,15 @@ void UICommDeptListView::onEditItem(UITableCellWidgetItem *item)
     traceout;
 }
 
-void UICommDeptListView::onDeleteItem(const QList<UITableItem *> &selectedItems)
+ErrCode UICommDeptListView::onDeleteItem(const QList<UITableItem *> &selectedItems)
 {
     UNDER_DEV("Xóa dữ liệu");
+    return ErrNotImpl;
 }
 
-void UICommDeptListView::onViewItem(UITableCellWidgetItem *item)
+ErrCode UICommDeptListView::onViewItem(UITableCellWidgetItem *item)
 {
-    UICommonListView::onViewItem(item);
+    return UICommonListView::onViewItem(item);
 }
 
 ErrCode UICommDeptListView::onMenuActionListPerson(QMenu *menu, UITableMenuAction *act)

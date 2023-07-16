@@ -31,6 +31,7 @@
 #include "dataexporter.h"
 #include "modeldefs.h"
 #include <QAtomicInt>
+#include "importtype.h"
 
 #define CLONE_MODEL(model, type) (model?((type*)((DbModel*)model)->clone()):nullptr)
 #define CLONE_LIST(list, type) DbModel::cloneListModel<type>(list)
@@ -103,6 +104,8 @@ do { \
                 } \
             }
 
+#define IS_MODEL_NAME(model, name) (model && name && (model->modelName() == name))
+
 class DbModel;
 class DbModelHandler;
 class DataExporter;
@@ -141,11 +144,15 @@ enum DB_RECORD_STATUS {
  *        then check status of db model
  */
 enum DbModelStatus{
-    MODEL_INACTIVE      = (1 << 0), // Map is inactive/closed/stoped
-    MODEL_ACTIVE        = (1 << 1), // Map is active
-    MODEL_BUILDING      = (1 << 2), // building phase, not ready
-    MODEL_NOT_READY     = (1 << 3),
-    MODEL_STATUS_MAX    = MODEL_INACTIVE | MODEL_ACTIVE | MODEL_BUILDING | MODEL_NOT_READY
+    MODEL_STATUS_UNKNOWN               = 0, // unknown status
+    MODEL_STATUS_INACTIVE      = (1 << 0), // Map is inactive/closed/stoped
+    MODEL_STATUS_ACTIVE        = (1 << 1), // Map is active
+    MODEL_STATUS_BUILDING      = (1 << 2), // building phase, not ready
+    MODEL_STATUS_NOT_READY     = (1 << 3),
+    MODEL_STATUS_MAX           =    MODEL_STATUS_INACTIVE |
+                                    MODEL_STATUS_ACTIVE |
+                                    MODEL_STATUS_BUILDING |
+                                    MODEL_STATUS_NOT_READY
 };
 
 typedef std::shared_ptr<DbModel> DbModel_sp;
@@ -159,10 +166,9 @@ class DbModel: public IDataImporter, public DataExporter
 {
 public:
     static const QHash<int, QString>* getModelStatusIdNameMap();
-    static QString modelStatus2Name(DbModelStatus status);
+    static QString modelStatus2Name(DbModelStatus status, bool* ok = nullptr);
     static const QList<int>* getModelStatusList();
     static const QList<int>* getDbStatusList();
-    static DbModelBuilder getBuilderByModelName(const QString& modelName);
     template<class T>
     static QList<T*> cloneListModel(const QList<T*>& list)
     {
@@ -244,7 +250,7 @@ public:
     virtual void setUid(const QString &newUid);
     virtual void buildUidIfNotSet();
     virtual QString buildUid(const QString* seed = nullptr);
-
+    virtual QString buildNameId(const QString* seed = nullptr, bool* ok = nullptr);
 
     /**
      * @brief Save all info. or create new
@@ -268,8 +274,6 @@ public:
     virtual ErrCode remove(bool force = false, QString* msg = nullptr);
     virtual ErrCode markRemove();
 
-    virtual ErrCode exportTo(const QString &fpath, ExportType type);
-
     virtual qint32 dbStatus() const;
     virtual void setDbStatus(qint32 newDbStatus);
 
@@ -277,6 +281,7 @@ public:
     virtual void dump();
     virtual QString toString() const;
 
+    virtual QString getName();
 
     void setNameId(const QString &newNameId);
     virtual DataExporter* getExporter();
@@ -319,9 +324,12 @@ public:
     bool markModified() const;
     void setMarkModified(bool newMarkModified);
 
-
+    virtual ErrCode exportTo(const QString &fpath, ExportType type);
     virtual ErrCode exportToFile(ExportType type, QString* fpath);
-    virtual const QString exportTemplatePath(FileExporter* exporter, QString* ftype = nullptr) const;
+    virtual ErrCode exportTemplatePath(FileExporter* exporter,
+                                       const QString& name,
+                                       QString& fpath,
+                                       QString* ftype = nullptr) const;
 
     virtual const QStringList getListExportKeyWord() const;
     virtual ErrCode getExportDataString(const QString& item, QString* data) const;
@@ -355,6 +363,8 @@ protected:
     bool mDeletable; // model can be deleted from db or not
     QHash<QString, ExportCallbackFunc> mExportCallbacks;
     QHash<QString, ImportCallbackFunc> mImportCallbacks;
+    QHash<QString, quint64> mImportItemsType;
+    QList<QString> mImportFieldRequired;
     QHash<QString, ErrCode>* mValidateResult;
     QString mValidateMsg;
     QList<QString> mUpdatedField; // List of fields/info were changed its value

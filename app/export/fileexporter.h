@@ -37,8 +37,9 @@ public:
 
     // FileExporter may contains data for export, or get data from list of data to export
     // TODO: is there any better way????
-    virtual ErrCode saveTo(const DataExporter* exporter, const QString& fpath);
-    virtual ErrCode saveTo(const DataExporter* exporter, const QList<DbModel*> data, const QString& fpath);
+    virtual ErrCode saveTo(const DataExporter* exporter, const QString& datatype, const QString& fpath);
+    virtual ErrCode saveTo(const DataExporter* exporter, const QString& datatype, const QList<DbModel*> data,
+                           const QString& fpath);
     virtual ExportType getExportType() = 0;
 
 

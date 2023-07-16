@@ -37,13 +37,18 @@ DataExporter::DataExporter()
     tracein;
 }
 
-const QString DataExporter::exportTemplatePath(FileExporter* exporter, QString* ftype) const
+ErrCode DataExporter::exportTemplatePath(FileExporter* exporter,
+                                         const QString& name,
+                                         QString& fpath,
+                                         QString* ftype) const
 {
     tracein;
-    return QString();
+    return ErrNone;
 }
 
-ErrCode DataExporter::getListTemplateExportKeywords(FileExporter *exporter, QList<QPair<QString,QString>>& outMap) const
+ErrCode DataExporter::getListTemplateExportKeywords(FileExporter *exporter,
+                                                    const QString& datatype,
+                                                    QList<QPair<QString,QString>>& outMap) const
 {
     tracein;
     ErrCode err = ErrNone;
@@ -52,7 +57,7 @@ ErrCode DataExporter::getListTemplateExportKeywords(FileExporter *exporter, QLis
     QString ftype;
 
     if (exporter) {
-        fpath = exportTemplatePath(exporter, &ftype);
+        err = exportTemplatePath(exporter, datatype, fpath, &ftype);
     } else {
         err = ErrInvalidArg;
         loge("invalid argument");
@@ -171,6 +176,9 @@ ErrCode DataExporter::parseJsonExportTemplate(const QString& fpath, QList<QPair<
                 // not found name, get default name???
                 if (name.isEmpty()) {
                     name = exportItem2Name(id);
+                }
+                if (name.isEmpty()) {
+                    name = id;
                 }
                 logd("id=%s, name=%s", STR2CHA(id), STR2CHA(name));
                 if (!id.isEmpty() && !name.isEmpty()) {

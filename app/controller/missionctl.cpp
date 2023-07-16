@@ -26,10 +26,11 @@
 #include "dbctl.h"
 #include "utils.h"
 #include "prebuiltdefs.h"
+#include "controllerdefs.h"
 
 GET_INSTANCE_CONTROLLER_IMPL(MissionCtl);
 
-MissionCtl::MissionCtl():ModelController(KModelHdlMission)
+MissionCtl::MissionCtl():ModelController(KControllerMission, KModelHdlMission)
 {
     tracein;
 }

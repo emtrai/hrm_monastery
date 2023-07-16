@@ -34,7 +34,7 @@ ExportCSVList::ExportCSVList()
     tracein;
 }
 
-ErrCode ExportCSVList::saveTo(const DataExporter* exporter, const QList<DbModel*> listData, const QString &fpath)
+ErrCode ExportCSVList::saveTo(const DataExporter* exporter, const QString& datatype, const QList<DbModel*> listData, const QString &fpath)
 {
     tracein;
     ErrCode ret = ErrNone;
@@ -43,7 +43,7 @@ ErrCode ExportCSVList::saveTo(const DataExporter* exporter, const QList<DbModel*
     QString finalData;
     QList<QPair<QString,QString>> keywordMap;
 
-    ret = exporter->getListTemplateExportKeywords(this, keywordMap);
+    ret = exporter->getListTemplateExportKeywords(this, datatype, keywordMap);
 
     if (ret == ErrNone) {
         logd("get header");

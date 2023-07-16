@@ -27,12 +27,12 @@ enum ViewType {
     NONE = 0,
     VIEW_TEXT_BROWSER,
     VIEW_PERSON,
-    VIEW_PERSON_COMMUNITY_LIST, // list of communities of person
+    VIEW_COMMUNITIES_OF_PERSON_LIST, // list of communities of person
     VIEW_SAINT,
     VIEW_COMMUNITY,
     VIEW_AREA,
     VIEW_AREA_PERSON,
-    VIEW_COMMUNITY_PERSON_LIST, // list of people of community
+    VIEW_PEOPLE_IN_COMMUNITY_LIST, // list of people of community
     VIEW_COMMUNITY_DEPT,
     VIEW_DEPARTMENT,
     VIEW_DEPARTMENT_PERSON,
@@ -50,22 +50,53 @@ enum ViewType {
     };
 
 typedef std::function<ErrCode(void* data)> ActionFunc_t;
+typedef std::function<ErrCode(void* data)> FreeDataFunc_t;
 
-
+/**
+ * @brief Base view class for content UI of program
+ */
 class BaseView
 {
 public:
+    BaseView();
+    ~BaseView();
+    /**
+     * @brief Setup UI
+     */
     virtual void setupUI() {};
+
+    /**
+     * @brief return view widget itself
+     * @return
+     */
     virtual QWidget* getWidget() = 0;
+
+    /**
+     * @brief data kept by view, caller just use, not free or have any change on value
+     * @return
+     */
     void *data() const;
-    void setData(void *newData);
+
+    /**
+     * @brief set data
+     * Data will be freed by freecb if set, else, caller must free data after use
+     * @param newData   data to be set, accept null,mean clear current data
+     * @param freecb    callback to free data, called in destructor
+     */
+    void setData(void *newData, FreeDataFunc_t freecb = nullptr);
 
 protected:
+    /**
+     * @brief view type \ref ViewType of view
+     * @return \ref ViewType
+     */
     virtual int getViewType() = 0;
 protected:
     void* mData;
     ActionFunc_t mShowActionFunc;// action to run when view show
+    FreeDataFunc_t mFreeFunc;
     bool mShowActionFuncRunOnce; // TODO: support other mode? run once, run on resume, run on pause, etc.???
+
 };
 
 #endif // BASEVIEW_H

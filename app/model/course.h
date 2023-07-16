@@ -46,7 +46,10 @@ public:
     virtual void clone(const DbModel* model);
     virtual QString modelName() const;
     virtual void initExportFields();
-    virtual const QString exportTemplatePath(FileExporter* exporter, QString* ftype = nullptr) const;
+    virtual ErrCode exportTemplatePath(FileExporter* exporter,
+                                       const QString& name,
+                                       QString& fpath,
+                                       QString* ftype = nullptr) const;
 
     virtual DbModelBuilder getBuilder() const;
     qint64 startDate() const;

@@ -24,6 +24,7 @@
 #include "dbmodel.h"
 #include "dbdefs.h"
 #include "dbsqlite.h"
+#include "dbmodelfactory.h"
 
 DbSqliteModelHandler::DbSqliteModelHandler()
 {
@@ -387,14 +388,13 @@ DbSqliteTbl *DbSqliteModelHandler::getTable(const QString& modelName)
 {
     return getMainTbl();
 }
-
 DbModelBuilder DbSqliteModelHandler::getBuilder(const QString &modelName)
 {
     tracein;
     logd("get builder for model '%s'", STR2CHA(modelName));
     DbModelBuilder builder = nullptr;
     if (!modelName.isEmpty()) {
-        builder = DbModel::getBuilderByModelName(modelName);
+        builder = DbModelFactory::getBuilder(modelName);
     } else {
         logd("null modelName, try to get defaule onle");
         builder = getMainBuilder();

@@ -61,7 +61,6 @@ protected:
     virtual const char* getPrebuiltFileName();
     virtual const char* getPrebuiltFileType();
 
-    virtual DbModelHandler* getModelHandler();
     virtual DbModelBuilder getMainBuilder();
 
     /**

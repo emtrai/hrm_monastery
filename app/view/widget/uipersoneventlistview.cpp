@@ -136,13 +136,13 @@ void UIPersonEventListView::updateItem(DbModel *item, UITableItem *tblItem, int 
     traceout;
 }
 
-void UIPersonEventListView::onAddItem(UITableCellWidgetItem *item)
+ErrCode UIPersonEventListView::onAddItem(UITableCellWidgetItem *item)
 {
     tracein;
     DlgAddPersonEvent * dlg = DlgAddPersonEvent::build(this, true);
     if (dlg == nullptr) {
         loge("Open dlg DlgAddPersonEvent fail, No memory");
-        return;
+        return ErrNoMemory;
     }
     dlg->setPerson(mPerson);
 
@@ -152,6 +152,7 @@ void UIPersonEventListView::onAddItem(UITableCellWidgetItem *item)
     }
     delete dlg;
     traceout;
+    return ErrNone;
 }
 
 void UIPersonEventListView::onEditItem(UITableCellWidgetItem *item)

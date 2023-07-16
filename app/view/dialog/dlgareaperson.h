@@ -48,7 +48,12 @@ public:
 
     void setAreaNameId(const QString &id);
 
-    void setArea(Area *newArea);
+    /**
+     * @brief Set new area
+     * @param newArea New area, will be cloned to dlg, can be NULL to clear current area
+     * @return ErrNone on success
+     */
+    ErrCode setArea(const Area *newArea);
 
 protected:
     virtual QDialogButtonBox* buttonBox();

@@ -301,7 +301,7 @@ ErrCode UIPersonListView::onMenuActionImport(QMenu *menu, UITableMenuAction *act
 {
     tracein;
     ErrCode ret = ErrNone;
-    MainWindow::showImportDlg(IMPORT_TARGET_PERSON);
+    ret = MainWindow::showImportDlg(IMPORT_TARGET_PERSON);
     traceret(ret);
     return ret;
 }
@@ -313,7 +313,7 @@ ErrCode UIPersonListView::onMenuActionExportListPerson(QMenu *menu, UITableMenuA
     QList<DbModel*> list = PERSONCTL->getAllItemsFromDb();
     if (!list.empty()) {
         logd("Export %d items", list.size());
-        err = MainWindow::exportListItems(&list, PERSONCTL, tr("Xuất danh sách nữ tu"), EXPORT_XLSX);
+        err = MainWindow::exportListItems(&list, KModelNamePerson, PERSONCTL, tr("Xuất danh sách nữ tu"), EXPORT_XLSX);
     } else {
         logw("nothing to export");
     }
@@ -441,7 +441,7 @@ ErrCode UIPersonListView::onMenuActionViewCommunity(QMenu *menu, UITableMenuActi
     Person* per = dynamic_cast<Person*>(act->getData());
     if (per != nullptr) {
         UICommunitiesOfPersonListView* view = (UICommunitiesOfPersonListView*)
-            UITableViewFactory::getView(ViewType::VIEW_PERSON_COMMUNITY_LIST);
+            UITableViewFactory::getView(ViewType::VIEW_COMMUNITIES_OF_PERSON_LIST);
 
         logd("person to view community %s", MODELSTR2CHA(per));
         view->setPerson(per);
@@ -550,7 +550,7 @@ ErrCode UIPersonListView::exportPersonInfo(QMenu *menu, UITableMenuAction *act)
     return err;
 }
 
-void UIPersonListView::onViewItem(UITableCellWidgetItem *item)
+ErrCode UIPersonListView::onViewItem(UITableCellWidgetItem *item)
 {
     tracein;
     int idx = item->idx();
@@ -581,6 +581,7 @@ void UIPersonListView::onViewItem(UITableCellWidgetItem *item)
         // TODO: popup message???
     }
     traceout;
+    return ErrNone; // TODO: check to return value
 }
 
 void UIPersonListView::onEditItem(UITableCellWidgetItem *item)

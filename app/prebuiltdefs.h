@@ -51,6 +51,7 @@ const char* const KPrebuiltCommonTemplateFileName = "common_template";
 const char* const KPrebuiltCourseTemplateFileName = "course_template";
 const char* const KPrebuiltCommunityExportTemplateName = "community_export_template";
 const char* const KPrebuiltDefaultExportTemplateName = "default_export_template";
+const char* const KPrebuiltAreaContactExportTemplateName = "area_contact_export_template";
 
 
 #endif // PREBUILTDEFS_H

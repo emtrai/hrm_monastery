@@ -59,13 +59,16 @@ public:
 
     virtual void setupUI();
     virtual const QList<DbModel *> &list() const;
-    virtual void setup(const QList<DbModel *> &newList);
+    virtual ErrCode setup(const QList<DbModel *> &newList);
+    void setTargetModel(const DbModel *newTargetModel);
+    void setTitle(const QString& title);
 private:
     QStringList getFinalHeader();
 protected:
     virtual QStringList getHeader();
     virtual void initHeader();
-    virtual QList<UIImportItem*>* getItems();
+    virtual QList<UIImportItem*> getItems(bool* ok = nullptr);
+    virtual ErrCode setWidgetItem(UIImportItem* wgitem, DbModel* item);
     virtual ErrCode onLoad();
     virtual void showEvent( QShowEvent* event);
     virtual ErrCode saveItems(const QList<DbModel *> &list);
@@ -73,6 +76,7 @@ protected:
 protected:
     QStringList mHeader;
     QList<DbModel*> mList;
+    DbModel* mTargetModel; // imported data will belong to this model
 private slots:
     void on_chkSelect_stateChanged(int arg1);
 

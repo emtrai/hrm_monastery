@@ -24,11 +24,8 @@
 #include "logger.h"
 #include <QList>
 #include "dbmodel.h"
-#include "dbareamodelhandler.h"
-#include "community.h"
 #include "areactl.h"
 #include "utils.h"
-#include "dialog/dlgsearchperson.h"
 #include "dialog/dlgareaperson.h"
 #include "area.h"
 #include "areaperson.h"
@@ -36,91 +33,125 @@
 #include "stringdefs.h"
 #include "mainwindow.h"
 #include "dialogutils.h"
+#include "datetimeutils.h"
 
 UIAreaContactPeopleListView::UIAreaContactPeopleListView(QWidget *parent):
-    UICommonListView(parent),
-    mArea(nullptr)
+    UICommonListView(parent)
 {
     tracein;
+    mHasImportMenu = true;
+    mHasExportMenu = true;
+    traceout;
 }
 
 
 UIAreaContactPeopleListView::~UIAreaContactPeopleListView()
 {
     tracein;
-    if (mArea) delete mArea;
     AREACTL->delListener(this);
     traceout;
 }
 
 Area *UIAreaContactPeopleListView::area() const
 {
-    return mArea;
+    return (Area*)parentModel();
 }
 
-void UIAreaContactPeopleListView::setArea(const Area *newArea)
+ErrCode UIAreaContactPeopleListView::setArea(const Area *newArea)
 {
+    ErrCode err = ErrNone;
     tracein;
-    if (mArea) {
-        logd("Delete old area");
-        delete mArea;
-        mArea = nullptr;
-    }
-    if (newArea) {
-        mArea = (Area*)((DbModel*)newArea)->clone();
+    err = setParentModel(newArea);
+    if (err == ErrNone) {
         setTitle(getTitle());
-    } else {
-        loge("No area");
     }
-    traceout;
+    traceret(err);
+    return err;
 }
 
 void UIAreaContactPeopleListView::setupUI()
 {
     tracein;
     UITableView::setupUI();
+
+    // register listener for any change in Area
     AREACTL->addListener(this);
     traceout;
+}
 
+QString UIAreaContactPeopleListView::getMainModelName()
+{
+    return KModelNameAreaPerson;
 }
 
 void UIAreaContactPeopleListView::initHeader()
 {
     tracein;
+    mHeader.append(STR_NAMEID);
     mHeader.append(STR_PERSON_NAMEID);
-    mHeader.append(STR_HOLLYNAME);
     mHeader.append(STR_FULLNAME);
     mHeader.append(STR_ROLE);
+    mHeader.append(STR_MODELSTATUS);
+    mHeader.append(STR_STARTDATE);
+    mHeader.append(STR_ENDDATE);
     mHeader.append(STR_TEL);
     mHeader.append(STR_EMAIL);
-    mHeader.append(STR_COURSE);
-    mHeader.append(STR_MODELSTATUS);
+    mHeader.append(STR_NOTE);
     traceout;
+}
+
+ImportTarget UIAreaContactPeopleListView::getImportTarget()
+{
+    return IMPORT_TARGET_AREA_CONTACT;
 }
 
 QString UIAreaContactPeopleListView::getTitle()
 {
-
-    return QString(tr("Danh sách Nữ tu liên lạc của khu vực: %1"))
-            .arg(mArea?mArea->name():STR_UNKNOWN);
+    Area* ar = area();
+    return QString(tr("Danh sách liên lạc của khu vực: %1"))
+        .arg(ar?ar->name():STR_UNKNOWN);
 }
 
-void UIAreaContactPeopleListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
+void UIAreaContactPeopleListView::initFilterFields()
 {
     tracein;
-    loge("updateItem '%s'", item?STR2CHA(item->modelName()):"");
-    if (item && item->modelName() == KModelNameAreaPerson) {
-        AreaPerson* per = (AreaPerson*) item;
-        tblItem->addValue(per->personNameId());
-        tblItem->addValue(per->hollyName());
-        tblItem->addValue(per->personName());
-        tblItem->addValue(per->roleName());
-        tblItem->addValue(per->personTel());
-        tblItem->addValue(per->personEmail());
-        tblItem->addValue(per->courseName());
-        tblItem->addValue(per->modelStatusName());
-    } else {
-        loge("No item found, or not expected model '%s'", item?STR2CHA(item->modelName()):"");
+    appendFilterField(FILTER_FIELD_MODEL_STATUS, STR_MODELSTATUS);
+    // TODO: support start date & end date
+    traceout;
+}
+
+ModelController *UIAreaContactPeopleListView::getController()
+{
+    return AREACTL;
+}
+
+void UIAreaContactPeopleListView::updateItem(DbModel *item,
+                                             UITableItem *tblItem, int idx)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    if (!item || !tblItem) {
+        err = ErrInvalidArg;
+        loge("invalid argument");
+    }
+    if (err == ErrNone) {
+        loge("updateItem '%s'", MODELSTR2CHA(item));
+        if (item->modelName() == KModelNameAreaPerson) {
+            AreaPerson* per = (AreaPerson*) item;
+            tblItem->addValue(per->nameId());
+            tblItem->addValue(per->personNameId());
+            tblItem->addValue(per->personName());
+            tblItem->addValue(per->roleName());
+            tblItem->addValue(per->modelStatusName());
+            tblItem->addValue(DatetimeUtils::date2String(per->startDate()));
+            tblItem->addValue(DatetimeUtils::date2String(per->endDate()));
+            tblItem->addValue(per->personTel());
+            tblItem->addValue(per->personEmail());
+            tblItem->addValue(per->remark());
+        } else {
+            loge("No item found, or not expected model '%s'",
+                 STR2CHA(item->modelName()));
+        }
     }
     traceout;
 }
@@ -130,66 +161,140 @@ QList<DbModel *> UIAreaContactPeopleListView::getListItem()
     tracein;
     ErrCode err = ErrNone;
     QList<DbModel*> items;
-    if (mArea != nullptr) {
-        logd("Load person list of area '%s'", STR2CHA(mArea->toString()));
-        err = AREACTL->getContactPeopleList(mArea->uid(), items);
+    QString uid;
+    Area* ar = area();
+    if (!ar) {
+        loge("Nothing to load");
+        err = ErrNoData;
+    }
+
+    if (err == ErrNone) {
+        uid = ar->uid();
+        if (uid.isEmpty()) {
+            err = ErrInvalidData;
+            loge("Invalud aream info, uid is null");
+        }
+    }
+    if (err == ErrNone) {
+        logd("Load person list of area '%s'", MODELSTR2CHA(ar));
+        err = AREACTL->getContactPeopleList(uid, items);
         if (err != ErrNone) {
             loge("Failed to get contact people list for area '%s', err=%d",
-                 STR2CHA(mArea->toString()), err);
-            REPORTERRCTL->reportErr(tr("Lỗi truy vấn thông tin người liên lạc cho khu vực"), err);
+                 MODELSTR2CHA(ar), err);
         }
-    } else {
-        loge("Nothing to load");
     }
+
+    if (err != ErrNone) {
+        loge("Faild to get list item, err=%d", err);
+        REPORTERRCTL->reportErr(
+            tr("Lỗi truy vấn thông tin người liên lạc cho khu vực"), err);
+    }
+
     traceout;
     return items;
 }
 
-void UIAreaContactPeopleListView::onAddItem(UITableCellWidgetItem *item)
+ErrCode UIAreaContactPeopleListView::onAddItem(UITableCellWidgetItem *item)
 {
     tracein;
-    DlgAreaPerson* dlg = DlgAreaPerson::build(this, true, KModelNameAreaPerson, nullptr, this);
-    dlg->setArea(mArea);
-    dlg->exec();
-    delete dlg;
-    traceout;
+    ErrCode err = ErrNone;
+    DlgAreaPerson* dlg = nullptr;
+    Area* ar = area();
+
+    if (err == ErrNone && !ar) {
+        loge("Invalid area, null value");
+        err = ErrInvalidData;
+    }
+    if (err == ErrNone) {
+        dlg = DlgAreaPerson::build(
+                            this, true, KModelNameAreaPerson, nullptr, this);
+        if (!dlg) {
+            loge("failed to build DlgAreaPerson, no memory?");
+            err = ErrNoMemory;
+        }
+    }
+    if (err == ErrNone) {
+        logd("Add area person for area '%s'", MODELSTR2CHA(ar));
+        err = dlg->setArea(ar);
+    }
+
+    if (err == ErrNone) {
+        dlg->exec();
+    } else {
+        DialogUtils::showErrorBox(err, tr("Thêm mới thất bại"));
+    }
+
+    FREE_PTR(dlg);
+    traceret(err);
+    return err;
 }
 
 void UIAreaContactPeopleListView::onEditItem(UITableCellWidgetItem *item)
 {
     tracein;
-    if (item) {
-        DbModel* model = item->itemData();
-        if (model) {
-            DlgAreaPerson* dlg = DlgAreaPerson::build(this, true, KModelNameAreaPerson, model, this);
-            dlg->setArea(mArea);
-            dlg->exec();
-            delete dlg;
-        } else {
-            loge("Edit failed, null area");
-        }
-    } else {
-        loge("Edit failed, null item");
+    ErrCode err = ErrNone;
+    DlgAreaPerson* dlg = nullptr;
+    DbModel* model = nullptr;
+    Area* ar = area();
+    if (!item) {
+        loge("Invalid argument");
+        err = ErrInvalidArg;
     }
+    if (err == ErrNone && !ar) {
+        loge("Invalid area, null value");
+        err = ErrInvalidData;
+    }
+    if (err == ErrNone && ((model = item->itemData()) == nullptr)) {
+        loge("Invalid area data, null item data");
+        err = ErrNoData;
+    }
+    if (err == ErrNone) {
+        dlg = DlgAreaPerson::build(this, true,
+                                   KModelNameAreaPerson,
+                                   model, this);
+        if (!dlg) {
+            loge("failed to build DlgAreaPerson, no memory?");
+            err = ErrNoMemory;
+        }
+    }
+    if (err == ErrNone) {
+        logd("Edit area person for area '%s'", MODELSTR2CHA(ar));
+        err = dlg->setArea(ar);
+    }
+
+    if (err == ErrNone) {
+        dlg->exec();
+    } else {
+        DialogUtils::showErrorBox(err, tr("Chỉnh sửa thất bại"));
+    }
+
+    FREE_PTR(dlg);
     traceout;
 }
-
-void UIAreaContactPeopleListView::onDeleteItem(const QList<UITableItem *> &selectedItems)
-{
-
-}
-
-void UIAreaContactPeopleListView::onViewItem(UITableCellWidgetItem *item)
+ErrCode UIAreaContactPeopleListView::onViewItem(UITableCellWidgetItem *item)
 {
     tracein;
-    int idx = item->idx();
-    DbModel* comm = item->itemData();
-    if (comm) {
-        MainWindow::showOnHtmlViewer(comm, tr("Vùng"));
-    } else {
-        loge("Comm obj is null");
-        DialogUtils::showErrorBox("Không có thông tin để xem");
+    ErrCode err = ErrNone;
+    DbModel* model = nullptr;
+
+    if (!item) {
+        err = ErrInvalidArg;
+        loge("invalid argument");
     }
-    traceout;
+
+    if (err == ErrNone && ((model = item->itemData()) == nullptr)) {
+        err = ErrInvalidData;
+        loge("Invalid argument");
+    }
+
+    if (err == ErrNone) {
+        err = MainWindow::showOnHtmlViewer(model, tr("Vùng"));
+    }
+    if (err != ErrNone) {
+        loge("view item err %d", err);
+        DialogUtils::showErrorBox(err, tr("Hiển thị thông tin lỗi"));
+    }
+    traceret(err);
+    return err;
 }
 

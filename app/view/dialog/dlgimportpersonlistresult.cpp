@@ -47,24 +47,21 @@ void DlgImportPersonListResult::initHeader()
 //    mHeader.append(tr("Khoá"));
 }
 
-QList<UIImportItem *> *DlgImportPersonListResult::getItems()
+ErrCode DlgImportPersonListResult::setWidgetItem(UIImportItem *wgitem, DbModel *item)
 {
-    QList<UIImportItem *> *items = new QList<UIImportItem *>();
-    foreach (DbModel* item, mList) {
-        Person* per = (Person*)item;
-        UIImportItem* wgitem = UIImportItem::build(item);
-        wgitem->addValue(per->nameId());
-        wgitem->addValue(per->hollyName());
-        wgitem->addValue(per->getFullName());
-        wgitem->addValue(DatetimeUtils::date2String(per->birthday()));
-        wgitem->addValue(per->birthPlace());
-        wgitem->addValue(DatetimeUtils::date2String(per->feastDay(), DEFAULT_FORMAT_MD)); // seem feastday convert repeate many time, make it common????
+    tracein;
+    Person* per = (Person*)item;
+    wgitem->addValue(per->nameId());
+    wgitem->addValue(per->hollyName());
+    wgitem->addValue(per->getFullName());
+    wgitem->addValue(DatetimeUtils::date2String(per->birthday()));
+    wgitem->addValue(per->birthPlace());
+    wgitem->addValue(DatetimeUtils::date2String(per->feastDay(), DEFAULT_FORMAT_MD)); // seem feastday convert repeate many time, make it common????
 
-        wgitem->addValue(per->tel().join(";"));
-        wgitem->addValue(per->email().join(";"));
-        wgitem->addValue(per->idCard());
-        wgitem->addValue(per->idCardIssuePlace());
-        items->append(wgitem);
-    }
-    return items;
+    wgitem->addValue(per->tel().join(";"));
+    wgitem->addValue(per->email().join(";"));
+    wgitem->addValue(per->idCard());
+    wgitem->addValue(per->idCardIssuePlace());
+    traceout;
+    return ErrNone;
 }

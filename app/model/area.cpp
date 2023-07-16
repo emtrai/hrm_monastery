@@ -138,15 +138,27 @@ void Area::setModelStatusName(QString newModelStatusName)
     mModelStatusName = newModelStatusName;
 }
 
-const QString Area::exportTemplatePath(FileExporter *exporter, QString *ftype) const
-{
+ErrCode Area::exportTemplatePath(FileExporter *exporter,
+                                 const QString& name,
+                                       QString& fpath, QString *ftype) const
+{    tracein;
+    ErrCode err = ErrNone;
     if (exporter) {
-        switch (exporter->getExportType()) {
+        ExportType type = exporter->getExportType();
+        switch (type) {
         case EXPORT_HTML:
-            return FileCtl::getPrebuiltDataFilePath(KPrebuiltAreaInfoTemplateFileName);
+            fpath = FileCtl::getPrebuiltDataFilePath(KPrebuiltAreaInfoTemplateFileName);
+            break;
+        default:
+            loge("export type %d not support", type);
+            err = ErrNotSupport;
         };
+    } else {
+        err = ErrInvalidArg;
+        loge("invalid exporter");
     }
-    return QString();
+    traceret(err);
+    return err;
 }
 
 void Area::initExportFields()

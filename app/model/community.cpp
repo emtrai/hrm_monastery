@@ -424,7 +424,7 @@ void Community::resetResource()
     mCreateDate = 0;
     mCloseDate = 0;
     mFeastDate = 0;
-    mStatus = MODEL_NOT_READY;
+    mStatus = MODEL_STATUS_NOT_READY;
     mAreaDbId = 0;
     mMissionUid.clear();
     mMissionName.clear();
@@ -586,15 +586,30 @@ void Community::setCurrentCEONameId(const QString &newCurrentCEOCode)
     markItemAsModified(KItemCEO);
 }
 
-const QString Community::exportTemplatePath(FileExporter* exporter, QString* ftype) const
+ErrCode Community::exportTemplatePath(FileExporter* exporter,
+                                      const QString& name,
+                                      QString& fpath,
+                                      QString* ftype) const
 {
+    tracein;
+    ErrCode err = ErrNone;
     if (exporter) {
-        switch (exporter->getExportType()) {
+        ExportType type = exporter->getExportType();
+        switch (type) {
         case EXPORT_HTML:
-            return FileCtl::getPrebuiltDataFilePath(KPrebuiltCommunityInfoTemplateFileName);
+            fpath = FileCtl::getPrebuiltDataFilePath(KPrebuiltCommunityInfoTemplateFileName);
+            break;
+        default:
+            err = ErrNotSupport;
+            loge("export type %d not support", type);
+            break;
         };
+    } else {
+        err = ErrInvalidArg;
+        loge("invalid exporter");
     }
-    return QString();
+    traceret(err);
+    return err;
 }
 
 const QString &Community::parentNameId()

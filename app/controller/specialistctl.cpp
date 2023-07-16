@@ -29,6 +29,7 @@
 #include "dbctl.h"
 #include "dbspecialistmodelhandler.h"
 #include "prebuiltdefs.h"
+#include "controllerdefs.h"
 
 #define SPLIT ','
 
@@ -36,7 +37,7 @@ GET_INSTANCE_CONTROLLER_IMPL(SpecialistCtl);
 
 
 SpecialistCtl::SpecialistCtl():
-    ModelController(KModelHdlSpecialist)
+    ModelController(KControllerSpecialist, KModelHdlSpecialist)
 {
     tracein;
 }

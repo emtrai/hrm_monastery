@@ -42,10 +42,11 @@
 #include "jsondefs.h"
 #include "prebuiltdefs.h"
 #include "communityperson.h"
+#include "controllerdefs.h"
 
 GET_INSTANCE_CONTROLLER_IMPL(CommunityCtl)
 
-CommunityCtl::CommunityCtl():ModelController(KModelHdlCommunity)
+CommunityCtl::CommunityCtl():ModelController(KControllerCommunity, KModelHdlCommunity)
 {
     tracein;
 }
@@ -191,7 +192,7 @@ DbModel* CommunityCtl::onJsonParseOneItem(const QJsonObject& jobj, bool* ok )
 
 }
 
-const QString CommunityCtl::exportListPrebuiltTemplateName() const
+const QString CommunityCtl::exportListPrebuiltTemplateName(const QString& modelName) const
 {
     return KPrebuiltCommunityExportTemplateName;
 }
@@ -338,11 +339,6 @@ const char *CommunityCtl::getPrebuiltFileType()
     return KFileTypeJson;
 }
 
-DbModelHandler *CommunityCtl::getModelHandler()
-{
-    return DB->getModelHandler(KModelHdlCommunity);
-}
-
 DbModelBuilder CommunityCtl::getMainBuilder()
 {
     return &Community::build;
@@ -398,44 +394,44 @@ DbModel *CommunityCtl::doImportOneItem(const QString& importName, int importFile
     return model;
 }
 
-DbModel *CommunityCtl::doImportOneItem(const QString& importName, int importFileType,
-                                       const QHash<QString, QString> &items, quint32 idx)
-{
-    ErrCode err = ErrNone;
-    DbModel* model = nullptr;
-    logd("idx = %d", idx);
-    if (importName == KModelHdlCommunity)
-        model = Community::build();
-    else { // TODO: import person to community
-        err = ErrNotSupport;
-        loge("import '%s' not support", STR2CHA(importName));
-    }
-    if (err == ErrNone) {
-        foreach (QString field, items.keys()) {
-            QString value = items.value(field);
-            logd("Import field %s", field.toStdString().c_str());
-            logd("Import value %s", value.toStdString().c_str());
-            err = model->onImportParseDataItem(importName, importFileType, field, value, idx);
-            if (err != ErrNone) {
-                loge("on import item failed, %d", err);
-                break;
-            }
-        }
-        if (err == ErrNone && model->nameId().isEmpty() && !model->name().isEmpty()) {
-            QString nameid = Utils::UidFromName(model->name(), NO_VN_MARK_UPPER);
-            logd("auto buid community nameid '%s'", STR2CHA(nameid));
-            model->setNameId(nameid);
-            // TODO: numer is increased, but not save --> may cause much dummy code?
-        }
-     }
+//DbModel *CommunityCtl::doImportOneItem(const QString& importName, int importFileType,
+//                                       const QHash<QString, QString> &items, quint32 idx)
+//{
+//    ErrCode err = ErrNone;
+//    DbModel* model = nullptr;
+//    logd("idx = %d", idx);
+//    if (importName == KModelHdlCommunity)
+//        model = Community::build();
+//    else { // TODO: import person to community
+//        err = ErrNotSupport;
+//        loge("import '%s' not support", STR2CHA(importName));
+//    }
+//    if (err == ErrNone) {
+//        foreach (QString field, items.keys()) {
+//            QString value = items.value(field);
+//            logd("Import field %s", field.toStdString().c_str());
+//            logd("Import value %s", value.toStdString().c_str());
+//            err = model->onImportParseDataItem(importName, importFileType, field, value, idx);
+//            if (err != ErrNone) {
+//                loge("on import item failed, %d", err);
+//                break;
+//            }
+//        }
+//        if (err == ErrNone && model->nameId().isEmpty() && !model->name().isEmpty()) {
+//            QString nameid = Utils::UidFromName(model->name(), NO_VN_MARK_UPPER);
+//            logd("auto buid community nameid '%s'", STR2CHA(nameid));
+//            model->setNameId(nameid);
+//            // TODO: numer is increased, but not save --> may cause much dummy code?
+//        }
+//     }
 
-    if (err != ErrNone) {
-        if (model) {
-            delete model;
-            model = nullptr;
-        }
-    }
-    traceout;
-    return model;
-}
+//    if (err != ErrNone) {
+//        if (model) {
+//            delete model;
+//            model = nullptr;
+//        }
+//    }
+//    traceout;
+//    return model;
+//}
 

@@ -32,6 +32,7 @@
 #include "filectl.h"
 #include "dbctl.h"
 #include "prebuiltdefs.h"
+#include "controllerdefs.h"
 
 SaintCtl *SaintCtl::gInstance = nullptr;
 
@@ -84,7 +85,7 @@ DbModel *SaintCtl::doImportOneItem(const QString& importName, int importFileType
 }
 
 SaintCtl::SaintCtl():
-    ModelController(KModelHdlSaint)
+    ModelController(KControllerSaint, KModelHdlSaint)
 {
 
 }

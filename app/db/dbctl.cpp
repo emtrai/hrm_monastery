@@ -31,7 +31,7 @@
 #include "dbsqlitespecialist.h"
 #include "filectl.h"
 #include "defs.h"
-
+#include "controllerdefs.h"
 
 DbCtl* DbCtl::gInstance = nullptr;
 
@@ -70,7 +70,7 @@ IDatabase *DbCtl::database() const
 
 QString DbCtl::getName()
 {
-    return "DbCtl";
+    return KControllerDb;
 }
 
 

@@ -44,10 +44,10 @@ protected:
     virtual void initHeader();
     virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
     virtual DbModel* onNewModel(const QString& modelName);
-    virtual void onAddItem(UITableCellWidgetItem *item);
+    virtual ErrCode onAddItem(UITableCellWidgetItem *item);
     virtual void onEditItem(UITableCellWidgetItem *item);
-    virtual void onDeleteItem(const QList<UITableItem *>& selectedItems);
-    virtual void onViewItem(UITableCellWidgetItem *item);
+    virtual ErrCode onDeleteItem(const QList<UITableItem *>& selectedItems);
+    virtual ErrCode onViewItem(UITableCellWidgetItem *item);
 
 protected:
     virtual ErrCode onLoad();

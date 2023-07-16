@@ -30,6 +30,13 @@
 #include "dbmodel.h"
 #include "filectl.h"
 #include "prebuiltdefs.h"
+#include "personctl.h"
+#include "areactl.h"
+#include "rolectl.h"
+#include "coursectl.h"
+#include "person.h"
+#include "utils.h"
+#include "area.h"
 
 AreaPerson::AreaPerson():MapDbModel()
 {
@@ -72,16 +79,53 @@ QString AreaPerson::modelName() const
     return KModelNameAreaPerson;
 }
 
-const QString AreaPerson::exportTemplatePath(FileExporter *exporter, QString *ftype) const
+ErrCode AreaPerson::exportTemplatePath(FileExporter *exporter,
+                                       const QString& name,
+                                             QString& fpath, QString *ftype) const
 {
-    traced;
+    tracein;
+    ErrCode err = ErrNone;
     if (exporter) {
-        switch (exporter->getExportType()) {
+        ExportType type = exporter->getExportType();
+        switch (type) {
         case EXPORT_HTML:
-            return FileCtl::getPrebuiltDataFilePath(KPrebuiltAreaPersonInfoTemplateFileName);
+            fpath = FileCtl::getPrebuiltDataFilePath(KPrebuiltAreaPersonInfoTemplateFileName);
+            break;
+        default:
+            loge("export type %d not support", type);
+            err = ErrNotSupport;
         };
+    } else {
+        err = ErrInvalidArg;
+        loge("invalid exporter");
     }
-    return QString();
+    traceret(err);
+    return err;
+}
+
+QString AreaPerson::buildNameId(const QString *seed, bool *ok)
+{
+    QString name = this->name();
+    QString nameid;
+    tracein;
+    if (!Utils::appendString(nameid, areaNameId())) {
+        logw("no area nameid to build nameid");
+    }
+    if (!Utils::appendString(nameid, personNameId())) {
+        logw("no person nameid to build nameid");
+    }
+    if (!Utils::appendString(nameid, roleNameId())) {
+        logw("no role nameid to build nameid");
+    }
+    if (seed) {
+        if (!Utils::appendString(nameid, Utils::UidFromName(*seed, NO_VN_MARK_UPPER))) {
+            logw("no seed to build nameid");
+        }
+    }
+    if (ok) *ok = !nameid.isEmpty();
+    logd("built nameid %s", STR2CHA(nameid));
+    traceout;
+    return nameid;
 }
 
 void AreaPerson::initExportFields()
@@ -94,17 +138,23 @@ void AreaPerson::initExportFields()
     mExportCallbacks.insert(KItemArea, [](const DbModel* model, const QString& item){
         return ((AreaPerson*)model)->areaName();
     });
-    mExportCallbacks.insert(KItemHollyName, [](const DbModel* model, const QString& item){
-        return ((AreaPerson*)model)->hollyName();
+    mExportCallbacks.insert(KItemAreaNameId, [](const DbModel* model, const QString& item){
+        return ((AreaPerson*)model)->areaNameId();
     });
-    mExportCallbacks.insert(KItemFullName, [](const DbModel* model, const QString& item){
+    mExportCallbacks.insert(KItemPersonName, [](const DbModel* model, const QString& item){
         return ((AreaPerson*)model)->personName();
     });
     mExportCallbacks.insert(KItemRole, [](const DbModel* model, const QString& item){
         return ((AreaPerson*)model)->roleName();
     });
+    mExportCallbacks.insert(KItemRoleNameId, [](const DbModel* model, const QString& item){
+        return ((AreaPerson*)model)->roleNameId();
+    });
     mExportCallbacks.insert(KItemTerm, [](const DbModel* model, const QString& item){
         return ((AreaPerson*)model)->courseName();
+    });
+    mExportCallbacks.insert(KItemTermNameId, [](const DbModel* model, const QString& item){
+        return ((AreaPerson*)model)->courseNameId();
     });
     mExportCallbacks.insert(KItemEmail, [](const DbModel* model, const QString& item){
         return ((AreaPerson*)model)->personEmail();
@@ -112,7 +162,161 @@ void AreaPerson::initExportFields()
     mExportCallbacks.insert(KItemTel, [](const DbModel* model, const QString& item){
         return ((AreaPerson*)model)->personTel();
     });
+    mExportCallbacks.insert(KItemRemark, [](const DbModel* model, const QString& item){
+        return ((AreaPerson*)model)->remark();
+    });
     traceout;
+}
+void AreaPerson::initImportFields()
+{
+    tracein;
+    MapDbModel::initImportFields();
+    // person
+    mImportCallbacks.insert(KItemPersonName, [this](const QString& value){
+        ErrCode err = ErrNone;
+        logd("set value '%s'", STR2CHA(value));
+        if (this->personName().isEmpty()) {
+            this->setPersonName(value);
+        }
+        return err;
+    });
+    mImportCallbacks.insert(KItemPersonNameId, [this](const QString& value){
+        ErrCode err = ErrNone;
+        logd("set value '%s'", STR2CHA(value));
+        this->setPersonNameId(value);
+        DbModel* model = PERSONCTL->getModelByNameId(value);
+        if (model) {
+            if (IS_MODEL_NAME(model, KModelNamePerson)) {
+                Person* per = (Person*) model;
+                this->setPersonName(per->displayName());
+                this->setPersonEmail(per->emailString());
+                this->setPersonTel(per->telString());
+                this->setPersonUid(per->uid());
+            } else {
+                loge("invalid model name '%s'", MODELSTR2CHA(model));
+            }
+        } else {
+            loge("not found name id '%s' for field '%s'",
+                 STR2CHA(value), KItemPersonNameId);
+            err = ErrNotFound;
+        }
+        FREE_PTR(model);
+        return err;
+    });
+    // area
+    mImportCallbacks.insert(KItemArea, [this](const QString& value){
+        ErrCode err = ErrNone;
+        logd("set value '%s'", STR2CHA(value));
+        if (this->areaName().isEmpty()) {
+            this->setAreaName(value);
+        }
+        return err;
+    });
+    mImportCallbacks.insert(KItemAreaNameId, [this](const QString& value){
+        ErrCode err = ErrNone;
+        logd("set value '%s'", STR2CHA(value));
+        this->setAreaNameId(value);
+        DbModel* model = AREACTL->getModelByNameId(value);
+        if (IS_MODEL_NAME(model, KModelNameArea)) {
+            this->setArea((Area*)model);
+        } else {
+            loge("not found name id '%s' for field '%s'",
+                 STR2CHA(value), KItemAreaNameId);
+            err = ErrNotFound;
+        }
+        FREE_PTR(model);
+        return err;
+    });
+    // Role
+    mImportCallbacks.insert(KItemRole, [this](const QString& value){
+        ErrCode err = ErrNone;
+        logd("set value '%s'", STR2CHA(value));
+        if (this->roleName().isEmpty()) {
+            this->setRoleName(value);
+        }
+        return err;
+    });
+    mImportCallbacks.insert(KItemRoleNameId, [this](const QString& value){
+        ErrCode err = ErrNone;
+        logd("set value '%s'", STR2CHA(value));
+        this->setRoleNameId(value);
+        DbModel* model = ROLECTL->getModelByNameId(value);
+        if (model) {
+            this->setRoleName(model->name());
+            this->setRoleUid(model->uid());
+        } else {
+            loge("not found name id '%s' for field '%s'",
+                 STR2CHA(value), KItemRoleNameId);
+            err = ErrNotFound;
+        }
+        FREE_PTR(model);
+        return err;
+    });
+    // Term/Course
+    mImportCallbacks.insert(KItemTerm, [this](const QString& value){
+        ErrCode err = ErrNone;
+        logd("set value '%s'", STR2CHA(value));
+        if (this->courseNameId().isEmpty()) {
+            this->setCourseName(value);
+        }
+        return err;
+    });
+
+    mImportCallbacks.insert(KItemTermNameId, [this](const QString& value){
+        ErrCode err = ErrNone;
+        logd("set value '%s'", STR2CHA(value));
+        this->setCourseNameId(value);
+        DbModel* model = COURSECTL->getModelByNameId(value);
+        if (model) {
+            this->setCourseName(model->name());
+            this->setCourseUid(model->uid());
+        } else {
+            loge("not found name id '%s' for field '%s'",
+                 STR2CHA(value), KItemTermNameId);
+            err = ErrNotFound;
+        }
+        FREE_PTR(model);
+        return err;
+    });
+    // contact
+    mImportCallbacks.insert(KItemEmail, [this](const QString& value){
+        ErrCode err = ErrNone;
+        logd("set value '%s'", STR2CHA(value));
+        if (this->personEmail().isEmpty()) {
+            this->setPersonEmail(value);
+        }
+        return err;
+    });
+    mImportCallbacks.insert(KItemTel, [this](const QString& value){
+        ErrCode err = ErrNone;
+        logd("set value '%s'", STR2CHA(value));
+        if (this->personTel().isEmpty()) {
+            this->setPersonTel(value);
+        }
+        return err;
+    });
+    mImportCallbacks.insert(KItemRemark, [this](const QString& value){
+        logd("set value '%s'", STR2CHA(value));
+        this->setRemark(value);
+        return ErrNone;
+    });
+
+    mImportItemsType.insert(KItemPersonNameId,
+                            (IMPORT_ITEM_TYPE_MATCH_DB | IMPORT_ITEM_TYPE_MANDATORY));
+    mImportItemsType.insert(KItemAreaNameId,
+                            (IMPORT_ITEM_TYPE_MATCH_DB | IMPORT_ITEM_TYPE_MANDATORY));
+    mImportItemsType.insert(KItemRoleNameId,
+                            (IMPORT_ITEM_TYPE_MATCH_DB | IMPORT_ITEM_TYPE_MANDATORY));
+    mImportItemsType.insert(KItemRemark,
+                            (IMPORT_ITEM_TYPE_UPDATE_DB));
+    mImportItemsType.insert(KItemTermNameId,
+                            (IMPORT_ITEM_TYPE_MATCH_DB));
+    traceout;
+}
+
+const QString &AreaPerson::name() const
+{
+    return personName();
 }
 
 
@@ -126,19 +330,45 @@ void AreaPerson::copy(const AreaPerson &model)
     tracein;
     mRoleUid = model.mRoleUid;
     mRoleName = model.mRoleName;
+    mRoleNameId = model.mRoleNameId;
+
     mCourseUid = model.mCourseUid;
     mCourseName = model.mCourseName;
+    mCourseNameId = model.mCourseNameId;
+
     mPersonUid = model.mPersonUid;
     mPersonName = model.mPersonName;
     mPersonNameId = model.mPersonNameId;
+
     mHollyName = model.mHollyName;
     mPersonTel = model.mPersonTel;
     mPersonEmail = model.mPersonEmail;
+
     mAreaUid = model.mAreaUid;
     mAreaName = model.mAreaName;
     mAreaNameId = model.mAreaNameId;
 
     traceout;
+}
+
+QString AreaPerson::courseNameId() const
+{
+    return mCourseNameId;
+}
+
+void AreaPerson::setCourseNameId(const QString &newCourseNameId)
+{
+    CHECK_MODIFIED_THEN_SET(mCourseNameId, newCourseNameId, KItemCourse);
+}
+
+QString AreaPerson::roleNameId() const
+{
+    return mRoleNameId;
+}
+
+void AreaPerson::setRoleNameId(const QString &newRoleNameId)
+{
+    CHECK_MODIFIED_THEN_SET(mRoleNameId, newRoleNameId, KItemRole);
 }
 
 const QString &AreaPerson::personNameId() const
@@ -148,7 +378,7 @@ const QString &AreaPerson::personNameId() const
 
 void AreaPerson::setPersonNameId(const QString &newPersonNameId)
 {
-    mPersonNameId = newPersonNameId;
+    CHECK_MODIFIED_THEN_SET(mPersonNameId, newPersonNameId, KItemPerson);
 }
 
 const QString &AreaPerson::personEmail() const
@@ -188,7 +418,23 @@ const QString &AreaPerson::areaNameId() const
 
 void AreaPerson::setAreaNameId(const QString &newAreaNameId)
 {
-    mAreaNameId = newAreaNameId;
+    CHECK_MODIFIED_THEN_SET(mAreaNameId, newAreaNameId, KItemArea);
+}
+
+ErrCode AreaPerson::setArea(const Area *area)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    if (!area) {
+        err = ErrInvalidArg;
+        loge("invalid area");
+    }
+    if (err == ErrNone) {
+        setAreaName(area->name());
+        setAreaNameId(area->nameId());
+        setAreaUid(area->uid());
+    }
+    traceout;
 }
 
 const QString &AreaPerson::areaName() const

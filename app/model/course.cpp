@@ -125,17 +125,29 @@ void Course::initExportFields()
     traceout;
 }
 
-const QString Course::exportTemplatePath(FileExporter *exporter, QString *ftype) const
+ErrCode Course::exportTemplatePath(FileExporter *exporter,
+                                   const QString& name,
+                                   QString& fpath,
+                                   QString *ftype) const
 {
     tracein;
+    ErrCode err = ErrNone;
     if (exporter) {
-        switch (exporter->getExportType()) {
+        ExportType type = exporter->getExportType();
+        switch (type) {
         case EXPORT_HTML:
-            return FileCtl::getPrebuiltDataFilePath(KPrebuiltCourseTemplateFileName);
+            fpath = FileCtl::getPrebuiltDataFilePath(KPrebuiltCourseTemplateFileName);
+            break;
+        default:
+            loge("export type %d not support", type);
+            break;
         };
+    } else {
+        loge("invalid exporter");
+        err = ErrInvalidArg;
     }
-    traceout;
-    return QString();
+    traceret(err);
+    return err;
 }
 
 DbModelBuilder Course::getBuilder() const

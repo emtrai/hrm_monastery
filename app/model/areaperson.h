@@ -23,7 +23,7 @@
 #define AREAPERSON_H
 
 #include "mapdbmodel.h"
-
+class Area;
 class AreaPerson : public MapDbModel
 {
 public:
@@ -33,8 +33,16 @@ public:
     virtual void clone(const DbModel* model);
     virtual DbModelBuilder getBuilder() const;
     virtual QString modelName() const;
-    virtual const QString exportTemplatePath(FileExporter* exporter, QString* ftype = nullptr) const;
+    virtual ErrCode exportTemplatePath(FileExporter* exporter,
+                                       const QString& name,
+                                       QString& fpath,
+                                       QString* ftype = nullptr) const;
+
+    virtual QString buildNameId(const QString* seed = nullptr, bool* ok = nullptr);
     virtual void initExportFields();
+    virtual void initImportFields();
+
+    virtual const QString &name() const;
 
 
     const QString &roleUid() const;
@@ -63,6 +71,8 @@ public:
     const QString &areaNameId() const;
     void setAreaNameId(const QString &newAreaNameId);
 
+    ErrCode setArea(const Area* area);
+
     const QString &hollyName() const;
     void setHollyName(const QString &newHollyName);
 
@@ -74,6 +84,12 @@ public:
 
     const QString &personNameId() const;
     void setPersonNameId(const QString &newPersonNameId);
+
+    QString roleNameId() const;
+    void setRoleNameId(const QString &newRoleNameId);
+
+    QString courseNameId() const;
+    void setCourseNameId(const QString &newCourseNameId);
 
 protected:
     AreaPerson();
@@ -87,12 +103,14 @@ protected:
     QString mPersonTel; // just for display
     QString mPersonEmail; // just for display
     QString mAreaUid;
-    QString mAreaName;; // just for display
+    QString mAreaName; // just for display
     QString mAreaNameId; // just for display
     QString mRoleUid;
-    QString mRoleName;; // just for display
+    QString mRoleNameId;
+    QString mRoleName; // just for display
     QString mCourseUid;
-    QString mCourseName;; // just for display
+    QString mCourseNameId;
+    QString mCourseName; // just for display
 };
 
 #endif // AREAPERSON_H

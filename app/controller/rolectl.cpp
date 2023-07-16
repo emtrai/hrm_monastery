@@ -27,11 +27,12 @@
 #include "utils.h"
 #include "defs.h"
 #include "prebuiltdefs.h"
+#include "controllerdefs.h"
 
 GET_INSTANCE_CONTROLLER_IMPL(RoleCtl)
 
 RoleCtl::RoleCtl():
-    ModelController(KModelHdlRole)
+    ModelController(KControllerRole, KModelHdlRole)
 {
     tracein;
 }

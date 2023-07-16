@@ -26,8 +26,10 @@
 #include "utils.h"
 #include "mainwindow.h"
 #include "dialogutils.h"
+#include "stringdefs.h"
 
 #define ITEM_CHECK (Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable)
+#define ITEM_NONE_CHECK (Qt::NoItemFlags)
 
 UIImportItem *UIImportItem::build(void *data)
 {
@@ -65,16 +67,19 @@ void UIImportItem::setValueList(const QStringList &newValueList)
 
 DlgImportListResult::DlgImportListResult(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::DlgImportListResult)
+    ui(new Ui::DlgImportListResult),
+    mTargetModel(nullptr)
 {
     tracein;
     ui->setupUi(this);
+    traceout;
 //    DIALOG_SIZE_SHOW(this);
 }
 
 DlgImportListResult::~DlgImportListResult()
 {
     RELEASE_LIST_DBMODEL(mList);
+    FREE_PTR(mTargetModel);
     delete ui;
 }
 
@@ -87,10 +92,14 @@ const QList<DbModel *> &DlgImportListResult::list() const
     return mList;
 }
 
-void DlgImportListResult::setup(const QList<DbModel *> &newList)
+ErrCode DlgImportListResult::setup(const QList<DbModel *> &newList)
 {
+    ErrCode err = ErrNone;
+    tracein;
     setupUI();
     mList = newList;
+    traceret(err);
+    return err;
 }
 
 void DlgImportListResult::setupUI()
@@ -109,11 +118,20 @@ void DlgImportListResult::setupUI()
     ui->tblList->setMinimumHeight(500);
 
     ui->tblList->setHorizontalHeaderLabels(hdrs);
+
+    if (mTargetModel) {
+        QString title = QString(tr("Nhập dữ liệu cho: %1")).arg(mTargetModel->name());
+        setTitle(title);
+    }
+    traceout;
 }
 
 void DlgImportListResult::initHeader()
 {
     tracein;
+    mHeader.append(STR_NAMEID);
+    mHeader.append(STR_NAME);
+    traceout;
 }
 
 QStringList DlgImportListResult::getFinalHeader()
@@ -123,6 +141,7 @@ QStringList DlgImportListResult::getFinalHeader()
     hdrs.append(tr("Chọn"));
 //    hdrs.append(tr(""));
     hdrs.append(getHeader());
+    traceout;
     return hdrs;
 }
 
@@ -131,15 +150,65 @@ QStringList DlgImportListResult::getHeader()
     return mHeader;
 }
 
-QList<UIImportItem *>* DlgImportListResult::getItems()
+QList<UIImportItem *> DlgImportListResult::getItems(bool* ok)
 {
-    return nullptr;
+    tracein;
+    QList<UIImportItem *> items;
+    ErrCode err = ErrNone;
+    int cnt = 0;
+    if (mList.size() > 0) {
+        foreach (DbModel* item, mList) {
+            if (item) {
+                UIImportItem* wgitem = UIImportItem::build(item);
+                if (wgitem) {
+                    setWidgetItem(wgitem, item);
+                    // TODO: add more information??
+                    items.append(wgitem);
+                } else {
+                    loge("no memory?");
+                    err = ErrNoMemory;
+                    break;
+                }
+            } else {
+                loge("Something wrong, data at %d in list but null", cnt);
+                err = ErrInvalidData;
+            }
+            cnt++;
+        }
+    } else {
+        logw("No import data to show");
+    }
+    if (err != ErrNone) {
+        loge("invalid data for import err=%d", err);
+        RELEASE_LIST(items, UIImportItem);
+    }
+    if (ok) *ok = (err == ErrNone);
+    traceout;
+    return items;
+}
+
+ErrCode DlgImportListResult::setWidgetItem(UIImportItem *wgitem, DbModel *item)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    if (!wgitem || !item) {
+        err = ErrInvalidArg;
+        loge("invalid argument");
+    }
+    if (err == ErrNone) {
+        wgitem->addValue(item->nameId());
+        wgitem->addValue(item->name());
+    }
+    traceret(err);
+    return err;
 }
 
 ErrCode DlgImportListResult::onLoad()
 {
     tracein;
     QTableWidget* tbl = ui->tblList;
+    bool ok = false;
+    ErrCode err = ErrNone;
 
     // TODO: is it really remove all data?
     // Is there any risk of leakage memory here??
@@ -149,14 +218,18 @@ ErrCode DlgImportListResult::onLoad()
     // TODO: clear all data in UIImportItem???
     // TODO: check carefully to avoid memory leak, stupid C/C++
 
-    QList<UIImportItem*>* items = getItems();
-    if (items && !items->empty()) {
+    QList<UIImportItem*> items = getItems(&ok);
+    if (!ok) {
+        err = ErrInvalidData;
+        loge("no item data to get");
+    }
+    if (err == ErrNone && !items.empty()) {
         int idx = tbl->rowCount();
         QIcon icOk (QString::fromUtf8(":/icon/icon/icons8-ok-48"));
         QIcon icNok (QString::fromUtf8(":/icon/icon/icons8-error-cloud-96"));
         QIcon icDup (QString::fromUtf8(":/icon/icon/icons8-copy-64.png"));
         int itemIdx = 0;
-        foreach (UIImportItem* item, *items){
+        foreach (UIImportItem* item, items){
             tbl->insertRow(idx);
             QStringList values = item->valueList();
 
@@ -168,19 +241,25 @@ ErrCode DlgImportListResult::onLoad()
             if (val != nullptr) {
                 bool isExist = val->isExist();
                 if (isExist) {
+                    widgetItem->setFlags(ITEM_NONE_CHECK);
                     widgetItem->setIcon(icDup);
+                    widgetItem->setToolTip(STR_DATA_EXISTED);
                 } else {
                     ErrCode valRes = val->validateAllFields();
                     if (valRes == ErrNone) {
                         widgetItem->setFlags(ITEM_CHECK);
                         widgetItem->setCheckState(Qt::CheckState::Unchecked);
                     } else {
+                        widgetItem->setFlags(ITEM_NONE_CHECK);
                         widgetItem->setIcon(icNok);
+                        widgetItem->setToolTip(STR_DATA_ERROR);
                     }
                 }
 
             } else {
+                widgetItem->setFlags(ITEM_NONE_CHECK);
                 widgetItem->setIcon(icNok);
+                widgetItem->setToolTip(STR_DATA_ERROR);
             }
             tbl->setItem(idx, 0, widgetItem);
             widgetItem->setData(Qt::UserRole, itemIdx);
@@ -191,11 +270,12 @@ ErrCode DlgImportListResult::onLoad()
             idx ++;
             itemIdx++;
         }
-        delete items;
+        RELEASE_LIST(items, UIImportItem);
     } else {
         loge("Nothing to show");
     }
-    return ErrNone;
+    traceret(err);
+    return err;
 
 }
 
@@ -204,15 +284,18 @@ void DlgImportListResult::showEvent(QShowEvent *event)
     tracein;
     QWidget::showEvent( event );
     onLoad();
+    traceout;
 }
 
 ErrCode DlgImportListResult::saveItems(const QList<DbModel *> &list)
 {
     tracein;
     ErrCode ret = ErrNone;
+    logd("save %d items", list.size());
     ret = MainWindow::showProcessingDialog(tr("Lưu dữ liệu"), nullptr,
         [this, list](ErrCode* err, void* data, DlgWait* dlg) {
             int total = list.size();
+            logd("saving %ld item", list.size());
             int cnt = 0;
             foreach (DbModel* item, list) {
 //                logd("Save %s", item->name().toStdString().c_str());
@@ -237,6 +320,7 @@ ErrCode DlgImportListResult::saveItems(const QList<DbModel *> &list)
 //        ret = item->save();
 //        logi("save item result %d", ret);
 //    }
+    traceout;
     return ErrNone; // TODO: handle error case???
 }
 
@@ -257,15 +341,42 @@ void DlgImportListResult::accept()
                 selectedItem.append(mList[itemIdx]);
             }
         }
-        ret = saveItems(selectedItem);
+        if (selectedItem.size() > 0) {
+            ret = saveItems(selectedItem);
+            logi("Save %ld items, ret %d", selectedItem.size(), ret);
+            if (ret == ErrNone)
+                QDialog::accept();
+            else
+                DialogUtils::showErrorBox(QString(tr("Lỗi ! Mã lỗi %1").arg(ret)));
+        } else {
+            loge("no selected item");
+            DialogUtils::showErrorBox(tr("Vui lòng chọn mục để lưu"));
+        }
     } else {
         logi("Nothing to save");
-    }
-    logi("Add Country, ret %d", ret);
-    if (ret == ErrNone)
         QDialog::accept();
-    else
-        DialogUtils::showErrorBox(QString(tr("Lỗi ! Mã lỗi %1").arg(ret)));
+    }
+    traceout;
+}
+
+void DlgImportListResult::setTargetModel(const DbModel *newTargetModel)
+{
+    tracein;
+    FREE_PTR(mTargetModel);
+    if (newTargetModel) {
+        logd("clone model '%s'", MODELSTR2CHA(newTargetModel));
+        mTargetModel = CLONE_MODEL(newTargetModel, DbModel);
+    } else {
+        logw("null input value");
+    }
+    traceout;
+}
+
+void DlgImportListResult::setTitle(const QString &title)
+{
+    if (!title.isEmpty()) {
+        ui->txtSubject->setText(title);
+    }
 }
 
 

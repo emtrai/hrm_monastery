@@ -18,6 +18,7 @@
 #include "filter.h"
 #include "jsondefs.h"
 #include "prebuiltdefs.h"
+#include "dbmodelfactory.h"
 
 ModelController::ModelController():
     mEnableCache(true),
@@ -35,10 +36,11 @@ ModelController::~ModelController()
     traceout;
 }
 
-ModelController::ModelController(const QString& name):ModelController()
+ModelController::ModelController(const QString& name, const QString& hdlName):ModelController()
 {
     tracein;
     mName = name;
+    mMainModelHandlerName = hdlName;
     logd("construct with name=%s", STR2CHA(name));
     traceout;
 }
@@ -63,12 +65,17 @@ QString ModelController::getName()
     return mName;
 }
 
+QString ModelController::getMainModelHandlerName()
+{
+    return mMainModelHandlerName;
+}
+
 DbModelHandler *ModelController::getModelHandler()
 {
     tracein;
     logd("Get model handler for controller using name: %s", STR2CHA(mName));
     // TODO: fix me if this is not suitble
-    return DB->getModelHandler(getName());
+    return DB->getModelHandler(getMainModelHandlerName());
 }
 
 void ModelController::addListener(OnModelControllerListener *listener)
@@ -197,12 +204,12 @@ quint64 ModelController::getExportTypeList()
 
 }
 
-const QString ModelController::exportListPrebuiltTemplateName() const
+const QString ModelController::exportListPrebuiltTemplateName(const QString& modelName) const
 {
     return KPrebuiltDefaultExportTemplateName;
 }
 
-const QString ModelController::exportHtmlPrebuiltTemplateName() const
+const QString ModelController::exportHtmlPrebuiltTemplateName(const QString &modelName) const
 {
     return KPrebuiltCommonTemplateFileName;
 }
@@ -835,10 +842,13 @@ ErrCode ModelController::insertModelToCache(DbModel* model, bool clone)
 }
 
 
-const QString ModelController::exportTemplatePath(FileExporter *exporter, QString* ftype) const
+ErrCode ModelController::exportTemplatePath(
+                            FileExporter *exporter,
+                            const QString& name,
+                            QString& fpath,
+                            QString* ftype) const
 {
     tracein;
-    QString fpath;
     QString templateName;
     ErrCode err = ErrNone;
     if (exporter) {
@@ -846,11 +856,11 @@ const QString ModelController::exportTemplatePath(FileExporter *exporter, QStrin
         switch (exporter->getExportType()) {
         case EXPORT_CSV_LIST:
         case EXPORT_XLSX:
-            templateName = exportListPrebuiltTemplateName();
+            templateName = exportListPrebuiltTemplateName(name);
             if (ftype) *ftype = KFileTypeJson;
             break;
         case EXPORT_HTML:
-            templateName= exportHtmlPrebuiltTemplateName();
+            templateName= exportHtmlPrebuiltTemplateName(name);
             if (ftype) *ftype = KFileTypeHtml;
             break;
             // TODO: docx, text???
@@ -874,10 +884,12 @@ const QString ModelController::exportTemplatePath(FileExporter *exporter, QStrin
     }
     logd("fpath '%s'", STR2CHA(fpath));
     traceout;
-    return fpath;
+    return err;
 }
 
-ErrCode ModelController::getExportFileName(ExportType type, QString fnameNoExt, QString *fpath)
+ErrCode ModelController::getExportFileName(ExportType type,
+                                           QString fnameNoExt,
+                                           QString *fpath)
 {
     tracein;
     ErrCode ret = ErrNone;
@@ -896,7 +908,7 @@ ErrCode ModelController::getExportFileName(ExportType type, QString fnameNoExt, 
         }
     }
     if (ret == ErrNone) {
-        fname = QString("%1.%2").arg(fnameNoExt, ext);
+        fname = QString("%1.%2").arg(Utils::normalizeFileName(fnameNoExt), ext);
         logd("fname '%s'", STR2CHA(fname));
         if (fpath && fpath->isEmpty()) {
             *fpath = FileCtl::getTmpDataFile(fname);
@@ -925,7 +937,8 @@ ErrCode ModelController::getExportDataString(const QString &item, const DbModel 
     return err;
 }
 
-ErrCode ModelController::exportToFile(DbModel *model, ExportType type, QString *fpath)
+ErrCode ModelController::exportToFile(DbModel *model,
+                                      ExportType type, QString *fpath)
 {
     tracein;
     ErrCode ret = ErrNone;
@@ -943,6 +956,7 @@ ErrCode ModelController::exportToFile(DbModel *model, ExportType type, QString *
     }
     if (ret == ErrNone) {
         ret = ExportFactory::exportTo(model->getExporter(),
+                                      model->modelName(),
                                       *fpath, type);
     }
     // TODO: DbModel also has this function, redundant?????
@@ -950,7 +964,9 @@ ErrCode ModelController::exportToFile(DbModel *model, ExportType type, QString *
     return ret;
 }
 
-ErrCode ModelController::exportToFile(const QList<DbModel *>* listModel, ExportType type, QString *fpath)
+ErrCode ModelController::exportToFile(const QList<DbModel *>* listModel,
+                                      const QString& datatype,
+                                      ExportType type, QString *fpath)
 {
     tracein;
     ErrCode ret = ErrNone;
@@ -962,8 +978,9 @@ ErrCode ModelController::exportToFile(const QList<DbModel *>* listModel, ExportT
         ret = getExportFileName(type, getName(), fpath);
     }
     if (ret == ErrNone) {
-        logd("export file path %s", fpath?STR2CHA((*fpath)):"(unknown)");
-        ret = ExportFactory::exportTo(this, *listModel,
+        logd("export file path %s datatype '%s'",
+             fpath?STR2CHA((*fpath)):"(unknown)", STR2CHA(datatype));
+        ret = ExportFactory::exportTo(this, datatype, *listModel,
                                       *fpath, type);
     }
     // TODO: DbModel also has this function, redundant?????
@@ -979,6 +996,7 @@ ErrCode ModelController::onImportParseDataItem(const QString& importName, int im
     ErrCode ret = ErrNone;
     DbModel* model = doImportOneItem(importName, importFileType, items, idx);
     if (model != nullptr) {
+        logd("found one item %s", MODELSTR2CHA(model));
         if (outList != nullptr) {
             outList->append(model);
         } else {
@@ -1001,8 +1019,10 @@ ErrCode ModelController::onImportParseDataItem(const QString& importName, int im
 {
     tracein;
     ErrCode ret = ErrNone;
-    DbModel* model = doImportOneItem(importName, importFileType, items, idx);
+    DbModel* model = nullptr;
+    model = doImportOneItem(importName, importFileType, items, idx);
     if (model != nullptr) {
+        logd("found one item %s", MODELSTR2CHA(model));
         if (outList != nullptr) {
             outList->append(model);
         } else {
@@ -1029,13 +1049,66 @@ DbModel* ModelController::doImportOneItem(const QString& importName, int importF
     return nullptr;
 }
 
-DbModel *ModelController::doImportOneItem(const QString& importName, int importFileType, const QHash<QString, QString> &items, quint32 idx)
+DbModel *ModelController::doImportOneItem(const QString& importName,
+                                          int importFileType,
+                                          const QHash<QString, QString> &items,
+                                          quint32 idx)
 {
-    tracein;
-    loge("DEFAULT doImportOneItem, MUST BE IMPLEMENTED IN DERIVED CLASS");
-    FAIL("DEFAULT doImportOneItem, MUST BE IMPLEMENTED IN DERIVED CLASS");
-    // TODO: make it abstract????
-    return nullptr;
+
+    ErrCode err = ErrNone;
+    DbModel* model = nullptr;
+    logd("idx = %d", idx);
+    logd("importName = %s", STR2CHA(importName));
+    DbModelBuilder builder = DbModelFactory::getBuilder(importName);
+    if (builder) {
+        model = builder();
+        if (!model) {
+            err = ErrNoMemory;
+            loge("cannot allocate model, no mem?");
+        }
+    } else {
+        err = ErrNotSupport;
+        loge("import '%s' not support", STR2CHA(importName));
+    }
+    if (err == ErrNone) {
+        foreach (QString field, items.keys()) {
+            QString value = items.value(field);
+            logd("Import field %s", field.toStdString().c_str());
+            logd("Import value %s", value.toStdString().c_str());
+            err = model->onImportParseDataItem(importName,
+                                               importFileType,
+                                               field, value, idx);
+            if (err != ErrNone) {
+                loge("on import item failed, %d", err);
+                break;
+            }
+        }
+        if (err == ErrNone && model->nameId().isEmpty() && !model->name().isEmpty()) {
+//            QString nameid = Utils::UidFromName(model->name(), NO_VN_MARK_UPPER);
+            bool ok = false;
+            QString nameid = model->buildNameId(nullptr, &ok);
+            logd("auto buid nameid '%s'", STR2CHA(nameid));
+            // TODO: check if nameid exist
+            if (ok) {
+                model->setNameId(nameid);
+            } else {
+                err = ErrNoId;
+                loge("Failed to build nameid");
+            }
+            // TODO: numer is increased, but not save --> may cause much dummy code?
+        }
+    }
+
+    if (err != ErrNone) {
+        FREE_PTR(model);
+    }
+    traceout;
+    return model;
+}
+
+DbModelBuilder ModelController::getBuilder(const QString &modelName)
+{
+    return DbModelFactory::getBuilder(modelName);
 }
 
 DbModel* ModelController::allocMainModel()

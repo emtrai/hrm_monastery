@@ -41,7 +41,7 @@
 #include "workctl.h"
 #include "config.h"
 #include "prebuiltdefs.h"
-
+#include "controllerdefs.h"
 GET_INSTANCE_CONTROLLER_IMPL(PersonCtl)
 
 ErrCode PersonCtl::getListPersonInCommunity(const QString &communityUid, QList<DbModel *>& list, qint32 status)
@@ -340,25 +340,31 @@ ErrCode PersonCtl::filter(int catetoryid, qint64 opFlags,
     return err;
 }
 
-const QString PersonCtl::exportTemplatePath(FileExporter *exporter, QString* ftype) const
+ErrCode PersonCtl::exportTemplatePath(FileExporter *exporter,
+                                    const QString& name,
+                                    QString& fpath,
+                                    QString* ftype) const
 {
-    QString ret;
     tracein;
+    ErrCode ret = ErrNone;
     if (exporter) {
         logd("exporter type %d", exporter->getExportType());
         switch (exporter->getExportType()) {
         case EXPORT_CSV_LIST:
         case EXPORT_XLSX:
-            ret = FileCtl::getPrebuiltDataFilePath(KPrebuiltPersonListJSONTemplateFileName);
+            fpath = FileCtl::getPrebuiltDataFilePath(KPrebuiltPersonListJSONTemplateFileName);
             if (ftype) *ftype = KFileTypeJson;
             break;
         default:
             loge("unsupported export type %d", exporter->getExportType());
+            ret = ErrNotSupport;
             break;
         }
     } else {
         loge("empty exporter");
+        ret = ErrInvalidArg;
     }
+    traceout;
     return ret;
 }
 
@@ -381,7 +387,11 @@ ErrCode PersonCtl::exportListPersonInCommunity(const QString &communityUid, Expo
         if (items.length() > 0) {
             logi("found %ld person in community uid '%s', start export to '%s'",
                  items.length(), STR2CHA(communityUid), STR2CHA(fpath));
-            err = ExportFactory::exportTo(this, items, fpath, exportType);
+            err = ExportFactory::exportTo(this,
+                                          KModelNameCommPerson,
+                                          items,
+                                          fpath,
+                                          exportType);
         } else {
             err = ErrNoData;
             loge("nothing to export, no person in specified community uid '%s'", STR2CHA(communityUid));
@@ -398,7 +408,7 @@ quint64 PersonCtl::getExportTypeList()
 }
 
 PersonCtl::PersonCtl():
-    ModelController(KModelHdlPerson)
+    ModelController(KControllerPerson, KModelHdlPerson)
 {
     mEnableCache = false;
 }

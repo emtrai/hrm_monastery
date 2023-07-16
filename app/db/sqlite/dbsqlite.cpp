@@ -315,12 +315,10 @@ ErrCode_t DbSqlite::checkOrCreateAllTables()
 void DbSqlite::appendModelHandler(DbModelHandler *hdl)
 {
     tracein;
-    if (nullptr != hdl)
-    {
+    if (nullptr != hdl) {
+        logd("Append handler '%s'", STR2CHA(hdl->getName()));
         mModelHdlList[hdl->getName()] = hdl;
-    }
-    else
-    {
+    } else {
         // TODO: throw exception?????
     }
 }
@@ -393,13 +391,12 @@ DbModelHandler *DbSqlite::getModelHandler(const QString &name)
     tracein;
     if (mModelHdlList.contains(name)){
         hdl = mModelHdlList[name];
-    }
-    else{
+    } else{
         hdl = nullptr;
-        loge("Not found model %s", name.toStdString().c_str());
+        loge("Not found model %s", STR2CHA(name));
         // TODO: reload system? or what should we do?
     }
-
+    traceout;
     return hdl;
 }
 

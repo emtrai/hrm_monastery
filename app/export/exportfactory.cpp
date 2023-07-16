@@ -55,14 +55,17 @@ FileExporter *ExportFactory::getExporter(ExportType type)
     return ret;
 }
 
-ErrCode ExportFactory::exportTo(const DataExporter *item, const QString &fpath, ExportType type)
+ErrCode ExportFactory::exportTo(const DataExporter *item,
+                                const QString& datatype,
+                                const QString &fpath,
+                                ExportType type)
 {
     tracein;
     ErrCode ret = ErrNone;
     logi("Export to %d", type);
     FileExporter* exporter = getExporter(type);
     if (exporter != nullptr)
-        ret = exporter->saveTo(item, fpath);
+        ret = exporter->saveTo(item, datatype, fpath);
     else {
         ret = ErrNotSupport;
         loge("FileExporter %d not support", type);
@@ -70,17 +73,21 @@ ErrCode ExportFactory::exportTo(const DataExporter *item, const QString &fpath, 
     return ret;
 }
 
-ErrCode ExportFactory::exportTo(const DataExporter* item, QList<DbModel*> data, const QString &fpath, ExportType type)
+ErrCode ExportFactory::exportTo(const DataExporter* item,
+                                const QString& datatype,
+                                QList<DbModel*> data,
+                                const QString &fpath,
+                                ExportType type)
 {
     tracein;
     // TODO: add "tag" parameter here to input to getExporter/saveTo???
     // so that derived class can have more information to judge which data should be used.
     // TODO: add title? (title for export info)
     ErrCode ret = ErrNone;
-    logi("Export to %d", type);
+    logi("Export to %d, datatype '%s'", type, STR2CHA(datatype));
     FileExporter* exporter = getExporter(type);
     if (exporter != nullptr)
-        ret = exporter->saveTo(item, data, fpath);
+        ret = exporter->saveTo(item, datatype, data, fpath);
     else {
         ret = ErrNotSupport;
         loge("FileExporter %d not support", type);

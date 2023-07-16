@@ -191,6 +191,11 @@ public:
 
     virtual QWidget* getWidget();
 protected:
+    /**
+     * @brief List view has filter or not
+     * @return true if has filter
+     */
+    virtual bool hasFilters();
     virtual QString getTitle();
     virtual QStringList getHeader();
     virtual void showEvent(QShowEvent *ev);
@@ -205,10 +210,10 @@ protected:
      */
     virtual ErrCode onReload();
     virtual void importRequested(const QString& fpath);
-    virtual void onViewItem(UITableCellWidgetItem *item);
+    virtual ErrCode onViewItem(UITableCellWidgetItem *item);
     virtual void onEditItem(UITableCellWidgetItem *item);
-    virtual void onDeleteItem(const QList<UITableItem *>& selectedItems);
-    virtual void onAddItem(UITableCellWidgetItem *item);
+    virtual ErrCode onDeleteItem(const QList<UITableItem *>& selectedItems);
+    virtual ErrCode onAddItem(UITableCellWidgetItem *item);
 //    virtual void onDeleteItem(UITableItem *item);
 
     // MENU

@@ -39,7 +39,7 @@
 
 
 
-class Saint: public DbModel, public DataExporter, public IDataImporter
+class Saint: public DbModel
 {
     public:
         static DbModel* build();
@@ -53,7 +53,8 @@ class Saint: public DbModel, public DataExporter, public IDataImporter
                                      const QString& keyword, const QString& value,
                                      quint32 idx = 0, QList<DbModel *>* outList = nullptr);
 
-        QString modelName() const;
+        virtual QString modelName() const;
+
         qint64 feastDay() const;
         void setFeastDay(qint64 newFeastDay);
         void setFeastDay(const QString& newFeastDay, const QString& f = "D-M");

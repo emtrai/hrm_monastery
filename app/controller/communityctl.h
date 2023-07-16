@@ -73,13 +73,6 @@ protected:
 
     virtual const char* getPrebuiltFileName();
     virtual const char* getPrebuiltFileType();
-
-    /**
-     * @brief Default model handler
-     * @return
-     */
-    virtual DbModelHandler* getModelHandler();
-
     /**
      * @brief default/main builder
      * @return
@@ -95,7 +88,7 @@ protected:
      */
     virtual DbModel* onJsonParseOneItem(const QJsonObject& jobj, bool* ok = nullptr);
 
-    virtual const QString exportListPrebuiltTemplateName() const;
+    virtual const QString exportListPrebuiltTemplateName(const QString& modelName = nullptr) const;
 
     /**
      * @brief before import flow
@@ -122,7 +115,7 @@ protected:
      * @param idx
      * @return
      */
-    virtual DbModel* doImportOneItem(const QString& importName, int importFileType, const QHash<QString, QString>& items, quint32 idx);
+//    virtual DbModel* doImportOneItem(const QString& importName, int importFileType, const QHash<QString, QString>& items, quint32 idx);
 
 protected:
     QList<QString> mImportFields;// import fields/headers, main used in CSV importing

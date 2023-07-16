@@ -79,8 +79,12 @@ public:
             static void showAddEditPerson(bool isSelfUpdate = true, Person* per = nullptr, bool isNew = true);
             static void showAddEditCommunity(bool isSelfUpdate = true, Community* com = nullptr,
                                              CommonEditModelListener* listener = nullptr);
-            static void showImportDlg(ImportTarget target);
-            static void showOnHtmlViewer(DbModel* model, const QString& subject);
+            static ErrCode showImportDlg(ImportTarget target = IMPORT_TARGET_MAX,
+                                         ModelController* controller = nullptr,
+                                         const QString& modelName = nullptr,
+                                         const DbModel* targetModel = nullptr // import list will belong to this model
+                                         );
+            static ErrCode showOnHtmlViewer(DbModel* model, const QString& subject);
             static void showAddEditCommonModel(bool isSelfUpdate = true, DbModel* model = nullptr,
                                              CommonEditModelListener* listener = nullptr);
             static void showAddEditCourse(bool isSelfUpdate = true, DbModel* com = nullptr,
@@ -91,9 +95,11 @@ public:
                                              CommonEditModelListener* listener = nullptr);
             static void showAddEditEthnic(bool isSelfUpdate = true, DbModel* com = nullptr,
                                              CommonEditModelListener* listener = nullptr);
-            static ErrCode exportListItems(const QList<DbModel*>* items, ModelController* controller,
-                                    const QString& title = nullptr,
-                                    quint64 exportTypeList = 0 // List of supported export type, bitwise
+            static ErrCode exportListItems(const QList<DbModel*>* items,
+                                           const QString& datatype,
+                                           ModelController* controller,
+                                           const QString& title = nullptr,
+                                           quint64 exportTypeList = ExportType::EXPORT_XLSX // List of supported export type, bitwise
                                     );
             static ErrCode showProcessingDialog(const QString& title,
                                                 WaitPrepare_t prepare,
@@ -135,6 +141,10 @@ protected:
                                  CommonEditModelListener* listener = nullptr);
      void doShowImportPerson();
      void doShowImportCommunity();
+     ErrCode doShowCommonImport(ImportTarget target,
+                                ModelController* controller,
+                                const QString& modelName,
+                                const DbModel* targetModel = nullptr);
      void doShowAddEditCommonModel(bool isSelfUpdate = true, DbModel* model = nullptr,
                                         CommonEditModelListener* listener = nullptr);
      void doShowAddEditCourse(bool isSelfUpdate = true, DbModel* model = nullptr,
@@ -145,8 +155,12 @@ protected:
                                    CommonEditModelListener* listener = nullptr);
      void doShowAddEditEthnic(bool isSelfUpdate = true, DbModel* model = nullptr,
                                    CommonEditModelListener* listener = nullptr);
-     ErrCode doExportListItems(const QList<DbModel*>* items, ModelController* controller,
+
+     ErrCode doExportListItems(const QList<DbModel*>* items,
+                               const QString& datatype,
+                               ModelController* controller,
                                const QString& title = nullptr, quint64 exportTypeList = 0);
+
      ErrCode doShowProcessingDialog(const QString& title,
                                          WaitPrepare_t prepare,
                                          WaitRunt_t run,

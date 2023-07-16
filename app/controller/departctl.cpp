@@ -34,10 +34,11 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include "prebuiltdefs.h"
+#include "controllerdefs.h"
 
 GET_INSTANCE_CONTROLLER_IMPL(DepartCtl)
 
-DepartCtl::DepartCtl():ModelController(KModelHdlDept)
+DepartCtl::DepartCtl():ModelController(KControllerDept, KModelHdlDept)
 {
     tracein;
 }

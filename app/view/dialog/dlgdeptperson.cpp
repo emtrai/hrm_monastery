@@ -64,7 +64,7 @@ ErrCode DlgDeptPerson::buildModel(DbModel *model, QString &errMsg)
     if (err == ErrNone){
         perdep->setMarkModified(true); // start marking fields which are modified
     }
-    perdep->setModelStatus(MODEL_ACTIVE);
+    perdep->setModelStatus(MODEL_STATUS_ACTIVE);
     SET_VAL_FROM_TEXTBOX(ui->txtSearch, KItemUid, perdep->setPersonUid, perdep->setPersonName);
     SET_VAL_FROM_CBOX(ui->cbRole, perdep->setRoleUid, perdep->setRoleName, err);
     SET_VAL_FROM_CBOX(ui->cbTerm, perdep->setCourseUid, perdep->setCourseName, err);

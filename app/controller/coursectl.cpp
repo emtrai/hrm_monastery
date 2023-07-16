@@ -28,10 +28,11 @@
 #include "datetimeutils.h"
 #include "defs.h"
 #include "prebuiltdefs.h"
+#include "controllerdefs.h"
 
 GET_INSTANCE_CONTROLLER_IMPL(CourseCtl)
 
-CourseCtl::CourseCtl():ModelController(KModelHdlCourse)
+CourseCtl::CourseCtl():ModelController(KControllerCourse, KModelHdlCourse)
 {
     tracein;
 }

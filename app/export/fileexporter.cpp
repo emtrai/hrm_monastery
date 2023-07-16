@@ -30,7 +30,9 @@ FileExporter::FileExporter()
     tracein;
 }
 
-ErrCode FileExporter::saveTo(const DataExporter* exporter, const QString &fpath)
+ErrCode FileExporter::saveTo(const DataExporter* exporter,
+                             const QString& datatype,
+                             const QString &fpath)
 {
     tracein;
     loge("Not support export here");
@@ -38,7 +40,10 @@ ErrCode FileExporter::saveTo(const DataExporter* exporter, const QString &fpath)
     return ErrNotSupport;
 }
 
-ErrCode FileExporter::saveTo(const DataExporter* exporter, const QList<DbModel*> data, const QString &fpath)
+ErrCode FileExporter::saveTo(const DataExporter* exporter,
+                             const QString& datatype,
+                             const QList<DbModel*> data,
+                             const QString &fpath)
 {
     tracein;
     loge("Not support export list here");

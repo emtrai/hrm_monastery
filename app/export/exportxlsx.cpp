@@ -44,7 +44,9 @@ ExportXlsx::ExportXlsx()
 
 }
 
-ErrCode ExportXlsx::saveTo(const DataExporter *item, const QString &fpath)
+ErrCode ExportXlsx::saveTo(const DataExporter *item,
+                           const QString& datatype,
+                           const QString &fpath)
 {
     tracein;
     QXlsx::Document xlsx;
@@ -55,7 +57,10 @@ ErrCode ExportXlsx::saveTo(const DataExporter *item, const QString &fpath)
     return ErrNone;
 }
 
-ErrCode ExportXlsx::saveTo(const DataExporter *exporter, const QList<DbModel *> listData, const QString &fpath)
+ErrCode ExportXlsx::saveTo(const DataExporter *exporter,
+                           const QString& datatype,
+                           const QList<DbModel *> listData,
+                           const QString &fpath)
 {
 //    tracein;
 //    QXlsx::Document xlsx;
@@ -71,10 +76,10 @@ ErrCode ExportXlsx::saveTo(const DataExporter *exporter, const QList<DbModel *> 
     QStringList items;
     QString finalData;
     QXlsx::Document xlsx;
-    ret = exporter->getListTemplateExportKeywords(this, keywordMap);
+    ret = exporter->getListTemplateExportKeywords(this, datatype, keywordMap);
     if (keywordMap.isEmpty()) {
         ret = ErrInvalidData;
-        loge("Export HTML failed, not template found");
+        loge("Export xlsx failed, not template found");
     }
 
     if (ret == ErrNone) {

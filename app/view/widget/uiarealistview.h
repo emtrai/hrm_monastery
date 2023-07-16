@@ -34,6 +34,7 @@ public:
     virtual void setupUI();
 protected:
     virtual int getViewType() { return VIEW_AREA;}
+    virtual ImportTarget getImportTarget();
     void initHeader();
     void updateItem(DbModel *item, UITableItem *tblItem, int idx);
 
@@ -41,9 +42,9 @@ protected:
 
     virtual DbModel* onNewModel(const QString& modelName);
 
-    virtual void onAddItem(UITableCellWidgetItem *item);
+    virtual ErrCode onAddItem(UITableCellWidgetItem *item);
     virtual void onEditItem(UITableCellWidgetItem *item);
-    virtual void onDeleteItem(const QList<UITableItem *>& selectedItems);
+    virtual ErrCode onDeleteItem(const QList<UITableItem *>& selectedItems);
 
 
     virtual QList<UITableMenuAction*> getMenuSingleSelectedItemActions(const QMenu* menu,

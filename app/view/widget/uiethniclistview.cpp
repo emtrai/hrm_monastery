@@ -82,11 +82,12 @@ void UIEthnicListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
     traceout;
 }
 
-void UIEthnicListView::onAddItem(UITableCellWidgetItem *item)
+ErrCode UIEthnicListView::onAddItem(UITableCellWidgetItem *item)
 {
     tracein;
     MainWindow::showAddEditEthnic(true, nullptr, this);
     traceout;
+    return ErrNone;
 }
 
 void UIEthnicListView::onEditItem(UITableCellWidgetItem *item)

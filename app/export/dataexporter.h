@@ -33,14 +33,20 @@ class DataExporter
 public:
     DataExporter();
 
-    virtual const QString exportTemplatePath(FileExporter* exporter, QString* ftype = nullptr) const;
+    virtual ErrCode exportTemplatePath(FileExporter* exporter,
+                                       const QString& name,
+                                       QString& fpath,
+                                       QString* ftype = nullptr) const;
 
     /* list of export field, in map: id:name*/
-    virtual ErrCode getListTemplateExportKeywords(FileExporter *exporter, QList<QPair<QString,QString>>& outMap) const;
+    virtual ErrCode getListTemplateExportKeywords(FileExporter *exporter,
+                                                  const QString& datatype,
+                                                  QList<QPair<QString,QString>>& outMap) const;
 
     virtual const QStringList getListExportKeyWord() const;
     virtual ErrCode getExportDataString(const QString& item, QString* data) const;
 
+    virtual QString getName() = 0;
     /**
      * @brief Get data to be exported
      * @param[in] item keyword/data/item to be exported

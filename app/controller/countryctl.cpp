@@ -26,10 +26,11 @@
 #include "dbctl.h"
 #include "dbmodel.h"
 #include "prebuiltdefs.h"
+#include "controllerdefs.h"
 
 GET_INSTANCE_CONTROLLER_IMPL(CountryCtl)
 
-CountryCtl::CountryCtl():ModelController(KModelHdlCountry)
+CountryCtl::CountryCtl():ModelController(KControllerCountry, KModelHdlCountry)
 {
     tracein;
 }

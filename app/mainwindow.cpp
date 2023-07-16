@@ -57,6 +57,7 @@
 #include "backup/backupctl.h"
 #include "prebuiltdefs.h"
 #include "dialogutils.h"
+#include "dlgimportlistresultfactory.h"
 
 #define ADD_MENU_ITEM(menu, func, name, iconPath) \
 do { \
@@ -186,9 +187,13 @@ void MainWindow::showAddEditCommunity(bool isSelfUpdate, Community *com, CommonE
     traceout;
 }
 
-void MainWindow::showImportDlg(ImportTarget target)
+ErrCode MainWindow::showImportDlg(ImportTarget target,
+                                  ModelController* controller,
+                                  const QString& modelName,
+                                  const DbModel* targetModel)
 {
     tracein;
+    ErrCode err = ErrNone;
     logd("import target %d", target);
     switch (target) {
     case IMPORT_TARGET_PERSON:
@@ -197,22 +202,51 @@ void MainWindow::showImportDlg(ImportTarget target)
     case IMPORT_TARGET_COMMUNITY:
         getInstance()->doShowImportCommunity();
         break;
+    default:
+        logw("import target %d not support, use commone one", target);
+        err = getInstance()->doShowCommonImport(target, controller, modelName, targetModel);
+        break;
     }
     // TODO: return value to handle error case???
     // TODO: use function pointer instead?
-    traceout;
+    traceret(err);
+    return err;
 }
 
-void MainWindow::showOnHtmlViewer(DbModel *model, const QString& subject)
+ErrCode MainWindow::showOnHtmlViewer(DbModel *model, const QString& subject)
 {
+    tracein;
     QString fpath;
-    ErrCode ret = model->exportToFile(ExportType::EXPORT_HTML, &fpath);
-    if (QFile::exists(fpath)){
-        dlgHtmlViewer* viewer = new dlgHtmlViewer();
+    ErrCode ret = ErrNone;
+    dlgHtmlViewer* viewer = nullptr;
+    if (!model) {
+        ret = ErrInvalidArg;
+        loge("invalid argument");
+    }
+
+    if (ret == ErrNone) {
+        logd("export to html file");
+        ret = model->exportToFile(ExportType::EXPORT_HTML, &fpath);
+        logd("exported file '%s'", STR2CHA(fpath));
+    }
+
+    if (ret == ErrNone && !QFile::exists(fpath)){
+        loge("Export html file %s not exist", STR2CHA(fpath));
+        ret = ErrNotExist;
+    }
+    if (ret == ErrNone && ((viewer = new dlgHtmlViewer()) == nullptr)) {
+        loge("faie to allocate viewer dialog");
+        ret = ErrNoMemory;
+    }
+    if (ret == ErrNone) {
+        logd("show html viewer");
         viewer->setHtmlPath(fpath);
         viewer->setSubject(subject);
         viewer->exec();
     }
+    FREE_PTR(viewer);
+    traceret(ret);
+    return ret;
 }
 
 void MainWindow::showAddEditCommonModel(bool isSelfUpdate, DbModel *model, CommonEditModelListener *listener)
@@ -255,12 +289,13 @@ void MainWindow::showAddEditEthnic(bool isSelfUpdate, DbModel *com, CommonEditMo
 }
 
 ErrCode MainWindow::exportListItems(const QList<DbModel *>* items,
+                                    const QString& datatype,
                                     ModelController* controller,
                                     const QString& title, quint64 exportTypeList)
 {
     tracein;
     ErrCode err = ErrNone;
-    err = getInstance()->doExportListItems(items, controller, title, exportTypeList);
+    err = getInstance()->doExportListItems(items, datatype, controller, title, exportTypeList);
     traceret(err);
     return err;
 }
@@ -525,12 +560,69 @@ void MainWindow::doShowImportCommunity()
         ErrCode ret = COMMUNITYCTL->importFromFile(KModelHdlCommunity, ImportType::IMPORT_XLSX, fname, &list);
         logd("Import result %d", ret);
         logd("No of import item %d", list.count());
-        DlgImportCommunityListResult* dlg = new DlgImportCommunityListResult();
+        DlgImportListResult* dlg = nullptr;
+        err = DlgImportListResultFactory::getImportListResult(
+                            IMPORT_TARGET_COMMUNITY, &dlg, this);
         dlg->setup(list);
         dlg->exec();
         delete dlg;
     }
     traceout;
+}
+
+ErrCode MainWindow::doShowCommonImport(ImportTarget target,
+                                       ModelController *controller,
+                                       const QString &modelName,
+                                       const DbModel* targetModel)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    QList<DbModel*> list;
+    DlgImportListResult* dlg = nullptr;
+    logd("import for target %d", target);
+    logd("model name '%s'", STR2CHA(modelName));
+    // TODO: show dialog to select which type of file to be imported???
+    QString fname = QFileDialog::getOpenFileName(
+        this,
+        tr("Open file"),
+        FileCtl::getAppDataDir(),
+        tr("Excel (*.xlsx)"));
+    if (fname.isEmpty()) {
+        loge("no file name selected");
+        err = ErrNoFile;
+    }
+    if (err == ErrNone) {
+        logd("Import from file %s", STR2CHA(fname));
+        err = controller->importFromFile(modelName,
+                                        ImportType::IMPORT_XLSX, fname, &list);
+        logd("Import result %d", err);
+    }
+    if (err == ErrNone && list.size() == 0) {
+        loge("no data is imported");
+        err = ErrNoData;
+    }
+    if (err == ErrNone) {
+        logd("No of import item %d", list.size());
+        err = DlgImportListResultFactory::getImportListResult(target, &dlg, this);
+    }
+    if (err == ErrNone && !dlg) {
+        loge("cannot create dialog obj, no memory?");
+        err = ErrNoMemory;
+    }
+    if (err == ErrNone && targetModel) {
+        logd("set target model '%s'", MODELSTR2CHA(targetModel));
+        dlg->setTargetModel(targetModel);
+    }
+    if (err == ErrNone) {
+        logd("Set up list, no. item %d", list.size());
+        err = dlg->setup(list);
+    }
+    if (err == ErrNone) {
+        dlg->exec();
+    }
+    FREE_PTR(dlg);
+    traceret(err);
+    return err;
 }
 
 void MainWindow::doShowAddEditCommonModel(bool isSelfUpdate, DbModel *model, CommonEditModelListener *listener)
@@ -592,27 +684,50 @@ void MainWindow::doShowAddEditEthnic(bool isSelfUpdate, DbModel *model, CommonEd
     traceout;
 }
 
-ErrCode MainWindow::doExportListItems(const QList<DbModel *> *items, ModelController *controller,
-                                      const QString& title, quint64 exportTypeList)
+ErrCode MainWindow::doExportListItems(const QList<DbModel *> *items,
+                                      const QString& datatype,
+                                      ModelController *controller,
+                                      const QString& title,
+                                      quint64 exportTypeList)
 {
     tracein;
     ErrCode err = ErrNone;
     QString fpath;
     ExportType type;
-    DlgImportExportSelect* dlg = new DlgImportExportSelect(this);
-    dlg->setImportExport(true, title);
-    dlg->setExportTypes(exportTypeList);
-    dlg->exec();
-    fpath = dlg->path();
-    type = dlg->selectedExportType();
-    if (type && !fpath.isEmpty()) {
-        // TODO: show dialog???
-        // TODO: should get export type list basing on controller???
-        err = controller->exportToFile(items, type, &fpath);
-    } else {
-        loge("Not selected type nor fpath");
+    DlgImportExportSelect* dlg = nullptr;
+    if (err == ErrNone && !items) {
+        loge("invalid list item");
+        err = ErrInvalidArg;
     }
-    delete dlg;
+    if (err == ErrNone && !controller) {
+        loge("invalid lis controller");
+        err = ErrInvalidArg;
+    }
+    if (err == ErrNone) {
+        dlg = new DlgImportExportSelect(this);
+        if (!dlg) {
+            loge("fail to allocate DlgImportExportSelect");
+            err = ErrNoMemory;
+        }
+    }
+    logd("datatype '%s', exportTypeList %d controller '%s'",
+         STR2CHA(datatype), exportTypeList,
+         controller?STR2CHA(controller->getName()):"null");
+    if (err == ErrNone) {
+        dlg->setImportExport(true, title);
+        dlg->setExportTypes(exportTypeList);
+        dlg->exec();
+        fpath = dlg->path();
+        type = dlg->selectedExportType();
+        if (type && !fpath.isEmpty()) {
+            // TODO: show dialog???
+            // TODO: should get export type list basing on controller???
+            err = controller->exportToFile(items, datatype, type, &fpath);
+        } else {
+            loge("Not selected type nor fpath");
+        }
+    }
+    FREE_PTR(dlg);
     traceret(err);
     return err;
 }
@@ -1205,7 +1320,7 @@ void MainWindow::on_action_ExportPersonList_triggered()
     QList<DbModel*> list = PERSONCTL->getAllItemsFromDb();
 //    UNDER_DEV(tr("Xuất danh sách nữ tu ra tập tin"));
 //    doExportListItems(&list, PERSONCTL, "Danh sách nữ tu", ExportType::EXPORT_XLSX | ExportType::EXPORT_CSV_LIST);
-    doExportListItems(&list, PERSONCTL, "Danh sách nữ tu", ExportType::EXPORT_XLSX);
+    doExportListItems(&list, KModelNamePerson, PERSONCTL, "Danh sách nữ tu", ExportType::EXPORT_XLSX);
     RELEASE_LIST_DBMODEL(list);
 }
 
@@ -1214,7 +1329,7 @@ void MainWindow::on_action_ExportCommunityList_triggered()
     tracein;
     QList<DbModel*> list = COMMUNITYCTL->getAllItemsFromDb();
 //    UNDER_DEV(tr("Xuất danh sách nữ tu ra tập tin"));
-    doExportListItems(&list, COMMUNITYCTL, "Danh sách cộng đoàn", ExportType::EXPORT_XLSX);
+    doExportListItems(&list, KModelNameCommunity, COMMUNITYCTL, "Danh sách cộng đoàn", ExportType::EXPORT_XLSX);
     RELEASE_LIST_DBMODEL(list);
 }
 

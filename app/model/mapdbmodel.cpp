@@ -151,11 +151,67 @@ void MapDbModel::initExportFields()
     mExportCallbacks.insert(KItemStatus, [](const DbModel* model, const QString& item){
         return ((MapDbModel*)model)->modelStatusName();
     });
+    mExportCallbacks.insert(KItemStatusId, [](const DbModel* model, const QString& item){
+        return QString("%1").arg(((MapDbModel*)model)->modelStatus());
+    });
     mExportCallbacks.insert(KItemChangeHistory, [](const DbModel* model, const QString& item){
         return ((MapDbModel*)model)->changeHistory();
     });
     traceout;
 
+}
+
+void MapDbModel::initImportFields()
+{
+    tracein;
+    DbModel::initImportFields();
+    mImportCallbacks.insert(KItemStartDate, [this](const QString& value){
+        this->setStartDate(DatetimeUtils::dateFromString(value));
+        return ErrNone;
+    });
+    mImportCallbacks.insert(KItemEndDate, [this](const QString& value){
+        this->setEndDate(DatetimeUtils::dateFromString(value));
+        return ErrNone;
+    });
+    mImportCallbacks.insert(KItemStatus, [this](const QString& value){
+        if (this->modelStatusName().isEmpty()) {
+            this->setModelStatusName(value);
+        }
+        return ErrNone;
+    });
+    mImportCallbacks.insert(KItemStatusId, [this](const QString& value){
+        bool ok = false;
+        ErrCode ret = ErrNone;
+        quint64 status = value.toLong(&ok);
+        logd("status id %s", STR2CHA(value));
+        if (ok) {
+            QString name = DbModel::modelStatus2Name((DbModelStatus)status);
+            if (!name.isEmpty()) {
+                this->setModelStatus(status);
+                this->setModelStatusName(name);
+            } else {
+                loge("invalid status id %s", STR2CHA(value));
+                ret = ErrInvalidData;
+            }
+        } else {
+            loge("invalid status id %s", STR2CHA(value));
+            ret = ErrInvalidData;
+        }
+        return ret;
+    });
+    mImportCallbacks.insert(KItemChangeHistory, [this](const QString& value){
+        this->setChangeHistory(value);
+        return ErrNone;
+    });
+    mImportItemsType.insert(KItemChangeHistory,
+                            (IMPORT_ITEM_TYPE_UPDATE_DB));
+    mImportItemsType.insert(KItemStatusId,
+                            (IMPORT_ITEM_TYPE_MATCH_DB));
+    mImportItemsType.insert(KItemStartDate,
+                            (IMPORT_ITEM_TYPE_UPDATE_DB));
+    mImportItemsType.insert(KItemEndDate,
+                            (IMPORT_ITEM_TYPE_UPDATE_DB));
+    traceout;
 }
 
 const QString &MapDbModel::uid1() const

@@ -63,11 +63,12 @@ DbModel *UICourseListView::onNewModel(const QString& modelName)
     return Course::build();
 }
 
-void UICourseListView::onAddItem(UITableCellWidgetItem *item)
+ErrCode UICourseListView::onAddItem(UITableCellWidgetItem *item)
 {
     tracein;
     MainWindow::showAddEditCourse(true, nullptr, this);
     traceout;
+    return ErrNone;
 }
 
 void UICourseListView::onEditItem(UITableCellWidgetItem *item)
@@ -86,14 +87,15 @@ void UICourseListView::onEditItem(UITableCellWidgetItem *item)
     traceout;
 }
 
-void UICourseListView::onDeleteItem(const QList<UITableItem *> &selectedItems)
+ErrCode UICourseListView::onDeleteItem(const QList<UITableItem *> &selectedItems)
 {
     tracein;
     UNDER_DEV(tr("Xóa dữ liệu..."));
     traceout;
+    return ErrNotImpl;
 }
 
-void UICourseListView::onViewItem(UITableCellWidgetItem *item)
+ErrCode UICourseListView::onViewItem(UITableCellWidgetItem *item)
 {
     tracein;
     int idx = item->idx();
@@ -105,6 +107,7 @@ void UICourseListView::onViewItem(UITableCellWidgetItem *item)
         DialogUtils::showErrorBox("Không có thông tin để xem");
     }
     traceout;
+    return ErrNone;//TODO: check return value
 }
 
 QList<DbModel *> UICourseListView::getListItem()

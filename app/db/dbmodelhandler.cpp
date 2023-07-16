@@ -113,6 +113,31 @@ DbModel *DbModelHandler::getByNameId(const QString &nameId)
     return model;
 }
 
+DbModel *DbModelHandler::getByName(const QString &name,
+                                   const DbModelBuilder &builder,
+                                   bool firstOrLastMatch)
+{
+    tracein;
+    loge("Default one, do nothing");
+    return nullptr; // TODO: throw exception????
+}
+
+DbModel *DbModelHandler::getByName(const QString &name,
+                                   bool firstOrLastMatch)
+{
+    tracein;
+    DbModel *model = nullptr;
+    DbModelBuilder builder = getMainBuilder();
+    if (builder) {
+        model = getByName(name, builder, firstOrLastMatch);
+    } else {
+        loge("NO BUILDER, SHOULD NOT BE CALLED, MUST BE IMPLEMENTED BY DERIVED CLASS");
+    }
+    // TODO: throw exception???
+    traceout;
+    return model;
+}
+
 
 void DbModelHandler::addListener(onDbModelHandlerListener *listener)
 {

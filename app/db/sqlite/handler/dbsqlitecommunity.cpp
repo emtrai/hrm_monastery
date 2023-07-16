@@ -137,7 +137,7 @@ ErrCode DbSqliteCommunity::add(DbModel *model, bool notify)
                     commdept->setCommunityUid(model->uid());
                     commdept->setDepartmentUid(dept->uid());
                     commdept->setName(dept->name());
-                    commdept->setModelStatus(MODEL_ACTIVE);
+                    commdept->setModelStatus(MODEL_STATUS_ACTIVE);
                     logi("Add dept '%s' to community '%s'", STR2CHA(dept->toString()), STR2CHA(model->toString()));
                     err = commdept->save();
                     delete commdept;
@@ -293,7 +293,7 @@ ErrCode DbSqliteCommunity::addPerson2Community(const Community *comm,
             logd("found %d community which person uid belong to, set it as active", listCommunitiesOfPerson.size());
             foreach (DbModel* model, listCommunitiesOfPerson) {
                 newAdd = false;
-                tblCommPer->updateModelStatusInDb(model->uid(), MODEL_ACTIVE);
+                tblCommPer->updateModelStatusInDb(model->uid(), MODEL_STATUS_ACTIVE);
             }
         }
         RELEASE_LIST_DBMODEL(listCommunitiesOfPerson);
@@ -304,7 +304,7 @@ ErrCode DbSqliteCommunity::addPerson2Community(const Community *comm,
             if (listCommunitiesOfPerson.size() > 0) {
                 logd("found %d community which person uid belong to currently, change status to inactive", listCommunitiesOfPerson.size());
                 foreach (CommunityPerson* model, listCommunitiesOfPerson) {
-                    tblCommPer->updateModelStatusInDb(model->uid(), MODEL_INACTIVE);
+                    tblCommPer->updateModelStatusInDb(model->uid(), MODEL_STATUS_INACTIVE);
                 }
             }
             RELEASE_LIST(listCommunitiesOfPerson, CommunityPerson);
@@ -316,7 +316,7 @@ ErrCode DbSqliteCommunity::addPerson2Community(const Community *comm,
                                                                             status, startdate,
                                                                             enddate, remark);
             if (mapModel) {
-                mapModel->setModelStatus(MODEL_ACTIVE); // TODO: set active here is suitable???
+                mapModel->setModelStatus(MODEL_STATUS_ACTIVE); // TODO: set active here is suitable???
                 err = mapModel->save();
                 delete mapModel;
             } else {

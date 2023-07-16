@@ -20,14 +20,44 @@
  * Brief:
  */
 #include "baseview.h"
+#include "logger.h"
 
+
+BaseView::BaseView():
+    mData(nullptr),
+    mShowActionFunc(nullptr),
+    mFreeFunc(nullptr),
+    mShowActionFuncRunOnce(false)
+{
+    traced;
+}
+
+BaseView::~BaseView()
+{
+    tracein;
+    if (mFreeFunc && mData) {
+        mFreeFunc(mData);
+    }
+    mData = nullptr;
+    traceout;
+}
 
 void *BaseView::data() const
 {
     return mData;
 }
 
-void BaseView::setData(void *newData)
+void BaseView::setData(void *newData, FreeDataFunc_t freecb)
 {
+    tracein;
+    // free old data if exist
+    if (mData && mFreeFunc) {
+        mFreeFunc(mData);
+    }
+    if (!newData) {
+        logd("reset data");
+    }
     mData = newData;
+    mFreeFunc = freecb;
+    traceout;
 }

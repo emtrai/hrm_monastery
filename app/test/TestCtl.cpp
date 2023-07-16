@@ -73,7 +73,7 @@ Community* TestCtl::genRandomCommunity(){
     Community* commObj = (Community*)Community::build();
 
     commObj->setName(GetRandomName(2));
-    commObj->setModelStatus(DbModelStatus::MODEL_ACTIVE);
+    commObj->setModelStatus(DbModelStatus::MODEL_STATUS_ACTIVE);
     commObj->setCreateDate(QDateTime::currentMSecsSinceEpoch());
     commObj->dump();
 

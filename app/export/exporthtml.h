@@ -33,7 +33,7 @@ class ExportHtml : public FileExporter
     GET_INSTANCE_DECL(ExportHtml)
 public:
     ExportHtml();
-    virtual ErrCode saveTo(const DataExporter* item, const QString& fpath);
+    virtual ErrCode saveTo(const DataExporter* item, const QString& datatype, const QString& fpath);
     virtual ExportType getExportType();
 
 

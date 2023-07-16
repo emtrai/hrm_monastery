@@ -34,12 +34,13 @@ ExportHtml::ExportHtml()
     tracein;
 }
 
-ErrCode ExportHtml::saveTo(const DataExporter *item, const QString &fpath)
+ErrCode ExportHtml::saveTo(const DataExporter *item, const QString& datatype, const QString &fpath)
 {
     tracein;
     ErrCode ret = ErrNone;
     QString ftype;
-    const QString templatePath = item->exportTemplatePath(this, &ftype);
+    QString templatePath;
+    ret = item->exportTemplatePath(this, datatype, templatePath, &ftype);
     QStringList keywords = item->getListExportKeyWord();
     QString templateData;
 

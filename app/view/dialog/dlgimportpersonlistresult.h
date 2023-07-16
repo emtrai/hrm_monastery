@@ -32,7 +32,7 @@ public:
 
 protected:
     virtual void initHeader();
-    virtual QList<UIImportItem*>* getItems();
+    virtual ErrCode setWidgetItem(UIImportItem* wgitem, DbModel* item);
 };
 
 #endif // DLGIMPORTPERSONLISTRESULT_H

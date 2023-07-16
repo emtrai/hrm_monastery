@@ -36,24 +36,43 @@ void DlgImportCommunityListResult::initHeader()
     mHeader.append(tr("Địa chỉ"));
     mHeader.append(tr("Điện thoại"));
     mHeader.append(tr("Email"));
+    traceout;
 }
 
-QList<UIImportItem *> *DlgImportCommunityListResult::getItems()
+QList<UIImportItem *> DlgImportCommunityListResult::getItems(bool* ok)
 {
     tracein;
-    QList<UIImportItem *> *items = new QList<UIImportItem *>();
+    QList<UIImportItem *> items;
+    ErrCode err = ErrNone;
+    int cnt = 0;
     foreach (DbModel* item, mList) {
+        if (!item) {
+            err = ErrInvalidData;
+            loge("data at %d invalid, in list but null data", cnt);
+            break;
+        }
         Community* comm = (Community*)item;
         comm->dump();
         UIImportItem* wgitem = UIImportItem::build(item);
+        if (!wgitem) {
+            loge("no memory at element %d", cnt);
+            err = ErrNoMemory;
+            break;
+        }
         wgitem->addValue(comm->nameId());
         wgitem->addValue(comm->name());
         wgitem->addValue(comm->addr());
         wgitem->addValue(comm->tel());
         wgitem->addValue(comm->email());
         // TODO: add more information??
-        items->append(wgitem);
+        items.append(wgitem);
+        cnt++;
     }
+    if (err != ErrNone) {
+        loge("invalid data for import err=%d", err);
+        RELEASE_LIST(items, UIImportItem);
+    }
+    if (ok) *ok = (err == ErrNone);
     traceout;
     return items;
 }

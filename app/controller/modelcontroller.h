@@ -35,11 +35,12 @@ public:
      * @brief constructor
      * @param name controller name, should be same as model handler name??
      */
-    ModelController(const QString& name);
+    ModelController(const QString& name, const QString& hdlName);
     ModelController(const ModelController&) = delete; // not allow copy constructor
     virtual void init();
 
     virtual QString getName();
+    virtual QString getMainModelHandlerName();
 
     virtual DbModelHandler* getModelHandler();
 
@@ -174,7 +175,10 @@ public:
      * @return err code
      */
     virtual ErrCode exportToFile(DbModel* model, ExportType type, QString* fpath = nullptr) ;
-    virtual ErrCode exportToFile(const QList<DbModel*>* listModel, ExportType type, QString* fpath = nullptr);
+    virtual ErrCode exportToFile(const QList<DbModel*>* listModel,
+                                 const QString& datatype,
+                                 ExportType type,
+                                 QString* fpath = nullptr);
     virtual void reloadDb();
 protected:
     /**
@@ -187,14 +191,17 @@ protected:
      * @brief get prebuilt template name
      * @return prebuilt template name, empty if not support
      */
-    virtual const QString exportListPrebuiltTemplateName() const;
-    virtual const QString exportHtmlPrebuiltTemplateName() const;
+    virtual const QString exportListPrebuiltTemplateName(const QString& modelName = nullptr) const;
+    virtual const QString exportHtmlPrebuiltTemplateName(const QString &modelName = nullptr) const;
     /**
      * @brief path to template file for export
      * @param exporter
      * @return
      */
-    virtual const QString exportTemplatePath(FileExporter* exporter, QString* ftype = nullptr) const;
+    virtual ErrCode exportTemplatePath(FileExporter* exporter,
+                                       const QString& name,
+                                       QString& fpath,
+                                       QString* ftype = nullptr) const;
 
     /**
      * @brief get path to export file
@@ -232,6 +239,7 @@ protected:
      * @return
      */
     virtual DbModelBuilder getMainBuilder() = 0;
+    virtual DbModelBuilder getBuilder(const QString& modelName);
 
     /**
      * @brief allocate model using main builder
@@ -306,6 +314,7 @@ protected slots:
     void onModelControllerDataUpdated(const DbModel *model);
 protected:
     QString mName;
+    QString mMainModelHandlerName;
     bool mEnableCache;
     // cached item list, must clone data from cache, not get from it directly!!!!
     QHash<QString, DbModel*> mCacheItemList;

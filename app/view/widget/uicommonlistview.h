@@ -29,15 +29,32 @@
 #include "modelcontroller.h"
 #include "dlgcommoneditmodel.h"
 
+enum ImportTarget;
+
 class UICommonListView : public UITableView, public CommonEditModelListener, public OnModelControllerListener
 {
 public:
     explicit UICommonListView(QWidget *parent = nullptr);
     virtual ~UICommonListView();
     virtual void setupUI();
+    ErrCode setParentModel(const DbModel *newParentModel);
+
+    DbModel *parentModel() const;
+
 protected:
+    virtual QList<UITableMenuAction*> getMenuCommonActions(const QMenu* menu);
+    virtual bool hasImportMenuItem();
+    virtual ImportTarget getImportTarget();
+    virtual ModelController* importController();
+    virtual bool hasExportMenuItem();
+    virtual ModelController* exportController();
     virtual QList<UITableItem*> getListItem(qint32 page, qint32 perPage, qint32 totalPages);
     virtual qint32 getTotalItems();
+
+    /**
+     * @brief get list of item to show on list view
+     * @return list of item to show on listview
+     */
     virtual QList<DbModel*> getListItem();
     virtual ModelController* getController();
     virtual ErrCode onLoad();
@@ -46,8 +63,8 @@ protected:
     virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
     virtual void initFilterFields();
     virtual QHash<QString, QString> getFilterKeywords(int fieldId, const QString& fieldText);
-    virtual void onViewItem(UITableCellWidgetItem *item);
-    virtual void onAddItem(UITableCellWidgetItem *item);
+    virtual ErrCode onViewItem(UITableCellWidgetItem *item);
+    virtual ErrCode onAddItem(UITableCellWidgetItem *item);
     virtual void onEditItem(UITableCellWidgetItem *item);
 
     virtual void onDbModelReady(ErrCode ret, DbModel* model, DlgCommonEditModel* dlg);
@@ -62,8 +79,13 @@ protected:
             mItemList.append((DbModel*) item);
         }
     }
+    virtual ErrCode onMenuActionImport(QMenu* menu, UITableMenuAction* act);
+    virtual ErrCode onMenuActionExport(QMenu *menu, UITableMenuAction *act);
 protected:
     QList<DbModel*> mItemList;
+    DbModel* mParentModel; //
+    bool mHasImportMenu;
+    bool mHasExportMenu;
 };
 
 #endif // UICOMMONLISTVIEW_H

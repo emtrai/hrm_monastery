@@ -27,11 +27,12 @@
 #include "utils.h"
 #include "defs.h"
 #include "prebuiltdefs.h"
+#include "controllerdefs.h"
 
 GET_INSTANCE_CONTROLLER_IMPL(PersonStatusCtl)
 
 PersonStatusCtl::PersonStatusCtl():
-    ModelController(KModelHdlPersonStatus)
+    ModelController(KControllerPersonStatus, KModelHdlPersonStatus)
 {
     tracein;
 }

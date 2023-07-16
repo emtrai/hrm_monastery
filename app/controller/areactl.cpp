@@ -30,10 +30,12 @@
 #include "dbareamodelhandler.h"
 #include "errreporterctl.h"
 #include "prebuiltdefs.h"
+#include "controllerdefs.h"
+
 
 GET_INSTANCE_CONTROLLER_IMPL(AreaCtl)
 
-AreaCtl::AreaCtl():ModelController(KModelHdlArea)
+AreaCtl::AreaCtl():ModelController(KControllerArea, KModelHdlArea)
 {
     tracein;
 }
@@ -177,3 +179,16 @@ DbModelBuilder AreaCtl::getMainBuilder()
     return &Area::build;
 }
 
+const QString AreaCtl::exportListPrebuiltTemplateName(const QString &modelName) const
+{
+    tracein;
+    QString fpath;
+    logd("model name '%s'", STR2CHA(modelName));
+    if (modelName == KModelNameAreaPerson) {
+        fpath = KPrebuiltAreaContactExportTemplateName;
+    } else {
+        fpath = ModelController::exportListPrebuiltTemplateName(modelName);
+    }
+    traceout;
+    return fpath;
+}

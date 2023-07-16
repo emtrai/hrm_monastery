@@ -48,6 +48,7 @@ protected:
     virtual const char* getPrebuiltFileName();
 
     virtual DbModelBuilder getMainBuilder();
+    virtual const QString exportListPrebuiltTemplateName(const QString& modelName = nullptr) const;
 
 };
 

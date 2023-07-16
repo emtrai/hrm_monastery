@@ -92,7 +92,7 @@ public:
 
     QString getFullName() const;
     QString fullName() const;
-    QString displayName();
+    QString displayName() const;
     ErrCode fromCSVFile(const QString& fname);
 
     virtual DataExporter* getExporter();
@@ -374,12 +374,12 @@ public:
     void setFeastDay(const QString& newFeastDay,
                      const QString& format = DEFAULT_FORMAT_MD);
 
-    virtual ErrCode onImportParseDataItem(const QString& importName,
-                                 int importFileType,
-                                 const QString& keyword,
-                                 const QString& value,
-                                 quint32 idx = 0,
-                                 QList<DbModel *>* outList = nullptr);
+//    virtual ErrCode onImportParseDataItem(const QString& importName,
+//                                 int importFileType,
+//                                 const QString& keyword,
+//                                 const QString& value,
+//                                 quint32 idx = 0,
+//                                 QList<DbModel *>* outList = nullptr);
 
     const QString &communityUid() const;
     void setCommunityUid(const QString &newCommunityUid);
@@ -449,7 +449,10 @@ public:
 protected:
     virtual void check2ReloadPersonEventList(bool reload = false);
     virtual DbModelHandler *getDbModelHandler() const;
-    virtual const QString exportTemplatePath(FileExporter* exporter, QString* ftype = nullptr) const;
+    virtual ErrCode exportTemplatePath(FileExporter* exporter,
+                                       const QString& name,
+                                       QString& fpath,
+                                       QString* ftype = nullptr) const;
 
     virtual ErrCode prepare2Save();
 

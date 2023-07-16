@@ -66,6 +66,8 @@ typedef enum ErrCode {
     ErrFileOp,
     ErrNotAllow,
     ErrPermDenied,
+    ErrNoId,
+    ErrNoFile,
     ErrMax
     } ErrCode_t;
 

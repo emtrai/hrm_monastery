@@ -34,6 +34,7 @@
 
 UITableView::UITableView(QWidget *parent) :
     QFrame(parent),
+    BaseView(),
     ui(new Ui::UITableView),
     mFpDataReq(nullptr),
     mFpTotalDataReq(nullptr),
@@ -72,6 +73,7 @@ QStringList UITableView::getHeader()
 void UITableView::setupUI()
 {
     tracein;
+    BaseView::setupUI();
     if (mHeader.empty())
         initHeader();
     ui->tblList->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -87,9 +89,15 @@ void UITableView::setupUI()
 
     setTitle(getTitle());
 
-    loadFilterFields();
-    int key = ui->cbCategory->currentData().toInt();
-    loadFilterOperators(key);
+    if (hasFilters()) {
+        logd("has filters, load filters");
+        loadFilterFields();
+        int key = ui->cbCategory->currentData().toInt();
+        loadFilterOperators(key);
+    } else {
+        ui->wgFilter->setVisible(false);
+        logd("no filter for listview");
+    }
     traceout;
 }
 
@@ -206,10 +214,12 @@ void UITableView::importRequested(const QString& fpath)
     tracein;
 }
 
-void UITableView::onViewItem(UITableCellWidgetItem *item)
+ErrCode UITableView::onViewItem(UITableCellWidgetItem *item)
 {
     tracein;
     logd("parent class, nothing to do");
+    traceout;
+    return ErrNoData;
 }
 
 void UITableView::onEditItem(UITableCellWidgetItem *item)
@@ -219,7 +229,7 @@ void UITableView::onEditItem(UITableCellWidgetItem *item)
 
 }
 
-void UITableView::onDeleteItem(const QList<UITableItem *>& selectedItems)
+ErrCode UITableView::onDeleteItem(const QList<UITableItem *>& selectedItems)
 {
     tracein;
     ErrCode err = ErrNone;
@@ -283,12 +293,14 @@ void UITableView::onDeleteItem(const QList<UITableItem *>& selectedItems)
     mSuspendReloadOnDbUpdate = false;
     reload();
     traceout;
+    return err;
 }
 
-void UITableView::onAddItem(UITableCellWidgetItem *item)
+ErrCode UITableView::onAddItem(UITableCellWidgetItem *item)
 {
     tracein;
     logd("parent class, nothing to do");
+    return ErrNone;
 }
 
 
@@ -302,6 +314,7 @@ QMenu* UITableView::buildPopupMenu(UITableCellWidgetItem* wgitem, const QList<UI
     mMenu->clear();
 
     QList<UITableMenuAction*> actions = getMenuCommonActions(mMenu);
+    // TODO: cache actions for later use, to improve performance
 
     if (items.count() > 1){
         actions.append(UITableMenuAction::buildSeparateAction());
@@ -346,17 +359,24 @@ QMenu* UITableView::buildPopupMenu(UITableCellWidgetItem* wgitem, const QList<UI
 QList<UITableMenuAction *> UITableView::getMenuCommonActions(const QMenu* menu)
 {
     tracein;
+    ErrCode err = ErrNone;
     QList<UITableMenuAction*> actionList;
+    if (!menu) {
+        loge("invalid arg");
+        err = ErrInvalidArg;
+    }
 
-    actionList.append(UITableMenuAction::build(tr("Thêm"), this)
-                        ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
-                                return this->onMenuActionAdd(m, a);
-                          }));
+    if (err == ErrNone) {
+        actionList.append(UITableMenuAction::build(tr("Thêm"), this)
+                            ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                    return this->onMenuActionAdd(m, a);
+                              }));
 
-    actionList.append(UITableMenuAction::build(tr("Cập nhật thông tin (refresh)"), this)
-                                                               ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
-                                                                   return this->onMenuActionReload(m, a);
-                                                               }));
+        actionList.append(UITableMenuAction::build(tr("Cập nhật thông tin (refresh)"), this)
+                                                                   ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                                                       return this->onMenuActionReload(m, a);
+                                                                   }));
+    }
     return actionList;
 }
 
@@ -400,20 +420,42 @@ QList<UITableMenuAction *> UITableView::getMenuMultiSelectedItemActions(const QM
 ErrCode UITableView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act)
 {
     tracein;
-    onAddItem((UITableCellWidgetItem*)act->tblItem());
-    return ErrNone;
+    ErrCode err = ErrNone;
+    if (!act || !menu) {
+        err = ErrInvalidArg;
+        loge("invalid argument");
+    }
+    if (err == ErrNone) {
+        err = onAddItem((UITableCellWidgetItem*)act->tblItem());
+    }
+    traceret(err);
+    return err;
 }
 
 ErrCode UITableView::onMenuActionDelete(QMenu *menu, UITableMenuAction *act)
 {
     tracein;
-    if (act) {
-        onDeleteItem(act->itemList());
-    } else {
+    ErrCode err = ErrNone;
+
+    if (!act) {
         loge("No menu action for delete!");
+        err = ErrInvalidArg;
     }
-//    onDeleteItem((UITableCellWidgetItem*)act->tblItem());
-    return ErrNone;
+    if (err == ErrNone && act->itemList().size() == 0) {
+        loge("No cell item data to delete");
+        err = ErrInvalidData;
+    }
+
+    if (err == ErrNone) {
+        err = onDeleteItem(act->itemList());
+    }
+
+    if (err != ErrNone) {
+        loge("delete model err %d", err);
+        DialogUtils::showErrorBox(err, tr("Lỗi xóa dữ liệu"));
+    }
+    traceret(err);
+    return err;
 }
 
 
@@ -434,11 +476,22 @@ ErrCode UITableView::onMenuActionView(QMenu *menu, UITableMenuAction *act)
 {
     tracein;
     ErrCode err = ErrNone;
-    if (act) {
-        onViewItem((UITableCellWidgetItem*)act->tblItem());
-    } else {
+    if (!act) {
         loge("Menu action is null!!!");
+        err = ErrInvalidArg;
+    }
+    if (err == ErrNone && !act->tblItem()) {
+        loge("No cell item data");
         err = ErrInvalidData;
+    }
+
+    if (err == ErrNone) {
+        err = onViewItem((UITableCellWidgetItem*)act->tblItem());
+    }
+
+    if (err != ErrNone) {
+        loge("view err %d", err);
+        DialogUtils::showErrorBox(err, tr("Không hiển thị được thông tin"));
     }
     traceout;
     return err;
@@ -495,7 +548,6 @@ void UITableView::appendFilterField(int id, const QString &txt)
 
 void UITableView::initFilterFields()
 {
-    tracein;
     logi("Default init filter field, do nothing");
 }
 
@@ -580,6 +632,11 @@ ErrCode UITableView::addFilter(const QString &filterItem, const QString &keyword
 QWidget *UITableView::getWidget()
 {
     return this;
+}
+
+bool UITableView::hasFilters()
+{
+    return true;
 }
 
 qint32 UITableView::itemPerPage() const
@@ -740,7 +797,13 @@ void UITableView::setCurrentPage(quint32 newCurrentPage)
 void UITableView::on_tblList_itemDoubleClicked(QTableWidgetItem *item)
 {
     tracein;
-    onViewItem((UITableCellWidgetItem*)item);
+    ErrCode err = onViewItem((UITableCellWidgetItem*)item);
+
+    if (err != ErrNone) {
+        loge("double click to view err %d", err);
+        DialogUtils::showErrorBox(err, tr("Không hiển thị được thông tin"));
+    }
+    traceout;
 }
 
 

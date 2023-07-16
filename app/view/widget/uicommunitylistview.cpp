@@ -105,7 +105,7 @@ ErrCode UICommunityListView::onMenuActionImport(QMenu *menu, UITableMenuAction *
 {
     tracein;
     ErrCode ret = ErrNone;
-    MainWindow::showImportDlg(IMPORT_TARGET_COMMUNITY);
+    ret = MainWindow::showImportDlg(IMPORT_TARGET_COMMUNITY);
     traceret(ret);
     return ret;
 }
@@ -152,7 +152,7 @@ ErrCode UICommunityListView::onMenuActionAddDepart(QMenu *menu, UITableMenuActio
     return err;
 }
 
-void UICommunityListView::onViewItem(UITableCellWidgetItem *item)
+ErrCode UICommunityListView::onViewItem(UITableCellWidgetItem *item)
 {
     tracein;
     int idx = item->idx();
@@ -164,6 +164,7 @@ void UICommunityListView::onViewItem(UITableCellWidgetItem *item)
         DialogUtils::showErrorBox("Không có thông tin để xem");
     }
     traceout;
+    return ErrNone;//TODO: check to return value
 }
 
 
@@ -231,7 +232,7 @@ ErrCode UICommunityListView::onMenuActionListAllPerson(QMenu *menu, UITableMenuA
     ErrCode ret = ErrNone;
     Community* community = dynamic_cast<Community*>(act->getData());
     if (community != nullptr) {
-        UIPeopleInCommunityListView* view = (UIPeopleInCommunityListView*)UITableViewFactory::getView(ViewType::VIEW_COMMUNITY_PERSON_LIST);
+        UIPeopleInCommunityListView* view = (UIPeopleInCommunityListView*)UITableViewFactory::getView(ViewType::VIEW_PEOPLE_IN_COMMUNITY_LIST);
 
         logd("community to view person %s", STR2CHA(community->toString()));
         view->setCommunity(community);
@@ -398,7 +399,7 @@ ErrCode UICommunityListView::onMenuActionExportListPerson(QMenu *menu, UITableMe
         QList<DbModel*> items;
         err = PERSONCTL->getListPersonInCommunity(community->uid(), items);
         if (!items.empty()) {
-            err = MainWindow::exportListItems(&items, PERSONCTL, tr("Xuất danh sách nữ tu"), EXPORT_XLSX);
+            err = MainWindow::exportListItems(&items, KModelNamePerson, PERSONCTL, tr("Xuất danh sách nữ tu"), EXPORT_XLSX);
             RELEASE_LIST_DBMODEL(items);
         } else {
             logw("nothing to export");
@@ -419,7 +420,7 @@ ErrCode UICommunityListView::onMenuActionExportListCommunity(QMenu *menu, UITabl
     ErrCode err = ErrNone;
     QList<DbModel*> list = COMMUNITYCTL->getAllItemsFromDb();
     if (!list.empty()) {
-        err = MainWindow::exportListItems(&list, COMMUNITYCTL, tr("Xuất danh sách cộng đoàn"), EXPORT_XLSX);
+        err = MainWindow::exportListItems(&list, KModelNameCommunity, COMMUNITYCTL, tr("Xuất danh sách cộng đoàn"), EXPORT_XLSX);
     } else {
         logw("nothing to export");
     }

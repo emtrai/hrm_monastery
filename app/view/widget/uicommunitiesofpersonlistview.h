@@ -44,7 +44,7 @@ public:
     ErrCode setPerson(const Person *per);
 
 protected:
-    virtual int getViewType() { return VIEW_PERSON_COMMUNITY_LIST;}
+    virtual int getViewType() { return VIEW_COMMUNITIES_OF_PERSON_LIST;}
     virtual void initHeader();
     virtual QString getTitle();
     virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
@@ -53,8 +53,8 @@ protected:
                                                                        const QList<UITableItem *>& items);
     virtual ErrCode onMenuActionListPerson(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionListDepartment(QMenu* menu, UITableMenuAction* act);
-    virtual void onViewItem(UITableCellWidgetItem *item);
-    virtual void onAddItem(UITableCellWidgetItem *item);
+    virtual ErrCode onViewItem(UITableCellWidgetItem *item);
+    virtual ErrCode onAddItem(UITableCellWidgetItem *item);
     virtual void onEditItem(UITableCellWidgetItem *item);
 
 protected:

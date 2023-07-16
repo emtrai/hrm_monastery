@@ -41,10 +41,11 @@
 #include "departctl.h"
 #include "jsondefs.h"
 #include "prebuiltdefs.h"
+#include "controllerdefs.h"
 
 GET_INSTANCE_CONTROLLER_IMPL(CommunityDeptCtl)
 
-CommunityDeptCtl::CommunityDeptCtl():ModelController(KModelHdlCommDept)
+CommunityDeptCtl::CommunityDeptCtl():ModelController(KControllerCommDept, KModelHdlCommDept)
 {
     tracein;
 }
@@ -292,11 +293,6 @@ const char *CommunityDeptCtl::getPrebuiltFileName()
 const char *CommunityDeptCtl::getPrebuiltFileType()
 {
     return KFileTypeJson;
-}
-
-DbModelHandler *CommunityDeptCtl::getModelHandler()
-{
-    return DB->getModelHandler(KModelHdlCommDept);
 }
 
 DbModelBuilder CommunityDeptCtl::getMainBuilder()

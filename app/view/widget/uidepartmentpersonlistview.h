@@ -47,8 +47,8 @@ protected:
     virtual DbModel* onNewModel(const QString& modelName);
     virtual QString getTitle();
 
-    virtual void onViewItem(UITableCellWidgetItem *item);
-    virtual void onAddItem(UITableCellWidgetItem *item);
+    virtual ErrCode onViewItem(UITableCellWidgetItem *item);
+    virtual ErrCode onAddItem(UITableCellWidgetItem *item);
     virtual void onEditItem(UITableCellWidgetItem *item);
 
 protected:

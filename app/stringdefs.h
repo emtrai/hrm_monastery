@@ -29,6 +29,7 @@
 #define STR_IGNORE      QObject::tr("Bỏ qua")
 #define STR_HELP        QObject::tr("Giúp đỡ")
 
+#define STR_CONTACT        QObject::tr("Liên hệ")
 #define STR_ADDR        QObject::tr("Địa chỉ")
 #define STR_TEL         QObject::tr("Điện thoại")
 #define STR_EMAIL       QObject::tr("Email")
@@ -39,6 +40,7 @@
 
 #define STR_NAMEID          QObject::tr("Tên định danh")
 #define STR_PERSON_NAMEID   QObject::tr("Tên định danh Nữ tu")
+#define STR_NU_TU     QObject::tr("Nữ tu")
 #define STR_NAME            QObject::tr("Tên")
 #define STR_HOLLYNAME       QObject::tr("Tên Thánh")
 #define STR_FULLNAME        QObject::tr("Họ tên")
@@ -47,10 +49,15 @@
 
 #define STR_COMMUNITY   QObject::tr("Cộng đoàn")
 #define STR_ROLE        QObject::tr("Vai trò")
+#define STR_ROLE_ID        QObject::tr("Mã vai trò")
 #define STR_UNKNOWN     QObject::tr("Không rõ")
-#define STR_COURSE      QObject::tr("Nhiệm kỳ")
+#define STR_COURSE      QObject::tr("Khóa")
+#define STR_COURSE_ID      QObject::tr("Mã khóa")
+#define STR_TERM      QObject::tr("Nhiệm kỳ")
+#define STR_TERM_ID      QObject::tr("Mã nhiệm kỳ")
 #define STR_MODELSTATUS QObject::tr("Tình trạng")
 #define STR_STATUS      QObject::tr("Trạng thái")
+#define STR_STATUS_ID      QObject::tr("Mã trạng thái")
 
 #define STR_DATE        QObject::tr("Ngày")
 #define STR_STARTDATE        QObject::tr("Ngày bắt đầu")
@@ -58,5 +65,12 @@
 #define STR_EVENT     QObject::tr("Sự kiện")
 #define STR_TITLE     QObject::tr("Tiêu đề")
 #define STR_CHANGE_COMMUNITY     QObject::tr("Đổi cộng đoàn")
+
+#define STR_IMPORT_FROM_FILE     QObject::tr("Nhập từ tập tin")
+#define STR_EXPORT_TO_FILE     QObject::tr("Xuất ra tập tin")
+
+#define STR_AREA     QObject::tr("Khu vực")
+#define STR_DATA_EXISTED     QObject::tr("Dữ liệu đã tồn tại")
+#define STR_DATA_ERROR     QObject::tr("Dữ liệu lỗi")
 
 #endif // STRINGDEFS_H

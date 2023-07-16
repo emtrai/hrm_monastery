@@ -25,27 +25,56 @@
 #include "uicommonlistview.h"
 
 class Area;
+/**
+ * @brief UI List of contact people of an area
+ */
 class UIAreaContactPeopleListView : public UICommonListView
 {
 public:
     explicit UIAreaContactPeopleListView(QWidget *parent = nullptr);
     virtual ~UIAreaContactPeopleListView();
 
+    /**
+     * @brief area
+     *        Caller must not free returned value.
+     *        If want to change returned value, clone it wit \ref CLONE_DBMODEL
+     * @return
+     */
     Area *area() const;
-    void setArea(const Area *newArea);
+    /**
+     * @brief Set area
+     * @param newArea, will be cloned to this object, caller can freely control assigned value
+     */
+    ErrCode setArea(const Area *newArea);
+
     virtual void setupUI();
 
 protected:
     virtual int getViewType() { return VIEW_AREA_PERSON;}
+    virtual QString getMainModelName();
     virtual void initHeader();
+    virtual ImportTarget getImportTarget();
     virtual QString getTitle();
+    virtual void initFilterFields();
+    virtual ModelController* getController();
+    /**
+     * @brief add one item of list
+     * @param item
+     * @param tblItem
+     * @param idx
+     */
     virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
+
+    /**
+     * @brief get list of item to show on list view
+     * @return list of item to show on listview
+     */
     virtual QList<DbModel*> getListItem();
 
-    virtual void onAddItem(UITableCellWidgetItem *item);
+    virtual ErrCode onAddItem(UITableCellWidgetItem *item);
     virtual void onEditItem(UITableCellWidgetItem *item);
-    virtual void onDeleteItem(const QList<UITableItem *>& selectedItems);
-    virtual void onViewItem(UITableCellWidgetItem *item);
+    virtual ErrCode onViewItem(UITableCellWidgetItem *item);
+
 private:
     Area* mArea;
 };

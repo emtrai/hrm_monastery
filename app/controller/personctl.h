@@ -101,7 +101,10 @@ public:
      * @param[out] ftype template file format
      * @return path to template file
      */
-    virtual const QString exportTemplatePath(FileExporter* exporter, QString* ftype = nullptr) const;
+    virtual ErrCode exportTemplatePath(FileExporter* exporter,
+                                        const QString& name,
+                                        QString& fpath,
+                                        QString* ftype = nullptr) const;
 
     /**
      * @brief Export list of person in community

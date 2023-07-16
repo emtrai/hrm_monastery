@@ -231,10 +231,11 @@ const QHash<int, QString> *DbModel::getModelStatusIdNameMap()
     static bool isInitiedStatusNameMap = false;
     static QHash<int, QString> map;
     if (!isInitiedStatusNameMap) {
-        map.insert(MODEL_NOT_READY, QObject::tr("Không rõ"));
-        map.insert(MODEL_INACTIVE, QObject::tr("Không hoạt động"));
-        map.insert(MODEL_ACTIVE, QObject::tr("Đang hoạt động"));
-        map.insert(MODEL_BUILDING, QObject::tr("Đang xây dựng"));
+        map.insert(MODEL_STATUS_UNKNOWN, QObject::tr("Không rõ"));
+        map.insert(MODEL_STATUS_NOT_READY, QObject::tr("Chưa sẵn sàng")); // TODO: change to suitable name???
+        map.insert(MODEL_STATUS_INACTIVE, QObject::tr("Không hoạt động"));
+        map.insert(MODEL_STATUS_ACTIVE, QObject::tr("Đang hoạt động"));
+        map.insert(MODEL_STATUS_BUILDING, QObject::tr("Đang xây dựng"));
         isInitiedStatusNameMap = true;
     }
     // TODO: make it as static to load once only???
@@ -242,7 +243,7 @@ const QHash<int, QString> *DbModel::getModelStatusIdNameMap()
     return &map;
 }
 
-QString DbModel::modelStatus2Name(DbModelStatus status)
+QString DbModel::modelStatus2Name(DbModelStatus status, bool* ok)
 {
     const QHash<int, QString>* statuses = getModelStatusIdNameMap();
     QString ret;
@@ -250,9 +251,11 @@ QString DbModel::modelStatus2Name(DbModelStatus status)
     logd("Status to get name %d", status);
     if (statuses->contains(status)){
         ret = statuses->value(status);
+        if (ok) *ok = true;
     } else {
         loge("invalid status %d", status);
         ret = STR_UNKNOWN; // TODO: translate???
+        if (ok) *ok = false;
     }
     traceout;
     return ret;
@@ -264,10 +267,11 @@ const QList<int>* DbModel::getModelStatusList()
     static bool isInitiedStatus = false;
     static QList<int> statusList;
     if (!isInitiedStatus) {
-        statusList.push_back(MODEL_NOT_READY);
-        statusList.push_back(MODEL_INACTIVE);
-        statusList.push_back(MODEL_ACTIVE);
-        statusList.push_back(MODEL_BUILDING);
+        statusList.push_back(MODEL_STATUS_UNKNOWN);
+        statusList.push_back(MODEL_STATUS_NOT_READY);
+        statusList.push_back(MODEL_STATUS_INACTIVE);
+        statusList.push_back(MODEL_STATUS_ACTIVE);
+        statusList.push_back(MODEL_STATUS_BUILDING);
         isInitiedStatus = true;
     }
     // TODO: make it as static to load once only???
@@ -291,25 +295,25 @@ const QList<int>* DbModel::getDbStatusList()
     return &dbstatusList;
 }
 
-DbModelBuilder DbModel::getBuilderByModelName(const QString& modelName)
-{
-    tracein;
-    static bool isInited = false;
-    static QHash<QString, DbModelBuilder> map;
-    DbModelBuilder builder = nullptr;
-    if (!isInited) {
-        map[KModelNamePerson] = &Person::build;
-        map[KModelNameCommunity] = &Community::build;
-        map[KModelHdlSpecialist] = &Specialist::build;
-        isInited = true;
-    }
-    if (map.contains(modelName)) {
-        builder = map.value(modelName);
-    }
-    // TODO: make it as static to load once only???
-    traceout;
-    return builder;
-}
+//DbModelBuilder DbModel::getBuilderByModelName(const QString& modelName)
+//{
+//    tracein;
+//    static bool isInited = false;
+//    static QHash<QString, DbModelBuilder> map;
+//    DbModelBuilder builder = nullptr;
+//    if (!isInited) {
+//        map[KModelNamePerson] = &Person::build;
+//        map[KModelNameCommunity] = &Community::build;
+//        map[KModelHdlSpecialist] = &Specialist::build;
+//        isInited = true;
+//    }
+//    if (map.contains(modelName)) {
+//        builder = map.value(modelName);
+//    }
+//    // TODO: make it as static to load once only???
+//    traceout;
+//    return builder;
+//}
 
 const QString &DbModel::name() const
 {
@@ -351,6 +355,7 @@ void DbModel::buildUidIfNotSet()
     if (uid().isEmpty()){
         setUid(buildUid());
     }
+    traceout;
 }
 
 QString DbModel::buildUid(const QString* seed)
@@ -363,7 +368,31 @@ QString DbModel::buildUid(const QString* seed)
     logd("value for uid calc: %s", STR2CHA(value));
     QString uid = Utils::UidFromName(value, UidNameConvertType::HASH_NAME);
     logd("uid: %s", uid.toStdString().c_str());
+    traceout;
     return uid;
+}
+
+QString DbModel::buildNameId(const QString *seed, bool* ok)
+{
+    QString name = this->name();
+    QString nameid;
+    tracein;
+    if (!name.isEmpty()) {
+        nameid = Utils::UidFromName(name, NO_VN_MARK_UPPER);
+    } else {
+        logw("no name to build nameid");
+    }
+    if (seed && !seed->isEmpty()) {
+        logd("set seed");
+        if (!nameid.isEmpty()) {
+            nameid += "_";
+        }
+        nameid += Utils::UidFromName(*seed, NO_VN_MARK_UPPER);
+    }
+    if (ok) *ok = !nameid.isEmpty();
+    logd("built nameid %s", STR2CHA(nameid));
+    traceout;
+    return nameid;
 }
 
 ErrCode DbModel::prepare2Save()
@@ -447,22 +476,32 @@ ErrCode DbModel::exportToFile(ExportType type, QString *fpath)
     *fpath = FileCtl::getTmpDataFile(fname);
     logd("fpath '%s'", STR2CHA((*fpath)));
     ret = ExportFactory::exportTo(getExporter(),
+                                  getName(),
                                   *fpath, type);
     // TODO: how about exportTo() method??
     return ret;
 }
 
-const QString DbModel::exportTemplatePath(FileExporter* exporter, QString* ftype) const
+ErrCode DbModel::exportTemplatePath(FileExporter* exporter,
+                                    const QString& name,
+                                    QString& fpath, QString* ftype) const
 {
     tracein;
+    ErrCode err = ErrNone;
     if (exporter) {
-        switch (exporter->getExportType()) {
+        ExportType type = exporter->getExportType();
+        logd("export type '%d'", type);
+        switch (type) {
         case EXPORT_HTML:
-            return FileCtl::getPrebuiltDataFilePath(KPrebuiltCommonTemplateFileName);
+            fpath = FileCtl::getPrebuiltDataFilePath(KPrebuiltCommonTemplateFileName);
+            break;
+        default:
+            err = ErrNotSupport;
+            loge("export type %d not support", type);
         };
     }
     traceout;
-    return QString();
+    return err;
 }
 
 const QStringList DbModel::getListExportKeyWord() const
@@ -495,10 +534,27 @@ ErrCode DbModel::onImportParseDataItem(const QString& importName, int importFile
     logd("importFileType %d", importFileType);
 
     // TODO: raise exception when error occur???
-    logd("keyword %s", keyword.toStdString().c_str());
-    if (mImportCallbacks.contains(keyword)){
-        ImportCallbackFunc func = mImportCallbacks.value(keyword);
-        if (func != nullptr) ret = func(value);
+    logd("keyword %s", STR2CHA(keyword));
+    if (!keyword.isEmpty()) {
+        if (mImportCallbacks.contains(keyword)){
+            ImportCallbackFunc func = mImportCallbacks.value(keyword);
+            if (func != nullptr) {
+                if (!value.isEmpty()) {
+                    ret = func(value);
+                } else {
+                    logw("empty value for keyword '%s' for model '%s'",
+                        STR2CHA(keyword), STR2CHA(modelName()));
+                }
+            } else {
+                logw("keyword '%s' has no callback in model '%s'",
+                     STR2CHA(keyword), STR2CHA(modelName()));
+            }
+        } else {
+            logw("keyword '%s' not support in model '%s'",
+                 STR2CHA(keyword), STR2CHA(modelName()));
+        }
+    } else {
+        logw("keywork is empty");
     }
     traceret(ret);
     return ret;
@@ -734,6 +790,11 @@ void DbModel::dump()
 QString DbModel::toString() const
 {
     return QString("%1:%2:%3:%4").arg(modelName(), uid(), nameId(),name());
+}
+
+QString DbModel::getName()
+{
+    return modelName();
 }
 
 void DbModel::setNameId(const QString &newNameId)

@@ -134,13 +134,14 @@ void UIPeopleInCommunityListView::onEditItem(UITableCellWidgetItem *item)
     traceout;
 }
 
-void UIPeopleInCommunityListView::onDeleteItem(const QList<UITableItem *> &selectedItems)
+ErrCode UIPeopleInCommunityListView::onDeleteItem(const QList<UITableItem *> &selectedItems)
 {
     // TODO: implement it
     UNDER_DEV("Delete Community Person");
+    return ErrNotImpl;
 }
 
-void UIPeopleInCommunityListView::onAddItem(UITableCellWidgetItem *item)
+ErrCode UIPeopleInCommunityListView::onAddItem(UITableCellWidgetItem *item)
 {
     tracein;
     ErrCode err = ErrNone;
@@ -187,6 +188,7 @@ void UIPeopleInCommunityListView::onAddItem(UITableCellWidgetItem *item)
     FREE_PTR(dlg);
     RELEASE_LIST(perList, Person);
     traceout;
+    return err;
 }
 
 QList<UITableMenuAction *>

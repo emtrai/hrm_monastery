@@ -122,6 +122,7 @@ SOURCES += \
     db/sqlite/table/dbmetadatatbl.cpp \
     db/sqlite/table/dbsqlitepersonstatustbl.cpp \
     db/sqlite/table/dbsqlsequencetbl.cpp \
+    dbmodelutils.cpp \
     dialogutils.cpp \
     exception/exception.cpp \
     image/image.cpp \
@@ -131,6 +132,7 @@ SOURCES += \
     model/areacommunity.cpp \
     model/areaperson.cpp \
     model/communityperson.cpp \
+    model/dbmodelfactory.cpp \
     model/mapdbmodel.cpp \
     model/personstatus.cpp \
     model/specialistperson.cpp \
@@ -224,9 +226,11 @@ SOURCES += \
     view/dialog/dlgeditmodel.cpp \
     view/dialog/dlgethnic.cpp \
     view/dialog/dlghtmlviewer.cpp \
+    view/dialog/dlgimportareapersonlistresult.cpp \
     view/dialog/dlgimportcommunitylistresult.cpp \
     view/dialog/dlgimportexportselect.cpp \
     view/dialog/dlgimportlistresult.cpp \
+    view/dialog/dlgimportlistresultfactory.cpp \
     view/dialog/dlgimportpersonlistresult.cpp \
     view/dialog/dlgperson.cpp \
     view/dialog/dlgpersoncomm.cpp \
@@ -274,6 +278,7 @@ HEADERS += \
     config/config.h \
     controller/communitydeptctl.h \
     controller/controller.h \
+    controller/controllerdefs.h \
     controller/modelcontroller.h \
     controller/countryctl.h \
     controller/coursectl.h \
@@ -326,6 +331,7 @@ HEADERS += \
     db/sqlite/table/dbmetadatatbl.h \
     db/sqlite/table/dbsqlitepersonstatustbl.h \
     db/sqlite/table/dbsqlsequencetbl.h \
+    dbmodelutils.h \
     dialogutils.h \
     eventdefs.h \
     exception/exception.h \
@@ -333,12 +339,14 @@ HEADERS += \
     image/imagectl.h \
     imagedefs.h \
     import/importlistener.h \
+    import/importtype.h \
     import/importxlsx.h \
     importexportdefs.h \
     jsondefs.h \
     model/areacommunity.h \
     model/areaperson.h \
     model/communityperson.h \
+    model/dbmodelfactory.h \
     model/mapdbmodel.h \
     model/personstatus.h \
     model/specialistperson.h \
@@ -437,9 +445,11 @@ HEADERS += \
     view/dialog/dlgeditmodel.h \
     view/dialog/dlgethnic.h \
     view/dialog/dlghtmlviewer.h \
+    view/dialog/dlgimportareapersonlistresult.h \
     view/dialog/dlgimportcommunitylistresult.h \
     view/dialog/dlgimportexportselect.h \
     view/dialog/dlgimportlistresult.h \
+    view/dialog/dlgimportlistresultfactory.h \
     view/dialog/dlgimportpersonlistresult.h \
     view/dialog/dlgperson.h \
     view/dialog/dlgpersoncomm.h \
@@ -525,6 +535,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 DISTFILES += \
     license.template \
     res/Saints.csv \
+    res/area_contact_export_template_vi.json \
     res/area_person_info_template.html \
     res/area_vi.csv \
     res/comm_dept_vi.json \

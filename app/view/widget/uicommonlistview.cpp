@@ -31,10 +31,13 @@
 #include "mainwindow.h"
 #include "stringdefs.h"
 #include "dialogutils.h"
-
+#include "importtype.h"
 
 UICommonListView::UICommonListView(QWidget *parent):
-    UITableView(parent)
+    UITableView(parent),
+    mHasImportMenu(false),
+    mHasExportMenu(false),
+    mParentModel(nullptr)
 {
 }
 
@@ -42,6 +45,7 @@ UICommonListView::~UICommonListView()
 {
     tracein;
     RELEASE_LIST_DBMODEL(mItemList);
+    FREE_PTR(mParentModel);
     traceout;
 }
 
@@ -52,6 +56,59 @@ void UICommonListView::setupUI()
     ModelController* ctl = getController();
     if (ctl) ctl->addListener(this);
     traceout;
+}
+
+QList<UITableMenuAction *> UICommonListView::getMenuCommonActions(const QMenu *menu)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    QList<UITableMenuAction*> actionList;
+    if (!menu) {
+        loge("invalid arg");
+        err = ErrInvalidArg;
+    }
+    if (err == ErrNone) {
+        actionList = UITableView::getMenuCommonActions(menu);
+        if (hasImportMenuItem()) {
+            actionList.append(UITableMenuAction::build(STR_IMPORT_FROM_FILE, this)
+                              ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                  return this->onMenuActionImport(m, a);
+                              }));
+        }
+        if (hasExportMenuItem()) {
+            actionList.append(UITableMenuAction::build(STR_EXPORT_TO_FILE, this)
+                              ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
+                                  return this->onMenuActionExport(m, a);
+                              }));
+        }
+    }
+    traceout;
+    return actionList;
+}
+
+bool UICommonListView::hasImportMenuItem()
+{
+    return mHasImportMenu;
+}
+
+ImportTarget UICommonListView::getImportTarget()
+{
+    return IMPORT_TARGET_MAX;
+}
+
+ModelController *UICommonListView::importController()
+{
+    return hasImportMenuItem()?getController():nullptr;
+}
+
+bool UICommonListView::hasExportMenuItem()
+{
+    return mHasExportMenu;
+}
+
+ModelController *UICommonListView::exportController()
+{
+    return hasExportMenuItem()?getController():nullptr;
 }
 
 QList<UITableItem *> UICommonListView::getListItem(qint32 page, qint32 perPage, qint32 totalPages)
@@ -94,6 +151,7 @@ qint32 UICommonListView::getTotalItems()
 
 QList<DbModel *> UICommonListView::getListItem()
 {
+    traced;
     return getController()->getAllItems(true);
 }
 
@@ -128,7 +186,8 @@ void UICommonListView::initFilterFields()
 }
 
 
-QHash<QString, QString> UICommonListView::getFilterKeywords(int fieldId, const QString &fieldText)
+QHash<QString, QString> UICommonListView::getFilterKeywords(int fieldId,
+                                                            const QString &fieldText)
 {
     tracein;
     logd("Query search keywords form db, field %d, %s", fieldId, fieldText.toStdString().c_str());
@@ -153,6 +212,18 @@ QHash<QString, QString> UICommonListView::getFilterKeywords(int fieldId, const Q
     case FILTER_FIELD_EDUCATION:
         modelList = EDUCTL->getAllItems();
         break;
+    case FILTER_FIELD_MODEL_STATUS:
+        {
+            const QHash<int, QString>* map = DbModel::getModelStatusIdNameMap();
+            if (map) {
+                foreach (int id, map->keys()) {
+                    keywords.insert(QString::number(id), map->value(id));
+                }
+            } else {
+                loge("invalid status id name map");
+            }
+        }
+        break;
     default:
         loge("Field %d not supported", fieldId);
     };
@@ -167,7 +238,7 @@ QHash<QString, QString> UICommonListView::getFilterKeywords(int fieldId, const Q
 }
 
 
-void UICommonListView::onViewItem(UITableCellWidgetItem *item)
+ErrCode UICommonListView::onViewItem(UITableCellWidgetItem *item)
 {
     tracein;
     if (item) {
@@ -184,14 +255,16 @@ void UICommonListView::onViewItem(UITableCellWidgetItem *item)
         DialogUtils::showErrorBox(tr("Lỗi, không có dữ liệu hiện thị"));
     }
     traceout;
+    return ErrNone;// TODO: check to return data;
 }
 
-void UICommonListView::onAddItem(UITableCellWidgetItem *item)
+ErrCode UICommonListView::onAddItem(UITableCellWidgetItem *item)
 {
     tracein;
     // TODO: handle it
     MainWindow::showAddEditCommonModel(true, nullptr, this);
     traceout;
+    return ErrNone;
 }
 
 void UICommonListView::onEditItem(UITableCellWidgetItem *item)
@@ -252,4 +325,84 @@ void UICommonListView::onModelControllerDataUpdated(const DbModel *model)
         logw("Suspend reload on data update");
     }
     traceout;
+}
+
+
+ErrCode UICommonListView::onMenuActionImport(QMenu *menu, UITableMenuAction *act)
+{
+    tracein;
+    ErrCode ret = ErrNone;
+    ModelController* ctrl = importController();
+    QString modelName = getMainModelName();
+    ImportTarget importTarget = getImportTarget();
+    if (!ctrl) {
+        ret = ErrInvalidData;
+        loge("Invalid import controller");
+    }
+    if (ret == ErrNone && modelName.isEmpty()) {
+        ret = ErrInvalidData;
+        loge("Invalid model name");
+    }
+    if (ret == ErrNone) {
+        ret = MainWindow::showImportDlg(importTarget,
+                                        ctrl,
+                                        modelName,
+                                        parentModel());
+    }
+    if (ret == ErrNone) {
+        logw("Import for target 0x%x, model '%s' success",
+             importTarget, STR2CHA(modelName));
+    } else {
+        loge("import failed, ret=%d", ret);
+        DialogUtils::showErrorBox(ret, tr("Nhập dữ liệu không thành công"));
+    }
+    traceret(ret);
+    return ret;
+}
+
+ErrCode UICommonListView::onMenuActionExport(QMenu *menu, UITableMenuAction *act)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    QString fpath;
+    if (!act){
+        err = ErrInvalidArg;
+        loge("export list failed, Empty menu action");
+    }
+    if (err == ErrNone) {
+        if (!mItemList.empty()) {
+            err = MainWindow::exportListItems(&mItemList,
+                                              getMainModelName(),
+                                              exportController(),
+                                              STR_EXPORT_TO_FILE, EXPORT_XLSX);
+        } else {
+            logw("nothing to export");
+            err = ErrNoData;
+        }
+    }
+    if (err != ErrNone){
+        loge("export list failed, error code %d",err);
+        DialogUtils::showErrorBox(QString("Xuất dữ liệu lỗi, mã lỗi: %1").arg(err));
+    }
+    traceret(err);
+    return err;
+}
+
+DbModel *UICommonListView::parentModel() const
+{
+    return mParentModel;
+}
+
+ErrCode UICommonListView::setParentModel(const DbModel *newParentModel)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    FREE_PTR(mParentModel);
+    if (newParentModel) {
+        mParentModel = CLONE_MODEL(newParentModel, DbModel);
+    } else {
+        logd("null value is set");
+    }
+    traceret(err);
+    return err;
 }

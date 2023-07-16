@@ -29,6 +29,7 @@
 #include <QDir>
 #include "filectl.h"
 #include "backupmetainfo.h"
+#include "controllerdefs.h"
 
 #define META_FILE_NAME "backup.json"
 
@@ -56,7 +57,7 @@ void BackupCtl::onUnload()
 
 QString BackupCtl::getName()
 {
-    return KControlBackupName;
+    return KControllerBackup;
 }
 
 ErrCode BackupCtl::backup(const QString &fpath)

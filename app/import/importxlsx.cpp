@@ -132,7 +132,10 @@ ErrCode ImportXlsx::importFrom(const QString &importName, int importFileType,
                                 row++;
                                 col = headCol;
                                 logd("reach end field, start parsing");
-                                ret = importer->onImportParseDataItem(importName, importFileType, fieldValues, cnt, outList);
+                                ret = importer->onImportParseDataItem(importName,
+                                                                      importFileType,
+                                                                      fieldValues,
+                                                                      cnt, outList);
                                 fieldValues.clear();
                                 cnt++;
                                 continue;

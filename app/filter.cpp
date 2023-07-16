@@ -63,6 +63,7 @@ static void initFilterOps()
         s_FilterOper.insert(FILTER_FIELD_COURSE, OPERATOR_FOR_STRING_EXACT);
         s_FilterOper.insert(FILTER_FIELD_SPECIALIST, OPERATOR_FOR_STRING_EXACT);
         s_FilterOper.insert(FILTER_FIELD_WORK, OPERATOR_FOR_STRING_EXACT);
+        s_FilterOper.insert(FILTER_FIELD_MODEL_STATUS, OPERATOR_FOR_STRING_EXACT);
 
         s_FilterOperName.insert(FILTER_OP_EQUAL, QObject::tr("= / Bằng"));
         s_FilterOperName.insert(FILTER_OP_NOT_EQUAL, QObject::tr("!= / Khác"));

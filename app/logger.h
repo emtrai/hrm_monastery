@@ -59,7 +59,7 @@
 #endif // DEBUG_LOG
 
 #ifdef DEBUG_TRACE
-#define traced logd("CALL>> %s", __func__)
+#define traced logd("CALL << %s >>", __func__)
 #define tracein logd("CALL IN>> %s", __func__)
 #define traceret(ret) logd("<<CALL OUT %s with ret=%d", __func__, (int)ret)
 #define traceout logd("<<CALL OUT %s", __func__)

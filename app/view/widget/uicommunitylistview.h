@@ -49,7 +49,7 @@ protected:
     virtual ErrCode onMenuActionImport(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionAddPerson(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionAddDepart(QMenu* menu, UITableMenuAction* act);
-    virtual void onViewItem(UITableCellWidgetItem *item);
+    virtual ErrCode onViewItem(UITableCellWidgetItem *item);
     void onEditItem(UITableCellWidgetItem *item);
     virtual QString getTitle();
 

@@ -329,6 +329,21 @@ QString Utils::UidFromName(const QString &name, UidNameConvertType type, bool* i
     return uid;
 }
 
+bool Utils::appendString(QString &target, const QString &value, const QString &sep)
+{
+    bool ok = false;
+    if (!value.isEmpty()) {
+        if (!target.isEmpty()) {
+            target += sep;
+        }
+        target += value;
+        ok = true;
+    } else {
+        ok = false;
+    }
+    return ok;
+}
+
 // FIXME: if those char is ok if putting on code???
 static const QString VNSigns[] =
 {
@@ -558,6 +573,15 @@ ErrCode Utils::buildComboxFromModel(QComboBox *cb, ModelController *controller)
     }
     traceret(err);
     return err;
+}
+
+const QString invalidFileNameChar = "#%&{}\\<>*?/$!'\":@+|=";
+QString Utils::normalizeFileName(const QString &fname, const QChar& replaceChar)
+{
+    QString finalString = fname;
+    for (int i = 0; i < invalidFileNameChar.length(); i++)
+        finalString = finalString.replace(invalidFileNameChar[i], replaceChar);
+    return finalString;
 }
 
 

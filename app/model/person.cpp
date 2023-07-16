@@ -254,7 +254,7 @@ QString Person::modelName() const
 
 const QString &Person::name() const
 {
-    return firstName();
+    return displayName();
 }
 
 DbModel* Person::build(){
@@ -995,11 +995,10 @@ QString Person::fullName() const
     return getFullName();
 }
 
-QString Person::displayName()
+QString Person::displayName() const
 {
     return QString("%1 %2").arg(hollyName(), fullName());
 }
-
 
 qint64 Person::christenDate() const
 {
@@ -1025,7 +1024,7 @@ ErrCode Person::exportTo(const QString &fpath, ExportType type)
     ErrCode ret = ErrNone;
     // TODO: implement something here
     logi("Export Person to %s", fpath.toStdString().c_str());
-    ret = ExportFactory::exportTo(this, fpath, type);
+    ret = ExportFactory::exportTo(this, getName(), fpath, type);
     traceret(ret);
     return ret;
 
@@ -1036,9 +1035,17 @@ DbModelHandler *Person::getDbModelHandler() const
     return DB->getModelHandler(KModelHdlPerson);
 }
 
-const QString Person::exportTemplatePath(FileExporter* exporter, QString* ftype) const
+ErrCode Person::exportTemplatePath(FileExporter* exporter,
+                                   const QString& name,
+                                 QString& fpath,
+                                 QString* ftype) const
 {
-    return FileCtl::getPrebuiltDataFilePath(KPrebuiltPersonInfoTemplateFileName);
+    tracein;
+    ErrCode err = ErrNone;
+
+    fpath = FileCtl::getPrebuiltDataFilePath(KPrebuiltPersonInfoTemplateFileName);
+    traceret(err);
+    return err;
 }
 
 ErrCode Person::prepare2Save()
@@ -1408,23 +1415,23 @@ void Person::dump()
     logd("- JoinPIC Name %s", joinPICName().toStdString().c_str());
     logd("- JoinPIC Uid %s", joinPICUid().toStdString().c_str());
 }
-ErrCode Person::onImportParseDataItem(const QString& importName, int importFileType,
-                             const QString &keyword, const QString &value,
-                             quint32 idx, QList<DbModel *>* outList)
-{
-    tracein;
-    ErrCode ret = ErrNone;
-    logd("importFileType %d", importFileType);
+//ErrCode Person::onImportParseDataItem(const QString& importName, int importFileType,
+//                             const QString &keyword, const QString &value,
+//                             quint32 idx, QList<DbModel *>* outList)
+//{
+//    tracein;
+//    ErrCode ret = ErrNone;
+//    logd("importFileType %d", importFileType);
 
-    // TODO: raise exception when error occur???
-    logd("keyword %s", keyword.toStdString().c_str());
-    if (mImportCallbacks.contains(keyword)){
-        ImportCallbackFunc func = mImportCallbacks.value(keyword);
-        if (func != nullptr) ret = func(value);
-    }
-    traceret(ret);
-    return ret;
-}
+//    // TODO: raise exception when error occur???
+//    logd("keyword %s", keyword.toStdString().c_str());
+//    if (mImportCallbacks.contains(keyword)){
+//        ImportCallbackFunc func = mImportCallbacks.value(keyword);
+//        if (func != nullptr) ret = func(value);
+//    }
+//    traceret(ret);
+//    return ret;
+//}
 
 qint64 Person::feastDay() const
 {

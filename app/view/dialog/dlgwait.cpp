@@ -187,6 +187,7 @@ DlgWaitWorker::DlgWaitWorker(QObject *parent, DlgWait* dlg, void* data):
 
 void DlgWaitWorker::setRunFunc(const WaitRunt_t &newRunFunc)
 {
+    traced;
     mRunFunc = newRunFunc;
 }
 
@@ -196,9 +197,12 @@ void DlgWaitWorker::run()
     ErrCode ret = ErrNone;
     void* result = nullptr;
     if (mRunFunc) {
+        logd("call run func");
         result = mRunFunc(&ret, mData, mDlg);
+    } else {
+        logw("no run function to execute");
     }
-    logd("signal done");
+    logd("signal done, ret %d", ret);
     emit done(ret, mData, result, mDlg);
     traceout;
 }

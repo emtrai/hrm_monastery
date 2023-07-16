@@ -26,11 +26,12 @@
 #include "dbctl.h"
 #include "countryctl.h"
 #include "prebuiltdefs.h"
+#include "controllerdefs.h"
 
 
 GET_INSTANCE_CONTROLLER_IMPL(EthnicCtl)
 
-EthnicCtl::EthnicCtl():ModelController(KModelHdlEthnic)
+EthnicCtl::EthnicCtl():ModelController(KControllerEthnic, KModelHdlEthnic)
 {
     tracein;
 }

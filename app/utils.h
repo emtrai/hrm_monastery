@@ -285,6 +285,7 @@ public:
                                         );
     static QString getPrebuiltFileByLang(const QString& prebuiltName, bool lang = true);
     static QString UidFromName(const QString& name, UidNameConvertType type = SIMPLIFY_UPPER, bool* isOk = nullptr);
+    static bool appendString(QString& target, const QString& value, const QString& sep = "_");
     static QString removeVietnameseSign(const QString& vietnameseString);
     static QString removeSpecialChar(const QString& string,
                                      const QString& replacement = nullptr,
@@ -299,6 +300,7 @@ public:
     static ErrCode setSelectItemComboxByData(QComboBox *cb, const QVariant& data, int* index = nullptr);
     static ErrCode buildComboxFromModel(QComboBox *cb, const QList<DbModel*>& modelList);
     static ErrCode buildComboxFromModel(QComboBox *cb, ModelController* controller);
+    static QString normalizeFileName(const QString& fname, const QChar& replaceChar = '_');
 
     template<class T>
     static bool isSameList(const QList<T>& l1, const QList<T>& l2);

@@ -79,7 +79,7 @@ ErrCode DlgAreaPerson::buildModel(DbModel *model, QString &errMsg)
         if (err == ErrNone){
             per->setMarkModified(true); // start marking fields which are modified
         }
-        per->setModelStatus(MODEL_ACTIVE);
+        per->setModelStatus(MODEL_STATUS_ACTIVE);
         per->setAreaUid(mArea->uid());
         SET_VAL_FROM_TEXTBOX(ui->txtSearch, KItemUid, per->setPersonUid, per->setPersonName);
         SET_VAL_FROM_CBOX(ui->cbRole, per->setRoleUid, per->setRoleName, err);
@@ -207,17 +207,21 @@ void DlgAreaPerson::on_btnSearch_clicked()
     traceout;
 }
 
-void DlgAreaPerson::setArea(Area *newArea)
+ErrCode DlgAreaPerson::setArea(const Area *newArea)
 {
     tracein;
-    if (mArea) {
-        delete mArea;
-        mArea = nullptr;
-    }
+    ErrCode err = ErrNone;
+    FREE_PTR(mArea);
     if (newArea) {
-        mArea = (Area*)(((DbModel*)newArea)->clone());
+        logd("clone new area");
+        mArea = CLONE_MODEL(newArea, Area);
+        if (!mArea) {
+            err = ErrNoMemory;
+            loge("Clone new area fail, no memory?");
+        }
     }
-    traceout;
+    traceret(err);
+    return err;
 }
 
 void DlgAreaPerson::setAreaUid(const QString &id)

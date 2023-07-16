@@ -142,7 +142,10 @@ public:
 
     const QString &currentCEONameId();
     void setCurrentCEONameId(const QString &newCurrentCEOCode);
-    virtual const QString exportTemplatePath(FileExporter* exporter, QString* ftype = nullptr) const;
+    virtual ErrCode exportTemplatePath(FileExporter* exporter,
+                                       const QString& name,
+                                       QString& fpath,
+                                       QString* ftype = nullptr) const;
     const QString &brief() const;
     void setBrief(const QString &newBrief);
 

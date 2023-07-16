@@ -54,6 +54,11 @@ void UIAreaListView::setupUI()
     traceout;
 }
 
+ImportTarget UIAreaListView::getImportTarget()
+{
+    return IMPORT_TARGET_AREA;
+}
+
 void UIAreaListView::initHeader()
 {
     tracein;
@@ -100,11 +105,12 @@ DbModel *UIAreaListView::onNewModel(const QString& modelName)
     return Area::build();
 }
 
-void UIAreaListView::onAddItem(UITableCellWidgetItem *item)
+ErrCode UIAreaListView::onAddItem(UITableCellWidgetItem *item)
 {
     tracein;
     MainWindow::showAddEditArea(true, nullptr, this);
     traceout;
+    return ErrNone;
 }
 
 void UIAreaListView::onEditItem(UITableCellWidgetItem *item)
@@ -123,9 +129,10 @@ void UIAreaListView::onEditItem(UITableCellWidgetItem *item)
     traceout;
 }
 
-void UIAreaListView::onDeleteItem(const QList<UITableItem *> &selectedItems)
+ErrCode UIAreaListView::onDeleteItem(const QList<UITableItem *> &selectedItems)
 {
     UNDER_DEV("Xóa dữ liệu");
+    return ErrNotImpl;
 }
 
 QList<UITableMenuAction *> UIAreaListView::getMenuSingleSelectedItemActions(const QMenu *menu, UITableCellWidgetItem *item)
