@@ -90,7 +90,7 @@ ErrCode DbSqlitePersonEventTbl::insertTableField(DbSqliteInsertBuilder *builder,
     return ErrNone;
 }
 
-ErrCode DbSqlitePersonEventTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqlitePersonEventTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     tracein;
     ErrCode err = ErrNone;
@@ -99,7 +99,7 @@ ErrCode DbSqlitePersonEventTbl::updateModelFromQuery(DbModel *item, const QSqlQu
         loge("invalid arg");
     }
     if (err == ErrNone) {
-        err = DbSqliteTbl::updateModelFromQuery(item, qry);
+        err = DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
     }
     if (err == ErrNone) {
         PersonEvent* model = (PersonEvent*) item;
@@ -177,7 +177,7 @@ ErrCode DbSqlitePersonEventTbl::getListEvents(const QString &personUid,
         {
             while (qry.next()) {
                 PersonEvent* item = (PersonEvent*)PersonEvent::build();
-                ErrCode tmpret = updateModelFromQuery(item, qry);
+                ErrCode tmpret = updateDbModelDataFromQuery(item, qry);
                 if (tmpret == ErrNone) {
     //                item->setDbId(qry.value(KFieldId).toInt());
     //                item->setDbStatus(qry.value(KFieldDbStatus).toInt());

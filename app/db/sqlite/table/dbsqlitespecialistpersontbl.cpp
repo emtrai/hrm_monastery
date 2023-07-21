@@ -165,7 +165,7 @@ ErrCode DbSqliteSpecialistPersonTbl::insertTableField(DbSqliteInsertBuilder *bui
     return ret;
 }
 
-ErrCode DbSqliteSpecialistPersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqliteSpecialistPersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     tracein;
     ErrCode err = ErrNone;
@@ -175,20 +175,20 @@ ErrCode DbSqliteSpecialistPersonTbl::updateModelFromQuery(DbModel *item, const Q
     {
         logd("update for person model");
         DbSqlitePersonTbl* tbl = dynamic_cast<DbSqlitePersonTbl*>(DbSqlite::table(KTablePerson));
-        err = tbl->updateModelFromQuery(item, qry);
+        err = tbl->updateDbModelDataFromQuery(item, qry);
     } else if (modelName == KModelNameSpecialist) {
         logd("update for specialist model");
         DbSqliteSpecialistTbl* tbl = dynamic_cast<DbSqliteSpecialistTbl*>(DbSqlite::table(KTableSpecialist));
-        err = tbl->updateModelFromQuery(item, qry);
+        err = tbl->updateDbModelDataFromQuery(item, qry);
     } else if (modelName == KModelNameSpecialistPerson) {
         logd("update model for specialist info");
         DbSqliteSpecialistTbl* tblSpecialist = dynamic_cast<DbSqliteSpecialistTbl*>(DbSqlite::table(KTableSpecialist));
         DbModel* specialist = Specialist::build();
         logd("update model for specialist info");
-        err = tblSpecialist->updateModelFromQuery(specialist, qry);
+        err = tblSpecialist->updateDbModelDataFromQuery(specialist, qry);
 
         logd("update for specialist person model");
-        err = DbSqliteMapTbl::updateModelFromQuery(item, qry);
+        err = DbSqliteMapTbl::updateDbModelDataFromQuery(item, qry);
         SpecialistPerson* model = (SpecialistPerson*) item;
         model->setSpecialist(specialist);
         model->setExperienceHistory(qry.value(KFieldExperienceHistory).toString());

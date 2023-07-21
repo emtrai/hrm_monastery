@@ -628,7 +628,7 @@ int UIPersonListView::onFilter(int catetoryid,
 {
     tracein;
     RELEASE_LIST_DBMODEL(mItemList);
-    ErrCode ret = PERSONCTL->filter(catetoryid, opFlags, keywords, KModelNamePerson, &mItemList);
+    ErrCode ret = PERSONCTL->filter(catetoryid, opFlags, keywords, KModelNamePerson, nullptr, &mItemList);
     logd("filter ret %d", ret);
     logd("mItemList cnt %d", mItemList.count());
     traceout;

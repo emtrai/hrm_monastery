@@ -51,6 +51,7 @@ static void initFieldMap()
         s_fieldMap[FILTER_FIELD_SPECIALIST] = KFieldSpecialistName;
         s_fieldMap[FILTER_FIELD_MISSON] = KFieldMissionName;
         s_fieldMap[FILTER_FIELD_COURSE] = KFieldCourseName;
+        s_fieldMap[FILTER_FIELD_MODEL_STATUS] = KFieldModelStatus;
         s_fieldMapInit = true;
     }
 

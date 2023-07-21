@@ -116,6 +116,7 @@ void UIAreaContactPeopleListView::initFilterFields()
 {
     tracein;
     appendFilterField(FILTER_FIELD_MODEL_STATUS, STR_MODELSTATUS);
+    appendFilterField(FILTER_FIELD_FULL_NAME, STR_FULLNAME);
     // TODO: support start date & end date
     traceout;
 }
@@ -135,7 +136,7 @@ void UIAreaContactPeopleListView::updateItem(DbModel *item,
         loge("invalid argument");
     }
     if (err == ErrNone) {
-        loge("updateItem '%s'", MODELSTR2CHA(item));
+        logd("updateItem '%s'", MODELSTR2CHA(item));
         if (item->modelName() == KModelNameAreaPerson) {
             AreaPerson* per = (AreaPerson*) item;
             tblItem->addValue(per->nameId());

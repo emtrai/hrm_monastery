@@ -172,12 +172,32 @@ public:
 
     // TODO: separate it into 2 info: detail and brief????
     // as some model has a lots of information, such as person, community
-    virtual ErrCode updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
+    virtual ErrCode updateDbModelDataFromQuery(DbModel* item, const QSqlQuery& qry);
+
+    /**
+     * @brief Get condition string for filter field, i.e "name = :fieldValue"
+     * @param fieldId
+     * @param operatorId
+     * @param fieldValueName Field Value name, i.e. ":fieldValue"
+     * @param[out] cond Condition string, i.e. "name = :fieldValue"
+     * @param[out] dataType data type of condition, i.e TEXT, INT
+     * @param[out] isExact true if it's exact condition, false otherwise
+     * @return
+     */
+    virtual ErrCode filterFieldCond(int fieldId,
+                        int operatorId,
+                        QString fieldValueName,
+                        const DbModel* parentModel,
+                        QString& cond,
+                        int& dataType,
+                        bool& isExact
+                        );
 
     virtual ErrCode filter(int fieldId,
                        int operatorId,
                        const QString& keyword,
                        const DbModelBuilder& builder,
+                       const DbModel* parentModel = nullptr,
                        QList<DbModel*>* outList = nullptr,
                        qint64 dbStatus = DB_RECORD_ACTIVE,
                        int from = 0,

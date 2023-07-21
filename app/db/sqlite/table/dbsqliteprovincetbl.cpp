@@ -69,11 +69,11 @@ ErrCode DbSqliteProvinceTbl::insertTableField(DbSqliteInsertBuilder *builder,
     return ErrNone;
 }
 
-ErrCode DbSqliteProvinceTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqliteProvinceTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     tracein;
     ErrCode err = ErrNone;
-    DbSqliteTbl::updateModelFromQuery(item, qry);
+    DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
     Province* model = (Province*) item;
     model->setCountryUid(qry.value(KFieldCountryUid).toString());
     model->setCountryDbId(qry.value(KFieldCountryDbId).toInt());

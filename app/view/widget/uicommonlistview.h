@@ -63,6 +63,10 @@ protected:
     virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
     virtual void initFilterFields();
     virtual QHash<QString, QString> getFilterKeywords(int fieldId, const QString& fieldText);
+    virtual int onFilter(int catetoryid,
+                         const QString& catetory,
+                         qint64 opFlags,
+                         const QString& keywords, const QVariant *value);
     virtual ErrCode onViewItem(UITableCellWidgetItem *item);
     virtual ErrCode onAddItem(UITableCellWidgetItem *item);
     virtual void onEditItem(UITableCellWidgetItem *item);
@@ -83,9 +87,9 @@ protected:
     virtual ErrCode onMenuActionExport(QMenu *menu, UITableMenuAction *act);
 protected:
     QList<DbModel*> mItemList;
-    DbModel* mParentModel; //
     bool mHasImportMenu;
     bool mHasExportMenu;
+    DbModel* mParentModel; //
 };
 
 #endif // UICOMMONLISTVIEW_H

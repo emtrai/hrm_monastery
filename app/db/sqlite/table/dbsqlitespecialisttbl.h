@@ -32,7 +32,7 @@ public:
     DbSqliteSpecialistTbl(DbSqlite* db);
 
 
-    virtual ErrCode updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
+    virtual ErrCode updateDbModelDataFromQuery(DbModel* item, const QSqlQuery& qry);
 private:
     static const qint32 KVersionCode;
 };

@@ -509,7 +509,7 @@ ErrCode UITableView::onMenuActionReload(QMenu *menu, UITableMenuAction *act)
 int UITableView::onFilter(int catetoryid, const QString &catetory, qint64 opFlags, const QString &keywords, const QVariant *value)
 {
     tracein;
-    logi("DEFAULT filter, should not caller here, DERIVED CLASS implement this");
+    logi("DEFAULT filter, should not called here, DERIVED CLASS implement this");
     logd("category id %d", catetoryid);
     logd("category '%s'", catetory.toStdString().c_str());
     logd("opFlags %d", opFlags);

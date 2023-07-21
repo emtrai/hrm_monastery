@@ -38,12 +38,15 @@ public:
 protected:
     ErrCode insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item);
     virtual void addTableField(DbSqliteTableBuilder* builder);
-    virtual ErrCode updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
+    virtual ErrCode updateDbModelDataFromQuery(DbModel* item, const QSqlQuery& qry);
     virtual ErrCode onTblMigration(qint64 oldVer);
 
     virtual ErrCode updateTableField(DbSqliteUpdateBuilder* builder,
                                      const QList<QString>& updateField,
                                      const DbModel *item);
+    virtual QString getSearchQueryStringWithTag(const QString& cond = nullptr,
+                                                const QString& tag = nullptr);
+
 private:
     static const qint32 KVersionCode;
 };

@@ -32,7 +32,7 @@ public:
 
     virtual void addTableField(DbSqliteTableBuilder* builder);
     virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
-    virtual ErrCode updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
+    virtual ErrCode updateDbModelDataFromQuery(DbModel* item, const QSqlQuery& qry);
 protected:
     virtual ErrCode updateTableField(DbSqliteUpdateBuilder* builder,
                                      const QList<QString>& updateField,

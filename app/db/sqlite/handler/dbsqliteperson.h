@@ -89,6 +89,7 @@ public:
                        int operatorId,
                        const QString& keyword,
                        const char* targetModelName = nullptr,
+                       const DbModel* parentModel = nullptr,
                        QList<DbModel*>* outList = nullptr,
                        qint64 dbStatus = DB_RECORD_ACTIVE,
                        int from = 0,

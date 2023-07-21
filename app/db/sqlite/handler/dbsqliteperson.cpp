@@ -387,6 +387,7 @@ ErrCode DbSqlitePerson::search(const QString &keyword,
 ErrCode DbSqlitePerson::filter(int fieldId, int operatorId,
                                const QString &keyword,
                                const char* targetModelName,
+                               const DbModel* parentModel,
                                QList<DbModel *> *outList,
                                qint64 dbStatus,
                                int from,
@@ -399,7 +400,8 @@ ErrCode DbSqlitePerson::filter(int fieldId, int operatorId,
     // and require override search function
     Q_ASSERT(tbl != nullptr);
 
-    ErrCode ret = tbl->filter(fieldId, operatorId, keyword,  &Person::build, outList,
+    ErrCode ret = tbl->filter(fieldId, operatorId, keyword,  &Person::build,
+                              parentModel, outList,
                               dbStatus, from, noItems, total);
     traceret(ret);
     return ret;

@@ -41,6 +41,21 @@ public:
                                   const QString &uid,
                                   int status = MODEL_STATUS_MAX,
                                   const QString& selectedField = "*");
+    virtual QString getListItemsQueryString(const QString &mapTblName,
+                                          const QString &modelTblName,
+                                          const QString &fieldUid2Join,
+                                          const QString &fieldModelUid,
+                                          const QString &cond = nullptr,
+                                          int status = MODEL_STATUS_MAX,
+                                          const QString& selectedField = "*");
+    virtual QList<DbModel*> getListItems(const QString &mapTblName,
+                                          const QString &modelTblName,
+                                          const QString &fieldUid2Join,
+                                          const QString &fieldModelUid,
+                                          const DbModelBuilder &builder,
+                                          const QString &cond = nullptr,
+                                          int status = MODEL_STATUS_MAX,
+                                          const QString& selectedField = "*");
 //    virtual QList<DbModel*> getListItemsOfUid2(const QString& uid2,
 //                                                const DbModelBuilder &builder,
 //                                                int modelStatus = MODEL_STATUS_MAX);
@@ -51,7 +66,7 @@ public:
 protected:
     virtual void addTableField(DbSqliteTableBuilder* builder);
     virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
-    virtual ErrCode updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
+    virtual ErrCode updateDbModelDataFromQuery(DbModel* item, const QSqlQuery& qry);
     virtual QHash<QString, QString> getFieldsCheckExists(const DbModel* item);
 
     virtual const QString& getFieldNameUid1() const;
@@ -62,6 +77,14 @@ protected:
     virtual ErrCode updateTableField(DbSqliteUpdateBuilder* builder,
                                      const QList<QString>& updateField,
                                      const DbModel *item);
+    virtual ErrCode filterFieldCond(int fieldId,
+                                    int operatorId,
+                                    QString fieldValueName,
+                                    const DbModel* parentModel,
+                                    QString& cond,
+                                    int& dataType,
+                                    bool& isExact
+                                    );
 protected:
     QString mFieldNameUid1;
     QString mFieldNameDbId1;

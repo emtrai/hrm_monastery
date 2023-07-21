@@ -101,12 +101,12 @@ ErrCode DbSqliteAreaTbl::insertTableField(DbSqliteInsertBuilder *builder,
     return ErrNone;
 }
 
-ErrCode DbSqliteAreaTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqliteAreaTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     tracein;
     ErrCode err = ErrNone;
     if (item) {
-        DbSqliteTbl::updateModelFromQuery(item, qry);
+        DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
         if (item->modelName() == KModelNameArea) {
             Area* model = (Area*) item;
             model->setCountryUid(qry.value(KFieldCountryUid).toString());//TODO: load country obj

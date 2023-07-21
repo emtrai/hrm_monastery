@@ -35,6 +35,7 @@
 #include "area.h"
 #include "areactl.h"
 #include "person.h"
+#include "personctl.h"
 #include "areaperson.h"
 #include "rolectl.h"
 #include "role.h"
@@ -87,11 +88,15 @@ QList<DbModel *> DbSqliteAreaMgrTbl::getListPerson(const QString &areaUid, int s
                                                          &AreaPerson::build,
                                                          areaUid,
                                                          status,
-                                                         QString("*, %1.%2 AS %3, %1.%4 AS %5")
+                                                         QString("*, %1.%2 AS %3, %1.%4 AS %5, (%6 || ' ' || %7) AS %8")
                                                              .arg(KTablePerson, KFieldNameId)
                                                              .arg(KFieldPersonNameId)
                                                              .arg(KFieldUid)
-                                                             .arg(KFieldPersonUid));
+                                                             .arg(KFieldPersonUid)
+                                                             .arg(KFieldLastName)
+                                                             .arg(KFieldFirstName)
+                                                             .arg(KFieldFullName)
+                                                         );
 
     traceout;
     return list;
@@ -131,7 +136,7 @@ void DbSqliteAreaMgrTbl::addTableField(DbSqliteTableBuilder *builder)
     traceout;
 }
 
-ErrCode DbSqliteAreaMgrTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqliteAreaMgrTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     tracein;
     ErrCode err = ErrNone;
@@ -140,7 +145,7 @@ ErrCode DbSqliteAreaMgrTbl::updateModelFromQuery(DbModel *item, const QSqlQuery 
         loge("invalid argument");
     }
     if (err == ErrNone) {
-        err = DbSqliteMapTbl::updateModelFromQuery(item, qry);
+        err = DbSqliteMapTbl::updateDbModelDataFromQuery(item, qry);
     }
     if (err == ErrNone) {
         QString modelName = item->modelName();
@@ -193,20 +198,34 @@ ErrCode DbSqliteAreaMgrTbl::updateModelFromQuery(DbModel *item, const QSqlQuery 
                 logw("areaUid empty");
             }
 
-            areaPerson->setPersonUid(qry.value(KFieldPersonUid).toString());
-            Person* person = (Person*)Person::build();
-            if (person) {
-                tblPerson->updateModelFromQuery(person, qry);
-                areaPerson->setPersonName(person->displayName());
-                areaPerson->setPersonNameId(person->nameId());
-                // TODO: risk of no sync up data of holly name!!!
-                areaPerson->setPersonUid(person->uid());
-                areaPerson->setPersonEmail(person->emailString());
-                areaPerson->setPersonTel(person->telString());
-                delete person;
+            if (!qry.isNull(KFieldPersonUid)) {
+                areaPerson->setPersonUid(qry.value(KFieldPersonUid).toString());
+                Person* person = nullptr;
+                if (!qry.isNull(KFieldPersonNameId)) {
+                    person = (Person*)Person::build();
+                    if (person) {
+                        tblPerson->updateDbModelDataFromQuery(person, qry);
+                    } else {
+                        err = ErrNoMemory;
+                        loge("no memory, cannot allocat person");
+                    }
+                } else {
+                    person = (Person*)PERSONCTL->getModelByUid(areaPerson->personUid());
+                    if (!person) {
+                        logw("not found personUid '%s'", STR2CHA(areaPerson->personUid()));
+                    }
+                }
+                if ((err == ErrNone) && person) {
+                    areaPerson->setPersonName(person->displayName());
+                    areaPerson->setPersonNameId(person->nameId());
+                    // TODO: risk of no sync up data of holly name!!!
+                    areaPerson->setPersonUid(person->uid());
+                    areaPerson->setPersonEmail(person->emailString());
+                    areaPerson->setPersonTel(person->telString());
+                }
+                FREE_PTR(person);
             } else {
-                err = ErrNoMemory;
-                loge("no memory, cannot allocat person");
+                logw("not found field '%s'", KFieldPersonUid);
             }
 
         } else {
@@ -321,4 +340,27 @@ ErrCode DbSqliteAreaMgrTbl::updateTableField(DbSqliteUpdateBuilder *builder,
     }
     traceret(err);
     return err;
+}
+
+QString DbSqliteAreaMgrTbl::getSearchQueryStringWithTag(const QString &cond, const QString &tag)
+{
+    tracein;
+    QString queryStr = getListItemsQueryString(KTableAreaPerson,
+                                            KTablePerson,
+                                            KFieldPersonUid,
+                                            KFieldUid,
+                                            cond,
+                                            MODEL_STATUS_MAX, // TODO: status?
+                                            QString("*, %1.%2 AS %3, %1.%4 AS %5, (%6 || ' ' || %7) AS %8")
+                                                .arg(KTablePerson)
+                                                .arg(KFieldNameId)
+                                                .arg(KFieldPersonNameId)
+                                                .arg(KFieldUid)
+                                                .arg(KFieldPersonUid)
+                                                .arg(KFieldLastName)
+                                                .arg(KFieldFirstName)
+                                                .arg(KFieldFullName)
+                                            );
+    traceout;
+    return queryStr;
 }

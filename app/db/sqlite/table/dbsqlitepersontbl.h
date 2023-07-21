@@ -37,7 +37,7 @@ class DbSqlitePersonTbl : public DbSqliteTbl
 public:
     DbSqlitePersonTbl(DbSqlite* db);
 
-    virtual ErrCode updateModelFromQuery(DbModel* item, const QSqlQuery& qry);
+    virtual ErrCode updateDbModelDataFromQuery(DbModel* item, const QSqlQuery& qry);
     virtual ErrCode updateTableField(DbSqliteUpdateBuilder* builder,
                                      const QList<QString>& updateField,
                                      const DbModel *item);

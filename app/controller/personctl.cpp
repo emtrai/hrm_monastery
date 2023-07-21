@@ -168,12 +168,13 @@ DbModel *PersonCtl::doImportOneItem(const QString& importName, int importFileTyp
 }
 
 ErrCode PersonCtl::filter(int catetoryid, qint64 opFlags,
-                      const QString &keywords,
-                      const char* targetModelName,
-                      QList<DbModel *> *outList,
-                      int from,
-                      int noItems,
-                      int* total)
+                        const QString &keywords,
+                        const char* targetModelName,
+                        const DbModel* parentModel,
+                        QList<DbModel *> *outList,
+                        int from,
+                        int noItems,
+                        int* total)
 {
     tracein;
     ErrCode err = ErrNone;
@@ -225,7 +226,15 @@ ErrCode PersonCtl::filter(int catetoryid, qint64 opFlags,
         case FILTER_FIELD_COURSE:
         case FILTER_FIELD_WORK:
             directFilter = true;
-            err = ModelController::filter(catetoryid, opFlags, keywords, targetModelName, outList, from, noItems, total);
+            err = ModelController::filter(catetoryid,
+                                          opFlags,
+                                          keywords,
+                                          targetModelName,
+                                          parentModel,
+                                          outList,
+                                          from,
+                                          noItems,
+                                          total);
             break;
         default:
             err = ErrNotSupport;
@@ -277,6 +286,7 @@ ErrCode PersonCtl::filter(int catetoryid, qint64 opFlags,
                 QList<DbModel *> models;
                 err = controller->filter(FILTER_FIELD_NAME, FILTER_OP_CONTAIN, keywords,
                                          nullptr, /* use main/default target model name*/
+                                         nullptr,
                                          &models, from, noItems, total);
                 logd("Search ret=%d, found=%lld models", err, models.size());
                 logd("search model for each models");

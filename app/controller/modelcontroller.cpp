@@ -389,6 +389,7 @@ ErrCode ModelController::filter(int fieldId,
                                qint64 opFlags,
                                const QString &keywords,
                                const char* targetModelName,
+                               const DbModel* parentModel,
                                QList<DbModel*>* outList,
                                int from,
                                int noItems,
@@ -398,7 +399,10 @@ ErrCode ModelController::filter(int fieldId,
     tracein;
     DbModelHandler *hdl = getModelHandler();
     if (hdl != nullptr) {
-        ret = hdl->filter(fieldId, opFlags, keywords, targetModelName, outList, DB_RECORD_ACTIVE, from, noItems, total);
+        ret = hdl->filter(fieldId, opFlags, keywords,
+                          targetModelName, parentModel,
+                          outList,
+                          DB_RECORD_ACTIVE, from, noItems, total);
     } else {
         loge("Unknown handler, DERIVED class should implement this");
         ret = ErrNoHandler;
@@ -438,7 +442,7 @@ ErrCode ModelController::getUidListFromName(const QString &name, QHash<QString, 
         foreach (QString name, names) {
             QList<DbModel*> modellist;
             logd("Check name '%s'", name.toStdString().c_str());
-            ret = hdlr->filter(FILTER_FIELD_NAME, FILTER_OP_EQUAL, name.trimmed(), nullptr, &modellist);
+            ret = hdlr->filter(FILTER_FIELD_NAME, FILTER_OP_EQUAL, name.trimmed(), nullptr, nullptr, &modellist);
             if (ret == ErrNone) {
                 if (modellist.size()) {
                     foreach(DbModel* model, modellist) {

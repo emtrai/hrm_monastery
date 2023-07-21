@@ -158,18 +158,18 @@ ErrCode DbSqliteCommDeptPersonTbl::insertTableField(DbSqliteInsertBuilder *build
     return ret;
 }
 
-ErrCode DbSqliteCommDeptPersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqliteCommDeptPersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     tracein;
     ErrCode err = ErrNone;
-    DbSqliteTbl::updateModelFromQuery(item, qry);
+    DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
     QString modelName = item->modelName();
     logd("update for map model '%s'", modelName.toStdString().c_str());
     if (modelName == KModelNamePerson )
     {
         logd("update for person model");
         DbSqlitePersonTbl* tbl = dynamic_cast<DbSqlitePersonTbl*>(DbSqlite::table(KTablePerson));
-        tbl->updateModelFromQuery(item, qry);
+        tbl->updateDbModelDataFromQuery(item, qry);
     } else if (modelName == KModelNamePersonDept) {
 
         PersonDept* model = (PersonDept*) item;

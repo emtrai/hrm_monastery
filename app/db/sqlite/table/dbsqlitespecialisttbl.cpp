@@ -42,11 +42,11 @@ DbSqliteSpecialistTbl::DbSqliteSpecialistTbl(DbSqlite* db)
     tracein;
 }
 
-ErrCode DbSqliteSpecialistTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqliteSpecialistTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     tracein;
     ErrCode err = ErrNone;
-    DbSqliteTbl::updateModelFromQuery(item, qry);
+    DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
     if (item->name().isEmpty()) {
         if (!qry.isNull(KFieldSpecialistName)) { /* name may be in this field, not name field*/
             logd("update name from field %s", KFieldSpecialistName);

@@ -106,6 +106,7 @@ public:
                        qint64 opFlags,
                        const QString& keywords,
                        const char* targetModelName = nullptr,
+                       const DbModel* parentModel = nullptr,
                        QList<DbModel*>* outList = nullptr,
                        int from = 0,
                        int noItems = 0,

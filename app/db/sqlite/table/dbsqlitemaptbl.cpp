@@ -70,25 +70,124 @@ QList<DbModel *> DbSqliteMapTbl::getListItems(const QString &mapTblName,
                                               const QString& selectedField)
 {
     tracein;
-//    DB->openDb();
     QSqlQuery qry(SQLITE->currentDb());
+    QString cond;
     qint32 cnt = 0;
+    QList<DbModel *> outList;
     if (uid.isEmpty()){
         loge("Invalid uid");
         return QList<DbModel*>();
     }
-    logi("uid '%s'", uid.toStdString().c_str());
-    QString queryString = QString("SELECT %6 FROM %1 LEFT JOIN %2 ON %1.%3 = %2.%4 WHERE %1.%5 = :uid")
+    logd("uid '%s'", STR2CHA(uid));
+    cond = QString("%1.%2 = '%3'").arg(mapTblName, fieldUid1Cond,uid);
+    outList = getListItems(mapTblName, modelTblName, fieldUid2Join, fieldModelUid, builder,
+                           cond, status, selectedField);
+//    appendModelStatusCond(cond, status);
+//    logd("condition String '%s'", STR2CHA(cond));
+//    if (!cond.isEmpty()) {
+//        queryString += " WHERE " + cond;
+//    }
+//    logd("Query String '%s'", STR2CHA(queryString));
+//    qry.prepare(queryString);
+
+//    // TODO: check sql injection issue
+//    qry.bindValue( ":uid", uid);
+//    // TODO: status check???
+//    cnt = runQuery(qry, builder, &outList);
+
+//    logi("Found %d", cnt);
+    traceout;
+    return outList;
+}
+
+QString DbSqliteMapTbl::getListItemsQueryString(const QString &mapTblName,
+                                                const QString &modelTblName,
+                                                const QString &fieldUid2Join,
+                                                const QString &fieldModelUid,
+                                                const QString &cond,
+                                                int status,
+                                                const QString &selectedField)
+{
+    tracein;
+    QString condStr = cond;
+    logd("cond '%s'", STR2CHA(cond));
+    QString queryString = QString("SELECT %5 FROM %1 LEFT JOIN %2 ON %1.%3 = %2.%4")
                               .arg(mapTblName, modelTblName) // 1 & 2
-                              .arg(fieldUid2Join, fieldModelUid, fieldUid1Cond) // 3 & 4 & 5
-                              .arg(selectedField) // 6
+                              .arg(fieldUid2Join, fieldModelUid) // 3 & 4
+                              .arg(selectedField) // 5
         ;
+    appendModelStatusCond(condStr, status);
+    logd("condition String '%s'", STR2CHA(condStr));
+    if (!cond.isEmpty()) {
+        queryString += " WHERE " + condStr;
+    }
+    logd("Query String '%s'", STR2CHA(queryString));
+    traceout;
+    return queryString;
+}
+//QList<DbModel *> DbSqliteMapTbl::getListItems(const QString &mapTblName,
+//                                              const QString &modelTblName,
+//                                              const QString &fieldUid2Join,
+//                                              const QString &fieldModelUid,
+//                                              const QString &fieldUid1Cond,
+//                                              const DbModelBuilder &builder,
+//                                              const QString &uid, int status,
+//                                              const QString& selectedField)
+//{
+//    tracein;
+//    QSqlQuery qry(SQLITE->currentDb());
+//    QString cond;
+//    qint32 cnt = 0;
+//    if (uid.isEmpty()){
+//        loge("Invalid uid");
+//        return QList<DbModel*>();
+//    }
+//    logi("uid '%s'", uid.toStdString().c_str());
+//    QString queryString = QString("SELECT %5 FROM %1 LEFT JOIN %2 ON %1.%3 = %2.%4")
+//                              .arg(mapTblName, modelTblName) // 1 & 2
+//                              .arg(fieldUid2Join, fieldModelUid) // 3 & 4
+//                              .arg(selectedField) // 5
+//        ;
+//    cond = QString("%1.%2 = :uid").arg(mapTblName, fieldUid1Cond);
+//    appendModelStatusCond(cond, status);
+//    logd("condition String '%s'", STR2CHA(cond));
+//    if (!cond.isEmpty()) {
+//        queryString += " WHERE " + cond;
+//    }
+//    logd("Query String '%s'", STR2CHA(queryString));
+//    qry.prepare(queryString);
 
+//    // TODO: check sql injection issue
+//    qry.bindValue( ":uid", uid);
+//    // TODO: status check???
+//    QList<DbModel *> outList;
+//    cnt = runQuery(qry, builder, &outList);
+
+//    logi("Found %d", cnt);
+//    traceout;
+//    return outList;
+//}
+
+QList<DbModel *> DbSqliteMapTbl::getListItems(const QString &mapTblName,
+                                              const QString &modelTblName,
+                                              const QString &fieldUid2Join,
+                                              const QString &fieldModelUid,
+                                              const DbModelBuilder &builder,
+                                              const QString &cond,
+                                              int status,
+                                              const QString &selectedField)
+{
+    tracein;
+    QSqlQuery qry(SQLITE->currentDb());
+    qint32 cnt = 0;
+    QString condStr = cond;
+    logd("cond '%s'", STR2CHA(cond));
+    QString queryString = getListItemsQueryString(mapTblName, modelTblName,
+                                                  fieldUid2Join, fieldModelUid,
+                                                  cond, status, selectedField);
+    logd("Query String '%s'", STR2CHA(queryString));
     qry.prepare(queryString);
-    logd("Query String '%s'", queryString.toStdString().c_str());
 
-    // TODO: check sql injection issue
-    qry.bindValue( ":uid", uid);
     // TODO: status check???
     QList<DbModel *> outList;
     cnt = runQuery(qry, builder, &outList);
@@ -235,7 +334,7 @@ ErrCode DbSqliteMapTbl::insertTableField(DbSqliteInsertBuilder *builder, const D
     return ret;
 }
 
-ErrCode DbSqliteMapTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqliteMapTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     tracein;
     ErrCode err = ErrNone;
@@ -244,7 +343,7 @@ ErrCode DbSqliteMapTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry
         loge("invalid argument");
     }
     if (err == ErrNone) {
-        err = DbSqliteTbl::updateModelFromQuery(item, qry);
+        err = DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
     }
     if (err == ErrNone) {
         logd("update for map model '%s'", item->modelName().toStdString().c_str());
@@ -356,6 +455,23 @@ ErrCode DbSqliteMapTbl::updateTableField(DbSqliteUpdateBuilder *builder,
         }
     }
     traceout;
+    return err;
+}
+
+ErrCode DbSqliteMapTbl::filterFieldCond(int fieldId, int operatorId,
+                                        QString fieldValueName, const DbModel *parentModel,
+                                        QString &cond, int &dataType, bool &isExact)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    err = DbSqliteTbl::filterFieldCond(fieldId, operatorId, fieldValueName,
+                                       parentModel, cond, dataType, isExact);
+    if (err == ErrNone && parentModel && !parentModel->uid().isEmpty()) {
+        logd("Append uid '%s'", STR2CHA(parentModel->uid()));
+        cond = QString("((%1) AND (%2 = '%3'))").arg(cond, getFieldNameUid1(), parentModel->uid());
+    }
+    logd("cond: '%s'", STR2CHA(cond));
+    traceret(err);
     return err;
 }
 

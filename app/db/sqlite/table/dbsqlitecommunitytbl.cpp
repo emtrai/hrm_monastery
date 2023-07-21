@@ -103,11 +103,11 @@ ErrCode DbSqliteCommunityTbl::insertTableField(DbSqliteInsertBuilder *builder, c
     return ErrNone;
 }
 
-ErrCode DbSqliteCommunityTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqliteCommunityTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     tracein;
     ErrCode err = ErrNone;
-    DbSqliteTbl::updateModelFromQuery(item, qry);
+    DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
     Community* cmm = (Community*) item;
     cmm->setBrief(qry.value(KFieldBrief).toString());
     cmm->setFullInfo(qry.value(KFieldFullInfo).toString());

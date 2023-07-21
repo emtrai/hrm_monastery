@@ -32,6 +32,8 @@ typedef enum ErrCode {
     ErrInvalidData,
     ErrInvalidState,
     ErrInvalid,
+    ErrInvalidController,
+    ErrInvalidModel,
     ErrNotSupport,
     ErrNotFound,
     ErrNotReady,

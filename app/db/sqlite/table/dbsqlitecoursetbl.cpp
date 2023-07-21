@@ -64,11 +64,11 @@ ErrCode DbSqliteCourseTbl::insertTableField(DbSqliteInsertBuilder *builder, cons
     return ErrNone;
 }
 
-ErrCode DbSqliteCourseTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqliteCourseTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     tracein;
     ErrCode err = ErrNone;
-    DbSqliteTbl::updateModelFromQuery(item, qry);
+    DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
     Course* course = (Course*) item;
     course->setStartDate(qry.value(KFieldStartDate).toInt());
     course->setEndDate(qry.value(KFieldEndDate).toInt());

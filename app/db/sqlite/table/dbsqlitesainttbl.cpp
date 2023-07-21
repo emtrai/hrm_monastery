@@ -65,11 +65,11 @@ ErrCode DbSqliteSaintTbl::insertTableField(DbSqliteInsertBuilder *builder, const
     return ErrNone;
 }
 
-ErrCode DbSqliteSaintTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqliteSaintTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     tracein;
     ErrCode err = ErrNone;
-    DbSqliteTbl::updateModelFromQuery(item, qry);
+    DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
     Saint* saint = (Saint*) item;
     saint->setFullName(qry.value(KFieldFullName).toString());
     saint->setOriginName(qry.value(KFieldOriginName).toString());

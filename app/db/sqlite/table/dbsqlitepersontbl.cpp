@@ -264,11 +264,11 @@ ErrCode DbSqlitePersonTbl::insertTableField(DbSqliteInsertBuilder *builder, cons
 
 // TODO: separate it into 2 info: detail and brief????
 // as person has a lots of information
-ErrCode DbSqlitePersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqlitePersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     tracein;
     ErrCode err = ErrNone;
-    DbSqliteTbl::updateModelFromQuery(item, qry);
+    DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
     // TODO: separate into short info and full info, to avoid consume too much memory?
     // TODO: paging to avoid too much memory?
     Person* cmm = (Person*) item;

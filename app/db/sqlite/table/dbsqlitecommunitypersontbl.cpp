@@ -168,7 +168,7 @@ QList<DbModel *> DbSqliteCommunityPersonTbl::getListItems(const QString &personU
     return getListItemsUids(commuid, personUid, builder);
 }
 
-ErrCode DbSqliteCommunityPersonTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqliteCommunityPersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     tracein;
     ErrCode err = ErrNone;
@@ -176,7 +176,7 @@ ErrCode DbSqliteCommunityPersonTbl::updateModelFromQuery(DbModel *item, const QS
     logd("update for map model '%s'", modelName.toStdString().c_str());
     DbSqlitePersonTbl* tblPerson = dynamic_cast<DbSqlitePersonTbl*>(DbSqlite::table(KTablePerson));
     DbModelHandler* commHdl = DB->getCommunityModelHandler();
-    err = DbSqliteMapTbl::updateModelFromQuery(item, qry);
+    err = DbSqliteMapTbl::updateDbModelDataFromQuery(item, qry);
     if (err == ErrNone && !item) {
         loge("invalid input model, it's NULL!");
         err = ErrInvalidArg;
@@ -193,7 +193,7 @@ ErrCode DbSqliteCommunityPersonTbl::updateModelFromQuery(DbModel *item, const QS
         if (modelName == KModelNamePerson) {
             logd("update for person model");
             if (tblPerson) {
-                tblPerson->updateModelFromQuery(item, qry);
+                tblPerson->updateDbModelDataFromQuery(item, qry);
             } else {
                 err = ErrNoTable;
                 loge("not found table person");
@@ -202,7 +202,7 @@ ErrCode DbSqliteCommunityPersonTbl::updateModelFromQuery(DbModel *item, const QS
             CommunityPerson* commPer = (CommunityPerson*)item;
             Person* person = (Person*)Person::build();
             if (person) {
-                tblPerson->updateModelFromQuery(person, qry);
+                tblPerson->updateDbModelDataFromQuery(person, qry);
                 commPer->setPerson(person);
                 delete person;
             } else {

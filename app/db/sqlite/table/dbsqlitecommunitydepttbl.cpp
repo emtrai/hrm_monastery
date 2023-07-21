@@ -80,11 +80,11 @@ ErrCode DbSqliteCommunityDeptTbl::insertTableField(DbSqliteInsertBuilder *builde
     return ErrNone;
 }
 
-ErrCode DbSqliteCommunityDeptTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqliteCommunityDeptTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     tracein;
     ErrCode err = ErrNone;
-    DbSqliteTbl::updateModelFromQuery(item, qry);
+    DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
     CommunityDept* cmm = (CommunityDept*) item;
     cmm->setCommunityUid(qry.value(KFieldCommunityUid).toString());
     if (!cmm->communityUid().isEmpty()) {

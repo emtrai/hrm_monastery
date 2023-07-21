@@ -237,6 +237,54 @@ QHash<QString, QString> UICommonListView::getFilterKeywords(int fieldId,
     return keywords;
 }
 
+int UICommonListView::onFilter(int catetoryid, const QString &catetory,
+                               qint64 opFlags, const QString &keywords,
+                               const QVariant *value)
+{
+    tracein;
+    if (keywords.isEmpty()) {
+        logd("no filter keyword, do reload all");
+        onReload();
+    } else {
+        QString modelName = getMainModelName();
+        ModelController* ctrl = getController();
+        ErrCode err = ErrNone;
+        logi("filter with keyword '%s'", STR2CHA(keywords));
+        if (!ctrl) {
+            loge("Invalid controller");
+            err = ErrInvalidController;
+        }
+        if (err == ErrNone && modelName.isEmpty()) {
+            loge("Invalid model name");
+            err = ErrInvalidModel;
+        }
+        if (err == ErrNone) {
+            RELEASE_LIST_DBMODEL(mItemList);
+            QString searchKeyWork;
+            if (value && value->isValid()) {
+                searchKeyWork = value->toString();
+            }else {
+                searchKeyWork = keywords;
+            }
+            logd("category id %d", catetoryid);
+            logd("category '%s'", STR2CHA(catetory));
+            logd("opFlags 0x%llx", opFlags);
+            logd("searchKeyWork %s", STR2CHA(searchKeyWork));
+            logd("modelName %s", STR2CHA(modelName));
+            logd("ctrl %s", STR2CHA(ctrl->getName()));
+            err = ctrl->filter(catetoryid,
+                              opFlags, searchKeyWork,
+                              modelName.toStdString().c_str(),
+                               mParentModel,
+                              &mItemList);
+        }
+        logd("filter err %d", err);
+        logd("mItemList cnt %lld", mItemList.count());
+    }
+    traceout;
+    return mItemList.count();
+}
+
 
 ErrCode UICommonListView::onViewItem(UITableCellWidgetItem *item)
 {

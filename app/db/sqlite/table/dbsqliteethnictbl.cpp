@@ -66,11 +66,11 @@ ErrCode DbSqliteEthnicTbl::insertTableField(DbSqliteInsertBuilder *builder,
     return ErrNone;
 }
 
-ErrCode DbSqliteEthnicTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqliteEthnicTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     tracein;
     ErrCode err = ErrNone;
-    DbSqliteTbl::updateModelFromQuery(item, qry);
+    DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
     Ethnic* model = (Ethnic*) item;
     model->setCountryUid(qry.value(KFieldCountryUid).toString().trimmed());
     model->setCountryDbId(qry.value(KFieldCountryDbId).toInt());

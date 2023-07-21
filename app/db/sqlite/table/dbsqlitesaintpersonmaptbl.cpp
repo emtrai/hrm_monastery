@@ -63,11 +63,11 @@ ErrCode DbSqliteSaintPersonMapTbl::insertTableField(DbSqliteInsertBuilder *build
     return ErrNone;
 }
 
-ErrCode DbSqliteSaintPersonMapTbl::updateModelFromQuery(DbModel *item, const QSqlQuery &qry)
+ErrCode DbSqliteSaintPersonMapTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     tracein;
     ErrCode err = ErrNone;
-    DbSqliteTbl::updateModelFromQuery(item, qry);
+    DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
     SaintPerson* saint = (SaintPerson*) item;
     saint->setSaintDbId(qry.value(KFieldSaintDbId).toInt());
     saint->setSaintUid(qry.value(KFieldSaintUid).toString());

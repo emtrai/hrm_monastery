@@ -632,7 +632,7 @@ QHash<QString, QString> DbSqliteTbl::getFieldsCheckExists(const DbModel* item)
 }
 
 
-ErrCode DbSqliteTbl::updateModelFromQuery(DbModel* item, const QSqlQuery& qry)
+ErrCode DbSqliteTbl::updateDbModelDataFromQuery(DbModel* item, const QSqlQuery& qry)
 {
     tracein;
     ErrCode err = ErrNone;
@@ -655,86 +655,237 @@ ErrCode DbSqliteTbl::updateModelFromQuery(DbModel* item, const QSqlQuery& qry)
     return err;
 }
 
+ErrCode DbSqliteTbl::filterFieldCond(int fieldId,
+                                int operatorId,
+                                QString fieldValueName,
+                                const DbModel* parentModel,
+                                QString& cond,
+                                int& dataType,
+                                bool& isExact
+                                )
+{
+    tracein;
+    bool isOk = false;
+    QString fieldName;
+    QString field;
+    ErrCode err = ErrNone;
+    logd("fieldId %d or operatorId %d", fieldId, operatorId);
+    if (fieldId >= FILTER_FIELD_MAX || operatorId >= FILTER_OP_MAX) {
+        loge("invalid fieldId %d or operatorId %d", fieldId, operatorId);
+        err = ErrInvalidArg;
+    }
+    if (err == ErrNone) {
+        fieldName = getFieldNameFromId(fieldId, &isOk);
+        if (!isOk || fieldName.isEmpty()) {
+            err = ErrNotFound;
+            loge("not found fiedName for fieldId %d", fieldId);
+        }
+        logd("fieldName '%s'", STR2CHA(fieldName));
+    }
+
+    if (err == ErrNone) {
+        switch (fieldId) {
+        case FILTER_FIELD_NAME:
+            field = QString("%1.%2").arg(name(), fieldName);
+            dataType = TEXT;
+            break;
+        case FILTER_FIELD_MODEL_STATUS:
+            field = fieldName;
+            dataType = INT64;
+            break;
+        default:
+            field = fieldName;
+            dataType = TEXT;
+            break;
+        }
+    }
+    logd("field '%s'", STR2CHA(field));
+    if (err == ErrNone) {
+        switch (operatorId) {
+        case FILTER_OP_EQUAL:
+            cond = QString("lower(%1) = ").arg(field);
+            isExact = true;
+            break;
+        case FILTER_OP_NOT_EQUAL:
+            cond = QString("lower(%1) != ").arg(field);
+            isExact = true;
+            break;
+
+        case FILTER_OP_CONTAIN:
+            cond = QString("lower(%1) like ").arg(field);
+            isExact = false;
+            break;
+
+        case FILTER_OP_NOT_CONTAIN:
+            cond = QString("lower(%1) not like ").arg(field);
+            isExact = false;
+            break;
+        case FILTER_OP_LESS:
+            cond = QString("%1 < ").arg(field);
+            isExact = true;
+            break;
+        case FILTER_OP_LESS_EQ:
+            cond = QString("%1 <= ").arg(field);
+            isExact = true;
+            break;
+        case FILTER_OP_GREATER:
+            cond = QString("%1 > ").arg(field);
+            isExact = true;
+            break;
+        case FILTER_OP_GREATER_EQ:
+            cond = QString("%1 >= ").arg(field);
+            isExact = true;
+            break;
+        default:
+            err = ErrNotSupport;
+            loge("operatorId 0x%x not support", operatorId);
+            break;
+        }
+    }
+    if (err == ErrNone) {
+        cond += fieldValueName;
+    }
+
+    logd("cond '%s'", STR2CHA(cond));
+    logd("isExact %d", isExact);
+    traceret(err);
+    return err;
+}
+
+
 ErrCode DbSqliteTbl::filter(int fieldId,
-                        int operatorId,
-                        const QString& keyword,
-                        const DbModelBuilder& builder,
-                        QList<DbModel*>* outList,
-                        qint64 dbStatus,
-                        int from,
-                        int noItems,
-                        int* total)
+                            int operatorId,
+                            const QString& keyword,
+                            const DbModelBuilder& builder,
+                            const DbModel* parentModel,
+                            QList<DbModel*>* outList,
+                            qint64 dbStatus,
+                            int from,
+                            int noItems,
+                            int* total)
 {
     tracein;
     // TODO: implement it
     // TODO: check data typpe text vs integer
-//    DB->openDb();
+    //    DB->openDb();
     QSqlQuery qry(SQLITE->currentDb());
     qint32 cnt = 0;
     ErrCode err = ErrNone;
-    logi("Filter keyword '%s'", keyword.toStdString().c_str());
     QString cond;
-    bool isOk = false;
-    QString fieldName = getFieldNameFromId(fieldId, &isOk);
-    QString field;
-    switch (fieldId) {
-    case FILTER_FIELD_NAME:
-        field = QString("%1.%2").arg(name(), fieldName);
-        break;
-    default:
-        field = fieldName;
-        break;
+    int fieldDataType = 0;
+    QString fieldValueName = ":fieldValue";
+    bool isFieldValueExact = false;
+    logi("Filter keyword '%s'", STR2CHA(keyword));
+    err = filterFieldCond(fieldId, operatorId, fieldValueName, parentModel,
+                          cond, fieldDataType, isFieldValueExact);
+    if (err == ErrNone) {
+        appendDbStatusCond(cond, dbStatus);
     }
-    if (isOk && !fieldName.isEmpty()) {
-        switch (operatorId) {
-        case FILTER_OP_EQUAL:
-            cond = QString("lower(%1) = :keywordexact").arg(field);
-            break;
-        case FILTER_OP_NOT_EQUAL:
-            cond = QString("lower(%1) != :keywordexact").arg(field);
-            break;
+    if (err == ErrNone) {
+        logd("Query cond '%s'", STR2CHA(cond));
+        QString queryString = getFilterQueryString(fieldId, cond);
 
-        case FILTER_OP_CONTAIN:
-            cond = QString("lower(%1) like :keyword").arg(field);
-            break;
+        qry.prepare(queryString);
+        logd("Query String '%s'", queryString.toStdString().c_str());
 
-        case FILTER_OP_NOT_CONTAIN:
-            cond = QString("lower(%1) not like :keyword").arg(field);
-            break;
-        case FILTER_OP_LESS:
-            cond = QString("%1 < :value").arg(field);
-            break;
-        case FILTER_OP_LESS_EQ:
-            cond = QString("%1 <= :value").arg(field);
-            break;
-        case FILTER_OP_GREATER:
-            cond = QString("%1 > :value").arg(field);
-            break;
-        case FILTER_OP_GREATER_EQ:
-            cond = QString("%1 >= :value").arg(field);
-            break;
-        default:
-            break;
+        // TODO: check sql injection issue
+        logd("bind keyword='%s'", STR2CHA(keyword));
+        if (isFieldValueExact) {
+            qry.bindValue(fieldValueName, QString("%1").arg(keyword.trimmed().toLower()) );
+        } else {
+            qry.bindValue(fieldValueName, QString("\%%1\%").arg(keyword.trimmed().toLower()) );
         }
+        cnt = runQuery(qry, builder, outList);
+
+        logi("Found %d for keyword '%s'", cnt, STR2CHA(keyword));
+    } else {
+        loge("get filter cond failed err %d", err);
     }
-    appendDbStatusCond(cond, dbStatus);
-    logd("Query cond '%s'", cond.toStdString().c_str());
-    QString queryString = getFilterQueryString(fieldId, cond);
-
-    qry.prepare(queryString);
-    logd("Query String '%s'", queryString.toStdString().c_str());
-
-    // TODO: check sql injection issue
-    logd("bind keyword='%s'", STR2CHA(keyword));
-    qry.bindValue( ":keyword", QString("%1%").arg(keyword.trimmed().toLower()) );
-    qry.bindValue( ":keywordexact", QString("%1").arg(keyword.trimmed().toLower()) );
-    qry.bindValue( ":value", QString("%1").arg(keyword.trimmed().toLower()) );
-    cnt = runQuery(qry, builder, outList);
-
-    logi("Found %d", cnt);
-    traceout;
+    traceret(err);
     return err;
 }
+
+//ErrCode DbSqliteTbl::filter(int fieldId,
+//                        int operatorId,
+//                        const QString& keyword,
+//                        const DbModelBuilder& builder,
+//                        const DbModel* parentModel,
+//                        QList<DbModel*>* outList,
+//                        qint64 dbStatus,
+//                        int from,
+//                        int noItems,
+//                        int* total)
+//{
+//    tracein;
+//    // TODO: implement it
+//    // TODO: check data typpe text vs integer
+////    DB->openDb();
+//    QSqlQuery qry(SQLITE->currentDb());
+//    qint32 cnt = 0;
+//    ErrCode err = ErrNone;
+//    logi("Filter keyword '%s'", keyword.toStdString().c_str());
+//    QString cond;
+//    bool isOk = false;
+//    QString fieldName = getFieldNameFromId(fieldId, &isOk);
+//    QString field;
+//    switch (fieldId) {
+//    case FILTER_FIELD_NAME:
+//        field = QString("%1.%2").arg(name(), fieldName);
+//        break;
+//    default:
+//        field = fieldName;
+//        break;
+//    }
+//    if (isOk && !fieldName.isEmpty()) {
+//        switch (operatorId) {
+//        case FILTER_OP_EQUAL:
+//            cond = QString("lower(%1) = :keywordexact").arg(field);
+//            break;
+//        case FILTER_OP_NOT_EQUAL:
+//            cond = QString("lower(%1) != :keywordexact").arg(field);
+//            break;
+
+//        case FILTER_OP_CONTAIN:
+//            cond = QString("lower(%1) like :keyword").arg(field);
+//            break;
+
+//        case FILTER_OP_NOT_CONTAIN:
+//            cond = QString("lower(%1) not like :keyword").arg(field);
+//            break;
+//        case FILTER_OP_LESS:
+//            cond = QString("%1 < :value").arg(field);
+//            break;
+//        case FILTER_OP_LESS_EQ:
+//            cond = QString("%1 <= :value").arg(field);
+//            break;
+//        case FILTER_OP_GREATER:
+//            cond = QString("%1 > :value").arg(field);
+//            break;
+//        case FILTER_OP_GREATER_EQ:
+//            cond = QString("%1 >= :value").arg(field);
+//            break;
+//        default:
+//            break;
+//        }
+//    }
+//    appendDbStatusCond(cond, dbStatus);
+//    logd("Query cond '%s'", cond.toStdString().c_str());
+//    QString queryString = getFilterQueryString(fieldId, cond);
+
+//    qry.prepare(queryString);
+//    logd("Query String '%s'", queryString.toStdString().c_str());
+
+//    // TODO: check sql injection issue
+//    logd("bind keyword='%s'", STR2CHA(keyword));
+//    qry.bindValue( ":keyword", QString("%1%").arg(keyword.trimmed().toLower()) );
+//    qry.bindValue( ":keywordexact", QString("%1").arg(keyword.trimmed().toLower()) );
+//    qry.bindValue( ":value", QString("%1").arg(keyword.trimmed().toLower()) );
+//    cnt = runQuery(qry, builder, outList);
+
+//    logi("Found %d", cnt);
+//    traceout;
+//    return err;
+//}
 
 ErrCode DbSqliteTbl::updateQueryromFields(const QHash<QString, QString>& inFields,
                                           QSqlQuery &qry, bool isMatchAllField,
@@ -863,7 +1014,7 @@ int DbSqliteTbl::runQuery(QSqlQuery &qry, const DbModelBuilder& builder,
                 logd("found one build item");
                 DbModel* item = builder();
                 logd("Updae model from query");
-                err = updateModelFromQuery(item, qry);
+                err = updateDbModelDataFromQuery(item, qry);
                 if (err == ErrNone) {
                     logd("add model '%s' to outlist", STR2CHA(item->toString()));
                     outList->append(item); // TODO: when it cleaned up?????
@@ -944,7 +1095,7 @@ QList<DbModel *> DbSqliteTbl::getAll(const DbModelBuilder& builder, qint64 statu
             item->setDbCreatedTime(qry->value(KFieldDbCreateTime).toInt());
             item->setLastDbUpdatedTime(qry->value(KFieldLastDbUpdateItme).toInt());
             // TODO: validate value before, i.e. toInt return ok
-            err = updateModelFromQuery(item, *qry);
+            err = updateDbModelDataFromQuery(item, *qry);
             if (err == ErrNone) {
                 logd("add model '%s' to outlist", STR2CHA(item->toString()));
                 list.append(item); // TODO: when it cleaned up?????
@@ -995,7 +1146,7 @@ DbModel *DbSqliteTbl::getModel(qint64 dbId, const DbModelBuilder& builder)
         item->setUid(qry.value(KFieldUid).toString());
         item->setDbCreatedTime(qry.value(KFieldDbCreateTime).toInt());
         item->setLastDbUpdatedTime(qry.value(KFieldLastDbUpdateItme).toInt());
-        err = updateModelFromQuery(item, qry);
+        err = updateDbModelDataFromQuery(item, qry);
     }
 
     if (err != ErrNone && item){
