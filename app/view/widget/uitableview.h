@@ -211,7 +211,7 @@ protected:
     virtual ErrCode onReload();
     virtual void importRequested(const QString& fpath);
     virtual ErrCode onViewItem(UITableCellWidgetItem *item);
-    virtual void onEditItem(UITableCellWidgetItem *item);
+    virtual ErrCode onEditItem(UITableCellWidgetItem *item);
     virtual ErrCode onDeleteItem(const QList<UITableItem *>& selectedItems);
     virtual ErrCode onAddItem(UITableCellWidgetItem *item);
 //    virtual void onDeleteItem(UITableItem *item);

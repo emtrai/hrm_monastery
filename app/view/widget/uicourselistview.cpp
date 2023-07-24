@@ -71,9 +71,10 @@ ErrCode UICourseListView::onAddItem(UITableCellWidgetItem *item)
     return ErrNone;
 }
 
-void UICourseListView::onEditItem(UITableCellWidgetItem *item)
+ErrCode UICourseListView::onEditItem(UITableCellWidgetItem *item)
 {
     tracein;
+    ErrCode err = ErrNone;
     if (item) {
         DbModel* course = item->itemData();
         if (course) {
@@ -83,8 +84,10 @@ void UICourseListView::onEditItem(UITableCellWidgetItem *item)
         }
     } else {
         loge("Edit failed, null item");
+        err = ErrInvalidArg;
     }
-    traceout;
+    traceret(err);
+    return err;
 }
 
 ErrCode UICourseListView::onDeleteItem(const QList<UITableItem *> &selectedItems)

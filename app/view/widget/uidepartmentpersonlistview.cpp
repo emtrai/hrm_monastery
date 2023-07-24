@@ -89,9 +89,10 @@ ErrCode UIDepartmentPersonListView::onAddItem(UITableCellWidgetItem *item)
     return ErrNone;
 }
 
-void UIDepartmentPersonListView::onEditItem(UITableCellWidgetItem *item)
+ErrCode UIDepartmentPersonListView::onEditItem(UITableCellWidgetItem *item)
 {
     tracein;
+    ErrCode err = ErrNone;
     DbModel* model = item->itemData();
     if (model){
         PersonDept* per = (PersonDept*)model;
@@ -105,9 +106,11 @@ void UIDepartmentPersonListView::onEditItem(UITableCellWidgetItem *item)
 
     } else {
         loge("Invalid item data");
+        err = ErrInvalidArg;
         // TODO: popup message???
     }
-    traceout;
+    traceret(err);
+    return err;
 }
 
 

@@ -61,8 +61,10 @@ ErrCode UIAreaContactPeopleListView::setArea(const Area *newArea)
 {
     ErrCode err = ErrNone;
     tracein;
+    // parent model is area, as this listview will show all contact people of an area
     err = setParentModel(newArea);
     if (err == ErrNone) {
+        // update title when setting parent model
         setTitle(getTitle());
     }
     traceret(err);
@@ -72,7 +74,7 @@ ErrCode UIAreaContactPeopleListView::setArea(const Area *newArea)
 void UIAreaContactPeopleListView::setupUI()
 {
     tracein;
-    UITableView::setupUI();
+    UICommonListView::setupUI();
 
     // register listener for any change in Area
     AREACTL->addListener(this);
@@ -81,7 +83,7 @@ void UIAreaContactPeopleListView::setupUI()
 
 QString UIAreaContactPeopleListView::getMainModelName()
 {
-    return KModelNameAreaPerson;
+    return KModelNameAreaPerson; // this listview lists up list of area person model
 }
 
 void UIAreaContactPeopleListView::initHeader()
@@ -116,15 +118,17 @@ QString UIAreaContactPeopleListView::getTitle()
 void UIAreaContactPeopleListView::initFilterFields()
 {
     tracein;
+    // filter by model status
     appendFilterField(FILTER_FIELD_MODEL_STATUS, STR_MODELSTATUS);
+    // filter by person full name
     appendFilterField(FILTER_FIELD_FULL_NAME, STR_FULLNAME);
-    // TODO: support start date & end date
+    // TODO: support start date & end date and/term (course)
     traceout;
 }
 
 ModelController *UIAreaContactPeopleListView::getController()
 {
-    return AREACTL;
+    return AREACTL; // area contact people is controlled by area controller
 }
 
 void UIAreaContactPeopleListView::updateItem(DbModel *item,
@@ -153,7 +157,7 @@ void UIAreaContactPeopleListView::updateItem(DbModel *item,
             tblItem->addValue(per->remark());
         } else {
             loge("No item found, or not expected model '%s'",
-                 STR2CHA(item->modelName()));
+                 MODELSTR2CHA(item));
         }
     }
     traceout;
@@ -167,7 +171,7 @@ QList<DbModel *> UIAreaContactPeopleListView::getListItem()
     QString uid;
     Area* ar = area();
     if (!ar) {
-        loge("Nothing to load");
+        loge("No area, nothing to load");
         err = ErrNoData;
     }
 
@@ -175,7 +179,7 @@ QList<DbModel *> UIAreaContactPeopleListView::getListItem()
         uid = ar->uid();
         if (uid.isEmpty()) {
             err = ErrInvalidData;
-            loge("Invalud aream info, uid is null");
+            loge("Invalid area info, uid is null, area '%s'", MODELSTR2CHA(ar));
         }
     }
     if (err == ErrNone) {
@@ -203,6 +207,7 @@ ErrCode UIAreaContactPeopleListView::onAddItem(UITableCellWidgetItem *item)
     ErrCode err = ErrNone;
     DlgAreaPerson* dlg = nullptr;
     Area* ar = area();
+    UNUSED(item);
 
     if (err == ErrNone && !ar) {
         loge("Invalid area, null value");
@@ -217,7 +222,7 @@ ErrCode UIAreaContactPeopleListView::onAddItem(UITableCellWidgetItem *item)
         }
     }
     if (err == ErrNone) {
-        logd("Add area person for area '%s'", MODELSTR2CHA(ar));
+        logd("Set area '%s' for area person", MODELSTR2CHA(ar));
         err = dlg->setArea(ar);
     }
 
@@ -232,7 +237,7 @@ ErrCode UIAreaContactPeopleListView::onAddItem(UITableCellWidgetItem *item)
     return err;
 }
 
-void UIAreaContactPeopleListView::onEditItem(UITableCellWidgetItem *item)
+ErrCode UIAreaContactPeopleListView::onEditItem(UITableCellWidgetItem *item)
 {
     tracein;
     ErrCode err = ErrNone;
@@ -272,7 +277,8 @@ void UIAreaContactPeopleListView::onEditItem(UITableCellWidgetItem *item)
     }
 
     FREE_PTR(dlg);
-    traceout;
+    traceret(err);
+    return err;
 }
 ErrCode UIAreaContactPeopleListView::onViewItem(UITableCellWidgetItem *item)
 {
@@ -291,7 +297,7 @@ ErrCode UIAreaContactPeopleListView::onViewItem(UITableCellWidgetItem *item)
     }
 
     if (err == ErrNone) {
-        err = MainWindow::showOnHtmlViewer(model, tr("Vùng"));
+        err = MainWindow::showOnHtmlViewer(model, tr("Liên lạc của khu vực"));
     }
     if (err != ErrNone) {
         loge("view item err %d", err);

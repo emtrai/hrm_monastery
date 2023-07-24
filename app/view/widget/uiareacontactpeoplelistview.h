@@ -47,6 +47,9 @@ public:
      */
     ErrCode setArea(const Area *newArea);
 
+    /**
+     * @brief setup UI
+     */
     virtual void setupUI();
 
 protected:
@@ -72,11 +75,9 @@ protected:
     virtual QList<DbModel*> getListItem();
 
     virtual ErrCode onAddItem(UITableCellWidgetItem *item);
-    virtual void onEditItem(UITableCellWidgetItem *item);
+    virtual ErrCode onEditItem(UITableCellWidgetItem *item);
     virtual ErrCode onViewItem(UITableCellWidgetItem *item);
 
-private:
-    Area* mArea;
 };
 
 #endif // UIAREACONTACTPEOPLELISTVIEW_H

@@ -69,7 +69,7 @@ protected:
                          const QString& keywords, const QVariant *value);
     virtual ErrCode onViewItem(UITableCellWidgetItem *item);
     virtual ErrCode onAddItem(UITableCellWidgetItem *item);
-    virtual void onEditItem(UITableCellWidgetItem *item);
+    virtual ErrCode onEditItem(UITableCellWidgetItem *item);
 
     virtual void onDbModelReady(ErrCode ret, DbModel* model, DlgCommonEditModel* dlg);
     virtual DbModel* onNewModel(const QString& modelName);

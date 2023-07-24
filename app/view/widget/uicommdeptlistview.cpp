@@ -95,9 +95,10 @@ ErrCode UICommDeptListView::onAddItem(UITableCellWidgetItem *item)
     return ErrNone;
 }
 
-void UICommDeptListView::onEditItem(UITableCellWidgetItem *item)
+ErrCode UICommDeptListView::onEditItem(UITableCellWidgetItem *item)
 {
     tracein;
+    ErrCode err = ErrNone;
     if (item) {
         DbModel* comm = item->itemData();
         if (comm) {
@@ -108,7 +109,8 @@ void UICommDeptListView::onEditItem(UITableCellWidgetItem *item)
     } else {
         loge("Edit failed, null item");
     }
-    traceout;
+    traceret(err);
+    return err;
 }
 
 ErrCode UICommDeptListView::onDeleteItem(const QList<UITableItem *> &selectedItems)

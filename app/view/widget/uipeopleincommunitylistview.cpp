@@ -92,7 +92,7 @@ UIPeopleInCommunityListView::~UIPeopleInCommunityListView()
 //    return ErrNone;
 //}
 
-void UIPeopleInCommunityListView::onEditItem(UITableCellWidgetItem *item)
+ErrCode UIPeopleInCommunityListView::onEditItem(UITableCellWidgetItem *item)
 {
     tracein;
     ErrCode err = ErrNone;
@@ -131,7 +131,8 @@ void UIPeopleInCommunityListView::onEditItem(UITableCellWidgetItem *item)
     } else if (err != ErrCancelled) {
         DialogUtils::showErrorBox(err, tr("Lỗi cập nhật Cộng đoàn - Nữ tu"));
     } // cancel, do nothing
-    traceout;
+    traceret(err);
+    return err;
 }
 
 ErrCode UIPeopleInCommunityListView::onDeleteItem(const QList<UITableItem *> &selectedItems)

@@ -47,7 +47,7 @@ protected:
     virtual QList<UITableMenuAction*> getMenuMultiSelectedItemActions(const QMenu *menu,
                                                                const QList<UITableItem *>& items);
 //    virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
-    virtual void onEditItem(UITableCellWidgetItem *item);
+    virtual ErrCode onEditItem(UITableCellWidgetItem *item);
     virtual ErrCode onDeleteItem(const QList<UITableItem *>& selectedItems);
     virtual ErrCode onAddItem(UITableCellWidgetItem *item);
 

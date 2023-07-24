@@ -584,9 +584,10 @@ ErrCode UIPersonListView::onViewItem(UITableCellWidgetItem *item)
     return ErrNone; // TODO: check to return value
 }
 
-void UIPersonListView::onEditItem(UITableCellWidgetItem *item)
+ErrCode UIPersonListView::onEditItem(UITableCellWidgetItem *item)
 {
     tracein;
+    ErrCode err = ErrNone;
     DbModel* model = item->itemData();
 //    logd("idx=%d",idx);
     if (model){
@@ -597,9 +598,11 @@ void UIPersonListView::onEditItem(UITableCellWidgetItem *item)
 
     } else {
         loge("Invalid item data");
+        err = ErrInvalidArg;
         // TODO: popup message???
     }
-    traceout;
+    traceret(err);
+    return err;
 }
 
 QString UIPersonListView::getTitle()

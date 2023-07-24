@@ -90,9 +90,10 @@ ErrCode UIEthnicListView::onAddItem(UITableCellWidgetItem *item)
     return ErrNone;
 }
 
-void UIEthnicListView::onEditItem(UITableCellWidgetItem *item)
+ErrCode UIEthnicListView::onEditItem(UITableCellWidgetItem *item)
 {
     tracein;
+    ErrCode err = ErrNone;
     if (item) {
         DbModel* ethnic = item->itemData();
         if (ethnic) {
@@ -102,6 +103,8 @@ void UIEthnicListView::onEditItem(UITableCellWidgetItem *item)
         }
     } else {
         loge("Edit failed, null item");
+        err = ErrInvalidArg;
     }
-    traceout;
+    traceret(err);
+    return err;
 }

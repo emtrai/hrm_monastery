@@ -315,9 +315,10 @@ ErrCode UICommonListView::onAddItem(UITableCellWidgetItem *item)
     return ErrNone;
 }
 
-void UICommonListView::onEditItem(UITableCellWidgetItem *item)
+ErrCode UICommonListView::onEditItem(UITableCellWidgetItem *item)
 {
     tracein;
+    ErrCode err = ErrNone;
     int idx = item->idx();
     DbModel* comm = item->itemData();
     if (comm) {
@@ -326,7 +327,8 @@ void UICommonListView::onEditItem(UITableCellWidgetItem *item)
         loge("Model obj is null");
         DialogUtils::showErrorBox("Không có thông tin để chỉnh sửa");
     }
-    traceout;
+    traceret(err);
+    return err;
 }
 
 void UICommonListView::onDbModelReady(ErrCode ret, DbModel *model, DlgCommonEditModel *dlg)

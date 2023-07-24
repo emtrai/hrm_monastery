@@ -168,12 +168,15 @@ ErrCode UICommunityListView::onViewItem(UITableCellWidgetItem *item)
 }
 
 
-void UICommunityListView::onEditItem(UITableCellWidgetItem *item)
+ErrCode UICommunityListView::onEditItem(UITableCellWidgetItem *item)
 {
     tracein;
+    ErrCode err = ErrNone;
     DbModel* comm = item->itemData();
     MainWindow::showAddEditCommunity(true, dynamic_cast<Community*>(comm), this);
-    traceout;
+
+    traceret(err);
+    return err;
 }
 
 QString UICommunityListView::getTitle()

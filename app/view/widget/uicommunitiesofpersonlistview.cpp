@@ -99,7 +99,7 @@ ErrCode UICommunitiesOfPersonListView::onAddItem(UITableCellWidgetItem *item)
     return err;
 }
 
-void UICommunitiesOfPersonListView::onEditItem(UITableCellWidgetItem *item)
+ErrCode UICommunitiesOfPersonListView::onEditItem(UITableCellWidgetItem *item)
 {
     ErrCode err = ErrNone;
     DlgPersonCommunity* dlg = nullptr;
@@ -133,7 +133,8 @@ void UICommunitiesOfPersonListView::onEditItem(UITableCellWidgetItem *item)
         DialogUtils::showErrorBox(err, tr("Lỗi chỉnh sửa dữ liệu Cộng đoàn"));
     }
     if (dlg) delete dlg;
-    traceout;
+    traceret(err);
+    return err;
 }
 
 QList<UITableMenuAction *> UICommunitiesOfPersonListView::getMenuMultiSelectedItemActions(const QMenu *menu,

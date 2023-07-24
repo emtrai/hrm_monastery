@@ -155,7 +155,7 @@ ErrCode UIPersonEventListView::onAddItem(UITableCellWidgetItem *item)
     return ErrNone;
 }
 
-void UIPersonEventListView::onEditItem(UITableCellWidgetItem *item)
+ErrCode UIPersonEventListView::onEditItem(UITableCellWidgetItem *item)
 {
     tracein;
     DbModel* model = nullptr;
@@ -175,7 +175,7 @@ void UIPersonEventListView::onEditItem(UITableCellWidgetItem *item)
         DlgAddPersonEvent * dlg = DlgAddPersonEvent::build(this, true, KModelNamePersonEvent, model, this);
         if (dlg == nullptr) {
             loge("Open dlg DlgAddPersonEvent fail, No memory");
-            return;
+            return ErrNoMemory;
         }
         dlg->setPerson(mPerson);
 
@@ -188,5 +188,6 @@ void UIPersonEventListView::onEditItem(UITableCellWidgetItem *item)
     if (err != ErrNone) {
         DialogUtils::showErrorBox((int)err, QString(tr("Không thể chỉnh sửa sự kiện")));
     }
-    traceout;
+    traceret(err);
+    return err;
 }

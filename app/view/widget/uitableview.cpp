@@ -222,10 +222,13 @@ ErrCode UITableView::onViewItem(UITableCellWidgetItem *item)
     return ErrNoData;
 }
 
-void UITableView::onEditItem(UITableCellWidgetItem *item)
+ErrCode UITableView::onEditItem(UITableCellWidgetItem *item)
 {
     tracein;
+    ErrCode err = ErrNone;
     logd("parent class, nothing to do");
+    traceret(err);
+    return err;
 
 }
 
@@ -463,13 +466,15 @@ ErrCode UITableView::onMenuActionEdit(QMenu *menu, UITableMenuAction *act)
 {
     tracein;
     ErrCode err = ErrNone;
+    UNUSED(menu);
     if (act) {
-        onEditItem((UITableCellWidgetItem*)act->tblItem());
+        err = onEditItem((UITableCellWidgetItem*)act->tblItem());
     } else {
         loge("Menu action is null!!!");
         err = ErrInvalidData;
     }
-    return ErrNone;
+    // TODO: report error, show error dialog???
+    return err;
 }
 
 ErrCode UITableView::onMenuActionView(QMenu *menu, UITableMenuAction *act)

@@ -113,9 +113,10 @@ ErrCode UIAreaListView::onAddItem(UITableCellWidgetItem *item)
     return ErrNone;
 }
 
-void UIAreaListView::onEditItem(UITableCellWidgetItem *item)
+ErrCode UIAreaListView::onEditItem(UITableCellWidgetItem *item)
 {
     tracein;
+    ErrCode err = ErrNone;
     if (item) {
         DbModel* area = item->itemData();
         if (area) {
@@ -126,7 +127,8 @@ void UIAreaListView::onEditItem(UITableCellWidgetItem *item)
     } else {
         loge("Edit failed, null item");
     }
-    traceout;
+    traceret(err);
+    return err;
 }
 
 ErrCode UIAreaListView::onDeleteItem(const QList<UITableItem *> &selectedItems)

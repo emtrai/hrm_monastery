@@ -55,7 +55,7 @@ protected:
     virtual ErrCode onMenuActionListDepartment(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onViewItem(UITableCellWidgetItem *item);
     virtual ErrCode onAddItem(UITableCellWidgetItem *item);
-    virtual void onEditItem(UITableCellWidgetItem *item);
+    virtual ErrCode onEditItem(UITableCellWidgetItem *item);
 
 protected:
     virtual ErrCode onLoad();

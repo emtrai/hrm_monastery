@@ -50,7 +50,7 @@ protected:
     virtual ErrCode onMenuActionAddPerson(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionAddDepart(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onViewItem(UITableCellWidgetItem *item);
-    void onEditItem(UITableCellWidgetItem *item);
+    virtual ErrCode onEditItem(UITableCellWidgetItem *item);
     virtual QString getTitle();
 
     virtual QString getName();

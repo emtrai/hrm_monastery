@@ -43,7 +43,7 @@ protected:
     virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
 
     virtual ErrCode onAddItem(UITableCellWidgetItem *item);
-    virtual void onEditItem(UITableCellWidgetItem *item);
+    virtual ErrCode onEditItem(UITableCellWidgetItem *item);
 
 protected:
     virtual ErrCode onLoad();
