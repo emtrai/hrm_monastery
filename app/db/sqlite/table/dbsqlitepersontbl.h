@@ -38,9 +38,9 @@ public:
     DbSqlitePersonTbl(DbSqlite* db);
 
     virtual ErrCode updateDbModelDataFromQuery(DbModel* item, const QSqlQuery& qry);
-    virtual ErrCode updateTableField(DbSqliteUpdateBuilder* builder,
-                                     const QList<QString>& updateField,
-                                     const DbModel *item);
+    virtual ErrCode updateBuilderFieldFromModel(DbSqliteUpdateBuilder *builder,
+                                                const QString &field,
+                                                const DbModel *item);
     virtual ErrCode updateCommunity(const QString& uid, const QString& communityUid);
 protected:
     virtual void addTableField(DbSqliteTableBuilder* builder);

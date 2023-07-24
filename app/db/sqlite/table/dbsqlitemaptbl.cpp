@@ -420,41 +420,38 @@ const QString& DbSqliteMapTbl::getFieldNameDbid2() const
 
 }
 
-ErrCode DbSqliteMapTbl::updateTableField(DbSqliteUpdateBuilder *builder,
-                                         const QList<QString> &updateField, const DbModel *item)
+ErrCode DbSqliteMapTbl::updateBuilderFieldFromModel(DbSqliteUpdateBuilder *builder,
+                                                    const QString &field,
+                                                    const DbModel *item)
 {
     tracein;
     ErrCode err = ErrNone;
-    if (!builder || !item) {
+    logd("update table field '%s' for model '%s'", STR2CHA(field), MODELSTR2CHA(item));
+    if (!builder || !item || field.isEmpty()) {
         err = ErrInvalidArg;
         loge("invalid arg");
     }
     if (err == ErrNone) {
-        err = DbSqliteTbl::updateTableField(builder, updateField, item);
-    }
-    if (err == ErrNone) {
         if (item->modelType() == MODEL_MAP) {
             MapDbModel* comm = (MapDbModel*) item;
-            foreach (QString field, updateField) {
-                logd("Update field %s", STR2CHA(field));
-                if (field == KItemChangeHistory) {
-                    builder->addValue(KFieldChangeHistory, comm->changeHistory());
-                }else if (field == KItemStatus) {
-                    builder->addValue(KFieldModelStatus, comm->modelStatus());
-                } else if (field == KItemEndDate) {
-                    builder->addValue(KFieldEndDate, comm->endDate());
-                } else if (field == KItemStartDate) {
-                    builder->addValue(KFieldStartDate, comm->startDate());
-                } else {
-                    logw("Field '%s' not support here", STR2CHA(field));
-                }
+            if (field == KItemChangeHistory) {
+                builder->addValue(KFieldChangeHistory, comm->changeHistory());
+            }else if (field == KItemStatus) {
+                builder->addValue(KFieldModelStatus, comm->modelStatus());
+            } else if (field == KItemEndDate) {
+                builder->addValue(KFieldEndDate, comm->endDate());
+            } else if (field == KItemStartDate) {
+                builder->addValue(KFieldStartDate, comm->startDate());
+            } else {
+                err = DbSqliteTbl::updateBuilderFieldFromModel(builder, field, item);
             }
         } else {
-            logw("'%s' is not a model map, current type %d",
-                 STR2CHA(item->modelName()), item->modelType());
+            loge("Model '%s' is no support",
+                 MODELSTR2CHA(item));
+            err = ErrNotSupport;
         }
     }
-    traceout;
+    traceret(err);
     return err;
 }
 

@@ -171,31 +171,65 @@ ErrCode_t DbSqliteTbl::add(DbModel *item)
 
 }
 
-ErrCode DbSqliteTbl::updateTableField(DbSqliteUpdateBuilder *builder,
+ErrCode DbSqliteTbl::updateBuilderFromModel(DbSqliteUpdateBuilder *builder,
                                       const QList<QString>& updateField,
                                       const DbModel *item)
 {
     tracein;
     ErrCode err = ErrNone;
-    if (!item || !builder) {
+    if (!item || !builder || updateField.isEmpty()) {
         err = ErrInvalidArg;
         loge("invalid argument");
     }
     if (err == ErrNone) {
-        logd("Add %d field to update", updateField.count());
+        logd("Add %lld field to update", updateField.count());
         foreach (QString field, updateField) {
-            logd("Update field %s", field.toStdString().c_str());
-            if (field == KItemUid) {
-                builder->addValue(KFieldUid, item->uid());
-            } else if (field == KItemName){
-                builder->addValue(KFieldName, item->name());
-            } else if (field == KItemNameId){
-                builder->addValue(KFieldNameId, item->nameId());
-            } else if (field == KItemRemark){
-                builder->addValue(KFieldRemark, item->remark());
-            }  else {
-                logw("Field '%s' not support here", STR2CHA(field));
+            logd("Update field %s", STR2CHA(field));
+            err = updateBuilderFieldFromModel(builder, field, item);
+            if (err != ErrNone) {
+                loge("update builder field '%s' for model '%s' failed, err=%d",
+                     STR2CHA(field), MODELSTR2CHA(item), err);
+                break;
             }
+//            if (field == KItemUid) {
+//                builder->addValue(KFieldUid, item->uid());
+//            } else if (field == KItemName){
+//                builder->addValue(KFieldName, item->name());
+//            } else if (field == KItemNameId){
+//                builder->addValue(KFieldNameId, item->nameId());
+//            } else if (field == KItemRemark){
+//                builder->addValue(KFieldRemark, item->remark());
+//            }  else {
+//                logd("Field '%s' not support here, may supported by derive class",
+//                     STR2CHA(field));
+//            }
+        }
+    }
+    traceret(err);
+    return err;
+}
+
+ErrCode DbSqliteTbl::updateBuilderFieldFromModel(DbSqliteUpdateBuilder *builder, const QString &field, const DbModel *item)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    if (!item || !builder || field.isEmpty()) {
+        err = ErrInvalidArg;
+        loge("invalid argument");
+    }
+    if (err == ErrNone) {
+        logd("Update field %s", STR2CHA(field));
+        if (field == KItemUid) {
+            builder->addValue(KFieldUid, item->uid());
+        } else if (field == KItemName){
+            builder->addValue(KFieldName, item->name());
+        } else if (field == KItemNameId){
+            builder->addValue(KFieldNameId, item->nameId());
+        } else if (field == KItemRemark){
+            builder->addValue(KFieldRemark, item->remark());
+        }  else {
+            logw("Field '%s' not support here, may supported by derive class",
+                 STR2CHA(field));
         }
     }
     traceret(err);
@@ -224,8 +258,8 @@ ErrCode DbSqliteTbl::update(DbModel *item)
         updateBuilder = DbSqliteUpdateBuilder::build(name());
         err = updateTableCondition(updateBuilder, item);
         if (err == ErrNone) {
-            err = updateTableField(updateBuilder, updatedFields, item);
-            logd("updateTableField ret %d", err);
+            err = updateBuilderFromModel(updateBuilder, updatedFields, item);
+            logd("updateBuilderFromModel ret %d", err);
         } else {
             loge("update table cond failed err %d", err);
         }
@@ -1436,13 +1470,15 @@ QString DbSqliteTbl::toModelStatusCond(qint64 modelStatus)
     tracein;
     logd("modelStatus=0x%llx", modelStatus);
     QString condStatus;
-    const QList<int>* statusList = DbModel::getModelStatusList();
-    foreach (int status, (*statusList)) {
-        if ((status & modelStatus) != 0) {
-            if (!condStatus.isEmpty()) {
-                condStatus += " OR ";
+    if (modelStatus != MODEL_STATUS_MAX) {
+        const QList<int>* statusList = DbModel::getModelStatusList();
+        foreach (int status, (*statusList)) {
+            if ((status & modelStatus) != 0) {
+                if (!condStatus.isEmpty()) {
+                    condStatus += " OR ";
+                }
+                condStatus += QString("(%1.%2=%3)").arg(name(), KFieldModelStatus).arg(status);
             }
-            condStatus += QString("(%1.%2=%3)").arg(name(), KFieldModelStatus).arg(status);
         }
     }
     logd("Status cond string=%s", STR2CHA(condStatus));

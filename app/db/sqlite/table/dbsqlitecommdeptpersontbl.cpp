@@ -231,14 +231,52 @@ ErrCode DbSqliteCommDeptPersonTbl::updateDbModelDataFromQuery(DbModel *item, con
     return err;
 }
 
-ErrCode DbSqliteCommDeptPersonTbl::updateTableField(DbSqliteUpdateBuilder *builder, const QList<QString> &updateField, const DbModel *item)
+//ErrCode DbSqliteCommDeptPersonTbl::updateBuilderFromModel(DbSqliteUpdateBuilder *builder, const QList<QString> &updateField, const DbModel *item)
+//{
+//    tracein;
+//    ErrCode err = DbSqliteTbl::updateBuilderFromModel(builder, updateField, item);
+//    if (err == ErrNone) {
+//        PersonDept* comm = (PersonDept*) item;
+//        foreach (QString field, updateField) {
+//            logd("Update field %s", STR2CHA(field));
+//            if (field == KItemRole) {
+//                builder->addValue(KFieldRoleUid, comm->roleUid());
+//            } else if (field == KItemCourse) {
+//                builder->addValue(KFieldCourseUid, comm->courseUid());
+//            } else if (field == KItemChangeHistory) {
+//                builder->addValue(KFieldChangeHistory, comm->changeHistory());
+//            } else if (field == KItemPerson) {
+//                builder->addValue(KFieldPersonUid, comm->personUid());
+//            } else if (field == KItemCommunityDept) {
+//                builder->addValue(KFieldCommDeptUid, comm->commDeptUid());
+//            } else if (field == KItemStatus) {
+//                builder->addValue(KFieldModelStatus, comm->modelStatus());
+//            } else if (field == KItemEndDate) {
+//                builder->addValue(KFieldEndDate, comm->endDate());
+//            } else if (field == KItemStartDate) {
+//                builder->addValue(KFieldStartDate, comm->startDate());
+//            } else {
+//                logw("Field '%s' not support here", STR2CHA(field));
+//            }
+//        }
+//    }
+//    traceout;
+//    return err;
+//}
+
+ErrCode DbSqliteCommDeptPersonTbl::updateBuilderFieldFromModel(DbSqliteUpdateBuilder *builder, const QString &field, const DbModel *item)
 {
     tracein;
-    ErrCode err = DbSqliteTbl::updateTableField(builder, updateField, item);
+    ErrCode err = ErrNone;
+    logd("update table field '%s' for model '%s'", STR2CHA(field), MODELSTR2CHA(item));
+    if (!builder || !item || field.isEmpty()) {
+        err = ErrInvalidArg;
+        loge("invalid arg");
+    }
+
     if (err == ErrNone) {
-        PersonDept* comm = (PersonDept*) item;
-        foreach (QString field, updateField) {
-            logd("Update field %s", STR2CHA(field));
+        if (item->modelName() == KModelNamePersonDept) {
+            PersonDept* comm = (PersonDept*) item;
             if (field == KItemRole) {
                 builder->addValue(KFieldRoleUid, comm->roleUid());
             } else if (field == KItemCourse) {
@@ -256,10 +294,14 @@ ErrCode DbSqliteCommDeptPersonTbl::updateTableField(DbSqliteUpdateBuilder *build
             } else if (field == KItemStartDate) {
                 builder->addValue(KFieldStartDate, comm->startDate());
             } else {
-                logw("Field '%s' not support here", STR2CHA(field));
+                err = DbSqliteTbl::updateBuilderFieldFromModel(builder, field, item);
             }
+        } else {
+            loge("Model '%s' is no support",
+                 MODELSTR2CHA(item));
+            err = ErrNotSupport;
         }
     }
-    traceout;
+    traceret(err);
     return err;
 }

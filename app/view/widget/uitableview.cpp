@@ -256,7 +256,7 @@ ErrCode UITableView::onDeleteItem(const QList<UITableItem *>& selectedItems)
 //                }
 //            }
             err = MainWindow::showProcessingDialog(tr("Lưu dữ liệu"), nullptr,
-               [this, &cnt, &msg, selectedItems](ErrCode* err, void* data, DlgWait* dlg) {
+               [ &cnt, &msg, selectedItems](ErrCode* err, void* data, DlgWait* dlg) {
                     int total = selectedItems.size();
                     foreach (UITableItem* item, selectedItems) {
                         if (item && item->data()) {

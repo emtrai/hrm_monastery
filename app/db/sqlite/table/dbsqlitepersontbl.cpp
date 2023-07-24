@@ -590,142 +590,152 @@ ErrCode DbSqlitePersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQ
     return err;
 }
 
-ErrCode DbSqlitePersonTbl::updateTableField(DbSqliteUpdateBuilder *builder,
-                                            const QList<QString> &updateField,
-                                            const DbModel *item)
+ErrCode DbSqlitePersonTbl::updateBuilderFieldFromModel(DbSqliteUpdateBuilder *builder,
+                                                       const QString &field,
+                                                       const DbModel *item)
 {
     tracein;
     ErrCode err = ErrNone;
-    logd("Add %d field to update", updateField.count());
-    Person* per = (Person*) item;
-    foreach (QString field, updateField) {
-        logd("Update field %s", field.toStdString().c_str());
-        if (field == KItemFullName) {
-            builder->addValue(KFieldFirstName, per->firstName());
-            builder->addValue(KFieldLastName, per->lastName());
-        } else if (field == KItemCommunity) {
-            builder->addValue(KFieldCommunityUid, per->communityUid());
-        } else if (field == KItemHolly) {
-            builder->addValue(KFieldHollyName, per->hollyName());
-            builder->addValue(KFieldSaintUid, per->saintUidListInString());
-        } else if (field == KItemBirthplace) {
-            builder->addValue(KFieldBirthPlace, per->birthPlace());
-        } else if (field == KItemBirthday) {
-            builder->addValue(KFieldBirthDay, per->birthday());
-        } else if (field == KItemChristenDate) {
-            builder->addValue(KFieldChristenDate, per->christenDate());
-        } else if (field == KItemWork) {
-            builder->addValue(KFieldWorkUid, per->currentWorkUid());
-        } else if (field == KItemWorkHistory) {
-            builder->addValue(KFieldWorkHistory, per->workHistory());
-        } else if (field == KItemSpecialistInfo) {
-            builder->addValue(KFieldSpecialistInfo, per->specialistInfo());
-        } else if (field == KItemEduDetail) {
-            builder->addValue(KFieldEduDetail, per->eduDetail());
-        } else if (field == KItemNationality) {
-            builder->addValue(KFieldNationalityUid, per->nationalityUid());
-        } else if (field == KItemFeastDay) {
-            builder->addValue(KFieldFeastDay, per->feastDay());
-        } else if (field == KItemEucharistPlace) {
-            builder->addValue(KFieldEucharistPlace, per->eucharistPlace());
-        } else if (field == KItemEucharistDate) {
-            builder->addValue(KFieldEucharistDate, per->eucharistDate());
-        } else if (field == KItemOtherContact) {
-            builder->addValue(KFieldContact, per->otherContact());
-        } else if (field == KItemImg) {
-            builder->addValue(KFieldImgId, per->imgId());
-        } else if (field == KItemDeadPlace) {
-            builder->addValue(KFieldDeadPlace, per->deadPlace());
-        } else if (field == KItemDeadDate) {
-            builder->addValue(KFieldDeadDate, per->deadDate());
-        } else if (field == KItemRetirePlace) {
-            builder->addValue(KFieldRetirePlace, per->retirePlace());
-        } else if (field == KItemRetireDate) {
-            builder->addValue(KFieldRetireDate, per->retireDate());
-        } else if (field == KItemStatus) {
-            builder->addValue(KFieldPersonStatusUid, per->personStatusUid());
-        } else if (field == KItemEternalPlace) {
-            builder->addValue(KFieldEternalPlace, per->eternalPlace());
-        } else if (field == KItemEternalDate) {
-            builder->addValue(KFieldEternalDate, per->eternalDate());
-        } else if (field == KItemGoldenPlace) {
-            builder->addValue(KFieldGoldenPlace, per->goldenPlace());
-        } else if (field == KItemGoldenDate) {
-            builder->addValue(KFieldGoldenDate, per->goldenDate());
-        } else if (field == KItemBankPlace) {
-            builder->addValue(KFieldBankPlace, per->bankPlace());
-        } else if (field == KItemBankDate) {
-            builder->addValue(KFieldBankDate, per->bankDate());
-        } else if (field == KItemEternalVowsCEO) {
-            builder->addValue(KFieldEternalVowsCEOUid, per->eternalVowsCEOUid());
-        } else if (field == KItemEternalVowsPIC) {
-            builder->addValue(KFieldEternalVowsPICUid, per->eternalVowsPICUid());
-        } else if (field == KItemEternalVowsDate) {
-            builder->addValue(KFieldEternalVowsDate, per->eternalVowsDate());
-        } else if (field == KItemVowsDate) {
-            builder->addValue(KFieldVowsDate, per->vowsDate());
-        } else if (field == KItemVowsCEO) {
-            builder->addValue(KFieldVowsCEOUid, per->vowsCEOUid());
-        } else if (field == KItemTrainPIC) {
-            builder->addValue(KFieldTrainPICUid, per->trainPICUid());
-        } else if (field == KItemTrainDate) {
-            builder->addValue(KFieldTrainDate, per->trainJoinDate());
-        } else if (field == KItemPreTrainPIC) {
-            builder->addValue(KFieldPreTrainPICUid, per->preTrainPICUid());
-        } else if (field == KItemPreTrainDate) {
-            builder->addValue(KFieldPreTrainDate, per->preTrainJoinDate());
-        } else if (field == KItemJoinPIC) {
-            builder->addValue(KFieldJoinPICUid, per->joinPICUid());
-        } else if (field == KItemJoinDate) {
-            builder->addValue(KFieldJoinDate, per->joinDate());
-        } else if (field == KItemFamilyContact) {
-            builder->addValue(KFieldFamilyContact, per->familyContact());
-        } else if (field == KItemHollyDate) {
-            builder->addValue(KFieldHollyDate, per->hollyDate());
-        } else if (field == KItemHollyPlace) {
-            builder->addValue(KFieldHollyPlace, per->hollyPlace());
-        } else if (field == KItemChristenDate) {
-            builder->addValue(KFieldChristenDate, per->christenDate());
-        } else if (field == KItemChristenPlace) {
-            builder->addValue(KFieldChristenPlace, per->christenPlace());
-        } else if (field == KItemFamilyHistory) {
-            builder->addValue(KFieldFamilyHistory, per->familyHistory());
-        } else if (field == KItemMomAddr) {
-            builder->addValue(KFieldMomAddr, per->momAddr());
-        } else if (field == KItemMomBirthday) {
-            builder->addValue(KFieldMomBirthDay, per->momBirthday());
-        } else if (field == KItemMom) {
-            builder->addValue(KFieldMomName, per->momName());
-        } else if (field == KItemDadAddr) {
-            builder->addValue(KFieldDadAddr, per->dadAddr());
-        } else if (field == KItemDadBirthday) {
-            builder->addValue(KFieldDadBirthDay, per->dadBirthday());
-        } else if (field == KItemDad) {
-            builder->addValue(KFieldDadName, per->dadName());
-        } else if (field == KItemTel) {
-            builder->addValue(KFieldTel, per->tel().join(';'));
-        } else if (field == KItemEmail) {
-            builder->addValue(KFieldEmail, per->email().join(';'));
-        } else if (field == KItemChurchAddress) {
-            builder->addValue(KFieldChurchAddr, per->churchAddr());
-        } else if (field == KItemAddress) {
-            builder->addValue(KFieldAddr, per->addr());
-        } else if (field == KItemCountry) {
-            builder->addValue(KFieldCountryUid, per->countryUid());
-        } else if (field == KItemCourse) {
-            builder->addValue(KFieldCourseUid, per->courseUid());
-        } else if (field == KItemEdu) {
-            builder->addValue(KFieldEduUid, per->eduUid());
-        } else if (field == KItemIDcardIssuer) {
-            builder->addValue(KFieldIDCardIssuePlace, per->idCardIssuePlace());
-        } else if (field == KItemIDcardIssueDate) {
-            builder->addValue(KFieldIDCardIssueDate, per->idCardIssueDate());
-        } else if (field == KItemIDcard) {
-            builder->addValue(KFieldIDCard, per->idCard());
-        } else if (field == KItemEthnic) {
-            builder->addValue(KFieldEthnicUid, per->ethnicUid());
+    logd("update table field '%s' for model '%s'", STR2CHA(field), MODELSTR2CHA(item));
+    if (!builder || !item || field.isEmpty()) {
+        err = ErrInvalidArg;
+        loge("invalid arg");
+    }
+    if (err == ErrNone) {
+        if (item->modelName() == KModelNamePerson) {
+            Person* per = (Person*) item;
+            if (field == KItemFullName) {
+                builder->addValue(KFieldFirstName, per->firstName());
+                builder->addValue(KFieldLastName, per->lastName());
+            } else if (field == KItemCommunity) {
+                builder->addValue(KFieldCommunityUid, per->communityUid());
+            } else if (field == KItemHolly) {
+                builder->addValue(KFieldHollyName, per->hollyName());
+                builder->addValue(KFieldSaintUid, per->saintUidListInString());
+            } else if (field == KItemBirthplace) {
+                builder->addValue(KFieldBirthPlace, per->birthPlace());
+            } else if (field == KItemBirthday) {
+                builder->addValue(KFieldBirthDay, per->birthday());
+            } else if (field == KItemChristenDate) {
+                builder->addValue(KFieldChristenDate, per->christenDate());
+            } else if (field == KItemWork) {
+                builder->addValue(KFieldWorkUid, per->currentWorkUid());
+            } else if (field == KItemWorkHistory) {
+                builder->addValue(KFieldWorkHistory, per->workHistory());
+            } else if (field == KItemSpecialistInfo) {
+                builder->addValue(KFieldSpecialistInfo, per->specialistInfo());
+            } else if (field == KItemEduDetail) {
+                builder->addValue(KFieldEduDetail, per->eduDetail());
+            } else if (field == KItemNationality) {
+                builder->addValue(KFieldNationalityUid, per->nationalityUid());
+            } else if (field == KItemFeastDay) {
+                builder->addValue(KFieldFeastDay, per->feastDay());
+            } else if (field == KItemEucharistPlace) {
+                builder->addValue(KFieldEucharistPlace, per->eucharistPlace());
+            } else if (field == KItemEucharistDate) {
+                builder->addValue(KFieldEucharistDate, per->eucharistDate());
+            } else if (field == KItemOtherContact) {
+                builder->addValue(KFieldContact, per->otherContact());
+            } else if (field == KItemImg) {
+                builder->addValue(KFieldImgId, per->imgId());
+            } else if (field == KItemDeadPlace) {
+                builder->addValue(KFieldDeadPlace, per->deadPlace());
+            } else if (field == KItemDeadDate) {
+                builder->addValue(KFieldDeadDate, per->deadDate());
+            } else if (field == KItemRetirePlace) {
+                builder->addValue(KFieldRetirePlace, per->retirePlace());
+            } else if (field == KItemRetireDate) {
+                builder->addValue(KFieldRetireDate, per->retireDate());
+            } else if (field == KItemStatus) {
+                builder->addValue(KFieldPersonStatusUid, per->personStatusUid());
+            } else if (field == KItemEternalPlace) {
+                builder->addValue(KFieldEternalPlace, per->eternalPlace());
+            } else if (field == KItemEternalDate) {
+                builder->addValue(KFieldEternalDate, per->eternalDate());
+            } else if (field == KItemGoldenPlace) {
+                builder->addValue(KFieldGoldenPlace, per->goldenPlace());
+            } else if (field == KItemGoldenDate) {
+                builder->addValue(KFieldGoldenDate, per->goldenDate());
+            } else if (field == KItemBankPlace) {
+                builder->addValue(KFieldBankPlace, per->bankPlace());
+            } else if (field == KItemBankDate) {
+                builder->addValue(KFieldBankDate, per->bankDate());
+            } else if (field == KItemEternalVowsCEO) {
+                builder->addValue(KFieldEternalVowsCEOUid, per->eternalVowsCEOUid());
+            } else if (field == KItemEternalVowsPIC) {
+                builder->addValue(KFieldEternalVowsPICUid, per->eternalVowsPICUid());
+            } else if (field == KItemEternalVowsDate) {
+                builder->addValue(KFieldEternalVowsDate, per->eternalVowsDate());
+            } else if (field == KItemVowsDate) {
+                builder->addValue(KFieldVowsDate, per->vowsDate());
+            } else if (field == KItemVowsCEO) {
+                builder->addValue(KFieldVowsCEOUid, per->vowsCEOUid());
+            } else if (field == KItemTrainPIC) {
+                builder->addValue(KFieldTrainPICUid, per->trainPICUid());
+            } else if (field == KItemTrainDate) {
+                builder->addValue(KFieldTrainDate, per->trainJoinDate());
+            } else if (field == KItemPreTrainPIC) {
+                builder->addValue(KFieldPreTrainPICUid, per->preTrainPICUid());
+            } else if (field == KItemPreTrainDate) {
+                builder->addValue(KFieldPreTrainDate, per->preTrainJoinDate());
+            } else if (field == KItemJoinPIC) {
+                builder->addValue(KFieldJoinPICUid, per->joinPICUid());
+            } else if (field == KItemJoinDate) {
+                builder->addValue(KFieldJoinDate, per->joinDate());
+            } else if (field == KItemFamilyContact) {
+                builder->addValue(KFieldFamilyContact, per->familyContact());
+            } else if (field == KItemHollyDate) {
+                builder->addValue(KFieldHollyDate, per->hollyDate());
+            } else if (field == KItemHollyPlace) {
+                builder->addValue(KFieldHollyPlace, per->hollyPlace());
+            } else if (field == KItemChristenDate) {
+                builder->addValue(KFieldChristenDate, per->christenDate());
+            } else if (field == KItemChristenPlace) {
+                builder->addValue(KFieldChristenPlace, per->christenPlace());
+            } else if (field == KItemFamilyHistory) {
+                builder->addValue(KFieldFamilyHistory, per->familyHistory());
+            } else if (field == KItemMomAddr) {
+                builder->addValue(KFieldMomAddr, per->momAddr());
+            } else if (field == KItemMomBirthday) {
+                builder->addValue(KFieldMomBirthDay, per->momBirthday());
+            } else if (field == KItemMom) {
+                builder->addValue(KFieldMomName, per->momName());
+            } else if (field == KItemDadAddr) {
+                builder->addValue(KFieldDadAddr, per->dadAddr());
+            } else if (field == KItemDadBirthday) {
+                builder->addValue(KFieldDadBirthDay, per->dadBirthday());
+            } else if (field == KItemDad) {
+                builder->addValue(KFieldDadName, per->dadName());
+            } else if (field == KItemTel) {
+                builder->addValue(KFieldTel, per->tel().join(';'));
+            } else if (field == KItemEmail) {
+                builder->addValue(KFieldEmail, per->email().join(';'));
+            } else if (field == KItemChurchAddress) {
+                builder->addValue(KFieldChurchAddr, per->churchAddr());
+            } else if (field == KItemAddress) {
+                builder->addValue(KFieldAddr, per->addr());
+            } else if (field == KItemCountry) {
+                builder->addValue(KFieldCountryUid, per->countryUid());
+            } else if (field == KItemCourse) {
+                builder->addValue(KFieldCourseUid, per->courseUid());
+            } else if (field == KItemEdu) {
+                builder->addValue(KFieldEduUid, per->eduUid());
+            } else if (field == KItemIDcardIssuer) {
+                builder->addValue(KFieldIDCardIssuePlace, per->idCardIssuePlace());
+            } else if (field == KItemIDcardIssueDate) {
+                builder->addValue(KFieldIDCardIssueDate, per->idCardIssueDate());
+            } else if (field == KItemIDcard) {
+                builder->addValue(KFieldIDCard, per->idCard());
+            } else if (field == KItemEthnic) {
+                builder->addValue(KFieldEthnicUid, per->ethnicUid());
+            } else {
+                err = DbSqliteTbl::updateBuilderFieldFromModel(builder, field, item);
+            }
+        } else {
+            loge("Model '%s' is no support",
+                 MODELSTR2CHA(item));
+            err = ErrNotSupport;
         }
-
     }
     traceret(err);
     return err;

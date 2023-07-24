@@ -73,7 +73,11 @@ public:
     virtual void buildUidIfNotSet();
     virtual QString buildUid(const QString* seed = nullptr);
     virtual QString modelName() const;
-    virtual const QString &name() const;
+    // cannot override name here, as this return a reference
+    // but name of person is constructed from last name & first name,
+    // which cannot return from reference, but value
+    // due to stack issue
+//    virtual const QString &name() const;
 
     const QString &firstName() const;
     void setFirstName(const QString &newFirstName);

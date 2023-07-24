@@ -777,14 +777,15 @@ void DbModel::dump()
     tracein;
     // TODO: dump to stdout, sdderr or file???
 #ifdef DEBUG_TRACE
-    logd("- modelName %s", modelName().toStdString().c_str());
+    logd("- modelName %s", STR2CHA(modelName()));
     logd("- DbId %lld", dbId());
-    logd("- Uid %s", uid().toStdString().c_str());
-    logd("- NameId %s", nameId().toStdString().c_str());
-    logd("- Name %s", name().toStdString().c_str());
-    logd("- mDbCreatedTime %s", DatetimeUtils::timeMsToDatestring(dbCreatedTime()).toStdString().c_str());
-    logd("- mLastDbUpdatedTime %s", DatetimeUtils::timeMsToDatestring(lastDbUpdatedTime()).toStdString().c_str());
+    logd("- Uid %s", STR2CHA(uid()));
+    logd("- NameId %s", STR2CHA(nameId()));
+    logd("- Name %s", STR2CHA(name()));
+    logd("- mDbCreatedTime %s", STR2CHA(DatetimeUtils::timeMsToDatestring(dbCreatedTime())));
+    logd("- mLastDbUpdatedTime %s", STR2CHA(DatetimeUtils::timeMsToDatestring(lastDbUpdatedTime())));
 #endif //DEBUG_TRACE
+    traceout;
 }
 
 QString DbModel::toString() const

@@ -182,56 +182,106 @@ ErrCode DbSqliteAreaTbl::onTblMigration(qint64 oldVer)
     return err;
 }
 
-ErrCode DbSqliteAreaTbl::updateTableField(DbSqliteUpdateBuilder *builder, const QList<QString> &updateField, const DbModel *item)
+ErrCode DbSqliteAreaTbl::updateBuilderFieldFromModel(DbSqliteUpdateBuilder *builder, const QString &field, const DbModel *item)
 {
+
     tracein;
     ErrCode err = ErrNone;
-    if (!builder || !item) {
+    logd("update table field '%s' for model '%s'", STR2CHA(field), MODELSTR2CHA(item));
+    if (!builder || !item || field.isEmpty()) {
             err = ErrInvalidArg;
             loge("invalid arg");
     }
     if (err == ErrNone) {
-            err = DbSqliteTbl::updateTableField(builder, updateField, item);
-    }
-
-    if (err == ErrNone) {
-            if (item->modelName() == KModelNameArea) {
+        if (item->modelName() == KModelNameArea) {
             Area* comm = (Area*) item;
-            foreach (QString field, updateField) {
-                logd("Update field %s", STR2CHA(field));
-                if (field == KItemCountry) {
-                    builder->addValue(KFieldCountryUid, comm->countryUid());
+            if (field == KItemCountry) {
+                builder->addValue(KFieldCountryUid, comm->countryUid());
 
-                } else if (field == KItemAddress) {
-                    builder->addValue(KFieldAddr, comm->addr());
+            } else if (field == KItemAddress) {
+                builder->addValue(KFieldAddr, comm->addr());
 
-                } else if (field == KItemEmail) {
-                    builder->addValue(KFieldEmail, comm->email());
+            } else if (field == KItemEmail) {
+                builder->addValue(KFieldEmail, comm->email());
 
-                } else if (field == KItemTel) {
-                    builder->addValue(KFieldTel, comm->tel());
+            } else if (field == KItemTel) {
+                builder->addValue(KFieldTel, comm->tel());
 
-                } else if (field == KItemChangeHistory) {
-                    builder->addValue(KFieldChangeHistory, comm->changeHistory());
+            } else if (field == KItemChangeHistory) {
+                builder->addValue(KFieldChangeHistory, comm->changeHistory());
 
-                } else if (field == KItemStatus) {
-                    builder->addValue(KFieldModelStatus, comm->modelStatus());
+            } else if (field == KItemStatus) {
+                builder->addValue(KFieldModelStatus, comm->modelStatus());
 
-                } else if (field == KItemEndDate) {
-                    builder->addValue(KFieldEndDate, comm->endDate());
+            } else if (field == KItemEndDate) {
+                builder->addValue(KFieldEndDate, comm->endDate());
 
-                } else if (field == KItemStartDate) {
-                    builder->addValue(KFieldStartDate, comm->startDate());
+            } else if (field == KItemStartDate) {
+                builder->addValue(KFieldStartDate, comm->startDate());
 
-                } else {
-                    logw("Field '%s' not support here", STR2CHA(field));
-                }
-            }
             } else {
-            logw("Model name '%s' is no support",
-                 STR2CHA(item->modelName()));
+                err = DbSqliteTbl::updateBuilderFieldFromModel(builder, field, item);
             }
+        } else {
+            loge("Model name '%s' is no support",
+                 MODELSTR2CHA(item));
+            err = ErrNotSupport;
+        }
     }
     traceret(err);
     return err;
 }
+
+//ErrCode DbSqliteAreaTbl::updateBuilderFromModel(DbSqliteUpdateBuilder *builder, const QList<QString> &updateField, const DbModel *item)
+//{
+//    tracein;
+//    ErrCode err = ErrNone;
+//    if (!builder || !item) {
+//            err = ErrInvalidArg;
+//            loge("invalid arg");
+//    }
+//    if (err == ErrNone) {
+//            err = DbSqliteTbl::updateBuilderFromModel(builder, updateField, item);
+//    }
+
+//    if (err == ErrNone) {
+//            if (item->modelName() == KModelNameArea) {
+//            Area* comm = (Area*) item;
+//            foreach (QString field, updateField) {
+//                logd("Update field %s", STR2CHA(field));
+//                if (field == KItemCountry) {
+//                    builder->addValue(KFieldCountryUid, comm->countryUid());
+
+//                } else if (field == KItemAddress) {
+//                    builder->addValue(KFieldAddr, comm->addr());
+
+//                } else if (field == KItemEmail) {
+//                    builder->addValue(KFieldEmail, comm->email());
+
+//                } else if (field == KItemTel) {
+//                    builder->addValue(KFieldTel, comm->tel());
+
+//                } else if (field == KItemChangeHistory) {
+//                    builder->addValue(KFieldChangeHistory, comm->changeHistory());
+
+//                } else if (field == KItemStatus) {
+//                    builder->addValue(KFieldModelStatus, comm->modelStatus());
+
+//                } else if (field == KItemEndDate) {
+//                    builder->addValue(KFieldEndDate, comm->endDate());
+
+//                } else if (field == KItemStartDate) {
+//                    builder->addValue(KFieldStartDate, comm->startDate());
+
+//                } else {
+//                    logw("Field '%s' not support here", STR2CHA(field));
+//                }
+//            }
+//            } else {
+//            logw("Model name '%s' is no support",
+//                 STR2CHA(item->modelName()));
+//            }
+//    }
+//    traceret(err);
+//    return err;
+//}

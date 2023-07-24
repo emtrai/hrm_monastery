@@ -260,16 +260,21 @@ int DlgSearch::query(std::function<int ()> queryfunc)
         for(int i = 0; i < cnt; i++){
             DbModel* item = getItemAtIdx(i);
             logd("idx=%d", idx);
-            item->dump();
-            tbl->insertRow(idx);
-            for (int col = 0; col < mHeader.count(); col++) {
-                tbl->setItem(idx, col, new QTableWidgetItem(getValueOfItemAt(i, col, mHeader[col], item)));
+            if (item) {
+                item->dump();
+                tbl->insertRow(idx);
+                for (int col = 0; col < mHeader.count(); col++) {
+                    tbl->setItem(idx, col, new QTableWidgetItem(getValueOfItemAt(i, col, mHeader[col], item)));
+                }
+                idx++;
+            } else {
+                logw("item at idex %d is null", i);
             }
-            idx++;
         }
     } else {
         logi("no data");
     }
+    traceout;
     return cnt;
 }
 

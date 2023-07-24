@@ -32,18 +32,15 @@
 #include <QSqlRecord>
 #include <QHash>
 #include "table/dbsqlitepersontbl.h"
-#include "area.h"
 #include "areactl.h"
 #include "person.h"
 #include "personctl.h"
 #include "areaperson.h"
 #include "rolectl.h"
-#include "role.h"
 #include "course.h"
 #include "coursectl.h"
-#include "dbctl.h"
+#include "utils.h"
 #include "dbmodelutils.h"
-
 /**
  * VERSION 0.0.1:
  * + KFieldAreaUid
@@ -172,8 +169,15 @@ ErrCode DbSqliteAreaMgrTbl::updateDbModelDataFromQuery(DbModel *item, const QSql
                 logd("search courseUid '%s'", STR2CHA(areaPerson->courseUid()));
                 DbModel* model = COURSECTL->getModelByUid(areaPerson->courseUid());
                 if (model) {
+                    Course* course = (Course*)model;
                     areaPerson->setCourseNameId(model->nameId());
                     areaPerson->setCourseName(model->name());
+                    if (!areaPerson->startDate()) {
+                        areaPerson->setStartDate(course->startDate());
+                    }
+                    if (!areaPerson->endDate()) {
+                        areaPerson->setEndDate(course->endDate());
+                    }
                     delete model;
                 } else {
                     logw("not found courseUid '%s'", STR2CHA(areaPerson->courseUid()));
@@ -181,7 +185,6 @@ ErrCode DbSqliteAreaMgrTbl::updateDbModelDataFromQuery(DbModel *item, const QSql
             } else {
                 logw("courseUid empty");
             }
-
 
             areaPerson->setAreaUid(qry.value(KFieldAreaUid).toString());
             if (!areaPerson->areaUid().isEmpty()){
@@ -263,79 +266,146 @@ ErrCode DbSqliteAreaMgrTbl::onTblMigration(qint64 oldVer)
     return err;
 }
 
-ErrCode DbSqliteAreaMgrTbl::updateTableField(DbSqliteUpdateBuilder *builder,
-                                             const QList<QString> &updateField,
-                                             const DbModel *item)
+//ErrCode DbSqliteAreaMgrTbl::updateBuilderFromModel(DbSqliteUpdateBuilder *builder,
+//                                             const QList<QString> &updateField,
+//                                             const DbModel *item)
+//{
+//    tracein;
+//    ErrCode err = ErrNone;
+//    logd("update table for model '%s'", MODELSTR2CHA(item));
+//    if (!builder || !item) {
+//        err = ErrInvalidArg;
+//        loge("invalid arg");
+//    }
+
+//    if (err == ErrNone) {
+//        err = DbSqliteMapTbl::updateBuilderFromModel(builder, updateField, item);
+//    }
+
+//    if (err == ErrNone) {
+//        if (item->modelName() == KModelNameAreaPerson) {
+//            AreaPerson* comm = (AreaPerson*) item;
+//            foreach (QString field, updateField) {
+//                logd("Update field %s", STR2CHA(field));
+//                if (field == KItemRole) {
+//                    err = DbModelUtils::updateField(builder,
+//                                                    KFieldRoleUid,
+//                                                    KModelHdlArea,
+//                                                    comm->roleUid(),
+//                                                    comm->roleNameId(),
+//                                                    comm->roleName());
+//                } else if (field == KItemCourse) {
+//                    err = DbModelUtils::updateField(builder,
+//                                                    KFieldCourseUid,
+//                                                    KModelHdlCourse,
+//                                                    comm->courseUid(),
+//                                                    comm->courseNameId(),
+//                                                    comm->courseName());
+////                    builder->addValue(KFieldCourseUid, comm->courseUid());
+//                } else if (field == KItemChangeHistory) {
+//                    builder->addValue(KFieldChangeHistory, comm->changeHistory());
+//                } else if (field == KItemPerson) {
+
+//                    err = DbModelUtils::updateField(builder,
+//                                                    KFieldPersonUid,
+//                                                    KModelHdlPerson,
+//                                                    comm->personUid(),
+//                                                    comm->personNameId(),
+//                                                    comm->personName());
+////                    builder->addValue(KFieldPersonUid, comm->personUid());
+//                } else if (field == KItemArea) {
+
+//                    err = DbModelUtils::updateField(builder,
+//                                                    KFieldAreaUid,
+//                                                    KModelHdlArea,
+//                                                    comm->areaUid(),
+//                                                    comm->areaNameId(),
+//                                                    comm->areaName());
+////                    builder->addValue(KFieldAreaUid, comm->areaUid());
+//                } else if (field == KItemStatus) {
+//                    builder->addValue(KFieldModelStatus, comm->modelStatus());
+//                } else if (field == KItemEndDate) {
+//                    builder->addValue(KFieldEndDate, comm->endDate());
+//                } else if (field == KItemStartDate) {
+//                    builder->addValue(KFieldStartDate, comm->startDate());
+//                } else {
+//                    logw("Field '%s' not support here", STR2CHA(field));
+//                }
+//                if (err != ErrNone) {
+//                    loge("not found '%s', err=%d, field '%s'",
+//                         MODELSTR2CHA(comm), err, STR2CHA(field));
+//                    break;
+//                }
+//            }
+//        } else {
+//            logw("Model name '%s' is no support",
+//                 STR2CHA(item->modelName()));
+//        }
+//    }
+//    traceret(err);
+//    return err;
+//}
+
+ErrCode DbSqliteAreaMgrTbl::updateBuilderFieldFromModel(DbSqliteUpdateBuilder *builder,
+                                                        const QString &field,
+                                                        const DbModel *item)
 {
     tracein;
     ErrCode err = ErrNone;
-    if (!builder || !item) {
+    logd("update table field '%s' for model '%s'", STR2CHA(field), MODELSTR2CHA(item));
+    if (!builder || !item || field.isEmpty()) {
         err = ErrInvalidArg;
         loge("invalid arg");
     }
 
     if (err == ErrNone) {
-        err = DbSqliteMapTbl::updateTableField(builder, updateField, item);
-    }
-
-    if (err == ErrNone) {
         if (item->modelName() == KModelNameAreaPerson) {
             AreaPerson* comm = (AreaPerson*) item;
-            foreach (QString field, updateField) {
-                logd("Update field %s", STR2CHA(field));
-                if (field == KItemRole) {
-                    err = DbModelUtils::updateField(builder,
-                                                    KFieldRoleUid,
-                                                    KModelHdlArea,
-                                                    comm->roleUid(),
-                                                    comm->roleNameId(),
-                                                    comm->roleName());
-                } else if (field == KItemCourse) {
-                    err = DbModelUtils::updateField(builder,
-                                                    KFieldCourseUid,
-                                                    KModelHdlCourse,
-                                                    comm->courseUid(),
-                                                    comm->courseNameId(),
-                                                    comm->courseName());
-//                    builder->addValue(KFieldCourseUid, comm->courseUid());
-                } else if (field == KItemChangeHistory) {
-                    builder->addValue(KFieldChangeHistory, comm->changeHistory());
-                } else if (field == KItemPerson) {
+            if (field == KItemRole) {
+                err = DbModelUtils::updateField(builder,
+                                                KFieldRoleUid,
+                                                KModelHdlRole,
+                                                comm->roleUid(),
+                                                comm->roleNameId(),
+                                                comm->roleName());
+            } else if (field == KItemCourse) {
+                err = DbModelUtils::updateField(builder,
+                                                KFieldCourseUid,
+                                                KModelHdlCourse,
+                                                comm->courseUid(),
+                                                comm->courseNameId(),
+                                                comm->courseName());
+            } else if (field == KItemChangeHistory) {
+                builder->addValue(KFieldChangeHistory, comm->changeHistory());
+            } else if (field == KItemPerson) {
 
-                    err = DbModelUtils::updateField(builder,
-                                                    KFieldPersonUid,
-                                                    KModelHdlPerson,
-                                                    comm->personUid(),
-                                                    comm->personNameId(),
-                                                    comm->personName());
-//                    builder->addValue(KFieldPersonUid, comm->personUid());
-                } else if (field == KItemArea) {
+                err = DbModelUtils::updateField(builder,
+                                                KFieldPersonUid,
+                                                KModelHdlPerson,
+                                                comm->personUid(),
+                                                comm->personNameId(),
+                                                comm->personName());
+            } else if (field == KItemArea) {
 
-                    err = DbModelUtils::updateField(builder,
-                                                    KFieldAreaUid,
-                                                    KModelHdlArea,
-                                                    comm->areaUid(),
-                                                    comm->areaNameId(),
-                                                    comm->areaName());
-//                    builder->addValue(KFieldAreaUid, comm->areaUid());
-                } else if (field == KItemStatus) {
-                    builder->addValue(KFieldModelStatus, comm->modelStatus());
-                } else if (field == KItemEndDate) {
-                    builder->addValue(KFieldEndDate, comm->endDate());
-                } else if (field == KItemStartDate) {
-                    builder->addValue(KFieldStartDate, comm->startDate());
-                } else {
-                    logw("Field '%s' not support here", STR2CHA(field));
-                }
-                if (err != ErrNone) {
-                    loge("not found '%s', err=%d, field '%s'",
-                         MODELSTR2CHA(comm), err, STR2CHA(field));
-                    break;
-                }
+                err = DbModelUtils::updateField(builder,
+                                                KFieldAreaUid,
+                                                KModelHdlArea,
+                                                comm->areaUid(),
+                                                comm->areaNameId(),
+                                                comm->areaName());
+            } else if (field == KItemStatus) {
+                builder->addValue(KFieldModelStatus, comm->modelStatus());
+            } else if (field == KItemEndDate) {
+                builder->addValue(KFieldEndDate, comm->endDate());
+            } else if (field == KItemStartDate) {
+                builder->addValue(KFieldStartDate, comm->startDate());
+            } else {
+                err = DbSqliteMapTbl::updateBuilderFieldFromModel(builder, field, item);
             }
         } else {
-            logw("Model name '%s' is no support",
-                 STR2CHA(item->modelName()));
+            loge("Model '%s' is no support",
+                 MODELSTR2CHA(item));
+            err = ErrNotSupport;
         }
     }
     traceret(err);

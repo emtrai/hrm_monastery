@@ -48,10 +48,10 @@ ModelController::ModelController(const QString& name, const QString& hdlName):Mo
 void ModelController::init()
 {
     tracein;
-
+    logd("Init controller '%s'", STR2CHA(getName()));
     logd("Register signal/slots");
-    QObject::connect(this, SIGNAL(dataUpdate(const DbModel *model)),
-                     this, SLOT(onModelControllerDataUpdated(const DbModel *model)));
+    QObject::connect(this, SIGNAL(dataUpdate(DbModel*)),
+                     this, SLOT(onModelControllerDataUpdated(DbModel*)));
 
     DbModelHandler* hdl = getModelHandler();
     if (hdl) {
@@ -641,6 +641,7 @@ ErrCode ModelController::parsePrebuiltFile(const QString &fpath, const QString &
 void ModelController::onDbModelHandlerDataUpdate(DbModel *model, int type, ErrCode err)
 {
     tracein;
+    logd("controller '%s'", STR2CHA(getName()));
     reloadDb();
     emit dataUpdate(model);
     traceout;
@@ -768,9 +769,10 @@ ErrCode ModelController::onCsvParseOneItemCallback(const QStringList &items, voi
     return ret;
 }
 
-void ModelController::onModelControllerDataUpdated(const DbModel *model)
+void ModelController::onModelControllerDataUpdated(DbModel* model)
 {
     tracein;
+    logd("controller '%s'", STR2CHA(getName()));
     foreach (OnModelControllerListener* listener, mListeners) {
         if (listener) {
             listener->onModelControllerDataUpdated(model);

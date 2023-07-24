@@ -96,33 +96,30 @@ QString DbSqliteEthnicTbl::getSearchQueryString(const QString &cond)
     return queryString;
 }
 
-ErrCode DbSqliteEthnicTbl::updateTableField(DbSqliteUpdateBuilder *builder, const QList<QString> &updateField, const DbModel *item)
+ErrCode DbSqliteEthnicTbl::updateBuilderFieldFromModel(DbSqliteUpdateBuilder *builder,
+                                                       const QString &field,
+                                                       const DbModel *item)
 {
     tracein;
     ErrCode err = ErrNone;
-    if (!builder || !item) {
+    logd("update table field '%s' for model '%s'", STR2CHA(field), MODELSTR2CHA(item));
+    if (!builder || !item || field.isEmpty()) {
         err = ErrInvalidArg;
         loge("invalid arg");
     }
     if (err == ErrNone) {
-        err = DbSqliteTbl::updateTableField(builder, updateField, item);
-    }
-
-    if (err == ErrNone) {
         if (item->modelName() == KModelNameEthnic) {
             Ethnic* comm = (Ethnic*) item;
-            foreach (QString field, updateField) {
-                logd("Update field %s", STR2CHA(field));
-                if (field == KItemCountry) {
-                    builder->addValue(KFieldCountryUid, comm->countryUid());
+            if (field == KItemCountry) {
+                builder->addValue(KFieldCountryUid, comm->countryUid());
 
-                } else {
-                    logw("Field '%s' not support here", STR2CHA(field));
-                }
+            } else {
+                err = DbSqliteTbl::updateBuilderFieldFromModel(builder, field, item);
             }
         } else {
-            logw("Model name '%s' is no support",
-                 STR2CHA(item->modelName()));
+            loge("Model '%s' is no support",
+                 MODELSTR2CHA(item));
+            err = ErrNotSupport;
         }
     }
     traceret(err);

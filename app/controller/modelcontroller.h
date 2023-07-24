@@ -310,9 +310,9 @@ protected:
 private:
     static ErrCode onCsvParseOneItemCallback(const QStringList& items, void* caller, void* param, quint32 idx);
 signals:
-    void dataUpdate(const DbModel *model);
+    void dataUpdate(DbModel*);
 protected slots:
-    void onModelControllerDataUpdated(const DbModel *model);
+    void onModelControllerDataUpdated(DbModel*);
 protected:
     QString mName;
     QString mMainModelHandlerName;

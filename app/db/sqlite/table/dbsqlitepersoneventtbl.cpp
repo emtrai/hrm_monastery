@@ -209,42 +209,40 @@ ErrCode DbSqlitePersonEventTbl::getListEvents(const QString &personUid,
     return ret;
 }
 
-ErrCode DbSqlitePersonEventTbl::updateTableField(DbSqliteUpdateBuilder *builder, const QList<QString> &updateField, const DbModel *item)
+ErrCode DbSqlitePersonEventTbl::updateBuilderFieldFromModel(DbSqliteUpdateBuilder *builder,
+                                                            const QString &field,
+                                                            const DbModel *item)
 {
     tracein;
     ErrCode err = ErrNone;
-    if (!builder || !item) {
+    logd("update table field '%s' for model '%s'", STR2CHA(field), MODELSTR2CHA(item));
+    if (!builder || !item || field.isEmpty()) {
         err = ErrInvalidArg;
         loge("invalid arg");
-    }
-    if (err == ErrNone) {
-        err = DbSqliteTbl::updateTableField(builder, updateField, item);
     }
 
     if (err == ErrNone) {
         if (item->modelName() == KModelNamePersonEvent) {
             PersonEvent* comm = (PersonEvent*) item;
-            foreach (QString field, updateField) {
-                logd("Update field %s", STR2CHA(field));
-                if (field == KItemEvent) {
-                    builder->addValue(KFieldEventUid, comm->eventUid());
+            if (field == KItemEvent) {
+                builder->addValue(KFieldEventUid, comm->eventUid());
 
-                } else if (field == KItemEndDate) {
-                    builder->addValue(KFieldEndDate, comm->endDate());
+            } else if (field == KItemEndDate) {
+                builder->addValue(KFieldEndDate, comm->endDate());
 
-                } else if (field == KItemPerson) {
-                    builder->addValue(KFieldPersonId, comm->personUid());
+            } else if (field == KItemPerson) {
+                builder->addValue(KFieldPersonId, comm->personUid());
 
-                } else if (field == KItemDate) {
-                    builder->addValue(KFieldDate, comm->date());
+            } else if (field == KItemDate) {
+                builder->addValue(KFieldDate, comm->date());
 
-                } else {
-                    logw("Field '%s' not support here", STR2CHA(field));
-                }
+            } else {
+                err = DbSqliteTbl::updateBuilderFieldFromModel(builder, field, item);
             }
         } else {
-            logw("Model name '%s' is no support",
-                 STR2CHA(item->modelName()));
+            loge("Model '%s' is no support",
+                 MODELSTR2CHA(item));
+            err = ErrNotSupport;
         }
     }
     traceret(err);

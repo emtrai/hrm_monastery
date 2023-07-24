@@ -230,9 +230,13 @@ protected:
      * @param item
      * @return
      */
-    virtual ErrCode updateTableField(DbSqliteUpdateBuilder* builder,
+    virtual ErrCode updateBuilderFromModel(DbSqliteUpdateBuilder* builder,
                                      const QList<QString>& updateField,
                                          const DbModel *item);
+
+    virtual ErrCode updateBuilderFieldFromModel(DbSqliteUpdateBuilder* builder,
+                                                const QString& field,
+                                                const DbModel *item);
     virtual ErrCode updateTableCondition(DbSqliteUpdateBuilder* builder,
                                      const DbModel *item);
     virtual int runQuery(QSqlQuery& qry, const DbModelBuilder& builder,

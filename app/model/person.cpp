@@ -252,10 +252,14 @@ QString Person::modelName() const
     return KModelNamePerson;
 }
 
-const QString &Person::name() const
-{
-    return displayName();
-}
+// cannot override name here, as this return a reference
+// but name of person is constructed from last name & first name,
+// which cannot return from reference, but value
+// due to stack issue
+//const QString &Person::name() const
+//{
+//    return displayName();
+//}
 
 DbModel* Person::build(){
     Person* item = new Person();
@@ -1414,6 +1418,7 @@ void Person::dump()
     logd("- HollyName %s", hollyName().toStdString().c_str());
     logd("- JoinPIC Name %s", joinPICName().toStdString().c_str());
     logd("- JoinPIC Uid %s", joinPICUid().toStdString().c_str());
+    tracein;
 }
 //ErrCode Person::onImportParseDataItem(const QString& importName, int importFileType,
 //                             const QString &keyword, const QString &value,

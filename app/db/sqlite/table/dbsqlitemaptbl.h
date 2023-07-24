@@ -74,9 +74,9 @@ protected:
     virtual const QString& getFieldNameUid2() const;
     virtual const QString& getFieldNameDbid2() const;
 
-    virtual ErrCode updateTableField(DbSqliteUpdateBuilder* builder,
-                                     const QList<QString>& updateField,
-                                     const DbModel *item);
+    virtual ErrCode updateBuilderFieldFromModel(DbSqliteUpdateBuilder *builder,
+                                                const QString &field,
+                                                const DbModel *item);
     virtual ErrCode filterFieldCond(int fieldId,
                                     int operatorId,
                                     QString fieldValueName,

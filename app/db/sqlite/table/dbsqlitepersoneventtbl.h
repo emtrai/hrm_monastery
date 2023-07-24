@@ -57,9 +57,9 @@ public:
                                 const QString* eventUid = nullptr,
                                 qint64 date = 0); // TODO; should support enddate???
 protected:
-    virtual ErrCode updateTableField(DbSqliteUpdateBuilder* builder,
-                                     const QList<QString>& updateField,
-                                     const DbModel *item);
+    virtual ErrCode updateBuilderFieldFromModel(DbSqliteUpdateBuilder *builder,
+                                                const QString &field,
+                                                const DbModel *item);
 private:
     static const qint32 KVersionCode;
 };

@@ -29,14 +29,19 @@ class DbSqliteCourseTbl : public DbSqliteTbl
 public:
     DbSqliteCourseTbl();
     DbSqliteCourseTbl(DbSqlite* db);
+    virtual ~DbSqliteCourseTbl();
 
     virtual void addTableField(DbSqliteTableBuilder* builder);
     virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
     virtual ErrCode updateDbModelDataFromQuery(DbModel* item, const QSqlQuery& qry);
 protected:
-    virtual ErrCode updateTableField(DbSqliteUpdateBuilder* builder,
-                                     const QList<QString>& updateField,
-                                     const DbModel *item);
+//    virtual ErrCode updateBuilderFromModel(DbSqliteUpdateBuilder* builder,
+//                                     const QList<QString>& updateField,
+//                                     const DbModel *item);
+    virtual ErrCode updateBuilderFieldFromModel(DbSqliteUpdateBuilder *builder,
+                                        const QString &field,
+                                        const DbModel *item);
+
 private:
     static const qint32 KVersionCode;
 };

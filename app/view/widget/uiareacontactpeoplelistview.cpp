@@ -91,6 +91,7 @@ void UIAreaContactPeopleListView::initHeader()
     mHeader.append(STR_PERSON_NAMEID);
     mHeader.append(STR_FULLNAME);
     mHeader.append(STR_ROLE);
+    mHeader.append(STR_TERM);
     mHeader.append(STR_MODELSTATUS);
     mHeader.append(STR_STARTDATE);
     mHeader.append(STR_ENDDATE);
@@ -143,6 +144,7 @@ void UIAreaContactPeopleListView::updateItem(DbModel *item,
             tblItem->addValue(per->personNameId());
             tblItem->addValue(per->personName());
             tblItem->addValue(per->roleName());
+            tblItem->addValue(per->courseName());
             tblItem->addValue(per->modelStatusName());
             tblItem->addValue(DatetimeUtils::date2String(per->startDate()));
             tblItem->addValue(DatetimeUtils::date2String(per->endDate()));

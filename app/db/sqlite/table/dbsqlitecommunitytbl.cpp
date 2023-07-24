@@ -220,14 +220,60 @@ QString DbSqliteCommunityTbl::getSearchQueryString(const QString &cond)
     return queryString;
 }
 
-ErrCode DbSqliteCommunityTbl::updateTableField(DbSqliteUpdateBuilder *builder, const QList<QString> &updateField, const DbModel *item)
+//ErrCode DbSqliteCommunityTbl::updateBuilderFromModel(DbSqliteUpdateBuilder *builder, const QList<QString> &updateField, const DbModel *item)
+//{
+//    tracein;
+//    ErrCode err = DbSqliteTbl::updateBuilderFromModel(builder, updateField, item);
+//    if (err == ErrNone) {
+//        Community* comm = (Community*) item;
+//        foreach (QString field, updateField) {
+//            logd("Update field %s", STR2CHA(field));
+//            if (field == KItemFeastDay) {
+//                builder->addValue(KFieldFeastDay, comm->feastDate());
+//            } else if (field == KItemArea) {
+//                builder->addValue(KFieldAreaUid, comm->areaUid());
+//                builder->addValue(KFieldAreaDbId, comm->areaDbId());
+//            } else if (field == KItemTel) {
+//                builder->addValue(KFieldTel, comm->tel());
+//            } else if (field == KItemAddress) {
+//                builder->addValue(KFieldAddr, comm->addr());
+//            } else if (field == KItemEmail) {
+//                builder->addValue(KFieldEmail, comm->email());
+//            } else if (field == KItemCountry) {
+//                builder->addValue(KFieldCountryUid, comm->countryUid());
+//            } else if (field == KItemChurchAddress) {
+//                builder->addValue(KFieldChurchAddr, comm->church());
+//            } else if (field == KItemStatus) {
+//                builder->addValue(KFieldModelStatus, comm->getStatus());
+//            } else if (field == KItemCreateTime) {
+//                builder->addValue(KFieldCreateDate, comm->createDate());
+//            } else if (field == KItemParentCommunity) {
+//                builder->addValue(KFieldParentUid, comm->parentUid());
+//            } else if (field == KItemContact) {
+//                builder->addValue(KFieldContact, comm->contact());
+//            } else if (field == KItemBrief) {
+//                builder->addValue(KFieldBrief, comm->brief());
+//            } else {
+//                logw("Field '%s' not support here", STR2CHA(field));
+//            }
+//        }
+//    }
+//    traceout;
+//    return err;
+//}
+
+ErrCode DbSqliteCommunityTbl::updateBuilderFieldFromModel(DbSqliteUpdateBuilder *builder, const QString &field, const DbModel *item)
 {
     tracein;
-    ErrCode err = DbSqliteTbl::updateTableField(builder, updateField, item);
+    ErrCode err = ErrNone;
+    logd("update table field '%s' for model '%s'", STR2CHA(field), MODELSTR2CHA(item));
+    if (!builder || !item || field.isEmpty()) {
+        err = ErrInvalidArg;
+        loge("invalid arg");
+    }
     if (err == ErrNone) {
-        Community* comm = (Community*) item;
-        foreach (QString field, updateField) {
-            logd("Update field %s", STR2CHA(field));
+        if (item->modelName() == KModelNameCommunity) {
+            Community* comm = (Community*) item;
             if (field == KItemFeastDay) {
                 builder->addValue(KFieldFeastDay, comm->feastDate());
             } else if (field == KItemArea) {
@@ -254,8 +300,12 @@ ErrCode DbSqliteCommunityTbl::updateTableField(DbSqliteUpdateBuilder *builder, c
             } else if (field == KItemBrief) {
                 builder->addValue(KFieldBrief, comm->brief());
             } else {
-                logw("Field '%s' not support here", STR2CHA(field));
+                err = DbSqliteTbl::updateBuilderFieldFromModel(builder, field, item);
             }
+        } else {
+            loge("Model '%s' is no support",
+                 MODELSTR2CHA(item));
+            err = ErrNotSupport;
         }
     }
     traceout;
