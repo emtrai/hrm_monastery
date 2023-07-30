@@ -37,6 +37,7 @@ UICommonListView::UICommonListView(QWidget *parent):
     UITableView(parent),
     mHasImportMenu(false),
     mHasExportMenu(false),
+    mSortItem(false), // Sorting disable by default. Sorting may cause list display incorrectly.
     mParentModel(nullptr)
 {
 }
@@ -127,7 +128,6 @@ QList<UITableItem *> UICommonListView::getListItem(qint32 page, qint32 perPage, 
 void UICommonListView::initHeader()
 {
     tracein;
-    mHeader.append(STR_STT);
     mHeader.append(STR_NAMEID);
     mHeader.append(STR_NAME);
     mHeader.append(STR_NOTE);
@@ -136,10 +136,24 @@ void UICommonListView::initHeader()
 void UICommonListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
-    tblItem->addValue(QString("%1").arg(idx));
     tblItem->addValue(item->nameId());
     tblItem->addValue(item->name());
     tblItem->addValue(item->remark());
+    traceout;
+}
+
+void UICommonListView::onUpdatePageDone(qint32 page, qint32 totalpages, qint32 totalItems)
+{
+    tracein;
+    UITableView::onUpdatePageDone(page, totalpages, totalItems);
+    logd("Sort %d", mSortItem);
+    if (mSortItem) {
+        // data from db was sorted, by data is stored in hashlist, which is not sorted
+        // TODO: improve performance by using sorted list intead of hash map?
+        // Sorting may cause list display incorrectly, i.e some field lost info
+        // TODO: check why sorting cause some field in tableview list lost data
+        sort(1); // name
+    }
     traceout;
 }
 
@@ -289,21 +303,28 @@ int UICommonListView::onFilter(int catetoryid, const QString &catetory,
 ErrCode UICommonListView::onViewItem(UITableCellWidgetItem *item)
 {
     tracein;
-    if (item) {
-        int idx = item->idx();
-        DbModel* comm = item->itemData();
-        if (comm) {
-            MainWindow::showOnHtmlViewer(comm, getTitle());
-        } else {
-            loge("Comm obj is null");
-            DialogUtils::showErrorBox("Không có thông tin để xem");
-        }
-    } else {
-        loge("no data to view");
-        DialogUtils::showErrorBox(tr("Lỗi, không có dữ liệu hiện thị"));
+    ErrCode err = ErrNone;
+    DbModel* model = nullptr;
+
+    if (!item) {
+        err = ErrInvalidArg;
+        loge("invalid argument");
     }
-    traceout;
-    return ErrNone;// TODO: check to return data;
+
+    if (err == ErrNone && ((model = item->itemData()) == nullptr)) {
+        err = ErrInvalidData;
+        loge("Invalid argument");
+    }
+
+    if (err == ErrNone) {
+        err = MainWindow::showOnHtmlViewer(model, getTitle());
+    }
+    if (err != ErrNone) {
+        loge("view item err %d", err);
+        DialogUtils::showErrorBox(err, tr("Hiển thị thông tin lỗi"));
+    }
+    traceret(err);
+    return err;
 }
 
 ErrCode UICommonListView::onAddItem(UITableCellWidgetItem *item)
@@ -424,7 +445,8 @@ ErrCode UICommonListView::onMenuActionExport(QMenu *menu, UITableMenuAction *act
             err = MainWindow::exportListItems(&mItemList,
                                               getMainModelName(),
                                               exportController(),
-                                              STR_EXPORT_TO_FILE, EXPORT_XLSX);
+                                              QString("%1: %2").arg(STR_EXPORT_TO_FILE, getTitle()),
+                                              EXPORT_XLSX);
         } else {
             logw("nothing to export");
             err = ErrNoData;

@@ -135,15 +135,15 @@ MainWindow::MainWindow(QWidget *parent)
         FileCtl::getUpdatePrebuiltDataFilePath(KPrebuiltHomeHtmlFileName, false)));
 
 
-    mMainViews.append((BaseView*)mSummarizeView);
-    mMainViews.append((BaseView*)mSaintsView);
-    mMainViews.append((BaseView*)mPersonView);
-    mMainViews.append((BaseView*)mAreaView);
-    mMainViews.append((BaseView*)mHomeView);
-    mMainViews.append((BaseView*)mCommunityView);
-    mMainViews.append((BaseView*)mDepartView);
-    mMainViews.append((BaseView*)mRoleView);
-    mMainViews.append((BaseView*)mCourseView);
+    mViewList.insert(VIEW_SUMMARY, (BaseView*)mSummarizeView);
+    mViewList.insert(VIEW_SAINT, (BaseView*)mSaintsView);
+    mViewList.insert(VIEW_PERSON, (BaseView*)mPersonView);
+    mViewList.insert(VIEW_AREA, (BaseView*)mAreaView);
+    mViewList.insert(VIEW_TEXT_BROWSER, (BaseView*)mHomeView);
+    mViewList.insert(VIEW_COMMUNITY, (BaseView*)mCommunityView);
+    mViewList.insert(VIEW_DEPARTMENT, (BaseView*)mDepartView);
+    mViewList.insert(VIEW_ROLE, (BaseView*)mRoleView);
+    mViewList.insert(VIEW_COURSE, (BaseView*)mCourseView);
 
     switchView(mHomeView);
 
@@ -376,7 +376,7 @@ void MainWindow::switchView(BaseView *nextView, bool fromStack)
             ui->centralLayout->replaceWidget(mCurrentView->getWidget(), nextView->getWidget());
     //        ui->centralwidget->layout()->replaceWidget(mCurrentView, nextView);
             // TODO: make this as stack????
-    //        if (!mMainViews.contains(mCurrentView)) {
+    //        if (!mViewList.contains(mCurrentView)) {
     //            logd("Not in cached view, remove");
     //            delete mCurrentView;
                 // TODO: delete here cause something terrible, i.e UICommDeptListView --> uidepartmentpersonlistview.cpp
@@ -407,25 +407,38 @@ BaseView *MainWindow::getView(ViewType type)
 {
     tracein;
     BaseView *nextView = nullptr;
-    logd("type %d", type);
-    switch (type) {
-    case ViewType::VIEW_DEPARTMENT:
-        nextView = mDepartView;
-        break;
-    case ViewType::VIEW_PERSON:
-        nextView = mPersonView;
-        break;
-    default:
-        {
-            BaseView* view = UITableViewFactory::getView(type);
-            if (view) {
-                nextView = (BaseView*) view;
-            } else {
-                loge("Unknown type %d", type);
-            }
+    logd("getView type %d", type);
+    if (mViewList.contains(type)) {
+        logd("view existed");
+        nextView = mViewList.value(type);
+    } else {
+        logd("view not exist, create new one");
+        nextView = UITableViewFactory::getView(type);
+        if (nextView) {
+            logi("Add view %d to view list as cache", type);
+            mViewList.insert(type, nextView);
+        } else {
+            loge("invalid type '%d' or no memory", type);
         }
-        break;
     }
+//    switch (type) {
+//    case ViewType::VIEW_DEPARTMENT:
+//        nextView = mDepartView;
+//        break;
+//    case ViewType::VIEW_PERSON:
+//        nextView = mPersonView;
+//        break;
+//    default:
+//        {
+//            BaseView* view = UITableViewFactory::getView(type);
+//            if (view) {
+//                nextView = (BaseView*) view;
+//            } else {
+//                loge("Unknown type %d", type);
+//            }
+//        }
+//        break;
+//    }
     traceout;
     return nextView;
 }
@@ -714,6 +727,7 @@ ErrCode MainWindow::doExportListItems(const QList<DbModel *> *items,
          STR2CHA(datatype), exportTypeList,
          controller?STR2CHA(controller->getName()):"null");
     if (err == ErrNone) {
+        dlg->setTitle(title);
         dlg->setImportExport(true, title);
         dlg->setExportTypes(exportTypeList);
         dlg->exec();
@@ -1300,7 +1314,7 @@ void MainWindow::on_actionCourse_triggered()
 }
 
 
-MainWindow *MainWindow::getInstance()
+MainWindow *MAINWIN
 {
     return gInstance;
 }

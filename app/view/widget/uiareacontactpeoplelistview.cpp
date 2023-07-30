@@ -280,30 +280,5 @@ ErrCode UIAreaContactPeopleListView::onEditItem(UITableCellWidgetItem *item)
     traceret(err);
     return err;
 }
-ErrCode UIAreaContactPeopleListView::onViewItem(UITableCellWidgetItem *item)
-{
-    tracein;
-    ErrCode err = ErrNone;
-    DbModel* model = nullptr;
 
-    if (!item) {
-        err = ErrInvalidArg;
-        loge("invalid argument");
-    }
-
-    if (err == ErrNone && ((model = item->itemData()) == nullptr)) {
-        err = ErrInvalidData;
-        loge("Invalid argument");
-    }
-
-    if (err == ErrNone) {
-        err = MainWindow::showOnHtmlViewer(model, tr("Liên lạc của khu vực"));
-    }
-    if (err != ErrNone) {
-        loge("view item err %d", err);
-        DialogUtils::showErrorBox(err, tr("Hiển thị thông tin lỗi"));
-    }
-    traceret(err);
-    return err;
-}
 

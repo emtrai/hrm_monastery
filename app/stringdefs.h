@@ -29,6 +29,9 @@
 #define STR_IGNORE      QObject::tr("Bỏ qua")
 #define STR_HELP        QObject::tr("Giúp đỡ")
 
+#define STR_NO_DATA         QObject::tr("Không có dữ liệu")
+#define STR_INVALID_DATA     QObject::tr("Dữ liệu không hợp lệ")
+
 #define STR_CONTACT        QObject::tr("Liên hệ")
 #define STR_ADDR        QObject::tr("Địa chỉ")
 #define STR_TEL         QObject::tr("Điện thoại")

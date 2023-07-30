@@ -101,6 +101,12 @@ void UITableView::setupUI()
     traceout;
 }
 
+void UITableView::sort(int column)
+{
+    logd("sort column %d", column);
+    ui->tblList->sortByColumn(column, Qt::AscendingOrder);
+}
+
 void UITableView::reload()
 {
     tracein;
@@ -131,6 +137,7 @@ void UITableView::showEvent(QShowEvent *ev)
 void UITableView::onUpdatePage(qint32 page)
 {
     QTableWidget* tbl = ui->tblList;
+    qint32 totalPages = 0;
     tracein;
 
     // TODO: is it really remove all data?
@@ -147,7 +154,7 @@ void UITableView::onUpdatePage(qint32 page)
     if (total > 0){
         // TODO: remove paging, as it not need????
         qint32 perPage = ((mItemPerPage != 0) && (mItemPerPage < total))?mItemPerPage:total;
-        qint32 totalPages = total/perPage;
+        totalPages = total/perPage;
         logd("total %d perpage %d totaPage %d", total, perPage, totalPages);
 
         QList<UITableItem*> items = getListItem(page, perPage, totalPages);
@@ -163,6 +170,14 @@ void UITableView::onUpdatePage(qint32 page)
             idx ++;
         }
     }
+    onUpdatePageDone(total, totalPages, total);
+    traceout;
+}
+
+void UITableView::onUpdatePageDone(qint32 page, qint32 totalpages, qint32 totalItems)
+{
+    tracein;
+    logd("page %d, totalPages %d, totalItems %d", page, totalpages, totalItems);
     traceout;
 }
 

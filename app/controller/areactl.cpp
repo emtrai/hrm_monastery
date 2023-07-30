@@ -186,6 +186,8 @@ const QString AreaCtl::exportListPrebuiltTemplateName(const QString &modelName) 
     logd("model name '%s'", STR2CHA(modelName));
     if (modelName == KModelNameAreaPerson) {
         fpath = KPrebuiltAreaContactExportTemplateName;
+    } else if (modelName == KModelNameArea) {
+        fpath = KPrebuiltAreaExportTemplateName;
     } else {
         fpath = ModelController::exportListPrebuiltTemplateName(modelName);
     }

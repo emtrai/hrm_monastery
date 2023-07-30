@@ -419,11 +419,11 @@ ErrCode UIPersonListView::onMenuActionViewPersonEvent(QMenu *menu, UITableMenuAc
     Person* person = dynamic_cast<Person*>(act->getData());
     if (person != nullptr) {
         UIPersonEventListView* view =
-            (UIPersonEventListView*)UITableViewFactory::getView(ViewType::VIEW_PERSON_EVENT);
+            (UIPersonEventListView*)MAINWIN->getView(ViewType::VIEW_PERSON_EVENT);
 
         logd("view event of person %s", STR2CHA(person->toString()));
         view->setPerson(person);
-        MainWindow::getInstance()->switchView(view);
+        MAINWIN->switchView(view);
     } else {
         loge("no person event info");
         ret = ErrNoData;
@@ -441,11 +441,11 @@ ErrCode UIPersonListView::onMenuActionViewCommunity(QMenu *menu, UITableMenuActi
     Person* per = dynamic_cast<Person*>(act->getData());
     if (per != nullptr) {
         UICommunitiesOfPersonListView* view = (UICommunitiesOfPersonListView*)
-            UITableViewFactory::getView(ViewType::VIEW_COMMUNITIES_OF_PERSON_LIST);
+            MAINWIN->getView(ViewType::VIEW_COMMUNITIES_OF_PERSON_LIST);
 
         logd("person to view community %s", MODELSTR2CHA(per));
         view->setPerson(per);
-        MainWindow::getInstance()->switchView(view);
+        MAINWIN->switchView(view);
     } else {
         loge("no per info");
         ret = ErrNoData;

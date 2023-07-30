@@ -172,6 +172,7 @@ QList<DbModel *> ModelController::getAllItems(bool readFromDb, int from, int noI
             }
         }
         logd("Copy data from cache");
+        // Cache is hash map, so data is not sorted, take care
         foreach (DbModel* item, mCacheItemList.values()) {
             if (item) {
                 DbModel* cloneItem = item->clone();

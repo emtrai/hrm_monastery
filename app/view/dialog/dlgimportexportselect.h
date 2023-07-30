@@ -41,6 +41,7 @@ public:
     ErrCode setExportTypes(quint64 exportTypes);
     void setImportExport (bool isExport, const QString& title);
     const QString &path() const;
+    void setTitle(const QString& title);
 
     ExportType selectedExportType() const;
     void setSelectedExportType(ExportType newSelectedExportType);

@@ -536,6 +536,7 @@ DISTFILES += \
     license.template \
     res/Saints.csv \
     res/area_contact_export_template_vi.json \
+    res/area_export_template_vi.json \
     res/area_person_info_template.html \
     res/area_vi.csv \
     res/comm_dept_vi.json \

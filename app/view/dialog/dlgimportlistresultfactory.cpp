@@ -46,6 +46,10 @@ ErrCode DlgImportListResultFactory::getImportListResult(int target,
         case IMPORT_TARGET_AREA_CONTACT:
             dlg = new DlgImportAreaPersonListResult(parent);
             break;
+        case IMPORT_TARGET_MAX:
+            loge("import target %d not support", target);
+            err = ErrNotSupport;
+            break;
         default:
             logw("target %d not support, use default one", target);
             dlg = new DlgImportListResult(parent);

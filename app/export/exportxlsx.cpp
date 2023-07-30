@@ -58,7 +58,7 @@ ErrCode ExportXlsx::saveTo(const DataExporter *item,
 }
 
 ErrCode ExportXlsx::saveTo(const DataExporter *exporter,
-                           const QString& datatype,
+                           const QString& datatype,// datatype mostly modelname, or controller name
                            const QList<DbModel *> listData,
                            const QString &fpath)
 {

@@ -61,6 +61,8 @@ protected:
     virtual ErrCode onReload();
     virtual void initHeader();
     virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
+
+    virtual void onUpdatePageDone(qint32 page, qint32 totalpages, qint32 totalItems);
     virtual void initFilterFields();
     virtual QHash<QString, QString> getFilterKeywords(int fieldId, const QString& fieldText);
     virtual int onFilter(int catetoryid,
@@ -89,6 +91,7 @@ protected:
     QList<DbModel*> mItemList;
     bool mHasImportMenu;
     bool mHasExportMenu;
+    bool mSortItem;
     DbModel* mParentModel; //
 };
 

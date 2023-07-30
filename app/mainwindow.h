@@ -34,6 +34,7 @@
 #include "view/dialog/dlgcommoneditmodel.h"
 #include "importfactory.h"
 #include <QStack>
+#include <QHash>
 #include "view/widget/baseview.h"
 #include "view/widget/uitextbrowser.h"
 #include "dialog/dlgwait.h"
@@ -42,7 +43,7 @@ QT_BEGIN_NAMESPACE
     namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
-#define MAIN MainWindow::getInstance()
+#define MAINWIN MainWindow::getInstance()
 
 // TODO: full state machine/state transition check/report incident
 enum AppState {
@@ -190,7 +191,7 @@ protected:
     BaseView* mDepartView;
     BaseView* mRoleView;
     BaseView* mCourseView;
-    QList<BaseView*> mMainViews;
+    QHash<int, BaseView*> mViewList;
     UITextBrowser* mHomeView;
     BaseView* mCurrentView;
 

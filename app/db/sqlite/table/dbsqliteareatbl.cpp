@@ -114,7 +114,9 @@ ErrCode DbSqliteAreaTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQue
             if (qry.value(KFieldCountryName).isValid()) {
                 model->setCountryName(qry.value(KFieldCountryName).toString());
             }
-
+            if (qry.value(KFieldCountryNameId).isValid()) {
+                model->setCountryNameId(qry.value(KFieldCountryNameId).toString());
+            }
             model->setAddr(qry.value(KFieldAddr).toString());
             model->setEmail(qry.value(KFieldEmail).toString());
             model->setTel(qry.value(KFieldTel).toString());
@@ -139,11 +141,11 @@ QString DbSqliteAreaTbl::getSearchQueryString(const QString &cond)
 {
     tracein;
     QString queryString = QString("SELECT *, %2.%5 AS %6, %2.%7 AS %8, %2.%4 AS %9 FROM %1 LEFT JOIN %2 ON %1.%3 = %2.%4")
-                              .arg(name(), KTableCountry)
-                              .arg(KFieldCountryUid, KFieldUid)
-                              .arg(KFieldName, KFieldCountryName)
-                              .arg(KFieldNameId, KFieldCountryNameId)
-                              .arg(KFieldCountryUid)
+                              .arg(name(), KTableCountry) // 1, 2
+                              .arg(KFieldCountryUid, KFieldUid) // 3, 4
+                              .arg(KFieldName, KFieldCountryName) // 5, 6
+                              .arg(KFieldNameId, KFieldCountryNameId) // 7, 8
+                              .arg(KFieldCountryUid) // 9
         ;
     if (!cond.isEmpty()) {
         queryString += QString(" WHERE %1").arg(cond);

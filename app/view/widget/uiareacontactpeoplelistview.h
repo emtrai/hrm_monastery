@@ -76,7 +76,6 @@ protected:
 
     virtual ErrCode onAddItem(UITableCellWidgetItem *item);
     virtual ErrCode onEditItem(UITableCellWidgetItem *item);
-    virtual ErrCode onViewItem(UITableCellWidgetItem *item);
 
 };
 

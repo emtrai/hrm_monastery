@@ -78,6 +78,9 @@ public:
                                        QString* ftype = nullptr) const;
 
     virtual void initExportFields();
+    QString countryNameId() const;
+    void setCountryNameId(const QString &newCountryNameId);
+
 protected:
     virtual DbModelHandler* getDbModelHandler() const;
     virtual DbModelBuilder getBuilder() const;
@@ -86,6 +89,7 @@ private:
     QString mCountryName; // just for display, not store to db
     qint64 mCountryDbId;
     QString mCountryUid;
+    QString mCountryNameId;
 
     QString mAddr;
     QString mTel;

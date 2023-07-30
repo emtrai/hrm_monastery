@@ -100,6 +100,16 @@ void Area::setCountryUid(const QString &newCountryUid)
     markItemAsModified(KItemCountry);
 }
 
+QString Area::countryNameId() const
+{
+    return mCountryNameId;
+}
+
+void Area::setCountryNameId(const QString &newCountryNameId)
+{
+    mCountryNameId = newCountryNameId;
+}
+
 DbModelHandler *Area::getDbModelHandler() const
 {
 
@@ -117,6 +127,7 @@ void Area::copy(const Area &model)
     mCountryName = model.mCountryName;
     mCountryDbId = model.mCountryDbId;
     mCountryUid = model.mCountryUid;
+    mCountryNameId = model.mCountryNameId;
     mAddr = model.mAddr;
     mTel = model.mTel;
     mEmail = model.mEmail;
@@ -167,6 +178,9 @@ void Area::initExportFields()
     DbModel::initExportFields();
     mExportCallbacks.insert(KItemCountry, [](const DbModel* model, const QString& item){
         return ((Area*)model)->countryName();
+    });
+    mExportCallbacks.insert(KItemCountryNameId, [](const DbModel* model, const QString& item){
+        return ((Area*)model)->countryNameId();
     });
     mExportCallbacks.insert(KItemAddress, [](const DbModel* model, const QString& item){
         return ((Area*)model)->addr();

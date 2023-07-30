@@ -119,7 +119,7 @@ protected:
     virtual bool onValidateData(QString& msg);
 
     virtual ErrCode loadList(QComboBox* cb, ModelController* ctrl);
-    virtual void onChangeNameIdTxt(QLineEdit* txt, const QString &arg1, bool direct = true);
+    virtual void onChangeNameIdTxt(QLineEdit* txt, const QString &arg1, bool direct = false);
     virtual void onEditnameId(QLineEdit* txt);
 protected:
 

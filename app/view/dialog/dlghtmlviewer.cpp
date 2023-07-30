@@ -32,7 +32,7 @@ dlgHtmlViewer::dlgHtmlViewer(QWidget *parent) :
 {
     ui->setupUi(this);
     DIALOG_SIZE_SHOW(this);
-    this->setWindowTitle(tr("Thông tin nữ tu"));
+
     ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Thoát"));
 }
 
@@ -43,7 +43,7 @@ dlgHtmlViewer::~dlgHtmlViewer()
 
 void dlgHtmlViewer::setSubject(const QString &value)
 {
-    ui->lblSubject->setText(value);
+    setWindowTitle(value);
 }
 
 void dlgHtmlViewer::setHtmlPath(const QString &fpath)
@@ -64,7 +64,7 @@ void dlgHtmlViewer::on_btnExport_clicked()
     // Export information to file
     tracein;
     ErrCode err = Utils::saveHtmlToPdf(mHtmlPath,
-                                       Utils::UidFromName(ui->lblSubject->text(),
+                                       Utils::UidFromName(this->windowTitle(),
                                             UidNameConvertType::NO_VN_MARK_UPPER),
                                        this);
     if (err == ErrNone) {

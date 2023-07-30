@@ -215,9 +215,9 @@ ErrCode UICommunityListView::onMenuActionListPerson(QMenu *menu, UITableMenuActi
     Community* community = dynamic_cast<Community*>(act->getData());
     if (community != nullptr) {
         community->dump();
-        UITableView* view = (UITableView*)MAIN->getView(ViewType::VIEW_PERSON);
+        UITableView* view = (UITableView*)MAINWIN->getView(ViewType::VIEW_PERSON);
         view->addFilter(KItemCommunity, QString(), QVariant(community->uid()));
-        MainWindow::getInstance()->switchView(view);
+        MAINWIN->switchView(view);
     } else {
         loge("no community info");
         ret = ErrNoData;
@@ -235,11 +235,11 @@ ErrCode UICommunityListView::onMenuActionListAllPerson(QMenu *menu, UITableMenuA
     ErrCode ret = ErrNone;
     Community* community = dynamic_cast<Community*>(act->getData());
     if (community != nullptr) {
-        UIPeopleInCommunityListView* view = (UIPeopleInCommunityListView*)UITableViewFactory::getView(ViewType::VIEW_PEOPLE_IN_COMMUNITY_LIST);
+        UIPeopleInCommunityListView* view = (UIPeopleInCommunityListView*)MAINWIN->getView(ViewType::VIEW_PEOPLE_IN_COMMUNITY_LIST);
 
         logd("community to view person %s", STR2CHA(community->toString()));
         view->setCommunity(community);
-        MainWindow::getInstance()->switchView(view);
+        MAINWIN->switchView(view);
     } else {
         loge("no community info");
         ret = ErrNoData;
@@ -257,10 +257,10 @@ ErrCode UICommunityListView::onMenuActionListDepartment(QMenu *menu, UITableMenu
     Community* community = dynamic_cast<Community*>(act->getData());
     if (community != nullptr) {
         community->dump();
-        UICommDeptListView* view = (UICommDeptListView*)UITableViewFactory::getView(ViewType::VIEW_COMMUNITY_DEPT);
+        UICommDeptListView* view = (UICommDeptListView*)MAINWIN->getView(ViewType::VIEW_COMMUNITY_DEPT);
 
         view->setCommunity(community);
-        MainWindow::getInstance()->switchView(view);
+        MAINWIN->switchView(view);
     } else {
         loge("no community info");
         ret = ErrNoData;
@@ -280,13 +280,13 @@ ErrCode UICommunityListView::onMenuActionListDepartment(QMenu *menu, UITableMenu
 //            loge("no uid");
 //            return;
 //        }
-//        UICommunityPersonListView* view = (UICommunityPersonListView*)UITableViewFactory::getView(ViewType::VIEW_PEOPLE_IN_COMMUNITY);
+//        UICommunityPersonListView* view = (UICommunityPersonListView*)MAINWIN->getView(ViewType::VIEW_PEOPLE_IN_COMMUNITY);
 
 //        logd("community uid %s", uid.toStdString().c_str());
 //        //        view->setCommunityUid(uid);
 //        view->setCommunity(model);
 //        view->setTitle(model->name());
-//        MainWindow::getInstance()->switchView(view);
+//        MAINWIN->switchView(view);
 //    } else {
 //        loge("Invalid idx");
 //        // TODO: popup message???

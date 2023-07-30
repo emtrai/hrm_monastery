@@ -43,7 +43,7 @@ void DialogUtils::showErrorBox(const QString &msg)
 {
     tracein;
     logd("Error box %s", msg.toStdString().c_str());
-    QMessageBox::critical(MainWindow::getInstance(), "Lỗi", msg, QMessageBox::Close);
+    QMessageBox::critical(MAINWIN, "Lỗi", msg, QMessageBox::Close);
     traceout;
 }
 
@@ -65,7 +65,7 @@ bool DialogUtils::showConfirmDialog(QWidget *parent, const QString &title,
 {
     tracein;
     bool ok = false;
-    if (!parent) parent = MainWindow::getInstance();
+    if (!parent) parent = MAINWIN;
     QMessageBox msgBox;
     msgBox.setText(title);
     msgBox.setInformativeText(message);

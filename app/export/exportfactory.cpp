@@ -26,6 +26,29 @@
 #include "exporthtml.h"
 #include "exportcsvlist.h"
 #include "exportxlsx.h"
+#include "prebuiltdefs.h"
+#include "modeldefs.h"
+#include "exporttype.h"
+
+#define EXPORT_TEMPLATE_ID(name,type) QString("%1_%2").arg(name).arg(type)
+
+QHash<QString, ExportTemplate*> ExportFactory::s_modelNameExportTemplateMap;
+
+struct ExportTemplate {
+    ExportTemplate(ExportType type, QString name, QString path);
+    ExportType exportType;
+    QString name;
+    QString templatePath;
+};
+
+ExportTemplate::ExportTemplate(ExportType type, QString name, QString path)
+{
+    tracein;
+    this->exportType = type;
+    this->name = name;
+    this->templatePath = path;
+    traceout;
+}
 
 ExportFactory::ExportFactory()
 {
@@ -74,7 +97,7 @@ ErrCode ExportFactory::exportTo(const DataExporter *item,
 }
 
 ErrCode ExportFactory::exportTo(const DataExporter* item,
-                                const QString& datatype,
+                                const QString& datatype, // datatype mostly modelname, or controller name
                                 QList<DbModel*> data,
                                 const QString &fpath,
                                 ExportType type)
@@ -93,5 +116,62 @@ ErrCode ExportFactory::exportTo(const DataExporter* item,
         loge("FileExporter %d not support", type);
     }
     return ret;
+}
+
+// this looks useless, re-consider again
+// This cause objects not pure independent. All model/control object need to exist here
+// We want each object/class need to independent together.
+// currently, no one use this function, just put here for backup
+QString ExportFactory::getExportTemplatePath(const QString &modelName, ExportType type, bool* ok)
+{
+    tracein;
+    QString fpath;
+    QString id = EXPORT_TEMPLATE_ID(modelName, type);
+    ErrCode err = ErrNone;
+    initExportTemplate();
+    logd("model name '%s', type=%d, id='%s'", STR2CHA(modelName), type, STR2CHA(id));
+    if (s_modelNameExportTemplateMap.contains(id)) {
+        ExportTemplate* exportTemplate = s_modelNameExportTemplateMap.value(id);
+        if (exportTemplate) {
+            fpath = exportTemplate->templatePath;
+        } else {
+            err = ErrNoData;
+            loge("export template id '%s' has no data", STR2CHA(id));
+        }
+    } else {
+        fpath = KPrebuiltDefaultExportTemplateName;
+        logi("export template id '%s' use default tempalte name", STR2CHA(id));
+    }
+
+    if (ok) *ok = (err = ErrNone);
+    traceout;
+    return fpath;
+}
+
+void ExportFactory::initExportTemplate()
+{
+    if (s_modelNameExportTemplateMap.size() == 0) {
+        tracein;
+        logd("init template");
+        addExportTemplate(EXPORT_XLSX,
+                          KModelNameAreaPerson,
+                          KPrebuiltAreaContactExportTemplateName);
+        traceout;
+    }
+}
+
+void ExportFactory::addExportTemplate(ExportType type, const QString &modelName, QString fpath)
+{
+    logd("Add export template type %d name '%s' fpath '%s'",
+         type, STR2CHA(modelName), STR2CHA(fpath));
+    ExportTemplate *tpl = new ExportTemplate(type,
+                                             modelName,
+                                             fpath);
+    if (tpl) {
+        s_modelNameExportTemplateMap.insert(
+            EXPORT_TEMPLATE_ID(modelName, type),tpl);
+    } else {
+        loge("No memory to allocate export template");
+    }
 }
 

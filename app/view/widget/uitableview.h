@@ -191,6 +191,7 @@ public:
 
     virtual QWidget* getWidget();
 protected:
+    virtual void sort(int column);
     /**
      * @brief List view has filter or not
      * @return true if has filter
@@ -200,6 +201,7 @@ protected:
     virtual QStringList getHeader();
     virtual void showEvent(QShowEvent *ev);
     virtual void onUpdatePage(qint32 page);
+    virtual void onUpdatePageDone(qint32 page, qint32 totalpages, qint32 totalItems);
     virtual QList<UITableItem*> getListItem(qint32 page, qint32 perPage, qint32 totalPages);
     virtual QList<UITableItem*> getListAllItem();
     virtual qint32 getTotalItems();

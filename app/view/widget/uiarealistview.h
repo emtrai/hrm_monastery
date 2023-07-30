@@ -34,18 +34,23 @@ public:
     virtual void setupUI();
 protected:
     virtual int getViewType() { return VIEW_AREA;}
-    virtual ImportTarget getImportTarget();
+    virtual QString getTitle();
     void initHeader();
     void updateItem(DbModel *item, UITableItem *tblItem, int idx);
+    virtual void initFilterFields();
 
     virtual ModelController* getController();
 
     virtual DbModel* onNewModel(const QString& modelName);
+    /**
+     * @brief Model name to be used for checking/create model
+     *        This is name of moodel which list view to show
+     * @return
+     */
+    virtual QString getMainModelName();
 
     virtual ErrCode onAddItem(UITableCellWidgetItem *item);
     virtual ErrCode onEditItem(UITableCellWidgetItem *item);
-    virtual ErrCode onDeleteItem(const QList<UITableItem *>& selectedItems);
-
 
     virtual QList<UITableMenuAction*> getMenuSingleSelectedItemActions(const QMenu* menu,
                                                           UITableCellWidgetItem* item);

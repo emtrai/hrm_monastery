@@ -29,7 +29,6 @@
 #include "utils.h"
 #include "mainwindow.h"
 #include "uiareacontactpeoplelistview.h"
-#include "uitableviewfactory.h"
 #include "stringdefs.h"
 #include "errreporterctl.h"
 #include "dialogutils.h"
@@ -38,25 +37,32 @@ UIAreaListView::UIAreaListView(QWidget *parent):
     UICommonListView(parent)
 {
     tracein;
+    // there is not much area items, so skipping import area
+    // TODO: support to import areas?
+    mHasImportMenu = false;
+    mHasExportMenu = true;
+
+    traceout;
 }
 
 UIAreaListView::~UIAreaListView()
 {
     tracein;
     AREACTL->delListener(this);
+    traceout;
 }
 
 void UIAreaListView::setupUI()
 {
     tracein;
-    UITableView::setupUI();
+    UICommonListView::setupUI();
     AREACTL->addListener(this);
     traceout;
 }
 
-ImportTarget UIAreaListView::getImportTarget()
+QString UIAreaListView::getTitle()
 {
-    return IMPORT_TARGET_AREA;
+    return STR_AREA;
 }
 
 void UIAreaListView::initHeader()
@@ -68,14 +74,18 @@ void UIAreaListView::initHeader()
     mHeader.append(STR_TEL);
     mHeader.append(STR_EMAIL);
     mHeader.append(STR_ADDR);
+
+    traceout;
 }
 
 void UIAreaListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
+    UNUSED(tblItem);
+    UNUSED(idx);
     if (item) {
-        UICommonListView::updateItem(item, tblItem, idx);
         if (item->modelName() == KModelNameArea) {
+            UICommonListView::updateItem(item, tblItem, idx);
             Area* model = (Area*) item;
             tblItem->addValue(model->modelStatusName());
             tblItem->addValue(model->countryName());
@@ -93,21 +103,45 @@ void UIAreaListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
     traceout;
 }
 
+void UIAreaListView::initFilterFields()
+{
+    tracein;
+    // filter by model status
+    appendFilterField(FILTER_FIELD_MODEL_STATUS, STR_MODELSTATUS);
+    // filter by  name
+    appendFilterField(FILTER_FIELD_NAME, STR_NAME);
+    traceout;
+}
+
 ModelController *UIAreaListView::getController()
 {
     tracein;
     return AREACTL;
 }
 
-
 DbModel *UIAreaListView::onNewModel(const QString& modelName)
 {
-    return Area::build();
+    tracein;
+    DbModel* model = nullptr;
+    logd("new model name '%s'", STR2CHA(modelName));
+    if (modelName.isNull() || modelName.isEmpty() || modelName == KModelNameArea) {
+        model = Area::build();
+    } else {
+        loge("cannot create model, invalid modelName '%s'", STR2CHA(modelName));
+    }
+    traceout;
+    return model;
+}
+
+QString UIAreaListView::getMainModelName()
+{
+    return KModelNameArea;
 }
 
 ErrCode UIAreaListView::onAddItem(UITableCellWidgetItem *item)
 {
     tracein;
+    UNUSED(item);
     MainWindow::showAddEditArea(true, nullptr, this);
     traceout;
     return ErrNone;
@@ -119,53 +153,71 @@ ErrCode UIAreaListView::onEditItem(UITableCellWidgetItem *item)
     ErrCode err = ErrNone;
     if (item) {
         DbModel* area = item->itemData();
-        if (area) {
+        if (area && area->modelName() == KModelNameArea) {
             MainWindow::showAddEditArea(true, area, this);
         } else {
-            loge("Edit failed, null area");
+            loge("Edit failed, invalid area '%s'", MODELSTR2CHA(area));
+            REPORTERRCTL->reportErr(STR_INVALID_DATA);
         }
     } else {
         loge("Edit failed, null item");
+        REPORTERRCTL->reportErr(STR_NO_DATA);
     }
     traceret(err);
     return err;
 }
 
-ErrCode UIAreaListView::onDeleteItem(const QList<UITableItem *> &selectedItems)
-{
-    UNDER_DEV("Xóa dữ liệu");
-    return ErrNotImpl;
-}
-
-QList<UITableMenuAction *> UIAreaListView::getMenuSingleSelectedItemActions(const QMenu *menu, UITableCellWidgetItem *item)
+QList<UITableMenuAction *> UIAreaListView::getMenuSingleSelectedItemActions(
+    const QMenu *menu, UITableCellWidgetItem *item)
 {
     tracein;
-    QList<UITableMenuAction*> actionList = UITableView::getMenuSingleSelectedItemActions(menu, item);
+    QList<UITableMenuAction*> actionList =
+        UITableView::getMenuSingleSelectedItemActions(menu, item);
     actionList.append(UITableMenuAction::build(tr("Xem danh sách liên lạc"), this, item)
                                                ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                    return this->onMenuActionViewContactPeople(m, a);
                                                }));
-    // TODO: export data
-    // TODO: import data
     return actionList;
 }
 
 ErrCode UIAreaListView::onMenuActionViewContactPeople(QMenu *menu, UITableMenuAction *act)
 {
     tracein;
+    UNUSED(menu);
     ErrCode ret = ErrNone;
-    Area* area = dynamic_cast<Area*>(act->getData());
-    if (area != nullptr) {
-        UIAreaContactPeopleListView* view =
-                (UIAreaContactPeopleListView*)UITableViewFactory::getView(ViewType::VIEW_AREA_PERSON);
+    Area* area = nullptr;
+    UIAreaContactPeopleListView* view = nullptr;
+    if (!act) {
+        ret = ErrInvalidArg;
+        loge("invalid argument");
+    }
+    if (ret == ErrNone) {
+        area = dynamic_cast<Area*>(act->getData());
+        if (!area) {
+            loge("No area data in menu item");
+            ret = ErrNoData;
+        }
+    }
+    if (ret == ErrNone) {
+        view = (UIAreaContactPeopleListView*)
+               MAINWIN->getView(ViewType::VIEW_AREA_PERSON);
+        if (!view) {
+            loge("no view found, no memory?");
+            ret = ErrNotFound;
+        }
+    }
+    if (ret == ErrNone) {
+        logd("area to view contact list '%s'", MODELSTR2CHA(area));
+        ret = view->setArea(area);
+    }
 
-        logd("area to view person %s", STR2CHA(area->toString()));
-        view->setArea(area);
-        MainWindow::getInstance()->switchView(view);
-    } else {
-        loge("no area info");
-        ret = ErrNoData;
-        DialogUtils::showErrorBox(tr("Vui lòng chọn khu vực cần xem"));
+    if (ret == ErrNone) {
+        logd("Switch view");
+        MAINWIN->switchView(view);
+    }
+
+    if (ret != ErrNone) {
+        DialogUtils::showErrorBox(ret, tr("Xem danh sách liên lạc lỗi"));
     }
 
     traceret(ret);

@@ -25,6 +25,8 @@
 #include "fileexporter.h"
 #include "exporttype.h"
 
+enum ExportType;
+struct ExportTemplate;
 class ExportFactory
 {
 public:
@@ -42,6 +44,12 @@ public:
                             const QString& fpath,
                             ExportType type);
 
+    static QString getExportTemplatePath(const QString& modelName, ExportType type, bool* ok = nullptr);
+private:
+    static void initExportTemplate();
+    static void addExportTemplate(ExportType type, const QString& modelName, QString fpath);
+private:
+    static QHash<QString, ExportTemplate*> s_modelNameExportTemplateMap;
 };
 
 #endif // EXPORTFACTORY_H

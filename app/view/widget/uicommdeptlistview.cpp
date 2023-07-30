@@ -132,12 +132,12 @@ ErrCode UICommDeptListView::onMenuActionListPerson(QMenu *menu, UITableMenuActio
     if (item != nullptr) {
         item->dump();
         UIDepartmentPersonListView* view = (UIDepartmentPersonListView*)
-            UITableViewFactory::getView(ViewType::VIEW_DEPARTMENT_PERSON);
+            MAINWIN->getView(ViewType::VIEW_DEPARTMENT_PERSON);
 
         view->setCommDept(item);;
 
         view->setTitle(QString(tr("Thành viên phòng ban %1 cộng đoàn %2")).arg(item->departmentName(), item->communityName()));
-        MainWindow::getInstance()->switchView(view);
+        MAINWIN->switchView(view);
     } else {
         loge("no department info");
         ret = ErrNoData;

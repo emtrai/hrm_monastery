@@ -93,6 +93,11 @@ const QString &DlgImportExportSelect::path() const
     return mPath;
 }
 
+void DlgImportExportSelect::setTitle(const QString &title)
+{
+    this->setWindowTitle(title);
+}
+
 ExportType DlgImportExportSelect::selectedExportType() const
 {
     return mSelectedExportType;
@@ -140,8 +145,9 @@ void DlgImportExportSelect::accept()
     if (err == ErrNone) {
         logd("extension %s", STR2CHA(ext));
         if (mIsExport) {
+            QString suffix = Utils::UidFromName(windowTitle(), NO_VN_MARK_UPPER);
             mPath = DialogUtils::saveFileDialog(this, mTitle,
-                                          QString("xuatdulieu.%1").arg(ext),
+                                          QString("xuatdulieu_%1.%2").arg(suffix, ext),
                                           QString("%1 (*.%2)").arg(ext.toUpper(), ext)
                                           );
         } else {

@@ -318,6 +318,7 @@ protected:
     QString mMainModelHandlerName;
     bool mEnableCache;
     // cached item list, must clone data from cache, not get from it directly!!!!
+    // data will also not sorted.
     QHash<QString, DbModel*> mCacheItemList;
     bool mReloadDb;
     QList<OnModelControllerListener*> mListeners;

@@ -104,12 +104,15 @@ QSqlQuery *DbSqliteUpdateBuilder::buildSqlQuery(const QString *cond)
     foreach( QString field, mValue.keys() )
     {
         QString id = ":val_" + field;
-        logd("Bind update command field '%s', value '%s'",
-             id.toStdString().c_str(), mValue.value(field).value.toStdString().c_str());
+        logd("Bind update command field id '%s'",STR2CHA(id));
         if (mValue.value(field).dataType == TEXT) {
-            qry->bindValue(id, mValue.value(field).valueString());
+            QString val = mValue.value(field).valueString();
+            logd("bind text value '%s'", STR2CHA(val));
+            qry->bindValue(id, val);
         } else {
-            qry->bindValue(id, mValue.value(field).valueInt());
+            qint64 val = mValue.value(field).valueInt();
+            logd("bind INT value '%lld'", val);
+            qry->bindValue(id, val);
         }
 
     }

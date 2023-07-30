@@ -41,7 +41,10 @@
       </font>
      </property>
      <property name="editTriggers">
-      <set>QAbstractItemView::EditKeyPressed</set>
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="sortingEnabled">
+      <bool>false</bool>
      </property>
     </widget>
    </item>

@@ -28,7 +28,7 @@ enum ImportTarget {
     IMPORT_TARGET_AREA, // Area contact person
     IMPORT_TARGET_AREA_CONTACT, // Area contact person
 
-    IMPORT_TARGET_MAX
+    IMPORT_TARGET_MAX // not support
 };
 
 enum ImportItemType {
