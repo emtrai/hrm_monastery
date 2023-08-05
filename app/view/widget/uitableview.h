@@ -279,8 +279,10 @@ protected:
      */
     virtual QHash<QString, QString> getFilterKeywords(int fieldId, const QString& fieldText);
 
-
+signals:
+    void signalDeleteDone(ErrCode err, QString msg);
 private slots:
+    void onHandleSignalDeleteDone(ErrCode err, QString msg);
     void on_btnImport_clicked();
 
     void on_tblList_itemDoubleClicked(QTableWidgetItem *item);

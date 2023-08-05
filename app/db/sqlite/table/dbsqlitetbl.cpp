@@ -313,8 +313,18 @@ ErrCode DbSqliteTbl::update(const QString &uid, const QHash<QString, FieldValue>
         updateBuilder->addCond(KFieldUid, uid);
         // TODO: data type? (int vs string, different representation)
         foreach (QString field, updatedFields) {
-            logd("Update field %s", field.toStdString().c_str());
-            updateBuilder->addValue(field, fieldValues[field].value, fieldValues[field].dataType);
+            if (mFieldDataTypeMap.contains(field)) {
+                logd("Update field %s for table '%s'", STR2CHA(field), STR2CHA(name()));
+                updateBuilder->addValue(field,
+                                        fieldValues[field].value,
+                                        fieldValues[field].dataType);
+            } else {
+                logw("Field '%s' is not exist in table '%s'",
+                     STR2CHA(field), STR2CHA(name()));
+                // TODO: still continue here, so that model handler can add common fields
+                // and some field may not exist
+                // FIXME: ignore error & continue, is it ok??
+            }
         }
 
         if (err == ErrNone){
@@ -361,8 +371,10 @@ ErrCode DbSqliteTbl::update(const QString &uid, const QHash<QString, QString> &i
             fieldValues.insert(field, FieldValue(value, datatype));
         } else {
             logw("get data type for field '%s' failed, err=%d", STR2CHA(field), err);
+            // TODO: still continue here, so that model handler can add common fields
+            // and some field may not exist
             // FIXME: ignore error & continue, is it ok??
-            break;
+//            break;
         }
     }
     if (err == ErrNone && (fieldValues.size() == 0)) {

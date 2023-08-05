@@ -22,17 +22,13 @@
 #include "dbsqlitearea.h"
 #include "area.h"
 #include "community.h"
-#include "person.h"
 #include "logger.h"
-#include "defs.h"
 
 #include "dbsqlitedefs.h"
 #include "dbsqlite.h"
 #include "table/dbsqliteareamgrtbl.h"
 #include "table/dbsqlitecommunitytbl.h"
 #include "model/areaperson.h"
-#include "model/areacommunity.h"
-#include "dbdefs.h"
 
 
 GET_INSTANCE_IMPL(DbSqliteArea)
@@ -141,76 +137,76 @@ ErrCode DbSqliteArea::deleteHard(DbModel *model, bool force, QString *msg)
         if (model->modelName() == KModelNameAreaPerson) {
             err = DbSqliteModelHandler::deleteHard(model, force, msg);
         } else if (model->modelName() == KModelNameArea){
-            // KFieldAreaUid delete map, community, person
-            QHash<QString, QString> itemToSearch; // for searching
-            QHash<QString, QString> itemToSet; // for update
-            QList<DbModel*> list;
-            int count = 0;
-            ErrCode tmpErr = ErrNone;
-            bool errDependency = false;
+            err = deleteHardArea(model, force, msg);
+        }
+    }
+    traceout;
+    return err;
+}
 
-            itemToSearch.insert(KFieldAreaUid, model->uid());
-            itemToSet.insert(KFieldAreaUid, ""); // update to null/empty
+ErrCode DbSqliteArea::deleteHardArea(DbModel *model, bool force, QString *msg)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    if (!model || (model->modelName() != KModelNameArea)) {
+        err = ErrInvalidArg;
+        loge("Invalid model '%s'", MODELSTR2CHA(model));
+    }
 
+    if (err == ErrNone) {
+        logd("Delete hard model '%s', force %d", STR2CHA(model->toString()), force);
 
-            logd("Check to delete table %s", KTableCommunity);
-            err = getListItems(itemToSearch, KTableCommunity, true, &count, &list, &Community::build);
-            if (err == ErrNone && count > 0) {
-                if (!force) {
-                    errDependency = true;
-                    if (msg) *msg += QString("Area '%1' existed in %2.").arg(model->name(), KTableCommunity);
-                } else {
-                    foreach (DbModel* model, list) {
-                        logd("force Update '%s'", STR2CHA(model->toString()));
-                        tmpErr = update(model, itemToSet, KTableCommunity);
-                        logd("Update result=%d", tmpErr);
-                        // TODO: handler error???
-                    }
-                }
-            }
-            RELEASE_LIST_DBMODEL(list);
+        // KFieldAreaUid delete map, community, person
+        QHash<QString, QString> itemToSearch; // for searching
+        QHash<QString, QString> itemToSet; // for update
+        QList<DbModel*> list;
+        int count = 0;
+        ErrCode tmpErr = ErrNone;
+        bool errDependency = false;
 
+        itemToSearch.insert(KFieldAreaUid, model->uid());
+        itemToSet.insert(KFieldAreaUid, ""); // update to null/empty
+        itemToSet.insert(KFieldAreaDbId, ""); // update to null/empty
 
-            logd("Check to delete table %s", KTablePerson);
-            err = getListItems(itemToSearch, KTablePerson, true, &count, &list, &Person::build);
-            if (err == ErrNone && count > 0) {
-                if (!force) {
-                    errDependency = true;
-                    if (msg) *msg += QString("Area '%1' existed in %2.").arg(model->name(), KTablePerson);
-                } else {
-                    foreach (DbModel* model, list) {
-                        logd("force Update '%s'", STR2CHA(model->toString()));
-                        tmpErr = update(model, itemToSet, KTablePerson);
-                        logd("Update result=%d", tmpErr);
-                        // TODO: handler error???
-                    }
-                }
-            }
-            RELEASE_LIST_DBMODEL(list);
-
-            logd("Check to delete table %s", KTableAreaPerson);
-            err = getListItems(itemToSearch, KTableAreaPerson, true, &count, &list, &AreaPerson::build);
-            if (err == ErrNone && count > 0) {
-                if (!force) {
-                    errDependency = true;
-                    if (msg) *msg += QString("Area '%1' existed in %2.").arg(model->name(), KTableAreaPerson);
-                } else {
-                    foreach (DbModel* model, list) {
-                        logd("force delete '%s'", STR2CHA(model->toString()));
-                        tmpErr = DbSqliteModelHandler::deleteHard(model, force, msg);
-                        logd("Delete result=%d", tmpErr);
-                        // TODO: handler error???
-                    }
-                }
-            }
-            RELEASE_LIST_DBMODEL(list);
-
-            if (errDependency) {
-                err = ErrDependency;
-                loge("cannot delete, has dependency '%s'", msg?STR2CHA(*msg):"");
+        logd("Check to delete value in table %s", KTableCommunity);
+        err = getListItems(itemToSearch, KTableCommunity, true, &count, &list, &Community::build);
+        if (err == ErrNone && count > 0) {
+            if (!force) {
+                errDependency = true;
+                if (msg) *msg += QString("Area '%1' existed in %2.").arg(model->name(), KTableCommunity);
             } else {
-                err = DbSqliteModelHandler::deleteHard(model, force, msg);
+                foreach (DbModel* model, list) {
+                    logd("force Update '%s'", STR2CHA(model->toString()));
+                    tmpErr = update(model, itemToSet, KTableCommunity);
+                    logd("Update result=%d", tmpErr);
+                    // TODO: handler error???
+                }
             }
+        }
+        RELEASE_LIST_DBMODEL(list);
+
+        logd("Check to delete items in table %s", KTableAreaPerson);
+        err = getListItems(itemToSearch, KTableAreaPerson, true, &count, &list, &AreaPerson::build);
+        if (err == ErrNone && count > 0) {
+            if (!force) {
+                errDependency = true;
+                if (msg) *msg += QString("Area '%1' existed in %2.").arg(model->name(), KTableAreaPerson);
+            } else {
+                foreach (DbModel* model, list) {
+                    logd("force delete '%s'", STR2CHA(model->toString()));
+                    tmpErr = DbSqliteModelHandler::deleteHard(model, force, msg);
+                    logd("Delete result=%d", tmpErr);
+                    // TODO: handler error???
+                }
+            }
+        }
+        RELEASE_LIST_DBMODEL(list);
+
+        if (errDependency) {
+            err = ErrDependency;
+            loge("cannot delete, has dependency '%s'", msg?STR2CHA(*msg):"");
+        } else {
+            err = DbSqliteModelHandler::deleteHard(model, force, msg);
         }
     }
     traceout;

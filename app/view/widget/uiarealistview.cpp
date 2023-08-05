@@ -84,7 +84,7 @@ void UIAreaListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
     UNUSED(tblItem);
     UNUSED(idx);
     if (item) {
-        if (item->modelName() == KModelNameArea) {
+        if (IS_MODEL_NAME(item, KModelNameArea)) {
             UICommonListView::updateItem(item, tblItem, idx);
             Area* model = (Area*) item;
             tblItem->addValue(model->modelStatusName());
@@ -173,6 +173,7 @@ QList<UITableMenuAction *> UIAreaListView::getMenuSingleSelectedItemActions(
     tracein;
     QList<UITableMenuAction*> actionList =
         UITableView::getMenuSingleSelectedItemActions(menu, item);
+    // view area contact list
     actionList.append(UITableMenuAction::build(tr("Xem danh sách liên lạc"), this, item)
                                                ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                    return this->onMenuActionViewContactPeople(m, a);
@@ -186,17 +187,22 @@ ErrCode UIAreaListView::onMenuActionViewContactPeople(QMenu *menu, UITableMenuAc
     UNUSED(menu);
     ErrCode ret = ErrNone;
     Area* area = nullptr;
+    DbModel* dataModel = nullptr;
     UIAreaContactPeopleListView* view = nullptr;
-    if (!act) {
+    if (act) {
+        dataModel = act->getData();
+    } else {
         ret = ErrInvalidArg;
         loge("invalid argument");
     }
+    if (ret == ErrNone &&
+        (!dataModel || !IS_MODEL_NAME(dataModel, KModelNameArea))) {
+        loge("No/invalid area data in menu item '%s'", MODELNAME2CHA(dataModel));
+        ret = ErrInvalidData;
+    }
+
     if (ret == ErrNone) {
         area = dynamic_cast<Area*>(act->getData());
-        if (!area) {
-            loge("No area data in menu item");
-            ret = ErrNoData;
-        }
     }
     if (ret == ErrNone) {
         view = (UIAreaContactPeopleListView*)

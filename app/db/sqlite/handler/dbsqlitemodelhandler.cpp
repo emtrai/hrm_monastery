@@ -94,12 +94,13 @@ ErrCode DbSqliteModelHandler::update(DbModel *model)
     return err;
 }
 
-ErrCode DbSqliteModelHandler::update(DbModel *model, const QHash<QString, QString> &inFields, const QString &tableName)
+ErrCode DbSqliteModelHandler::update(DbModel *model,
+                                     const QHash<QString, QString> &inFields,
+                                     const QString &tableName)
 {
     tracein;
     DbSqliteTbl* tbl = nullptr;
     ErrCode err = ErrNone;
-    int cnt = 0;
     tbl = DbSqlite::table(tableName);
     if (!tbl) {
         err = ErrNoTable;

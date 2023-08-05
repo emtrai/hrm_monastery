@@ -49,6 +49,11 @@ UITableView::UITableView(QWidget *parent) :
     ui->tblList->horizontalHeader()->setStretchLastSection(true);
     connect(ui->tblList, SIGNAL(customContextMenuRequested(QPoint)),
             SLOT(customMenuRequested(QPoint)));
+    if (!connect(this,
+                 SIGNAL(signalDeleteDone(ErrCode,QString)),
+                 SLOT(onHandleSignalDeleteDone(ErrCode,QString)))) {
+        loge("Failed to connect signalDeleteDone to onHandleSignalDeleteDone");
+    }
 //    QObject::connect(ui->cbKeyword, SIGNAL(returnPressed()), this, SLOT(on_cbKeyword_returnPressed()));
 }
 
@@ -261,20 +266,9 @@ ErrCode UITableView::onDeleteItem(const QList<UITableItem *>& selectedItems)
         if (accept) {
             QString msg;
             int cnt = 0;
-//            foreach (UITableItem* item, selectedItems) {
-//                if (item && item->data()) {
-//                    DbModel* model = item->data();
-//                    err = model->remove(true, &msg);
-//                    if (err == ErrNone) {
-//                        cnt++;
-//                    } else {
-//                        loge("Delete '%s' err = %d", STR2CHA(model->toString()), err);
-//                        break;
-//                    }
-//                }
-//            }
             err = MainWindow::showProcessingDialog(tr("Lưu dữ liệu"), nullptr,
                [ &cnt, &msg, selectedItems](ErrCode* err, void* data, DlgWait* dlg) {
+                    tracein;
                     int total = selectedItems.size();
                     foreach (UITableItem* item, selectedItems) {
                         if (item && item->data()) {
@@ -292,24 +286,36 @@ ErrCode UITableView::onDeleteItem(const QList<UITableItem *>& selectedItems)
                             }
                         }
                     }
+                    traceout;
                    return nullptr;
                },
-                [this](ErrCode err, void* data, void* result, DlgWait* dlg) {
-                    logd("Save result %d", err);
+                [this, cnt](ErrCode err, void* data, void* result, DlgWait* dlg) {
+                    traced;
+                    logd("delete result %d", err);
+                    QString errMsg;
+                    if (err != ErrNone) {
+                        loge("failed to delete item, err=%d", err);
+                        errMsg = QString(tr("Lỗi, mã lỗi: %1")).arg(err);
+                    } else {
+                        logi("Deleted %d item", cnt);
+                        errMsg = QString(tr("Đã xóa '%1' mục")).arg(cnt);
+                    }
+                    emit this->signalDeleteDone(err, errMsg);
                     return err;
                 });
-
-            if (err != ErrNone) {
-                DialogUtils::showErrorBox(QString(tr("Lỗi, mã lỗi: %1")).arg(err));
-            } else {
-                logi("Deleted %d item", cnt);
-                DialogUtils::showMsgBox(QString(tr("Đã xóa '%1' mục")).arg(cnt));
-            }
+//            logd("delete result %d", err);
+//            if (err != ErrNone) {
+//                loge("failed to delete item, err=%d", err);
+////                DialogUtils::showErrorBox(QString(tr("Lỗi, mã lỗi: %1")).arg(err));
+//            } else {
+//                logi("Deleted %d item", cnt);
+//                DialogUtils::showMsgBox(QString(tr("Đã xóa '%1' mục")).arg(cnt));
+//                mSuspendReloadOnDbUpdate = false;
+//                reload();
+//            }
         }
     }
 
-    mSuspendReloadOnDbUpdate = false;
-    reload();
     traceout;
     return err;
 }
@@ -470,7 +476,7 @@ ErrCode UITableView::onMenuActionDelete(QMenu *menu, UITableMenuAction *act)
 
     if (err != ErrNone) {
         loge("delete model err %d", err);
-        DialogUtils::showErrorBox(err, tr("Lỗi xóa dữ liệu"));
+//        DialogUtils::showErrorBox(err, tr("Lỗi xóa dữ liệu"));
     }
     traceret(err);
     return err;
@@ -621,6 +627,18 @@ QHash<QString, QString> UITableView::getFilterKeywords(int fieldId, const QStrin
     tracein;
     logi("Default one, nothing to do");
     return QHash<QString, QString>();
+}
+
+void UITableView::onHandleSignalDeleteDone(ErrCode err, QString msg)
+{
+    if (err != ErrNone) {
+        loge("failed to delete item, err=%d", err);
+        DialogUtils::showErrorBox(QString(tr("Lỗi, mã lỗi: %1")).arg(err));
+    } else {
+        DialogUtils::showMsgBox(msg);
+        mSuspendReloadOnDbUpdate = false;
+        reload();
+    }
 }
 
 ErrCode UITableView::addFilter(const QString &filterItem, const QString &keyword, const QVariant &value)

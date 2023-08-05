@@ -164,7 +164,7 @@ void DlgWait::handleResult(ErrCode err, void *data, void *result)
     if (mFinishCallback) {
         err = mFinishCallback(err, data, result, this);
     }
-    setResult(err);
+    setErrResult(err);
     forceClose();
     traceout;
 }

@@ -137,12 +137,15 @@ FieldValue::FieldValue(const QString &value, int dataType)
     this->dataType = dataType;
     if (dataType == INT32 || dataType == INT64) {
         bool ok = false;
-        qint64 longValue = value.toLong(&ok);
-        if (!ok) {
-            THROWEX("Failed to convert '%s' to long", STR2CHA(value));
-        } else {
-            logd("convert '%s' to long %lld", STR2CHA(value), longValue);
-        }
+        qint64 longValue = 0;
+        if (!value.isEmpty()) {
+            longValue = value.toLong(&ok);
+            if (!ok) {
+                THROWEX("Failed to convert '%s' to long", STR2CHA(value));
+            } else {
+                logd("convert '%s' to long %lld", STR2CHA(value), longValue);
+            }
+        } // empty, set default to zero
         this->mIntValue = longValue;
     }
     traceout;

@@ -76,6 +76,7 @@ public:
      * @return
      */
     virtual ErrCode deleteHard(DbModel* model, bool force = false, QString* msg = nullptr);
+    ErrCode deleteHardArea(DbModel* model, bool force = false, QString* msg = nullptr);
 protected:
     /**
      * @brief Get main table, usually Area table

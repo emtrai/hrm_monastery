@@ -67,6 +67,21 @@ QString Area::modelName() const
     return KModelNameArea;
 }
 
+bool Area::allowRemove(QString *msg)
+{
+    tracein;
+    bool allow = ((nameId() != KModelNameIdNone) && (nameId() != KModelNameIdNone2));
+    logd("name id '%s' allow %d", STR2CHA(nameId()), allow);
+    if (!allow) {
+        loge("Not allow to delete default area");
+        if (msg) *msg = QObject::tr("Không được phép xóa khu vực mặc định");
+    } else {
+        logi("allow to delete '%s'", MODELSTR2CHA(this));
+    }
+    traceout;
+    return allow;
+}
+
 qint64 Area::countryDbId() const
 {
     return mCountryDbId;

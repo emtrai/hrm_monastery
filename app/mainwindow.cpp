@@ -87,7 +87,7 @@ MainWindow::MainWindow(QWidget *parent)
     , mWaitDlg(nullptr)
     , mAppState(APP_STATE_NOT_READY)
 {
-
+    tracein;
     Logger::init();
     mAppState = APP_STATE_INITING;
     gInstance = this;
@@ -154,6 +154,13 @@ MainWindow::MainWindow(QWidget *parent)
 //    QObject::connect(this, SIGNAL(load()), loader, SLOT(onLoad()));
     QObject::connect(this, SIGNAL(load()), this, SLOT(onLoad()));
     QObject::connect(this, SIGNAL(unload()), this, SLOT(onUnload()));
+    if (!QObject::connect(this,
+                          SIGNAL(showMsgDlgSignal(QString)),
+                          this,
+                          SLOT(onShowMsgDlg(QString)))) {
+        loge("Failed to connect showMsgDlgSignal to onShowMsgDlg");
+    }
+    traceout;
 }
 
 
@@ -348,6 +355,14 @@ ErrCode MainWindow::doShowAddPersonEvent(bool isSelfUpdate, DbModel* person, DbM
     }
     dlg->exec();
     delete dlg;
+    traceout;
+}
+
+void MainWindow::showMsgDlg(QString msg)
+{
+    tracein;
+    logd("show msg dlg '%s'", STR2CHA(msg));
+    emit showMsgDlgSignal(msg);
     traceout;
 }
 void MainWindow::switchView(ViewType type, void* data)
@@ -1158,6 +1173,13 @@ void MainWindow::onImportPeople(ErrCode err, QList<DbModel *> *list)
         DialogUtils::showErrorBox(QString(tr("Nhập dữ liệu lỗi, mã lỗi %1")).arg(err));
         notifyMainWindownImportListenerEnd(IMPORT_TARGET_PERSON, err, nullptr);
     }
+    traceout;
+}
+
+void MainWindow::onShowMsgDlg(QString msg)
+{
+    tracein;
+    DialogUtils::showMsgBox(msg);
     traceout;
 }
 

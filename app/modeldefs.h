@@ -63,4 +63,7 @@ const char* const KModelNameCourse = "model@course";
 const char* const KModelNameEthnic = "model@ethnic"; // dan toc
 const char* const KModelNameEvent = "model@event"; // su kien
 
+const char* const KModelNameIdNone = "KHONG";
+const char* const KModelNameIdNone2 = "VN_KHONG";
+
 #endif // MODELDEFS_H

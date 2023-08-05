@@ -171,6 +171,7 @@ protected:
      ErrCode doShowAddPersonEvent(bool isSelfUpdate = true, DbModel* person = nullptr,
                                   DbModel* model = nullptr,
                                   CommonEditModelListener* listener = nullptr);
+     void showMsgDlg(QString msg);
 //     ErrCode doShowAddPersonCommEvent(bool isSelfUpdate = true, DbModel* person = nullptr,
 //                                  DbModel* model = nullptr,
 //                                  CommonEditModelListener* listener = nullptr);
@@ -230,10 +231,12 @@ protected:
     void unload();
 
      void importPeople(ErrCode err, QList<DbModel*>* list);
+    void showMsgDlgSignal(QString);
  private slots:
     void onLoad();
     void onUnload();
      void onImportPeople(ErrCode err, QList<DbModel*>* list);
+    void onShowMsgDlg(QString);
      void on_action_ImportPerson_triggered();
      void on_action_ImportPersonList_triggered();
      void on_action_ImportCommunityList_triggered();

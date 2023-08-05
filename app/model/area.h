@@ -39,6 +39,7 @@ public:
 
     virtual QString modelName() const;
 
+    virtual bool allowRemove(QString* msg = nullptr);
     qint64 countryDbId() const;
     void setCountryDbId(qint64 newCountryDbId);
 

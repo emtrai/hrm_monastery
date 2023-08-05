@@ -44,6 +44,7 @@ void DialogUtils::showErrorBox(const QString &msg)
     tracein;
     logd("Error box %s", msg.toStdString().c_str());
     QMessageBox::critical(MAINWIN, "Lỗi", msg, QMessageBox::Close);
+//    MAINWIN->showMsgDlg(msg);
     traceout;
 }
 
@@ -70,8 +71,8 @@ bool DialogUtils::showConfirmDialog(QWidget *parent, const QString &title,
     msgBox.setText(title);
     msgBox.setInformativeText(message);
     msgBox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
-    msgBox.setDefaultButton(QMessageBox::Yes);
-    msgBox.setParent(parent);
+    msgBox.setDefaultButton(QMessageBox::No);
+//    msgBox.setParent(parent);
     int reply = msgBox.exec();
 //    reply = QMessageBox::question(parent, title, message,
 //                                  QMessageBox::Yes|QMessageBox::No);
