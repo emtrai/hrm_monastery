@@ -58,7 +58,7 @@ QString UICourseListView::getTitle()
     return tr("Khóa/Nhiệm Kỳ/Lớp Khấn");
 }
 
-DbModel *UICourseListView::onNewModel(const QString& modelName)
+DbModel *UICourseListView::onCreateDbModelObj(const QString& modelName)
 {
     return Course::build();
 }
@@ -131,7 +131,7 @@ void UICourseListView::initHeader()
     traceout;
 }
 
-void UICourseListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
+void UICourseListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
     Course* course = (Course*)item;

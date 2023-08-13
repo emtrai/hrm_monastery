@@ -32,27 +32,43 @@ public:
     explicit UICommDeptListView(QWidget *parent = nullptr);
     virtual ~UICommDeptListView();
     Community *community() const;
-    void setCommunity(Community *newCommunity);
+    ErrCode setCommunity(const Community *newCommunity);
 
 protected:
     virtual int getViewType() { return VIEW_COMMUNITY_DEPT;}
-    virtual QList<UITableMenuAction*> getMenuSingleSelectedItemActions(const QMenu* menu,
-                                                          UITableCellWidgetItem* item);
-    virtual ErrCode onMenuActionListPerson(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onMenuActionListDepartment(QMenu* menu, UITableMenuAction* act);
+    virtual QString getMainModelName();
+    virtual DbModel* onCreateDbModelObj(const QString& modelName);
+    virtual ModelController* getController();
+    virtual void initFilterFields();
     virtual QString getTitle();
     virtual void initHeader();
-    virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
-    virtual DbModel* onNewModel(const QString& modelName);
+
+    // Use default delete flow of common list view & table list view
+    // As there is no special thing we need to handle
+
     virtual ErrCode onAddItem(UITableCellWidgetItem *item);
     virtual ErrCode onEditItem(UITableCellWidgetItem *item);
-    virtual ErrCode onDeleteItem(const QList<UITableItem *>& selectedItems);
-    virtual ErrCode onViewItem(UITableCellWidgetItem *item);
+
+    virtual QList<UITableMenuAction*> getMenuSingleSelectedItemActions(const QMenu* menu,
+                                                          UITableCellWidgetItem* item);
+
+    /**
+     * @brief Menu item to list of managing people of dept
+     * @param menu
+     * @param act
+     * @return
+     */
+    virtual ErrCode onMenuActionListPerson(QMenu* menu, UITableMenuAction* act);
+
+    virtual void fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
+
 
 protected:
-    virtual ErrCode onLoad();
-private:
-    Community* mCommunity;
+    /**
+     * @brief get list of item to show on list view
+     * @return list of item to show on listview
+     */
+    virtual QList<DbModel*> getListItem();
 };
 
 #endif // UICOMMDEPTLISTVIEW_H

@@ -268,7 +268,7 @@ QString UIPeopleInCommunityListView::getTitle()
     return QString(tr("Danh sách nữ tu của cộng đoàn: %1")).arg(mCommunity?mCommunity->name():tr("Không rõ"));
 }
 
-void UIPeopleInCommunityListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
+void UIPeopleInCommunityListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
     CommunityPerson* commper = nullptr;

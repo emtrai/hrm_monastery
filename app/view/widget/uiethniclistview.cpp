@@ -52,7 +52,7 @@ QString UIEthnicListView::getTitle()
     return tr("Dân tộc");
 }
 
-DbModel *UIEthnicListView::onNewModel(const QString& modelName)
+DbModel *UIEthnicListView::onCreateDbModelObj(const QString& modelName)
 {
     return Ethnic::build();
 }
@@ -67,7 +67,7 @@ void UIEthnicListView::initHeader()
     traceout;
 }
 
-void UIEthnicListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
+void UIEthnicListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
     Ethnic* model = (Ethnic*)item;

@@ -104,7 +104,7 @@ DbModel *DlgCommonEditModel::model()
     }
     if (!mModel && mListener) {
         logd("call onNewModel from listener");
-        mModel = mListener->onNewModel(mModelName);
+        mModel = mListener->onCreateDbModelObj(mModelName);
     }
     logd("mModel=%s", mModel?STR2CHA(mModel->toString()):"(null)");
     traceout;

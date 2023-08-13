@@ -33,18 +33,18 @@ public:
     virtual ~UIDepartmentPersonListView();
 
 
-    void setCommDept(CommunityDept *commDept);
+    void setCommDept(const CommunityDept *commDept);
 
 protected:
     virtual int getViewType() { return VIEW_DEPARTMENT_PERSON;}
     virtual void initHeader();
-    virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
+    virtual void fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
 
     virtual QList<UITableMenuAction*> getMenuMultiSelectedItemActions(const QMenu *menu,
                                                                const QList<UITableItem *>& items);
     virtual ErrCode onMenuActionListPerson(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionListDepartment(QMenu* menu, UITableMenuAction* act);
-    virtual DbModel* onNewModel(const QString& modelName);
+    virtual DbModel* onCreateDbModelObj(const QString& modelName);
     virtual QString getTitle();
 
     virtual ErrCode onViewItem(UITableCellWidgetItem *item);

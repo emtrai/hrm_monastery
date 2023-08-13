@@ -63,6 +63,7 @@ ErrCode DlgWait::show(void* data, WaitPrepare_t prepare,
         this->exec();
         err = mResult;
     }
+    // TODO: delete mWorker?
     traceret(err);
     return err;
 }

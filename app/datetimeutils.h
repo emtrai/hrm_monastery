@@ -44,8 +44,25 @@ do { \
             qint64 date = DatetimeUtils::dateFromString(val, format, &isOk);\
             if (isOk && date > 0){\
                 func(date);\
-        }\
-    } \
+            }\
+        } \
+} while (0)
+
+
+#define SET_DATE_FORMAT_VAL_FROM_WIDGET_RET(widget,func, format, ret) \
+do { \
+        QString val = widget->text().trimmed();\
+        func(0);\
+        if (!val.isEmpty()){ \
+            bool isOk = false;\
+            qint64 date = DatetimeUtils::dateFromString(val, format, &isOk);\
+            if (isOk && date > 0){\
+                func(date);\
+            } else {\
+                loge("invalid date '%s'", STR2CHA(val)); \
+                ret = ErrInvalidArg;\
+            } \
+        } \
 } while (0)
 
 

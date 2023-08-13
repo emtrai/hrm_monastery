@@ -61,7 +61,7 @@ class DlgPerson : public QDialog, public UIMultiComboxViewListener, public Commo
 //                    add model name to common edit model, pass it to onNewModel
                     virtual QString getName();
                     virtual void onDbModelReady(ErrCode ret, DbModel* model, DlgCommonEditModel* dlg);
-                    virtual DbModel* onNewModel(const QString& modelName);
+                    virtual DbModel* onCreateDbModelObj(const QString& modelName);
              private:
                 Ui::DlgPerson *ui;
 

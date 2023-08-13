@@ -167,6 +167,10 @@ QString exportItem2Name(const QString &item, bool* isOk)
         s_item2Name.insert(KItemEndDate, STR_ENDDATE);
         s_item2Name.insert(KItemStartDate, STR_STARTDATE);
         s_item2Name.insert(KItemStatusId, STR_STATUS_ID);
+        s_item2Name.insert(KItemDepartmentName, STR_DEPARTMENT_NAME);
+        s_item2Name.insert(KItemDepartmentNameId, STR_DEPARTMENT_NAMEID);
+        s_item2Name.insert(KItemCommunityName, STR_COMMUNITY_NAME);
+        s_item2Name.insert(KItemCommunityNameId, STR_COMMUNITY_NAMEID);
 
         initialized = true;
     }

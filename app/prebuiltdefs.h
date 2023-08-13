@@ -50,6 +50,7 @@ const char* const KPrebuiltRoleCSVFileName = "role";
 const char* const KPrebuiltCommonTemplateFileName = "common_template";
 const char* const KPrebuiltCourseTemplateFileName = "course_template";
 const char* const KPrebuiltCommunityExportTemplateName = "community_export_template";
+const char* const KPrebuiltCommunityDeptExportTemplateName = "community_dept_export_template";
 const char* const KPrebuiltDefaultExportTemplateName = "default_export_template";
 const char* const KPrebuiltAreaContactExportTemplateName = "area_contact_export_template";
 const char* const KPrebuiltAreaExportTemplateName = "area_export_template";

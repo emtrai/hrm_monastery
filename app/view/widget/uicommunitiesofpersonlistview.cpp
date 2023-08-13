@@ -214,7 +214,7 @@ QString UICommunitiesOfPersonListView::getTitle()
         .arg(mPerson?mPerson->displayName():STR_UNKNOWN);
 }
 
-void UICommunitiesOfPersonListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
+void UICommunitiesOfPersonListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
     loge("updateItem '%s'", MODELSTR2CHA(item));

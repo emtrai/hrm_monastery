@@ -66,7 +66,7 @@ protected:
      * @param tblItem
      * @param idx
      */
-    virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
+    virtual void fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
 
     /**
      * @brief get list of item to show on list view

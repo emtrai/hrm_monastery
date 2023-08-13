@@ -1137,7 +1137,7 @@ void DlgPerson::onDbModelReady(ErrCode ret, DbModel *model, DlgCommonEditModel *
     traceout;
 }
 
-DbModel *DlgPerson::onNewModel(const QString &modelName)
+DbModel *DlgPerson::onCreateDbModelObj(const QString &modelName)
 {
     DbModel* model = nullptr;
     tracein;

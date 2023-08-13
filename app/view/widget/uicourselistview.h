@@ -33,7 +33,7 @@ public:
 protected:
 
     virtual QString getTitle();
-    virtual DbModel* onNewModel(const QString& modelName);
+    virtual DbModel* onCreateDbModelObj(const QString& modelName);
     virtual ErrCode onAddItem(UITableCellWidgetItem *item);
     virtual ErrCode onEditItem(UITableCellWidgetItem *item);
     virtual ErrCode onDeleteItem(const QList<UITableItem *>& selectedItems);
@@ -43,7 +43,7 @@ protected:
     virtual int getViewType() { return VIEW_COURSE;}
     virtual QList<DbModel*> getListItem();
     virtual void initHeader();
-    virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
+    virtual void fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
 };
 
 #endif // UICOURSELISTVIEW_H

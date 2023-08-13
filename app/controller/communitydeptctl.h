@@ -60,6 +60,7 @@ public:
 protected:
     virtual const char* getPrebuiltFileName();
     virtual const char* getPrebuiltFileType();
+    const QString exportListPrebuiltTemplateName(const QString& modelName) const;
 
     virtual DbModelBuilder getMainBuilder();
 

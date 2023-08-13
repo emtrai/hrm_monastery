@@ -70,8 +70,8 @@ CommunityDept* CommunityDeptCtl::onJsonParseOneItem(const QJsonObject& jobj, boo
         JSON_GET_TO_SET_STR(jobj, JSON_ADDR, ret->setAddr);
         JSON_GET_TO_SET_STR(jobj, JSON_TEL, ret->setTel);
         JSON_GET_TO_SET_STR(jobj, JSON_EMAIL, ret->setEmail);
-        JSON_GET_TO_SET_STR(jobj, JSON_ESTABLISH, ret->setEstablishDateFromString);
-        JSON_GET_TO_SET_STR(jobj, JSON_CLOSEDATE, ret->setClosedDateFromString);
+        JSON_GET_TO_SET_STR_RET(jobj, JSON_ESTABLISH, ret->setEstablishDateFromString, err);
+        JSON_GET_TO_SET_STR_RET(jobj, JSON_CLOSEDATE, ret->setClosedDateFromString, err);
         JSON_GET_TO_SET_STR(jobj, JSON_BRIEF, ret->setBrief);
         JSON_GET_TO_SET_STR(jobj, JSON_REMARK, ret->setRemark);
     }
@@ -293,6 +293,18 @@ const char *CommunityDeptCtl::getPrebuiltFileName()
 const char *CommunityDeptCtl::getPrebuiltFileType()
 {
     return KFileTypeJson;
+}
+
+const QString CommunityDeptCtl::exportListPrebuiltTemplateName(const QString &modelName) const
+{
+    QString ret;
+    logd("modelName '%s'", STR2CHA(modelName));
+    if (modelName == KModelNameCommDept) {
+        ret = KPrebuiltCommunityDeptExportTemplateName;
+    } else {
+        loge("unknown model name '%s'", STR2CHA(modelName));
+    }
+    return ret;
 }
 
 DbModelBuilder CommunityDeptCtl::getMainBuilder()

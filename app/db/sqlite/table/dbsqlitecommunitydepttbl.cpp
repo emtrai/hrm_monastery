@@ -34,6 +34,8 @@
 #include "dbsqlite.h"
 #include "dbsqliteperson.h"
 #include "dbctl.h"
+#include "dbmodelutils.h"
+#include "dbsqliteupdatebuilder.h"
 
 const qint32 DbSqliteCommunityDeptTbl::KVersionCode = VERSION_CODE(0,0,1);
 
@@ -104,9 +106,11 @@ ErrCode DbSqliteCommunityDeptTbl::updateDbModelDataFromQuery(DbModel *item, cons
             cmm->setDepartmentDbId(model->dbId());
             cmm->setDepartmentNameId(model->nameId());
             cmm->setDepartmentName(model->name());
+            cmm->setName(model->name());
             delete model;
         }
     }
+    // TODO: load information about current director?
 
     cmm->setEstablishDate(qry.value(KFieldCreateDate).toInt());
     cmm->setClosedDate(qry.value(KFieldCloseDate).toInt());
@@ -139,6 +143,66 @@ ErrCode DbSqliteCommunityDeptTbl::updateDbModelDataFromQuery(DbModel *item, cons
 DbModelBuilder DbSqliteCommunityDeptTbl::mainModelBuilder()
 {
     return &CommunityDept::build;
+}
+
+ErrCode DbSqliteCommunityDeptTbl::updateBuilderFieldFromModel(
+    DbSqliteUpdateBuilder *builder, const QString &field, const DbModel *item)
+{
+
+    tracein;
+    ErrCode err = ErrNone;
+    logd("update table field '%s' for model '%s'", STR2CHA(field), MODELSTR2CHA(item));
+    if (!builder || !item || field.isEmpty()) {
+        err = ErrInvalidArg;
+        loge("invalid arg");
+    }
+
+    if (err == ErrNone) {
+        if (item->modelName() == KModelNameCommDept) {
+            CommunityDept* comm = (CommunityDept*) item;
+            if (field == KItemEstablishDate) {
+                builder->addValue(KFieldCreateDate, comm->establishDate());
+
+            } else if (field == KItemEmail) {
+                builder->addValue(KFieldEmail, comm->email());
+
+            } else if (field == KItemAddress) {
+                builder->addValue(KFieldAddr, comm->addr());
+
+            } else if (field == KItemTel) {
+                builder->addValue(KFieldTel, comm->tel());
+
+            } else if (field == KItemBrief) {
+                builder->addValue(KFieldBrief, comm->brief());
+
+            } else if (field == KItemStatus) {
+                builder->addValue(KFieldModelStatus, comm->modelStatus());
+
+            } else if (field == KItemCloseDate) {
+                builder->addValue(KFieldCloseDate, comm->closedDate());
+
+            } else if (field == KItemCommunityDbId) {
+                builder->addValue(KFieldCommunityDbId, comm->communityDbId());
+
+            } else if (field == KItemDepartmentDbId) {
+                builder->addValue(KFieldDepartmentDbId, comm->departmentDbId());
+
+            } else if (field == KItemDepartment) {
+                builder->addValue(KFieldDepartmentUid, comm->departmentUid());
+
+            } else if (field == KItemCommunity) {
+                builder->addValue(KFieldCommunityUid, comm->communityUid());
+            } else {
+                err = DbSqliteTbl::updateBuilderFieldFromModel(builder, field, item);
+            }
+        } else {
+            loge("Model '%s' is no support",
+                 MODELSTR2CHA(item));
+            err = ErrNotSupport;
+        }
+    }
+    traceret(err);
+    return err;
 }
 
 void DbSqliteCommunityDeptTbl::addTableField(DbSqliteTableBuilder *builder)

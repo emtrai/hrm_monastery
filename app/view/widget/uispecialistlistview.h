@@ -33,7 +33,7 @@ protected:
     virtual int getViewType() { return VIEW_SPECIALIST;}
     virtual QString getTitle();
     virtual ModelController* getController();
-    virtual DbModel* onNewModel(const QString& modelName);
+    virtual DbModel* onCreateDbModelObj(const QString& modelName);
 };
 
 #endif // UISPECIALISTLISTVIEW_H

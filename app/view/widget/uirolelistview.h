@@ -36,7 +36,7 @@ protected:
     virtual ModelController* getController();
     virtual int getViewType() { return VIEW_ROLE;}
     virtual QString getTitle();
-    virtual DbModel* onNewModel(const QString& modelName);
+    virtual DbModel* onCreateDbModelObj(const QString& modelName);
 
 
 };

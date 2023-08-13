@@ -34,9 +34,9 @@ protected:
     virtual int getViewType() { return VIEW_ETHNIC;}
     virtual ModelController* getController();
     virtual QString getTitle();
-    virtual DbModel* onNewModel(const QString& modelName);
+    virtual DbModel* onCreateDbModelObj(const QString& modelName);
     virtual void initHeader();
-    virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
+    virtual void fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
 
     virtual ErrCode onAddItem(UITableCellWidgetItem *item);
     virtual ErrCode onEditItem(UITableCellWidgetItem *item);

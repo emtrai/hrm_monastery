@@ -24,10 +24,12 @@
 
 #include <dbmodel.h>
 
+class Person;
 class CommunityDept : public DbModel
 {
 public:
-    CommunityDept();
+    explicit CommunityDept();
+    virtual ~CommunityDept();
 
     static DbModel *build();
     virtual DbModelBuilder getBuilder() const;
@@ -35,9 +37,10 @@ public:
     virtual void clone(const DbModel* model);
     virtual DbModel* clone() const;
 
+    virtual void initExportFields();
     qint64 establishDate() const;
     void setEstablishDate(qint64 newEstablishDate);
-    void setEstablishDateFromString(const QString &date, const QString &format="D.M.Y");
+    ErrCode setEstablishDateFromString(const QString &date);
 
     const QString &email() const;
     void setEmail(const QString &newEmail);
@@ -74,7 +77,7 @@ public:
 
     qint64 closedDate() const;
     void setClosedDate(qint64 newClosedDate);
-    void setClosedDateFromString(const QString &date, const QString &format="D.M.Y");
+    ErrCode setClosedDateFromString(const QString &date);
 
 
     const QString &departmentNameId() const;
@@ -85,6 +88,21 @@ public:
 
     QString modelStatusName() const;
     void setModelStatusName(const QString &newModelStatusName);
+
+    /**
+     * @brief Current director of department
+     *        just for display
+     * @return
+     */
+    Person *currentDirector() const;
+    QString currentDirectorName();
+    QString currentDirectorNameId();
+    /**
+     * @brief set current director of department
+     *        just for display
+     * @param newCurrentDirector
+     */
+    void setCurrentDirector(const Person *newCurrentDirector);
 
 protected:
     virtual DbModelHandler* getDbModelHandler() const;
@@ -106,6 +124,8 @@ private:
     QString mBrief;
     qint64 mStatus;
     QString mModelStatusName;
+
+    Person* mCurrentDirector;
 };
 
 #endif // COMMUNITYDEPT_H

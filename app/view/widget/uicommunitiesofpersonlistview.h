@@ -47,7 +47,7 @@ protected:
     virtual int getViewType() { return VIEW_COMMUNITIES_OF_PERSON_LIST;}
     virtual void initHeader();
     virtual QString getTitle();
-    virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
+    virtual void fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
 
     virtual QList<UITableMenuAction*> getMenuMultiSelectedItemActions(const QMenu *menu,
                                                                        const QList<UITableItem *>& items);

@@ -78,14 +78,14 @@ void UIAreaListView::initHeader()
     traceout;
 }
 
-void UIAreaListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
+void UIAreaListView::updateTableItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
     UNUSED(tblItem);
     UNUSED(idx);
     if (item) {
         if (IS_MODEL_NAME(item, KModelNameArea)) {
-            UICommonListView::updateItem(item, tblItem, idx);
+            UICommonListView::fillValueTableRowItem(item, tblItem, idx);
             Area* model = (Area*) item;
             tblItem->addValue(model->modelStatusName());
             tblItem->addValue(model->countryName());
@@ -119,7 +119,7 @@ ModelController *UIAreaListView::getController()
     return AREACTL;
 }
 
-DbModel *UIAreaListView::onNewModel(const QString& modelName)
+DbModel *UIAreaListView::onCreateDbModelObj(const QString& modelName)
 {
     tracein;
     DbModel* model = nullptr;

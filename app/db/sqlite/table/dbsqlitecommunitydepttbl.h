@@ -37,6 +37,9 @@ protected:
 //    virtual QString getSearchQueryStringWithTag(const QString& cond = nullptr, const QString& condTag = nullptr);
 
     virtual DbModelBuilder mainModelBuilder();
+    virtual ErrCode updateBuilderFieldFromModel(DbSqliteUpdateBuilder* builder,
+                                                const QString& field,
+                                                const DbModel *item);
 private:
     static const qint32 KVersionCode;
 };

@@ -34,7 +34,7 @@ protected:
     virtual int getViewType() { return VIEW_EDUCATION;}
     virtual ModelController* getController();
     virtual QString getTitle();
-    virtual DbModel* onNewModel(const QString& modelName);
+    virtual DbModel* onCreateDbModelObj(const QString& modelName);
 };
 
 #endif // UIEDUCATIONLISTVIEW_H

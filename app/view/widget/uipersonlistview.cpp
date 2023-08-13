@@ -159,7 +159,7 @@ ErrCode UIPersonListView::onLoad()
     return err;
 }
 
-void UIPersonListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
+void UIPersonListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
     logd("updateItem '%s'", item?STR2CHA(item->modelName()):"");
@@ -638,7 +638,7 @@ int UIPersonListView::onFilter(int catetoryid,
     return mItemList.count();
 }
 
-DbModel *UIPersonListView::onNewModel(const QString& modelName)
+DbModel *UIPersonListView::onCreateDbModelObj(const QString& modelName)
 {
     return Person::build();
 }

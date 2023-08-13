@@ -61,7 +61,7 @@ ErrCode DlgCommDept::buildModel(DbModel *model, QString &errMsg)
     tracein;
     ErrCode err = ErrNone;
     CommunityDept* comm = (CommunityDept*) model;
-    if (!model){
+    if (!comm){
         err = ErrInvalidArg;
         loge("Invalid arg");
     }
@@ -83,7 +83,7 @@ ErrCode DlgCommDept::buildModel(DbModel *model, QString &errMsg)
     if (err == ErrNone){
         SET_VAL_FROM_CBOX(ui->cbDept, comm->setDepartmentUid, comm->setDepartmentName, err);
     }
-    if (mCommunity) {
+    if ((err == ErrNone) && mCommunity) {
         comm->setCommunityUid(mCommunity->uid());
         comm->setCommunityNameId(mCommunity->nameId());
         comm->setCommunityName(mCommunity->name());
@@ -91,10 +91,10 @@ ErrCode DlgCommDept::buildModel(DbModel *model, QString &errMsg)
     }
 
     if (err == ErrNone){
-        SET_DATE_FORMAT_VAL_FROM_WIDGET(ui->txtEstablishDate, comm->setEstablishDate, DATE_FORMAT_DM);
+        SET_DATE_FORMAT_VAL_FROM_WIDGET_RET(ui->txtEstablishDate, comm->setEstablishDate, DEFAULT_FORMAT_YMD, err);
     }
     if (err == ErrNone){
-        SET_DATE_FORMAT_VAL_FROM_WIDGET(ui->txtCloseDate, comm->setClosedDate, DATE_FORMAT_DM);
+        SET_DATE_FORMAT_VAL_FROM_WIDGET_RET(ui->txtCloseDate, comm->setClosedDate, DEFAULT_FORMAT_YMD, err);
     }
     if (err == ErrNone){
         comm->setAddr(ui->txtAddr->toPlainText().trimmed());

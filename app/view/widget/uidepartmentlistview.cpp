@@ -49,11 +49,11 @@ void UIDepartmentListView::initHeader()
     UICommonListView::initHeader();
 }
 
-void UIDepartmentListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
+void UIDepartmentListView::updateTableItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
-
-    UICommonListView::updateItem(item, tblItem, idx);
+    
+    UICommonListView::fillValueTableRowItem(item, tblItem, idx);
 }
 
 
@@ -69,7 +69,7 @@ QList<DbModel *> UIDepartmentListView::getListItem()
     return DEPART->getAllItemsFromDb(); // TODO: getAllItem???
 }
 
-DbModel *UIDepartmentListView::onNewModel(const QString& modelName)
+DbModel *UIDepartmentListView::onCreateDbModelObj(const QString& modelName)
 {
     return Department::build();
 }

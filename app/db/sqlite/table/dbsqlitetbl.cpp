@@ -412,7 +412,7 @@ ErrCode DbSqliteTbl::deleteHard(DbModel *item)
     ErrCode_t err = ErrNone;
     DbSqliteDeleteBuilder* deleteBuilder = nullptr;
     QSqlQuery* updateQry = nullptr;
-    QList<QString> updatedFields = item->updatedField();
+
     logd("build delete builder");
     // TODO: check to make sure that uid does not exist?????
     deleteBuilder = DbSqliteDeleteBuilder::build(name());

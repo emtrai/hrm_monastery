@@ -51,7 +51,7 @@ UIDepartmentPersonListView::~UIDepartmentPersonListView()
     }
 }
 
-DbModel *UIDepartmentPersonListView::onNewModel(const QString& modelName)
+DbModel *UIDepartmentPersonListView::onCreateDbModelObj(const QString& modelName)
 {
     // TODO: handle it
     return nullptr;
@@ -167,17 +167,10 @@ ErrCode UIDepartmentPersonListView::onLoad()
 }
 
 
-void UIDepartmentPersonListView::setCommDept(CommunityDept *commDept)
+void UIDepartmentPersonListView::setCommDept(const CommunityDept *commDept)
 {
     tracein;
-    if (mCommDept) {
-        delete mCommDept;
-        mCommDept = nullptr;
-    }
-    if (commDept) {
-        logd("clone new one");
-        mCommDept = (CommunityDept*)commDept->clone();
-    }
+    CLEAR_THEN_SET(mCommDept, commDept, CommunityDept);
     traceout;
 }
 
@@ -195,7 +188,7 @@ void UIDepartmentPersonListView::initHeader()
     mHeader.append(tr("Ngày kết thúc"));
 }
 
-void UIDepartmentPersonListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
+void UIDepartmentPersonListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
     PersonDept* model = (PersonDept*) item;

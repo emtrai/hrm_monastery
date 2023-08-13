@@ -38,7 +38,7 @@ public:
     virtual void setupUI();
 protected:
     virtual ErrCode onLoad();
-    virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
+    virtual void fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
     virtual void initHeader();
 protected:
     virtual int getViewType() { return VIEW_PERSON;}
@@ -77,7 +77,7 @@ protected:
                           const QString& catetory,
                           qint64 opFlags,
                           const QString& keywords, const QVariant *value);
-    virtual DbModel* onNewModel(const QString& modelName);
+    virtual DbModel* onCreateDbModelObj(const QString& modelName);
     virtual QString getName();
     virtual void onImportStart(const QString& importName, const QString& fpath, ImportType type);
     virtual void onImportEnd(const QString& importName, ErrCode err, const QString& fpath, ImportType type);

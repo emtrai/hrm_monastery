@@ -34,7 +34,7 @@ protected:
     virtual int getViewType() { return VIEW_COUNTRY;}
     virtual ModelController* getController();
     virtual QString getTitle();
-    virtual DbModel* onNewModel(const QString& modelName);
+    virtual DbModel* onCreateDbModelObj(const QString& modelName);
 };
 
 #endif // UICOUNTRYLISTVIEW_H

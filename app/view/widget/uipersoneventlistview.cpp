@@ -118,7 +118,7 @@ QString UIPersonEventListView::getTitle()
         mPerson?mPerson->displayName():tr("Không rõ"));
 }
 
-void UIPersonEventListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
+void UIPersonEventListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
     loge("updateItem '%s'", item?STR2CHA(item->modelName()):"");

@@ -60,7 +60,7 @@ protected:
     virtual ErrCode onLoad();
     virtual ErrCode onReload();
     virtual void initHeader();
-    virtual void updateItem(DbModel* item, UITableItem* tblItem, int idx);
+    virtual void fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
 
     virtual void onUpdatePageDone(qint32 page, qint32 totalpages, qint32 totalItems);
     virtual void initFilterFields();
@@ -74,7 +74,7 @@ protected:
     virtual ErrCode onEditItem(UITableCellWidgetItem *item);
 
     virtual void onDbModelReady(ErrCode ret, DbModel* model, DlgCommonEditModel* dlg);
-    virtual DbModel* onNewModel(const QString& modelName);
+    virtual DbModel* onCreateDbModelObj(const QString& modelName);
     virtual QString getName();
     virtual QString getMainModelName();
     virtual void onModelControllerDataUpdated(const DbModel *model);

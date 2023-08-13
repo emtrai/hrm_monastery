@@ -541,6 +541,7 @@ DISTFILES += \
     res/area_vi.csv \
     res/comm_dept_vi.json \
     res/common_template.html \
+    res/community_dept_export_template_vi.json \
     res/community_export_template_vi.json \
     res/course_template.html \
     res/course_vi.csv \

@@ -55,7 +55,6 @@ const char* const JSON_PARENT_NAMEID = "parent";
 const char* const JSON_MISSION_NAMEID = "mission";
 const char* const JSON_COUNTRY_NAMEID = "country";
 
-
 #define JSON_GET_TO_SET_STR(jobj, key ,func) \
 do { \
         if (jobj.contains(key)){ \
@@ -63,6 +62,19 @@ do { \
             if (!tmp.isEmpty()) { \
                 logd("Set %s", key);\
                 func(tmp); \
+        } else {\
+                logw("%s defined but no data", key);\
+        } \
+    } \
+} while (0)
+
+#define JSON_GET_TO_SET_STR_RET(jobj, key ,func, ret) \
+do { \
+        if (jobj.contains(key)){ \
+            QString tmp = jobj[key].toString().trimmed(); \
+            if (!tmp.isEmpty()) { \
+                logd("Set %s", key);\
+                ret = func(tmp); \
         } else {\
                 logw("%s defined but no data", key);\
         } \

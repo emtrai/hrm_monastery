@@ -53,7 +53,7 @@ ErrCode UISaintListView::onLoad()
     return ErrNone;
 }
 
-void UISaintListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
+void UISaintListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
     if (item && item->modelName() == KModelNameSaint) {
@@ -103,7 +103,7 @@ int UISaintListView::onFilter(int catetoryid, const QString &catetory, qint64 op
     return mItemList.size();
 }
 
-DbModel *UISaintListView::onNewModel(const QString& modelName)
+DbModel *UISaintListView::onCreateDbModelObj(const QString& modelName)
 {
     return Saint::build();
 }

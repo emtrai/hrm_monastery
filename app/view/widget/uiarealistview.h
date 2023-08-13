@@ -36,12 +36,12 @@ protected:
     virtual int getViewType() { return VIEW_AREA;}
     virtual QString getTitle();
     void initHeader();
-    void updateItem(DbModel *item, UITableItem *tblItem, int idx);
+    void updateTableItem(DbModel *item, UITableItem *tblItem, int idx);
     virtual void initFilterFields();
 
     virtual ModelController* getController();
-
-    virtual DbModel* onNewModel(const QString& modelName);
+    
+    virtual DbModel* onCreateDbModelObj(const QString& modelName);
     /**
      * @brief Model name to be used for checking/create model
      *        This is name of moodel which list view to show

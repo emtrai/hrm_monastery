@@ -119,7 +119,7 @@ QList<UITableItem *> UICommonListView::getListItem(qint32 page, qint32 perPage, 
     int idx = 0;
     foreach (DbModel* item, mItemList) {
         UITableItem* tblItem = UITableItem::build(item->clone());
-        updateItem(item, tblItem, ++idx);
+        fillValueTableRowItem(item, tblItem, ++idx);
         items.append(tblItem);
     }
     return items;
@@ -131,9 +131,10 @@ void UICommonListView::initHeader()
     mHeader.append(STR_NAMEID);
     mHeader.append(STR_NAME);
     mHeader.append(STR_NOTE);
+    // TODO: header/column by order, i.e. 1: name id, 2: name, last: note
     traceout;
 }
-void UICommonListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
+void UICommonListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
     tblItem->addValue(item->nameId());
@@ -365,7 +366,7 @@ void UICommonListView::onDbModelReady(ErrCode ret, DbModel *model, DlgCommonEdit
     traceout;
 }
 
-DbModel *UICommonListView::onNewModel(const QString& modelName)
+DbModel *UICommonListView::onCreateDbModelObj(const QString& modelName)
 {
     tracein;
     return nullptr;

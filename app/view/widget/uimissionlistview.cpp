@@ -53,7 +53,7 @@ QString UIMissionListView::getTitle()
     return tr("Công tác xã hội");
 }
 
-DbModel *UIMissionListView::onNewModel(const QString& modelName)
+DbModel *UIMissionListView::onCreateDbModelObj(const QString& modelName)
 {
     return Mission::build();
 }

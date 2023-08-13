@@ -31,7 +31,6 @@
 #include "areaperson.h"
 #include "errreporterctl.h"
 #include "stringdefs.h"
-#include "mainwindow.h"
 #include "dialogutils.h"
 #include "datetimeutils.h"
 
@@ -131,7 +130,7 @@ ModelController *UIAreaContactPeopleListView::getController()
     return AREACTL; // area contact people is controlled by area controller
 }
 
-void UIAreaContactPeopleListView::updateItem(DbModel *item,
+void UIAreaContactPeopleListView::fillValueTableRowItem(DbModel *item,
                                              UITableItem *tblItem, int idx)
 {
     tracein;

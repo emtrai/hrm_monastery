@@ -34,7 +34,7 @@ public:
 protected:
     virtual int getViewType() { return VIEW_COMMUNITY;}
     void initHeader();
-    void updateItem(DbModel *item, UITableItem *tblItem, int idx);
+    void fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx);
     virtual QList<UITableMenuAction*> getMenuSingleSelectedItemActions(const QMenu* menu,
                                                           UITableCellWidgetItem* item);
     virtual QList<UITableMenuAction*> getMenuCommonActions(const QMenu* menu);
@@ -60,7 +60,7 @@ protected:
 protected:
     virtual ErrCode onLoad();
     virtual ErrCode onReload();
-    virtual DbModel* onNewModel(const QString& modelName);
+    virtual DbModel* onCreateDbModelObj(const QString& modelName);
 };
 
 

@@ -52,7 +52,7 @@ ModelController *UISpecialistListView::getController()
     return SPECIALISTCTL;
 }
 
-DbModel *UISpecialistListView::onNewModel(const QString& modelName)
+DbModel *UISpecialistListView::onCreateDbModelObj(const QString& modelName)
 {
     return Specialist::build();
 }

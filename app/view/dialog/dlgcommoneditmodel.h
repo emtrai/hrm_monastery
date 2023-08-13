@@ -61,7 +61,7 @@ class CommonEditModelListener
 public:
     virtual QString getName() = 0;
     virtual void onDbModelReady(ErrCode ret, DbModel* model, DlgCommonEditModel* dlg) = 0;
-    virtual DbModel* onNewModel(const QString& modelName) = 0;
+    virtual DbModel* onCreateDbModelObj(const QString& modelName) = 0;
 };
 
 class DlgCommonEditModel: public QDialog

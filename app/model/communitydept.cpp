@@ -26,13 +26,24 @@
 #include "dbctl.h"
 #include "defs.h"
 #include "dbmodel.h"
-
+#include "utils.h"
+#include "person.h"
+#include "stringdefs.h"
 
 CommunityDept::CommunityDept():DbModel()
 {
     tracein;
     mEstablishDate = 0;
     mStatus = 0;
+    mCurrentDirector = nullptr;
+    traceout;
+}
+
+CommunityDept::~CommunityDept()
+{
+    tracein;
+    FREE_PTR(mCurrentDirector);
+    traceout;
 }
 
 DbModel *CommunityDept::build()
@@ -54,6 +65,7 @@ QString CommunityDept::modelName() const
 
 void CommunityDept::clone(const DbModel *model)
 {
+    tracein;
     DbModel::clone(model);
     if (model && model->modelName() == KModelNameCommDept) {
         CommunityDept* comm = (CommunityDept*)model;
@@ -73,13 +85,93 @@ void CommunityDept::clone(const DbModel *model)
         mBrief = comm->mBrief;
         mStatus = comm->mStatus;
         mModelStatusName = comm->mModelStatusName;
+        FREE_PTR(mCurrentDirector);
+        if (comm->currentDirector()) {
+            mCurrentDirector = CLONE_MODEL(comm->currentDirector(), Person);
+        }
     }
+    traceout;
 }
 
 DbModel *CommunityDept::clone() const
 {
     traced;
     return DbModel::clone();
+}
+void CommunityDept::initExportFields()
+{
+    tracein;
+    DbModel::initExportFields();
+    mExportCallbacks.insert(KItemAddress, EXPORT_CALLBACK_STRING_IMPL(
+                                            CommunityDept,
+                                            KModelNameCommDept,
+                                            addr));
+    mExportCallbacks.insert(KItemEmail, EXPORT_CALLBACK_STRING_IMPL(
+                                            CommunityDept,
+                                            KModelNameCommDept,
+                                            email));
+    mExportCallbacks.insert(KItemTel, EXPORT_CALLBACK_STRING_IMPL(
+                                          CommunityDept,
+                                          KModelNameCommDept,
+                                          tel));
+    mExportCallbacks.insert(KItemBrief, EXPORT_CALLBACK_STRING_IMPL(
+                                             CommunityDept,
+                                             KModelNameCommDept,
+                                             brief));
+    mExportCallbacks.insert(KItemRemark, EXPORT_CALLBACK_STRING_IMPL(
+                                             CommunityDept,
+                                             KModelNameCommDept,
+                                             remark));
+    mExportCallbacks.insert(KItemEstablishDate, EXPORT_CALLBACK_DATETIME_IMPL(
+                                                CommunityDept,
+                                                KModelNameCommDept,
+                                                establishDate,
+                                                DEFAULT_FORMAT_YMD));
+    mExportCallbacks.insert(KItemCloseDate, EXPORT_CALLBACK_DATETIME_IMPL(
+                                            CommunityDept,
+                                            KModelNameCommDept,
+                                            closedDate,
+                                            DEFAULT_FORMAT_YMD));
+    mExportCallbacks.insert(KItemStatus, EXPORT_CALLBACK_STRING_IMPL(
+                                            CommunityDept,
+                                            KModelNameCommDept,
+                                            modelStatusName));
+    mExportCallbacks.insert(KItemCommunityName, EXPORT_CALLBACK_STRING_IMPL(
+                                             CommunityDept,
+                                             KModelNameCommDept,
+                                             communityName));
+    mExportCallbacks.insert(KItemDepartmentName, EXPORT_CALLBACK_STRING_IMPL(
+                                                    CommunityDept,
+                                                    KModelNameCommDept,
+                                                    departmentName));
+    mExportCallbacks.insert(KItemCommunityNameId, EXPORT_CALLBACK_STRING_IMPL(
+                                                    CommunityDept,
+                                                    KModelNameCommDept,
+                                                    communityNameId));
+    mExportCallbacks.insert(KItemDepartmentNameId, EXPORT_CALLBACK_STRING_IMPL(
+                                                     CommunityDept,
+                                                     KModelNameCommDept,
+                                                     departmentNameId));
+//    mExportCallbacks.insert(KItemTel, [](const DbModel* model, const QString& item){
+//        return CHECK_TO_GET_MODEL_DATA_RET(model, CommunityDept, KModelNameCommDept, tel);
+//        return ((CommunityDept*)model)->personTel();
+//    });
+//    mExportCallbacks.insert(KItemRemark, [](const DbModel* model, const QString& item){
+//        return ((AreaPerson*)model)->remark();
+//    });
+//    mExportCallbacks.insert(KItemStartDate, [](const DbModel* model, const QString& item){
+//        return DatetimeUtils::date2String(((MapDbModel*)model)->startDate(), DEFAULT_FORMAT_YMD);
+//    });
+//    mExportCallbacks.insert(KItemEndDate, [](const DbModel* model, const QString& item){
+//        return DatetimeUtils::date2String(((MapDbModel*)model)->endDate(), DEFAULT_FORMAT_YMD);
+//    });
+//    mExportCallbacks.insert(KItemStatus, [](const DbModel* model, const QString& item){
+//        return ((MapDbModel*)model)->modelStatusName();
+//    });
+//    mExportCallbacks.insert(KItemStatusId, [](const DbModel* model, const QString& item){
+//        return QString("%1").arg(((MapDbModel*)model)->modelStatus());
+//    });
+    traceout;
 }
 
 qint64 CommunityDept::establishDate() const
@@ -89,15 +181,26 @@ qint64 CommunityDept::establishDate() const
 
 void CommunityDept::setEstablishDate(qint64 newEstablishDate)
 {
-    mEstablishDate = newEstablishDate;
+    CHECK_MODIFIED_THEN_SET(mEstablishDate, newEstablishDate, KItemEstablishDate);
 }
 
-void CommunityDept::setEstablishDateFromString(const QString &date, const QString &format)
+ErrCode CommunityDept::setEstablishDateFromString(const QString &date)
 {
     tracein;
+    ErrCode err = ErrNone;
+    bool isOk = false;
     logd("create date string '%s'", date.toStdString().c_str());
-    mEstablishDate = DatetimeUtils::dateFromString(date, format);
-    logd("mEstablishDate %ll", mEstablishDate);
+    qint64 dateValue = DatetimeUtils::dateFromString(date, DEFAULT_FORMAT_YMD, &isOk);
+    logd("mEstablishDate 0x%llx, isOk %d", dateValue, isOk);
+    if (isOk) {
+        setEstablishDate(dateValue);
+    } else {
+        err = ErrInvalidArg;
+        loge("invalid establish date time '%s'", STR2CHA(date));
+    }
+
+    traceret(err);
+    return err;
 }
 
 const QString &CommunityDept::email() const
@@ -107,7 +210,7 @@ const QString &CommunityDept::email() const
 
 void CommunityDept::setEmail(const QString &newEmail)
 {
-    mEmail = newEmail;
+    CHECK_MODIFIED_THEN_SET(mEmail, newEmail, KItemEmail);
 }
 
 const QString &CommunityDept::addr() const
@@ -117,7 +220,7 @@ const QString &CommunityDept::addr() const
 
 void CommunityDept::setAddr(const QString &newAddr)
 {
-    mAddr = newAddr;
+    CHECK_MODIFIED_THEN_SET(mAddr, newAddr, KItemAddress);
 }
 
 const QString &CommunityDept::tel() const
@@ -127,7 +230,7 @@ const QString &CommunityDept::tel() const
 
 void CommunityDept::setTel(const QString &newTel)
 {
-    mTel = newTel;
+    CHECK_MODIFIED_THEN_SET(mTel, newTel, KItemTel);
 }
 
 const QString &CommunityDept::brief() const
@@ -137,7 +240,7 @@ const QString &CommunityDept::brief() const
 
 void CommunityDept::setBrief(const QString &newBrief)
 {
-    mBrief = newBrief;
+    CHECK_MODIFIED_THEN_SET(mBrief, newBrief, KItemBrief);
 }
 
 qint64 CommunityDept::modelStatus() const
@@ -147,7 +250,7 @@ qint64 CommunityDept::modelStatus() const
 
 void CommunityDept::setModelStatus(qint64 newStatus)
 {
-    mStatus = newStatus;
+    CHECK_MODIFIED_THEN_SET(mStatus, newStatus, KItemStatus);
 }
 
 DbModelHandler *CommunityDept::getDbModelHandler() const
@@ -156,11 +259,48 @@ DbModelHandler *CommunityDept::getDbModelHandler() const
     return DB->getModelHandler(KModelHdlCommDept);
 }
 
+Person *CommunityDept::currentDirector() const
+{
+    return mCurrentDirector;
+}
+
+QString CommunityDept::currentDirectorName()
+{
+    QString ret;
+    if (mCurrentDirector) {
+        ret = mCurrentDirector->displayName();
+    }
+    return ret;
+}
+
+QString CommunityDept::currentDirectorNameId()
+{
+    QString ret;
+    if (mCurrentDirector) {
+        ret = mCurrentDirector->nameId();
+    }
+    return ret;
+}
+
+// Just for display
+void CommunityDept::setCurrentDirector(const Person *newCurrentDirector)
+{
+    tracein;
+    FREE_PTR(mCurrentDirector);
+    if (newCurrentDirector) {
+        logd("clone for new director '%s'", MODELSTR2CHA(newCurrentDirector));
+        mCurrentDirector = CLONE_MODEL(newCurrentDirector, Person);
+    }
+    traceout;
+}
+
+
 QString CommunityDept::modelStatusName() const
 {
     return mModelStatusName;
 }
 
+// Just for display
 void CommunityDept::setModelStatusName(const QString &newModelStatusName)
 {
     mModelStatusName = newModelStatusName;
@@ -171,6 +311,7 @@ const QString &CommunityDept::communityNameId() const
     return mCommunityNameId;
 }
 
+// just for display
 void CommunityDept::setCommunityNameId(const QString &newCommunityNameId)
 {
     mCommunityNameId = newCommunityNameId;
@@ -181,6 +322,7 @@ const QString &CommunityDept::departmentNameId() const
     return mDepartmentNameId;
 }
 
+// just for display
 void CommunityDept::setDepartmentNameId(const QString &newDepartmentNameId)
 {
     mDepartmentNameId = newDepartmentNameId;
@@ -193,15 +335,26 @@ qint64 CommunityDept::closedDate() const
 
 void CommunityDept::setClosedDate(qint64 newClosedDate)
 {
-    mClosedDate = newClosedDate;
+    CHECK_MODIFIED_THEN_SET(mClosedDate, newClosedDate, KItemCloseDate);
 }
 
-void CommunityDept::setClosedDateFromString(const QString &date, const QString &format)
+ErrCode CommunityDept::setClosedDateFromString(const QString &date)
 {
     tracein;
+    bool isOk = false;
+    ErrCode err = ErrNone;
     logd("close date string '%s'", date.toStdString().c_str());
-    mClosedDate = DatetimeUtils::dateFromString(date, format);
-    logd("mClosedDate %ll", mClosedDate);
+    qint64 dateval = DatetimeUtils::dateFromString(date, DEFAULT_FORMAT_YMD, &isOk);
+    logd("mClosedDate 0x%llx, isOk %d", dateval, isOk);
+    if (isOk) {
+        setClosedDate(dateval);
+    } else {
+        err = ErrInvalidArg;
+        loge("invalid close date time '%s'", STR2CHA(date));
+    }
+
+    traceret(err);
+    return err;
 }
 
 
@@ -210,6 +363,7 @@ const QString & CommunityDept::communityName() const
     return mCommunityName;
 }
 
+// just for display
 void CommunityDept::setCommunityName(const QString & newCommunityName)
 {
     mCommunityName = newCommunityName;
@@ -220,6 +374,7 @@ const QString &CommunityDept::departmentName() const
     return mDepartmentName;
 }
 
+// just for display
 void CommunityDept::setDepartmentName(const QString &newDepartmentName)
 {
     mDepartmentName = newDepartmentName;
@@ -232,7 +387,7 @@ qint64 CommunityDept::communityDbId() const
 
 void CommunityDept::setCommunityDbId(qint64 newCommunityDbId)
 {
-    mCommunityDbId = newCommunityDbId;
+    CHECK_MODIFIED_THEN_SET(mCommunityDbId, newCommunityDbId, KItemCommunityDbId);
 }
 
 qint64 CommunityDept::departmentDbId() const
@@ -242,7 +397,7 @@ qint64 CommunityDept::departmentDbId() const
 
 void CommunityDept::setDepartmentDbId(qint64 newDepartmentDbId)
 {
-    mDepartmentDbId = newDepartmentDbId;
+    CHECK_MODIFIED_THEN_SET(mDepartmentDbId, newDepartmentDbId, KItemDepartmentDbId);
 }
 
 const QString &CommunityDept::departmentUid() const
@@ -252,7 +407,7 @@ const QString &CommunityDept::departmentUid() const
 
 void CommunityDept::setDepartmentUid(const QString &newDepartmentUid)
 {
-    mDepartmentUid = newDepartmentUid;
+    CHECK_MODIFIED_THEN_SET(mDepartmentUid, newDepartmentUid, KItemDepartment);
 }
 
 const QString &CommunityDept::communityUid() const
@@ -262,6 +417,6 @@ const QString &CommunityDept::communityUid() const
 
 void CommunityDept::setCommunityUid(const QString &newCommunityUid)
 {
-    mCommunityUid = newCommunityUid;
+    CHECK_MODIFIED_THEN_SET(mCommunityUid, newCommunityUid, KItemCommunity);
 }
 

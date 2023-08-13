@@ -51,6 +51,11 @@
 #define STR_NOTE        QObject::tr("Ghi chú")
 
 #define STR_COMMUNITY   QObject::tr("Cộng đoàn")
+#define STR_COMMUNITY_NAME   QObject::tr("Tên Cộng đoàn")
+#define STR_COMMUNITY_NAMEID   QObject::tr("Mã Cộng đoàn")
+#define STR_DEPARTMENT   QObject::tr("Phòng ban")
+#define STR_DEPARTMENT_NAME   QObject::tr("Tên Phòng ban")
+#define STR_DEPARTMENT_NAMEID   QObject::tr("Mã Phòng ban")
 #define STR_ROLE        QObject::tr("Vai trò")
 #define STR_ROLE_ID        QObject::tr("Mã vai trò")
 #define STR_UNKNOWN     QObject::tr("Không rõ")
@@ -63,6 +68,7 @@
 #define STR_STATUS_ID      QObject::tr("Mã trạng thái")
 
 #define STR_DATE        QObject::tr("Ngày")
+#define STR_ESTABLISHDATE        QObject::tr("Ngày thành lập")
 #define STR_STARTDATE        QObject::tr("Ngày bắt đầu")
 #define STR_ENDDATE     QObject::tr("Ngày kết thúc")
 #define STR_EVENT     QObject::tr("Sự kiện")

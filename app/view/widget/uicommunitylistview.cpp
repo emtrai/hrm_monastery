@@ -74,11 +74,11 @@ void UICommunityListView::initHeader()
     mHeader.append(tr("Cộng đoàn quản lý"));
 }
 
-void UICommunityListView::updateItem(DbModel *item, UITableItem *tblItem, int idx)
+void UICommunityListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
-
-    UICommonListView::updateItem(item, tblItem, idx);
+    
+    UICommonListView::fillValueTableRowItem(item, tblItem, idx);
     Community* model = (Community*) item;
     tblItem->addValue(DbModel::modelStatus2Name(model->getStatus()));
     tblItem->addValue(DatetimeUtils::date2String(model->feastDate(), DEFAULT_FORMAT_MD));
@@ -259,7 +259,7 @@ ErrCode UICommunityListView::onMenuActionListDepartment(QMenu *menu, UITableMenu
         community->dump();
         UICommDeptListView* view = (UICommDeptListView*)MAINWIN->getView(ViewType::VIEW_COMMUNITY_DEPT);
 
-        view->setCommunity(community);
+        ret = view->setCommunity(community);
         MAINWIN->switchView(view);
     } else {
         loge("no community info");
@@ -463,7 +463,7 @@ ErrCode UICommunityListView::onReload()
     return ErrNone;
 }
 
-DbModel *UICommunityListView::onNewModel(const QString& modelName)
+DbModel *UICommunityListView::onCreateDbModelObj(const QString& modelName)
 {
     return Community::build();
 }
