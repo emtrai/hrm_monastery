@@ -59,7 +59,6 @@ enum FilterOperation {
 
 QHash<int, QString> getFilterOpsList(int filterField);
 
-
 class FilterItem {
 
     // TODO: copy constructor??

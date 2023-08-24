@@ -118,22 +118,36 @@ QString UIPersonEventListView::getTitle()
         mPerson?mPerson->displayName():tr("Không rõ"));
 }
 
-void UIPersonEventListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
+ModelController *UIPersonEventListView::getController()
+{
+    return PERSONCTL;
+}
+
+ErrCode UIPersonEventListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
-    loge("updateItem '%s'", item?STR2CHA(item->modelName()):"");
-    if (item && item->modelName() == KModelNamePersonEvent) {
-        PersonEvent* per = (PersonEvent*) item;
-        tblItem->addValue(per->nameId());
-        tblItem->addValue(per->eventName());
-        tblItem->addValue(per->name());
-        tblItem->addValue(DatetimeUtils::date2String(per->date()));
-        tblItem->addValue(DatetimeUtils::date2String(per->endDate()));
-        tblItem->addValue(per->remark());
-    } else {
-        loge("No item found, or not expected model '%s'", MODELSTR2CHA(item));
+    ErrCode err = ErrNone;
+    if (!item || !tblItem) {
+        err = ErrInvalidArg;
+        loge("invalid argument");
     }
-    traceout;
+    if (err == ErrNone) {
+        logd("updateItem '%s'", item?STR2CHA(item->modelName()):"");
+        if (item && item->modelName() == KModelNamePersonEvent) {
+            PersonEvent* per = (PersonEvent*) item;
+            tblItem->addValue(per->nameId());
+            tblItem->addValue(per->eventName());
+            tblItem->addValue(per->name());
+            tblItem->addValue(DatetimeUtils::date2String(per->date()));
+            tblItem->addValue(DatetimeUtils::date2String(per->endDate()));
+            tblItem->addValue(per->remark());
+        } else {
+            loge("No item found, or not expected model '%s'", MODELSTR2CHA(item));
+            err = ErrInvalidModel;
+        }
+    }
+    traceret(err);
+    return err;
 }
 
 ErrCode UIPersonEventListView::onAddItem(UITableCellWidgetItem *item)

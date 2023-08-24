@@ -183,7 +183,8 @@ void PersonEvent::setPersonName(const QString &newPersonName)
 
 QString PersonEvent::toString() const
 {
-    return QString("%1:%2:%3").arg(DbModel::toString(),DatetimeUtils::date2String(date()), STR2CHA(eventName()));
+    return QString("%1:%2:%3").arg(
+        DbModel::toString(),DatetimeUtils::date2String(date()), STR2CHA(eventName()));
 }
 
 qint64 PersonEvent::endDate() const

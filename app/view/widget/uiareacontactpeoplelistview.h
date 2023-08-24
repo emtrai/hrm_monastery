@@ -66,13 +66,13 @@ protected:
      * @param tblItem
      * @param idx
      */
-    virtual void fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
+    virtual ErrCode fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
 
     /**
      * @brief get list of item to show on list view
      * @return list of item to show on listview
      */
-    virtual QList<DbModel*> getListItem();
+    virtual QList<DbModel*> getListDbModels();
 
     virtual ErrCode onAddItem(UITableCellWidgetItem *item);
     virtual ErrCode onEditItem(UITableCellWidgetItem *item);

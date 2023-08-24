@@ -176,6 +176,7 @@ ErrCode DbSqliteCommunityPersonTbl::updateDbModelDataFromQuery(DbModel *item, co
     logd("update for map model '%s'", modelName.toStdString().c_str());
     DbSqlitePersonTbl* tblPerson = dynamic_cast<DbSqlitePersonTbl*>(DbSqlite::table(KTablePerson));
     DbModelHandler* commHdl = DB->getCommunityModelHandler();
+    DbModelHandler* personHdl = DB->getPersonModelHandler();
     err = DbSqliteMapTbl::updateDbModelDataFromQuery(item, qry);
     if (err == ErrNone && !item) {
         loge("invalid input model, it's NULL!");
@@ -189,6 +190,10 @@ ErrCode DbSqliteCommunityPersonTbl::updateDbModelDataFromQuery(DbModel *item, co
         err = ErrNoHandler;
         loge("not found handler community");
     }
+    if (err == ErrNone && !personHdl) {
+        err = ErrNoHandler;
+        loge("not found handler personHdl");
+    }
     if (err == ErrNone) {
         if (modelName == KModelNamePerson) {
             logd("update for person model");
@@ -200,16 +205,31 @@ ErrCode DbSqliteCommunityPersonTbl::updateDbModelDataFromQuery(DbModel *item, co
             }
         } else if (modelName == KModelNameCommPerson) {
             CommunityPerson* commPer = (CommunityPerson*)item;
-            Person* person = (Person*)Person::build();
-            if (person) {
-                tblPerson->updateDbModelDataFromQuery(person, qry);
-                commPer->setPerson(person);
-                delete person;
-            } else {
-                err = ErrNoMemory;
-                loge("no memory, cannot allocat person");
-            }
+//            Person* person = (Person*)Person::build();
+//            if (person) {
+//                tblPerson->updateDbModelDataFromQuery(person, qry);
+//                commPer->setPerson(person);
+//                delete person;
+//            } else {
+//                err = ErrNoMemory;
+//                loge("no memory, cannot allocat person");
+//            }
 
+            if (!commPer->personUid().isEmpty()) {
+                logd("Search person uid '%s'", STR2CHA(commPer->personUid()));
+                DbModel* model = personHdl->getByUid(commPer->personUid());
+                if (model) {
+                    logd("Found person '%s'", STR2CHA(model->toString()));
+                    commPer->setPerson((Person*)model);
+                    delete model;
+                } else {
+                    loge("Not found person uid '%s'", STR2CHA(commPer->personUid()));
+                    err = ErrNotFound;
+                }
+            } else {
+                loge("Person uid is empty!");
+                err = ErrNoData;
+            }
             if (err == ErrNone) {
                 if (!commPer->communityUid().isEmpty()) {
                     logd("Search community uid '%s'", STR2CHA(commPer->communityUid()));

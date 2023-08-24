@@ -154,6 +154,7 @@ void PersonDept::copy(const PersonDept &model)
     mPersonUid = model.mPersonUid;
     mPersonName = model.mPersonName;
     mPersonNameId = model.mPersonNameId;
+    mChangeHistory = model.mChangeHistory;
     traceout;
 }
 

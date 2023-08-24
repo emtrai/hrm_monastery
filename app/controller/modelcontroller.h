@@ -16,7 +16,6 @@
 
 class DbModel;
 class DbModelHandler;
-
 class OnModelControllerListener {
 public:
     virtual QString getName() = 0;

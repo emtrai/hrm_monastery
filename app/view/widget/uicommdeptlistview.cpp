@@ -74,11 +74,14 @@ void UICommDeptListView::initHeader()
     traceout;
 }
 
-void UICommDeptListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
+ErrCode UICommDeptListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
+    ErrCode err = ErrNone;
     if (item) {
-        UICommonListView::fillValueTableRowItem(item, tblItem, idx);
+        err = UICommonListView::fillValueTableRowItem(item, tblItem, idx);
+    }
+    if (err == ErrNone) {
         if (IS_MODEL_NAME(item, KModelNameCommDept)) {
             CommunityDept* dept = (CommunityDept*)item;
             tblItem->addValue(dept->departmentName());
@@ -91,11 +94,11 @@ void UICommDeptListView::fillValueTableRowItem(DbModel *item, UITableItem *tblIt
             tblItem->addValue(dept->addr());
         } else {
             loge("Update table failed, unsupported model '%s'", MODELSTR2CHA(item));
+            err = ErrInvalidModel;
         }
-    } else {
-        loge("Null item");
     }
-    traceout;
+    traceret(err);
+    return err;
 }
 
 DbModel *UICommDeptListView::onCreateDbModelObj(const QString& modelName)
@@ -191,7 +194,7 @@ QList<UITableMenuAction *> UICommDeptListView::getMenuSingleSelectedItemActions(
 
 }
 
-QList<DbModel *> UICommDeptListView::getListItem()
+QList<DbModel *> UICommDeptListView::getListDbModels()
 {
     tracein;
     ErrCode err = ErrNone;
@@ -239,16 +242,9 @@ Community *UICommDeptListView::community() const
 
 ErrCode UICommDeptListView::setCommunity(const Community *newCommunity)
 {
-    ErrCode err = ErrNone;
-    tracein;
+    traced;
     // parent model is community, as this listview will show all dept of community
-    err = setParentModel(newCommunity);
-    if (err == ErrNone) {
-        // update title when setting parent model
-        setTitle(getTitle());
-    }
-    traceret(err);
-    return err;
+    return setParentModel(newCommunity);
 }
 
 QString UICommDeptListView::getMainModelName()

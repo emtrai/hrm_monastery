@@ -159,35 +159,44 @@ ErrCode UIPersonListView::onLoad()
     return err;
 }
 
-void UIPersonListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
+ErrCode UIPersonListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
-    logd("updateItem '%s'", item?STR2CHA(item->modelName()):"");
-    if (item && item->modelName() == KModelNamePerson) {
-        Person* per = (Person*) item;
-        tblItem->addValue(per->nameId());
-        tblItem->addValue(per->hollyName());
-        tblItem->addValue(per->getFullName());
-        tblItem->addValue(per->communityName());
-        tblItem->addValue(DatetimeUtils::date2String(per->birthday()));
-        tblItem->addValue(per->birthPlace());
-        tblItem->addValue(DatetimeUtils::date2String(per->feastDay(), DEFAULT_FORMAT_MD)); // seem feastday convert repeate many time, make it common????
-
-        tblItem->addValue(DatetimeUtils::date2String(per->joinDate()));
-        tblItem->addValue(DatetimeUtils::date2String(per->vowsDate()));
-        tblItem->addValue(DatetimeUtils::date2String(per->eternalVowsDate()));
-        tblItem->addValue(per->courseName());
-        tblItem->addValue(DatetimeUtils::date2String(per->deadDate()));
-        tblItem->addValue(per->tel().join(";"));
-        tblItem->addValue(per->email().join(";"));
-        tblItem->addValue(per->specialistNameList().join(","));
-        tblItem->addValue(per->currentWorkName());
-
-        // TODO: show thumb image??? if support, need to verify performance
-    } else {
-        loge("No item found, or not expected model '%s'", item?STR2CHA(item->modelName()):"");
+    ErrCode err = ErrNone;
+    if (!item || !tblItem) {
+        err = ErrInvalidArg;
+        loge("invalid arg");
     }
-    traceout;
+    if (err == ErrNone) {
+        logd("updateItem '%s'", item?STR2CHA(item->modelName()):"");
+        if (item && item->modelName() == KModelNamePerson) {
+            Person* per = (Person*) item;
+            tblItem->addValue(per->nameId());
+            tblItem->addValue(per->hollyName());
+            tblItem->addValue(per->getFullName());
+            tblItem->addValue(per->communityName());
+            tblItem->addValue(DatetimeUtils::date2String(per->birthday()));
+            tblItem->addValue(per->birthPlace());
+            tblItem->addValue(DatetimeUtils::date2String(per->feastDay(), DEFAULT_FORMAT_MD)); // seem feastday convert repeate many time, make it common????
+
+            tblItem->addValue(DatetimeUtils::date2String(per->joinDate()));
+            tblItem->addValue(DatetimeUtils::date2String(per->vowsDate()));
+            tblItem->addValue(DatetimeUtils::date2String(per->eternalVowsDate()));
+            tblItem->addValue(per->courseName());
+            tblItem->addValue(DatetimeUtils::date2String(per->deadDate()));
+            tblItem->addValue(per->tel().join(";"));
+            tblItem->addValue(per->email().join(";"));
+            tblItem->addValue(per->specialistNameList().join(","));
+            tblItem->addValue(per->currentWorkName());
+
+            // TODO: show thumb image??? if support, need to verify performance
+        } else {
+            loge("No item found, or not expected model '%s'", item?STR2CHA(item->modelName()):"");
+            err = ErrInvalidModel;
+        }
+    }
+    traceret(err);
+    return err;
 }
 
 void UIPersonListView::initHeader()
@@ -210,6 +219,11 @@ void UIPersonListView::initHeader()
     mHeader.append(tr("Điện thoại"));
     mHeader.append(tr("Email"));
     traceout;
+}
+
+ModelController *UIPersonListView::getController()
+{
+    return PERSONCTL;
 }
 
 

@@ -203,6 +203,7 @@ public:
                        int from = 0,
                        int noItems = 0,
                        int* total = nullptr);
+
     virtual ErrCode updateQueryromFields(const QHash<QString, QString>& fields,
                                          QSqlQuery &query,
                                          bool isMatchAllField = false,

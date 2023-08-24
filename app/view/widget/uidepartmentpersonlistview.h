@@ -38,7 +38,8 @@ public:
 protected:
     virtual int getViewType() { return VIEW_DEPARTMENT_PERSON;}
     virtual void initHeader();
-    virtual void fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
+    virtual ModelController* getController();
+    virtual ErrCode fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
 
     virtual QList<UITableMenuAction*> getMenuMultiSelectedItemActions(const QMenu *menu,
                                                                const QList<UITableItem *>& items);

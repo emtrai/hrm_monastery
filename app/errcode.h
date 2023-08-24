@@ -30,6 +30,7 @@ typedef enum ErrCode {
     ErrNoMemory,
     ErrInvalidArg,
     ErrInvalidData,
+    ErrInvalidCond,
     ErrInvalidState,
     ErrInvalid,
     ErrInvalidController,

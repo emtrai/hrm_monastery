@@ -74,23 +74,32 @@ void UICommunityListView::initHeader()
     mHeader.append(tr("Cộng đoàn quản lý"));
 }
 
-void UICommunityListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
+ModelController *UICommunityListView::getController()
+{
+    return COMMUNITYCTL;
+}
+
+ErrCode UICommunityListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
-    
-    UICommonListView::fillValueTableRowItem(item, tblItem, idx);
-    Community* model = (Community*) item;
-    tblItem->addValue(DbModel::modelStatus2Name(model->getStatus()));
-    tblItem->addValue(DatetimeUtils::date2String(model->feastDate(), DEFAULT_FORMAT_MD));
-    tblItem->addValue(model->missionNameString());
-    tblItem->addValue(model->areaName());
-    tblItem->addValue(model->currentCEOName());
-    tblItem->addValue(model->church());
-    tblItem->addValue(model->addr());
-    tblItem->addValue(model->tel());
-    tblItem->addValue(model->email());
-    tblItem->addValue(model->countryName());
-    tblItem->addValue(model->parentName());
+    ErrCode err = ErrNone;
+    err = UICommonListView::fillValueTableRowItem(item, tblItem, idx);
+    if (err == ErrNone) {
+        Community* model = (Community*) item;
+        tblItem->addValue(DbModel::modelStatus2Name(model->getStatus()));
+        tblItem->addValue(DatetimeUtils::date2String(model->feastDate(), DEFAULT_FORMAT_MD));
+        tblItem->addValue(model->missionNameString());
+        tblItem->addValue(model->areaName());
+        tblItem->addValue(model->currentCEOName());
+        tblItem->addValue(model->church());
+        tblItem->addValue(model->addr());
+        tblItem->addValue(model->tel());
+        tblItem->addValue(model->email());
+        tblItem->addValue(model->countryName());
+        tblItem->addValue(model->parentName());
+    }
+    traceret(err);
+    return err;
 }
 
 

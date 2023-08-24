@@ -75,6 +75,9 @@ ErrCode DlgDeptPerson::buildModel(DbModel *model, QString &errMsg)
     if (!nameid.isEmpty()) {
         perdep->setNameId(nameid);
     }
+    if (!mCommDeptUid.isEmpty()) {
+        perdep->setCommDeptUid(mCommDeptUid);
+    }
     traceret(err);
     return err;
 }

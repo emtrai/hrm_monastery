@@ -53,7 +53,7 @@ do { \
 do { \
     QList<DbModel*> list; \
     int count = 0; \
-    logd("Check to delete table %s", tableName); \
+    logd("Check to delete iten in table %s", tableName); \
     err = getListItems(itemToSearch, tableName, true, &count, &list, builder); \
     if (err == ErrNone && count > 0) { \
         if (!force) { \
@@ -61,9 +61,9 @@ do { \
             if (msg) *msg += QString("'%1' existed in %2.").arg(model->name(), tableName); \
         } else { \
             foreach (DbModel* model, list) { \
-                logd("force delete '%s'", STR2CHA(model->toString())); \
+                logi("force delete '%s'", MODELSTR2CHA(model)); \
                 tmpErr = DbSqliteModelHandler::deleteHard(model, force, msg, tableName); \
-                logd("Delete result=%d", tmpErr); \
+                logi("Delete result=%d", tmpErr); \
             } \
         } \
     } \
@@ -162,6 +162,7 @@ public:
                        int from = 0,
                        int noItems = 0,
                        int* total = nullptr);
+
     /**
      * @brief checkFields
      * @param inFields

@@ -24,14 +24,10 @@
 #include "dbsqlitedefs.h"
 #include "dbsqlite.h"
 #include "logger.h"
-#include "defs.h"
 #include "model/communitydept.h"
-#include "person.h"
-#include "community.h"
-#include "handler/dbsqliteperson.h"
-#include "dbpersonmodelhandler.h"
 #include "table/dbsqlitecommdeptpersontbl.h"
 #include "table/dbsqlitecommunitydepttbl.h"
+#include "persondept.h"
 
 GET_INSTANCE_IMPL(DbSqliteCommunityDept);
 
@@ -60,6 +56,49 @@ QList<DbModel *> DbSqliteCommunityDept::getListDept(const QString &communityUid,
     DbSqliteCommunityDeptTbl* tbl = (DbSqliteCommunityDeptTbl*)DbSqlite::table(KTableCommDept);
     if (ok) *ok = true; // TODO: handle error case
     return tbl->getListDept(communityUid, status);
+}
+
+ErrCode DbSqliteCommunityDept::deleteHard(DbModel *model, bool force, QString *msg)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    if (!model) {
+        err = ErrInvalidArg;
+        loge("Invalid model");
+    }
+
+    if (err == ErrNone) {
+        logi("Delete hard model '%s', force %d", MODELSTR2CHA(model), force);
+
+        if (IS_MODEL_NAME(model, KModelNameCommDept)){
+            QHash<QString, QString> itemToSearch; // for searching
+            ErrCode tmpErr = ErrNone;
+            bool errDependency = false;
+            logi("Check to delete item '%s' in dept manager table '%s'",
+                 MODELSTR2CHA(model), KTableCommDepartPerson);
+            itemToSearch.insert(KFieldCommDeptUid, model->uid());
+
+            CHECK_REMOVE_TO_DELETE(err, errDependency, msg, force, itemToSearch,
+                                   KTableCommDepartPerson, &PersonDept::build);
+
+            if (errDependency) {
+                err = ErrDependency;
+                loge("cannot delete, has dependency '%s'", msg?STR2CHA((*msg)):"");
+            } else {
+                err = DbSqliteModelHandler::deleteHard(model, force, msg);
+            }
+        } else {
+            err = ErrInvalidData;
+            loge("invalid model '%s', expected model '%s'",
+                 MODELSTR2CHA(model), KModelNameCommDept);
+        }
+    }
+
+    logi("Delete '%s' ret %d", MODELSTR2CHA(model), err);
+
+    traceret(err);
+    return err;
+
 }
 
 DbSqliteTbl *DbSqliteCommunityDept::getTable(const QString &modelName)

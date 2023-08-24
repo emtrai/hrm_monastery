@@ -36,8 +36,6 @@ UITableView::UITableView(QWidget *parent) :
     QFrame(parent),
     BaseView(),
     ui(new Ui::UITableView),
-    mFpDataReq(nullptr),
-    mFpTotalDataReq(nullptr),
     mItemPerPage(0),
     mMenu(nullptr),
     mSuspendReloadOnDbUpdate(false)
@@ -143,6 +141,7 @@ void UITableView::onUpdatePage(qint32 page)
 {
     QTableWidget* tbl = ui->tblList;
     qint32 totalPages = 0;
+    ErrCode err = ErrNone;
     tracein;
 
     // TODO: is it really remove all data?
@@ -161,8 +160,8 @@ void UITableView::onUpdatePage(qint32 page)
         qint32 perPage = ((mItemPerPage != 0) && (mItemPerPage < total))?mItemPerPage:total;
         totalPages = total/perPage;
         logd("total %d perpage %d totaPage %d", total, perPage, totalPages);
-
-        QList<UITableItem*> items = getListItem(page, perPage, totalPages);
+        QList<UITableItem*> items;
+        err = getListTableRowItems(page, perPage, totalPages, items);
         int idx = tbl->rowCount();
         foreach (UITableItem* item, items){
             tbl->insertRow(idx);
@@ -186,15 +185,11 @@ void UITableView::onUpdatePageDone(qint32 page, qint32 totalpages, qint32 totalI
     traceout;
 }
 
-QList<UITableItem *> UITableView::getListItem(qint32 page, qint32 perPage, qint32 totalPages)
-{
-    return (mFpDataReq != nullptr)?mFpDataReq(page, perPage, totalPages):QList<UITableItem *>();
-}
-
-QList<UITableItem *> UITableView::getListAllItem()
+QList<UITableItem *> UITableView::getListAllTableRowItems()
 {
     tracein;
     QList<UITableItem*> items;
+    ErrCode err = ErrNone;
     // TODO: fix me please!!!
     qint32 total = getTotalItems();
     logd("total item %d", total);
@@ -204,7 +199,7 @@ QList<UITableItem *> UITableView::getListAllItem()
         qint32 totalPages = total/perPage;
         logd("total %d perpage %d totaPage %d", total, perPage, totalPages);
 
-        items = getListItem(0, perPage, totalPages);
+        err = getListTableRowItems(0, perPage, totalPages, items);
     } else {
         logd("Not item to load");
     }
@@ -214,7 +209,7 @@ QList<UITableItem *> UITableView::getListAllItem()
 
 qint32 UITableView::getTotalItems()
 {
-    return (mFpTotalDataReq != nullptr)?mFpTotalDataReq():0;
+    return 0;
 }
 
 ErrCode UITableView::onLoad()
@@ -692,16 +687,6 @@ void UITableView::initHeader()
     tracein;
 }
 
-void UITableView::setFpTotalDataReq(onRequestTotalData newFpTotalDataReq)
-{
-    mFpTotalDataReq = newFpTotalDataReq;
-}
-
-void UITableView::setFpDataReq(onRequestData newFpDataReq)
-{
-    mFpDataReq = newFpDataReq;
-}
-
 void UITableView::setHeader(const QStringList &newHeader)
 {
     mHeader = newHeader;
@@ -714,7 +699,7 @@ UITableItem::~UITableItem()
     traceout;
 }
 
-UITableItem *UITableItem::build(DbModel *data)
+UITableItem *UITableItem::build(const DbModel *data)
 {
     return new UITableItem(data->clone());
 }
@@ -856,7 +841,7 @@ void UITableView::customMenuRequested(QPoint pos)
     if (select->hasSelection()) {
         QModelIndexList selected = select->selectedRows();
         logd("Selected %d rows", selected.count());
-        QList<UITableItem*> items = getListAllItem();
+        QList<UITableItem*> items = getListAllTableRowItems();
         for(int i=0; i< selected.count(); i++)
         {
             QModelIndex index = selected.at(i);

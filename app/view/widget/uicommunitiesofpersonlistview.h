@@ -34,7 +34,6 @@ class UICommunitiesOfPersonListView : public UICommonListView
 public:
     explicit UICommunitiesOfPersonListView(QWidget *parent = nullptr);
     virtual ~UICommunitiesOfPersonListView();
-    void loadCommunityPerson(const QString& communityUid, bool isActive = true);
 
     /**
      * @brief Caller must not free this after use, if want to change/free, clone it
@@ -45,22 +44,18 @@ public:
 
 protected:
     virtual int getViewType() { return VIEW_COMMUNITIES_OF_PERSON_LIST;}
+    virtual QString getMainModelName();
+    virtual DbModel* onCreateDbModelObj(const QString& modelName);
+    virtual ModelController* getController();
     virtual void initHeader();
     virtual QString getTitle();
-    virtual void fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
 
-    virtual QList<UITableMenuAction*> getMenuMultiSelectedItemActions(const QMenu *menu,
-                                                                       const QList<UITableItem *>& items);
-    virtual ErrCode onMenuActionListPerson(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onMenuActionListDepartment(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onViewItem(UITableCellWidgetItem *item);
     virtual ErrCode onAddItem(UITableCellWidgetItem *item);
     virtual ErrCode onEditItem(UITableCellWidgetItem *item);
 
-protected:
-    virtual ErrCode onLoad();
-private:
-    Person* mPerson;
+    virtual ErrCode fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
+
+    virtual QList<DbModel*> getListDbModels();
 };
 
 #endif // UICOMMUNITIESOFPERSONLISTVIEW_H

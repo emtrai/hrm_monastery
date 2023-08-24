@@ -40,9 +40,10 @@ public:
 
 protected:
     virtual int getViewType() { return VIEW_PEOPLE_IN_COMMUNITY_LIST;}
+    virtual ModelController* getController();
     virtual void initHeader();
     virtual QString getTitle();
-    virtual void fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
+    virtual ErrCode fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
 
     virtual QList<UITableMenuAction*> getMenuMultiSelectedItemActions(const QMenu *menu,
                                                                const QList<UITableItem *>& items);

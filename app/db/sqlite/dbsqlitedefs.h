@@ -221,7 +221,6 @@ const char* const KTableStatus = "status"; //Tinh trang
 const char* const KTableEvent = "event"; //Tinh trang
 const char* const KTableSaintPerson = "saint_person";
 const char* const KTableCommDept = "comm_dept";
-const char* const KTableDeptMgr = "dept_mgr";
 const char* const KTableCommPerson = "comm_person";
 const char* const KTableAreaPerson = "area_person";
 const char* const KTableCommDepartPerson = "com_depart_person";

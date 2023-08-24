@@ -49,11 +49,13 @@ void UIDepartmentListView::initHeader()
     UICommonListView::initHeader();
 }
 
-void UIDepartmentListView::updateTableItem(DbModel *item, UITableItem *tblItem, int idx)
+ErrCode UIDepartmentListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
     
-    UICommonListView::fillValueTableRowItem(item, tblItem, idx);
+    ErrCode err = UICommonListView::fillValueTableRowItem(item, tblItem, idx);
+    traceret(err);
+    return err;
 }
 
 
@@ -63,7 +65,7 @@ ModelController *UIDepartmentListView::getController()
     return DEPART;
 }
 
-QList<DbModel *> UIDepartmentListView::getListItem()
+QList<DbModel *> UIDepartmentListView::getListDbModels()
 {
     tracein;
     return DEPART->getAllItemsFromDb(); // TODO: getAllItem???

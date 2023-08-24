@@ -103,12 +103,12 @@ DbSqliteInsertBuilder *DbSqliteInsertBuilder::addValue(
     const QString &name, const QString &value)
 {
     tracein;
-    logd("tble %s", mName.toStdString().c_str());
+    logd("insert value name for table %s", STR2CHA(mName));
     if (!value.isEmpty()) {
-        logd("addValue %s: %s", name.toStdString().c_str(), value.toStdString().c_str());
+        logd("insert value %s: %s", name.toStdString().c_str(), value.toStdString().c_str());
         mFields.append(new TableInsertItem(name, value));
     } else {
-        logd("Value is empty, do nothing");
+        logd("Value for item '%s' is empty, do nothing", STR2CHA(mName));
     }
 
 

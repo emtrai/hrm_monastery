@@ -78,12 +78,15 @@ void UIAreaListView::initHeader()
     traceout;
 }
 
-void UIAreaListView::updateTableItem(DbModel *item, UITableItem *tblItem, int idx)
+ErrCode UIAreaListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
-    UNUSED(tblItem);
-    UNUSED(idx);
-    if (item) {
+    ErrCode err = ErrNone;
+    if (!item || !tblItem) {
+        err = ErrInvalidArg;
+        loge("invalid argument");
+    }
+    if (err == ErrNone) {
         if (IS_MODEL_NAME(item, KModelNameArea)) {
             UICommonListView::fillValueTableRowItem(item, tblItem, idx);
             Area* model = (Area*) item;
@@ -94,13 +97,11 @@ void UIAreaListView::updateTableItem(DbModel *item, UITableItem *tblItem, int id
             tblItem->addValue(model->addr());
         } else {
             loge("Not area model name, it's '%s'", STR2CHA(item->modelName()));
-            REPORTERRCTL->reportErr(tr("Dữ liệu không phù hợp"));
+            err = ErrInvalidModel;
         }
-    } else {
-        loge("Invalid item to update");
-        REPORTERRCTL->reportErr(tr("Không có dữ liệu để cập nhật"));
     }
-    traceout;
+    traceret(err);
+    return err;
 }
 
 void UIAreaListView::initFilterFields()

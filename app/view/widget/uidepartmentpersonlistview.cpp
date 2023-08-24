@@ -188,17 +188,35 @@ void UIDepartmentPersonListView::initHeader()
     mHeader.append(tr("Ngày kết thúc"));
 }
 
-void UIDepartmentPersonListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
+ModelController *UIDepartmentPersonListView::getController()
+{
+    return COMMUNITYDEPTCTL;
+}
+
+ErrCode UIDepartmentPersonListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
-    PersonDept* model = (PersonDept*) item;
-    tblItem->addValue(model->nameId());
-    tblItem->addValue(model->personNameId());
-    tblItem->addValue(model->personName());
-    tblItem->addValue(model->roleName());
-    tblItem->addValue(DbModel::modelStatus2Name((DbModelStatus)model->modelStatus()));
-    tblItem->addValue(model->courseName());
-    tblItem->addValue(DatetimeUtils::date2String(model->startDate(), DEFAULT_FORMAT_YMD));
-    tblItem->addValue(DatetimeUtils::date2String(model->endDate(), DEFAULT_FORMAT_YMD));
-    traceout;
+    ErrCode err = ErrNone;
+    if (!item || !tblItem) {
+        err = ErrInvalidArg;
+        loge("invalid argument");
+    }
+    if (err == ErrNone) {
+        if (IS_MODEL_NAME(item, KModelNamePersonDept)) {
+            PersonDept* model = (PersonDept*) item;
+            tblItem->addValue(model->nameId());
+            tblItem->addValue(model->personNameId());
+            tblItem->addValue(model->personName());
+            tblItem->addValue(model->roleName());
+            tblItem->addValue(DbModel::modelStatus2Name((DbModelStatus)model->modelStatus()));
+            tblItem->addValue(model->courseName());
+            tblItem->addValue(DatetimeUtils::date2String(model->startDate(), DEFAULT_FORMAT_YMD));
+            tblItem->addValue(DatetimeUtils::date2String(model->endDate(), DEFAULT_FORMAT_YMD));
+        } else {
+            loge("invalid model '%s'", MODELSTR2CHA(item));
+            err = ErrInvalidModel;
+        }
+    }
+    traceret(err);
+    return err;
 }

@@ -35,11 +35,12 @@
 
 UICommonListView::UICommonListView(QWidget *parent):
     UITableView(parent),
-    mHasImportMenu(false),
+    mHasImportMenu(false), // derived class should set this value accordingly
     mHasExportMenu(false),
-    mSortItem(false), // Sorting disable by default. Sorting may cause list display incorrectly.
+    mSortItem(false), // Sorting disable by default. Sorting may cause list display incorrectly. TODO: fix it
     mParentModel(nullptr)
 {
+    traced;
 }
 
 UICommonListView::~UICommonListView()
@@ -54,8 +55,13 @@ void UICommonListView::setupUI()
 {
     tracein;
     UITableView::setupUI();
+    // register to receive dbmodel event, i.e. updated, added, etc.
     ModelController* ctl = getController();
-    if (ctl) ctl->addListener(this);
+    if (ctl) {
+        ctl->addListener(this);
+    } else {
+        logw("no controller, may not received any db model event");
+    }
     traceout;
 }
 
@@ -71,12 +77,14 @@ QList<UITableMenuAction *> UICommonListView::getMenuCommonActions(const QMenu *m
     if (err == ErrNone) {
         actionList = UITableView::getMenuCommonActions(menu);
         if (hasImportMenuItem()) {
+            logd("add import menu item");
             actionList.append(UITableMenuAction::build(STR_IMPORT_FROM_FILE, this)
                               ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                   return this->onMenuActionImport(m, a);
                               }));
         }
         if (hasExportMenuItem()) {
+            logd("add export menu item");
             actionList.append(UITableMenuAction::build(STR_EXPORT_TO_FILE, this)
                               ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                   return this->onMenuActionExport(m, a);
@@ -92,6 +100,11 @@ bool UICommonListView::hasImportMenuItem()
     return mHasImportMenu;
 }
 
+bool UICommonListView::hasExportMenuItem()
+{
+    return mHasExportMenu;
+}
+
 ImportTarget UICommonListView::getImportTarget()
 {
     return IMPORT_TARGET_MAX;
@@ -102,27 +115,42 @@ ModelController *UICommonListView::importController()
     return hasImportMenuItem()?getController():nullptr;
 }
 
-bool UICommonListView::hasExportMenuItem()
-{
-    return mHasExportMenu;
-}
-
 ModelController *UICommonListView::exportController()
 {
     return hasExportMenuItem()?getController():nullptr;
 }
 
-QList<UITableItem *> UICommonListView::getListItem(qint32 page, qint32 perPage, qint32 totalPages)
+ErrCode UICommonListView::getListTableRowItems(
+    qint32 page, qint32 perPage, qint32 totalPages,
+    QList<UITableItem*>& items)
 {
-    QList<UITableItem *> items;
-    tracein;
+    ErrCode err = ErrNone;
     int idx = 0;
+    tracein;
+    UNUSED(page);
+    UNUSED(perPage);
+    UNUSED(totalPages);
     foreach (DbModel* item, mItemList) {
-        UITableItem* tblItem = UITableItem::build(item->clone());
-        fillValueTableRowItem(item, tblItem, ++idx);
-        items.append(tblItem);
+        UITableItem* tblItem = UITableItem::build(item);
+        if (tblItem) {
+            err = fillValueTableRowItem(item, tblItem, ++idx);
+            if (err == ErrNone) {
+                items.append(tblItem);
+            }
+        } else {
+            err = ErrNoMemory;
+            loge("failed to allocate memory for tblItem");
+        }
+        if (err != ErrNone) {
+            break;
+        }
     }
-    return items;
+    if (err != ErrNone) {
+        loge("build table row item failed, err %d", err);
+        RELEASE_LIST(items, UITableItem);
+    }
+    traceret(err);
+    return err;
 }
 
 void UICommonListView::initHeader()
@@ -134,13 +162,22 @@ void UICommonListView::initHeader()
     // TODO: header/column by order, i.e. 1: name id, 2: name, last: note
     traceout;
 }
-void UICommonListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
+ErrCode UICommonListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
-    tblItem->addValue(item->nameId());
-    tblItem->addValue(item->name());
-    tblItem->addValue(item->remark());
-    traceout;
+    ErrCode err = ErrNone;
+    UNUSED(idx);
+    if (!item || !tblItem) {
+        err = ErrInvalidArg;
+        loge("invalid argument");
+    }
+    if (err == ErrNone) {
+        tblItem->addValue(item->nameId());
+        tblItem->addValue(item->name());
+        tblItem->addValue(item->remark());
+    }
+    traceret(err);
+    return err;
 }
 
 void UICommonListView::onUpdatePageDone(qint32 page, qint32 totalpages, qint32 totalItems)
@@ -164,22 +201,26 @@ qint32 UICommonListView::getTotalItems()
     return mItemList.count();
 }
 
-QList<DbModel *> UICommonListView::getListItem()
+QList<DbModel *> UICommonListView::getListDbModels()
 {
-    traced;
-    return getController()->getAllItems(true);
-}
-
-ModelController *UICommonListView::getController()
-{
-    return nullptr;
+    tracein;
+    QList<DbModel *> ret;
+    ModelController* ctl = getController();
+    if (ctl) {
+        logd("get list item from controller '%s'", STR2CHA(ctl->getName()));
+        ret = ctl->getAllItems(true);
+    } else {
+        loge("no controller to get list items");
+    }
+    traceout;
+    return ret;
 }
 
 ErrCode UICommonListView::onLoad()
 {
     tracein;
     RELEASE_LIST_DBMODEL(mItemList);
-    mItemList = getListItem();
+    mItemList = getListDbModels();
     clearFilter();
     traceout;
     return ErrNone;
@@ -188,15 +229,19 @@ ErrCode UICommonListView::onLoad()
 ErrCode UICommonListView::onReload()
 {
     tracein;
-    onLoad();
-    traceout;
-    return ErrNone;
+    ErrCode err = ErrNone;
+    err = onLoad();
+    traceret(err);
+    return err;
 }
 
 void UICommonListView::initFilterFields()
 {
     tracein;
-    appendFilterField(FILTER_FIELD_NAME, tr("Tên"));
+    // filter by model status
+    appendFilterField(FILTER_FIELD_MODEL_STATUS, STR_MODELSTATUS);
+    // filter by  name
+    appendFilterField(FILTER_FIELD_NAME, STR_NAME);
     traceout;
 }
 
@@ -205,9 +250,11 @@ QHash<QString, QString> UICommonListView::getFilterKeywords(int fieldId,
                                                             const QString &fieldText)
 {
     tracein;
-    logd("Query search keywords form db, field %d, %s", fieldId, fieldText.toStdString().c_str());
+    logd("Query search keywords form db, field %d, %s", fieldId, STR2CHA(fieldText));
     QHash<QString, QString> keywords;
     QList<DbModel*> modelList;
+    UNUSED(fieldText);
+    // TODO: query may take time, should call in thread?
     switch (fieldId) {
     case FILTER_FIELD_HOLLY_NAME:
         modelList = SAINTCTL->getAllItems();
@@ -290,7 +337,7 @@ int UICommonListView::onFilter(int catetoryid, const QString &catetory,
             err = ctrl->filter(catetoryid,
                               opFlags, searchKeyWork,
                               modelName.toStdString().c_str(),
-                               mParentModel,
+                              mParentModel,
                               &mItemList);
         }
         logd("filter err %d", err);
@@ -314,7 +361,7 @@ ErrCode UICommonListView::onViewItem(UITableCellWidgetItem *item)
 
     if (err == ErrNone && ((model = item->itemData()) == nullptr)) {
         err = ErrInvalidData;
-        loge("Invalid argument");
+        loge("Invalid data");
     }
 
     if (err == ErrNone) {
@@ -331,6 +378,7 @@ ErrCode UICommonListView::onViewItem(UITableCellWidgetItem *item)
 ErrCode UICommonListView::onAddItem(UITableCellWidgetItem *item)
 {
     tracein;
+    UNUSED(item);
     // TODO: handle it
     MainWindow::showAddEditCommonModel(true, nullptr, this);
     traceout;
@@ -341,13 +389,19 @@ ErrCode UICommonListView::onEditItem(UITableCellWidgetItem *item)
 {
     tracein;
     ErrCode err = ErrNone;
-    int idx = item->idx();
-    DbModel* comm = item->itemData();
-    if (comm) {
-        MainWindow::showAddEditCommonModel(true, comm, this);
-    } else {
-        loge("Model obj is null");
-        DialogUtils::showErrorBox("Không có thông tin để chỉnh sửa");
+    if (!item) {
+        loge("invalid arg");
+        err = ErrInvalidArg;
+    }
+    if (err == ErrNone) {
+        DbModel* comm = item->itemData();
+        if (comm) {
+            MainWindow::showAddEditCommonModel(true, comm, this);
+        } else {
+            loge("Model obj is null");
+            DialogUtils::showErrorBox("Không có thông tin để chỉnh sửa");
+            err = ErrInvalidData;
+        }
     }
     traceret(err);
     return err;
@@ -356,11 +410,16 @@ ErrCode UICommonListView::onEditItem(UITableCellWidgetItem *item)
 void UICommonListView::onDbModelReady(ErrCode ret, DbModel *model, DlgCommonEditModel *dlg)
 {
     tracein;
+    UNUSED(dlg);
     if (ret == ErrNone) {
+#ifdef DEBUG_LOG
         if (model){
             model->dump();
         }
+#endif
         onReload();
+    } else {
+        loge("db model err = %d", ret);
     }
 
     traceout;
@@ -369,6 +428,7 @@ void UICommonListView::onDbModelReady(ErrCode ret, DbModel *model, DlgCommonEdit
 DbModel *UICommonListView::onCreateDbModelObj(const QString& modelName)
 {
     tracein;
+    UNUSED(modelName);
     return nullptr;
 }
 
@@ -402,6 +462,8 @@ void UICommonListView::onModelControllerDataUpdated(const DbModel *model)
 
 ErrCode UICommonListView::onMenuActionImport(QMenu *menu, UITableMenuAction *act)
 {
+    UNUSED(menu);
+    UNUSED(act);
     tracein;
     ErrCode ret = ErrNone;
     ModelController* ctrl = importController();
@@ -422,7 +484,7 @@ ErrCode UICommonListView::onMenuActionImport(QMenu *menu, UITableMenuAction *act
                                         parentModel());
     }
     if (ret == ErrNone) {
-        logw("Import for target 0x%x, model '%s' success",
+        logi("Import for target 0x%x, model '%s' success",
              importTarget, STR2CHA(modelName));
     } else {
         loge("import failed, ret=%d", ret);
@@ -434,9 +496,10 @@ ErrCode UICommonListView::onMenuActionImport(QMenu *menu, UITableMenuAction *act
 
 ErrCode UICommonListView::onMenuActionExport(QMenu *menu, UITableMenuAction *act)
 {
+    UNUSED(menu);
+    UNUSED(act);
     tracein;
     ErrCode err = ErrNone;
-    QString fpath;
     if (!act){
         err = ErrInvalidArg;
         loge("export list failed, Empty menu action");
@@ -449,7 +512,7 @@ ErrCode UICommonListView::onMenuActionExport(QMenu *menu, UITableMenuAction *act
                                               QString("%1: %2").arg(STR_EXPORT_TO_FILE, getTitle()),
                                               EXPORT_XLSX);
         } else {
-            logw("nothing to export");
+            loge("nothing to export");
             err = ErrNoData;
         }
     }
@@ -474,7 +537,11 @@ ErrCode UICommonListView::setParentModel(const DbModel *newParentModel)
     if (newParentModel) {
         mParentModel = CLONE_MODEL(newParentModel, DbModel);
     } else {
-        logd("null value is set");
+        logw("null value is set");
+    }
+    if (err == ErrNone) {
+        // update title when setting parent model
+        setTitle(getTitle());
     }
     traceret(err);
     return err;

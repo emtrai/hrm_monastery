@@ -358,11 +358,18 @@ ErrCode PersonCtl::exportTemplatePath(FileExporter *exporter,
     tracein;
     ErrCode ret = ErrNone;
     if (exporter) {
-        logd("exporter type %d", exporter->getExportType());
+        logd("exporter type %d, name '%s'", exporter->getExportType(), STR2CHA(name));
         switch (exporter->getExportType()) {
         case EXPORT_CSV_LIST:
         case EXPORT_XLSX:
-            fpath = FileCtl::getPrebuiltDataFilePath(KPrebuiltPersonListJSONTemplateFileName);
+            if (name == KModelNamePerson) {
+                fpath = FileCtl::getPrebuiltDataFilePath(KPrebuiltPersonListJSONTemplateFileName);
+            } else if (name == KModelNameCommPerson) {
+                fpath = FileCtl::getPrebuiltDataFilePath(KPrebuiltCommunityOfPersonExportTemplateName);
+            } else {
+                loge("unsupport name '%s' for export template", STR2CHA(name));
+                ret = ErrNotSupport;
+            }
             if (ftype) *ftype = KFileTypeJson;
             break;
         default:

@@ -36,7 +36,7 @@ protected:
     virtual QString getTitle();
     virtual DbModel* onCreateDbModelObj(const QString& modelName);
     virtual void initHeader();
-    virtual void fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
+    virtual ErrCode fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
 
     virtual ErrCode onAddItem(UITableCellWidgetItem *item);
     virtual ErrCode onEditItem(UITableCellWidgetItem *item);

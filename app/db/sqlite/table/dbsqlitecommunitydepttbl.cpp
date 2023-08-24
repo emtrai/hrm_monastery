@@ -205,6 +205,26 @@ ErrCode DbSqliteCommunityDeptTbl::updateBuilderFieldFromModel(
     return err;
 }
 
+ErrCode DbSqliteCommunityDeptTbl::filterFieldCond(int fieldId, int operatorId, QString fieldValueName, const DbModel *parentModel, QString &cond, int &dataType, bool &isExact)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    err = DbSqliteTbl::filterFieldCond(fieldId, operatorId, fieldValueName,
+                                       parentModel, cond, dataType, isExact);
+    if (err == ErrNone && parentModel) {
+        if (IS_MODEL_NAME(parentModel, KModelNameCommunity)) {
+            logd("Append uid '%s'", STR2CHA(parentModel->uid()));
+            cond = QString("((%1) AND (%2 = '%3'))").arg(cond, KFieldCommunityUid, parentModel->uid());
+        } else {
+            err = ErrInvalidData;
+            loge("invalid parentModel '%s'", MODELSTR2CHA(parentModel));
+        }
+    }
+    logd("cond: '%s'", STR2CHA(cond));
+    traceret(err);
+    return err;
+}
+
 void DbSqliteCommunityDeptTbl::addTableField(DbSqliteTableBuilder *builder)
 {
     tracein;

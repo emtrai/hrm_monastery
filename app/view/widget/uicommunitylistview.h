@@ -33,8 +33,9 @@ public:
     virtual void setupUI();
 protected:
     virtual int getViewType() { return VIEW_COMMUNITY;}
-    void initHeader();
-    void fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx);
+    virtual void initHeader();
+    virtual ModelController* getController();
+    virtual ErrCode fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx);
     virtual QList<UITableMenuAction*> getMenuSingleSelectedItemActions(const QMenu* menu,
                                                           UITableCellWidgetItem* item);
     virtual QList<UITableMenuAction*> getMenuCommonActions(const QMenu* menu);

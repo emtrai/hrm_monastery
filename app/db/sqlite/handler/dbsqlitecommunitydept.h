@@ -34,6 +34,7 @@ public:
     DbSqliteCommunityDept();
     virtual QList<DbModel*> getListPerson(const QString& commDeptUid, int status = MODEL_STATUS_MAX, bool* ok = nullptr);
     virtual QList<DbModel*> getListDept(const QString& communityUid, int status = MODEL_STATUS_MAX, bool* ok = nullptr);
+    virtual ErrCode deleteHard(DbModel* model, bool force = false, QString* msg = nullptr);
 protected:
     virtual DbSqliteTbl* getMainTbl();
     virtual DbSqliteTbl* getTable(const QString& modelName);

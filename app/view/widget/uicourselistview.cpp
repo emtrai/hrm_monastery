@@ -113,9 +113,14 @@ ErrCode UICourseListView::onViewItem(UITableCellWidgetItem *item)
     return ErrNone;//TODO: check return value
 }
 
-QList<DbModel *> UICourseListView::getListItem()
+QList<DbModel *> UICourseListView::getListDbModels()
 {
     return COURSECTL->getAllItems();;
+}
+
+ModelController *UICourseListView::getController()
+{
+    return COURSECTL;
 }
 
 void UICourseListView::initHeader()
@@ -131,20 +136,29 @@ void UICourseListView::initHeader()
     traceout;
 }
 
-void UICourseListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
+ErrCode UICourseListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
-    Course* course = (Course*)item;
-    if (course && course->modelName() == KModelNameCourse) {
-        tblItem->addValue(course->nameId());
-        tblItem->addValue(course->name());
-        tblItem->addValue(course->courseTypeName());
-        tblItem->addValue(course->period());
-        tblItem->addValue(DatetimeUtils::date2String(course->startDate(), DEFAULT_FORMAT_YMD));
-        tblItem->addValue(DatetimeUtils::date2String(course->endDate(), DEFAULT_FORMAT_YMD));
-        tblItem->addValue(course->remark());
-    } else {
-        loge("Invalid course '%s'", course?STR2CHA(course->toString()):"null");
+    ErrCode err = ErrNone;
+    if (!item || !tblItem) {
+        loge("invalid argument");
+        err = ErrInvalidArg;
     }
-    traceout;
+    if (err == ErrNone) {
+        Course* course = (Course*)item;
+        if (course && course->modelName() == KModelNameCourse) {
+            tblItem->addValue(course->nameId());
+            tblItem->addValue(course->name());
+            tblItem->addValue(course->courseTypeName());
+            tblItem->addValue(course->period());
+            tblItem->addValue(DatetimeUtils::date2String(course->startDate(), DEFAULT_FORMAT_YMD));
+            tblItem->addValue(DatetimeUtils::date2String(course->endDate(), DEFAULT_FORMAT_YMD));
+            tblItem->addValue(course->remark());
+        } else {
+            loge("Invalid course '%s'", course?STR2CHA(course->toString()):"null");
+            err = ErrInvalidData;
+        }
+    }
+    traceret(err);
+    return err;
 }

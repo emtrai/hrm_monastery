@@ -57,6 +57,7 @@ public:
     virtual DbModelHandler* getSaintModelHandler() = 0;
     virtual DbModelHandler* getSpecialistModelHandler() = 0;
     virtual DbModelHandler* getCommunityModelHandler() = 0;
+    virtual DbModelHandler* getPersonModelHandler() = 0;
     virtual DbModelHandler* getDepartmentModelHandler() = 0;
     virtual DbModelHandler* getWorkModelHandler() = 0;
     virtual DbModelHandler* getCountryModelHandler() = 0;

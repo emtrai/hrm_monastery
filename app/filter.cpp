@@ -152,3 +152,4 @@ void FilterItem::setItem(const QString &newItem)
 {
     mItem = newItem;
 }
+

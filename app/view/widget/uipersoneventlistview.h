@@ -40,7 +40,8 @@ protected:
     virtual int getViewType() { return VIEW_PERSON_EVENT;}
     virtual void initHeader();
     virtual QString getTitle();
-    virtual void fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
+    virtual ModelController* getController();
+    virtual ErrCode fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
 
     virtual ErrCode onAddItem(UITableCellWidgetItem *item);
     virtual ErrCode onEditItem(UITableCellWidgetItem *item);

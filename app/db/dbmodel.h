@@ -353,6 +353,7 @@ public:
 
     virtual ErrCode exportTo(const QString &fpath, ExportType type);
     virtual ErrCode exportToFile(ExportType type, QString* fpath);
+    virtual QString exportHtmlTemplateFile(const QString& name) const;
     virtual ErrCode exportTemplatePath(FileExporter* exporter,
                                        const QString& name,
                                        QString& fpath,

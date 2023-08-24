@@ -79,6 +79,22 @@ DbModel *MapDbModel::clone() const
     return DbModel::clone();
 }
 
+void MapDbModel::dump()
+{
+    tracein;
+    DbModel::dump();
+    // TODO: dump to stdout, sdderr or file???
+#ifdef DEBUG_TRACE
+    logd("- mUid1 %s", STR2CHA(mUid1));
+    logd("- mUid2 %s", STR2CHA(mUid2));
+    logd("- mParentUid %s", STR2CHA(mParentUid));
+    logd("- mModelStatus %d", mModelStatus);
+    logd("- mStartDate %d - %s", mStartDate, STR2CHA(DatetimeUtils::date2String(mStartDate)));
+    logd("- mEndDate %d - %s", mEndDate, STR2CHA(DatetimeUtils::date2String(mEndDate)));
+#endif //DEBUG_TRACE
+    traceout;
+}
+
 DbModel *MapDbModel::buildMapModel(DbModelBuilder builder,
                                    const DbModel *item1, const DbModel *item2,
                                    int status, qint64 startdate, qint64 enddate,

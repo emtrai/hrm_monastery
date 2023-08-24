@@ -739,6 +739,7 @@ ErrCode DbSqliteTbl::filterFieldCond(int fieldId,
             field = fieldName;
             dataType = INT64;
             break;
+            // TODO: support more filter???
         default:
             field = fieldName;
             dataType = TEXT;

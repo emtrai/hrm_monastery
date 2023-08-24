@@ -40,6 +40,14 @@ protected:
     virtual ErrCode updateBuilderFieldFromModel(DbSqliteUpdateBuilder* builder,
                                                 const QString& field,
                                                 const DbModel *item);
+    virtual ErrCode filterFieldCond(int fieldId,
+                                    int operatorId,
+                                    QString fieldValueName,
+                                    const DbModel* parentModel,
+                                    QString& cond,
+                                    int& dataType,
+                                    bool& isExact
+                                    );
 private:
     static const qint32 KVersionCode;
 };

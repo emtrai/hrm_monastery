@@ -51,7 +51,7 @@ class UITableItem
 public:
     virtual ~UITableItem();
 public:
-    static UITableItem* build(DbModel* data);
+    static UITableItem* build(const DbModel* data);
     UITableItem* addValue(const QString& val);
 
     const QStringList &valueList() const;
@@ -159,10 +159,6 @@ public:
     void setHeader(const QStringList &newHeader);
 
 
-    void setFpDataReq(onRequestData newFpDataReq);
-
-    void setFpTotalDataReq(onRequestTotalData newFpTotalDataReq);
-
     qint32 itemPerPage() const;
     void setItemPerPage(qint32 newItemPerPage);
 
@@ -202,8 +198,9 @@ protected:
     virtual void showEvent(QShowEvent *ev);
     virtual void onUpdatePage(qint32 page);
     virtual void onUpdatePageDone(qint32 page, qint32 totalpages, qint32 totalItems);
-    virtual QList<UITableItem*> getListItem(qint32 page, qint32 perPage, qint32 totalPages);
-    virtual QList<UITableItem*> getListAllItem();
+    virtual ErrCode getListTableRowItems(qint32 page, qint32 perPage, qint32 totalPages,
+                                                      QList<UITableItem*>& items) = 0;
+    virtual QList<UITableItem*> getListAllTableRowItems();
     virtual qint32 getTotalItems();
     virtual ErrCode onLoad();
     /**
@@ -297,8 +294,6 @@ private slots:
 protected:
     QStringList mHeader;
     Ui::UITableView *ui;
-    onRequestData mFpDataReq;
-    onRequestTotalData mFpTotalDataReq;
     qint32 mItemPerPage;
     quint32 mCurrentPage;
     quint32 mTotalPages;

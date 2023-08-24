@@ -41,9 +41,10 @@ protected:
 protected:
 
     virtual int getViewType() { return VIEW_COURSE;}
-    virtual QList<DbModel*> getListItem();
+    virtual QList<DbModel*> getListDbModels();
+    virtual ModelController* getController();
     virtual void initHeader();
-    virtual void fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
+    virtual ErrCode fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
 };
 
 #endif // UICOURSELISTVIEW_H

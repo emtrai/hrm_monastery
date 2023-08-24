@@ -35,6 +35,8 @@ public:
     virtual DbModelBuilder getBuilder() const;
     virtual QString modelName() const;
     virtual void clone(const DbModel* model);
+    virtual QString exportHtmlTemplateFile(const QString& name) const;
+    virtual void initExportFields();
 
     const QString &communityUid() const { return uid1(); }
     void setCommunityUid(const QString &newUid1);

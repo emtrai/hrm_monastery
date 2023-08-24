@@ -38,8 +38,9 @@ public:
     virtual void setupUI();
 protected:
     virtual ErrCode onLoad();
-    virtual void fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
+    virtual ErrCode fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
     virtual void initHeader();
+    virtual ModelController* getController();
 protected:
     virtual int getViewType() { return VIEW_PERSON;}
     virtual void importRequested(const QString& fpath);

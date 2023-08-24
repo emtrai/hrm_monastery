@@ -72,6 +72,7 @@ DbModelBuilder DbModelFactory::getBuilder(const QString &modelName)
 #include "person.h"
 #include "community.h"
 #include "specialist.h"
+#include "communitydept.h"
 void DbModelFactory::addBuilders()
 {
     tracein;
@@ -80,6 +81,7 @@ void DbModelFactory::addBuilders()
     _addBuilder(KModelNamePerson, &Person::build);
     _addBuilder(KModelHdlSpecialist, &Specialist::build);
     _addBuilder(KModelNameCommunity, &Community::build);
+    _addBuilder(KModelNameCommDept, &CommunityDept::build);
 
     traceout;
 }

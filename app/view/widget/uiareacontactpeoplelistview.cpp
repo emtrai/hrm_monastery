@@ -58,16 +58,9 @@ Area *UIAreaContactPeopleListView::area() const
 
 ErrCode UIAreaContactPeopleListView::setArea(const Area *newArea)
 {
-    ErrCode err = ErrNone;
-    tracein;
+    traced;
     // parent model is area, as this listview will show all contact people of an area
-    err = setParentModel(newArea);
-    if (err == ErrNone) {
-        // update title when setting parent model
-        setTitle(getTitle());
-    }
-    traceret(err);
-    return err;
+    return setParentModel(newArea);
 }
 
 void UIAreaContactPeopleListView::setupUI()
@@ -130,7 +123,7 @@ ModelController *UIAreaContactPeopleListView::getController()
     return AREACTL; // area contact people is controlled by area controller
 }
 
-void UIAreaContactPeopleListView::fillValueTableRowItem(DbModel *item,
+ErrCode UIAreaContactPeopleListView::fillValueTableRowItem(DbModel *item,
                                              UITableItem *tblItem, int idx)
 {
     tracein;
@@ -159,10 +152,11 @@ void UIAreaContactPeopleListView::fillValueTableRowItem(DbModel *item,
                  MODELSTR2CHA(item));
         }
     }
-    traceout;
+    traceret(err);
+    return err;
 }
 
-QList<DbModel *> UIAreaContactPeopleListView::getListItem()
+QList<DbModel *> UIAreaContactPeopleListView::getListDbModels()
 {
     tracein;
     ErrCode err = ErrNone;

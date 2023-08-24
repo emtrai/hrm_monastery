@@ -67,17 +67,25 @@ void UIEthnicListView::initHeader()
     traceout;
 }
 
-void UIEthnicListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
+ErrCode UIEthnicListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
-    Ethnic* model = (Ethnic*)item;
-    if (model && model->modelName() == KModelNameEthnic) {
-        tblItem->addValue(model->nameId());
-        tblItem->addValue(model->name());
-        tblItem->addValue(model->countryName());
-        tblItem->addValue(model->remark());
-    } else {
-        loge("Invalid model '%s'", model?STR2CHA(model->toString()):"null");
+    ErrCode err = ErrNone;
+    if (!item || !tblItem) {
+        err = ErrInvalidArg;
+        loge("invalid argument");
+    }
+    if (err == ErrNone) {
+        Ethnic* model = (Ethnic*)item;
+        if (model && model->modelName() == KModelNameEthnic) {
+            tblItem->addValue(model->nameId());
+            tblItem->addValue(model->name());
+            tblItem->addValue(model->countryName());
+            tblItem->addValue(model->remark());
+        } else {
+            loge("Invalid model '%s'", model?STR2CHA(model->toString()):"null");
+            err = ErrInvalidModel;
+        }
     }
     traceout;
 }

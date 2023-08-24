@@ -60,15 +60,13 @@ protected:
      */
     virtual ErrCode onMenuActionListPerson(QMenu* menu, UITableMenuAction* act);
 
-    virtual void fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
+    virtual ErrCode fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
 
-
-protected:
     /**
      * @brief get list of item to show on list view
      * @return list of item to show on listview
      */
-    virtual QList<DbModel*> getListItem();
+    virtual QList<DbModel*> getListDbModels();
 };
 
 #endif // UICOMMDEPTLISTVIEW_H

@@ -33,8 +33,9 @@ public:
 protected:
     virtual int getViewType() { return VIEW_SAINT;}
     virtual ErrCode onLoad();
-    virtual void fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
+    virtual ErrCode fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
     virtual void initHeader();
+    virtual ModelController* getController();
 
     virtual int onFilter(int catetoryid, const QString& catetory, qint64 opFlags, const QString& keywords, const QVariant *value);
     

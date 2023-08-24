@@ -202,7 +202,6 @@ ErrCode DbSqliteCommunity::deleteHard(DbModel *model, bool force, QString *msg)
     }
     traceout;
     return err;
-
 }
 
 

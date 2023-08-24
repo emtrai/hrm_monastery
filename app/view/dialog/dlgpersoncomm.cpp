@@ -224,6 +224,26 @@ void DlgPersonCommunity::accept()
 
     if (mIsNew) {
         logd("build model to save/return");
+
+        if (!mCommunity) {
+            logd("get selected community");
+            bool isOk = false;
+            QString communityUid = Utils::getCurrentComboxDataString(ui->cbCommunity, &isOk);
+            logd("search community uid '%s'", STR2CHA(communityUid));
+            if (!communityUid.isEmpty() && ok) {
+                DbModel* model = COMMUNITYCTL->getModelByUid(communityUid);
+                if (model) {
+                    mCommunity = (Community*) model;
+                } else {
+                    loge("not found community with uid '%s'", STR2CHA(communityUid));
+                    err = ErrNotFound;
+                }
+            } else {
+                loge("community uid '%s' is empty or get cbox value failed", STR2CHA(communityUid));
+                err = ErrInvalidData;
+            }
+        }
+
         if (err == ErrNone && !mCommunity) {
             loge("no community");
             err = ErrNoData;

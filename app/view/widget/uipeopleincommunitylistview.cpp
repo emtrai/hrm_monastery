@@ -244,6 +244,11 @@ void UIPeopleInCommunityListView::setCommunity(const Community *newCommunity)
     traceout;
 }
 
+ModelController *UIPeopleInCommunityListView::getController()
+{
+    return COMMUNITYCTL;
+}
+
 void UIPeopleInCommunityListView::initHeader()
 {
     tracein;
@@ -268,7 +273,7 @@ QString UIPeopleInCommunityListView::getTitle()
     return QString(tr("Danh sách nữ tu của cộng đoàn: %1")).arg(mCommunity?mCommunity->name():tr("Không rõ"));
 }
 
-void UIPeopleInCommunityListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
+ErrCode UIPeopleInCommunityListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
     CommunityPerson* commper = nullptr;
@@ -304,5 +309,6 @@ void UIPeopleInCommunityListView::fillValueTableRowItem(DbModel *item, UITableIt
     logd("err = %d", err);
     // TODO: show dialog/report issue when invalid info?
 
-    traceout;
+    traceret(err);
+    return err;
 }

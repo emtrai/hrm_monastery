@@ -53,20 +53,29 @@ ErrCode UISaintListView::onLoad()
     return ErrNone;
 }
 
-void UISaintListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
+ErrCode UISaintListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
-    if (item && item->modelName() == KModelNameSaint) {
-        Saint* saint = (Saint*)item;
-        tblItem->addValue(item->nameId());
-        tblItem->addValue(item->name());
-        tblItem->addValue(saint->fullName());
-        tblItem->addValue(DatetimeUtils::date2String(saint->feastDay(), DEFAULT_FORMAT_MD));
-        tblItem->addValue(saint->remark());
-    } else {
-        logd("Invalid item");
+    ErrCode err = ErrNone;
+    if (!item || !tblItem) {
+        err = ErrInvalidArg;
+        loge("invalid argument");
     }
-    traceout;
+    if (err == ErrNone) {
+        if (item && item->modelName() == KModelNameSaint) {
+            Saint* saint = (Saint*)item;
+            tblItem->addValue(item->nameId());
+            tblItem->addValue(item->name());
+            tblItem->addValue(saint->fullName());
+            tblItem->addValue(DatetimeUtils::date2String(saint->feastDay(), DEFAULT_FORMAT_MD));
+            tblItem->addValue(saint->remark());
+        } else {
+            loge("Invalid item");
+            err = ErrInvalidModel;
+        }
+    }
+    traceret(err);
+    return err;
 
 }
 
@@ -78,7 +87,12 @@ void UISaintListView::initHeader()
     mHeader.append(tr("Tên đầy đủ"));
     mHeader.append(tr("Ngày bổn mạng"));
     mHeader.append(tr("Ghi chú"));
-    traceout;
+        traceout;
+}
+
+ModelController *UISaintListView::getController()
+{
+        return SAINTCTL;
 }
 
 int UISaintListView::onFilter(int catetoryid, const QString &catetory, qint64 opFlags, const QString &keywords, const QVariant *value)

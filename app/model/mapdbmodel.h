@@ -52,6 +52,7 @@ public:
     MapDbModel(const MapDbModel* model);
     virtual void clone(const DbModel* model);
     virtual DbModel* clone() const;
+    virtual void dump();
     static DbModel* buildMapModel(DbModelBuilder builder, const DbModel* item1, const DbModel* item2,
                                   int status = MODEL_STATUS_MAX,
                                   qint64 startdate = 0,

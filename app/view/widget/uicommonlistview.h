@@ -31,7 +31,9 @@
 
 enum ImportTarget;
 
-class UICommonListView : public UITableView, public CommonEditModelListener, public OnModelControllerListener
+class UICommonListView : public UITableView,
+                         public CommonEditModelListener,
+                         public OnModelControllerListener
 {
 public:
     explicit UICommonListView(QWidget *parent = nullptr);
@@ -44,31 +46,61 @@ public:
 protected:
     virtual QList<UITableMenuAction*> getMenuCommonActions(const QMenu* menu);
     virtual bool hasImportMenuItem();
+    virtual bool hasExportMenuItem();
+    /**
+     * Import target of list view, i.e. area, community, etc.
+     * @return
+     */
     virtual ImportTarget getImportTarget();
     virtual ModelController* importController();
-    virtual bool hasExportMenuItem();
     virtual ModelController* exportController();
-    virtual QList<UITableItem*> getListItem(qint32 page, qint32 perPage, qint32 totalPages);
+
+
+    virtual ErrCode getListTableRowItems(qint32 page, qint32 perPage, qint32 totalPages,
+                                                      QList<UITableItem*>& items);
     virtual qint32 getTotalItems();
+    virtual ErrCode fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
 
     /**
      * @brief get list of item to show on list view
      * @return list of item to show on listview
      */
-    virtual QList<DbModel*> getListItem();
-    virtual ModelController* getController();
+    virtual QList<DbModel*> getListDbModels();
+    virtual ModelController* getController() = 0;
+
     virtual ErrCode onLoad();
     virtual ErrCode onReload();
+
     virtual void initHeader();
-    virtual void fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
 
     virtual void onUpdatePageDone(qint32 page, qint32 totalpages, qint32 totalItems);
     virtual void initFilterFields();
+    /**
+     * @brief Preset keyword to filter, i.e. list of status to be filtered, etc.
+     * @param fieldId field id to be search, i.e name, status, etc.
+     * @param fieldText
+     * @return hash map between keyword and correspoinding id (i.e uid)
+     */
     virtual QHash<QString, QString> getFilterKeywords(int fieldId, const QString& fieldText);
+
+    /**
+     * @brief do filters basing on keyword.
+     *        filter/search by value first, if it's empty, search with raw keyword
+     * @param catetoryid category/field id, i.e. community
+     * @param catetory category in name
+     * @param opFlags operator, i.e >, <, contain, etc.
+     * @param keywords keyword to search
+     * @param value value to match with keyword if any (String type)
+     * @return number of found items
+     */
     virtual int onFilter(int catetoryid,
                          const QString& catetory,
                          qint64 opFlags,
                          const QString& keywords, const QVariant *value);
+
+
+    virtual ErrCode onMenuActionImport(QMenu* menu, UITableMenuAction* act);
+    virtual ErrCode onMenuActionExport(QMenu *menu, UITableMenuAction *act);
     virtual ErrCode onViewItem(UITableCellWidgetItem *item);
     virtual ErrCode onAddItem(UITableCellWidgetItem *item);
     virtual ErrCode onEditItem(UITableCellWidgetItem *item);
@@ -85,14 +117,29 @@ protected:
             mItemList.append((DbModel*) item);
         }
     }
-    virtual ErrCode onMenuActionImport(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onMenuActionExport(QMenu *menu, UITableMenuAction *act);
 protected:
     QList<DbModel*> mItemList;
+    /**
+     * set true if view supports import
+     * derived class should set this value accordingly
+     */
     bool mHasImportMenu;
+    /**
+     * set true if view supports export
+     * derived class should set this value accordingly
+     */
     bool mHasExportMenu;
+    /**
+     * set true if support sorting table list view
+     */
     bool mSortItem;
-    DbModel* mParentModel; //
+
+    /**
+     * Parent model of items in list view.
+     * i.e list view of community department, parent model is Community as
+     * list view is list of department of a community
+     */
+    DbModel* mParentModel;
 };
 
 #endif // UICOMMONLISTVIEW_H

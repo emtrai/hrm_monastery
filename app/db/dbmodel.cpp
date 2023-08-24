@@ -482,18 +482,27 @@ ErrCode DbModel::exportToFile(ExportType type, QString *fpath)
     return ret;
 }
 
+QString DbModel::exportHtmlTemplateFile(const QString &name) const
+{
+    UNUSED(name);
+    return KPrebuiltCommonTemplateFileName;
+}
+
 ErrCode DbModel::exportTemplatePath(FileExporter* exporter,
                                     const QString& name,
                                     QString& fpath, QString* ftype) const
 {
     tracein;
     ErrCode err = ErrNone;
+    QString templateFname;
     if (exporter) {
         ExportType type = exporter->getExportType();
-        logd("export type '%d'", type);
+        logd("export type '%d', name '%s'", type, STR2CHA(name));
         switch (type) {
         case EXPORT_HTML:
-            fpath = FileCtl::getPrebuiltDataFilePath(KPrebuiltCommonTemplateFileName);
+            templateFname = exportHtmlTemplateFile(name);
+            logd("templateFname '%s'", STR2CHA(templateFname));
+            fpath = FileCtl::getPrebuiltDataFilePath(templateFname);
             break;
         default:
             err = ErrNotSupport;

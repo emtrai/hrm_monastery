@@ -413,6 +413,7 @@ ErrCode ModelController::filter(int fieldId,
     return ret;
 }
 
+
 ErrCode ModelController::getUidListFromName(const QString &name, QHash<QString, QString> *list, const char *hdlName)
 {
     tracein;

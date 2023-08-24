@@ -31,11 +31,11 @@ public:
     virtual ~UIDepartmentListView();
 protected:
     virtual int getViewType() { return VIEW_DEPARTMENT;}
-    void initHeader();
-    void updateTableItem(DbModel *item, UITableItem *tblItem, int idx);
+    virtual void initHeader();
+    virtual ErrCode fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx);
     virtual ModelController* getController();
-
-    virtual QList<DbModel*> getListItem();
+    
+    virtual QList<DbModel*> getListDbModels();
     virtual DbModel* onCreateDbModelObj(const QString& modelName);
 };
 

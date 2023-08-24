@@ -24,11 +24,14 @@
 #include "errcode.h"
 #include "defs.h"
 
+#include "stringdefs.h"
 #include "utils.h"
 #include "dbctl.h"
 #include "dbmodel.h"
 #include "person.h"
 #include "community.h"
+#include "filectl.h"
+#include "prebuiltdefs.h"
 
 CommunityPerson::CommunityPerson():
     mPerson(nullptr),
@@ -75,6 +78,54 @@ void CommunityPerson::clone(const DbModel *model)
             CLEAR_THEN_SET(mCommunity, commper->community(), Community);
         }
     }
+    traceout;
+}
+
+QString CommunityPerson::exportHtmlTemplateFile(const QString &name) const
+{
+    UNUSED(name);
+    return KPrebuiltCommunityOfPersonTemplateName;
+}
+
+void CommunityPerson::initExportFields()
+{
+
+    tracein;
+    DbModel::initExportFields();
+    mExportCallbacks.insert(KItemPersonNameId, EXPORT_CALLBACK_STRING_IMPL(
+                                              CommunityPerson,
+                                              KModelNameCommPerson,
+                                              person()->nameId));
+    mExportCallbacks.insert(KItemFullName, EXPORT_CALLBACK_STRING_IMPL(
+                                                CommunityPerson,
+                                                KModelNameCommPerson,
+                                                person()->displayName));
+    mExportCallbacks.insert(KItemCommunityNameId, EXPORT_CALLBACK_STRING_IMPL(
+                                                 CommunityPerson,
+                                                 KModelNameCommPerson,
+                                                 community()->nameId));
+    mExportCallbacks.insert(KItemCommunityName, EXPORT_CALLBACK_STRING_IMPL(
+                                                    CommunityPerson,
+                                                    KModelNameCommPerson,
+                                                    community()->name));
+    mExportCallbacks.insert(KItemStartDate, EXPORT_CALLBACK_DATETIME_IMPL(
+                                                    CommunityPerson,
+                                                    KModelNameCommPerson,
+                                                    startDate,
+                                                    DEFAULT_FORMAT_YMD));
+    mExportCallbacks.insert(KItemEndDate, EXPORT_CALLBACK_DATETIME_IMPL(
+                                                CommunityPerson,
+                                                KModelNameCommPerson,
+                                                endDate,
+                                                DEFAULT_FORMAT_YMD));
+    mExportCallbacks.insert(KItemStatus, EXPORT_CALLBACK_STRING_IMPL(
+                                             CommunityPerson,
+                                             KModelNameCommPerson,
+                                             modelStatusName));
+    mExportCallbacks.insert(KItemRemark, EXPORT_CALLBACK_STRING_IMPL(
+                                             CommunityPerson,
+                                             KModelNameCommPerson,
+                                             remark));
     traceout;
 }
 

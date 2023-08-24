@@ -36,7 +36,7 @@ protected:
     virtual int getViewType() { return VIEW_AREA;}
     virtual QString getTitle();
     void initHeader();
-    void updateTableItem(DbModel *item, UITableItem *tblItem, int idx);
+    virtual ErrCode fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx);
     virtual void initFilterFields();
 
     virtual ModelController* getController();
