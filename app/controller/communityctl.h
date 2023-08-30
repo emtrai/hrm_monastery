@@ -50,7 +50,14 @@ public:
      */
     ErrCode getActivePersonList(const QString& communityUid, QList<Person*>& outList);
     ErrCode getPersonList(const QString& communityUid, QList<Person*>& outList, qint64 modelStatus = MODEL_STATUS_MAX);
-    ErrCode getListCommunityPerson(const QString& communityUid, QList<CommunityPerson*>& outList, qint64 modelStatus = MODEL_STATUS_MAX);
+    /**
+     * @brief getListCommunityPerson
+     * @param communityUid
+     * @param outList List of CommunityPerson objects
+     * @param modelStatus
+     * @return
+     */
+    ErrCode getListCommunityPerson(const QString& communityUid, QList<DbModel*>& outList, qint64 modelStatus = MODEL_STATUS_MAX);
 
     /**
      * @brief Add person to community

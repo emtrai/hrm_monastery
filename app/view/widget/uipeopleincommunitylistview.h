@@ -36,11 +36,13 @@ public:
     virtual ~UIPeopleInCommunityListView();
 
     Community *community() const;
-    void setCommunity(const Community *newCommunity);
+    ErrCode setCommunity(const Community *newCommunity);
 
 protected:
     virtual int getViewType() { return VIEW_PEOPLE_IN_COMMUNITY_LIST;}
+    virtual QString getMainModelName();
     virtual ModelController* getController();
+    virtual DbModel* onCreateDbModelObj(const QString& modelName);
     virtual void initHeader();
     virtual QString getTitle();
     virtual ErrCode fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
@@ -52,10 +54,9 @@ protected:
     virtual ErrCode onDeleteItem(const QList<UITableItem *>& selectedItems);
     virtual ErrCode onAddItem(UITableCellWidgetItem *item);
 
-protected:
-    virtual ErrCode onLoad();
+    virtual QList<DbModel*> getListDbModels();
 private:
-    Community* mCommunity;
+//    Community* mCommunity;
 };
 
 #endif // UIPEOPLEINCOMMUNITYLISTVIEW_H

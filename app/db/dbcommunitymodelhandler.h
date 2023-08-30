@@ -35,7 +35,14 @@ class DbCommunityModelHandler
 public:
 
     virtual QList<Person*> getListPerson(const QString& uid, int modelStatus = MODEL_STATUS_MAX, const QString* perStatusUid = nullptr) = 0;
-    virtual QList<CommunityPerson*> getListCommunityPerson(const QString& commUid, int modelStatus = MODEL_STATUS_MAX, const QString* perStatusUid = nullptr) = 0;
+    /**
+     * @brief getListCommunityPerson
+     * @param commUid
+     * @param modelStatus
+     * @param perStatusUid
+     * @return List of CommunityPerson objects
+     */
+    virtual QList<DbModel*> getListCommunityPerson(const QString& commUid, int modelStatus = MODEL_STATUS_MAX, const QString* perStatusUid = nullptr) = 0;
     virtual ErrCode addPerson2Community(const Community *comm,
                                         const Person* per,
                                       int status = 0,

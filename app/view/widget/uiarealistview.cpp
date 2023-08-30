@@ -52,14 +52,6 @@ UIAreaListView::~UIAreaListView()
     traceout;
 }
 
-void UIAreaListView::setupUI()
-{
-    tracein;
-    UICommonListView::setupUI();
-    AREACTL->addListener(this);
-    traceout;
-}
-
 QString UIAreaListView::getTitle()
 {
     return STR_AREA;

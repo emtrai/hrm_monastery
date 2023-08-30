@@ -71,6 +71,8 @@ typedef enum ErrCode {
     ErrPermDenied,
     ErrNoId,
     ErrNoFile,
+    ErrInvalidView,
+    ErrNotSelect,
     ErrMax
     } ErrCode_t;
 

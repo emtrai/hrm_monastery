@@ -78,7 +78,7 @@ public:
             static MainWindow *getInstance();
 
             static void showAddEditPerson(bool isSelfUpdate = true, Person* per = nullptr, bool isNew = true);
-            static void showAddEditCommunity(bool isSelfUpdate = true, Community* com = nullptr,
+            static void showAddEditCommunity(bool isSelfUpdate = true, const Community* com = nullptr,
                                              CommonEditModelListener* listener = nullptr);
             static ErrCode showImportDlg(ImportTarget target = IMPORT_TARGET_MAX,
                                          ModelController* controller = nullptr,
@@ -100,7 +100,8 @@ public:
                                            const QString& datatype,
                                            ModelController* controller,
                                            const QString& title = nullptr,
-                                           quint64 exportTypeList = ExportType::EXPORT_XLSX // List of supported export type, bitwise
+                                           quint64 exportTypeList = ExportType::EXPORT_XLSX, // List of supported export type, bitwise
+                                           QString* fpath = nullptr
                                     );
             static ErrCode showProcessingDialog(const QString& title,
                                                 WaitPrepare_t prepare,
@@ -138,7 +139,7 @@ protected:
      virtual void onLoadController (Controller* ctl);
      virtual void onUnloadController (Controller* ctl);
      void doShowAddEditPerson(bool isSelfUpdate = true, Person* per = nullptr, bool isNew = true);
-     void doShowAddEditCommunity(bool isSelfUpdate = true, Community* com = nullptr,
+     void doShowAddEditCommunity(bool isSelfUpdate = true, const Community* com = nullptr,
                                  CommonEditModelListener* listener = nullptr);
      void doShowImportPerson();
      void doShowImportCommunity();
@@ -160,7 +161,9 @@ protected:
      ErrCode doExportListItems(const QList<DbModel*>* items,
                                const QString& datatype,
                                ModelController* controller,
-                               const QString& title = nullptr, quint64 exportTypeList = 0);
+                               const QString& title = nullptr,
+                               quint64 exportTypeList = 0,
+                               QString* fpath = nullptr);
 
      ErrCode doShowProcessingDialog(const QString& title,
                                          WaitPrepare_t prepare,

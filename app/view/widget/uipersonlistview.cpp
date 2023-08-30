@@ -74,8 +74,7 @@ UIPersonListView::~UIPersonListView()
 void UIPersonListView::setupUI()
 {
     tracein;
-    UITableView::setupUI();
-    PERSONCTL->addListener(this);
+    UICommonListView::setupUI();
     MainWindow::addMainWindownImportListener(this);
     traceout;
 }

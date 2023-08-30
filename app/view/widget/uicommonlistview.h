@@ -40,7 +40,6 @@ public:
     virtual ~UICommonListView();
     virtual void setupUI();
     ErrCode setParentModel(const DbModel *newParentModel);
-
     DbModel *parentModel() const;
 
 protected:

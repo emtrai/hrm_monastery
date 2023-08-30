@@ -194,7 +194,17 @@ DbModel* CommunityCtl::onJsonParseOneItem(const QJsonObject& jobj, bool* ok )
 
 const QString CommunityCtl::exportListPrebuiltTemplateName(const QString& modelName) const
 {
-    return KPrebuiltCommunityExportTemplateName;
+    tracein;
+    QString tmplate;
+    logd("export template for model '%s'", STR2CHA(modelName));
+    if (modelName == KModelNameCommPerson) {
+        tmplate = KPrebuiltCommunityPersonExportTemplateName;
+    } else {
+        tmplate = KPrebuiltCommunityExportTemplateName;
+    }
+    logd("template '%s'", STR2CHA(tmplate));
+    traceout;
+    return tmplate;
 }
 
 ErrCode CommunityCtl::onImportDataStart(const QString &importName, int importFileType, const QString &fname)
@@ -256,13 +266,13 @@ ErrCode CommunityCtl::getPersonList(const QString &communityUid,
 }
 
 ErrCode CommunityCtl::getListCommunityPerson(const QString &communityUid,
-                                               QList<CommunityPerson *> &outList,
+                                               QList<DbModel *> &outList,
                                                qint64 modelStatus)
 {
     tracein;
     ErrCode err = ErrNone;
     DbCommunityModelHandler* hdl = nullptr;
-    QList<CommunityPerson *> items;
+    QList<DbModel *> items;
     logd("get list of person for community uid '%s', status 0x%x",
          STR2CHA(communityUid), modelStatus);
     if (communityUid.isEmpty()) {

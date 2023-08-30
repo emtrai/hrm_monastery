@@ -34,7 +34,13 @@ public:
     virtual QList<Person*> getListPerson(const QString& communityUid, int status = MODEL_STATUS_MAX, const QString* perStatusUid = nullptr);
     virtual QList<CommunityPerson*> getListCommunityOfPerson(const QString& personUid,
                                                       int modelStatus = MODEL_STATUS_MAX);
-    virtual QList<CommunityPerson*> getListCommunityPerson(const QString& community,
+    /**
+     * @brief getListCommunityPerson
+     * @param community
+     * @param modelStatus
+     * @return List of CommunityPerson objects
+     */
+    virtual QList<DbModel*> getListCommunityPerson(const QString& community,
                                                               int modelStatus = MODEL_STATUS_MAX);
     virtual QList<DbModel*> getListItems(const QString& personUid, const QString& commuid,
                                           const DbModelBuilder &builder);

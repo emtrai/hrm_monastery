@@ -32,6 +32,7 @@
 #include "communitydept.h"
 #include "stringdefs.h"
 #include "errreporterctl.h"
+#include "viewutils.h"
 
 UICommDeptListView::UICommDeptListView(QWidget *parent):
     UICommonListView(parent)
@@ -186,10 +187,9 @@ QList<UITableMenuAction *> UICommDeptListView::getMenuSingleSelectedItemActions(
     QList<UITableMenuAction*> actionList =
         UITableView::getMenuSingleSelectedItemActions(menu, item);
 
-    actionList.append(UITableMenuAction::build(tr("Danh sách thành viên"), this, item)
-                                              ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
-                                               return this->onMenuActionListPerson(m, a);
-                                           }));
+    actionList.append(BUILD_MENU_ACTION_IMPL(tr("Danh sách thành viên"),
+                                             item,
+                                             onMenuActionListPerson));
     return actionList;
 
 }

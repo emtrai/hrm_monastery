@@ -266,7 +266,8 @@ SOURCES += \
     view/widget/uitableview.cpp \
     view/widget/uitableviewfactory.cpp \
     view/widget/uitextbrowser.cpp \
-    view/widget/uiworklistview.cpp
+    view/widget/uiworklistview.cpp \
+    viewutils.cpp
 
 HEADERS += \
     address.h \
@@ -485,7 +486,8 @@ HEADERS += \
     view/widget/uitableview.h \
     view/widget/uitableviewfactory.h \
     view/widget/uitextbrowser.h \
-    view/widget/uiworklistview.h
+    view/widget/uiworklistview.h \
+    viewutils.h
 
 FORMS += \
     mainwindow.ui \
@@ -552,6 +554,7 @@ DISTFILES += \
     res/edu_vi.csv \
     res/event_category_vi.csv \
     res/home.html \
+    res/people_in_community_export_template_vi.json \
     res/person_info_template.html \
     res/person_list_export_template.csv \
     res/person_list_export_template_vi.json \

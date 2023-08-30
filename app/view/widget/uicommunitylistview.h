@@ -23,9 +23,9 @@
 #define UICOMMUNITYLISTVIEW_H
 
 #include "uicommonlistview.h"
-#include "importlistener.h"
+#include "mainwindow.h"
 
-class UICommunityListView : public UICommonListView, public ImportListener
+class UICommunityListView : public UICommonListView, public MainWindownImportListener
 {
 public:
     explicit UICommunityListView(QWidget *parent = nullptr);
@@ -34,34 +34,42 @@ public:
 protected:
     virtual int getViewType() { return VIEW_COMMUNITY;}
     virtual void initHeader();
+    virtual QString getTitle();
     virtual ModelController* getController();
+    virtual QString getName();
+    virtual DbModel* onCreateDbModelObj(const QString& modelName);
+    virtual QString getMainModelName();
+
+    virtual QList<DbModel*> getListDbModels();
+
     virtual ErrCode fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx);
+
+    virtual ImportTarget getImportTarget();
+
     virtual QList<UITableMenuAction*> getMenuSingleSelectedItemActions(const QMenu* menu,
                                                           UITableCellWidgetItem* item);
-    virtual QList<UITableMenuAction*> getMenuCommonActions(const QMenu* menu);
-    virtual QList<UITableMenuAction *> getMenuMultiSelectedItemActions(const QMenu *menu, const QList<UITableItem *> &items);
-    virtual ErrCode onMenuActionExportListPerson(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onMenuActionExportListCommunity(QMenu *menu, UITableMenuAction *act);
-    virtual ErrCode onMenuActionListPerson(QMenu* menu, UITableMenuAction* act);
+
+    virtual ErrCode onMenuActionExportListAllPeople(QMenu* menu, UITableMenuAction* act);
+    virtual ErrCode onMenuActionExportListActivePeople(QMenu* menu, UITableMenuAction* act);
+    virtual ErrCode onMenuActionListActivePerson(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionListAllPerson(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionListDepartment(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onMenuActionListManagers(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onMenuActionImport(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onMenuActionAddPerson(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onMenuActionAddDepart(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onViewItem(UITableCellWidgetItem *item);
+
+    virtual ErrCode onAddItem(UITableCellWidgetItem *item);
     virtual ErrCode onEditItem(UITableCellWidgetItem *item);
-    virtual QString getTitle();
 
-    virtual QString getName();
-    virtual void onImportStart(const QString& importName, const QString& fpath, ImportType type);
-    virtual void onImportEnd(const QString& importName, ErrCode err, const QString& fpath, ImportType type);
+    virtual void onMainWindownImportStart(ImportTarget target);
+    virtual void onMainWindownImportEnd(ImportTarget target, ErrCode err, void* importData = nullptr);
 
-protected:
-    virtual ErrCode onLoad();
-    virtual ErrCode onReload();
-    virtual DbModel* onCreateDbModelObj(const QString& modelName);
+private:
+    /**
+     * @brief Show list of people inside community
+     * @param act
+     * @param activeOnly true if show only active people in community
+     * @return ErrNone on success, error code otherwise
+     */
+    ErrCode showListPeople(UITableMenuAction *act, bool activeOnly = false);
+    ErrCode exportListPeople(UITableMenuAction *act, bool activeOnly = false);
 };
 
 

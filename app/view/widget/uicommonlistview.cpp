@@ -32,6 +32,7 @@
 #include "stringdefs.h"
 #include "dialogutils.h"
 #include "importtype.h"
+#include "viewutils.h"
 
 UICommonListView::UICommonListView(QWidget *parent):
     UITableView(parent),
@@ -76,12 +77,14 @@ QList<UITableMenuAction *> UICommonListView::getMenuCommonActions(const QMenu *m
     }
     if (err == ErrNone) {
         actionList = UITableView::getMenuCommonActions(menu);
+        bool appendSeparator = false;
         if (hasImportMenuItem()) {
             logd("add import menu item");
             actionList.append(UITableMenuAction::build(STR_IMPORT_FROM_FILE, this)
                               ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                   return this->onMenuActionImport(m, a);
                               }));
+            appendSeparator = true;
         }
         if (hasExportMenuItem()) {
             logd("add export menu item");
@@ -89,7 +92,9 @@ QList<UITableMenuAction *> UICommonListView::getMenuCommonActions(const QMenu *m
                               ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                   return this->onMenuActionExport(m, a);
                               }));
+            appendSeparator = true;
         }
+        if (appendSeparator) actionList.append(BUILD_MENU_SEPARATE);
     }
     traceout;
     return actionList;
@@ -219,18 +224,45 @@ QList<DbModel *> UICommonListView::getListDbModels()
 ErrCode UICommonListView::onLoad()
 {
     tracein;
-    RELEASE_LIST_DBMODEL(mItemList);
-    mItemList = getListDbModels();
-    clearFilter();
+    ErrCode err = ErrNone;
+    if (ready2FetchData()) {
+        RELEASE_LIST_DBMODEL(mItemList);
+        if (mFilterList.size() > 0) {
+            logd("Do filter");
+            foreach (FilterItem* item, this->mFilterList) {
+                logd("filter item %s", STR2CHA(item->item()));
+                if (item->item() == KItemStatus) {
+                    err = doFilter(FILTER_FIELD_MODEL_STATUS, FILTER_OP_EQUAL, item->value());
+                    // TODO: support only one filter, so found then break;
+                    // TODO: support more????
+                    break;
+                }
+            }
+            RELEASE_LIST(mFilterList, FilterItem);
+        } else {
+            logd("load all data");
+            mItemList = getListDbModels();
+            clearFilter();
+        }
+        err = ErrNone;
+    } else {
+        loge("not show, so not load data");
+        err = ErrNotReady;
+    }
     traceout;
-    return ErrNone;
+    return err;
 }
 
 ErrCode UICommonListView::onReload()
 {
     tracein;
     ErrCode err = ErrNone;
-    err = onLoad();
+    if (ready2FetchData()) {
+        err = onLoad();
+    } else {
+        loge("not show, so not reload data");
+        err = ErrNotReady;
+    }
     traceret(err);
     return err;
 }

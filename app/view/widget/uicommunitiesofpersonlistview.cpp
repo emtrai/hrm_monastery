@@ -56,6 +56,7 @@ UICommunitiesOfPersonListView::~UICommunitiesOfPersonListView()
 ErrCode UICommunitiesOfPersonListView::onAddItem(UITableCellWidgetItem *item)
 {
     tracein;
+    UNUSED(item);
     ErrCode err = ErrNone;
     DlgPersonCommunity* dlg = DlgPersonCommunity::build(this);
     const Person* per = person();
@@ -226,7 +227,7 @@ QList<DbModel *> UICommunitiesOfPersonListView::getListDbModels()
         }
     }
     if (err == ErrNone) {
-        logd("Load dept list of per '%s'", MODELSTR2CHA(per));
+        logd("Load comm list of per '%s'", MODELSTR2CHA(per));
 
         QList<CommunityPerson*> items;
         err = PERSONCTL->getListCommunityOfPerson(uid, items);

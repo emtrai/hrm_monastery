@@ -34,10 +34,10 @@
 #include "stringdefs.h"
 #include "communityperson.h"
 #include "dialogutils.h"
+#include "errreporterctl.h"
 
 UIPeopleInCommunityListView::UIPeopleInCommunityListView(QWidget *parent):
-    UICommonListView(parent),
-    mCommunity(nullptr)
+    UICommonListView(parent)
 {
     tracein;
 }
@@ -46,7 +46,6 @@ UIPeopleInCommunityListView::UIPeopleInCommunityListView(QWidget *parent):
 UIPeopleInCommunityListView::~UIPeopleInCommunityListView()
 {
     tracein;
-    FREE_PTR(mCommunity);
     traceout;
 }
 
@@ -192,6 +191,47 @@ ErrCode UIPeopleInCommunityListView::onAddItem(UITableCellWidgetItem *item)
     return err;
 }
 
+QList<DbModel *> UIPeopleInCommunityListView::getListDbModels()
+{
+    tracein;
+    ErrCode err = ErrNone;
+    QList<DbModel*> ret;
+    QString uid;
+    const Community* comm = community();
+    if (!comm) {
+        loge("No comm, nothing to load");
+        err = ErrNoData;
+    }
+
+    if (err == ErrNone) {
+        uid = comm->uid();
+        if (uid.isEmpty()) {
+            err = ErrInvalidData;
+            loge("Invalid comm info, uid is null, comm '%s'", MODELSTR2CHA(comm));
+        }
+    }
+    if (err == ErrNone) {
+        logd("Load people list of comm '%s'", MODELSTR2CHA(comm));
+
+//        QList<DbModel*> items;
+        err = COMMUNITYCTL->getListCommunityPerson(uid, ret);
+//        if (err == ErrNone && items.size() > 0) {
+//            foreach (CommunityPerson* item, items) {
+//                ret.append((DbModel*)item);
+//            }
+//        }
+    }
+
+    if (err != ErrNone) {
+        loge("Faild to get list item, err=%d", err);
+        REPORTERRCTL->reportErr(
+            tr("Lỗi truy vấn thông tin danh sách Nữ tu của Cộng đoàn"), err);
+    }
+
+    traceout;
+    return ret;
+}
+
 QList<UITableMenuAction *>
 UIPeopleInCommunityListView::getMenuMultiSelectedItemActions(const QMenu *menu,
                                                            const QList<UITableItem *>& items)
@@ -204,44 +244,39 @@ UIPeopleInCommunityListView::getMenuMultiSelectedItemActions(const QMenu *menu,
 
 }
 
-ErrCode UIPeopleInCommunityListView::onLoad()
-{
-    tracein;
-    ErrCode err = ErrNone;
-    if (mCommunity != nullptr) {
-        setTitle(getTitle());
-        logd("Load person list of community '%s'", STR2CHA(mCommunity->toString()));
-        QList<CommunityPerson*> items;
-        err = COMMUNITYCTL->getListCommunityPerson(mCommunity->uid(), items);
-        RELEASE_LIST_DBMODEL(mItemList);
-        foreach (CommunityPerson* per, items) {
-            mItemList.append((DbModel*)per); // TODO: convert it to Person????
-        }
-    } else {
-        loge("Nothing to load");
-    }
-    return err;
-}
+//ErrCode UIPeopleInCommunityListView::onLoad()
+//{
+//    tracein;
+//    ErrCode err = ErrNone;
+//    if (mCommunity != nullptr) {
+//        setTitle(getTitle());
+//        logd("Load person list of community '%s'", STR2CHA(mCommunity->toString()));
+//        QList<CommunityPerson*> items;
+//        err = COMMUNITYCTL->getListCommunityPerson(mCommunity->uid(), items);
+//        RELEASE_LIST_DBMODEL(mItemList);
+//        foreach (CommunityPerson* per, items) {
+//            mItemList.append((DbModel*)per); // TODO: convert it to Person????
+//        }
+//    } else {
+//        loge("Nothing to load");
+//    }
+//    return err;
+//}
 
 Community *UIPeopleInCommunityListView::community() const
 {
-    return mCommunity;
+    return (Community*) parentModel();
 }
 
-void UIPeopleInCommunityListView::setCommunity(const Community *newCommunity)
+ErrCode UIPeopleInCommunityListView::setCommunity(const Community *newCommunity)
 {
-    tracein;
-    if (mCommunity) {
-        logd("Delete old community");
-        delete mCommunity;
-        mCommunity = nullptr;
-    }
-    if (newCommunity) {
-        mCommunity = (Community*)((DbModel*)newCommunity)->clone();
-    } else {
-        loge("No community");
-    }
-    traceout;
+    traced;
+    return setParentModel(newCommunity);
+}
+
+QString UIPeopleInCommunityListView::getMainModelName()
+{
+    return KModelNameCommPerson;
 }
 
 ModelController *UIPeopleInCommunityListView::getController()
@@ -249,28 +284,35 @@ ModelController *UIPeopleInCommunityListView::getController()
     return COMMUNITYCTL;
 }
 
+DbModel *UIPeopleInCommunityListView::onCreateDbModelObj(const QString &modelName)
+{
+    UNUSED(modelName);
+    return CommunityPerson::build();
+}
+
 void UIPeopleInCommunityListView::initHeader()
 {
     tracein;
-    mHeader.append(tr("Mã"));
-    mHeader.append(tr("Tên Thánh"));
-    mHeader.append(tr("Họ tên"));
-    mHeader.append(tr("Năm sinh"));
-    mHeader.append(tr("Nơi sinh"));
-    mHeader.append(tr("Lớp khấn"));
-    mHeader.append(tr("Điện thoại"));
-    mHeader.append(tr("Email"));
-    mHeader.append(tr("Cộng đoàn hiện tại"));
+    mHeader.append(STR_PERSON_NAMEID);
+    mHeader.append(STR_HOLLYNAME);
+    mHeader.append(STR_FULLNAME);
+    mHeader.append(STR_BIRTHDAY);
+    mHeader.append(STR_BIRTHPLACE);
+    mHeader.append(STR_LOP_KHAN);
+    mHeader.append(STR_TEL);
+    mHeader.append(STR_EMAIL);
     mHeader.append(STR_STATUS);
     mHeader.append(STR_STARTDATE);
     mHeader.append(STR_ENDDATE);
+    mHeader.append(STR_CURRENT_COMMUNITY);
+    mHeader.append(STR_NOTE);
     traceout;
 }
 
 QString UIPeopleInCommunityListView::getTitle()
 {
-
-    return QString(tr("Danh sách nữ tu của cộng đoàn: %1")).arg(mCommunity?mCommunity->name():tr("Không rõ"));
+    Community* comm = community();
+    return QString(tr("Danh sách nữ tu của cộng đoàn: %1")).arg(comm?comm->name():tr("Không rõ"));
 }
 
 ErrCode UIPeopleInCommunityListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
@@ -302,9 +344,10 @@ ErrCode UIPeopleInCommunityListView::fillValueTableRowItem(DbModel *item, UITabl
         tblItem->addValue(per->tel().join(";"));
         tblItem->addValue(per->email().join(";"));
         tblItem->addValue(commper->modelStatusName());
-        tblItem->addValue(per->communityName());
         tblItem->addValue(DatetimeUtils::date2String(commper->startDate()));
         tblItem->addValue(DatetimeUtils::date2String(commper->endDate()));
+        tblItem->addValue(per->communityName());
+        tblItem->addValue(commper->remark());
     }
     logd("err = %d", err);
     // TODO: show dialog/report issue when invalid info?

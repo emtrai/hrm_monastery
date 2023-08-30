@@ -26,6 +26,7 @@
 #include "utils.h"
 #include "logger.h"
 #include "mainwindow.h"
+#include "stringdefs.h"
 
 void DialogUtils::showMsgBox(const QString &msg)
 {
@@ -33,9 +34,11 @@ void DialogUtils::showMsgBox(const QString &msg)
     QMessageBox msgBox;
     logd("Msg box %s", msg.toStdString().c_str());
     // TODO: title???
-    msgBox.setInformativeText(msg);
-    msgBox.setStandardButtons(QMessageBox::Close);
-    msgBox.exec();
+//    msgBox.setParent(MAINWIN);
+//    msgBox.setInformativeText(msg);
+//    msgBox.setStandardButtons(QMessageBox::Close);
+//    msgBox.exec();
+    QMessageBox::information(MAINWIN, STR_INFO, msg, QMessageBox::Close);
     traceout;
 }
 
@@ -43,7 +46,7 @@ void DialogUtils::showErrorBox(const QString &msg)
 {
     tracein;
     logd("Error box %s", msg.toStdString().c_str());
-    QMessageBox::critical(MAINWIN, "Lỗi", msg, QMessageBox::Close);
+    QMessageBox::critical(MAINWIN, STR_ERROR, msg, QMessageBox::Close);
 //    MAINWIN->showMsgDlg(msg);
     traceout;
 }

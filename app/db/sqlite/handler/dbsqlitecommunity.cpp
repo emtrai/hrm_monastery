@@ -227,10 +227,10 @@ QList<Person *> DbSqliteCommunity::getListPerson(const QString &commUid, int mod
     return list;
 }
 
-QList<CommunityPerson *> DbSqliteCommunity::getListCommunityPerson(const QString &commUid, int modelStatus, const QString *perStatusUid)
+QList<DbModel *> DbSqliteCommunity::getListCommunityPerson(const QString &commUid, int modelStatus, const QString *perStatusUid)
 {
     tracein;
-    QList<CommunityPerson *> list;
+    QList<DbModel *> list;
     logd("get list person of uid '%s'", STR2CHA(commUid));
     if(!commUid.isEmpty()) {
         // Get from commumity&person mapping table, how about community uid info in person tble??

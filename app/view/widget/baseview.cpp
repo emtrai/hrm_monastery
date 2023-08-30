@@ -27,7 +27,8 @@ BaseView::BaseView():
     mData(nullptr),
     mShowActionFunc(nullptr),
     mFreeFunc(nullptr),
-    mShowActionFuncRunOnce(false)
+    mShowActionFuncRunOnce(false),
+    mIsShown(false)
 {
     traced;
 }
@@ -60,4 +61,27 @@ void BaseView::setData(void *newData, FreeDataFunc_t freecb)
     mData = newData;
     mFreeFunc = freecb;
     traceout;
+}
+
+void BaseView::onStopped()
+{
+    logd("default implementation");
+    mIsShown = false;
+}
+
+void BaseView::onPaused()
+{
+    logd("default implementation");
+    mIsShown = false;
+}
+
+void BaseView::onShown()
+{
+    logd("default implementation");
+    mIsShown = true;
+}
+
+bool BaseView::ready2FetchData()
+{
+    return mIsShown;
 }

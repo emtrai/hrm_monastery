@@ -187,7 +187,7 @@ void MainWindow::showAddEditPerson(bool isSelfUpdate, Person *per, bool isNew)
     traceout;
 }
 
-void MainWindow::showAddEditCommunity(bool isSelfUpdate, Community *com, CommonEditModelListener* listener)
+void MainWindow::showAddEditCommunity(bool isSelfUpdate, const Community *com, CommonEditModelListener* listener)
 {
     tracein;
     getInstance()->doShowAddEditCommunity(isSelfUpdate, com, listener);
@@ -298,7 +298,8 @@ void MainWindow::showAddEditEthnic(bool isSelfUpdate, DbModel *com, CommonEditMo
 ErrCode MainWindow::exportListItems(const QList<DbModel *>* items,
                                     const QString& datatype,
                                     ModelController* controller,
-                                    const QString& title, quint64 exportTypeList)
+                                    const QString& title, quint64 exportTypeList,
+                                    QString* fpath)
 {
     tracein;
     ErrCode err = ErrNone;
@@ -388,6 +389,7 @@ void MainWindow::switchView(BaseView *nextView, bool fromStack)
         if (mCurrentView != nullptr) {
             logd("hide currentl widget");
             mCurrentView->getWidget()->hide();
+            mCurrentView->onPaused();
             ui->centralLayout->replaceWidget(mCurrentView->getWidget(), nextView->getWidget());
     //        ui->centralwidget->layout()->replaceWidget(mCurrentView, nextView);
             // TODO: make this as stack????
@@ -411,6 +413,7 @@ void MainWindow::switchView(BaseView *nextView, bool fromStack)
         }
         logd("show next");
         mCurrentView = nextView;
+        mCurrentView->onShown();
         mCurrentView->getWidget()->show();
     } else {
         logd("Same view!");
@@ -487,7 +490,7 @@ void MainWindow::doShowAddEditPerson(bool isSelfUpdate, Person *per, bool isNew)
     traceout;
 }
 
-void MainWindow::doShowAddEditCommunity(bool isSelfUpdate, Community *com, CommonEditModelListener* listener)
+void MainWindow::doShowAddEditCommunity(bool isSelfUpdate, const Community *com, CommonEditModelListener* listener)
 {
     tracein;
     logd("isSelfUpdate %d", isSelfUpdate);
@@ -716,7 +719,8 @@ ErrCode MainWindow::doExportListItems(const QList<DbModel *> *items,
                                       const QString& datatype,
                                       ModelController *controller,
                                       const QString& title,
-                                      quint64 exportTypeList)
+                                      quint64 exportTypeList,
+                                      QString* outFpath)
 {
     tracein;
     ErrCode err = ErrNone;
@@ -754,7 +758,11 @@ ErrCode MainWindow::doExportListItems(const QList<DbModel *> *items,
             err = controller->exportToFile(items, datatype, type, &fpath);
         } else {
             loge("Not selected type nor fpath");
+            err = ErrNotSelect;
         }
+    }
+    if (err == ErrNone && outFpath) {
+        *outFpath = fpath;
     }
     FREE_PTR(dlg);
     traceret(err);

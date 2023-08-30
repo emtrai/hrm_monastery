@@ -186,6 +186,7 @@ public:
     virtual ErrCode addFilter(const QString& filterItem, const QString& keyword, const QVariant& value);
 
     virtual QWidget* getWidget();
+    ErrCode doFilter(int field, int op, const QVariant& keyword);
 protected:
     virtual void sort(int column);
     /**

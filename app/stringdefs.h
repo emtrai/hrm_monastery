@@ -32,12 +32,15 @@
 #define STR_NO_DATA         QObject::tr("Không có dữ liệu")
 #define STR_INVALID_DATA     QObject::tr("Dữ liệu không hợp lệ")
 
+#define STR_BIRTHDAY        QObject::tr("Năm sinh")
+#define STR_BIRTHPLACE        QObject::tr("Nơi sinh")
 #define STR_CONTACT        QObject::tr("Liên hệ")
 #define STR_ADDR        QObject::tr("Địa chỉ")
 #define STR_TEL         QObject::tr("Điện thoại")
 #define STR_EMAIL       QObject::tr("Email")
 
 #define STR_COUNTRY     QObject::tr("Quốc gia")
+#define STR_CHURCH     QObject::tr("Giáo xứ")
 
 #define STR_STT         QObject::tr("STT")
 
@@ -51,6 +54,8 @@
 #define STR_NOTE        QObject::tr("Ghi chú")
 
 #define STR_COMMUNITY   QObject::tr("Cộng đoàn")
+#define STR_CURRENT_COMMUNITY   QObject::tr("Cộng đoàn hiện tại")
+#define STR_PARENT_COMMUNITY     QObject::tr("Cộng đoàn quản lý")
 #define STR_COMMUNITY_NAME   QObject::tr("Tên Cộng đoàn")
 #define STR_COMMUNITY_NAMEID   QObject::tr("Mã Cộng đoàn")
 #define STR_DEPARTMENT   QObject::tr("Phòng ban")
@@ -63,6 +68,7 @@
 #define STR_COURSE_ID      QObject::tr("Mã khóa")
 #define STR_TERM      QObject::tr("Nhiệm kỳ")
 #define STR_TERM_ID      QObject::tr("Mã nhiệm kỳ")
+#define STR_LOP_KHAN      QObject::tr("Lớp khấn")
 #define STR_MODELSTATUS QObject::tr("Tình trạng")
 #define STR_STATUS      QObject::tr("Trạng thái")
 #define STR_STATUS_ID      QObject::tr("Mã trạng thái")
@@ -71,6 +77,7 @@
 #define STR_ESTABLISHDATE        QObject::tr("Ngày thành lập")
 #define STR_STARTDATE        QObject::tr("Ngày bắt đầu")
 #define STR_ENDDATE     QObject::tr("Ngày kết thúc")
+#define STR_NGAY_BON_MANG     QObject::tr("Ngày bổn mạng")
 #define STR_EVENT     QObject::tr("Sự kiện")
 #define STR_TITLE     QObject::tr("Tiêu đề")
 #define STR_CHANGE_COMMUNITY     QObject::tr("Đổi cộng đoàn")
@@ -81,5 +88,18 @@
 #define STR_AREA     QObject::tr("Khu vực")
 #define STR_DATA_EXISTED     QObject::tr("Dữ liệu đã tồn tại")
 #define STR_DATA_ERROR     QObject::tr("Dữ liệu lỗi")
+
+
+#define STR_TONG_PHU_TRACH     QObject::tr("Tổng phụ trách")
+#define STR_NHIEM_VU_XA_HOI     QObject::tr("Nhiệm vụ xã hội")
+
+#define STR_ERR_EDIT_DATA     QObject::tr("Lỗi chỉnh sửa dữ liệu")
+#define STR_XUAT_DANH_SACH_NU_TU     QObject::tr("Xuất danh sách Nữ tu")
+#define STR_XUAT_DU_LIEU_THANH_CONG     QObject::tr("Xuất dữ liệu thành công")
+#define STR_XUAT_DU_LIEU_THANH_CONG_FILE     QObject::tr("Xuất dữ liệu thành công. Lưu tại %1")
+#define STR_INFO     QObject::tr("Thông tin")
+#define STR_ERROR     QObject::tr("Lỗi")
+#define STR_FAILED     QObject::tr("Thất bại")
+
 
 #endif // STRINGDEFS_H

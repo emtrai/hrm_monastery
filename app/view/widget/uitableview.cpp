@@ -31,6 +31,8 @@
 #include "dbmodel.h"
 #include "mainwindow.h"
 #include "dialogutils.h"
+#include "viewutils.h"
+#include "stringdefs.h"
 
 UITableView::UITableView(QWidget *parent) :
     QFrame(parent),
@@ -129,12 +131,13 @@ void UITableView::refesh()
 
 void UITableView::showEvent(QShowEvent *ev)
 {
-    QFrame::showEvent(ev);
     tracein;
+    QFrame::showEvent(ev);
 
     onLoad();
 
     onUpdatePage(1);
+    traceout;
 }
 
 void UITableView::onUpdatePage(qint32 page)
@@ -395,6 +398,7 @@ QList<UITableMenuAction *> UITableView::getMenuCommonActions(const QMenu* menu)
                                                                    ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                                        return this->onMenuActionReload(m, a);
                                                                    }));
+        actionList.append(BUILD_MENU_SEPARATE);
     }
     return actionList;
 }
@@ -488,6 +492,9 @@ ErrCode UITableView::onMenuActionEdit(QMenu *menu, UITableMenuAction *act)
     } else {
         loge("Menu action is null!!!");
         err = ErrInvalidData;
+    }
+    if (err != ErrNone) {
+        DialogUtils::showErrorBox(err, STR_ERR_EDIT_DATA);
     }
     // TODO: report error, show error dialog???
     return err;
@@ -622,6 +629,21 @@ QHash<QString, QString> UITableView::getFilterKeywords(int fieldId, const QStrin
     tracein;
     logi("Default one, nothing to do");
     return QHash<QString, QString>();
+}
+
+
+ErrCode UITableView::doFilter(int field, int op, const QVariant& keyword)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    logd("do filter field '%d', op '%d'", field, op);
+    logd("do filter keyword '%s'", STR2CHA(keyword.toString()));
+    Utils::setSelectItemComboxByData(ui->cbCategory, field);
+    Utils::setSelectItemComboxByData(ui->cbSearchOp, op);
+    Utils::setSelectItemComboxByData(ui->cbKeyword, keyword);
+    on_btnFilter_clicked();
+    traceret(err);
+    return err;
 }
 
 void UITableView::onHandleSignalDeleteDone(ErrCode err, QString msg)

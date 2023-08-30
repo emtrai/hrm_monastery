@@ -85,6 +85,10 @@ public:
      */
     void setData(void *newData, FreeDataFunc_t freecb = nullptr);
 
+    virtual void onStopped();
+    virtual void onPaused();
+    virtual void onShown();
+    virtual bool ready2FetchData();
 protected:
     /**
      * @brief view type \ref ViewType of view
@@ -96,7 +100,7 @@ protected:
     ActionFunc_t mShowActionFunc;// action to run when view show
     FreeDataFunc_t mFreeFunc;
     bool mShowActionFuncRunOnce; // TODO: support other mode? run once, run on resume, run on pause, etc.???
-
+    bool mIsShown; // should define more state, but for now, I'm lazy to do that, true/false is enough
 };
 
 #endif // BASEVIEW_H
