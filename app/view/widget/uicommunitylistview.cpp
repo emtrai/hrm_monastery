@@ -298,16 +298,19 @@ ErrCode UICommunityListView::exportListPeople(UITableMenuAction *act, bool activ
                                           STR_XUAT_DANH_SACH_NU_TU, EXPORT_XLSX, &fpath);
     }
 
+    // TODO: below process not work as expected
+    // dialog is shown then exist intermedately, check it returns 0, not standard button
+    // don't know why, need to investigate more...
     if (err == ErrNone) {
         logi("export data done");
         // TODO: look like this message box not shown correctly (auto close)
         // check it
         // FIXME: fix this, this dialog looks like close intermediately
         // cause by menu is closed?
-        DialogUtils::showMsgBox(QString(STR_XUAT_DU_LIEU_THANH_CONG_FILE).arg(fpath));
+//        DialogUtils::showMsgBox(QString(STR_XUAT_DU_LIEU_THANH_CONG_FILE).arg(fpath), this);
     } else {
         loge("export list person failed, error code %d",err);
-        DialogUtils::showErrorBox(err, QString("Xuất dữ liệu danh sách nữ tu trong cộng đoàn lỗi"));
+//        DialogUtils::showErrorBox(err, QString("Xuất dữ liệu danh sách nữ tu trong cộng đoàn lỗi"));
     }
 
     RELEASE_LIST_DBMODEL(items);
@@ -363,12 +366,14 @@ ErrCode UICommunityListView::onMenuActionListDepartment(QMenu *menu, UITableMenu
     }
 
     if (ret == ErrNone) {
-        logd("switch to view VIEW_COMMUNITY_DEPT, community '%s'",
-             MODELSTR2CHA(community));
         ret = view->setCommunity(community);
-        MAINWIN->switchView(view);
     }
 
+    if (ret == ErrNone) {
+        logd("switch to view VIEW_COMMUNITY_DEPT, community '%s'",
+             MODELSTR2CHA(community));
+        MAINWIN->switchView(view);
+    }
     traceret(ret);
     return ret;
 }

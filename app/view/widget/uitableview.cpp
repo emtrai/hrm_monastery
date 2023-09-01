@@ -43,6 +43,8 @@ UITableView::UITableView(QWidget *parent) :
     mSuspendReloadOnDbUpdate(false)
 {
     ui->setupUi(this);
+    // TODO: temporary disable/hide toolbox, till we have time to do
+    ui->frameToolbox->setVisible(false);
     ui->tblList->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->tblList->verticalHeader()->setVisible(false);
     ui->tblList->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);

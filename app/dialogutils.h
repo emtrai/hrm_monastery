@@ -31,7 +31,7 @@
 class DialogUtils
 {
 public:
-    static void showMsgBox(const QString& msg);
+    static void showMsgBox(const QString& msg, QWidget* parent = nullptr);
     static void showErrorBox(const QString& msg);
     static void showErrorBox(int ret, const QString& msg = nullptr);
     static bool showConfirmDialog(QWidget *parent, const QString& title,

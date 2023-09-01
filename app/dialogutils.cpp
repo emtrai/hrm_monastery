@@ -28,17 +28,18 @@
 #include "mainwindow.h"
 #include "stringdefs.h"
 
-void DialogUtils::showMsgBox(const QString &msg)
+void DialogUtils::showMsgBox(const QString &msg, QWidget* parent)
 {
     tracein;
-    QMessageBox msgBox;
+//    QMessageBox msgBox;
     logd("Msg box %s", msg.toStdString().c_str());
     // TODO: title???
-//    msgBox.setParent(MAINWIN);
+//    msgBox.setParent(parent?parent:MAINWIN);
 //    msgBox.setInformativeText(msg);
 //    msgBox.setStandardButtons(QMessageBox::Close);
 //    msgBox.exec();
-    QMessageBox::information(MAINWIN, STR_INFO, msg, QMessageBox::Close);
+    int ret = QMessageBox::information(MAINWIN, STR_INFO, msg, QMessageBox::Close);
+    logd("return %d", ret);
     traceout;
 }
 
