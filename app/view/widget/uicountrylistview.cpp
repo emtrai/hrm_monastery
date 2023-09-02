@@ -26,13 +26,16 @@
 #include <QList>
 #include "dbmodel.h"
 #include "utils.h"
-#include "mainwindow.h"
-#include "uitableviewfactory.h"
+#include "stringdefs.h"
+#include "filter.h"
 
 UICountryListView::UICountryListView(QWidget *parent):
     UICommonListView(parent)
 {
     tracein;
+    mHasImportMenu = false;
+    mHasExportMenu = false;
+    traceout;
 }
 
 UICountryListView::~UICountryListView()
@@ -47,10 +50,25 @@ ModelController *UICountryListView::getController()
 
 QString UICountryListView::getTitle()
 {
-    return tr("Quốc gia");
+    return STR_COUNTRY;
 }
 
 DbModel *UICountryListView::onCreateDbModelObj(const QString& modelName)
 {
+    UNUSED(modelName);
     return Country::build();
 }
+
+QString UICountryListView::getMainModelName()
+{
+    return KModelNameCountry;
+}
+
+void UICountryListView::initFilterFields()
+{
+    tracein;
+    // filter by  name
+    appendFilterField(FILTER_FIELD_NAME, STR_NAME);
+    traceout;
+}
+

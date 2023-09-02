@@ -74,6 +74,23 @@ DbModelBuilder DbModelFactory::getBuilder(const QString &modelName)
 #include "specialist.h"
 #include "communitydept.h"
 #include "communityperson.h"
+#include "country.h"
+#include "course.h"
+#include "department.h"
+#include "education.h"
+#include "ethnic.h"
+#include "event.h"
+#include "mission.h"
+#include "persondept.h"
+#include "personevent.h"
+#include "personstatus.h"
+#include "role.h"
+#include "saint.h"
+#include "saintperson.h"
+#include "specialist.h"
+#include "specialistperson.h"
+#include "work.h"
+
 void DbModelFactory::addBuilders()
 {
     tracein;
@@ -84,6 +101,21 @@ void DbModelFactory::addBuilders()
     _addBuilder(KModelNameCommunity, &Community::build);
     _addBuilder(KModelNameCommDept, &CommunityDept::build);
     _addBuilder(KModelNameCommPerson, &CommunityPerson::build);
+    _addBuilder(KModelNameCountry, &Country::build);
+    _addBuilder(KModelNameDepartment, &Department::build);
+    _addBuilder(KModelNameEducation, &Education::build);
+    _addBuilder(KModelNameEthnic, &Ethnic::build);
+    _addBuilder(KModelNameEvent, &Event::build);
+    _addBuilder(KModelNameMission, &Mission::build);
+    _addBuilder(KModelNamePersonDept, &PersonDept::build);
+    _addBuilder(KModelNamePersonEvent, &PersonEvent::build);
+    _addBuilder(KModelNamePersonStatus, &PersonStatus::build);
+    _addBuilder(KModelNameRole, &Role::build);
+    _addBuilder(KModelNameSaint, &Saint::build);
+    _addBuilder(KModelNameSaintPerson, &SaintPerson::build);
+    _addBuilder(KModelNameSpecialist, &Specialist::build);
+    _addBuilder(KModelNameSpecialistPerson, &SpecialistPerson::build);
+    _addBuilder(KModelNameWork, &Work::build);
 
     traceout;
 }

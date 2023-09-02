@@ -21,23 +21,74 @@
  */
 #include "dbsqlitecourse.h"
 #include "logger.h"
-#include "defs.h"
 #include "course.h"
 #include "dbsqlitedefs.h"
 #include "dbsqlite.h"
+#include "persondept.h"
+#include "areaperson.h"
 
 GET_INSTANCE_IMPL(DbSqliteCourse)
 
 
-DbSqliteCourse::DbSqliteCourse()
+DbSqliteCourse::DbSqliteCourse():DbSqliteModelHandler(KModelHdlCourse)
 {
     tracein;
 }
 
-const QString DbSqliteCourse::getName()
+ErrCode DbSqliteCourse::deleteHard(DbModel *model, bool force, QString *msg)
 {
-    return KModelHdlCourse;
+    tracein;
+    ErrCode err = ErrNone;
+    if (!model) {
+        err = ErrInvalidArg;
+        loge("Invalid model");
+    }
+
+    if (err == ErrNone) {
+        logi("Delete hard model '%s', force %d", MODELSTR2CHA(model), force);
+
+        if (model->modelName() == KModelNameCourse) {
+            // KFieldAreaUid delete map, community, person
+            QHash<QString, QString> itemToSearch; // for searching
+            QHash<QString, QString> itemToSet; // for update
+            bool errDependency = false;
+
+            itemToSearch.insert(KFieldCourseUid, model->uid());
+            itemToSet.insert(KFieldCourseUid, ""); // update to null/empty
+
+            CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency,
+                                       msg, force,
+                                       itemToSearch, itemToSet,
+                                       KTablePerson, &Person::build);
+
+            if (err == ErrNone && !errDependency) {
+                CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency,
+                                           msg, force,
+                                           itemToSearch, itemToSet,
+                                           KTableCommDepartPerson, &PersonDept::build);
+            }
+
+            if (err == ErrNone && !errDependency) {
+                CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency,
+                                           msg, force,
+                                           itemToSearch, itemToSet,
+                                           KTableAreaPerson, &AreaPerson::build);
+            }
+
+            if (errDependency) {
+                err = ErrDependency;
+                loge("cannot delete, has dependency '%s'", msg?STR2CHA((*msg)):"");
+            } else {
+                logi("Delete model '%s'", MODELSTR2CHA(model));
+                err = DbSqliteModelHandler::deleteHard(model, force, msg);
+            }
+        }
+    }
+    traceret(err);
+    return err;
+
 }
+
 
 DbSqliteTbl *DbSqliteCourse::getMainTbl()
 {

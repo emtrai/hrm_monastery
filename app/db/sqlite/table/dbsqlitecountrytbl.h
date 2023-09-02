@@ -23,7 +23,6 @@
 #define DBSQLITECOUNTRYTBL_H
 
 #include "dbsqlitetbl.h"
-#include "errcode.h"
 
 class DbSqlite;
 

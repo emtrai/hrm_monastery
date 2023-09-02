@@ -244,7 +244,7 @@ ErrCode DbSqlitePerson::deleteHard(DbModel *model, bool force, QString* msg)
     }
 
     if (err == ErrNone) {
-        logd("Delete hard model '%s', force %d", STR2CHA(model->toString()), force);
+        logi("Delete hard model '%s', force %d", STR2CHA(model->toString()), force);
 
         if (model->modelName() == KModelNamePerson){
             // KFieldAreaUid delete map, community, person

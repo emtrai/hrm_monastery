@@ -103,6 +103,7 @@ const char* const KItemRetirePlace = "NOI_NGHI_HUU";
 const char* const KItemDeadDate = "NGAY_MAT";
 const char* const KItemDeadPlace = "NOI_CHON_CAT";
 const char* const KItemCountry = "QUOC_GIA";
+const char* const KItemCountryUid = "UID_QUOC_GIA";
 const char* const KItemCountryNameId = "MA_QUOC_GIA";
 const char* const KItemProvince = "TINH_TP";
 const char* const KItemAddress = "DIA_CHI";

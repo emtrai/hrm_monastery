@@ -299,6 +299,7 @@ QHash<QString, QString> UICommonListView::getFilterKeywords(int fieldId,
         break;
     case FILTER_FIELD_COURSE:
         modelList = COURSECTL->getAllItems();
+        // TODO: support "unknown" item???
         break;
     case FILTER_FIELD_WORK:
         modelList = WORKCTL->getAllItems();

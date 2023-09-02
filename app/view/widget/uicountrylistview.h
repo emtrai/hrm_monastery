@@ -35,6 +35,10 @@ protected:
     virtual ModelController* getController();
     virtual QString getTitle();
     virtual DbModel* onCreateDbModelObj(const QString& modelName);
+    virtual QString getMainModelName();
+
+    virtual void initFilterFields();
+
 };
 
 #endif // UICOUNTRYLISTVIEW_H

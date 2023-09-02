@@ -43,6 +43,7 @@ const char* const KModelHdlPersonEvent = "modelhdl@person_event";
 const char* const KModelHdlEvent = "modelhdl@event";
 
 const char* const KModelNamePerson = "model@person";
+const char* const KModelNameCountry = "model@country";
 const char* const KModelNameArea = "model@area";
 const char* const KModelNamePersonEvent = "model@person_event";
 const char* const KModelNameSaintPerson = "model@saint_person";
@@ -62,8 +63,14 @@ const char* const KModelNameSaint = "model@saint";
 const char* const KModelNameCourse = "model@course";
 const char* const KModelNameEthnic = "model@ethnic"; // dan toc
 const char* const KModelNameEvent = "model@event"; // su kien
+const char* const KModelNameEducation = "model@education"; //
+const char* const KModelNameMission = "model@mission"; //
+const char* const KModelNamePersonStatus = "model@person_status"; //
+const char* const KModelNameWork = "model@work"; //
 
 const char* const KModelNameIdNone = "KHONG";
 const char* const KModelNameIdNone2 = "VN_KHONG";
 
+const char* const KUidNone = "";
+const char* const KNameIdUnkown = "KHONG_XAC_DINH";
 #endif // MODELDEFS_H

@@ -948,11 +948,11 @@ ErrCode DbSqliteTbl::updateQueryromFields(const QHash<QString, QString>& inField
     }
     if (err == ErrNone) {
         foreach (QString field, inFields.keys()) {
-            if (!cond.isEmpty()) {
-                cond += isMatchAllField?" AND ":" OR ";
-            }
             err = getDataType(field, datatype);
             if (err == ErrNone) {
+                if (!cond.isEmpty()) {
+                    cond += isMatchAllField?" AND ":" OR ";
+                }
                 logd("field '%s' data type %d", STR2CHA(field), datatype);
                 if (datatype == TEXT) {
                     cond += QString("lower(%1) = :%1_TEXT").arg(field);
@@ -960,8 +960,14 @@ ErrCode DbSqliteTbl::updateQueryromFields(const QHash<QString, QString>& inField
                     cond += QString("%1 = :%1_INT").arg(field);
                 }
             } else {
-                loge("get data type for field '%s' failed, err=%d", STR2CHA(field), err);
-                break;
+                if (!isMatchAllField && (err == ErrNotExist)) {
+                    err = ErrNone;
+                    logi("field '%s' not exist, but don't need to match all field here so just skip it",
+                         STR2CHA(field));
+                } else {
+                    loge("get data type for field '%s' failed, err=%d", STR2CHA(field), err);
+                    break;
+                }
             }
         }
     }
@@ -996,8 +1002,14 @@ ErrCode DbSqliteTbl::updateQueryromFields(const QHash<QString, QString>& inField
                     }
                 }
             } else {
-                loge("get data type for field '%s' failed, err=%d", STR2CHA(field), err);
-                break;
+                if (!isMatchAllField && (err == ErrNotExist)) {
+                    err = ErrNone;
+                    logi("field '%s' not exist, but don't need to match all field here so just skip it",
+                         STR2CHA(field));
+                } else {
+                    loge("get data type for field '%s' failed, err=%d", STR2CHA(field), err);
+                    break;
+                }
             }
         }
     }

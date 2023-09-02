@@ -173,6 +173,7 @@ ErrCode UIPersonListView::fillValueTableRowItem(DbModel *item, UITableItem *tblI
             tblItem->addValue(per->nameId());
             tblItem->addValue(per->hollyName());
             tblItem->addValue(per->getFullName());
+            tblItem->addValue(per->courseName());
             tblItem->addValue(per->communityName());
             tblItem->addValue(DatetimeUtils::date2String(per->birthday()));
             tblItem->addValue(per->birthPlace());
@@ -204,6 +205,7 @@ void UIPersonListView::initHeader()
     mHeader.append(tr("Mã"));
     mHeader.append(tr("Tên Thánh"));
     mHeader.append(tr("Họ tên"));
+    mHeader.append(STR_COURSE);
     mHeader.append(tr("Cộng đoàn"));
     mHeader.append(tr("Năm sinh"));
     mHeader.append(tr("Nơi sinh"));

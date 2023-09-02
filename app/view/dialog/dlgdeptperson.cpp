@@ -30,6 +30,8 @@
 #include "coursectl.h"
 #include "rolectl.h"
 #include "dialog/dlgsearchperson.h"
+#include "stringdefs.h"
+#include "modeldefs.h"
 
 DlgDeptPerson::DlgDeptPerson(QWidget *parent) :
     DlgCommonEditModel(parent),
@@ -131,7 +133,8 @@ void DlgDeptPerson::loadCourse()
 {
     tracein;
     ui->cbTerm->clear();
-    QList<DbModel*> listCourse = COURSECTL->getAllItemsFromDb(); // TODO: should call getAllItem???
+    QList<DbModel*> listCourse = COURSECTL->getAllItems(); // TODO: should call getAllItem???
+    ui->cbTerm->addItem(STR_UNKNOWN, KUidNone);
     foreach(DbModel* item, listCourse){
         ui->cbTerm->addItem(item->name(), item->uid());
     }

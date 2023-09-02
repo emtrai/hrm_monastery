@@ -289,7 +289,7 @@ ErrCode UITableView::onDeleteItem(const QList<UITableItem *>& selectedItems)
                     traceout;
                    return nullptr;
                },
-                [this, cnt](ErrCode err, void* data, void* result, DlgWait* dlg) {
+                [this, &cnt](ErrCode err, void* data, void* result, DlgWait* dlg) {
                     traced;
                     logd("delete result %d", err);
                     QString errMsg;

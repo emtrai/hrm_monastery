@@ -139,7 +139,7 @@ qint64 Saint::feastDay() const
 
 void Saint::setFeastDay(qint64 newFeastDay)
 {
-    mFeastDay = newFeastDay;
+    CHECK_MODIFIED_THEN_SET(mFeastDay, newFeastDay, KItemFeastDay);
 }
 
 void Saint::setFeastDay(const QString &newFeastDay, const QString& f)
@@ -154,12 +154,12 @@ Gender Saint::gender() const
 
 void Saint::setGender(Gender newGender)
 {
-    mGender = newGender;
+    CHECK_MODIFIED_THEN_SET(mGender, newGender, KItemGender);
 }
 
 void Saint::setGender(const QString &gender)
 {
-    mGender = Utils::genderFromString(gender);
+    setGender(Utils::genderFromString(gender));
 }
 
 const QString &Saint::country() const
@@ -169,7 +169,7 @@ const QString &Saint::country() const
 
 void Saint::setCountry(const QString &newCountry)
 {
-    mCountry = newCountry;
+    CHECK_MODIFIED_THEN_SET(mCountry, newCountry, KItemCountry);
 }
 
 const QString &Saint::fullName() const
@@ -179,7 +179,7 @@ const QString &Saint::fullName() const
 
 void Saint::setFullName(const QString &newFullName)
 {
-    mFullName = newFullName;
+    CHECK_MODIFIED_THEN_SET(mFullName, newFullName, KItemFullName);
 }
 
 void Saint::dump()
@@ -221,7 +221,7 @@ const QString &Saint::originName() const
 
 void Saint::setOriginName(const QString &newOriginName)
 {
-    mOriginName = newOriginName;
+    CHECK_MODIFIED_THEN_SET(mOriginName, newOriginName, KItemOriginName);
 }
 
 const QString &Saint::countryUid() const
@@ -231,7 +231,7 @@ const QString &Saint::countryUid() const
 
 void Saint::setCountryUid(const QString &newCountryUid)
 {
-    mCountryUid = newCountryUid;
+    CHECK_MODIFIED_THEN_SET(mCountryUid, newCountryUid, KItemCountryUid);
 }
 
 //bool Saint::isValid()

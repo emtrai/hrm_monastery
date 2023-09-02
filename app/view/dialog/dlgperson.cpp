@@ -79,6 +79,7 @@
 #include "image.h"
 #include "imagedefs.h"
 #include "dialogutils.h"
+#include "modeldefs.h"
 
 #define SPLIT_EMAIL_PHONE ";"
 
@@ -87,7 +88,6 @@
 
 const char* const KUiMultiComboxNameSaint = "saint";
 const char* const KUiMultiComboxNameSpecialist = "specialist";
-const char* const KUidNone = "";
 
 DlgPerson::DlgPerson(QWidget *parent) :
     QDialog(parent),
@@ -906,8 +906,8 @@ void DlgPerson::loadCourse()
 {
     tracein;
     ui->cbCourse->clear();
-    QList<DbModel*> listCourse = COURSECTL->getAllItemsFromDb(); // TODO: should call getAllItem???
-    ui->cbCourse->addItem(tr("Không rõ"), KUidNone);
+    QList<DbModel*> listCourse = COURSECTL->getAllItems(); // TODO: should call getAllItem???
+    ui->cbCourse->addItem(STR_UNKNOWN, KUidNone);
     foreach(DbModel* item, listCourse){
         ui->cbCourse->addItem(item->name(), item->uid());
     }
@@ -1000,6 +1000,7 @@ void DlgPerson::on_btnEditNation_clicked()
 
     }
     delete dlg;
+    traceout;
 }
 
 
@@ -1194,6 +1195,7 @@ void DlgPerson::on_btnAddCountry_clicked()
         loadCountry();
     }
     delete dlg;
+    traceout;
 }
 
 

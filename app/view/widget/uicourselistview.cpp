@@ -30,27 +30,22 @@
 #include "utils.h"
 #include "datetimeutils.h"
 #include "mainwindow.h"
-#include "uitableviewfactory.h"
 #include "coursectl.h"
-#include "dialogutils.h"
+#include "stringdefs.h"
+
 
 UICourseListView::UICourseListView(QWidget *parent):
     UICommonListView(parent)
 {
     tracein;
+    mHasImportMenu = false;
+    mHasExportMenu = false;
+    traceout;
 }
 
 UICourseListView::~UICourseListView()
 {
     tracein;
-}
-
-void UICourseListView::setupUI()
-{
-    tracein;
-    UITableView::setupUI();
-    COURSECTL->addListener(this);
-    traceout;
 }
 
 QString UICourseListView::getTitle()
@@ -60,12 +55,27 @@ QString UICourseListView::getTitle()
 
 DbModel *UICourseListView::onCreateDbModelObj(const QString& modelName)
 {
+    UNUSED(modelName);
     return Course::build();
+}
+
+QString UICourseListView::getMainModelName()
+{
+    return KModelNameCourse;
+}
+
+void UICourseListView::initFilterFields()
+{
+    tracein;
+    // filter by  name
+    appendFilterField(FILTER_FIELD_NAME, STR_NAME);
+    traceout;
 }
 
 ErrCode UICourseListView::onAddItem(UITableCellWidgetItem *item)
 {
     tracein;
+    UNUSED(item);
     MainWindow::showAddEditCourse(true, nullptr, this);
     traceout;
     return ErrNone;
@@ -90,32 +100,9 @@ ErrCode UICourseListView::onEditItem(UITableCellWidgetItem *item)
     return err;
 }
 
-ErrCode UICourseListView::onDeleteItem(const QList<UITableItem *> &selectedItems)
-{
-    tracein;
-    UNDER_DEV(tr("Xóa dữ liệu..."));
-    traceout;
-    return ErrNotImpl;
-}
-
-ErrCode UICourseListView::onViewItem(UITableCellWidgetItem *item)
-{
-    tracein;
-    int idx = item->idx();
-    DbModel* comm = item->itemData();
-    if (comm) {
-        MainWindow::showOnHtmlViewer(comm, tr("Khóa/Nhiệm Kỳ/Lớp Khấn"));
-    } else {
-        loge("Model obj is null");
-        DialogUtils::showErrorBox("Không có thông tin để xem");
-    }
-    traceout;
-    return ErrNone;//TODO: check return value
-}
-
 QList<DbModel *> UICourseListView::getListDbModels()
 {
-    return COURSECTL->getAllItems();;
+    return COURSECTL->getAllItems(true);
 }
 
 ModelController *UICourseListView::getController()
@@ -126,19 +113,20 @@ ModelController *UICourseListView::getController()
 void UICourseListView::initHeader()
 {
     tracein;
-    mHeader.append(tr("Tên định danh"));
-    mHeader.append(tr("Tên"));
-    mHeader.append(tr("Loại"));
-    mHeader.append(tr("Khóa"));
-    mHeader.append(tr("Ngày bắt đầu"));
-    mHeader.append(tr("Ngày kết thúc đầu"));
-    mHeader.append(tr("Ghi chú"));
+    mHeader.append(STR_NAMEID);
+    mHeader.append(STR_NAME);
+    mHeader.append(STR_TYPE);
+    mHeader.append(STR_COURSE);
+    mHeader.append(STR_STARTDATE);
+    mHeader.append(STR_ENDDATE);
+    mHeader.append(STR_NOTE);
     traceout;
 }
 
 ErrCode UICourseListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
+    UNUSED(idx);
     ErrCode err = ErrNone;
     if (!item || !tblItem) {
         loge("invalid argument");

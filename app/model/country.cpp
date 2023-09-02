@@ -50,6 +50,11 @@ DbModelBuilder Country::getBuilder() const
     return &Country::build;
 }
 
+QString Country::modelName() const
+{
+    return KModelNameCountry;
+}
+
 
 DbModelHandler *Country::getDbModelHandler() const
 {

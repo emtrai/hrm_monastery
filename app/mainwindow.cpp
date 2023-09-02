@@ -870,7 +870,7 @@ void MainWindow::loadOtherMenu()
     ADD_ACTION_ITEM(otherMenu,
                     on_actionCountry_triggered,
                     "Quốc gia",
-                    ICON_PATH("icons8-catholic-64"));
+                    ICON_PATH("icons8-vietnam-96"));
 
 
 #ifndef SKIP_PERSON_PROVINE

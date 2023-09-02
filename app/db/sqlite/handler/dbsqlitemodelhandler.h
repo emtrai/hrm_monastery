@@ -27,12 +27,18 @@
 #include "errcode.h"
 #include "dbmodel.h"
 
-
-#define CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency, msg, force, itemToSearch, itemToSet, tableName, builder) \
+/**
+ * Check to remove/clear data
+ */
+#define CHECK_REMOVE_TO_CLEAR_DATA( err, errDependency, \
+                                    msg, force, \
+                                    itemToSearch, itemToSet, \
+                                    tableName, builder) \
 do { \
     QList<DbModel*> list; \
     int count = 0; \
-    logd("Check to delete table %s", tableName); \
+    ErrCode tmpErr = ErrNone; \
+    logi("Check to delete on table %s", tableName); \
     err = getListItems(itemToSearch, tableName, false, &count, &list, builder); \
     if (err == ErrNone && count > 0) { \
         if (!force) { \
@@ -40,11 +46,13 @@ do { \
             if (msg) *msg += QString("'%1' existed in %2.").arg(model->name(), tableName); \
         } else { \
             foreach (DbModel* model, list) { \
-                logd("force Update '%s'", STR2CHA(model->toString())); \
+                logi("force Update '%s'", STR2CHA(model->toString())); \
                 tmpErr = update(model, itemToSet, tableName); \
-                logd("Update result=%d", tmpErr); \
+                logi("Update result=%d", tmpErr); \
             } \
         } \
+    } else { \
+        logi("get list item for tbl '%s' failed (err=%d) or no data", tableName, err); \
     } \
     RELEASE_LIST_DBMODEL(list); \
 } while(0)

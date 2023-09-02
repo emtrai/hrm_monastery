@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>340</height>
+    <height>429</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,58 +30,6 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Khoá/Nhiệm kỳ</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QLineEdit" name="txtPeriod">
-       <property name="placeholderText">
-        <string>vd: 2002-2006</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>Ngày bắt đầu</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QLineEdit" name="txtStartDate">
-       <property name="placeholderText">
-        <string>ngày/tháng/năm, vd: 29/02/2002</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0">
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>Ngày kết thúc</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="QLineEdit" name="txtEndDate">
-       <property name="placeholderText">
-        <string>ngày/tháng/năm, vd: 29/02/2002</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="0">
-      <widget class="QLabel" name="label_5">
-       <property name="text">
-        <string>Ghi chú</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="1">
-      <widget class="QTextEdit" name="txtRemark"/>
-     </item>
      <item row="1" column="0">
       <widget class="QLabel" name="label_6">
        <property name="text">
@@ -90,7 +38,7 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <layout class="QHBoxLayout" name="horizontalLayout">
+      <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
        <item>
         <widget class="QLineEdit" name="txtNameId">
          <property name="enabled">
@@ -110,15 +58,81 @@
        </item>
       </layout>
      </item>
-     <item row="2" column="1">
-      <widget class="QComboBox" name="cbCourseType"/>
-     </item>
      <item row="2" column="0">
       <widget class="QLabel" name="label_7">
        <property name="text">
         <string>Loại</string>
        </property>
       </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QComboBox" name="cbCourseType"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Khoá/Nhiệm kỳ</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="txtPeriod">
+       <property name="placeholderText">
+        <string>vd: 2002-2006</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLabel" name="label_8">
+       <property name="text">
+        <string>vd: 3/2022-12/2023</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Ngày bắt đầu</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QLineEdit" name="txtStartDate">
+       <property name="placeholderText">
+        <string>ngày/tháng/năm, vd: 29/02/2002</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Ngày kết thúc</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QLineEdit" name="txtEndDate">
+       <property name="placeholderText">
+        <string>ngày/tháng/năm, vd: 29/02/2002</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="QLabel" name="label_9">
+       <property name="text">
+        <string>vd 28/02/2022</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="0">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>Ghi chú</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="1">
+      <widget class="QTextEdit" name="txtRemark"/>
      </item>
     </layout>
    </item>

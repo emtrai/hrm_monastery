@@ -29,20 +29,19 @@ class UICourseListView : public UICommonListView
 public:
     explicit UICourseListView(QWidget *parent = nullptr);
     virtual ~UICourseListView();
-    virtual void setupUI();
-protected:
-
-    virtual QString getTitle();
-    virtual DbModel* onCreateDbModelObj(const QString& modelName);
-    virtual ErrCode onAddItem(UITableCellWidgetItem *item);
-    virtual ErrCode onEditItem(UITableCellWidgetItem *item);
-    virtual ErrCode onDeleteItem(const QList<UITableItem *>& selectedItems);
-    virtual ErrCode onViewItem(UITableCellWidgetItem *item);
 protected:
 
     virtual int getViewType() { return VIEW_COURSE;}
-    virtual QList<DbModel*> getListDbModels();
+    virtual QString getTitle();
     virtual ModelController* getController();
+    virtual DbModel* onCreateDbModelObj(const QString& modelName);
+    virtual QString getMainModelName();
+
+    virtual void initFilterFields();
+
+    virtual ErrCode onAddItem(UITableCellWidgetItem *item);
+    virtual ErrCode onEditItem(UITableCellWidgetItem *item);
+    virtual QList<DbModel*> getListDbModels();
     virtual void initHeader();
     virtual ErrCode fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
 };

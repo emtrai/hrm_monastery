@@ -32,7 +32,7 @@ class DbSqliteCourse : public DbSqliteModelHandler
     GET_INSTANCE_DECL(DbSqliteCourse)
 public:
     DbSqliteCourse();
-    virtual const QString getName();
+    virtual ErrCode deleteHard(DbModel* model, bool force = false, QString* msg = nullptr);
 protected:
     virtual DbSqliteTbl* getMainTbl();
     virtual DbModelBuilder getMainBuilder();

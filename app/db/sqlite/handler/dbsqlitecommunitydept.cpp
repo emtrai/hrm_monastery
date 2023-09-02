@@ -34,7 +34,7 @@ GET_INSTANCE_IMPL(DbSqliteCommunityDept);
 
 DbSqliteCommunityDept::DbSqliteCommunityDept():DbSqliteModelHandler(KModelHdlCommDept)
 {
-    tracein;
+    traced;
 }
 
 DbSqliteTbl *DbSqliteCommunityDept::getMainTbl()

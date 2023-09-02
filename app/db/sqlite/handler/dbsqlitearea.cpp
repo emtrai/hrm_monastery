@@ -132,7 +132,7 @@ ErrCode DbSqliteArea::deleteHard(DbModel *model, bool force, QString *msg)
     }
 
     if (err == ErrNone) {
-        logd("Delete hard model '%s', force %d", STR2CHA(model->toString()), force);
+        logi("Delete hard model '%s', force %d", STR2CHA(model->toString()), force);
 
         if (model->modelName() == KModelNameAreaPerson) {
             err = DbSqliteModelHandler::deleteHard(model, force, msg);
@@ -154,7 +154,7 @@ ErrCode DbSqliteArea::deleteHardArea(DbModel *model, bool force, QString *msg)
     }
 
     if (err == ErrNone) {
-        logd("Delete hard model '%s', force %d", STR2CHA(model->toString()), force);
+        logi("Delete hard model '%s', force %d", STR2CHA(model->toString()), force);
 
         // KFieldAreaUid delete map, community, person
         QHash<QString, QString> itemToSearch; // for searching

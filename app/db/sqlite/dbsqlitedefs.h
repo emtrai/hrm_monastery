@@ -124,6 +124,7 @@ const char* const KFieldChristenPlace = "christen_place";
 const char* const KFieldEucharistDate = "eucharist_date"; // bi tich thanh the
 const char* const KFieldEucharistPlace = "eucharist_place";
 const char* const KFieldCourseUid = "course_uid";
+const char* const KFieldCourseDbId = "course_dbid";
 const char* const KFieldCourseName = "course_name";
 const char* const KFieldCourseNameId = "course_nameid";
 const char* const KFieldChurchAddr = "church_addr";

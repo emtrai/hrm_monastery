@@ -101,5 +101,7 @@
 #define STR_ERROR     QObject::tr("Lỗi")
 #define STR_FAILED     QObject::tr("Thất bại")
 
+#define STR_TYPE     QObject::tr("Loại")
+
 
 #endif // STRINGDEFS_H

@@ -28,11 +28,16 @@
 #include "dbsqlitetablebuilder.h"
 #include "saint.h"
 #include "dbsqliteinsertbuilder.h"
+#include "dbsqliteupdatebuilder.h"
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QHash>
 
-const qint32 DbSqliteSaintTbl::KVersionCode = VERSION_CODE(0,0,1);
+#define VERSION_CODE_1 VERSION_CODE(0,0,1)
+#define VERSION_CODE_2 VERSION_CODE(0,0,2)
+
+const qint32 DbSqliteSaintTbl::KVersionCode = VERSION_CODE_2;
+
 
 DbSqliteSaintTbl::DbSqliteSaintTbl(DbSqlite* db)
     : DbSqliteTbl(db, KTableSaint, KTableSaint, KVersionCode)
@@ -61,6 +66,7 @@ ErrCode DbSqliteSaintTbl::insertTableField(DbSqliteInsertBuilder *builder, const
     builder->addValue(KFieldGender, saint->gender());
     builder->addValue(KFieldFeastDay, saint->feastDay());
     builder->addValue(KFieldCountry, saint->country());
+    builder->addValue(KFieldCountryUid, saint->countryUid());
     traceout;
     return ErrNone;
 }
@@ -76,6 +82,9 @@ ErrCode DbSqliteSaintTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQu
     saint->setGender((Gender)qry.value(KFieldGender).toInt());
     saint->setFeastDay(qry.value(KFieldFeastDay).toInt());
     saint->setCountry(qry.value(KFieldCountry).toString());
+    if (qry.value(KFieldCountryUid).isValid()) {
+        saint->setCountryUid(qry.value(KFieldCountryUid).toString());
+    }
     traceout;
     return err;
 }
@@ -107,5 +116,73 @@ ErrCode DbSqliteSaintTbl::search(const QString &keyword, QList<DbModel *> *outLi
 {
     tracein;
     return DbSqliteTbl::search(keyword, &Saint::build, outList, dbStatus, from, noItems, total);
+}
+
+ErrCode DbSqliteSaintTbl::onTblMigration(qint64 oldVer)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    logi("tbl '%s' version upgrade, from version 0x%llx to 0x%x",
+         STR2CHA(mName), oldVer, mVersionCode);
+    switch (oldVer) {
+    case VERSION_CODE_1:
+    {
+        QHash<QString, TableFieldDatatype_t> columnField;
+        // From version 0.0.2
+        columnField.insert(KFieldCountryUid, TEXT);
+        err = addTableColumn(columnField);
+    }
+    break;
+    default:
+        logi("skip upgrading from version 0x%llx to 0x%x",
+             oldVer, mVersionCode);
+        break;
+    };
+    traceret(err);
+    return err;
+}
+
+ErrCode DbSqliteSaintTbl::updateBuilderFieldFromModel(DbSqliteUpdateBuilder *builder, const QString &field, const DbModel *item)
+{
+
+    tracein;
+    ErrCode err = ErrNone;
+    logd("update table field '%s' for model '%s'", STR2CHA(field), MODELSTR2CHA(item));
+    if (!builder || !item || field.isEmpty()) {
+        err = ErrInvalidArg;
+        loge("invalid arg");
+    }
+    if (err == ErrNone) {
+        if (item->modelName() == KModelNameSaint) {
+            Saint* comm = (Saint*) item;
+            if (field == KItemFeastDay) {
+                builder->addValue(KFieldFeastDay, comm->feastDay());
+
+            } else if (field == KItemCountryUid) {
+                builder->addValue(KFieldCountryUid, comm->countryUid());
+
+            } else if (field == KItemGender) {
+                builder->addValue(KFieldGender, comm->gender());
+
+            } else if (field == KItemFullName) {
+                builder->addValue(KFieldFullName, comm->fullName());
+
+            } else if (field == KItemOriginName) {
+                builder->addValue(KFieldOriginName, comm->originName());
+
+            } else if (field == KItemCountry) {
+                builder->addValue(KFieldCountry, comm->country());
+
+            } else {
+                err = DbSqliteTbl::updateBuilderFieldFromModel(builder, field, item);
+            }
+        } else {
+            loge("Model name '%s' is no support",
+                 MODELSTR2CHA(item));
+            err = ErrNotSupport;
+        }
+    }
+    traceret(err);
+    return err;
 }
 

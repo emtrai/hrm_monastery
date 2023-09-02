@@ -26,8 +26,10 @@
 
 class DbSqliteCountry : public DbSqliteModelHandler
 {
+    GET_INSTANCE_DECL(DbSqliteCountry);
 public:
     DbSqliteCountry();
+    virtual ErrCode deleteHard(DbModel* model, bool force = false, QString* msg = nullptr);
 
 protected:
     virtual DbSqliteTbl *getMainTbl();
