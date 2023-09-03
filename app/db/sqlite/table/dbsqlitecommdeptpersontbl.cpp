@@ -102,10 +102,16 @@ QString DbSqliteCommDeptPersonTbl::getSearchQueryStringWithTag(const QString &co
 {
     tracein;
     // TODO: check with condTag????
-    QString queryString = QString("SELECT *, %2.%5 AS %6 FROM %1 LEFT JOIN %2 ON %1.%3 = %2.%4")
+    QString queryString = QString("SELECT *"
+                                  ", %2.%5 AS %6 "
+                                  ", %2.%7 AS %8 "
+                                  ", %2.%9 AS %10 "
+                                  "FROM %1 LEFT JOIN %2 ON %1.%3 = %2.%4")
                               .arg(KTableCommDepartPerson, KTablePerson) // 1 & 2
                               .arg(KFieldPersonUid, KFieldUid) // 3 & 4
                               .arg(KFieldNameId, KFieldPersonNameId) // 5 & 6
+                              .arg(KFieldEmail, KFieldPersonEmail) // 7 & 8
+                              .arg(KFieldTel, KFieldPersonTel) // 9 & 10
         ;
     if (!cond.isEmpty()) {
         queryString += QString(" WHERE %1").arg(cond);
@@ -179,6 +185,7 @@ ErrCode DbSqliteCommDeptPersonTbl::updateDbModelDataFromQuery(DbModel *item, con
         if (!model->commDeptUid().isEmpty()) {
             DbModel* commDept = hdlCommDept->getByUid(model->commDeptUid());
             if (commDept) {
+                model->setCommDeptName(commDept->name());
                 model->setCommDeptNameId(commDept->nameId());
                 delete commDept;
             } else {
@@ -188,6 +195,9 @@ ErrCode DbSqliteCommDeptPersonTbl::updateDbModelDataFromQuery(DbModel *item, con
         model->setRoleUid(qry.value(KFieldRoleUid).toString());
         model->setPersonUid(qry.value(KFieldPersonUid).toString());
         model->setPersonNameId(qry.value(KFieldPersonNameId).toString());
+        model->setPersonHollyName(qry.value(KFieldHollyName).toString());
+        model->setPersonEmail(qry.value(KFieldPersonEmail).toString());
+        model->setPersonTel(qry.value(KFieldPersonTel).toString());
         model->setPersonName(FULLNAME(qry.value(KFieldFirstName).toString(),
                                       qry.value(KFieldLastName).toString()));
         DbModelHandler* hdl = DB->getModelHandler(KModelHdlRole);
@@ -195,6 +205,7 @@ ErrCode DbSqliteCommDeptPersonTbl::updateDbModelDataFromQuery(DbModel *item, con
             DbModel* tmp = hdl->getItem(model->roleUid(), &Role::build);
             if (tmp != nullptr) {
                 model->setRoleName(tmp->name());
+                model->setRoleNameId(tmp->nameId());
                 delete tmp;
             } else {
                 logi("Not found role uid");
@@ -210,6 +221,7 @@ ErrCode DbSqliteCommDeptPersonTbl::updateDbModelDataFromQuery(DbModel *item, con
             DbModel* tmp = hdl->getItem(model->courseUid(), &Course::build);
             if (tmp != nullptr) {
                 model->setCourseName(tmp->name());
+                model->setCourseNameId(tmp->nameId());
                 delete tmp;
             } else {
                 logi("Not found course uid");
@@ -220,6 +232,8 @@ ErrCode DbSqliteCommDeptPersonTbl::updateDbModelDataFromQuery(DbModel *item, con
 
 
         model->setModelStatus(qry.value(KFieldModelStatus).toInt());
+        model->setModelStatusName(DbModel::modelStatus2Name((DbModelStatus)model->modelStatus()));
+
         model->setStartDate(qry.value(KFieldStartDate).toInt());
         model->setEndDate(qry.value(KFieldEndDate).toInt());
         model->setChangeHistory(qry.value(KFieldChangeHistory).toString());

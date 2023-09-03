@@ -38,6 +38,7 @@ public:
     virtual DbModel* clone() const;
 
     virtual void initExportFields();
+    virtual QString exportHtmlTemplateFile(const QString& name) const;
     qint64 establishDate() const;
     void setEstablishDate(qint64 newEstablishDate);
     ErrCode setEstablishDateFromString(const QString &date);
@@ -103,6 +104,7 @@ public:
      * @param newCurrentDirector
      */
     void setCurrentDirector(const Person *newCurrentDirector);
+
 
 protected:
     virtual DbModelHandler* getDbModelHandler() const;

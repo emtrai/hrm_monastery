@@ -31,12 +31,14 @@ public:
     virtual ~UIDepartmentListView();
 protected:
     virtual int getViewType() { return VIEW_DEPARTMENT;}
-    virtual void initHeader();
-    virtual ErrCode fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx);
+    virtual QString getTitle();
     virtual ModelController* getController();
-    
-    virtual QList<DbModel*> getListDbModels();
     virtual DbModel* onCreateDbModelObj(const QString& modelName);
+    virtual QString getMainModelName();
+
+    virtual void initFilterFields();
+
+    virtual QList<DbModel*> getListDbModels();
 };
 
 #endif // UIDEPARTMENTLISTVIEW_H

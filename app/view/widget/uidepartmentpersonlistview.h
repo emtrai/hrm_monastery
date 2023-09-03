@@ -32,30 +32,24 @@ public:
     explicit UIDepartmentPersonListView(QWidget *parent = nullptr);
     virtual ~UIDepartmentPersonListView();
 
-
-    void setCommDept(const CommunityDept *commDept);
+    CommunityDept* communityDept() const;
+    ErrCode setCommDept(const CommunityDept *commDept);
 
 protected:
     virtual int getViewType() { return VIEW_DEPARTMENT_PERSON;}
-    virtual void initHeader();
+    virtual QString getMainModelName();
     virtual ModelController* getController();
-    virtual ErrCode fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
-
-    virtual QList<UITableMenuAction*> getMenuMultiSelectedItemActions(const QMenu *menu,
-                                                               const QList<UITableItem *>& items);
-    virtual ErrCode onMenuActionListPerson(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onMenuActionListDepartment(QMenu* menu, UITableMenuAction* act);
     virtual DbModel* onCreateDbModelObj(const QString& modelName);
+
+    virtual QList<DbModel*> getListDbModels();
+
+    virtual void initHeader();
     virtual QString getTitle();
 
-    virtual ErrCode onViewItem(UITableCellWidgetItem *item);
+    virtual ErrCode fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
+
     virtual ErrCode onAddItem(UITableCellWidgetItem *item);
     virtual ErrCode onEditItem(UITableCellWidgetItem *item);
-
-protected:
-    virtual ErrCode onLoad();
-private:
-    CommunityDept* mCommDept;
 };
 
 #endif // UIDEPARTMENTPERSONLISTVIEW_H

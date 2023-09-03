@@ -263,7 +263,8 @@ QList<DbModel *> CommunityDeptCtl::getListDept(const QString &communityUid, bool
     return items;
 }
 
-const QList<DbModel *> CommunityDeptCtl::getListPerson(const QString &commDeptUid, bool* ok)
+const QList<DbModel *> CommunityDeptCtl::getListPerson(const QString &commDeptUid,
+                                                       int modelStatus, bool* ok)
 {
     tracein;
     QList<DbModel *> items;
@@ -271,7 +272,7 @@ const QList<DbModel *> CommunityDeptCtl::getListPerson(const QString &commDeptUi
     if (!commDeptUid.isEmpty()) {
         DbCommDeptModelHandler* modelHdl =  dynamic_cast<DbCommDeptModelHandler*>(DB->getModelHandler(KModelHdlCommDept));
         if (modelHdl) {
-            items = modelHdl->getListPerson(commDeptUid, MODEL_STATUS_MAX, ok);
+            items = modelHdl->getListPerson(commDeptUid, modelStatus, ok);
         } else {
             if (ok) *ok = false;
             loge("not found commdept handler");
@@ -283,6 +284,45 @@ const QList<DbModel *> CommunityDeptCtl::getListPerson(const QString &commDeptUi
     logd("items cnt=%lld", items.size());
     traceout;
     return items;
+}
+
+const QList<DbModel *> CommunityDeptCtl::getListActivePeople(const QString &commDeptUid, bool *ok)
+{
+    return getListPerson(commDeptUid, MODEL_STATUS_ACTIVE, ok);
+}
+
+QString CommunityDeptCtl::getListActivePeopleInString(const QString &commDeptUid,
+                                                          const QString &sep,
+                                                          bool *ok)
+{
+    tracein;
+    QStringList listString;
+    QString ret;
+    bool tmpok = false;
+    QList<DbModel *> listPeople = getListActivePeople(commDeptUid, &tmpok);
+    if (tmpok) {
+        foreach (DbModel* model, listPeople) {
+            if (model && IS_MODEL_NAME(model, KModelNamePersonDept)) {
+                PersonDept* per = (PersonDept*) model;
+                listString.append(QString("%1 : %2 %3").arg(per->roleName(),
+                                                   per->personHollyName(),
+                                                   per->personName()));
+            } else {
+                loge("invalid model '%s'", MODELSTR2CHA(model));
+            }
+        }
+        if (listString.size() > 0) {
+            logd("found %lld items", listString.size());
+            ret = listString.join(sep);
+        } else {
+            logi("no data found");
+        }
+    } else {
+        loge("get list active people failed");
+    }
+    if (ok) *ok = tmpok;
+    traceout;
+    return ret;
 }
 
 const char *CommunityDeptCtl::getPrebuiltFileName()
@@ -301,6 +341,8 @@ const QString CommunityDeptCtl::exportListPrebuiltTemplateName(const QString &mo
     logd("modelName '%s'", STR2CHA(modelName));
     if (modelName == KModelNameCommDept) {
         ret = KPrebuiltCommunityDeptExportTemplateName;
+    } else if (modelName == KModelNamePersonDept){
+        ret = KPrebuiltCommunityDeptPersonExportTemplateName;
     } else {
         loge("unknown model name '%s'", STR2CHA(modelName));
     }

@@ -171,9 +171,9 @@ DbModel *DlgCommunity::newModel()
 void DlgCommunity::loadData()
 {
     tracein;
-    loadList(ui->cbArea, AREACTL);
-    loadList(ui->cbCountry, COUNTRYCTL);
-    loadList(ui->cbParentCommunity, COMMUNITYCTL);
+    loadList(ui->cbArea, AREACTL, true);
+    loadList(ui->cbCountry, COUNTRYCTL, true);
+    loadList(ui->cbParentCommunity, COMMUNITYCTL, true);
     loadStatus();
     traceout;
 }

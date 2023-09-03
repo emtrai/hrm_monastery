@@ -29,6 +29,8 @@
 #include "utils.h"
 #include "person.h"
 #include "stringdefs.h"
+#include "prebuiltdefs.h"
+#include "communitydeptctl.h"
 
 CommunityDept::CommunityDept():DbModel()
 {
@@ -152,10 +154,15 @@ void CommunityDept::initExportFields()
                                                      CommunityDept,
                                                      KModelNameCommDept,
                                                      departmentNameId));
-//    mExportCallbacks.insert(KItemTel, [](const DbModel* model, const QString& item){
-//        return CHECK_TO_GET_MODEL_DATA_RET(model, CommunityDept, KModelNameCommDept, tel);
-//        return ((CommunityDept*)model)->personTel();
-//    });
+    mExportCallbacks.insert(KItemMember, [](const DbModel* model, const QString& item){
+        bool ok = false;
+        QString res = COMMUNITYDEPTCTL->getListActivePeopleInString(model->uid(), "\n", &ok);
+        if (!ok) {
+            loge("failed to get list active people");
+            res = STR_NONE;
+        }
+        return res;
+    });
 //    mExportCallbacks.insert(KItemRemark, [](const DbModel* model, const QString& item){
 //        return ((AreaPerson*)model)->remark();
 //    });
@@ -172,6 +179,12 @@ void CommunityDept::initExportFields()
 //        return QString("%1").arg(((MapDbModel*)model)->modelStatus());
 //    });
     traceout;
+}
+
+QString CommunityDept::exportHtmlTemplateFile(const QString &name) const
+{
+    UNUSED(name);
+    return KPrebuiltCommunityDeptInfoTemplateName;
 }
 
 qint64 CommunityDept::establishDate() const

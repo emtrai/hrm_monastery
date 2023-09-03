@@ -550,6 +550,8 @@ DISTFILES += \
     res/course_template.html \
     res/course_vi.csv \
     res/default_export_template_vi.json \
+    res/department_person_export_template_vi.json \
+    res/department_person_info_template.html \
     res/department_vi.json \
     res/edu_vi.csv \
     res/event_category_vi.csv \

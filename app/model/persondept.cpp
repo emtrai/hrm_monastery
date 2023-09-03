@@ -23,6 +23,7 @@
 #include "logger.h"
 #include "errcode.h"
 #include "dbctl.h"
+#include "stringdefs.h"
 #include "utils.h"
 #include "datetimeutils.h"
 #include "filectl.h"
@@ -33,6 +34,7 @@
 #include "dbpersonmodelhandler.h"
 #include "person.h"
 #include "department.h"
+#include "prebuiltdefs.h"
 
 PersonDept::PersonDept():mModelStatus(0)
 {
@@ -69,6 +71,111 @@ QString PersonDept::toString() const
     name.append(":" + personUid());
     name.append(":" + commDeptUid());
     return name;
+}
+
+QString PersonDept::exportHtmlTemplateFile(const QString &name) const
+{
+    UNUSED(name);
+    return KPrebuiltCommunityDeptPersonInfoTemplateName;
+
+}
+
+void PersonDept::initExportFields()
+{
+    tracein;
+    DbModel::initExportFields();
+    mExportCallbacks.insert(KItemPersonNameId, EXPORT_CALLBACK_STRING_IMPL(
+                                              PersonDept,
+                                              KModelNamePersonDept,
+                                              personNameId));
+
+    mExportCallbacks.insert(KItemDepartmentName, EXPORT_CALLBACK_STRING_IMPL(
+                                                   PersonDept,
+                                                   KModelNamePersonDept,
+                                                   commDeptName));
+
+    mExportCallbacks.insert(KItemDepartmentNameId, EXPORT_CALLBACK_STRING_IMPL(
+                                                     PersonDept,
+                                                     KModelNamePersonDept,
+                                                     commDeptNameId));
+
+    mExportCallbacks.insert(KItemPersonName, EXPORT_CALLBACK_STRING_IMPL(
+                                                       PersonDept,
+                                                       KModelNamePersonDept,
+                                                       personName));
+
+    mExportCallbacks.insert(KItemPersonNameId, EXPORT_CALLBACK_STRING_IMPL(
+                                                 PersonDept,
+                                                 KModelNamePersonDept,
+                                                 personNameId));
+
+    mExportCallbacks.insert(KItemHollyName, EXPORT_CALLBACK_STRING_IMPL(
+                                                   PersonDept,
+                                                   KModelNamePersonDept,
+                                                   personHollyName));
+
+    mExportCallbacks.insert(KItemRole, EXPORT_CALLBACK_STRING_IMPL(
+                                                PersonDept,
+                                                KModelNamePersonDept,
+                                                roleName));
+
+
+    mExportCallbacks.insert(KItemRoleNameId, EXPORT_CALLBACK_STRING_IMPL(
+                                           PersonDept,
+                                           KModelNamePersonDept,
+                                           roleNameId));
+
+
+    mExportCallbacks.insert(KItemTerm, EXPORT_CALLBACK_STRING_IMPL(
+                                                 PersonDept,
+                                                 KModelNamePersonDept,
+                                                 courseName));
+
+
+    mExportCallbacks.insert(KItemTermNameId, EXPORT_CALLBACK_STRING_IMPL(
+                                           PersonDept,
+                                           KModelNamePersonDept,
+                                           courseNameId));
+
+    mExportCallbacks.insert(KItemEmail, EXPORT_CALLBACK_STRING_IMPL(
+                                                 PersonDept,
+                                                 KModelNamePersonDept,
+                                                 personEmail));
+
+    mExportCallbacks.insert(KItemTel, EXPORT_CALLBACK_STRING_IMPL(
+                                            PersonDept,
+                                            KModelNamePersonDept,
+                                            personTel));
+
+    mExportCallbacks.insert(KItemStartDate, EXPORT_CALLBACK_DATETIME_IMPL(
+                                          PersonDept,
+                                          KModelNamePersonDept,
+                                          startDate,
+                                          DEFAULT_FORMAT_YMD));
+
+    mExportCallbacks.insert(KItemEndDate, EXPORT_CALLBACK_DATETIME_IMPL(
+                                                PersonDept,
+                                                KModelNamePersonDept,
+                                                endDate,
+                                                DEFAULT_FORMAT_YMD));
+
+
+    mExportCallbacks.insert(KItemStatus, EXPORT_CALLBACK_STRING_IMPL(
+                                              PersonDept,
+                                              KModelNamePersonDept,
+                                              modelStatusName));
+
+    mExportCallbacks.insert(KItemStatusId, EXPORT_CALLBACK_INT_IMPL(
+                                             PersonDept,
+                                             KModelNamePersonDept,
+                                             modelStatus));
+
+
+    mExportCallbacks.insert(KItemChangeHistory, EXPORT_CALLBACK_STRING_IMPL(
+                                             PersonDept,
+                                             KModelNamePersonDept,
+                                             changeHistory));
+    traceout;
 }
 
 const QString &PersonDept::roleUid() const
@@ -143,19 +250,84 @@ void PersonDept::copy(const PersonDept &model)
     tracein;
     mRoleUid = model.mRoleUid;
     mRoleName = model.mRoleName;
+    mRoleNameId = model.mRoleNameId;
     mCourseUid = model.mCourseUid;
     mCourseName = model.mCourseName;
+    mCourseNameId = model.mCourseNameId;
     mStartDate = model.mStartDate;
     mEndDate = model.mEndDate;
     mModelStatusName = model.mModelStatusName;
     mModelStatus = model.mModelStatus;
     mCommDeptUid = model.mCommDeptUid;
     mCommDeptNameId = model.mCommDeptNameId;
+    mCommDeptName = model.mCommDeptName;
     mPersonUid = model.mPersonUid;
     mPersonName = model.mPersonName;
     mPersonNameId = model.mPersonNameId;
+    mPersonEmail = model.mPersonEmail;
+    mPersonTel = model.mPersonTel;
     mChangeHistory = model.mChangeHistory;
     traceout;
+}
+
+QString PersonDept::personTel() const
+{
+    return mPersonTel;
+}
+
+void PersonDept::setPersonTel(const QString &newPersonTel)
+{
+    mPersonTel = newPersonTel;
+}
+
+QString PersonDept::personEmail() const
+{
+    return mPersonEmail;
+}
+
+void PersonDept::setPersonEmail(const QString &newPersonEmail)
+{
+    mPersonEmail = newPersonEmail;
+}
+
+QString PersonDept::courseNameId() const
+{
+    return mCourseNameId;
+}
+
+void PersonDept::setCourseNameId(const QString &newCourseNameId)
+{
+    mCourseNameId = newCourseNameId;
+}
+
+QString PersonDept::roleNameId() const
+{
+    return mRoleNameId;
+}
+
+void PersonDept::setRoleNameId(const QString &newRoleNameId)
+{
+    mRoleNameId = newRoleNameId;
+}
+
+QString PersonDept::commDeptName() const
+{
+    return mCommDeptName;
+}
+
+void PersonDept::setCommDeptName(const QString &newCommDeptName)
+{
+    mCommDeptName = newCommDeptName;
+}
+
+QString PersonDept::personHollyName() const
+{
+    return mPersonHollyName;
+}
+
+void PersonDept::setPersonHollyName(const QString &newPersonHollyName)
+{
+    mPersonHollyName = newPersonHollyName;
 }
 
 const QString &PersonDept::commDeptNameId() const

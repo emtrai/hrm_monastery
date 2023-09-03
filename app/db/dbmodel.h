@@ -119,6 +119,19 @@ do { \
     return ret; \
 }
 
+#define EXPORT_CALLBACK_INT_IMPL(type, modelName, func) \
+[](const DbModel* model, const QString& item){ \
+        QString ret; \
+        logd("get export item '%s'", STR2CHA(item));\
+        UNUSED(item); \
+        if (IS_MODEL_NAME(model, modelName)) { \
+            ret = QString::number(((type*)model)->func()); \
+    } else { \
+            ret = STR_DATA_ERROR; \
+    } \
+        return ret; \
+}
+
 #define EXPORT_CALLBACK_DATETIME_IMPL(type, modelName, func, format) \
 [](const DbModel* model, const QString& item){ \
     QString ret; \

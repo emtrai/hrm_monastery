@@ -36,27 +36,41 @@ const char* const KPrebuiltCommunityJsonFileName = "community";
 const char* const KPrebuiltCommunityDeptJsonFileName = "comm_dept";
 const char* const KPrebuiltHomeHtmlFileName = "home";
 const char* const KPrebuiltLogoFileName = "logo.png"; // special case, need file extenstion
+
 const char* const KPrebuiltPersonInfoTemplateFileName = "person_info_template";
 const char* const KPrebuiltPersonListCSVTemplateFileName = "person_list_export_template";
 const char* const KPrebuiltPersonListJSONTemplateFileName = "person_list_export_template_json";
-const char* const KPrebuiltCommunityInfoTemplateFileName = "community_info_template";
+
 const char* const KPrebuiltAreaInfoTemplateFileName = "area_info_template";
 const char* const KPrebuiltAreaPersonInfoTemplateFileName = "area_person_info_template";
+
+const char* const KPrebuiltAreaContactExportTemplateName = "area_contact_export_template";
+const char* const KPrebuiltAreaExportTemplateName = "area_export_template";
+
 const char* const KPrebuiltCourseCSVFileName = "course";
+const char* const KPrebuiltCourseTemplateFileName = "course_template";
+
 const char* const KPrebuiltWorkCSVFileName = "work";
 const char* const KPrebuiltStatusCSVFileName = "status";
 const char* const KPrebuiltEventCSVFileName = "event";
 const char* const KPrebuiltRoleCSVFileName = "role";
-const char* const KPrebuiltCommonTemplateFileName = "common_template";
-const char* const KPrebuiltCourseTemplateFileName = "course_template";
+
+const char* const KPrebuiltCommunityInfoTemplateFileName = "community_info_template";
 const char* const KPrebuiltCommunityExportTemplateName = "community_export_template";
-const char* const KPrebuiltCommunityPersonExportTemplateName = "people_in_community_export_template";
+
 const char* const KPrebuiltCommunityDeptExportTemplateName = "community_dept_export_template";
+const char* const KPrebuiltCommunityDeptInfoTemplateName = "community_dept_info_template";
+
+const char* const KPrebuiltCommunityDeptPersonInfoTemplateName = "department_person_info_template";
+const char* const KPrebuiltCommunityDeptPersonExportTemplateName = "department_person_export_template";
+
 const char* const KPrebuiltCommunityOfPersonTemplateName = "communities_of_person_info_template";
 const char* const KPrebuiltCommunityOfPersonExportTemplateName = "communities_of_person_export_template";
+const char* const KPrebuiltCommunityPersonExportTemplateName = "people_in_community_export_template";
+
+const char* const KPrebuiltCommonTemplateFileName = "common_template";
 const char* const KPrebuiltDefaultExportTemplateName = "default_export_template";
-const char* const KPrebuiltAreaContactExportTemplateName = "area_contact_export_template";
-const char* const KPrebuiltAreaExportTemplateName = "area_export_template";
+
 
 
 #endif // PREBUILTDEFS_H

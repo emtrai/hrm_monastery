@@ -149,7 +149,7 @@ DbModel *DlgCommDept::newModel()
 void DlgCommDept::loadDept()
 {
     tracein;
-    loadList(ui->cbDept, DEPART);
+    loadList(ui->cbDept, DEPART, false);
     traceout;
 }
 

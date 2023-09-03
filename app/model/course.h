@@ -24,9 +24,8 @@
 
 #include <dbmodel.h>
 
-#include "dataexporter.h"
 
-typedef enum CourseType {
+enum CourseType {
     COURSE_TYPE_COURSE = 0, // khoa hoc
     COURSE_TYPE_TERM, // nhiem ki
     COURSE_TYPE_OTHERS, // Khác

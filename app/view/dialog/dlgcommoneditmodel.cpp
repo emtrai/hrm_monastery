@@ -31,7 +31,7 @@
 #include <QPushButton>
 #include "stringdefs.h"
 #include "dialogutils.h"
-
+#include "modeldefs.h"
 
 DlgCommonEditModel::DlgCommonEditModel(QWidget *parent): QDialog(parent),
     mModel(nullptr), mIsNew(false), mIsSelfSave(false),
@@ -273,13 +273,16 @@ bool DlgCommonEditModel::onValidateData(QString &msg)
     return isValid;
 }
 
-ErrCode DlgCommonEditModel::loadList(QComboBox *cb, ModelController *ctrl)
+ErrCode DlgCommonEditModel::loadList(QComboBox *cb, ModelController *ctrl, bool unknownItem)
 {
     tracein;
     ErrCode err = ErrNone;
     cb->clear();
     QList<DbModel*> list = ctrl->getAllItems(true);
-    cb->addItem(STR_UNKNOWN, QString());
+    logd("add unkown item %d", unknownItem);
+    if (unknownItem) {
+        cb->addItem(STR_UNKNOWN, KUidNone);
+    }
     foreach(DbModel* item, list){
         cb->addItem(item->name(), item->uid());
     }

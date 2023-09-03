@@ -25,20 +25,59 @@
 #include "department.h"
 #include "dbsqlitedefs.h"
 #include "dbsqlite.h"
+#include "communitydept.h"
 
 GET_INSTANCE_IMPL(DbSqliteDept);
 
 
-DbSqliteDept::DbSqliteDept()
+DbSqliteDept::DbSqliteDept():DbSqliteModelHandler(KModelHdlDept)
 {
     tracein;
 }
 
-const QString DbSqliteDept::getName()
+ErrCode DbSqliteDept::deleteHard(DbModel *model, bool force, QString *msg)
 {
-    return KModelHdlDept;
-}
+    tracein;
+    ErrCode err = ErrNone;
+    if (!model) {
+        err = ErrInvalidArg;
+        loge("Invalid model");
+    }
 
+    if (err == ErrNone) {
+        logi("Delete hard model '%s', force %d", MODELSTR2CHA(model), force);
+
+        if (model->modelName() == KModelNameDepartment) {
+            // KFieldAreaUid delete map, community, person
+            QHash<QString, QString> itemToSearch; // for searching
+            QHash<QString, QString> itemToSet; // for update
+            bool errDependency = false;
+
+            itemToSearch.insert(KFieldDepartmentUid, model->uid());
+            itemToSet.insert(KFieldDepartmentUid, ""); // update to null/empty
+            if (model->dbId() > 0) {
+                logi("Set db id to clear %lld", model->dbId());
+                itemToSearch.insert(KFieldDepartmentDbId, QString::number(model->dbId()));
+                itemToSet.insert(KFieldDepartmentDbId, ""); // update to null/empty
+            }
+
+            CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency,
+                                       msg, force,
+                                       itemToSearch, itemToSet,
+                                       KTableCommDept, &CommunityDept::build);
+
+            if (errDependency) {
+                err = ErrDependency;
+                loge("cannot delete, has dependency '%s'", msg?STR2CHA((*msg)):"");
+            } else {
+                err = DbSqliteModelHandler::deleteHard(model, force, msg);
+            }
+        }
+    }
+    traceout;
+    return err;
+
+}
 
 DbSqliteTbl *DbSqliteDept::getMainTbl()
 {

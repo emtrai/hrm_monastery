@@ -72,6 +72,8 @@ void UICommDeptListView::initHeader()
     mHeader.append(STR_EMAIL);
     mHeader.append(STR_TEL);
     mHeader.append(STR_ADDR);
+    mHeader.append(STR_MEMBER);
+    mHeader.append(STR_NOTE);
     traceout;
 }
 
@@ -93,6 +95,9 @@ ErrCode UICommDeptListView::fillValueTableRowItem(DbModel *item, UITableItem *tb
             tblItem->addValue(dept->email());
             tblItem->addValue(dept->tel());
             tblItem->addValue(dept->addr());
+            tblItem->addValue(COMMUNITYDEPTCTL->getListActivePeopleInString(dept->uid(), "\n"));
+            tblItem->addValue(dept->remark());
+
         } else {
             loge("Update table failed, unsupported model '%s'", MODELSTR2CHA(item));
             err = ErrInvalidModel;

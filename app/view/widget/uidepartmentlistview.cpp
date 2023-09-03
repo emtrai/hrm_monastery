@@ -21,58 +21,59 @@
  */
 #include "uidepartmentlistview.h"
 
-#include "areactl.h"
 #include "logger.h"
 #include <QList>
 #include "dbmodel.h"
 #include "department.h"
 #include "utils.h"
-#include "mainwindow.h"
-#include "uicommdeptlistview.h"
-#include "uitableviewfactory.h"
 #include "departctl.h"
+#include "stringdefs.h"
 
 UIDepartmentListView::UIDepartmentListView(QWidget *parent):
     UICommonListView(parent)
 {
-    tracein;
+    traced;
 }
 
 UIDepartmentListView::~UIDepartmentListView()
 {
-    tracein;
+    traced;
 }
 
-void UIDepartmentListView::initHeader()
+QString UIDepartmentListView::getTitle()
 {
-    tracein;
-    UICommonListView::initHeader();
+    return STR_DEPARTMENT;
 }
-
-ErrCode UIDepartmentListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
-{
-    tracein;
-    
-    ErrCode err = UICommonListView::fillValueTableRowItem(item, tblItem, idx);
-    traceret(err);
-    return err;
-}
-
 
 ModelController *UIDepartmentListView::getController()
 {
-    tracein;
+    traced;
     return DEPART;
 }
 
 QList<DbModel *> UIDepartmentListView::getListDbModels()
 {
-    tracein;
-    return DEPART->getAllItemsFromDb(); // TODO: getAllItem???
+    traced;
+    return DEPART->getAllItems(true);
 }
 
 DbModel *UIDepartmentListView::onCreateDbModelObj(const QString& modelName)
 {
+    UNUSED(modelName);
     return Department::build();
+}
+
+QString UIDepartmentListView::getMainModelName()
+{
+    return KModelNameDepartment;
+}
+
+void UIDepartmentListView::initFilterFields()
+{
+    tracein;
+    // filter by  name
+    appendFilterField(FILTER_FIELD_NAME, STR_NAME);
+    traceout;
+
 }
 

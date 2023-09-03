@@ -25,44 +25,57 @@
 #include "logger.h"
 #include <QList>
 #include "dbmodel.h"
-#include "dbcommunitymodelhandler.h"
 #include "communitydept.h"
 #include "communitydeptctl.h"
 #include "utils.h"
 #include "datetimeutils.h"
 #include "dialog/dlgdeptperson.h"
-#include "person.h"
 #include "persondept.h"
+#include "stringdefs.h"
 
 UIDepartmentPersonListView::UIDepartmentPersonListView(QWidget *parent):
-    UICommonListView(parent),
-    mCommDept(nullptr)
+    UICommonListView(parent)
 {
     tracein;
+    mHasImportMenu = false;
+    mHasExportMenu = true;
+    traceout;
 }
 
 
 UIDepartmentPersonListView::~UIDepartmentPersonListView()
 {
-    tracein;
-    if (mCommDept) {
-        delete mCommDept;
-        mCommDept = nullptr;
-    }
+    traced;
 }
 
 DbModel *UIDepartmentPersonListView::onCreateDbModelObj(const QString& modelName)
 {
-    // TODO: handle it
-    return nullptr;
+    UNUSED(modelName);
+    return PersonDept::build();
+}
+
+QList<DbModel *> UIDepartmentPersonListView::getListDbModels()
+{
+    tracein;
+    QList<DbModel*> items;
+    CommunityDept* dept = communityDept();
+    if (dept) {
+        items = COMMUNITYDEPTCTL->getListPerson(dept->uid());
+        logd("found %lld item", items.size());
+    } else {
+        loge("no dept model");
+    }
+    traceout;
+    return items;
 }
 
 QString UIDepartmentPersonListView::getTitle()
 {
     tracein;
     QString title;
-    if (mCommDept) {
-        title = QString(tr("Thành viên phòng ban %1 cộng đoàn %2")).arg(mCommDept->departmentName(), mCommDept->communityName());
+    CommunityDept* dept = communityDept();
+    if (dept) {
+        title = QString(tr("Thành viên phòng ban %1 cộng đoàn %2")).arg(dept->departmentName(), dept->communityName());
     } else {
         loge("no common dept");
         title = QString(tr("Thành viên phòng ban"));
@@ -71,20 +84,30 @@ QString UIDepartmentPersonListView::getTitle()
     return title;
 }
 
-ErrCode UIDepartmentPersonListView::onViewItem(UITableCellWidgetItem *item)
-{
-    traced;
-    return ErrNoData;
-}
-
 ErrCode UIDepartmentPersonListView::onAddItem(UITableCellWidgetItem *item)
 {
     tracein;
-    DlgDeptPerson* dlg = DlgDeptPerson::build(this, true, KModelNamePersonDept, nullptr, this);
-    dlg->setCommDeptUid(mCommDept->uid());
-    dlg->setCommDeptNameId(mCommDept->nameId());
-    dlg->exec();
-    delete dlg;
+    UNUSED(item);
+    ErrCode err = ErrNone;
+    DlgDeptPerson* dlg = nullptr;
+    CommunityDept* dept = communityDept();
+    if (!dept) {
+        loge("Unknown depart");
+        err = ErrInvalidModel;
+    }
+    if (err == ErrNone) {
+        dlg = DlgDeptPerson::build(this, true, KModelNamePersonDept, nullptr, this);
+        if (!dlg) {
+            err = ErrNoMemory;
+            loge("No memory");
+        }
+    }
+    if (err == ErrNone) {
+        dlg->setCommDeptUid(dept->uid());
+        dlg->setCommDeptNameId(dept->nameId());
+        dlg->exec();
+    }
+    FREE_PTR(dlg);
     traceout;
     return ErrNone;
 }
@@ -93,99 +116,74 @@ ErrCode UIDepartmentPersonListView::onEditItem(UITableCellWidgetItem *item)
 {
     tracein;
     ErrCode err = ErrNone;
-    DbModel* model = item->itemData();
-    if (model){
-        PersonDept* per = (PersonDept*)model;
-        DlgDeptPerson* dlg = DlgDeptPerson::build(this, true, KModelNamePersonDept, per, this);
-        dlg->setCommDeptUid(mCommDept->uid());
-        dlg->setCommDeptNameId(mCommDept->nameId());
-//        dlg->setCommDeptUid(mCommDept->uid());
-//        dlg->setCommDept(mCommDept);
-        dlg->exec();
-        delete dlg;
-
-    } else {
-        loge("Invalid item data");
+    DbModel* model = nullptr;
+    PersonDept* per = nullptr;
+    DlgDeptPerson* dlg = nullptr;
+    CommunityDept* dept = communityDept();
+    if (!item) {
         err = ErrInvalidArg;
-        // TODO: popup message???
+        loge("Invalid argument");
     }
+    if (err == ErrNone && !dept) {
+        loge("Unknown depart");
+        err = ErrInvalidModel;
+    }
+    if (err == ErrNone) {
+        model = item->itemData();
+        if (model && IS_MODEL_NAME(model, KModelNamePersonDept)) {
+            per = (PersonDept*)model;
+        } else {
+            loge("no or invalid model data '%s'", MODELSTR2CHA(model));
+            err = ErrNoData;
+        }
+    }
+    if (err == ErrNone){
+        dlg = DlgDeptPerson::build(this, true, KModelNamePersonDept, per, this);
+        if (!dlg) {
+            loge("no memory?");
+            err = ErrNoMemory;
+        }
+    }
+    if (err == ErrNone) {
+        dlg->setCommDeptUid(dept->uid());
+        dlg->setCommDeptNameId(dept->nameId());
+        dlg->exec();
+    }
+    FREE_PTR(dlg);
     traceret(err);
     return err;
 }
 
-
-ErrCode UIDepartmentPersonListView::onMenuActionListPerson(QMenu *menu, UITableMenuAction *act)
+CommunityDept *UIDepartmentPersonListView::communityDept() const
 {
-    tracein;
-
-    return ErrNone;
-
+    return (CommunityDept*)parentModel();
 }
 
-ErrCode UIDepartmentPersonListView::onMenuActionListDepartment(QMenu *menu, UITableMenuAction *act)
+ErrCode UIDepartmentPersonListView::setCommDept(const CommunityDept *commDept)
 {
-    tracein;
-    return ErrNone;
-
+    traced;
+    // parent model is area, as this listview will show all contact people of an area
+    return setParentModel(commDept);
 }
 
-QList<UITableMenuAction *> UIDepartmentPersonListView::getMenuMultiSelectedItemActions(const QMenu *menu,
-                                                                                const QList<UITableItem *>& items)
+QString UIDepartmentPersonListView::getMainModelName()
 {
-    tracein;
-    //    logd("idx %d", idx);
-    QList<UITableMenuAction*> actionList = UITableView::getMenuMultiSelectedItemActions(menu, items);
-
-    //    actionList.append(UITableMenuAction::build(tr("Danh sách ban"), this)
-    //                                          ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
-    //                                              return this->onMenuActionListDepartment(m, a);
-    //                                          }));
-    return actionList;
-
-}
-
-ErrCode UIDepartmentPersonListView::onLoad()
-{
-    //    QList<Community*> items = COMMUNITYCTL->getCommunityList();
-    tracein;
-    if (mCommDept != nullptr) {
-        logd("Load person list of department");
-        mCommDept->dump();
-
-        QList<DbModel*> items = COMMUNITYDEPTCTL->getListPerson(mCommDept->uid());
-        RELEASE_LIST_DBMODEL(mItemList);
-        mItemList.append(items);
-    } else {
-        loge("Nothing to load");
-    }
-    // TODO: loop to much, redundant, do something better?
-    //    foreach (Community* item, items) {
-    //        mItemList.append(static_cast<DbModel*>(item));
-    //    }
-    traceout;
-    return ErrNone;
-}
-
-
-void UIDepartmentPersonListView::setCommDept(const CommunityDept *commDept)
-{
-    tracein;
-    CLEAR_THEN_SET(mCommDept, commDept, CommunityDept);
-    traceout;
+    return KModelNamePersonDept;
 }
 
 
 void UIDepartmentPersonListView::initHeader()
 {
     tracein;
-    mHeader.append(tr("Mã Định Danh"));
-    mHeader.append(tr("Mã Định Danh Nữ Tu"));
-    mHeader.append(tr("Tên"));
-    mHeader.append(tr("Vai trò"));
-    mHeader.append(tr("Trạng thái"));
-    mHeader.append(tr("Nhiệm kỳ"));
-    mHeader.append(tr("Ngày bắt đầu"));
-    mHeader.append(tr("Ngày kết thúc"));
+    mHeader.append(STR_NAMEID);
+    mHeader.append(STR_PERSON_NAMEID);
+    mHeader.append(STR_NU_TU);
+    mHeader.append(STR_ROLE);
+    mHeader.append(STR_STATUS);
+    mHeader.append(STR_TERM);
+    mHeader.append(STR_STARTDATE);
+    mHeader.append(STR_ENDDATE);
+    mHeader.append(STR_NOTE);
 }
 
 ModelController *UIDepartmentPersonListView::getController()
@@ -196,6 +194,7 @@ ModelController *UIDepartmentPersonListView::getController()
 ErrCode UIDepartmentPersonListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
+    UNUSED(idx);
     ErrCode err = ErrNone;
     if (!item || !tblItem) {
         err = ErrInvalidArg;
@@ -212,6 +211,7 @@ ErrCode UIDepartmentPersonListView::fillValueTableRowItem(DbModel *item, UITable
             tblItem->addValue(model->courseName());
             tblItem->addValue(DatetimeUtils::date2String(model->startDate(), DEFAULT_FORMAT_YMD));
             tblItem->addValue(DatetimeUtils::date2String(model->endDate(), DEFAULT_FORMAT_YMD));
+            tblItem->addValue(model->remark());
         } else {
             loge("invalid model '%s'", MODELSTR2CHA(item));
             err = ErrInvalidModel;

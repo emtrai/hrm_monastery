@@ -58,6 +58,7 @@
 #include "prebuiltdefs.h"
 #include "dialogutils.h"
 #include "dlgimportlistresultfactory.h"
+#include "stringdefs.h"
 
 #define ADD_MENU_ITEM(menu, func, name, iconPath) \
 do { \
@@ -787,7 +788,7 @@ void MainWindow::loadHomePageFile()
     do { \
         QAction* act = nullptr;\
         act = menu->addAction(QIcon(QString::fromUtf8(iconPath)), \
-                                   tr(name)); \
+                                   name); \
         QObject::connect(act, SIGNAL(triggered()), this, SLOT(func())); \
     } while (0)
 
@@ -813,13 +814,13 @@ void MainWindow::loadOtherAddMenu()
 
     ADD_ACTION_ITEM(otherMenu,
                     on_actionNew_Community_triggered,
-                    "Thêm cộng đoàn",
+                    STR_ADD_COMMUNITY,
                     ICON_PATH("icons8-community-64"));
 
 
     ADD_ACTION_ITEM(otherMenu,
                     on_actionNew_PersonEvent_triggered,
-                    "Thêm Sự kiện cho Nữ tu",
+                    STR_ADD_PERSON_EVENT,
                     ICON_PATH("icons8-add-64"));
 
 
@@ -852,24 +853,24 @@ void MainWindow::loadOtherMenu()
 
     ADD_ACTION_ITEM(otherMenu,
                     on_actionDept_triggered,
-                    "Ban",
+                    STR_DEPARTMENT,
                     ICON_PATH("icons8-diversity-64.png"));
 
     ADD_ACTION_ITEM(otherMenu,
                     on_actionSaints_2_triggered,
-                    "Thánh",
+                    STR_HOLLYNAME,
                     ICON_PATH("icons8-saint-64"));
 
 
     ADD_ACTION_ITEM(otherMenu,
                     on_actionRole_triggered,
-                    "Vị trí/vai trò",
+                    STR_ROLE,
                     ICON_PATH("icons8-unit-80"));
 
 
     ADD_ACTION_ITEM(otherMenu,
                     on_actionCountry_triggered,
-                    "Quốc gia",
+                    STR_COUNTRY,
                     ICON_PATH("icons8-vietnam-96"));
 
 
@@ -881,33 +882,33 @@ void MainWindow::loadOtherMenu()
 #endif
     ADD_ACTION_ITEM(otherMenu,
                     on_actionMisson_triggered,
-                    "Nhiệm vụ xã hội",
+                    STR_NHIEM_VU_XA_HOI,
                     ICON_PATH("icons8-catholic-64"));
 
 
     ADD_ACTION_ITEM(otherMenu,
                     on_actionSpeclialist_triggered,
-                    "Chuyên môn",
+                    STR_CHUYEN_MON,
                     ICON_PATH("icons8-catholic-64"));
 
     ADD_ACTION_ITEM(otherMenu,
                     on_actionEducation_triggered,
-                    "Giáo dục",
+                    STR_EDUCATION,
                     ICON_PATH("icons8-catholic-64"));
 
     ADD_ACTION_ITEM(otherMenu,
                     on_actionWork_triggered,
-                    "Công việc",
+                    STR_WORK,
                     ICON_PATH("icons8-catholic-64"));
 
     ADD_ACTION_ITEM(otherMenu,
                     on_actionEthnic_triggered,
-                    "Dân tộc",
+                    STR_NATIONALITY,
                     ICON_PATH("icons8-catholic-64"));
 
     ADD_ACTION_ITEM(otherMenu,
                     on_actionCourse_triggered,
-                    "Khóa/Nhiệm kỳ/Lớp khấn",
+                    STR_COURSE_TERM,
                     ICON_PATH("icons8-unit-80"));
 
     //    QAction* act = nullptr;

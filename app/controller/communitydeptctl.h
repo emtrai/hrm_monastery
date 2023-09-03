@@ -55,7 +55,23 @@ public:
      * @param ok true if success, false otherwise
      * @return list of department, model PersonDept. Caller must free after use
      */
-    const QList<DbModel*> getListPerson(const QString& commDeptUid, bool* ok = nullptr);
+    const QList<DbModel*> getListPerson(const QString& commDeptUid,
+                                         int modelStatus = MODEL_STATUS_MAX,
+                                         bool* ok = nullptr);
+
+    const QList<DbModel*> getListActivePeople(const QString& commDeptUid,
+                                         bool* ok = nullptr);
+
+
+    /**
+     * @brief Get list of active people in list with role
+     * @param commDeptUid
+     * @param ok
+     * @return List of people in format: <Name>:<role>
+     */
+    QString getListActivePeopleInString(const QString& commDeptUid,
+                                            const QString &sep = "\n",
+                                            bool* ok = nullptr);
 
 protected:
     virtual const char* getPrebuiltFileName();

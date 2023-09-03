@@ -39,6 +39,8 @@ public:
     virtual void clone(const DbModel* model);
 
     virtual QString toString() const;
+    virtual QString exportHtmlTemplateFile(const QString& name) const;
+    virtual void initExportFields();
 
     const QString &roleUid() const;
     void setRoleUid(const QString &newRoleUid);
@@ -91,23 +93,47 @@ public:
     const QString &commDeptNameId() const;
     void setCommDeptNameId(const QString &newCommDeptNameId);
 
+    QString personHollyName() const;
+    void setPersonHollyName(const QString &newPersonHollyName);
+
+    QString commDeptName() const;
+    void setCommDeptName(const QString &newCommDeptName);
+
+    QString roleNameId() const;
+    void setRoleNameId(const QString &newRoleNameId);
+
+    QString courseNameId() const;
+    void setCourseNameId(const QString &newCourseNameId);
+
+    QString personEmail() const;
+    void setPersonEmail(const QString &newPersonEmail);
+
+    QString personTel() const;
+    void setPersonTel(const QString &newPersonTel);
+
 protected:
     virtual DbModelHandler *getDbModelHandler() const;
     void copy(const PersonDept& model);
 protected:
     QString mRoleUid;
-    QString mRoleName;
+    QString mRoleName; // not store to db
+    QString mRoleNameId; // not store to db
     QString mCourseUid;
-    QString mCourseName;
+    QString mCourseName; // not store to db
+    QString mCourseNameId; // not store to db
     qint64 mStartDate;
     qint64 mEndDate;
     int mModelStatus;
-    QString mModelStatusName;
+    QString mModelStatusName; // not store to db
     QString mCommDeptUid;
     QString mCommDeptNameId; // not store to db
+    QString mCommDeptName; // not store to db
     QString mPersonUid;
-    QString mPersonName;
-    QString mPersonNameId;
+    QString mPersonName; // not store to db
+    QString mPersonNameId; // not store to db
+    QString mPersonHollyName; // not store to db
+    QString mPersonEmail; // not store to db
+    QString mPersonTel; // not store to db
     QString mChangeHistory;
 
 };

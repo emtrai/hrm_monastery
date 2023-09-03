@@ -103,7 +103,7 @@ ErrCode DlgPersonCommunity::fromModel(const DbModel *item)
 void DlgPersonCommunity::loadCommunity()
 {
     tracein;
-    loadList(ui->cbCommunity, COMMUNITYCTL);
+    loadList(ui->cbCommunity, COMMUNITYCTL, true);
     traceout;
 }
 

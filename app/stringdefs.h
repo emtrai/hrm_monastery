@@ -65,6 +65,7 @@
 #define STR_ROLE_ID        QObject::tr("Mã vai trò")
 #define STR_UNKNOWN     QObject::tr("Không rõ")
 #define STR_COURSE      QObject::tr("Khóa")
+#define STR_COURSE_TERM      QObject::tr("Khóa/Nhiệm kỳ")
 #define STR_COURSE_ID      QObject::tr("Mã khóa")
 #define STR_TERM      QObject::tr("Nhiệm kỳ")
 #define STR_TERM_ID      QObject::tr("Mã nhiệm kỳ")
@@ -103,5 +104,15 @@
 
 #define STR_TYPE     QObject::tr("Loại")
 
+#define STR_CHUYEN_MON     QObject::tr("Chuyên môn")
+#define STR_EDUCATION     QObject::tr("Giáo dục")
+#define STR_WORK     QObject::tr("Công việc")
+
+#define STR_NATIONALITY     QObject::tr("Dân tộc")
+#define STR_ADD_COMMUNITY     QObject::tr("Thêm cộng đoàn")
+#define STR_ADD_PERSON_EVENT     QObject::tr("Thêm Sự kiện cho Nữ tu")
+
+#define STR_NONE QObject::tr("Không")
+#define STR_MEMBER QObject::tr("Thành viên")
 
 #endif // STRINGDEFS_H
