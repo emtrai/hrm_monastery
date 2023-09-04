@@ -28,14 +28,14 @@
 #include "defs.h"
 #include "dbmodel.h"
 
-Work::Work()
+Work::Work():DbModel()
 {
-    tracein;
+    traced;
 }
 
 Work::~Work()
 {
-    tracein;
+    traced;
 }
 
 DbModel *Work::build()
@@ -49,6 +49,11 @@ DbModel *Work::build()
 DbModelBuilder Work::getBuilder() const
 {
     return &Work::build;
+}
+
+QString Work::modelName() const
+{
+    return KModelNameWork;
 }
 
 DbModelHandler *Work::getDbModelHandler() const

@@ -62,12 +62,12 @@ QString Course::courseType2Name(CourseType type)
     return ret;
 }
 
-Course::Course():
+Course::Course():DbModel(),
     mStartDate(0),
     mEndDate(0),
     mCourseType(COURSE_TYPE_MAX)
 {
-    tracein;
+    traced;
 }
 
 Course::~Course()

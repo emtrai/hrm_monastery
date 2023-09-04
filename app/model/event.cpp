@@ -25,9 +25,9 @@
 #include "dbctl.h"
 #include "defs.h"
 #include "dbmodel.h"
-Event::Event()
+Event::Event():DbModel()
 {
-    tracein;
+    traced;
 }
 
 DbModel *Event::build()

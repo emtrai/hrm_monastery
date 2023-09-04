@@ -27,9 +27,9 @@
 #include "dbmodel.h"
 
 
-Department::Department()
+Department::Department():DbModel()
 {
-
+    traced;
 }
 
 DbModel *Department::build()

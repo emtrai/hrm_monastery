@@ -26,6 +26,7 @@
 #include "dbsqlitedefs.h"
 #include "dbsqlite.h"
 #include "work.h"
+#include "person.h"
 
 GET_INSTANCE_IMPL(DbSqliteWork)
 
@@ -33,6 +34,48 @@ GET_INSTANCE_IMPL(DbSqliteWork)
 DbSqliteWork::DbSqliteWork()
 {
     tracein;
+}
+
+ErrCode DbSqliteWork::deleteHard(DbModel *model, bool force, QString *msg)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    if (!model) {
+        err = ErrInvalidArg;
+        loge("Invalid model");
+    }
+
+    if (err == ErrNone) {
+        logi("Delete hard model '%s', force %d", MODELSTR2CHA(model), force);
+
+        if (model->modelName() == KModelNameWork) {
+            // KFieldAreaUid delete map, community, person
+            QHash<QString, QString> itemToSearch; // for searching
+            QHash<QString, QString> itemToSet; // for update
+            bool errDependency = false;
+
+            itemToSearch.insert(KFieldWorkUid, model->uid());
+            itemToSet.insert(KFieldWorkUid, ""); // update to null/empty
+
+            CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency,
+                                       msg, force,
+                                       itemToSearch, itemToSet,
+                                       KTablePerson, &Person::build);
+
+            if (errDependency) {
+                err = ErrDependency;
+                loge("cannot delete, has dependency '%s'", msg?STR2CHA((*msg)):"");
+            } else {
+                logi("Delete model '%s'", MODELSTR2CHA(model));
+                err = DbSqliteModelHandler::deleteHard(model, force, msg);
+            }
+        } else {
+            err = ErrInvalidData;
+            loge("invalid model '%s'", MODELSTR2CHA(model));
+        }
+    }
+    traceret(err);
+    return err;
 }
 
 const QString DbSqliteWork::getName()

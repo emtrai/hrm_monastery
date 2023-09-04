@@ -21,7 +21,6 @@
  */
 #include "dbsqlitepersonevent.h"
 #include "logger.h"
-#include "defs.h"
 
 #include "dbsqlitedefs.h"
 #include "dbsqlite.h"
@@ -29,17 +28,11 @@
 
 GET_INSTANCE_IMPL(DbSqlitePersonEvent)
 
-DbSqlitePersonEvent::DbSqlitePersonEvent()
+DbSqlitePersonEvent::DbSqlitePersonEvent():DbSqliteModelHandler(KModelHdlPersonEvent)
 {
-    tracein;
+    traced;
 }
 
-
-
-const QString DbSqlitePersonEvent::getName()
-{
-    return KModelHdlPersonEvent;
-}
 
 DbSqliteTbl *DbSqlitePersonEvent::getMainTbl()
 {

@@ -29,6 +29,7 @@ class UICourseListView : public UICommonListView
 public:
     explicit UICourseListView(QWidget *parent = nullptr);
     virtual ~UICourseListView();
+    virtual QString getName();
 protected:
 
     virtual int getViewType() { return VIEW_COURSE;}

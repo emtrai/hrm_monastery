@@ -42,6 +42,11 @@ UIEthnicListView::~UIEthnicListView()
 }
 
 
+QString UIEthnicListView::getName()
+{
+    return "UIEthnicListView";
+}
+
 ModelController *UIEthnicListView::getController()
 {
     return ETHNIC;

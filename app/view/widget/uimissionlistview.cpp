@@ -44,6 +44,11 @@ UIMissionListView::~UIMissionListView()
     traced;
 }
 
+QString UIMissionListView::getName()
+{
+    return "UIMissionListView";
+}
+
 ModelController *UIMissionListView::getController()
 {
     return MISSIONCTL;
@@ -57,6 +62,7 @@ QString UIMissionListView::getTitle()
 
 DbModel *UIMissionListView::onCreateDbModelObj(const QString& modelName)
 {
+    UNUSED(modelName);
     return Mission::build();
 }
 

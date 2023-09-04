@@ -29,6 +29,7 @@ class UIDepartmentListView : public UICommonListView
 public:
     explicit UIDepartmentListView(QWidget *parent = nullptr);
     virtual ~UIDepartmentListView();
+    virtual QString getName();
 protected:
     virtual int getViewType() { return VIEW_DEPARTMENT;}
     virtual QString getTitle();

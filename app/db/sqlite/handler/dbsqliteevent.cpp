@@ -25,17 +25,57 @@
 #include "event.h"
 #include "dbsqlitedefs.h"
 #include "dbsqlite.h"
+#include "personevent.h"
 
+GET_INSTANCE_IMPL(DbSqliteEvent)
 
-DbSqliteEvent::DbSqliteEvent()
+DbSqliteEvent::DbSqliteEvent():DbSqliteModelHandler(KModelHdlEvent)
 {
-
+    traced;
 }
 
-const QString DbSqliteEvent::getName()
+ErrCode DbSqliteEvent::deleteHard(DbModel *model, bool force, QString *msg)
 {
-    return KModelHdlEvent;
+    tracein;
+    ErrCode err = ErrNone;
+    if (!model) {
+        err = ErrInvalidArg;
+        loge("Invalid model");
+    }
+
+    if (err == ErrNone) {
+        logi("Delete hard model '%s', force %d", MODELSTR2CHA(model), force);
+
+        if (model->modelName() == KModelNameEvent) {
+            // KFieldAreaUid delete map, community, person
+            QHash<QString, QString> itemToSearch; // for searching
+            QHash<QString, QString> itemToSet; // for update
+            bool errDependency = false;
+
+            itemToSearch.insert(KFieldEventUid, model->uid());
+            itemToSet.insert(KFieldEthnicUid, ""); // update to null/empty
+
+            CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency,
+                                       msg, force,
+                                       itemToSearch, itemToSet,
+                                       KTablePersonEvent, &PersonEvent::build);
+
+            if (errDependency) {
+                err = ErrDependency;
+                loge("cannot delete, has dependency '%s'", msg?STR2CHA((*msg)):"");
+            } else {
+                logi("Delete model '%s'", MODELSTR2CHA(model));
+                err = DbSqliteModelHandler::deleteHard(model, force, msg);
+            }
+        } else {
+            err = ErrInvalidData;
+            loge("invalid model '%s'", MODELSTR2CHA(model));
+        }
+    }
+    traceret(err);
+    return err;
 }
+
 
 DbSqliteTbl *DbSqliteEvent::getMainTbl()
 {

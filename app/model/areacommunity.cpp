@@ -29,9 +29,9 @@
 #include "dbctl.h"
 #include "dbmodel.h"
 
-AreaCommunity::AreaCommunity()
+AreaCommunity::AreaCommunity():MapDbModel()
 {
-    tracein;
+    traced;
 }
 
 DbModel *AreaCommunity::build()

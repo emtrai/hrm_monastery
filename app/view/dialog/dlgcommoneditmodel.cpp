@@ -32,6 +32,7 @@
 #include "stringdefs.h"
 #include "dialogutils.h"
 #include "modeldefs.h"
+#include "mainwindow.h"
 
 DlgCommonEditModel::DlgCommonEditModel(QWidget *parent): QDialog(parent),
     mModel(nullptr), mIsNew(false), mIsSelfSave(false),
@@ -222,12 +223,6 @@ void DlgCommonEditModel::accept()
             }
             logi("Save/Update result %d", ret);
 
-            if (ret == ErrNone) {
-                logi("Save/update '%s' ok , close dialog", STR2CHA(item->toString()));
-                DialogUtils::showMsgBox(QString(tr("Đã lưu %1")).arg(item->name()));
-            } else {
-                DialogUtils::showErrorBox("Lỗi, không thể lưu thông tin");
-            }
             if (mListener) {
                 logd("Call listener");
                 mListener->onDbModelReady(ret, item, this);
@@ -244,6 +239,13 @@ void DlgCommonEditModel::accept()
     logd("ret=%d", ret);
     if (ret == ErrNone) {
         QDialog::accept();
+    }
+    if (ret == ErrNone) {
+        logi("Save/update '%s' ok , close dialog", STR2CHA(item->toString()));
+//        DialogUtils::showMsgBox(QString(tr("Đã lưu %1")).arg(item->name()));
+        MAINWIN->showMessageBox(QString(tr("Đã lưu %1")).arg(item->name()));
+    } else {
+        DialogUtils::showErrorBox("Lỗi, không thể lưu thông tin");
     }
     traceout;
 }

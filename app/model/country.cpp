@@ -31,9 +31,9 @@
 #include "provincectl.h"
 
 
-Country::Country()
+Country::Country():DbModel()
 {
-    tracein;
+    traced;
 }
 
 Country::Country(const Country &country):DbModel(country)

@@ -30,20 +30,16 @@ class DbSqliteSpecialistTbl;
 
 class DbSqliteSpecialist : public DbSqliteModelHandler, public DbSpecialistModelHandler
 {
+    GET_INSTANCE_DECL(DbSqliteSpecialist)
 public:
     DbSqliteSpecialist();
-    static DbSqliteSpecialist* getInstance();
-    virtual const QString getName();
     virtual QList<DbModel*> getListPerson(const QString& specialistUid);
+    virtual ErrCode deleteHard(DbModel* model, bool force = false, QString* msg = nullptr);
 
 protected:
     virtual DbSqliteTbl* getMainTbl();
     virtual DbSqliteTbl* getTable(const QString& modelName);
     virtual DbModelBuilder getMainBuilder();
-private:
-
-private:
-    static DbSqliteSpecialist* gInstance;
 
 
 };

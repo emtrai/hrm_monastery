@@ -49,6 +49,11 @@ UIPersonEventListView::~UIPersonEventListView()
     traceout;
 }
 
+QString UIPersonEventListView::getName()
+{
+    return "UIPersonEventListView";
+}
+
 Person *UIPersonEventListView::person() const
 {
     return (Person*) parentModel();

@@ -29,6 +29,7 @@ class UICountryListView : public UICommonListView
 public:
     explicit UICountryListView(QWidget *parent = nullptr);
     virtual ~UICountryListView();
+    virtual QString getName();
 protected:
 
     virtual int getViewType() { return VIEW_COUNTRY;}

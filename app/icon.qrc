@@ -36,5 +36,7 @@
         <file>icon/icons8-education-100.png</file>
         <file>icon/icons8-ethnic-people-100.png</file>
         <file>icon/icons8-hospital-100.png</file>
+        <file>icon/icons8-nurse-80.png</file>
+        <file>icon/icons8-doctor-female-96.png</file>
     </qresource>
 </RCC>

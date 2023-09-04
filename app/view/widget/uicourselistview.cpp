@@ -48,6 +48,10 @@ UICourseListView::~UICourseListView()
     tracein;
 }
 
+QString UICourseListView::getName()
+{
+    return "UICourseListView";
+}
 QString UICourseListView::getTitle()
 {
     return tr("Khóa/Nhiệm Kỳ/Lớp Khấn");

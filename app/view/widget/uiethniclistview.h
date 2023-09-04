@@ -29,6 +29,7 @@ class UIEthnicListView : public UICommonListView
 public:
     explicit UIEthnicListView(QWidget *parent = nullptr);
     virtual ~UIEthnicListView();
+    virtual QString getName();
 protected:
 
     virtual int getViewType() { return VIEW_ETHNIC;}

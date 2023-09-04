@@ -52,6 +52,11 @@ UIAreaListView::~UIAreaListView()
     traceout;
 }
 
+QString UIAreaListView::getName()
+{
+    return "UIAreaListView";
+}
+
 QString UIAreaListView::getTitle()
 {
     return STR_AREA;

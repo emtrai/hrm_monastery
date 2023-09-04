@@ -31,6 +31,7 @@ class UIAreaListView : public UICommonListView
 public:
     explicit UIAreaListView(QWidget *parent = nullptr);
     virtual ~UIAreaListView();
+    virtual QString getName();
 protected:
     virtual int getViewType() { return VIEW_AREA;}
     virtual QString getTitle();

@@ -28,7 +28,7 @@
 #include "logger.h"
 
 
-Education::Education()
+Education::Education():DbModel()
 {
     traced;
 }

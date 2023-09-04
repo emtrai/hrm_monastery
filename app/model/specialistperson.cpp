@@ -29,10 +29,11 @@
 #include "dbctl.h"
 #include "dbmodel.h"
 
-SpecialistPerson::SpecialistPerson():
-    mSpecialist(nullptr)
+SpecialistPerson::SpecialistPerson():MapDbModel()
 {
     tracein;
+    mSpecialist = nullptr;
+    traceout;
 }
 
 SpecialistPerson::~SpecialistPerson()

@@ -29,9 +29,9 @@
 #include "defs.h"
 #include "dbmodel.h"
 
-Role::Role()
+Role::Role():DbModel()
 {
-    tracein;
+    traced;
 }
 DbModel *Role::build()
 {

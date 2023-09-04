@@ -31,6 +31,7 @@ class UICommDeptListView : public UICommonListView
 public:
     explicit UICommDeptListView(QWidget *parent = nullptr);
     virtual ~UICommDeptListView();
+    virtual QString getName();
     Community *community() const;
     ErrCode setCommunity(const Community *newCommunity);
 

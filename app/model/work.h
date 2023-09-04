@@ -32,6 +32,7 @@ public:
     virtual ~Work();
     static DbModel *build();
     virtual DbModelBuilder getBuilder() const;
+    virtual QString modelName() const;
 
 protected:
     virtual DbModelHandler* getDbModelHandler() const;

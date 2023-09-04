@@ -33,11 +33,11 @@
 #include "filectl.h"
 #include "prebuiltdefs.h"
 
-CommunityPerson::CommunityPerson():
+CommunityPerson::CommunityPerson():MapDbModel(),
     mPerson(nullptr),
     mCommunity(nullptr)
 {
-    tracein;
+    traced;
 }
 
 CommunityPerson::~CommunityPerson()

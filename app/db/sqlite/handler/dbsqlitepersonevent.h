@@ -30,8 +30,6 @@ class DbSqlitePersonEvent : public DbSqliteModelHandler
     GET_INSTANCE_DECL(DbSqlitePersonEvent);
 public:
     DbSqlitePersonEvent();
-
-    virtual const QString getName();
 protected:
     virtual DbSqliteTbl *getMainTbl();
     virtual DbModelBuilder getMainBuilder();

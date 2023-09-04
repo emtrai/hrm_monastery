@@ -104,6 +104,7 @@
 
 #define STR_TYPE     QObject::tr("Loại")
 
+#define STR_SPECIALIST     QObject::tr("Chuyên môn")
 #define STR_CHUYEN_MON     QObject::tr("Chuyên môn")
 #define STR_EDUCATION     QObject::tr("Giáo dục")
 #define STR_EDUCATION_LEVEL     QObject::tr("Trình độ học vấn")

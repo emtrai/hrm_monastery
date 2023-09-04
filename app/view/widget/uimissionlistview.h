@@ -29,6 +29,7 @@ class UIMissionListView : public UICommonListView
 public:
     explicit UIMissionListView(QWidget *parent = nullptr);
     virtual ~UIMissionListView();
+    virtual QString getName();
 protected:
 
     virtual int getViewType() { return VIEW_MISSION;}

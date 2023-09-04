@@ -29,6 +29,7 @@ class UIEducationListView : public UICommonListView
 public:
     explicit UIEducationListView(QWidget *parent = nullptr);
     virtual ~UIEducationListView();
+    virtual QString getName();
 protected:
 
     virtual int getViewType() { return VIEW_EDUCATION;}

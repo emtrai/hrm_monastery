@@ -27,6 +27,7 @@
 #include "saint.h"
 #include "utils.h"
 #include "datetimeutils.h"
+#include "stringdefs.h"
 
 UISaintListView::UISaintListView(QWidget *parent):
     UICommonListView(parent)

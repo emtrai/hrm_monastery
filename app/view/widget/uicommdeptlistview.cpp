@@ -50,6 +50,11 @@ UICommDeptListView::~UICommDeptListView()
     tracein;
     traceout;
 }
+QString UICommDeptListView::getName()
+{
+    return "UICommDeptListView";
+}
+
 QString UICommDeptListView::getTitle()
 {
     traced;

@@ -21,21 +21,58 @@
  */
 #include "dbsqlitepersonstatus.h"
 #include "logger.h"
-#include "defs.h"
 #include "personstatus.h"
 #include "dbsqlitedefs.h"
 #include "dbsqlite.h"
+#include "person.h"
 
+GET_INSTANCE_IMPL(DbSqlitePersonStatus)
 
-DbSqlitePersonStatus::DbSqlitePersonStatus()
+DbSqlitePersonStatus::DbSqlitePersonStatus():DbSqliteModelHandler(KModelHdlPersonStatus)
 {
-    tracein;
+    traced;
 }
 
-
-const QString DbSqlitePersonStatus::getName()
+ErrCode DbSqlitePersonStatus::deleteHard(DbModel *model, bool force, QString *msg)
 {
-    return KModelHdlPersonStatus;
+    tracein;
+    ErrCode err = ErrNone;
+    if (!model) {
+        err = ErrInvalidArg;
+        loge("Invalid model");
+    }
+
+    if (err == ErrNone) {
+        logi("Delete hard model '%s', force %d", MODELSTR2CHA(model), force);
+
+        if (model->modelName() == KModelNamePersonStatus) {
+            // KFieldAreaUid delete map, community, person
+            QHash<QString, QString> itemToSearch; // for searching
+            QHash<QString, QString> itemToSet; // for update
+            bool errDependency = false;
+
+            itemToSearch.insert(KFieldPersonStatusUid, model->uid());
+            itemToSet.insert(KFieldPersonStatusUid, ""); // update to null/empty
+
+            CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency,
+                                       msg, force,
+                                       itemToSearch, itemToSet,
+                                       KTablePerson, &Person::build);
+
+            if (errDependency) {
+                err = ErrDependency;
+                loge("cannot delete, has dependency '%s'", msg?STR2CHA((*msg)):"");
+            } else {
+                logi("Delete model '%s'", MODELSTR2CHA(model));
+                err = DbSqliteModelHandler::deleteHard(model, force, msg);
+            }
+        } else {
+            err = ErrInvalidData;
+            loge("invalid model '%s'", MODELSTR2CHA(model));
+        }
+    }
+    traceret(err);
+    return err;
 }
 
 DbSqliteTbl *DbSqlitePersonStatus::getMainTbl()

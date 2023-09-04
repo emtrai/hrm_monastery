@@ -29,27 +29,14 @@
 #include "dbsqlitedefs.h"
 #include "specialist.h"
 
-DbSqliteSpecialist* DbSqliteSpecialist::gInstance = nullptr;
 
-DbSqliteSpecialist::DbSqliteSpecialist():
-    DbSqliteModelHandler()
+GET_INSTANCE_IMPL(DbSqliteSpecialist)
+
+DbSqliteSpecialist::DbSqliteSpecialist():DbSqliteModelHandler(KModelHdlSpecialist)
 {
     tracein;
 }
 
-DbSqliteSpecialist *DbSqliteSpecialist::getInstance()
-{
-    if (gInstance == nullptr){
-        gInstance = new DbSqliteSpecialist();
-    }
-
-    return gInstance;
-}
-
-const QString DbSqliteSpecialist::getName()
-{
-    return KModelHdlSpecialist;
-}
 
 QList<DbModel *> DbSqliteSpecialist::getListPerson(const QString &specialistUid)
 {
@@ -63,6 +50,49 @@ QList<DbModel *> DbSqliteSpecialist::getListPerson(const QString &specialistUid)
     logd("found %lld", list.count());
     traceout;
     return list;
+}
+#include "person.h"
+#include "specialistperson.h"
+
+ErrCode DbSqliteSpecialist::deleteHard(DbModel *model, bool force, QString *msg)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    if (!model) {
+        err = ErrInvalidArg;
+        loge("Invalid model");
+    }
+
+    if (err == ErrNone) {
+        logi("Delete hard model '%s', force %d", MODELSTR2CHA(model), force);
+
+        if (model->modelName() == KModelNameSpecialist) {
+            // KFieldAreaUid delete map, community, person
+            QHash<QString, QString> itemToSearch; // for searching
+            QHash<QString, QString> itemToSet; // for update
+            bool errDependency = false;
+
+            itemToSearch.insert(KFieldSpecialistUid, model->uid());
+            itemToSet.insert(KFieldRoleUid, ""); // update to null/empty
+
+            CHECK_REMOVE_TO_DELETE( err, errDependency,
+                                    msg, force,
+                                    itemToSearch,
+                                    KTableSpecialistPerson, &SpecialistPerson::build);
+            if (errDependency) {
+                err = ErrDependency;
+                loge("cannot delete, has dependency '%s'", msg?STR2CHA((*msg)):"");
+            } else {
+                logi("Delete model '%s'", MODELSTR2CHA(model));
+                err = DbSqliteModelHandler::deleteHard(model, force, msg);
+            }
+        } else {
+            err = ErrInvalidData;
+            loge("invalid model '%s'", MODELSTR2CHA(model));
+        }
+    }
+    traceret(err);
+    return err;
 }
 
 DbSqliteTbl *DbSqliteSpecialist::getMainTbl()

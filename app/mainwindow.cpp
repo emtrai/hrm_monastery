@@ -59,6 +59,8 @@
 #include "dialogutils.h"
 #include "dlgimportlistresultfactory.h"
 #include "stringdefs.h"
+#include "imagedefs.h"
+
 
 #define ADD_MENU_ITEM(menu, func, name, iconPath) \
 do { \
@@ -160,6 +162,12 @@ MainWindow::MainWindow(QWidget *parent)
                           this,
                           SLOT(onShowMsgDlg(QString)))) {
         loge("Failed to connect showMsgDlgSignal to onShowMsgDlg");
+    }
+    if (!QObject::connect(this,
+                          SIGNAL(showErrorDlgSignal(ErrCode,QString)),
+                          this,
+                          SLOT(onShowErrorMsgDlg(ErrCode,QString)))) {
+        loge("Failed to connect showErrorDlgSignal to onShowErrorMsgDlg");
     }
     traceout;
 }
@@ -328,6 +336,16 @@ void MainWindow::removeMainWindownImportListener(MainWindownImportListener *list
     return getInstance()->doRemoveMainWindownImportListener(listener);
 }
 
+void MainWindow::showMessageBox(const QString &msg)
+{
+    emit showMsgDlgSignal(msg);
+}
+
+void MainWindow::showErrorBox(const QString &msg, ErrCode err)
+{
+    emit showErrorDlgSignal(err, msg);
+}
+
 ErrCode MainWindow::doShowProcessingDialog(const QString& title,
                                WaitPrepare_t prepare,
                                WaitRunt_t run,
@@ -360,13 +378,6 @@ ErrCode MainWindow::doShowAddPersonEvent(bool isSelfUpdate, DbModel* person, DbM
     traceout;
 }
 
-void MainWindow::showMsgDlg(QString msg)
-{
-    tracein;
-    logd("show msg dlg '%s'", STR2CHA(msg));
-    emit showMsgDlgSignal(msg);
-    traceout;
-}
 void MainWindow::switchView(ViewType type, void* data)
 {
     tracein;
@@ -803,7 +814,7 @@ void MainWindow::loadOtherAddMenu()
     otherButton->setPopupMode(QToolButton::InstantPopup);
     otherButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     QIcon icon;
-    icon.addFile(QString::fromUtf8(":/icon/icon/icons8-add-64"), QSize(), QIcon::Normal, QIcon::On);
+    icon.addFile(ICON_ADD, QSize(), QIcon::Normal, QIcon::On);
     otherButton->setIcon(icon);
 
     QMenu *otherMenu = new QMenu(otherButton);
@@ -815,13 +826,13 @@ void MainWindow::loadOtherAddMenu()
     ADD_ACTION_ITEM(otherMenu,
                     on_actionNew_Community_triggered,
                     STR_ADD_COMMUNITY,
-                    ICON_PATH("icons8-community-64"));
+                    ICON_ADD_COMMUNITY);
 
 
     ADD_ACTION_ITEM(otherMenu,
                     on_actionNew_PersonEvent_triggered,
                     STR_ADD_PERSON_EVENT,
-                    ICON_PATH("icons8-add-64"));
+                    ICON_ADD_PERSON_EVENT);
 
 
 
@@ -854,24 +865,24 @@ void MainWindow::loadOtherMenu()
     ADD_ACTION_ITEM(otherMenu,
                     on_actionDept_triggered,
                     STR_DEPARTMENT,
-                    ICON_PATH("icons8-diversity-64.png"));
+                    ICON_DEPT);
 
     ADD_ACTION_ITEM(otherMenu,
                     on_actionSaints_2_triggered,
                     STR_HOLLYNAME,
-                    ICON_PATH("icons8-saint-64"));
+                    ICON_SAINT);
 
 
     ADD_ACTION_ITEM(otherMenu,
                     on_actionRole_triggered,
                     STR_ROLE,
-                    ICON_PATH("icons8-unit-80"));
+                    ICON_ROLE);
 
 
     ADD_ACTION_ITEM(otherMenu,
                     on_actionCountry_triggered,
                     STR_COUNTRY,
-                    ICON_PATH("icons8-vietnam-96"));
+                    ICON_COUNTRY);
 
 
 #ifndef SKIP_PERSON_PROVINE
@@ -883,33 +894,33 @@ void MainWindow::loadOtherMenu()
     ADD_ACTION_ITEM(otherMenu,
                     on_actionMisson_triggered,
                     STR_NHIEM_VU_XA_HOI,
-                    ICON_PATH("icons8-hospital-100"));
+                    ICON_MISSION);
 
 
     ADD_ACTION_ITEM(otherMenu,
                     on_actionSpeclialist_triggered,
                     STR_CHUYEN_MON,
-                    ICON_PATH("icons8-catholic-64"));
+                    ICON_SPECIALIST);
 
     ADD_ACTION_ITEM(otherMenu,
                     on_actionEducation_triggered,
                     STR_EDUCATION,
-                    ICON_PATH("icons8-education-100"));
+                    ICON_EDU);
 
     ADD_ACTION_ITEM(otherMenu,
                     on_actionWork_triggered,
                     STR_WORK,
-                    ICON_PATH("icons8-catholic-64"));
+                    ICON_WORK);
 
     ADD_ACTION_ITEM(otherMenu,
                     on_actionEthnic_triggered,
                     STR_ETHNIC,
-                    ICON_PATH("icons8-ethnic-people-100"));
+                    ICON_ETHNIC);
 
     ADD_ACTION_ITEM(otherMenu,
                     on_actionCourse_triggered,
                     STR_COURSE_TERM,
-                    ICON_PATH("icons8-unit-80"));
+                    ICON_COURSE);
 
     //    QAction* act = nullptr;
 
@@ -1189,6 +1200,13 @@ void MainWindow::onShowMsgDlg(QString msg)
 {
     tracein;
     DialogUtils::showMsgBox(msg);
+    traceout;
+}
+
+void MainWindow::onShowErrorMsgDlg(ErrCode err, QString msg)
+{
+    tracein;
+    DialogUtils::showErrorBox(err, msg);
     traceout;
 }
 

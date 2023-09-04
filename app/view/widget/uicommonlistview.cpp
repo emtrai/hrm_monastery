@@ -478,7 +478,8 @@ QString UICommonListView::getMainModelName()
 void UICommonListView::onModelControllerDataUpdated(const DbModel *model)
 {
     tracein;
-    logd("update model '%s'", model?MODELSTR2CHA(model):"(null)");
+    logd("update model '%s' for list '%s'",
+         model?MODELSTR2CHA(model):"(null)", STR2CHA(getName()));
     if (!mSuspendReloadOnDbUpdate) {
         QString mainModelName = getMainModelName();
         logd("main model name '%s'", STR2CHA(mainModelName));

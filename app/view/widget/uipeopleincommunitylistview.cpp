@@ -53,6 +53,11 @@ UIPeopleInCommunityListView::~UIPeopleInCommunityListView()
     traceout;
 }
 
+QString UIPeopleInCommunityListView::getName()
+{
+    return "UIPeopleInCommunityListView";
+}
+
 ErrCode UIPeopleInCommunityListView::onEditItem(UITableCellWidgetItem *item)
 {
     tracein;

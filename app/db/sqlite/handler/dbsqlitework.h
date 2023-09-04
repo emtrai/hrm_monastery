@@ -30,6 +30,7 @@ class DbSqliteWork : public DbSqliteModelHandler
     GET_INSTANCE_DECL(DbSqliteWork)
 public:
     DbSqliteWork();
+    virtual ErrCode deleteHard(DbModel* model, bool force = false, QString* msg = nullptr);
     virtual const QString getName();
     virtual DbModelBuilder getMainBuilder();
 protected:

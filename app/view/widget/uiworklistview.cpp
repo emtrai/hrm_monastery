@@ -28,16 +28,25 @@
 #include "utils.h"
 #include "mainwindow.h"
 #include "uitableviewfactory.h"
+#include "stringdefs.h"
 
 UIWorkListView::UIWorkListView(QWidget *parent):
     UICommonListView(parent)
 {
     tracein;
+    mHasImportMenu = false;
+    mHasExportMenu = false;
+    traceout;
 }
 
 UIWorkListView::~UIWorkListView()
 {
-    tracein;
+    traced;
+}
+
+QString UIWorkListView::getName()
+{
+    return "UIWorkListView";
 }
 
 ModelController *UIWorkListView::getController()
@@ -47,10 +56,24 @@ ModelController *UIWorkListView::getController()
 
 QString UIWorkListView::getTitle()
 {
-    return tr("Trình độ học vấn");
+    return STR_WORK;
 }
 
 DbModel *UIWorkListView::onCreateDbModelObj(const QString& modelName)
 {
+    UNUSED(modelName);
     return Work::build();
+}
+
+QString UIWorkListView::getMainModelName()
+{
+    return KModelNameWork;
+}
+
+void UIWorkListView::initFilterFields()
+{
+    tracein;
+    // filter by  name
+    appendFilterField(FILTER_FIELD_NAME, STR_NAME);
+    traceout;
 }

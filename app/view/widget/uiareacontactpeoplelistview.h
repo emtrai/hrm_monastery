@@ -33,6 +33,7 @@ class UIAreaContactPeopleListView : public UICommonListView
 public:
     explicit UIAreaContactPeopleListView(QWidget *parent = nullptr);
     virtual ~UIAreaContactPeopleListView();
+    virtual QString getName();
 
     /**
      * @brief area

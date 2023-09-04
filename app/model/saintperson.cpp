@@ -28,9 +28,9 @@
 #include "dbctl.h"
 #include "dbmodel.h"
 
-SaintPerson::SaintPerson()
+SaintPerson::SaintPerson():DbModel()
 {
-    tracein;
+    traced;
 }
 
 DbModel *SaintPerson::build()

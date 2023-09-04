@@ -42,6 +42,10 @@ UIEducationListView::~UIEducationListView()
 {
     traced;
 }
+QString UIEducationListView::getName()
+{
+    return "UIEducationListView";
+}
 
 ModelController *UIEducationListView::getController()
 {

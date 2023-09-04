@@ -43,6 +43,11 @@ UICountryListView::~UICountryListView()
     traced;
 }
 
+QString UICountryListView::getName()
+{
+    return "UICountryListView";
+}
+
 ModelController *UICountryListView::getController()
 {
     return COUNTRYCTL;

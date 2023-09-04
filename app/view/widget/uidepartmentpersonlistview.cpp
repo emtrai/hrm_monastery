@@ -48,6 +48,10 @@ UIDepartmentPersonListView::~UIDepartmentPersonListView()
     traced;
 }
 
+QString UIDepartmentPersonListView::getName()
+{
+    return "UIDepartmentPersonListView";
+}
 DbModel *UIDepartmentPersonListView::onCreateDbModelObj(const QString& modelName)
 {
     UNUSED(modelName);

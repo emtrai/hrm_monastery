@@ -33,7 +33,7 @@
 
 Ethnic::Ethnic():DbModel()
 {
-    tracein;
+    traced;
 }
 
 DbModel *Ethnic::build()

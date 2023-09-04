@@ -28,9 +28,9 @@
 #include "defs.h"
 #include "dbmodel.h"
 
-PersonStatus::PersonStatus()
+PersonStatus::PersonStatus():DbModel()
 {
-    tracein;
+    traced;
 }
 DbModel *PersonStatus::build()
 {

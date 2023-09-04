@@ -31,12 +31,12 @@ public:
     explicit UICommunityListView(QWidget *parent = nullptr);
     virtual ~UICommunityListView();
     virtual void setupUI();
+    virtual QString getName();
 protected:
     virtual int getViewType() { return VIEW_COMMUNITY;}
     virtual void initHeader();
     virtual QString getTitle();
     virtual ModelController* getController();
-    virtual QString getName();
     virtual DbModel* onCreateDbModelObj(const QString& modelName);
     virtual QString getMainModelName();
 

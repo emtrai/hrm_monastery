@@ -57,10 +57,13 @@ do { \
     RELEASE_LIST_DBMODEL(list); \
 } while(0)
 
-#define CHECK_REMOVE_TO_DELETE(err, errDependency, msg, force, itemToSearch, tableName, builder) \
+#define CHECK_REMOVE_TO_DELETE( err, errDependency, \
+                                msg, force, itemToSearch, \
+                                tableName, builder) \
 do { \
     QList<DbModel*> list; \
     int count = 0; \
+    ErrCode tmpErr = ErrNone; \
     logd("Check to delete iten in table %s", tableName); \
     err = getListItems(itemToSearch, tableName, true, &count, &list, builder); \
     if (err == ErrNone && count > 0) { \

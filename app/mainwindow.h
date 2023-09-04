@@ -110,6 +110,14 @@ public:
                                                 void *data = nullptr);
             static void addMainWindownImportListener(MainWindownImportListener* listener);
             static void removeMainWindownImportListener(MainWindownImportListener* listener);
+
+            void showMessageBox(const QString& msg);
+            /**
+             * @brief showErrorBox
+             * @param msg error code string to be showed.
+             * @param err error code, if ErrNone, just show \ref msg, not show error code string
+             */
+            void showErrorBox(const QString& msg, ErrCode err = ErrNone);
 protected:
     void showEvent(QShowEvent *ev);
     /**
@@ -174,7 +182,6 @@ protected:
      ErrCode doShowAddPersonEvent(bool isSelfUpdate = true, DbModel* person = nullptr,
                                   DbModel* model = nullptr,
                                   CommonEditModelListener* listener = nullptr);
-     void showMsgDlg(QString msg);
 //     ErrCode doShowAddPersonCommEvent(bool isSelfUpdate = true, DbModel* person = nullptr,
 //                                  DbModel* model = nullptr,
 //                                  CommonEditModelListener* listener = nullptr);
@@ -235,11 +242,13 @@ protected:
 
      void importPeople(ErrCode err, QList<DbModel*>* list);
     void showMsgDlgSignal(QString);
+    void showErrorDlgSignal(ErrCode,QString);
  private slots:
     void onLoad();
     void onUnload();
      void onImportPeople(ErrCode err, QList<DbModel*>* list);
     void onShowMsgDlg(QString);
+    void onShowErrorMsgDlg(ErrCode err,QString msg);
      void on_action_ImportPerson_triggered();
      void on_action_ImportPersonList_triggered();
      void on_action_ImportCommunityList_triggered();

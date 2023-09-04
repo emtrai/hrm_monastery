@@ -32,7 +32,7 @@ GET_INSTANCE_IMPL(DbSqliteEthnic)
 
 DbSqliteEthnic::DbSqliteEthnic():DbSqliteModelHandler(KModelHdlEthnic)
 {
-    tracein;
+    traced;
 }
 
 ErrCode DbSqliteEthnic::deleteHard(DbModel *model, bool force, QString *msg)

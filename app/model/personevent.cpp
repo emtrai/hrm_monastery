@@ -32,11 +32,11 @@
 #include "prebuiltdefs.h"
 #include "stringdefs.h"
 
-PersonEvent::PersonEvent():
+PersonEvent::PersonEvent():DbModel(),
     mDate(0),
     mEndDate(0)
 {
-    tracein;
+    traced;
 }
 
 PersonEvent::PersonEvent(const PersonEvent *model):

@@ -159,9 +159,6 @@ do { \
     }\
 } while (0)
 
-#define ICON_ROOT_PATH ":/icon/icon"
-#define ICON_PATH(name) ICON_ROOT_PATH "/" name
-
 #define GET_VAL_INT_FROM_CB(widget, out) \
     do { \
         QString currtxt = widget->currentText().trimmed();\

@@ -31,6 +31,7 @@ class UIDepartmentPersonListView : public UICommonListView
 public:
     explicit UIDepartmentPersonListView(QWidget *parent = nullptr);
     virtual ~UIDepartmentPersonListView();
+    virtual QString getName();
 
     CommunityDept* communityDept() const;
     ErrCode setCommDept(const CommunityDept *commDept);

@@ -34,6 +34,7 @@ class UICommunitiesOfPersonListView : public UICommonListView
 public:
     explicit UICommunitiesOfPersonListView(QWidget *parent = nullptr);
     virtual ~UICommunitiesOfPersonListView();
+    virtual QString getName();
 
     /**
      * @brief Caller must not free this after use, if want to change/free, clone it

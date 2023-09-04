@@ -26,10 +26,11 @@
 
 class DbSqlitePersonStatus : public DbSqliteModelHandler
 {
+    GET_INSTANCE_DECL(DbSqlitePersonStatus);
 public:
     DbSqlitePersonStatus();
+    virtual ErrCode deleteHard(DbModel* model, bool force = false, QString* msg = nullptr);
 
-    virtual const QString getName();
 protected:
     virtual DbSqliteTbl *getMainTbl();
     virtual DbModelBuilder getMainBuilder();

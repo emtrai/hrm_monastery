@@ -36,9 +36,10 @@
 #include "department.h"
 #include "prebuiltdefs.h"
 
-PersonDept::PersonDept():mModelStatus(0)
+PersonDept::PersonDept():DbModel(),
+    mModelStatus(0)
 {
-    tracein;
+    traced;
 }
 
 DbModel *PersonDept::build()

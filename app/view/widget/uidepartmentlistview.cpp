@@ -40,6 +40,10 @@ UIDepartmentListView::~UIDepartmentListView()
     traced;
 }
 
+QString UIDepartmentListView::getName()
+{
+    return "UIDepartmentListView";
+}
 QString UIDepartmentListView::getTitle()
 {
     return STR_DEPARTMENT;

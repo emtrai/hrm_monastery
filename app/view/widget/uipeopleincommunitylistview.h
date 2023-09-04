@@ -34,6 +34,7 @@ class UIPeopleInCommunityListView : public UICommonListView
 public:
     explicit UIPeopleInCommunityListView(QWidget *parent = nullptr);
     virtual ~UIPeopleInCommunityListView();
+    virtual QString getName();
 
     Community *community() const;
     ErrCode setCommunity(const Community *newCommunity);

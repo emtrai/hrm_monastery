@@ -51,6 +51,11 @@ UIAreaContactPeopleListView::~UIAreaContactPeopleListView()
     traceout;
 }
 
+QString UIAreaContactPeopleListView::getName()
+{
+    return "UIAreaContactPeopleListView";
+}
+
 Area *UIAreaContactPeopleListView::area() const
 {
     return (Area*)parentModel();

@@ -30,12 +30,17 @@ class UIWorkListView : public UICommonListView
 public:
     explicit UIWorkListView(QWidget *parent = nullptr);
     virtual ~UIWorkListView();
+    virtual QString getName();
 protected:
 
     virtual int getViewType() { return VIEW_WORK;}
     virtual ModelController* getController();
     virtual QString getTitle();
     virtual DbModel* onCreateDbModelObj(const QString& modelName);
+
+
+    virtual QString getMainModelName();
+    virtual void initFilterFields();
 };
 
 #endif // UIWORKLISTVIEW_H

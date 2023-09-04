@@ -35,7 +35,7 @@ Area::Area():DbModel(),
       mEndDate(0),
       mModelStatus(0)
 {
-    tracein;
+    traced;
 }
 
 Area::~Area()

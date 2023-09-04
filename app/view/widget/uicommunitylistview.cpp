@@ -51,6 +51,11 @@ UICommunityListView::~UICommunityListView()
     traced;
 }
 
+QString UICommunityListView::getName()
+{
+    return "UICommunityListView";
+}
+
 void UICommunityListView::setupUI()
 {
     tracein;
@@ -162,11 +167,6 @@ ErrCode UICommunityListView::onEditItem(UITableCellWidgetItem *item)
 QString UICommunityListView::getTitle()
 {
     return STR_COMMUNITY;
-}
-
-QString UICommunityListView::getName()
-{
-    return "UICommunityListView";
 }
 
 void UICommunityListView::onMainWindownImportStart(ImportTarget target)

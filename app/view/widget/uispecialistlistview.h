@@ -29,11 +29,16 @@ class UISpecialistListView : public UICommonListView
 public:
     explicit UISpecialistListView(QWidget *parent = nullptr);
     virtual ~UISpecialistListView();
+    virtual QString getName();
 protected:
     virtual int getViewType() { return VIEW_SPECIALIST;}
     virtual QString getTitle();
     virtual ModelController* getController();
     virtual DbModel* onCreateDbModelObj(const QString& modelName);
+
+    virtual QString getMainModelName();
+    virtual void initFilterFields();
+
 };
 
 #endif // UISPECIALISTLISTVIEW_H

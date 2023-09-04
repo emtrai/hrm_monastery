@@ -30,21 +30,30 @@
 #include "utils.h"
 #include "mainwindow.h"
 #include "uitableviewfactory.h"
+#include "stringdefs.h"
 
 UISpecialistListView::UISpecialistListView(QWidget *parent):
     UICommonListView(parent)
 {
     tracein;
+    mHasImportMenu = false;
+    mHasExportMenu = false;
+    traceout;
 }
 
 UISpecialistListView::~UISpecialistListView()
 {
-    tracein;
+    traced;
+}
+
+QString UISpecialistListView::getName()
+{
+    return "UISpecialistListView";
 }
 
 QString UISpecialistListView::getTitle()
 {
-    return tr("Chuyên môn");
+    return STR_SPECIALIST;
 }
 
 ModelController *UISpecialistListView::getController()
@@ -54,6 +63,20 @@ ModelController *UISpecialistListView::getController()
 
 DbModel *UISpecialistListView::onCreateDbModelObj(const QString& modelName)
 {
+    UNUSED(modelName);
     return Specialist::build();
+}
+
+QString UISpecialistListView::getMainModelName()
+{
+    return KModelNameSpecialist;
+}
+
+void UISpecialistListView::initFilterFields()
+{
+    tracein;
+    // filter by  name
+    appendFilterField(FILTER_FIELD_NAME, STR_NAME);
+    traceout;
 }
 

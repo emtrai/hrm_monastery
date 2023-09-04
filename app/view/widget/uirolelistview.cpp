@@ -30,16 +30,20 @@
 #include "utils.h"
 #include "mainwindow.h"
 #include "uitableviewfactory.h"
+#include "stringdefs.h"
 
 UIRoleListView::UIRoleListView(QWidget *parent):
     UICommonListView(parent)
 {
     tracein;
+    mHasImportMenu = false;
+    mHasExportMenu = false;
+    traceout;
 }
 
 UIRoleListView::~UIRoleListView()
 {
-    tracein;
+    traced;
 }
 
 QString UIRoleListView::getName()
@@ -54,11 +58,25 @@ ModelController *UIRoleListView::getController()
 
 QString UIRoleListView::getTitle()
 {
-    return tr("Vai trò/vị trí");
+    return STR_ROLE;
 }
 
 DbModel *UIRoleListView::onCreateDbModelObj(const QString& modelName)
 {
+    UNUSED(modelName);
     return Role::build();
+}
+
+QString UIRoleListView::getMainModelName()
+{
+    return KModelNameRole;
+}
+
+void UIRoleListView::initFilterFields()
+{
+    tracein;
+    // filter by  name
+    appendFilterField(FILTER_FIELD_NAME, STR_NAME);
+    traceout;
 }
 

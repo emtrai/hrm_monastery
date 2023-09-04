@@ -31,6 +31,7 @@ class UIPersonEventListView : public UICommonListView
 public:
     explicit UIPersonEventListView(QWidget *parent = nullptr);
     virtual ~UIPersonEventListView();
+    virtual QString getName();
 
     Person *person() const;
     ErrCode setPerson(const Person *newPerson);

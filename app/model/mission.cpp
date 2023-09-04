@@ -30,8 +30,9 @@
 #include "dbmodel.h"
 
 
-Mission::Mission()
+Mission::Mission():DbModel()
 {
+    traced;
 
 }
 
@@ -47,6 +48,11 @@ DbModel *Mission::build()
 DbModelBuilder Mission::getBuilder() const
 {
     return &Mission::build;
+}
+
+QString Mission::modelName() const
+{
+    return KModelNameMission;
 }
 
 DbModelHandler *Mission::getDbModelHandler() const
