@@ -26,19 +26,19 @@
 #include "dbmodel.h"
 #include "utils.h"
 #include "mainwindow.h"
-#include "uitableviewfactory.h"
 #include "stringdefs.h"
 #include "modeldefs.h"
+#include "filter.h"
 
 UIEthnicListView::UIEthnicListView(QWidget *parent):
     UICommonListView(parent)
 {
-    tracein;
+    traced;
 }
 
 UIEthnicListView::~UIEthnicListView()
 {
-    tracein;
+    traced;
 }
 
 
@@ -49,12 +49,26 @@ ModelController *UIEthnicListView::getController()
 
 QString UIEthnicListView::getTitle()
 {
-    return tr("Dân tộc");
+    return STR_ETHNIC;
 }
 
 DbModel *UIEthnicListView::onCreateDbModelObj(const QString& modelName)
 {
+    UNUSED(modelName);
     return Ethnic::build();
+}
+
+QString UIEthnicListView::getMainModelName()
+{
+    return KModelNameEthnic;
+}
+
+void UIEthnicListView::initFilterFields()
+{
+    tracein;
+    // filter by  name
+    appendFilterField(FILTER_FIELD_NAME, STR_NAME);
+    traceout;
 }
 
 void UIEthnicListView::initHeader()
@@ -70,24 +84,25 @@ void UIEthnicListView::initHeader()
 ErrCode UIEthnicListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
+    UNUSED(idx);
     ErrCode err = ErrNone;
     if (!item || !tblItem) {
         err = ErrInvalidArg;
         loge("invalid argument");
     }
+    if (err == ErrNone && !IS_MODEL_NAME(item, KModelNameEthnic)) {
+        loge("Invalid model '%s'", MODELSTR2CHA(item));
+        err = ErrInvalidModel;
+    }
     if (err == ErrNone) {
         Ethnic* model = (Ethnic*)item;
-        if (model && model->modelName() == KModelNameEthnic) {
-            tblItem->addValue(model->nameId());
-            tblItem->addValue(model->name());
-            tblItem->addValue(model->countryName());
-            tblItem->addValue(model->remark());
-        } else {
-            loge("Invalid model '%s'", model?STR2CHA(model->toString()):"null");
-            err = ErrInvalidModel;
-        }
+        tblItem->addValue(model->nameId());
+        tblItem->addValue(model->name());
+        tblItem->addValue(model->countryName());
+        tblItem->addValue(model->remark());
     }
-    traceout;
+    traceret(err);
+    return err;
 }
 
 ErrCode UIEthnicListView::onAddItem(UITableCellWidgetItem *item)
@@ -108,6 +123,7 @@ ErrCode UIEthnicListView::onEditItem(UITableCellWidgetItem *item)
             MainWindow::showAddEditEthnic(true, ethnic, this);
         } else {
             loge("Edit failed, null ethnic");
+            err = ErrInvalidModel;
         }
     } else {
         loge("Edit failed, null item");

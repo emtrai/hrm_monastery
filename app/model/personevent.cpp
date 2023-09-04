@@ -29,6 +29,8 @@
 #include "defs.h"
 #include "dbmodel.h"
 #include "eventctl.h"
+#include "prebuiltdefs.h"
+#include "stringdefs.h"
 
 PersonEvent::PersonEvent():
     mDate(0),
@@ -78,7 +80,7 @@ QString PersonEvent::makeNameId(const QString &perNameId, const QString &eventNa
     return nameId;
 }
 
-ErrCode PersonEvent::buildNameId(const QString &perNameId, const QString &eventNameId, const QString &date)
+ErrCode PersonEvent::buildNameIdFromOthersNameId(const QString &perNameId, const QString &eventNameId, const QString &date)
 {
     tracein;
     ErrCode err = ErrNone;
@@ -124,6 +126,44 @@ void PersonEvent::clone(const DbModel *model)
         logd("Model is null or not person event type, name '%s'",
              model?STR2CHA(model->name()):"null");
     }
+    traceout;
+}
+
+QString PersonEvent::exportHtmlTemplateFile(const QString &name) const
+{
+    UNUSED(name);
+    return KPrebuiltPersonEventInfoTemplateFileName;
+
+}
+
+void PersonEvent::initExportFields()
+{
+    tracein;
+    DbModel::initExportFields();
+    mExportCallbacks.insert(KItemNameId, EXPORT_CALLBACK_STRING_IMPL(
+                                                   PersonEvent,
+                                                   KModelNamePersonEvent,
+                                                   nameId));
+    mExportCallbacks.insert(KItemEvent, EXPORT_CALLBACK_STRING_IMPL(
+                                             PersonEvent,
+                                             KModelNamePersonEvent,
+                                             eventName));
+
+    mExportCallbacks.insert(KItemTitle, EXPORT_CALLBACK_STRING_IMPL(
+                                            PersonEvent,
+                                            KModelNamePersonEvent,
+                                            name));
+
+    mExportCallbacks.insert(KItemStartDate, EXPORT_CALLBACK_STRING_IMPL(
+                                                PersonEvent,
+                                                KModelNamePersonEvent,
+                                                dateString));
+
+    mExportCallbacks.insert(KItemEndDate, EXPORT_CALLBACK_STRING_IMPL(
+                                              PersonEvent,
+                                              KModelNamePersonEvent,
+                                              endDateString));
+
     traceout;
 }
 
@@ -187,9 +227,28 @@ QString PersonEvent::toString() const
         DbModel::toString(),DatetimeUtils::date2String(date()), STR2CHA(eventName()));
 }
 
+QString PersonEvent::toEventString() const
+{
+    tracein;
+    QString event;
+    QString sep = ", ";
+    APPEND_STRING(event, dateString(), sep);
+    APPEND_STRING(event, endDateString(), "-");
+    APPEND_STRING(event, eventName(), ": ");
+    APPEND_STRING(event, name(), sep);
+    logd("event string '%s'", STR2CHA(event));
+    traceout;
+    return event;
+}
+
 qint64 PersonEvent::endDate() const
 {
     return mEndDate;
+}
+
+QString PersonEvent::endDateString() const
+{
+    return DatetimeUtils::date2String(endDate(), DEFAULT_FORMAT_YMD);
 }
 
 void PersonEvent::setEndDate(qint64 newEndDate)
@@ -251,6 +310,11 @@ void PersonEvent::setPersonUid(const QString &newPersonUid)
 qint64 PersonEvent::date() const
 {
     return mDate;
+}
+
+QString PersonEvent::dateString() const
+{
+    return DatetimeUtils::date2String(date(), DEFAULT_FORMAT_YMD);
 }
 
 void PersonEvent::setDate(qint64 newDate)

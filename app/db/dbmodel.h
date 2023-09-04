@@ -34,6 +34,7 @@
 #include "importtype.h"
 
 #define CLONE_MODEL(model, type) (model?((type*)((DbModel*)model)->clone()):nullptr)
+#define CLONE_DBMODEL(model) (model?(model->clone()):nullptr)
 #define CLONE_LIST(list, type) DbModel::cloneListModel<type>(list)
 #define CLONE_LIST_DBMODEL(list) CLONE_LIST(list, DbModel)
 #define CLONE_LIST_FROM_DBMODEL(list, type) DbModel::cloneListFromDbModelList<type>(list)

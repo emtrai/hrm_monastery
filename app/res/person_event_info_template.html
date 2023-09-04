@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+
+body {
+<!--    background-image: url(':/icon/icon/background.jpeg');-->
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    min-height: 100%;
+    }
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    }
+.right {
+    text-align: right;
+    }
+.header {
+<!--    background-color:rgb(208, 244, 246);-->
+    padding: 5px;
+    width: 30%;
+}
+.value {
+    padding: 5px;
+    width: 80%;
+}
+.header2 {
+    padding: 5px;
+    font-weight: bold;
+    text-align: left;
+    font-size: large;
+    width: 100%;
+
+}
+.avatar {
+    vertical-align: middle;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    max-width: 50px;
+    max-height: 50px;
+  }
+</style>
+</head>
+<body>
+<div style="padding: 5%">
+<table style="border: none;border-collapse: collapse;display: block;" width="100%">
+    <colgroup>
+    <col width="30%"/>
+    <col width="80%"/>
+    </colgroup>
+    <tr>
+        <td class="header2" colspan="2">Thông tin</td>
+    </tr>
+    <tr>
+        <td class="header" width="30%">Mã định danh</td>
+        <td class="value">{{MA_DINH_DANH}}</td>
+    </tr>
+    <tr>
+        <td class="header" width="30%">Sự kiện</td>
+        <td class="value">{{SU_KIEN}}</td>
+    </tr>
+    <tr>
+        <td class="header" width="30%">Tiêu đề</td>
+        <td class="value">{{TIEU_DE}}</td>
+    </tr>
+    <tr>
+        <td class="header">Ngày bắt đầu</td>
+        <td class="value">{{NGAY_BAT_DAU}}</td>
+    </tr>
+    <tr>
+        <td class="header">Ngày kết thúc</td>
+        <td class="value">{{NGAY_KET_THUC}}</td>
+    </tr>
+    <tr>
+        <td class="header">Ghi chú</td>
+        <td>{{GHI_CHU}}</td>
+    </tr>
+</table>
+</div>
+</body>
+
+</html>

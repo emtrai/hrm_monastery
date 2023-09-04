@@ -25,26 +25,55 @@
 #include "dbsqlite.h"
 #include "dbsqlitedefs.h"
 #include "table/dbsqliteedutbl.h"
-#include "defs.h"
-DbSqliteEdu* DbSqliteEdu::gInstance = nullptr;
 
-DbSqliteEdu::DbSqliteEdu()
+GET_INSTANCE_IMPL(DbSqliteEdu)
+
+DbSqliteEdu::DbSqliteEdu():DbSqliteModelHandler(KModelHdlEdu)
+{
+    traced;
+}
+
+ErrCode DbSqliteEdu::deleteHard(DbModel *model, bool force, QString *msg)
 {
     tracein;
-}
-
-DbSqliteEdu *DbSqliteEdu::getInstance()
-{
-    if (gInstance == nullptr){
-        gInstance = new DbSqliteEdu();
+    ErrCode err = ErrNone;
+    if (!model) {
+        err = ErrInvalidArg;
+        loge("Invalid model");
     }
 
-    return gInstance;
-}
+    if (err == ErrNone) {
+        logi("Delete hard model '%s', force %d", MODELSTR2CHA(model), force);
 
-const QString DbSqliteEdu::getName()
-{
-    return KModelHdlEdu;
+        if (model->modelName() == KModelNameEducation) {
+            // KFieldAreaUid delete map, community, person
+            QHash<QString, QString> itemToSearch; // for searching
+            QHash<QString, QString> itemToSet; // for update
+            bool errDependency = false;
+
+            itemToSearch.insert(KFieldEduUid, model->uid());
+            itemToSet.insert(KFieldEduUid, ""); // update to null/empty
+
+            CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency,
+                                       msg, force,
+                                       itemToSearch, itemToSet,
+                                       KTablePerson, &Person::build);
+
+            if (errDependency) {
+                err = ErrDependency;
+                loge("cannot delete, has dependency '%s'", msg?STR2CHA((*msg)):"");
+            } else {
+                logi("Delete model '%s'", MODELSTR2CHA(model));
+                err = DbSqliteModelHandler::deleteHard(model, force, msg);
+            }
+        } else {
+            err = ErrInvalidData;
+            loge("invalid model '%s'", MODELSTR2CHA(model));
+        }
+    }
+    traceret(err);
+    return err;
+
 }
 
 DbSqliteTbl *DbSqliteEdu::getMainTbl()

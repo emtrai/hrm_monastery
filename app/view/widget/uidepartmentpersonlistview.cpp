@@ -177,8 +177,11 @@ void UIDepartmentPersonListView::initHeader()
     tracein;
     mHeader.append(STR_NAMEID);
     mHeader.append(STR_PERSON_NAMEID);
+    mHeader.append(STR_HOLLYNAME);
     mHeader.append(STR_NU_TU);
     mHeader.append(STR_ROLE);
+    mHeader.append(STR_EMAIL);
+    mHeader.append(STR_TEL);
     mHeader.append(STR_STATUS);
     mHeader.append(STR_TERM);
     mHeader.append(STR_STARTDATE);
@@ -205,8 +208,11 @@ ErrCode UIDepartmentPersonListView::fillValueTableRowItem(DbModel *item, UITable
             PersonDept* model = (PersonDept*) item;
             tblItem->addValue(model->nameId());
             tblItem->addValue(model->personNameId());
+            tblItem->addValue(model->personHollyName());
             tblItem->addValue(model->personName());
             tblItem->addValue(model->roleName());
+            tblItem->addValue(model->personEmail());
+            tblItem->addValue(model->personTel());
             tblItem->addValue(DbModel::modelStatus2Name((DbModelStatus)model->modelStatus()));
             tblItem->addValue(model->courseName());
             tblItem->addValue(DatetimeUtils::date2String(model->startDate(), DEFAULT_FORMAT_YMD));

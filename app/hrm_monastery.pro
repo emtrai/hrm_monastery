@@ -554,9 +554,11 @@ DISTFILES += \
     res/department_person_info_template.html \
     res/department_vi.json \
     res/edu_vi.csv \
+    res/ethnic_info_template_vi.html \
     res/event_category_vi.csv \
     res/home.html \
     res/people_in_community_export_template_vi.json \
+    res/person_event_info_template.html \
     res/person_info_template.html \
     res/person_list_export_template.csv \
     res/person_list_export_template_vi.json \

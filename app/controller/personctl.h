@@ -69,7 +69,9 @@ public:
      * @return
      */
     ErrCode getListEvents(const QString& personUid, QList<DbModel*>& list); // TODO: should move to separate event controller?
-
+    QString getListEventsInString(const QString& personUid,
+                                        const QString &sep = "\n",
+                                        bool* ok = nullptr);
 
     virtual DbModel* doImportOneItem(const QString& importName, int importFileType, const QStringList& items, quint32 idx);
     virtual DbModel* doImportOneItem(const QString& importName, int importFileType, const QHash<QString, QString>& items, quint32 idx);

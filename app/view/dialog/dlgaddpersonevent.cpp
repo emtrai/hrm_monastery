@@ -118,8 +118,8 @@ ErrCode DlgAddPersonEvent::fromModel(const DbModel *item)
             }
             Utils::setSelectItemComboxByData(ui->cbEvent, comm->eventUid());
             ui->txtTitle->setText(comm->name());
-            ui->txtDate->setText(DatetimeUtils::date2String(comm->date(), DEFAULT_FORMAT_YMD));
-            ui->txtEndDate->setText(DatetimeUtils::date2String(comm->endDate(), DEFAULT_FORMAT_YMD));
+            ui->txtDate->setText(comm->dateString());
+            ui->txtEndDate->setText(comm->endDateString());
             ui->txtRemark->setPlainText(comm->remark());
             ui->btnSearch->setEnabled(false); // not allow to change person
             if (!mEvenInfoOnly) {

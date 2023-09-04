@@ -88,7 +88,7 @@
 
 #define STR_AREA     QObject::tr("Khu vực")
 #define STR_DATA_EXISTED     QObject::tr("Dữ liệu đã tồn tại")
-#define STR_DATA_ERROR     QObject::tr("Dữ liệu lỗi")
+#define STR_DATA_ERROR     QObject::tr("Dữ liệu lỗi!!!")
 
 
 #define STR_TONG_PHU_TRACH     QObject::tr("Tổng phụ trách")
@@ -99,20 +99,24 @@
 #define STR_XUAT_DU_LIEU_THANH_CONG     QObject::tr("Xuất dữ liệu thành công")
 #define STR_XUAT_DU_LIEU_THANH_CONG_FILE     QObject::tr("Xuất dữ liệu thành công. Lưu tại %1")
 #define STR_INFO     QObject::tr("Thông tin")
-#define STR_ERROR     QObject::tr("Lỗi")
-#define STR_FAILED     QObject::tr("Thất bại")
+#define STR_ERROR     QObject::tr("Lỗi!!!")
+#define STR_FAILED     QObject::tr("Thất bại!!!")
 
 #define STR_TYPE     QObject::tr("Loại")
 
 #define STR_CHUYEN_MON     QObject::tr("Chuyên môn")
 #define STR_EDUCATION     QObject::tr("Giáo dục")
+#define STR_EDUCATION_LEVEL     QObject::tr("Trình độ học vấn")
 #define STR_WORK     QObject::tr("Công việc")
 
-#define STR_NATIONALITY     QObject::tr("Dân tộc")
+#define STR_ETHNIC     QObject::tr("Dân tộc")
+#define STR_NATIONALITY     QObject::tr("Quốc tịch")
 #define STR_ADD_COMMUNITY     QObject::tr("Thêm cộng đoàn")
 #define STR_ADD_PERSON_EVENT     QObject::tr("Thêm Sự kiện cho Nữ tu")
 
 #define STR_NONE QObject::tr("Không")
 #define STR_MEMBER QObject::tr("Thành viên")
+#define STR_CONG_TAC_XA_HOI QObject::tr("Công tác xã hội")
+
 
 #endif // STRINGDEFS_H

@@ -34,10 +34,12 @@ public:
     PersonEvent(const PersonEvent* model);
     static DbModel *build();
     static QString makeNameId(const QString& perNameId, const QString& eventNameId, const QString& date);
-    ErrCode buildNameId(const QString& perNameId, const QString& eventNameId, const QString& date = nullptr);
+    virtual ErrCode buildNameIdFromOthersNameId(const QString& perNameId, const QString& eventNameId, const QString& date = nullptr);
     virtual DbModelBuilder getBuilder() const;
     virtual QString modelName() const;
     virtual void clone(const DbModel* model);
+    virtual QString exportHtmlTemplateFile(const QString& name) const;
+    virtual void initExportFields();
     /**
      * @brief Copy data only, except identity such as uid, nameid, dbid
      * @param model
@@ -46,6 +48,7 @@ public:
     virtual void buildUidIfNotSet();
 
     qint64 date() const;
+    QString dateString() const;
     void setDate(qint64 newDate);
     void setDate(const QString& newDate, const QString& format=DEFAULT_FORMAT_YMD);
 
@@ -60,12 +63,14 @@ public:
     void setEventName(const QString &newEventName);
 
     qint64 endDate() const;
+    QString endDateString() const;
     void setEndDate(qint64 newEndDate);
 
     QString personName() const;
     void setPersonName(const QString &newPersonName);
     virtual QString toString() const;
 
+    QString toEventString() const;
 protected:
     virtual DbModelHandler *getDbModelHandler() const;
 private:

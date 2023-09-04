@@ -32,9 +32,11 @@ class Education: public DbModel
 {
 public:
     Education();
+    virtual ~Education();
 public:
     static DbModel *build();
     virtual DbModelBuilder getBuilder() const;
+    virtual QString modelName() const;
 
 protected:
     virtual DbModelHandler *getDbModelHandler() const;

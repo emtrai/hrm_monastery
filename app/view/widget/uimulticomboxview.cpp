@@ -35,9 +35,9 @@ UIMultiComboxView::UIMultiComboxView(QWidget *parent) :
     ui(new Ui::UIMultiComboxView),
     mListener(nullptr)
 {
+    tracein;
     ui->setupUi(this);
-//    mContainerLayout = new QVBoxLayout;
-    //    ui->wContainer->setLayout( layout );
+    traceout;
 }
 
 UIMultiComboxView::UIMultiComboxView(const QString &name, QWidget *parent):
@@ -45,9 +45,8 @@ UIMultiComboxView::UIMultiComboxView(const QString &name, QWidget *parent):
 {
     tracein;
     mName = name;
+    traceout;
 }
-
-
 
 UIMultiComboxView::~UIMultiComboxView()
 {
@@ -58,14 +57,13 @@ ErrCode UIMultiComboxView::addItem(const QString &name, const QVariant& value)
 {
     tracein;
     ui->cbItems->addItem(name, value);
-
+    traceout;
     return ErrNone;
 }
 
 void UIMultiComboxView::on_btnAdd_clicked()
 {
     tracein;
-    ErrCode ret = ErrNone;
     QString currtxt = ui->cbItems->currentText().trimmed();
 
     if (!currtxt.isEmpty()) {
@@ -77,16 +75,21 @@ void UIMultiComboxView::on_btnAdd_clicked()
 void UIMultiComboxView::on_item_clicked( UIItemButton * button, QVariant value){
     tracein;
     logd("Remain count %lld", mValueList.count());
-    mValueList.remove(button->text());
-    logd("Remove %s", button->text().toStdString().c_str());
-    ui->formLayout->removeWidget(button);
-    if (mListener != nullptr) {
-        mListener->onComboxItemDeleted(this, button->text(), value);
+    if (button) {
+        mValueList.remove(button->text());
+        logd("Remove %s", button->text().toStdString().c_str());
+        ui->formLayout->removeWidget(button);
+        if (mListener != nullptr) {
+            mListener->onComboxItemDeleted(this, button->text(), value);
+        }
+        if (mButtonList.removeOne(button)){
+            logd("Removed button %s", button->text().toStdString().c_str());
+        }
+        delete button; // TODO: is it safe to delete here????
+    } else {
+        loge("no button to delete");
     }
-    if (mButtonList.removeOne(button)){
-        logd("Removed button %s", button->text().toStdString().c_str());
-    }
-    delete button; // TODO: is it safe to delete here????
+    traceout;
 }
 
 const QString &UIMultiComboxView::name() const
@@ -101,15 +104,17 @@ void UIMultiComboxView::clearAll()
 
     mValueList.clear();
     foreach (UIItemButton* btn, mButtonList) {
-        ui->formLayout->removeWidget(btn);
-        delete btn;
+        if (btn) {
+            ui->formLayout->removeWidget(btn);
+            delete btn;
+        }
     }
     mButtonList.clear();
     if (mListener != nullptr) {
         logd("call callback");
         mListener->onComboxClearAll();
     }
-
+    traceout;
 }
 
 void UIMultiComboxView::addSelectedItemByName(const QString &txt)
@@ -119,22 +124,22 @@ void UIMultiComboxView::addSelectedItemByName(const QString &txt)
 
     int index = ui->cbItems->findText(txt);
     logd("index %d", index);
-    if (index < 0){
+    if (index < 0) {
         if (mListener != nullptr) {
             ret = mListener->onComboxNewItem(this, txt, false);
         } else {
             ret = ErrNotFound;
             loge("not found data");
         }
-        if (ret == ErrNone){
+        if (ret == ErrNone) {
             index = ui->cbItems->findText(txt);
-            if (index < 0){
+            if (index < 0) {
                 ret = ErrNotFound;
                 loge("not found data");
             }
         }
     }
-    if (ret == ErrNone){
+    if (ret == ErrNone) {
         QVariant value = ui->cbItems->itemData(index);
 
         if (mValueList.keys().contains(txt)) {
@@ -143,21 +148,25 @@ void UIMultiComboxView::addSelectedItemByName(const QString &txt)
         }
 
         UIItemButton* lbl = new UIItemButton();
-
-        QObject::connect(lbl,
-                         SIGNAL(clicked(UIItemButton*,QVariant)),
-                         this,
-                         SLOT(on_item_clicked(UIItemButton*,QVariant)));
-        lbl->setText(txt);
-        lbl->setValue(value);
-        // TODO: use text/name as key for array here, something quite bad!!!
-        mValueList.insert(txt, value);
-        ui->formLayout->addWidget(lbl);
-        if (mListener != nullptr) {
-            mListener->onComboxItemAdded(this, txt, value);
+        if (lbl) {
+            QObject::connect(lbl,
+                             SIGNAL(clicked(UIItemButton*,QVariant)),
+                             this,
+                             SLOT(on_item_clicked(UIItemButton*,QVariant)));
+            lbl->setText(txt);
+            lbl->setValue(value);
+            // TODO: use text/name as key for array here, something quite bad!!!
+            mValueList.insert(txt, value);
+            ui->formLayout->addWidget(lbl);
+            if (mListener != nullptr) {
+                mListener->onComboxItemAdded(this, txt, value);
+            }
+            mButtonList.append(lbl);
+        } else {
+            loge("not memory to create label");
         }
-        mButtonList.append(lbl);
     }
+    traceout;
 }
 
 void UIMultiComboxView::addSelectedItemByData(const QVariant &data)
@@ -167,7 +176,6 @@ void UIMultiComboxView::addSelectedItemByData(const QVariant &data)
     int cnt = ui->cbItems->count();
     logd ("no. item %d", cnt);
     logd ("add item with data %s", data.toString().toStdString().c_str());
-    ErrCode ret = ErrNotFound;
     for (int i = 0; i < cnt; i++) {
         QVariant value = ui->cbItems->itemData(i);
         logd("value %s", value.toString().toStdString().c_str());
@@ -203,10 +211,6 @@ void UIMultiComboxView::addSelectedItemByData(const QVariant &data)
 
 const QHash<QString, QVariant> &UIMultiComboxView::items() const
 {
-//    QHash<QString, QString> item;
-//    foreach (QVariant key, mValueList.keys()) {
-//        item.insert(key.toString(), mValueList.value(key));
-//    }
     return mValueList;
 }
 
@@ -219,5 +223,3 @@ void UIMultiComboxView::setListener(UIMultiComboxViewListener *newListener)
 {
     mListener = newListener;
 }
-
-

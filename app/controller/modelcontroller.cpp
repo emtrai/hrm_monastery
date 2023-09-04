@@ -645,7 +645,7 @@ void ModelController::onDbModelHandlerDataUpdate(DbModel *model, int type, ErrCo
     tracein;
     logd("controller '%s'", STR2CHA(getName()));
     reloadDb();
-    emit dataUpdate(model);
+    emit dataUpdate(CLONE_DBMODEL(model));
     traceout;
 }
 
@@ -775,11 +775,13 @@ void ModelController::onModelControllerDataUpdated(DbModel* model)
 {
     tracein;
     logd("controller '%s'", STR2CHA(getName()));
+    mReloadDb = true;
     foreach (OnModelControllerListener* listener, mListeners) {
         if (listener) {
             listener->onModelControllerDataUpdated(model);
         }
     }
+    FREE_PTR(model);
     traceout;
 }
 

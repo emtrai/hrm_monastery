@@ -26,13 +26,13 @@
 
 class DbSqliteMission : public DbSqliteModelHandler
 {
+    GET_INSTANCE_DECL(DbSqliteMission)
 public:
     DbSqliteMission();
-    virtual const QString getName();
+    virtual ErrCode deleteHard(DbModel* model, bool force = false, QString* msg = nullptr);
 protected:
     virtual DbSqliteTbl *getMainTbl();
     virtual DbModelBuilder getMainBuilder();
-private:
 };
 
 #endif // DBSQLITEMISSION_H

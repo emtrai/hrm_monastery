@@ -28,18 +28,20 @@
 #include "dbmodel.h"
 #include "mission.h"
 #include "utils.h"
-#include "mainwindow.h"
-#include "uitableviewfactory.h"
+#include "stringdefs.h"
 
 UIMissionListView::UIMissionListView(QWidget *parent):
     UICommonListView(parent)
 {
     tracein;
+    mHasImportMenu = false;
+    mHasExportMenu = false;
+    traceout;
 }
 
 UIMissionListView::~UIMissionListView()
 {
-    tracein;
+    traced;
 }
 
 ModelController *UIMissionListView::getController()
@@ -50,12 +52,25 @@ ModelController *UIMissionListView::getController()
 
 QString UIMissionListView::getTitle()
 {
-    return tr("Công tác xã hội");
+    return STR_CONG_TAC_XA_HOI;
 }
 
 DbModel *UIMissionListView::onCreateDbModelObj(const QString& modelName)
 {
     return Mission::build();
+}
+
+QString UIMissionListView::getMainModelName()
+{
+    return KModelNameMission;
+}
+
+void UIMissionListView::initFilterFields()
+{
+    tracein;
+    // filter by  name
+    appendFilterField(FILTER_FIELD_NAME, STR_NAME);
+    traceout;
 }
 
 

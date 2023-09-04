@@ -35,6 +35,9 @@ protected:
     virtual ModelController* getController();
     virtual QString getTitle();
     virtual DbModel* onCreateDbModelObj(const QString& modelName);
+    virtual QString getMainModelName();
+    virtual void initFilterFields();
+
     virtual void initHeader();
     virtual ErrCode fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
 

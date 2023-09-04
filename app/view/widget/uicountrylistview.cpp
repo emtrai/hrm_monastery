@@ -40,7 +40,7 @@ UICountryListView::UICountryListView(QWidget *parent):
 
 UICountryListView::~UICountryListView()
 {
-    tracein;
+    traced;
 }
 
 ModelController *UICountryListView::getController()

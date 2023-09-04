@@ -31,25 +31,25 @@ class UIPersonEventListView : public UICommonListView
 public:
     explicit UIPersonEventListView(QWidget *parent = nullptr);
     virtual ~UIPersonEventListView();
-    void loadPersonEvent(const QString& personUid, bool isActive = true);
 
     Person *person() const;
-    void setPerson(const Person *newPerson);
+    ErrCode setPerson(const Person *newPerson);
 
 protected:
     virtual int getViewType() { return VIEW_PERSON_EVENT;}
-    virtual void initHeader();
-    virtual QString getTitle();
     virtual ModelController* getController();
+    virtual QString getMainModelName();
+    virtual DbModel* onCreateDbModelObj(const QString& modelName);
+    virtual QString getTitle();
+
+    virtual void initHeader();
     virtual ErrCode fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
 
     virtual ErrCode onAddItem(UITableCellWidgetItem *item);
     virtual ErrCode onEditItem(UITableCellWidgetItem *item);
 
-protected:
-    virtual ErrCode onLoad();
-private:
-    Person* mPerson;
+
+    virtual QList<DbModel*> getListDbModels();
 };
 
 #endif // UIPERSONEVENTLISTVIEW_H

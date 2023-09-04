@@ -87,10 +87,11 @@ ErrCode DbSqliteCommunityDept::deleteHard(DbModel *model, bool force, QString *m
             } else {
                 err = DbSqliteModelHandler::deleteHard(model, force, msg);
             }
+        } else if (IS_MODEL_NAME(model, KModelNamePersonDept)) {
+            err = DbSqliteModelHandler::deleteHard(model, force, msg);
         } else {
             err = ErrInvalidData;
-            loge("invalid model '%s', expected model '%s'",
-                 MODELSTR2CHA(model), KModelNameCommDept);
+            loge("invalid model '%s'", MODELSTR2CHA(model));
         }
     }
 

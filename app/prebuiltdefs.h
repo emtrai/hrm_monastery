@@ -55,6 +55,11 @@ const char* const KPrebuiltStatusCSVFileName = "status";
 const char* const KPrebuiltEventCSVFileName = "event";
 const char* const KPrebuiltRoleCSVFileName = "role";
 
+
+const char* const KPrebuiltPersonEventInfoTemplateFileName = "person_event_info_template";
+
+const char* const KPrebuiltEthnicInfoTemplateFileName = "ethnic_info_template";
+
 const char* const KPrebuiltCommunityInfoTemplateFileName = "community_info_template";
 const char* const KPrebuiltCommunityExportTemplateName = "community_export_template";
 

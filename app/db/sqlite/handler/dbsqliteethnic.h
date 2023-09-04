@@ -26,11 +26,11 @@
 
 class DbSqliteEthnic : public DbSqliteModelHandler
 {
+    GET_INSTANCE_DECL(DbSqliteEthnic)
 public:
     DbSqliteEthnic();
 
-    virtual const QString getName();
-    virtual DbModel *getByUid(const QString& uid);
+    virtual ErrCode deleteHard(DbModel* model, bool force = false, QString* msg = nullptr);
 protected:
     virtual DbSqliteTbl *getMainTbl();
     virtual DbModelBuilder getMainBuilder();

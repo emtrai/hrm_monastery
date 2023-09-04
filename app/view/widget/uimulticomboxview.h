@@ -34,7 +34,6 @@
 
 class UIMultiComboxView;
 
-//typedef ErrCode (*onNewItem)(UIMultiComboxView* ui, const QString& value);
 
 namespace Ui {
 class UIMultiComboxView;

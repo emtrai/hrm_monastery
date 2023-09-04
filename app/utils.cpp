@@ -105,7 +105,7 @@ ErrCode Utils::parseCSVFile(const QString &filePath,
                 while(!stream.atEnd()) {
                     QString line = stream.readLine();
                     logd("> Line '%s'", line.toStdString().c_str());
-                    line = line.simplified();
+                    if (!line.isEmpty()) line = line.simplified();
                     if (!line.isEmpty() && !line.startsWith(COMMENT))
                     {
                         QStringList items = line.split(splitBy);

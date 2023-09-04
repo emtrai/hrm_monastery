@@ -33,5 +33,8 @@
         <file>icon/icons8-back-arrow-64.png</file>
         <file>icon/icons8-community-64.png</file>
         <file>icon/icons8-vietnam-96.png</file>
+        <file>icon/icons8-education-100.png</file>
+        <file>icon/icons8-ethnic-people-100.png</file>
+        <file>icon/icons8-hospital-100.png</file>
     </qresource>
 </RCC>

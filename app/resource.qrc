@@ -37,6 +37,8 @@
         <file alias="community_dept_info_template">res/community_dept_info_template.html</file>
         <file alias="department_person_info_template">res/department_person_info_template.html</file>
         <file alias="department_person_export_template">res/department_person_export_template_vi.json</file>
+        <file alias="ethnic_info_template">res/ethnic_info_template_vi.html</file>
+        <file alias="person_event_info_template">res/person_event_info_template.html</file>
     </qresource>
     <qresource prefix="/template"/>
 </RCC>

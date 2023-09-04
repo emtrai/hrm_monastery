@@ -883,7 +883,7 @@ void MainWindow::loadOtherMenu()
     ADD_ACTION_ITEM(otherMenu,
                     on_actionMisson_triggered,
                     STR_NHIEM_VU_XA_HOI,
-                    ICON_PATH("icons8-catholic-64"));
+                    ICON_PATH("icons8-hospital-100"));
 
 
     ADD_ACTION_ITEM(otherMenu,
@@ -894,7 +894,7 @@ void MainWindow::loadOtherMenu()
     ADD_ACTION_ITEM(otherMenu,
                     on_actionEducation_triggered,
                     STR_EDUCATION,
-                    ICON_PATH("icons8-catholic-64"));
+                    ICON_PATH("icons8-education-100"));
 
     ADD_ACTION_ITEM(otherMenu,
                     on_actionWork_triggered,
@@ -903,8 +903,8 @@ void MainWindow::loadOtherMenu()
 
     ADD_ACTION_ITEM(otherMenu,
                     on_actionEthnic_triggered,
-                    STR_NATIONALITY,
-                    ICON_PATH("icons8-catholic-64"));
+                    STR_ETHNIC,
+                    ICON_PATH("icons8-ethnic-people-100"));
 
     ADD_ACTION_ITEM(otherMenu,
                     on_actionCourse_triggered,

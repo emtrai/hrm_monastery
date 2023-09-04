@@ -36,6 +36,8 @@ public:
     virtual QString modelName() const;
 
     virtual void clone(const DbModel* model);
+    virtual void initExportFields();
+    virtual QString exportHtmlTemplateFile(const QString& name) const;
 
     qint64 countryDbId() const;
     void setCountryDbId(qint64 newCountryDbId);

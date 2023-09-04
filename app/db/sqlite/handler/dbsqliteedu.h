@@ -32,17 +32,14 @@ class DbSqliteEduTbl;
 
 class DbSqliteEdu : public DbSqliteModelHandler
 {
+    GET_INSTANCE_DECL(DbSqliteEdu)
 public:
     DbSqliteEdu();
-    static DbSqliteEdu* getInstance();
-    virtual const QString getName();
+    virtual ErrCode deleteHard(DbModel* model, bool force = false, QString* msg = nullptr);
 protected:
     virtual DbSqliteTbl* getMainTbl();
     virtual DbModelBuilder getMainBuilder();
-private:
 
-private:
-    static DbSqliteEdu* gInstance;
 };
 
 #endif // DBSQLITEEDU_H

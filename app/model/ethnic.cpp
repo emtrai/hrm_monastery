@@ -28,7 +28,8 @@
 #include "dbctl.h"
 #include "defs.h"
 #include "dbmodel.h"
-
+#include "prebuiltdefs.h"
+#include "stringdefs.h"
 
 Ethnic::Ethnic():DbModel()
 {
@@ -66,6 +67,24 @@ void Ethnic::clone(const DbModel *model)
         loge("null or invald model name '%s'", model?STR2CHA(model->modelName()):"null");
     }
     traceout;
+}
+
+void Ethnic::initExportFields()
+{
+    tracein;
+    DbModel::initExportFields();
+    mExportCallbacks.insert(KItemCountry, EXPORT_CALLBACK_STRING_IMPL(
+                                                   Ethnic,
+                                                   KModelNameEthnic,
+                                                   countryName));
+    traceout;
+}
+
+QString Ethnic::exportHtmlTemplateFile(const QString &name) const
+{
+    UNUSED(name);
+    return KPrebuiltEthnicInfoTemplateFileName;
+
 }
 
 qint64 Ethnic::countryDbId() const

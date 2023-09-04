@@ -26,18 +26,21 @@
 #include "dbmodel.h"
 #include "education.h"
 #include "utils.h"
-#include "mainwindow.h"
-#include "uitableviewfactory.h"
+#include "stringdefs.h"
+#include "filter.h"
 
 UIEducationListView::UIEducationListView(QWidget *parent):
     UICommonListView(parent)
 {
     tracein;
+    mHasImportMenu = false;
+    mHasExportMenu = false;
+    traceout;
 }
 
 UIEducationListView::~UIEducationListView()
 {
-    tracein;
+    traced;
 }
 
 ModelController *UIEducationListView::getController()
@@ -47,11 +50,26 @@ ModelController *UIEducationListView::getController()
 
 QString UIEducationListView::getTitle()
 {
-    return tr("Trình độ học vấn");
+    return STR_EDUCATION_LEVEL;
 }
 
 DbModel *UIEducationListView::onCreateDbModelObj(const QString& modelName)
 {
+    UNUSED(modelName);
     return Education::build();
+}
+
+QString UIEducationListView::getMainModelName()
+{
+    return KModelNameEducation;
+}
+
+void UIEducationListView::initFilterFields()
+{
+    tracein;
+    // filter by  name
+    appendFilterField(FILTER_FIELD_NAME, STR_NAME);
+    traceout;
+
 }
 

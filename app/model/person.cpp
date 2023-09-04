@@ -48,6 +48,8 @@
 #include "personevent.h"
 #include "personctl.h"
 
+#include "stringdefs.h"
+
 #define SPLIT_EMAIL_TEL ";"
 // TODO: show person code instead of uid?? uid should use for debug only?
 #define EXPORT_PERSON_INFO_COMMON_IMPL(item, uid, name) \
@@ -400,6 +402,9 @@ void Person::initExportFields()
     mExportCallbacks.insert(KItemWork, [](const DbModel* model, const QString& item){
         return ((Person*)model)->currentWorkName();
     }); //"work";
+    mExportCallbacks.insert(KItemEducation, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->eduName();
+    }); //"edu";
     mExportCallbacks.insert(KItemWorkHistory, [](const DbModel* model, const QString& item){
         return ((Person*)model)->workHistory();
     }); //"work_history";
@@ -513,6 +518,22 @@ void Person::initExportFields()
     }); //"eternal_date";
     mExportCallbacks.insert(KItemEternalPlace, [](const DbModel* model, const QString& item){
         return ((Person*)model)->eternalPlace();
+    }); //"eternal_place";
+
+
+    mExportCallbacks.insert(KItemPersonEvent, [](const DbModel* model, const QString& item){
+        QString events;
+        if (model) {
+            bool ok = false;
+            events = PERSONCTL->getListEventsInString(model->uid(), "\n", &ok);
+            if (!ok) {
+                loge("failed to get event list for ''%s'", MODELSTR2CHA(model));
+                events = STR_DATA_ERROR;
+            }
+        } else {
+            events = STR_ERROR;
+        }
+        return events;
     }); //"eternal_place";
 
 }
@@ -2276,6 +2297,7 @@ const QString &Person::eduName() const
 
 void Person::setEduName(const QString &newEduName)
 {
+//    logd("set newEduName '%s'", STR2CHA(newEduName));
 //    CHECK_MODIFIED_THEN_SET(mEduName, newEduName, KItemEdu);
     mEduName = newEduName;
 }
@@ -2287,6 +2309,7 @@ const QString &Person::eduUid() const
 
 void Person::setEduUid(const QString &newEduUid)
 {
+//    logd("set edu uid '%s'", STR2CHA(newEduUid));
     CHECK_MODIFIED_THEN_SET(mEduUid, newEduUid, KItemEdu);
 //    mEduUid = newEduUid;
 }

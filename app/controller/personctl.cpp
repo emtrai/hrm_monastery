@@ -93,6 +93,43 @@ ErrCode PersonCtl::getListEvents(const QString &personUid, QList<DbModel*>& list
     return err;
 }
 
+QString PersonCtl::getListEventsInString(const QString &personUid, const QString &sep, bool *ok)
+{
+    tracein;
+    QList<DbModel*> events;
+    QString eventString;
+    QStringList eventList;
+    ErrCode err = ErrNone;
+    if (personUid.isEmpty()) {
+        err = ErrInvalidArg;
+        loge("invalid person uid");
+    }
+    if (err == ErrNone) {
+        logd("get event list of person uid '%s'", STR2CHA(personUid));
+        err = getListEvents(personUid, events);
+    }
+    if (err == ErrNone) {
+        logd("number of event %lld", events.size());
+        foreach (DbModel* model, events) {
+            if (model && IS_MODEL_NAME(model, KModelNamePersonEvent)) {
+                PersonEvent* event = (PersonEvent*)model;
+                eventList.append(event->toEventString());
+            } else {
+                logw("invalid event '%s'", MODELSTR2CHA(model));
+            }
+        }
+        logi("number of event string %lld", eventList.size());
+        if (!eventList.empty()) {
+            eventString = eventList.join(sep);
+        }
+    }
+    logd("get list event result %d", err);
+    if (ok) *ok = (err == ErrNone);
+    RELEASE_LIST_DBMODEL(events);
+    traceout;
+    return eventString;
+}
+
 
 DbModel *PersonCtl::doImportOneItem(const QString& importName, int importFileType, const QStringList &items, quint32 idx)
 {

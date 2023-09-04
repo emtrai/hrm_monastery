@@ -24,7 +24,6 @@
 #include "logger.h"
 #include <QList>
 #include "dbmodel.h"
-#include "dbcommunitymodelhandler.h"
 #include "community.h"
 #include "communityctl.h"
 #include "utils.h"
@@ -40,6 +39,11 @@ UIPeopleInCommunityListView::UIPeopleInCommunityListView(QWidget *parent):
     UICommonListView(parent)
 {
     tracein;
+    // there is not much items, so skipping import
+    // TODO: support to import?
+    mHasImportMenu = false;
+    mHasExportMenu = true;
+    traceout;
 }
 
 
@@ -48,48 +52,6 @@ UIPeopleInCommunityListView::~UIPeopleInCommunityListView()
     tracein;
     traceout;
 }
-
-//ErrCode UICommunityPersonListView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act)
-//{
-//    tracein;
-//    DlgSearchPerson * dlg = DlgSearchPerson::build(this, true);
-//    if (dlg == nullptr) {
-//        loge("Open dlg DlgAddPersonEvent fail, No memory");
-//        return ErrNone; // TODO: open dlg??
-//    }
-//    dlg->setIsMultiSelection(true);
-
-//    if (dlg->exec() == QDialog::Accepted){
-//        QList<DbModel *>  list = dlg->selectedItems();
-//        logd("Selected %d per ", list.count());
-//        int cnt = 0;
-//        if (list.count() > 0) {
-//            foreach(DbModel* item, list) {
-//                Person* per = (Person*) item;
-//                logd("Add per %s to comm %s ", per->getFullName().toStdString().c_str(),
-//                     community()->name().toStdString().c_str());
-//                ErrCode ret = CommunityCtl::getInstance()->addPerson2Community(community(), per);
-//                logd("Add comm vs per ret=%d", ret);
-//                if (ret == ErrNone){
-//                    cnt ++;
-//                } else {
-//                    loge("Add per %s to comm %s failed %d", per->getFullName().toStdString().c_str(),
-//                         community()->name().toStdString().c_str(), ret);
-//                }
-//            }
-//            logd("Add %d per", cnt);
-//            if (cnt > 0) {
-//                logd("reload data");
-//                reload();
-//            }
-//        } else {
-//            logi("Nothing to add to community");
-//        }
-
-//    }
-//    delete dlg;
-//    return ErrNone;
-//}
 
 ErrCode UIPeopleInCommunityListView::onEditItem(UITableCellWidgetItem *item)
 {
@@ -134,16 +96,10 @@ ErrCode UIPeopleInCommunityListView::onEditItem(UITableCellWidgetItem *item)
     return err;
 }
 
-ErrCode UIPeopleInCommunityListView::onDeleteItem(const QList<UITableItem *> &selectedItems)
-{
-    // TODO: implement it
-    UNDER_DEV("Delete Community Person");
-    return ErrNotImpl;
-}
-
 ErrCode UIPeopleInCommunityListView::onAddItem(UITableCellWidgetItem *item)
 {
     tracein;
+    UNUSED(item);
     ErrCode err = ErrNone;
     QList<Person*> perList;
     Community* comm = community();
@@ -160,7 +116,7 @@ ErrCode UIPeopleInCommunityListView::onAddItem(UITableCellWidgetItem *item)
     }
     if ((err == ErrNone) && (dlg->exec() == QDialog::Accepted)){
         QList<DbModel *>  list = dlg->selectedItems();
-        logd("Selected %d per ", list.count());
+        logd("Selected %lld per ", list.count());
         if (list.count() > 0) {
             perList = CLONE_LIST_FROM_DBMODEL(list, Person);
         } else {
@@ -172,7 +128,7 @@ ErrCode UIPeopleInCommunityListView::onAddItem(UITableCellWidgetItem *item)
     }
 
     if (err == ErrNone) {
-        logd("Add %d people to community '%s'", perList.size(), MODELSTR2CHA(community()));
+        logd("Add %lld people to community '%s'", perList.size(), MODELSTR2CHA(community()));
         err = DlgPersonCommunity::addListPeopleToCommunity(this,
                                                            community(),
                                                            perList);
@@ -212,14 +168,7 @@ QList<DbModel *> UIPeopleInCommunityListView::getListDbModels()
     }
     if (err == ErrNone) {
         logd("Load people list of comm '%s'", MODELSTR2CHA(comm));
-
-//        QList<DbModel*> items;
         err = COMMUNITYCTL->getListCommunityPerson(uid, ret);
-//        if (err == ErrNone && items.size() > 0) {
-//            foreach (CommunityPerson* item, items) {
-//                ret.append((DbModel*)item);
-//            }
-//        }
     }
 
     if (err != ErrNone) {
@@ -231,37 +180,6 @@ QList<DbModel *> UIPeopleInCommunityListView::getListDbModels()
     traceout;
     return ret;
 }
-
-QList<UITableMenuAction *>
-UIPeopleInCommunityListView::getMenuMultiSelectedItemActions(const QMenu *menu,
-                                                           const QList<UITableItem *>& items)
-{
-    tracein;
-    QList<UITableMenuAction*> actionList =
-        UITableView::getMenuMultiSelectedItemActions(menu, items);
-
-    return actionList;
-
-}
-
-//ErrCode UIPeopleInCommunityListView::onLoad()
-//{
-//    tracein;
-//    ErrCode err = ErrNone;
-//    if (mCommunity != nullptr) {
-//        setTitle(getTitle());
-//        logd("Load person list of community '%s'", STR2CHA(mCommunity->toString()));
-//        QList<CommunityPerson*> items;
-//        err = COMMUNITYCTL->getListCommunityPerson(mCommunity->uid(), items);
-//        RELEASE_LIST_DBMODEL(mItemList);
-//        foreach (CommunityPerson* per, items) {
-//            mItemList.append((DbModel*)per); // TODO: convert it to Person????
-//        }
-//    } else {
-//        loge("Nothing to load");
-//    }
-//    return err;
-//}
 
 Community *UIPeopleInCommunityListView::community() const
 {
@@ -318,6 +236,7 @@ QString UIPeopleInCommunityListView::getTitle()
 ErrCode UIPeopleInCommunityListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
+    UNUSED(idx);
     CommunityPerson* commper = nullptr;
     Person* per  = nullptr;
     ErrCode err = ErrNone;

@@ -26,16 +26,58 @@
 #include "logger.h"
 #include "defs.h"
 #include "mission.h"
+#include "community.h"
 
-DbSqliteMission::DbSqliteMission()
+GET_INSTANCE_IMPL(DbSqliteMission)
+
+DbSqliteMission::DbSqliteMission():DbSqliteModelHandler(KModelHdlMission)
 {
+    traced;
+}
+
+ErrCode DbSqliteMission::deleteHard(DbModel *model, bool force, QString *msg)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    if (!model) {
+        err = ErrInvalidArg;
+        loge("Invalid model");
+    }
+
+    if (err == ErrNone) {
+        logi("Delete hard model '%s', force %d", MODELSTR2CHA(model), force);
+
+        if (model->modelName() == KModelNameMission) {
+            // KFieldAreaUid delete map, community, person
+            QHash<QString, QString> itemToSearch; // for searching
+            QHash<QString, QString> itemToSet; // for update
+            bool errDependency = false;
+
+            itemToSearch.insert(KFieldMissionUid, model->uid());
+            itemToSet.insert(KFieldMissionUid, ""); // update to null/empty
+
+            CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency,
+                                       msg, force,
+                                       itemToSearch, itemToSet,
+                                       KTableCommunity, &Community::build);
+
+            if (errDependency) {
+                err = ErrDependency;
+                loge("cannot delete, has dependency '%s'", msg?STR2CHA((*msg)):"");
+            } else {
+                logi("Delete model '%s'", MODELSTR2CHA(model));
+                err = DbSqliteModelHandler::deleteHard(model, force, msg);
+            }
+        } else {
+            err = ErrInvalidData;
+            loge("invalid model '%s'", MODELSTR2CHA(model));
+        }
+    }
+    traceret(err);
+    return err;
 
 }
 
-const QString DbSqliteMission::getName()
-{
-    return KModelHdlMission;
-}
 
 DbSqliteTbl *DbSqliteMission::getMainTbl()
 {

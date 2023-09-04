@@ -51,6 +51,7 @@
 #include "dlgpersoncomm.h"
 #include "dlgconfirmupdatepeoplecomm.h"
 #include "dialogutils.h"
+#include "viewutils.h"
 
 UIPersonListView::UIPersonListView(QWidget *parent):
     UICommonListView(parent)
@@ -267,6 +268,9 @@ QList<UITableMenuAction *> UIPersonListView::getMenuSingleSelectedItemActions(co
                                                    ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                        return this->onMenuActionChangeCommunity(m, a);
                                                    }));
+
+    actionList.append(BUILD_MENU_SEPARATE);
+
     actionList.append(UITableMenuAction::build(tr("Xem thông tin Cộng đoàn"), this, item)
                                                     ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                         return this->onMenuActionViewCommunity(m, a);
@@ -275,10 +279,16 @@ QList<UITableMenuAction *> UIPersonListView::getMenuSingleSelectedItemActions(co
                                                    ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                        return this->onMenuActionViewPersonEvent(m, a);
                                                    }));
+
+    actionList.append(BUILD_MENU_SEPARATE);
+
     actionList.append(UITableMenuAction::build(tr("Thêm thông tin sự kiện"), this, item)
                                                     ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                         return this->onMenuActionAddPersonEvent(m, a);
                                                     }));
+
+    actionList.append(BUILD_MENU_SEPARATE);
+
     actionList.append(UITableMenuAction::build(tr("Xuất thông tin Nữ tu"), this, item)
                                                     ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                         return this->exportPersonInfo(m, a);
@@ -295,6 +305,7 @@ QList<UITableMenuAction *> UIPersonListView::getMenuMultiSelectedItemActions(con
                                                    ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                        return this->onMenuActionChangeCommunity(m, a);
                                                    }));
+    actionList.append(BUILD_MENU_SEPARATE);
     actionList.append(UITableMenuAction::buildMultiItem(tr("Thêm thông tin sự kiện"), this, &items)
                                                  ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                      return this->onMenuActionAddPersonEvent(m, a);
@@ -882,7 +893,7 @@ ErrCode UIPersonListView::updatePersonEvent(const QList<DbModel *>& perList, con
                         PersonEvent* tmp = (PersonEvent* )(((DbModel*)perEvent)->clone());
                         if (tmp) {
                             tmp->setPersonUid(per->uid());
-                            tmp->buildNameId(per->nameId(), event->nameId());
+                            tmp->buildNameIdFromOthersNameId(per->nameId(), event->nameId());
                             perEventList.append(tmp);
                         } else {
                             err = ErrNoMemory;

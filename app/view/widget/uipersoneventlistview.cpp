@@ -34,69 +34,30 @@
 #include "dialogutils.h"
 
 UIPersonEventListView::UIPersonEventListView(QWidget *parent):
-    UICommonListView(parent),
-    mPerson(nullptr)
+    UICommonListView(parent)
 {
     tracein;
+    mHasImportMenu = false;
+    mHasExportMenu = false;
+    traceout;
 }
 
 
 UIPersonEventListView::~UIPersonEventListView()
 {
     tracein;
-    if (mPerson) {
-        delete mPerson;
-        mPerson = nullptr;
-    }
     traceout;
-}
-
-void UIPersonEventListView::loadPersonEvent(const QString &personUid, bool isActive)
-{
-    tracein;
-
-}
-
-ErrCode UIPersonEventListView::onLoad()
-{
-    tracein;
-    ErrCode err = ErrNone;
-    if (mPerson != nullptr) {
-        setTitle(getTitle());
-        logd("Load person list of mPerson '%s'", MODELSTR2CHA(mPerson));
-        QList<DbModel*> items;
-        err = PERSONCTL->getListEvents(mPerson->uid(), items);
-        if (err != ErrNone) {
-            loge("Falied to get list event of person '%s', err=%d",
-                 MODELSTR2CHA(mPerson), err);
-        }
-        RELEASE_LIST_DBMODEL(mItemList);
-        mItemList.append(items);
-    } else {
-        loge("Nothing to load");
-    }
-    return err;
 }
 
 Person *UIPersonEventListView::person() const
 {
-    return mPerson;
+    return (Person*) parentModel();
 }
 
-void UIPersonEventListView::setPerson(const Person *person)
+ErrCode UIPersonEventListView::setPerson(const Person *person)
 {
-    tracein;
-    if (mPerson) {
-        logd("Delete old person");
-        delete mPerson;
-        mPerson = nullptr;
-    }
-    if (person) {
-        mPerson = (Person*)((DbModel*)person)->clone();
-    } else {
-        loge("No person");
-    }
-    traceout;
+    traced;
+    return setParentModel(person);
 }
 
 void UIPersonEventListView::initHeader()
@@ -113,9 +74,9 @@ void UIPersonEventListView::initHeader()
 
 QString UIPersonEventListView::getTitle()
 {
-
+    Person* per = person();
     return QString(tr("Danh sách sự kiện của nữ tu: %1")).arg(
-        mPerson?mPerson->displayName():tr("Không rõ"));
+        per?per->displayName():tr("Không rõ"));
 }
 
 ModelController *UIPersonEventListView::getController()
@@ -123,28 +84,39 @@ ModelController *UIPersonEventListView::getController()
     return PERSONCTL;
 }
 
+QString UIPersonEventListView::getMainModelName()
+{
+    return KModelNamePersonEvent;
+}
+
+DbModel *UIPersonEventListView::onCreateDbModelObj(const QString &modelName)
+{
+    UNUSED(modelName);
+    return PersonEvent::build();
+}
+
 ErrCode UIPersonEventListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
+    UNUSED(idx);
     ErrCode err = ErrNone;
     if (!item || !tblItem) {
         err = ErrInvalidArg;
         loge("invalid argument");
     }
+    if (err == ErrNone && !IS_MODEL_NAME(item, KModelNamePersonEvent)) {
+        loge("No item found, or not expected model '%s'", MODELSTR2CHA(item));
+        err = ErrInvalidModel;
+    }
     if (err == ErrNone) {
         logd("updateItem '%s'", item?STR2CHA(item->modelName()):"");
-        if (item && item->modelName() == KModelNamePersonEvent) {
-            PersonEvent* per = (PersonEvent*) item;
-            tblItem->addValue(per->nameId());
-            tblItem->addValue(per->eventName());
-            tblItem->addValue(per->name());
-            tblItem->addValue(DatetimeUtils::date2String(per->date()));
-            tblItem->addValue(DatetimeUtils::date2String(per->endDate()));
-            tblItem->addValue(per->remark());
-        } else {
-            loge("No item found, or not expected model '%s'", MODELSTR2CHA(item));
-            err = ErrInvalidModel;
-        }
+        PersonEvent* per = (PersonEvent*) item;
+        tblItem->addValue(per->nameId());
+        tblItem->addValue(per->eventName());
+        tblItem->addValue(per->name());
+        tblItem->addValue(per->dateString());
+        tblItem->addValue(per->endDateString());
+        tblItem->addValue(per->remark());
     }
     traceret(err);
     return err;
@@ -153,20 +125,29 @@ ErrCode UIPersonEventListView::fillValueTableRowItem(DbModel *item, UITableItem 
 ErrCode UIPersonEventListView::onAddItem(UITableCellWidgetItem *item)
 {
     tracein;
+    UNUSED(item);
+    ErrCode err = ErrNone;
+    Person* per = person();
     DlgAddPersonEvent * dlg = DlgAddPersonEvent::build(this, true);
-    if (dlg == nullptr) {
+    if (!dlg) {
         loge("Open dlg DlgAddPersonEvent fail, No memory");
-        return ErrNoMemory;
+        err = ErrNoMemory;
     }
-    dlg->setPerson(mPerson);
+    if (err == ErrNone && !per){
+        loge("invalid per model");
+        err = ErrInvalidModel;
+    }
+    if (err == ErrNone) {
+        dlg->setPerson(per);
 
-    if (dlg->exec() == QDialog::Accepted){
-        logd("reload data");
-        reload();
+        if (dlg->exec() == QDialog::Accepted){
+            logd("reload data");
+            reload();
+        }
     }
-    delete dlg;
-    traceout;
-    return ErrNone;
+    FREE_PTR(dlg);
+    traceret(err);
+    return err;
 }
 
 ErrCode UIPersonEventListView::onEditItem(UITableCellWidgetItem *item)
@@ -191,7 +172,7 @@ ErrCode UIPersonEventListView::onEditItem(UITableCellWidgetItem *item)
             loge("Open dlg DlgAddPersonEvent fail, No memory");
             return ErrNoMemory;
         }
-        dlg->setPerson(mPerson);
+        dlg->setPerson(person());
 
         if (dlg->exec() == QDialog::Accepted){
             logd("reload data");
@@ -204,4 +185,25 @@ ErrCode UIPersonEventListView::onEditItem(UITableCellWidgetItem *item)
     }
     traceret(err);
     return err;
+}
+
+QList<DbModel *> UIPersonEventListView::getListDbModels()
+{
+    tracein;
+    QList<DbModel*> items;
+    ErrCode err = ErrNone;
+    Person* per = person();
+    if (!per) {
+        err = ErrInvalidModel;
+        loge("invalid per model");
+    }
+    if (err == ErrNone) {
+        err = PERSONCTL->getListEvents(per->uid(), items);
+    }
+    if (err != ErrNone) {
+        loge("Falied to get list event of person '%s', err=%d",
+             MODELSTR2CHA(per), err);
+    }
+    traceout;
+    return items;
 }

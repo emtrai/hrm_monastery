@@ -30,7 +30,12 @@
 
 Education::Education()
 {
-    tracein;
+    traced;
+}
+
+Education::~Education()
+{
+    traced;
 }
 
 DbModel *Education::build()
@@ -45,8 +50,13 @@ DbModelBuilder Education::getBuilder() const
     return &Education::build;
 }
 
+QString Education::modelName() const
+{
+    return KModelNameEducation;
+}
+
 DbModelHandler *Education::getDbModelHandler() const
 {
-    return DbCtl::getInstance()->getDb()->getEduModelHandler();
+    return DB->getEduModelHandler();
 }
 

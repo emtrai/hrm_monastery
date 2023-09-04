@@ -694,9 +694,10 @@ void DlgPerson::loadEdu()
     logd("Load Education");
     QList<DbModel*> list = EduCtl::getInstance()->getAllItemsFromDb();
     ui->cbEdu->clear();
+    ui->cbEdu->addItem(STR_UNKNOWN, KUidNone);
     foreach(DbModel* edu, list){
 
-        ui->cbEdu->addItem(edu->name());
+        ui->cbEdu->addItem(edu->name(), edu->uid());
     }
 }
 
@@ -837,8 +838,8 @@ void DlgPerson::loadEvent(bool reloadAll)
         tbl->setItem(idx, col++, new QTableWidgetItem(event->nameId()));
         tbl->setItem(idx, col++, new QTableWidgetItem(event->eventName()));
         tbl->setItem(idx, col++, new QTableWidgetItem(event->name()));
-        tbl->setItem(idx, col++, new QTableWidgetItem(DatetimeUtils::date2String(event->date())));
-        tbl->setItem(idx, col++, new QTableWidgetItem(DatetimeUtils::date2String(event->endDate())));
+        tbl->setItem(idx, col++, new QTableWidgetItem(event->dateString()));
+        tbl->setItem(idx, col++, new QTableWidgetItem(event->endDateString()));
         tbl->setItem(idx, col++, new QTableWidgetItem(event->remark()));
         idx++;
     }

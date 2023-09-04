@@ -43,20 +43,15 @@ protected:
     virtual QString getMainModelName();
     virtual ModelController* getController();
     virtual DbModel* onCreateDbModelObj(const QString& modelName);
-    virtual void initHeader();
     virtual QString getTitle();
+
+    virtual void initHeader();
     virtual ErrCode fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
 
-    virtual QList<UITableMenuAction*> getMenuMultiSelectedItemActions(const QMenu *menu,
-                                                               const QList<UITableItem *>& items);
-//    virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onEditItem(UITableCellWidgetItem *item);
-    virtual ErrCode onDeleteItem(const QList<UITableItem *>& selectedItems);
     virtual ErrCode onAddItem(UITableCellWidgetItem *item);
 
     virtual QList<DbModel*> getListDbModels();
-private:
-//    Community* mCommunity;
 };
 
 #endif // UIPEOPLEINCOMMUNITYLISTVIEW_H
