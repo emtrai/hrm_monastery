@@ -24,10 +24,10 @@
 
 UITextBrowser::UITextBrowser(QWidget *parent):QTextBrowser(parent)
 {
-    tracein;
+    traced;
 }
 
 UITextBrowser::~UITextBrowser()
 {
-    tracein;
+    traced;
 }

@@ -261,7 +261,7 @@ ErrCode UIPeopleInCommunityListView::fillValueTableRowItem(DbModel *item, UITabl
     if (err == ErrNone) {
         tblItem->addValue(per->nameId());
         tblItem->addValue(per->hollyName());
-        tblItem->addValue(per->getFullName());
+        tblItem->addValue(per->fullName());
         tblItem->addValue(DatetimeUtils::date2String(per->birthday()));
         tblItem->addValue(per->birthPlace());
         tblItem->addValue(per->courseName());

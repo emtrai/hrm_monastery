@@ -320,6 +320,11 @@ const QString &DbModel::name() const
     return mName;
 }
 
+QString DbModel::fullName() const
+{
+    return name();
+}
+
 void DbModel::setName(const QString &newName)
 {
     mName = newName;

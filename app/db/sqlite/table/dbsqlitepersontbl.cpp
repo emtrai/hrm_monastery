@@ -450,7 +450,7 @@ ErrCode DbSqlitePersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQ
         // as table calls directly to model handler
         DbModel* model = SQLITE->getPersonModelHandler()->getByUid(cmm->joinPICUid());
         if (model) {
-            cmm->setJoinPICName(dynamic_cast<Person*>(model)->getFullName());
+            cmm->setJoinPICName(dynamic_cast<Person*>(model)->fullName());
             cmm->setJoinPICNameId(model->nameId());
             delete model;
         } else {
@@ -466,7 +466,7 @@ ErrCode DbSqlitePersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQ
         // as table calls directly to model handler
         DbModel* model = SQLITE->getPersonModelHandler()->getByUid(cmm->preTrainPICUid());
         if (model) {
-            cmm->setPreTrainPICName(dynamic_cast<Person*>(model)->getFullName());
+            cmm->setPreTrainPICName(dynamic_cast<Person*>(model)->fullName());
             cmm->setPreTrainPICNameId(model->nameId());
             delete model;
         } else {
@@ -482,7 +482,7 @@ ErrCode DbSqlitePersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQ
         // as table calls directly to model handler
         DbModel* model = SQLITE->getPersonModelHandler()->getByUid(cmm->trainPICUid());
         if (model) {
-            cmm->setTrainPICName(dynamic_cast<Person*>(model)->getFullName());
+            cmm->setTrainPICName(dynamic_cast<Person*>(model)->fullName());
             cmm->setTrainPICNameId(model->nameId());
             delete model;
         } else {
@@ -498,7 +498,7 @@ ErrCode DbSqlitePersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQ
         // as table calls directly to model handler
         DbModel* model = SQLITE->getPersonModelHandler()->getByUid(cmm->vowsCEOUid());
         if (model) {
-            cmm->setVowsCEOName(dynamic_cast<Person*>(model)->getFullName());
+            cmm->setVowsCEOName(dynamic_cast<Person*>(model)->fullName());
             cmm->setVowsCEONameId(model->nameId());
             delete model;
         } else {
@@ -514,7 +514,7 @@ ErrCode DbSqlitePersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQ
         // as table calls directly to model handler
         DbModel* model = SQLITE->getPersonModelHandler()->getByUid(cmm->eternalVowsPICUid());
         if (model) {
-            cmm->setEternalVowsPICName(dynamic_cast<Person*>(model)->getFullName());
+            cmm->setEternalVowsPICName(dynamic_cast<Person*>(model)->fullName());
             cmm->setEternalVowsPICNameId(model->nameId());
             delete model;
         } else {
@@ -531,7 +531,7 @@ ErrCode DbSqlitePersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQ
         // as table calls directly to model handler
         DbModel* model = SQLITE->getPersonModelHandler()->getByUid(cmm->eternalVowsCEOUid());
         if (model) {
-            cmm->setEternalVowsCEOName(dynamic_cast<Person*>(model)->getFullName());
+            cmm->setEternalVowsCEOName(dynamic_cast<Person*>(model)->fullName());
             cmm->setEternalVowsCEONameId(model->nameId());
             delete model;
         } else {

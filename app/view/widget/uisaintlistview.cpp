@@ -32,26 +32,33 @@
 UISaintListView::UISaintListView(QWidget *parent):
     UICommonListView(parent)
 {
-
+    tracein;
+    mHasImportMenu = false;
+    mHasExportMenu = false;
+    traceout;
 
 }
 
 UISaintListView::~UISaintListView()
 {
-    tracein;
+    traced;
 }
 
-ErrCode UISaintListView::onLoad()
-{
 
+QList<DbModel *> UISaintListView::getListDbModels()
+{
+    return SAINTCTL->getAllItems(true);
+}
+
+void UISaintListView::initHeader()
+{
     tracein;
-    RELEASE_LIST_DBMODEL(mItemList);
-    mItemList = SAINTCTL->getAllItems();
-    // TODO: loop to much, redundant, do something better?
-//    foreach (Saint* item, items) {
-//        mItemList.append(static_cast<DbModel*>(item));
-//    }
-    return ErrNone;
+    mHeader.append(STR_NAMEID);
+    mHeader.append(STR_NAME);
+    mHeader.append(STR_FULLNAME);
+    mHeader.append(STR_NGAY_BON_MANG);
+    mHeader.append(STR_NOTE);
+    traceout;
 }
 
 ErrCode UISaintListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
@@ -80,20 +87,14 @@ ErrCode UISaintListView::fillValueTableRowItem(DbModel *item, UITableItem *tblIt
 
 }
 
-void UISaintListView::initHeader()
-{
-    tracein;
-    mHeader.append(tr("Tên định danh"));
-    mHeader.append(tr("Tên"));
-    mHeader.append(tr("Tên đầy đủ"));
-    mHeader.append(tr("Ngày bổn mạng"));
-    mHeader.append(tr("Ghi chú"));
-        traceout;
-}
-
 ModelController *UISaintListView::getController()
 {
-        return SAINTCTL;
+    return SAINTCTL;
+}
+
+QString UISaintListView::getTitle()
+{
+    return STR_HOLLYNAME;
 }
 
 int UISaintListView::onFilter(int catetoryid, const QString &catetory, qint64 opFlags, const QString &keywords, const QVariant *value)
@@ -121,4 +122,17 @@ int UISaintListView::onFilter(int catetoryid, const QString &catetory, qint64 op
 DbModel *UISaintListView::onCreateDbModelObj(const QString& modelName)
 {
     return Saint::build();
+}
+
+QString UISaintListView::getMainModelName()
+{
+    return KModelNameSaint;
+}
+
+void UISaintListView::initFilterFields()
+{
+    tracein;
+    // filter by  name
+    appendFilterField(FILTER_FIELD_NAME, STR_NAME);
+    traceout;
 }

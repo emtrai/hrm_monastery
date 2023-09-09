@@ -424,7 +424,7 @@ ErrCode DlgPerson::fromPerson(const Person *model)
     }
 
     ui->txtCode->setText(per->nameId());
-    ui->txtName->setText(per->getFullName());
+    ui->txtName->setText(per->fullName());
     ui->txtBirthday->setText(DatetimeUtils::date2String(per->birthday()));
 
     // cbSaints
@@ -866,7 +866,7 @@ void DlgPerson::searchPerson(QLineEdit *wget)
     if (dlg->exec() == QDialog::Accepted){
         const Person* per = (const Person*)dlg->selectedItem();
         if (per != nullptr) {
-            wget->setText(per->getFullName());
+            wget->setText(per->fullName());
             logd("setProperty %s", per->uid().toStdString().c_str());
             wget->setProperty(KItemUid, per->uid());
         } else {

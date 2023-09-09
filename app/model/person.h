@@ -94,8 +94,7 @@ public:
 
     ErrCode setNameFromFullName(const QString& name);
 
-    QString getFullName() const;
-    QString fullName() const;
+    virtual QString fullName() const;
     QString displayName() const;
     ErrCode fromCSVFile(const QString& fname);
 

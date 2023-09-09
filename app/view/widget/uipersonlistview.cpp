@@ -21,7 +21,6 @@
  */
 #include "uipersonlistview.h"
 #include "personctl.h"
-#include "specialistctl.h"
 #include "utils.h"
 #include "datetimeutils.h"
 #include "logger.h"
@@ -56,17 +55,16 @@
 UIPersonListView::UIPersonListView(QWidget *parent):
     UICommonListView(parent)
 {
-    traced;
-
+    tracein;
     connect(this, SIGNAL(changeCommunityDone(ErrCode,QList<DbModel*>,Community*,bool,bool)),
             this, SLOT(onChangeCommunityDone(ErrCode,QList<DbModel*>,Community*,bool,bool)));
+    traceout;
 }
 
 UIPersonListView::~UIPersonListView()
 {
     tracein;
 
-    PERSONCTL->delListener(this);
     MainWindow::removeMainWindownImportListener(this);
 
     traceout;
@@ -123,38 +121,7 @@ ErrCode UIPersonListView::onLoad()
             clearFilter();
             return err;
         });
-//    if (mFilterList.count() > 0) {
-//        // TODO: multi filter items???? should limite???? what the hell is it
-//        foreach (FilterItem* item, mFilterList) {
-//            logd("filter item %s", STR2CHA(item->item()));
-//            if (item->item() == KItemCommunity) {
-//                // TODO: how about keyword? assume value only?????
-//                QList<DbModel*> list;
-//                ErrCode err = PERSONCTL->getListPersonInCommunity(item->value().toString(), list);
-//                if (err == ErrNone) {
-//                    if (list.count() > 0) {
-//                        items.append(list);
-//                    }
-//                } else {
-//                    loge("Get list person in community uid '%s' failed, err=%d",
-//                         STR2CHA(item->value().toString()), err);
-//                }
-//            } else {
-//                ASSERT(0, "not this filter item!!!");
-//            }
-//        }
-//    } else {
-//        logd("get all person");
-//        items = PERSONCTL->getAllItems();
-//    }
 
-//    RELEASE_LIST_DBMODEL(mItemList);
-//    // TODO: loop to much, redundant, do something better?
-//    foreach (DbModel* item, items) {
-//        mItemList.append(item);
-//    }
-
-//    clearFilter();
     traceout;
     return err;
 }
@@ -173,7 +140,7 @@ ErrCode UIPersonListView::fillValueTableRowItem(DbModel *item, UITableItem *tblI
             Person* per = (Person*) item;
             tblItem->addValue(per->nameId());
             tblItem->addValue(per->hollyName());
-            tblItem->addValue(per->getFullName());
+            tblItem->addValue(per->fullName());
             tblItem->addValue(per->courseName());
             tblItem->addValue(per->communityName());
             tblItem->addValue(DatetimeUtils::date2String(per->birthday()));
@@ -199,6 +166,37 @@ ErrCode UIPersonListView::fillValueTableRowItem(DbModel *item, UITableItem *tblI
     traceret(err);
     return err;
 }
+
+ErrCode UIPersonListView::onAddItem(UITableCellWidgetItem *item)
+{
+    tracein;
+    ErrCode ret = ErrNone;
+    MainWindow::showAddEditPerson();
+    traceret(ret);
+    return ret;
+}
+
+ErrCode UIPersonListView::onEditItem(UITableCellWidgetItem *item)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    DbModel* model = item->itemData();
+    //    logd("idx=%d",idx);
+    if (model){
+        Person* per = (Person*)model;
+        DlgPerson* dlg = DlgPerson::buildDlg(this, per, (per == nullptr));
+        dlg->exec();
+        delete dlg;
+
+    } else {
+        loge("Invalid item data");
+        err = ErrInvalidArg;
+        // TODO: popup message???
+    }
+    traceret(err);
+    return err;
+}
+
 
 void UIPersonListView::initHeader()
 {
@@ -312,15 +310,6 @@ QList<UITableMenuAction *> UIPersonListView::getMenuMultiSelectedItemActions(con
                                                  }));
     traceout;
     return actionList;
-}
-
-ErrCode UIPersonListView::onMenuActionAdd(QMenu *menu, UITableMenuAction *act)
-{
-    tracein;
-    ErrCode ret = ErrNone;
-    MainWindow::showAddEditPerson();
-    traceret(ret);
-    return ret;
 }
 
 ErrCode UIPersonListView::onMenuActionImport(QMenu *menu, UITableMenuAction *act)
@@ -557,7 +546,7 @@ ErrCode UIPersonListView::exportPersonInfo(QMenu *menu, UITableMenuAction *act)
         INSTANCE(PersonCtl)->exportToFile(per, ExportType::EXPORT_HTML, &fpath);
         if (QFile::exists(fpath)){
             err = Utils::saveHtmlToPdf(fpath,
-                                       Utils::UidFromName(per->getFullName(),
+                                       Utils::UidFromName(per->fullName(),
                                                     UidNameConvertType::NO_VN_MARK_UPPER),
                                         this);
                 if (err == ErrNone) {
@@ -576,60 +565,39 @@ ErrCode UIPersonListView::exportPersonInfo(QMenu *menu, UITableMenuAction *act)
     return err;
 }
 
-ErrCode UIPersonListView::onViewItem(UITableCellWidgetItem *item)
-{
-    tracein;
-    int idx = item->idx();
-    logd("idx=%d",idx);
-    if (idx < mItemList.length()){
-        Person* per = (Person*)mItemList.value(idx);
-        if (per) {
-//            QTemporaryFile file;
-            QString fpath;
-//            if (file.open()) {
-//                fpath = file.fileName();
-//                logd("export html file path='%s'", STR2CHA(fpath));
-//            }
-            INSTANCE(PersonCtl)->exportToFile(per, ExportType::EXPORT_HTML, &fpath);
-            if (QFile::exists(fpath)){
-                dlgHtmlViewer* viewer = new dlgHtmlViewer();
-                viewer->setHtmlPath(fpath);
-                viewer->setSubject(per->getFullName());
-                viewer->exec();
-            } else {
-                loge("html file '%s' not found", STR2CHA(fpath));
-            }
-        } else {
-            loge("not person data to view");
-        }
-    } else {
-        loge("Invalid idx");
-        // TODO: popup message???
-    }
-    traceout;
-    return ErrNone; // TODO: check to return value
-}
-
-ErrCode UIPersonListView::onEditItem(UITableCellWidgetItem *item)
-{
-    tracein;
-    ErrCode err = ErrNone;
-    DbModel* model = item->itemData();
+//ErrCode UIPersonListView::onViewItem(UITableCellWidgetItem *item)
+//{
+//    tracein;
+//    int idx = item->idx();
 //    logd("idx=%d",idx);
-    if (model){
-        Person* per = (Person*)model;
-        DlgPerson* dlg = DlgPerson::buildDlg(this, per, (per == nullptr));
-        dlg->exec();
-        delete dlg;
-
-    } else {
-        loge("Invalid item data");
-        err = ErrInvalidArg;
-        // TODO: popup message???
-    }
-    traceret(err);
-    return err;
-}
+//    if (idx < mItemList.length()){
+//        Person* per = (Person*)mItemList.value(idx);
+//        if (per) {
+////            QTemporaryFile file;
+//            QString fpath;
+////            if (file.open()) {
+////                fpath = file.fileName();
+////                logd("export html file path='%s'", STR2CHA(fpath));
+////            }
+//            INSTANCE(PersonCtl)->exportToFile(per, ExportType::EXPORT_HTML, &fpath);
+//            if (QFile::exists(fpath)){
+//                dlgHtmlViewer* viewer = new dlgHtmlViewer();
+//                viewer->setHtmlPath(fpath);
+//                viewer->setSubject(per->getFullName());
+//                viewer->exec();
+//            } else {
+//                loge("html file '%s' not found", STR2CHA(fpath));
+//            }
+//        } else {
+//            loge("not person data to view");
+//        }
+//    } else {
+//        loge("Invalid idx");
+//        // TODO: popup message???
+//    }
+//    traceout;
+//    return ErrNone; // TODO: check to return value
+//}
 
 QString UIPersonListView::getTitle()
 {

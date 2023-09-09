@@ -109,11 +109,16 @@ BaseView *UITableViewFactory::getView(ViewType type, QWidget *parent )
         view = new UIPersonEventListView(parent);
         break;
     default:
+        loge("invalid view type %d", type);
         break;
     }
 
-    if (nullptr != view)
+    if (nullptr != view) {
+        logd("setup ui for view %d", view->getViewType());
         view->setupUI();
+    } else {
+        loge("not create view, no memory?");
+    }
 
     traceout;
     return view;

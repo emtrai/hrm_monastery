@@ -89,7 +89,6 @@ public:
     virtual void onPaused();
     virtual void onShown();
     virtual bool ready2FetchData();
-protected:
     /**
      * @brief view type \ref ViewType of view
      * @return \ref ViewType

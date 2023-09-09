@@ -282,6 +282,7 @@ public:
                                  QList<DbModel *>* outList = nullptr);
 
     virtual const QString &name() const;
+    virtual QString fullName() const;
     virtual void setName(const QString &newName);
 
     virtual qint64 dbId() const;

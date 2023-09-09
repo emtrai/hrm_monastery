@@ -122,7 +122,7 @@ ErrCode DlgAreaPerson::fromModel(const DbModel *item)
                 Person* per = (Person*)PERSONCTL->getModelByUid(comm->personUid());
                 if (per) {
                     SET_TEXTBOX_FROM_VALUE(ui->txtSearch, KItemUid,
-                                           per->uid(), per->getFullName());
+                                           per->uid(), per->fullName());
                     logd("found person '%s'", STR2CHA(per->toString()));
                     if (nameid.isEmpty()) {
                         nameid = QString("%1_%2").arg(comm->areaNameId(), per->nameId());
@@ -193,7 +193,7 @@ void DlgAreaPerson::on_btnSearch_clicked()
     if (dlg->exec() == QDialog::Accepted){
         const Person* per = (const Person*)dlg->selectedItem();
         if (per != nullptr) {
-            ui->txtSearch->setText(per->getFullName());
+            ui->txtSearch->setText(per->fullName());
             logd("setProperty %s", per->uid().toStdString().c_str());
             ui->txtSearch->setProperty(KItemUid, per->uid());
             QString nameid;

@@ -32,14 +32,20 @@ public:
     virtual ~UISaintListView();
 protected:
     virtual int getViewType() { return VIEW_SAINT;}
-    virtual ErrCode onLoad();
+    virtual ModelController* getController();
+    virtual QString getMainModelName();
+    virtual DbModel* onCreateDbModelObj(const QString& modelName);
+    virtual QString getTitle();
+
+    virtual void initFilterFields();
+
     virtual ErrCode fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
     virtual void initHeader();
-    virtual ModelController* getController();
 
     virtual int onFilter(int catetoryid, const QString& catetory, qint64 opFlags, const QString& keywords, const QVariant *value);
-    
-    virtual DbModel* onCreateDbModelObj(const QString& modelName);
+
+    virtual QList<DbModel*> getListDbModels();
+
 };
 
 #endif // UISAINTLISTVIEW_H

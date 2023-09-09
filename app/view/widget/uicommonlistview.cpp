@@ -398,7 +398,7 @@ ErrCode UICommonListView::onViewItem(UITableCellWidgetItem *item)
     }
 
     if (err == ErrNone) {
-        err = MainWindow::showOnHtmlViewer(model, getTitle());
+        err = MainWindow::showOnHtmlViewer(model, model->fullName());
     }
     if (err != ErrNone) {
         loge("view item err %d", err);

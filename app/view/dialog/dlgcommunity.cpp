@@ -204,7 +204,7 @@ void DlgCommunity::on_btnSearchCEO_clicked()
     if (dlg->exec() == QDialog::Accepted){
         const Person* per = (const Person*)dlg->selectedItem();
         if (per != nullptr) {
-            ui->txtCEO->setText(per->getFullName());
+            ui->txtCEO->setText(per->fullName());
             logd("setProperty %s", per->uid().toStdString().c_str());
             ui->txtCEO->setProperty(KItemUid, per->uid());
         } else {

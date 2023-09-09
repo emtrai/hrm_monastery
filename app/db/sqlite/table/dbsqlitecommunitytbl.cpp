@@ -176,7 +176,7 @@ ErrCode DbSqliteCommunityTbl::updateDbModelDataFromQuery(DbModel *item, const QS
         // as table calls directly to model handler
         Person* per = (Person*)SQLITE->getPersonModelHandler()->getByUid(cmm->currentCEOUid());
         if (per) {
-            cmm->setCurrentCEOName(per->getFullName());
+            cmm->setCurrentCEOName(per->fullName());
             delete per;
         }
     }

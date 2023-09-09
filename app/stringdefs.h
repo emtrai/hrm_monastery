@@ -118,6 +118,7 @@
 #define STR_NONE QObject::tr("Không")
 #define STR_MEMBER QObject::tr("Thành viên")
 #define STR_CONG_TAC_XA_HOI QObject::tr("Công tác xã hội")
+#define STR_NGAY_BON_MANG QObject::tr("Ngày bổn mạng")
 
 
 #endif // STRINGDEFS_H

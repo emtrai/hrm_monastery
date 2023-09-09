@@ -53,7 +53,7 @@ ErrCode DlgImportPersonListResult::setWidgetItem(UIImportItem *wgitem, DbModel *
     Person* per = (Person*)item;
     wgitem->addValue(per->nameId());
     wgitem->addValue(per->hollyName());
-    wgitem->addValue(per->getFullName());
+    wgitem->addValue(per->fullName());
     wgitem->addValue(DatetimeUtils::date2String(per->birthday()));
     wgitem->addValue(per->birthPlace());
     wgitem->addValue(DatetimeUtils::date2String(per->feastDay(), DEFAULT_FORMAT_MD)); // seem feastday convert repeate many time, make it common????

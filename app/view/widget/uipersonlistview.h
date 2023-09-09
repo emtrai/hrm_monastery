@@ -36,13 +36,22 @@ public:
     explicit UIPersonListView(QWidget *parent = nullptr);
     virtual ~UIPersonListView();
     virtual void setupUI();
-protected:
-    virtual ErrCode onLoad();
-    virtual ErrCode fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
-    virtual void initHeader();
-    virtual ModelController* getController();
+    virtual QString getName();
 protected:
     virtual int getViewType() { return VIEW_PERSON;}
+    virtual ModelController* getController();
+    virtual QString getMainModelName();
+    virtual DbModel* onCreateDbModelObj(const QString& modelName);
+
+    virtual void initHeader();
+    virtual ErrCode fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
+
+
+    virtual ErrCode onAddItem(UITableCellWidgetItem *item);
+//    virtual ErrCode onViewItem(UITableCellWidgetItem *item);
+    virtual ErrCode onEditItem(UITableCellWidgetItem *item);
+
+    virtual ErrCode onLoad();
     virtual void importRequested(const QString& fpath);
     virtual QList<UITableMenuAction*> getMenuCommonActions(const QMenu* menu);
     /**
@@ -60,7 +69,6 @@ protected:
      */
     virtual QList<UITableMenuAction*> getMenuMultiSelectedItemActions(const QMenu* menu, const QList<UITableItem *>& items);
 
-    virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionImport(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionExportListPerson(QMenu *menu, UITableMenuAction *act);
     virtual ErrCode onMenuActionViewPersonEvent(QMenu* menu, UITableMenuAction* act);
@@ -68,8 +76,6 @@ protected:
     virtual ErrCode onMenuActionAddPersonEvent(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionChangeCommunity(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode exportPersonInfo(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onViewItem(UITableCellWidgetItem *item);
-    virtual ErrCode onEditItem(UITableCellWidgetItem *item);
     virtual QString getTitle();
 
     virtual void initFilterFields();
@@ -78,15 +84,12 @@ protected:
                           const QString& catetory,
                           qint64 opFlags,
                           const QString& keywords, const QVariant *value);
-    virtual DbModel* onCreateDbModelObj(const QString& modelName);
-    virtual QString getName();
     virtual void onImportStart(const QString& importName, const QString& fpath, ImportType type);
     virtual void onImportEnd(const QString& importName, ErrCode err, const QString& fpath, ImportType type);
 
     virtual void onMainWindownImportStart(ImportTarget target);
     virtual void onMainWindownImportEnd(ImportTarget target, ErrCode err, void* importData = nullptr);
 
-    virtual QString getMainModelName();
 
     virtual ErrCode updatePersonEvent(const QList<DbModel*>& perList, const PersonEvent* event = nullptr);
 private:

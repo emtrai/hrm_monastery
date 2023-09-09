@@ -25,6 +25,9 @@
 #include <QTextBrowser>
 #include "baseview.h"
 
+/**
+ * @brief Show HTML text
+ */
 class UITextBrowser : public QTextBrowser, public BaseView
 {
 public:

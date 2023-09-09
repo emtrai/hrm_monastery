@@ -172,7 +172,7 @@ void Saint::setCountry(const QString &newCountry)
     CHECK_MODIFIED_THEN_SET(mCountry, newCountry, KItemCountry);
 }
 
-const QString &Saint::fullName() const
+QString Saint::fullName() const
 {
     return mFullName;
 }

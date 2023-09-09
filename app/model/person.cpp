@@ -239,7 +239,7 @@ QString Person::buildUid(const QString *seed)
     QString uid;
     // FIXME: there are some case that this is not suitable, i.e. info like name
     // is change, no birthday/birthplace info, etc.
-    QString uidName = QString("%1_%2_%3").arg(getFullName()).arg(birthday()).arg(birthPlace());
+    QString uidName = QString("%1_%2_%3").arg(fullName()).arg(birthday()).arg(birthPlace());
     if (seed != nullptr) {
         uidName += "_" + *seed;
     }
@@ -1009,15 +1009,10 @@ ErrCode Person::setNameFromFullName(const QString &name)
 
 
 
-QString Person::getFullName() const
+QString Person::fullName() const
 {
     //TODO:check localization
     return FULLNAME(firstName(), lastName());
-}
-
-QString Person::fullName() const
-{
-    return getFullName();
 }
 
 QString Person::displayName() const
@@ -1433,7 +1428,7 @@ void Person::dump()
 {
     tracein;
     DbModel::dump();
-    logd("- FullName %s", getFullName().toStdString().c_str());
+    logd("- FullName %s", fullName().toStdString().c_str());
     logd("- FirstName %s", firstName().toStdString().c_str());
     logd("- LastName %s", lastName().toStdString().c_str());
     logd("- HollyName %s", hollyName().toStdString().c_str());

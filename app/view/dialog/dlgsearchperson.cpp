@@ -153,7 +153,7 @@ QString DlgSearchPerson::getValueOfItemAt(int idx, int col, QString header, DbMo
             val = per->hollyName();
             break;
         case 2:
-            val = per->getFullName();
+            val = per->fullName();
             break;
         case 3:
             val = DatetimeUtils::date2String(per->birthday());
