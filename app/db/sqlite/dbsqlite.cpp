@@ -453,7 +453,11 @@ QSqlDatabase DbSqlite::currentDb()
     } else {
         logd("db connection already exist, use existing one");
     }
-    return mDatabaseConnections.localData()->database();
+    if (mDatabaseConnections.localData()) {
+        return mDatabaseConnections.localData()->database();
+    } else {
+        THROWEX("NULL local data");
+    }
 }
 
 QSqlQuery DbSqlite::createQuery()

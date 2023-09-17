@@ -2444,6 +2444,7 @@ void Person::setSaintUidList(const QString &newSaintUidList)
 {
     tracein;
     setSaintUidList(newSaintUidList.split(HOLLYNAME_SPLIT));
+    traceout;
 }
 
 void Person::clearSaintUid()

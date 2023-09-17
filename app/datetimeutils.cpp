@@ -81,8 +81,8 @@ qint64 DatetimeUtils::dateFromString(const QString &date, const QString &f, bool
     }
     if (listDate.empty())
         listDate.append(date);
-    logd("listFormat length %lld", listFormat.length());
-    logd("listDate length %lld", listDate.length());
+//    logd("listFormat length %lld", listFormat.length());
+//    logd("listDate length %lld", listDate.length());
     if (!listDate.empty() && !listFormat.empty()
         && (listDate.length() >= 1)) {
 
@@ -94,10 +94,10 @@ qint64 DatetimeUtils::dateFromString(const QString &date, const QString &f, bool
         int dayIdx = -1;
         int noDateItem = listDate.length();
         QString fmt;
-        logd("parse each item in date");
+//        logd("parse each item in date");
         foreach (QString item, listFormat){
-            logd("item %s", item.toStdString().c_str());
-            logd("listDate %s", (idx < noDateItem)?listDate[idx].toStdString().c_str():"0");
+//            logd("item %s", item.toStdString().c_str());
+//            logd("listDate %s", (idx < noDateItem)?listDate[idx].toStdString().c_str():"0");
             if (yearIdx < 0 && item.simplified().startsWith("Y")){ // year
                 yearIdx = idx;
                 fmt += "Y";
@@ -110,8 +110,8 @@ qint64 DatetimeUtils::dateFromString(const QString &date, const QString &f, bool
             }
             idx ++;
         }
-        logd("fmt=%s, noDateItem=%d", STR2CHA(fmt), noDateItem);
-        logd("yearIdx=%d, monthIdx=%d, dayIdx=%d", yearIdx, monthIdx, dayIdx);
+//        logd("fmt=%s, noDateItem=%d", STR2CHA(fmt), noDateItem);
+//        logd("yearIdx=%d, monthIdx=%d, dayIdx=%d", yearIdx, monthIdx, dayIdx);
         if (noDateItem == 1) {
             if (fmt.contains("Y")) {
                 year = listDate[0].toInt(&ok);
@@ -145,38 +145,8 @@ qint64 DatetimeUtils::dateFromString(const QString &date, const QString &f, bool
             } else {
                 ok = false;
             }
-            //            if (yearIdx >= 0) { // has year, mean Y/M/D, D/M/Y, M/D/Y or M/Y, Y/M or Y
-            //                if (noDateItem  == 1) { // year only
-            //                    year = listDate[0].toInt(&ok);
-            //                } else if (noDateItem  == 2) { // M/Y or Y/M
-            //                    if (yearIdx == 0) {
-            //                        year = listDate[0].toInt(&ok); // Y/M
-            //                    } else {
-            //                        year = listDate[noDateItem-1].toInt(&ok); // M/Y
-            //                    }
-            //                } else { // Y/M/D or D/M/Y or M/D/Y
-            //                    if (yearIdx < noDateItem)
-            //                        year = listDate[yearIdx].toInt(&ok);
-            //                    else
-            //                        year = listDate[noDateItem-1].toInt(&ok);
-            //                }
-            //            }asdaddasasd
-            //            if (monthIdx >= 0) {
-            //                if (noDateItem == 2) { // Y/M, M/Y, M/D, D/M
-            //                    // 2 case: Y & M or M & D
-            //                    if (yearIdx == 0) { // Y/M
-            //                        month = listDate[noDateItem-1].toInt(&ok);
-            //                    } else if (yearIdx > 0) {
-            //                        month = listDate[0].toInt(&ok);
-            //                    } else { // M/D or D/M
-            //                        year = listDate[monthIdx].toInt(&ok);
-            //                    }
-            //                } else {
-
-            //                }
-            //            }
         }
-        logd("year %d moth %d date %d", year, month, day);
+//        logd("year %d moth %d date %d", year, month, day);
         if (ok){
             ret = YMD_TO_INT(year, month, day);
         } else{
@@ -184,39 +154,6 @@ qint64 DatetimeUtils::dateFromString(const QString &date, const QString &f, bool
             loge("Invalid data/format: parse faile");
 
         }
-        //        foreach (QString item, listFormat){
-        //            if (idx >= listDate.length())
-        //                break;
-        //            ok = false;
-        //            logd("item %s", item.toStdString().c_str());
-        //            logd("listDate %s", listDate[idx].toStdString().c_str());
-        //            if (item.simplified().startsWith("Y")){ // year
-        //                year = listDate[idx].toInt(&ok);
-        //                logd("year '%s' -> %d", STR2CHA(listDate[idx]), year);
-
-        //            } else if (item.simplified().startsWith("M")){
-        //                 // TODO: support format like Jan, January???
-        //                month = listDate[idx].toInt(&ok);
-        //                logd("month '%s' -> %d", STR2CHA(listDate[idx]), month);
-
-        //            }  else if (item.simplified().startsWith("D")){
-        //                // TODO: support format like Mon, Tuesday????
-        //                day = listDate[idx].toInt(&ok);
-        //                logd("day '%s' -> %d", STR2CHA(listDate[idx]), day);
-        //            }
-        //            if (!ok){
-        //                break;
-        //            }
-        //            idx ++;
-        //        }
-        //        logd("year %d moth %d date %d", year, month, day);
-        //        if (ok){
-        //            ret = YMD_TO_INT(year, month, day);
-        //        } else{
-        //            ret = 0;
-        //            loge("Invalid data/format: parse faile");
-
-        //        }
     } else{
         loge("Invalid data/format: not match date and format");
     }
@@ -241,10 +178,10 @@ QString DatetimeUtils::date2String(qint64 date, const QString& format, bool* isO
         year = YEAR_FROM_INT(date);
         month = MONTH_FROM_INT(date);
         day = DAY_FROM_INT(date);
-        logd("Date 0x%x", (quint32)date);
-        logd("year %d", (quint32)year);
-        logd("month %d", (quint32)month);
-        logd("day %d", (quint32)day);
+//        logd("Date 0x%x", (quint32)date);
+//        logd("year %d", (quint32)year);
+//        logd("month %d", (quint32)month);
+//        logd("day %d", (quint32)day);
         int len = sizeof(supportedSpli)/sizeof(supportedSpli[0]);
 
         for (int i = 0; i < len; i++){
@@ -256,7 +193,7 @@ QString DatetimeUtils::date2String(qint64 date, const QString& format, bool* isO
             }
         }
         if (foundSplit) {
-            logd("split: '%s'", STR2CHA(QString(split)));
+//            logd("split: '%s'", STR2CHA(QString(split)));
             int idx = 0;
             QString val;
             foreach (QString item, listFormat){
@@ -284,7 +221,7 @@ QString DatetimeUtils::date2String(qint64 date, const QString& format, bool* isO
             }
         } else {
             ok = false;
-            loge("not found split for format '%s'", STR2CHA(format));
+//            loge("not found split for format '%s'", STR2CHA(format));
         }
     } else {
         logd("date is zero, nothing to return");

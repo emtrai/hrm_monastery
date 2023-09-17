@@ -50,6 +50,7 @@ public:
     Community *community() const;
     void setCommunity(const Community *newCommunity);
 
+    virtual QString toString() const;
 protected:
     virtual DbModelHandler *getDbModelHandler() const;
 protected:

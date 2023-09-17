@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Sự kiện</string>
+   <string>Cập nhật Sự kiện của Nữ tu</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>

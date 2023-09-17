@@ -25,7 +25,8 @@
 #include <QDialog>
 #include "errcode.h"
 #include <QThread>
-#include "logger.h"
+
+#define MAX_WAIT_TIME_MS (5*60*1000)
 
 namespace Ui {
 class DlgWait;
@@ -34,6 +35,12 @@ class DlgWait;
 
 class DlgWait;
 typedef std::function<ErrCode(void* data, DlgWait* dlg)> WaitPrepare_t;
+/**
+ * @brief run callback for progress dialog
+ * @param err: output error code. Run function will return result via this param
+ * @param data: input data for processing run
+ * @param dlg: progress dialog
+ */
 typedef std::function<void*(ErrCode* err, void* data, DlgWait* dlg)> WaitRunt_t;
 typedef std::function<ErrCode(ErrCode err, void* data, void* result, DlgWait* dlg)> WaitFinished_t;
 
@@ -90,9 +97,11 @@ protected:
     virtual void accept();
     virtual void done(int);
     virtual void reject();
+signals:
+    void closeDlg(ErrCode err);
 public slots:
     void handleResult(ErrCode err, void* data, void* result);
-
+    void handleCloseDlg(ErrCode err);
 private:
     Ui::DlgWait *ui;
     bool mAllowCancel;

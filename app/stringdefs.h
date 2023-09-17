@@ -32,7 +32,7 @@
 #define STR_NO_DATA         QObject::tr("Không có dữ liệu")
 #define STR_INVALID_DATA     QObject::tr("Dữ liệu không hợp lệ")
 
-#define STR_BIRTHDAY        QObject::tr("Năm sinh")
+#define STR_BIRTHDAY        QObject::tr("Ngày sinh")
 #define STR_BIRTHPLACE        QObject::tr("Nơi sinh")
 #define STR_CONTACT        QObject::tr("Liên hệ")
 #define STR_ADDR        QObject::tr("Địa chỉ")
@@ -82,6 +82,8 @@
 #define STR_EVENT     QObject::tr("Sự kiện")
 #define STR_TITLE     QObject::tr("Tiêu đề")
 #define STR_CHANGE_COMMUNITY     QObject::tr("Đổi cộng đoàn")
+#define STR_ASK_CHANGE_TO_COMMUNITY     QObject::tr("Đổi sang cộng đoàn '%1'?")
+#define STR_CHANGE_TO_COMMUNITY     QObject::tr("Đổi sang cộng đoàn '%1'")
 
 #define STR_IMPORT_FROM_FILE     QObject::tr("Nhập từ tập tin")
 #define STR_EXPORT_TO_FILE     QObject::tr("Xuất ra tập tin")
@@ -119,6 +121,20 @@
 #define STR_MEMBER QObject::tr("Thành viên")
 #define STR_CONG_TAC_XA_HOI QObject::tr("Công tác xã hội")
 #define STR_NGAY_BON_MANG QObject::tr("Ngày bổn mạng")
+#define STR_NGAY_NHAP_DONG QObject::tr("Ngày Nhập Dòng")
+#define STR_NGAY_TIEN_KHAN QObject::tr("Ngày Tiên Khấn")
+#define STR_NGAY_VINH_KHAN QObject::tr("Ngày Vĩnh Khấn")
+#define STR_LOP_KHAN QObject::tr("Lớp khấn")
+#define STR_NGAY_AN_NGHI QObject::tr("Ngày an nghỉ")
+
+#define STR_QUERYING QObject::tr("Đang truy vấn dữ liệu")
+#define STR_QUERY_ERROR QObject::tr("Lỗi truy vấn dữ liệu")
+
+#define STR_ADD_EVENT QObject::tr("Thêm thông tin sự kiện")
+#define STR_VIEW_COMMUNITY QObject::tr("Xem thông tin Cộng đoàn")
+#define STR_VIEW_EVENT QObject::tr("Xem thông tin sự kiện")
+#define STR_EXPORT_PERSON_INFO QObject::tr("Xuất thông tin Nữ tu")
+#define STR_LIST_PERSON_EMPTY QObject::tr("Danh sách nữ tu trống")
 
 
 #endif // STRINGDEFS_H

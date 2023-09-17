@@ -73,6 +73,7 @@ typedef enum ErrCode {
     ErrNoFile,
     ErrInvalidView,
     ErrNotSelect,
+    ErrAbort,
     ErrMax
     } ErrCode_t;
 

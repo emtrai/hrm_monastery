@@ -268,17 +268,20 @@ ErrCode DbSqlitePersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQ
 {
     tracein;
     ErrCode err = ErrNone;
-    DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
-    // TODO: separate into short info and full info, to avoid consume too much memory?
-    // TODO: paging to avoid too much memory?
-    Person* cmm = (Person*) item;
-    if (!qry.isNull(KFieldPersonDbId)) {
-        qint64 dbId = 0;
-        bool ok = false;
-        dbId = qry.value(KFieldPersonDbId).toLongLong(&ok);
-        logd("dbId %lld, ok %d", dbId, ok);
-        if (ok) {
-            cmm->setDbId(dbId);
+    Person* cmm = nullptr;
+    err = DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
+    if (err == ErrNone) {
+        cmm = (Person*) item;
+        // TODO: separate into short info and full info, to avoid consume too much memory?
+        // TODO: paging to avoid too much memory?
+        if (!qry.isNull(KFieldPersonDbId)) {
+            qint64 dbId = 0;
+            bool ok = false;
+            dbId = qry.value(KFieldPersonDbId).toLongLong(&ok);
+            logd("dbId %lld, ok %d", dbId, ok);
+            if (ok) {
+                cmm->setDbId(dbId);
+            }
         }
     }
     if (!qry.isNull(KFieldPersonUid)) {
@@ -309,6 +312,7 @@ ErrCode DbSqlitePersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQ
 
     cmm->setNationalityUid(qry.value(KFieldNationalityUid).toString());
     if (!cmm->nationalityUid().isEmpty()) {
+        logd("check to set nationality uid '%s'", STR2CHA(cmm->nationalityUid()));
         // TODO: caching data (i.e. list of person in management board) for fast accessing?
         // TODO: is it ok to call here? does it break any design?
         // as table calls directly to model handler
@@ -323,6 +327,7 @@ ErrCode DbSqlitePersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQ
 
     cmm->setEthnicUid(qry.value(KFieldEthnicUid).toString());
     if (!cmm->ethnicUid().isEmpty()) {
+        logd("check to set ethnicUid '%s'", STR2CHA(cmm->ethnicUid()));
         // TODO: caching data (i.e. list of person in management board) for fast accessing?
         // TODO: is it ok to call here? does it break any design?
         // as table calls directly to model handler
@@ -338,6 +343,7 @@ ErrCode DbSqlitePersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQ
     cmm->setEduUid(qry.value(KFieldEduUid).toString());
     cmm->setEduDetail(qry.value(KFieldEduDetail).toString());
     if (!cmm->eduUid().isEmpty()) {
+        logd("check to set eduUid '%s'", STR2CHA(cmm->eduUid()));
         // TODO: caching data (i.e. list of person in management board) for fast accessing?
         // TODO: is it ok to call here? does it break any design?
         // as table calls directly to model handler
@@ -352,6 +358,7 @@ ErrCode DbSqlitePersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQ
 
     cmm->setCourseUid(qry.value(KFieldCourseUid).toString());
     if (!cmm->courseUid().isEmpty()) {
+        logd("check to set courseUid '%s'", STR2CHA(cmm->courseUid()));
         // TODO: caching data (i.e. list of person in management board) for fast accessing?
         // TODO: is it ok to call here? does it break any design?
         // as table calls directly to model handler
@@ -385,6 +392,7 @@ ErrCode DbSqlitePersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQ
 
     cmm->setCountryUid(qry.value(KFieldCountryUid).toString());
     if (!cmm->countryUid().isEmpty()) {
+        logd("check to set countryUid '%s'", STR2CHA(cmm->countryUid()));
         // TODO: caching data (i.e. list of person in management board) for fast accessing?
         // TODO: is it ok to call here? does it break any design?
         // as table calls directly to model handler
@@ -408,6 +416,7 @@ ErrCode DbSqlitePersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQ
 
     cmm->setCommunityUid(qry.value(KFieldCommunityUid).toString());
     if (!cmm->communityUid().isEmpty()) {
+        logd("check to set communityUid '%s'", STR2CHA(cmm->communityUid()));
         // TODO: caching data (i.e. list of person in management board) for fast accessing?
         // TODO: is it ok to call here? does it break any design?
         // as table calls directly to model handler
@@ -445,6 +454,7 @@ ErrCode DbSqlitePersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQ
     cmm->setJoinDate(qry.value(KFieldJoinDate).toInt());
     cmm->setJoinPICUid(qry.value(KFieldJoinPICUid).toString());
     if (!cmm->joinPICUid().isEmpty() && cmm->joinPICUid() != cmm->uid()) {
+        logd("check to set joinPICUid '%s'", STR2CHA(cmm->joinPICUid()));
         // TODO: caching data (i.e. list of person in management board) for fast accessing?
         // TODO: is it ok to call here? does it break any design?
         // as table calls directly to model handler
@@ -461,6 +471,7 @@ ErrCode DbSqlitePersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQ
     cmm->setPreTrainJoinDate(qry.value(KFieldPreTrainDate).toInt());
     cmm->setPreTrainPICUid(qry.value(KFieldPreTrainPICUid).toString());
     if (!cmm->preTrainPICUid().isEmpty() && cmm->preTrainPICUid() != cmm->uid()) {
+        logd("check to set preTrainPICUid '%s'", STR2CHA(cmm->preTrainPICUid()));
         // TODO: caching data (i.e. list of person in management board) for fast accessing?
         // TODO: is it ok to call here? does it break any design?
         // as table calls directly to model handler
@@ -477,6 +488,7 @@ ErrCode DbSqlitePersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQ
     cmm->setTrainJoinDate(qry.value(KFieldTrainDate).toInt());
     cmm->setTrainPICUid(qry.value(KFieldTrainPICUid).toString());
     if (!cmm->trainPICUid().isEmpty() && cmm->trainPICUid() != cmm->uid()) {
+        logd("check to set trainPICUid '%s'", STR2CHA(cmm->trainPICUid()));
         // TODO: caching data (i.e. list of person in management board) for fast accessing?
         // TODO: is it ok to call here? does it break any design?
         // as table calls directly to model handler
@@ -493,6 +505,7 @@ ErrCode DbSqlitePersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQ
     cmm->setVowsDate(qry.value(KFieldVowsDate).toInt());
     cmm->setVowsCEOUid(qry.value(KFieldVowsCEOUid).toString());
     if (!cmm->vowsCEOUid().isEmpty() && cmm->vowsCEOUid() != cmm->uid()) {
+        logd("check to set vowsCEOUid '%s'", STR2CHA(cmm->vowsCEOUid()));
         // TODO: caching data (i.e. list of person in management board) for fast accessing?
         // TODO: is it ok to call here? does it break any design?
         // as table calls directly to model handler
@@ -509,6 +522,7 @@ ErrCode DbSqlitePersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQ
     cmm->setEternalVowsDate(qry.value(KFieldEternalVowsDate).toInt());
     cmm->setEternalVowsPICUid(qry.value(KFieldEternalVowsPICUid).toString());
     if (!cmm->eternalVowsPICUid().isEmpty() && cmm->eternalVowsPICUid() != cmm->uid()) {
+        logd("check to set eternalVowsPICUid '%s'", STR2CHA(cmm->eternalVowsPICUid()));
         // TODO: caching data (i.e. list of person in management board) for fast accessing?
         // TODO: is it ok to call here? does it break any design?
         // as table calls directly to model handler
@@ -526,6 +540,7 @@ ErrCode DbSqlitePersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQ
 
     cmm->setEternalVowsCEOUid(qry.value(KFieldEternalVowsCEOUid).toString());
     if (!cmm->eternalVowsCEOUid().isEmpty() && cmm->eternalVowsCEOUid() != cmm->uid()) {
+        logd("check to set eternalVowsCEOUid '%s'", STR2CHA(cmm->eternalVowsCEOUid()));
         // TODO: caching data (i.e. list of person in management board) for fast accessing?
         // TODO: is it ok to call here? does it break any design?
         // as table calls directly to model handler
@@ -550,6 +565,7 @@ ErrCode DbSqlitePersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQ
 
     cmm->setPersonStatusUid(qry.value(KFieldPersonStatusUid).toString());
     if (!cmm->personStatusUid().isEmpty()) {
+        logd("check to set personStatusUid '%s'", STR2CHA(cmm->personStatusUid()));
         // TODO: caching data (i.e. list of person in management board) for fast accessing?
         // TODO: is it ok to call here? does it break any design?
         // as table calls directly to model handler
@@ -570,6 +586,7 @@ ErrCode DbSqlitePersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQ
 
     cmm->setCurrentWorkUid(qry.value(KFieldWorkUid).toString());
     if (!cmm->currentWorkUid().isEmpty()) {
+        logd("check to set currentWorkUid '%s'", STR2CHA(cmm->currentWorkUid()));
         // TODO: caching data (i.e. list of person in management board) for fast accessing?
         // TODO: is it ok to call here? does it break any design?
         // as table calls directly to model handler

@@ -42,8 +42,9 @@ public:
      */
     virtual QList<DbModel*> getListCommunityPerson(const QString& community,
                                                               int modelStatus = MODEL_STATUS_MAX);
-    virtual QList<DbModel*> getListItems(const QString& personUid, const QString& commuid,
-                                          const DbModelBuilder &builder);
+    virtual QList<DbModel*> getListCommunityPerson(const QString& personUid,
+                                                    const QString& commuid,
+                                                    int modelStatus = MODEL_STATUS_MAX);
 
 protected:
     virtual ErrCode updateDbModelDataFromQuery(DbModel* item, const QSqlQuery& qry);

@@ -199,7 +199,8 @@ ErrCode DbSqlitePerson::add2Table(DbModel *model, DbSqliteTbl *tbl)
         }
         else{
             err = ErrExisted;
-            loge("Person %s already exist", model->name().toStdString().c_str());
+            loge("Item '%s' already exist in table '%s'",
+                 MODELSTR2CHA(model), STR2CHA(tbl->name()));
         }
     } else {
         err = ErrUnknown;

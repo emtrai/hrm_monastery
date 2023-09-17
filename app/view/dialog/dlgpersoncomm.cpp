@@ -38,14 +38,16 @@
 DlgPersonCommunity::DlgPersonCommunity(QWidget *parent) :
     DlgCommonEditModel(parent),
     ui(new Ui::DlgPersonCommunity),
-    mCommunity(nullptr)
+    mCommunity(nullptr),
+    mSkipStartDate(false)
 {
     tracein;
     ui->setupUi(this);
     loadCommunity();
     loadModelStatus();
-    ui->txtStartDate->setText(DatetimeUtils::currentTimeToDatestring());
-    ui->txtEndDate->setText(DatetimeUtils::currentTimeToDatestring());
+//    ui->txtStartDate->setText(DatetimeUtils::currentTimeToDatestring());
+//    ui->txtEndDate->setText(DatetimeUtils::currentTimeToDatestring());
+    traceout;
 }
 
 DlgPersonCommunity::~DlgPersonCommunity()
@@ -86,7 +88,6 @@ ErrCode DlgPersonCommunity::fromModel(const DbModel *item)
         loge("invalid item");
     }
     if (err == ErrNone) {
-//    THROWEX("not support from model here");
         if (comm->startDate() > 0) {
             ui->txtStartDate->setText(DatetimeUtils::date2String(comm->startDate()));
         }
@@ -94,7 +95,7 @@ ErrCode DlgPersonCommunity::fromModel(const DbModel *item)
             ui->txtEndDate->setText(DatetimeUtils::date2String(comm->endDate()));
         }
         setModelStatus(comm->modelStatus());
-        setCommunityPerson(comm);
+        appendCommunityPerson(comm);
     }
     traceret(err);
     return err;
@@ -107,14 +108,14 @@ void DlgPersonCommunity::loadCommunity()
     traceout;
 }
 
-void DlgPersonCommunity::loadModelStatus()
+void DlgPersonCommunity::loadModelStatus(bool skipActive)
 {
     tracein;
     ui->cbModelStatus->clear();
     const QHash<int, QString>* statuses = DbModel::getModelStatusIdNameMap();
     logd("the number of status %lld", statuses->count());
     foreach (int key, statuses->keys()) {
-        if (key == MODEL_STATUS_ACTIVE) {
+        if (skipActive && key == MODEL_STATUS_ACTIVE) {
             // changing status will cause some complicated processing, so not allow to set here
             // TODO: support to change model status
             continue;
@@ -124,11 +125,11 @@ void DlgPersonCommunity::loadModelStatus()
     traceout;
 }
 
-ErrCode DlgPersonCommunity::setModelStatus(int modelStatus)
+ErrCode DlgPersonCommunity::setModelStatus(int modelStatus, bool allowChange)
 {
     tracein;
     ErrCode err = ErrNone;
-    logd("modelStatus 0x%x", modelStatus);
+    logd("modelStatus 0x%x, allowChange %d", modelStatus, allowChange);
     int index = -1;
     err = Utils::setSelectItemComboxByData(ui->cbModelStatus, modelStatus, &index);
     logd("index %d", index);
@@ -137,6 +138,7 @@ ErrCode DlgPersonCommunity::setModelStatus(int modelStatus)
     } else {
         loge("set model status failed, err = %d", err);
     }
+    ui->cbModelStatus->setEnabled(allowChange);
     traceret(err);
     return err;
 }
@@ -205,7 +207,6 @@ void DlgPersonCommunity::accept()
     tracein;
     QString errMsg;
     ErrCode err = ErrNone;
-    bool ok2Save = false;
     bool ok = false;
     int modelStatus = getModelStatus(&ok);
     QString remark = ui->txtRemark->toPlainText();
@@ -266,12 +267,24 @@ void DlgPersonCommunity::accept()
                 logd("per '%s'", MODELSTR2CHA(per));
                 commPer->setCommunity(mCommunity);
                 commPer->setPerson(per);
-                commPer->setStartDate(startDate);
+                if (!mSkipStartDate) commPer->setStartDate(startDate);
                 commPer->setEndDate(endDate);
                 commPer->setModelStatus(modelStatus);
                 commPer->setRemark(remark);
                 mCommunityPersonList.append(commPer);
             }
+        }
+    } else {
+        foreach (CommunityPerson* commPer, mCommunityPersonList) {
+            if (!commPer) {
+                logw("something strange, null value in list");
+                continue;
+            }
+            logd("commper '%s'", MODELSTR2CHA(commPer));
+            if (!mSkipStartDate) commPer->setStartDate(startDate);
+            commPer->setEndDate(endDate);
+            commPer->setModelStatus(modelStatus);
+            commPer->setRemark(remark);
         }
     }
 
@@ -283,7 +296,7 @@ void DlgPersonCommunity::accept()
                     err = commper->save();
                 } else {
                     commper->setMarkModified(true);
-                    commper->setStartDate(startDate);
+                    if (!mSkipStartDate) commper->setStartDate(startDate);
                     commper->setEndDate(endDate);
                     commper->setModelStatus(modelStatus);
                     commper->setRemark(remark);
@@ -316,6 +329,8 @@ void DlgPersonCommunity::accept()
         logd("not mIsSelfSave, just call accept");
     }
     logd("ret=%d", err);
+
+    mAcceptResult = err;
     if (err == ErrNone) {
         QDialog::accept();
     }
@@ -338,6 +353,21 @@ void DlgPersonCommunity::updateModelStatus(int status)
         ui->lblEndDateNote->setStyleSheet(QStringLiteral("QLabel{color: rgb(0, 0, 0);}"));
     }
 //    ui->cbModelStatus->setDisabled(true);
+    traceout;
+}
+
+void DlgPersonCommunity::setDate(QLineEdit *txt, qint64 timeInMs)
+{
+    tracein;
+    logd("set date timeInMs %lld", timeInMs);
+    if (!timeInMs) {
+        timeInMs = DatetimeUtils::currentTimeMs();
+    }
+    QString timeString = DatetimeUtils::timeMsToDatestring(timeInMs, QT_DATE_FORMAT_DMY);
+    logd("timeString '%s'", STR2CHA(timeString));
+    if (!timeString.isEmpty()) {
+        txt->setText(timeString);
+    }
     traceout;
 }
 
@@ -397,6 +427,31 @@ void DlgPersonCommunity::on_cbModelStatus_currentIndexChanged(int index)
     traceout;
 }
 
+void DlgPersonCommunity::setSkipStartDate(bool newSkipStartDate)
+{
+    tracein;
+    logd("newSkipStartDate %d", newSkipStartDate);
+    mSkipStartDate = newSkipStartDate;
+    ui->txtStartDate->setEnabled(!newSkipStartDate);
+    traceout;
+}
+
+void DlgPersonCommunity::setEndDate(qint64 timeInMs)
+{
+    tracein;
+    logd("set end date timeInMs %lld", timeInMs);
+    setDate(ui->txtEndDate, timeInMs);
+    traceout;
+}
+
+void DlgPersonCommunity::setStartDate(qint64 timeInMs)
+{
+    tracein;
+    logd("set start date timeInMs %lld", timeInMs);
+    setDate(ui->txtStartDate, timeInMs);
+    traceout;
+}
+
 void DlgPersonCommunity::setCommunity(const Community *newCommunity)
 {
     tracein;
@@ -419,7 +474,8 @@ const QList<CommunityPerson *> &DlgPersonCommunity::communityPersonList()
     return mCommunityPersonList;
 }
 
-ErrCode DlgPersonCommunity::setCommunityPerson(const CommunityPerson *commPer)
+ErrCode DlgPersonCommunity::appendCommunityPerson(const CommunityPerson *commPer,
+                                                  bool ignoreCommunity)
 {
     tracein;
     ErrCode err = ErrNone;
@@ -434,7 +490,6 @@ ErrCode DlgPersonCommunity::setCommunityPerson(const CommunityPerson *commPer)
         err = ErrInvalidArg;
     }
     if (err == ErrNone) {
-        RELEASE_LIST(mCommunityPersonList, CommunityPerson);
         newCommPer = CLONE_MODEL(commPer, CommunityPerson);
         if (newCommPer) {
             mCommunityPersonList.append(newCommPer);
@@ -445,8 +500,10 @@ ErrCode DlgPersonCommunity::setCommunityPerson(const CommunityPerson *commPer)
     }
 
     if (err == ErrNone) {
-        logd("set community");
-        setCommunity(newCommPer->community());
+        if (!ignoreCommunity) {
+            logd("set community");
+            setCommunity(newCommPer->community());
+        }
         logd("append person");
         appendPerson(commPer->person());
     } else {
@@ -456,6 +513,32 @@ ErrCode DlgPersonCommunity::setCommunityPerson(const CommunityPerson *commPer)
     // not allow to change persone nor community, just edit other data
     ui->btnSearchPeople->setEnabled(false);
     ui->cbCommunity->setEnabled(false);
+    traceret(err);
+    return err;
+}
+
+ErrCode DlgPersonCommunity::setCommunityPersonList(const QList<CommunityPerson *> &commPer, bool ignoreCommunity)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    logd("commPer size %lld, ignoreCommunity %d", commPer.size(), ignoreCommunity);
+    RELEASE_LIST(mCommunityPersonList, CommunityPerson);
+    if (commPer.size() > 0) {
+        foreach (CommunityPerson* item, commPer) {
+            if (item) {
+                err = appendCommunityPerson(item, ignoreCommunity);
+            } else {
+                loge("Invalid data");
+                err = ErrInvalidData;
+            }
+            if (err != ErrNone) {
+                break;
+            }
+        }
+    } else {
+        loge("No data");
+        err = ErrNoData;
+    }
     traceret(err);
     return err;
 }

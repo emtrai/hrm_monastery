@@ -50,6 +50,9 @@ public:
                                       qint64 enddate = 0,
                                       const QString& remark = nullptr,
                                       bool notifyDbChange = true) = 0;
+    virtual QList<DbModel*> getListCommunityPersonOfPerson(const QString& perUid,
+                                                            int modelStatus = MODEL_STATUS_MAX) = 0;
+    virtual QList<DbModel*> getListActiveCommunityPersonOfPerson(const QString& perUid) = 0;
 };
 
 #endif // DBCOMMUNITYMODELHANDLER_H

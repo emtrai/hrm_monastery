@@ -65,6 +65,17 @@ public:
                                                     const QString* perStatusUid = nullptr);
 
     /**
+     * @brief getListCommunityPerson
+     * @param commUid
+     * @param modelStatus
+     * @param perStatusUid
+     * @return List of CommunityPerson objects
+     */
+    virtual QList<DbModel*> getListCommunityPersonOfPerson(const QString& perUid,
+                                                    int modelStatus = MODEL_STATUS_MAX);
+    virtual QList<DbModel*> getListActiveCommunityPersonOfPerson(const QString& perUid);
+
+    /**
      * @brief Add person to community
      * @param comm
      * @param per

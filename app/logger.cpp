@@ -64,17 +64,17 @@ void LogWorker::doWork() {
     traceout;
 }
 void LogWorker::printLog(QString log) {
-    tracein;
+//    tracein;
     if (isRunning) {
         mMutex.lock();
-        logd("enqueue");
+//        logd("enqueue");
         mQueue.enqueue(log);
         mWait.wakeAll();
         mMutex.unlock();
     } else {
         loge("writing lock thread not started yet");
     }
-    traceout;
+//    traceout;
 }
 
 void LogWorker::startRuning()
@@ -255,15 +255,15 @@ void Logger::doHandleMessage(QtMsgType type, const QMessageLogContext &context, 
 
 void Logger::doPrintLog2File(const QString &log)
 {
-    tracein;
-    logd("doPrintLog2File");
+//    tracein;
+//    logd("doPrintLog2File");
     // TODO: check to change file & delete old file???
     if (!log.isEmpty()) {
         logd("write log '%s' to logfile", STR2CHA(log));
         mLogFile.write(log.toUtf8());
         mLogFile.flush();
     }
-    traceout;
+//    traceout;
 }
 
 void Logger::doReqWriteLog(const QString &log)

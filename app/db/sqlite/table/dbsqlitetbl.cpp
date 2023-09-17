@@ -511,6 +511,7 @@ bool DbSqliteTbl::isExist(const DbModel *item)
         logd("Query String '%s'", queryString.toStdString().c_str());
 
         // TODO: check sql injection issue
+        logd("bind nameid '%s'", STR2CHA(item->nameId()));
         qry.bindValue( ":nameid", item->nameId() );
         queryOk = true;
     } else {
@@ -672,7 +673,11 @@ QHash<QString, QString> DbSqliteTbl::getFieldsCheckExists(const DbModel* item)
 {
     tracein;
     QHash<QString, QString> list;
-    list[KFieldNameId] = item->nameId(); // TODO: make as class member?
+    if (item) {
+        list[KFieldNameId] = item->nameId(); // TODO: make as class member?
+    } else {
+        logw("item is null, tbl '%s'", STR2CHA(name()));
+    }
     traceout;
     return list;
 }
@@ -1089,7 +1094,7 @@ int DbSqliteTbl::runQuery(QSqlQuery &qry, const DbModelBuilder& builder,
     }
 
     logi("Found %d", cnt);
-
+    traceret(cnt);
     return cnt;
 }
 
@@ -1376,11 +1381,12 @@ DbModel *DbSqliteTbl::getByUid(const QString &uid, const DbModelBuilder &builder
     logi("Search err=%d", err);
     if (err == ErrNone && outList.count() > 0){
         logd("Found, return 1st element");
-        retDb = outList[0];
+        retDb = CLONE_DBMODEL(outList[0]);
     } else {
         logi("Not found uid '%s'", uid.toStdString().c_str());
         // TODO: safe to print unicode log????
     }
+    RELEASE_LIST_DBMODEL(outList);
     traceout;
     return retDb;
 }

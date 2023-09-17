@@ -171,18 +171,22 @@ ErrCode DbSqliteCommunityTbl::updateDbModelDataFromQuery(DbModel *item, const QS
     cmm->setModelStatus((DbModelStatus)qry.value(KFieldModelStatus).toInt());
     cmm->setCurrentCEOUid(qry.value(KFieldCEOUid).toString().trimmed()); // TODO: check and set name as well
     if (!cmm->currentCEOUid().isEmpty()) {
+        // WARNING WARNING WARNING: RECURSIVE!!!:
+        // person -> current community --> get current CEO (person) --> current community --> blablala
         // TODO: caching data (i.e. list of person in management board) for fast accessing?
         // TODO: is it ok to call here? does it break any design?
         // as table calls directly to model handler
-        Person* per = (Person*)SQLITE->getPersonModelHandler()->getByUid(cmm->currentCEOUid());
-        if (per) {
-            cmm->setCurrentCEOName(per->fullName());
-            delete per;
-        }
+        logd("get current CEO by Uid");
+//        Person* per = (Person*)SQLITE->getPersonModelHandler()->getByUid(cmm->currentCEOUid());
+//        if (per) {
+//            cmm->setCurrentCEOName(per->fullName());
+//            delete per;
+//        }
     }
     cmm->setContact(qry.value(KFieldContact).toString());
     cmm->setMissionUid(qry.value(KFieldMissionUid).toString().trimmed());
     if (!cmm->missionUid().isEmpty()) {
+        logd("get Mission by Uid");
         foreach (QString uid, cmm->missionUid()) {
             DbModel* model = SQLITE->getMissionModelHandler()->getByUid(uid);
             if (model) {

@@ -32,6 +32,7 @@
 #define DEFAULT_FORMAT_MD DATE_FORMAT_DM
 
 #define QT_DATE_FORMAT_DMY "dd/MM/yyyy"
+#define QT_DATE_FORMAT_DMYHMS "dd_MM_yyyy_hh_mm_ss"
 
 
 

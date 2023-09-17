@@ -97,6 +97,9 @@ public:
     QString modelStatusName();
     void setModelStatusName(const QString &newModelStatusName);
 
+
+    virtual QString toString() const;
+
 protected:
     void copy(const MapDbModel& model);
 protected:

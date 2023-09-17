@@ -202,11 +202,12 @@ QList<DbModel *> DbSqliteCommunityPersonTbl::getListCommunityPerson(
     traceout;
     return items;
 }
-QList<DbModel *> DbSqliteCommunityPersonTbl::getListItems(const QString &personUid, const QString &commuid,
-                                                                      const DbModelBuilder &builder)
+QList<DbModel *> DbSqliteCommunityPersonTbl::getListCommunityPerson(const QString &personUid,
+                                                                    const QString &commuid,
+                                                                    int modelStatus)
 {
     traced;
-    return getListItemsUids(commuid, personUid, builder);
+    return getListItemsUids(commuid, personUid,  &CommunityPerson::build, modelStatus);
 }
 
 ErrCode DbSqliteCommunityPersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQuery &qry)

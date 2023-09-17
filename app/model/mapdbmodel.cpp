@@ -308,6 +308,7 @@ void MapDbModel::setModelStatus(qint32 newStatus)
     if (mModelStatus != newStatus) {
         mModelStatus = newStatus;
         markItemAsModified(KItemStatus);
+        setModelStatusName(DbModel::modelStatus2Name((DbModelStatus)newStatus));
     }
 }
 
@@ -375,4 +376,16 @@ QString MapDbModel::modelStatusName()
 void MapDbModel::setModelStatusName(const QString &newModelStatusName)
 {
     mModelStatusName = newModelStatusName;
+}
+
+QString MapDbModel::toString() const
+{
+    QString str = DbModel::toString();
+    str += QString(":status('%1'-%2)")
+               .arg(DbModel::modelStatus2Name((DbModelStatus)modelStatus()))
+               .arg(modelStatus());
+    str += QString(":uid1('%1'):uid2('%2')").arg(uid1(), uid2());
+    str += QString(":start('%1')").arg(DatetimeUtils::date2String(startDate()));
+    str += QString(":end('%2')").arg(DatetimeUtils::date2String(endDate()));
+    return str;
 }

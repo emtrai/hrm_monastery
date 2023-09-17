@@ -187,6 +187,8 @@ public:
 
     virtual QWidget* getWidget();
     ErrCode doFilter(int field, int op, const QVariant& keyword);
+
+    void requestReload();
 protected:
     virtual void sort(int column);
     /**
@@ -279,6 +281,7 @@ protected:
 
 signals:
     void signalDeleteDone(ErrCode err, QString msg);
+    void signalRequestReload();
 private slots:
     void onHandleSignalDeleteDone(ErrCode err, QString msg);
     void on_btnImport_clicked();
@@ -291,6 +294,7 @@ private slots:
     void on_btnAdd_clicked();
 
     void on_cbCategory_currentIndexChanged(int index);
+    void onRequestReload();
 
 protected:
     QStringList mHeader;

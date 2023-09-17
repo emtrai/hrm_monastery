@@ -410,20 +410,20 @@ ErrCode DbModel::prepare2Save()
 
 void DbModel::markItemAsModified(const QString &itemName)
 {
-    tracein;
+//    tracein;
     if (markModified()) {
         logd("mark item %s as modified", itemName.toStdString().c_str());
 
         if (!mUpdatedField.contains(itemName)) {
             mUpdatedField.append(itemName);
         } else {
-            logd("Item already existed");
+//            logd("Item already existed");
         }
     } else {
-        logd("Skip mark modified for %s", itemName.toStdString().c_str());
+//        logd("Skip mark modified for %s", itemName.toStdString().c_str());
     }
 
-    traceout;
+//    traceout;
 }
 
 
@@ -804,7 +804,8 @@ void DbModel::dump()
 
 QString DbModel::toString() const
 {
-    return QString("%1:%2:%3:%4").arg(modelName(), uid(), nameId(),name());
+    return QString("modelName('%1'):uid('%2'):nameid('%3'):name('%4')")
+        .arg(modelName(), uid(), nameId(),name());
 }
 
 QString DbModel::getName()

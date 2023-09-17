@@ -56,6 +56,12 @@ UITableView::UITableView(QWidget *parent) :
                  SLOT(onHandleSignalDeleteDone(ErrCode,QString)))) {
         loge("Failed to connect signalDeleteDone to onHandleSignalDeleteDone");
     }
+
+    if (!connect(this,
+                 SIGNAL(signalRequestReload()),
+                 SLOT(onRequestReload()))) {
+        loge("Failed to connect signalRequestReload to onRequestReload");
+    }
 //    QObject::connect(ui->cbKeyword, SIGNAL(returnPressed()), this, SLOT(on_cbKeyword_returnPressed()));
 }
 
@@ -648,6 +654,14 @@ ErrCode UITableView::doFilter(int field, int op, const QVariant& keyword)
     return err;
 }
 
+void UITableView::requestReload()
+{
+    tracein;
+    logd("emilt signalRequestReload");
+    emit signalRequestReload();
+    traceout;
+}
+
 void UITableView::onHandleSignalDeleteDone(ErrCode err, QString msg)
 {
     if (err != ErrNone) {
@@ -1165,6 +1179,13 @@ void UITableView::on_cbCategory_currentIndexChanged(int index)
 
     onFilterFieldChange(categoryId, categoryTxt);
     loadFilterOperators(categoryId);
+    traceout;
+}
+
+void UITableView::onRequestReload()
+{
+    tracein;
+    reload();
     traceout;
 }
 

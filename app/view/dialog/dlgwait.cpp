@@ -21,6 +21,7 @@
  */
 #include "dlgwait.h"
 #include "ui_dlgwait.h"
+#include "logger.h"
 
 DlgWait::DlgWait(QWidget *parent) :
     QDialog(parent),
@@ -30,6 +31,7 @@ DlgWait::DlgWait(QWidget *parent) :
     mResult(ErrNone)
 {
     ui->setupUi(this);
+    connect(this, SIGNAL(closeDlg(ErrCode)), this, SLOT(handleCloseDlg(ErrCode)));
 }
 
 DlgWait::~DlgWait()
@@ -62,7 +64,9 @@ ErrCode DlgWait::show(void* data, WaitPrepare_t prepare,
         mWorker->start();
         this->exec();
         err = mResult;
+        logd("thread completed, err %d", err);
     }
+//    emit closeDlg(err);
     // TODO: delete mWorker?
     traceret(err);
     return err;
@@ -168,6 +172,12 @@ void DlgWait::handleResult(ErrCode err, void *data, void *result)
     setErrResult(err);
     forceClose();
     traceout;
+}
+
+void DlgWait::handleCloseDlg(ErrCode err)
+{
+    logd("handle close dialog, err=%d", err);
+    // TODO: implemen this
 }
 
 ErrCode DlgWait::errResult() const

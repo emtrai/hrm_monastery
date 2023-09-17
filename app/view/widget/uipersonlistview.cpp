@@ -31,7 +31,6 @@
 #include "person.h"
 #include "utils.h"
 #include "view/dialog/dlgimportpersonlistresult.h"
-#include "view/dialog/dlghtmlviewer.h"
 #include "view/dialog/dlgsearchcommunity.h"
 #include "view/dialog/dlgaddpersonevent.h"
 #include "view/widget/uipersoneventlistview.h"
@@ -51,13 +50,19 @@
 #include "dlgconfirmupdatepeoplecomm.h"
 #include "dialogutils.h"
 #include "viewutils.h"
+#include "errreporterctl.h"
+#include "communityperson.h"
 
 UIPersonListView::UIPersonListView(QWidget *parent):
     UICommonListView(parent)
 {
     tracein;
+    // emit event when change community done
     connect(this, SIGNAL(changeCommunityDone(ErrCode,QList<DbModel*>,Community*,bool,bool)),
             this, SLOT(onChangeCommunityDone(ErrCode,QList<DbModel*>,Community*,bool,bool)));
+
+    mHasImportMenu = true;
+    mHasExportMenu = true;
     traceout;
 }
 
@@ -74,6 +79,9 @@ void UIPersonListView::setupUI()
 {
     tracein;
     UICommonListView::setupUI();
+    // register to receive even of import.
+    // we need to suspend reloading list when importing, to avoid list to be updated
+    // continuously
     MainWindow::addMainWindownImportListener(this);
     traceout;
 }
@@ -82,40 +90,72 @@ ErrCode UIPersonListView::onLoad()
 {
     tracein;
     QList<DbModel*> items;
-    ErrCode err = MainWindow::showProcessingDialog(tr("Đang truy vấn dữ liệu"), nullptr,
+    ErrCode err = ErrNone;
+    if (mSuspendReloadOnDbUpdate) {
+        loge("busy, pending to reload");
+        return err;
+    }
+    // async loading, to show progress dialog
+    err = MainWindow::showProcessingDialog(STR_QUERYING,
+        nullptr, // prepare callback
+        // run callback
        [this, &items](ErrCode* err, void* data, DlgWait* dlg) {
+            UNUSED(data);
+            UNUSED(dlg);
+            ErrCode ret = ErrNone;
             if (this->mFilterList.count() > 0) {
                 // TODO: multi filter items???? should limite???? what the hell is it
                 foreach (FilterItem* item, this->mFilterList) {
+                    if (!item) {
+                        logw("invalid filter item to load");
+                        continue;
+                    }
                     logd("filter item %s", STR2CHA(item->item()));
                     if (item->item() == KItemCommunity) {
-                        // TODO: how about keyword? assume value only?????
                         QList<DbModel*> list;
-                        *err = PERSONCTL->getListPersonInCommunity(item->value().toString(), list);
-                        if (*err == ErrNone) {
-                            if (list.count() > 0) {
+                        // TODO: how about keyword? assume value only?????
+                        ret = PERSONCTL->getListPersonInCommunity(item->value().toString(), list);
+                        if (ret == ErrNone) {
+                            logd("found %lld items", list.size());
+                            if (list.size() > 0) {
                                 items.append(list);
                             }
                         } else {
-                            loge("Get list person in community uid '%s' failed, err=%d",
-                                 STR2CHA(item->value().toString()), err);
+                            loge("Get list person in community uid '%s' failed, ret=%d",
+                                 STR2CHA(item->value().toString()), ret);
+                            break;
                         }
                     } else {
-                        ASSERT(0, "not this filter item!!!");
+                        loge("Not support to filter item '%s'", STR2CHA(item->item()));
+                        ret = ErrNotSupport;
+                        break;
                     }
                 }
             } else {
                 logd("get all person");
-                items = PERSONCTL->getAllItems();
+                items = PERSONCTL->getAllItems(true);
+                logd("found %lld item", items.size());
             }
+            if (err) *err = ret;
             return nullptr;//nothing to return
        },
+        // finish callback
         [this, &items](ErrCode err, void* data, void* result, DlgWait* dlg) {
+            UNUSED(data);
+            UNUSED(result);
+            UNUSED(dlg);
             logd("Save result %d", err);
             RELEASE_LIST_DBMODEL(this->mItemList);
-            // TODO: loop to much, redundant, do something better?
-            foreach (DbModel* item, items) {
-                this->mItemList.append(item);
+            if (err == ErrNone) {
+                if (items.size() > 0) {
+                    this->mItemList.append(items);
+                } else {
+                    logd("no data to load");
+                }
+            } else {
+                RELEASE_LIST_DBMODEL(items);
+                loge("load data failed, err=%d",err);
+                REPORTERRCTL->reportErr(STR_QUERY_ERROR, err, true);
             }
 
             clearFilter();
@@ -126,9 +166,35 @@ ErrCode UIPersonListView::onLoad()
     return err;
 }
 
+
+void UIPersonListView::initHeader()
+{
+    tracein;
+    mHeader.append(STR_NAMEID);
+    mHeader.append(STR_HOLLYNAME);
+    mHeader.append(STR_FULLNAME);
+    mHeader.append(STR_STATUS);
+    mHeader.append(STR_COURSE);
+    mHeader.append(STR_COMMUNITY);
+    mHeader.append(STR_BIRTHDAY);
+    mHeader.append(STR_BIRTHPLACE);
+    mHeader.append(STR_NGAY_BON_MANG);
+    mHeader.append(STR_LOP_KHAN);
+    mHeader.append(STR_NGAY_NHAP_DONG);
+    mHeader.append(STR_NGAY_TIEN_KHAN);
+    mHeader.append(STR_NGAY_VINH_KHAN);
+    mHeader.append(STR_SPECIALIST);
+    mHeader.append(STR_CONG_TAC_XA_HOI);
+    mHeader.append(STR_TEL);
+    mHeader.append(STR_EMAIL);
+    mHeader.append(STR_NGAY_AN_NGHI);
+    traceout;
+}
+
 ErrCode UIPersonListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
 {
     tracein;
+    UNUSED(idx);
     ErrCode err = ErrNone;
     if (!item || !tblItem) {
         err = ErrInvalidArg;
@@ -141,21 +207,22 @@ ErrCode UIPersonListView::fillValueTableRowItem(DbModel *item, UITableItem *tblI
             tblItem->addValue(per->nameId());
             tblItem->addValue(per->hollyName());
             tblItem->addValue(per->fullName());
+            tblItem->addValue(per->personStatusName());
             tblItem->addValue(per->courseName());
             tblItem->addValue(per->communityName());
             tblItem->addValue(DatetimeUtils::date2String(per->birthday()));
             tblItem->addValue(per->birthPlace());
             tblItem->addValue(DatetimeUtils::date2String(per->feastDay(), DEFAULT_FORMAT_MD)); // seem feastday convert repeate many time, make it common????
 
+            tblItem->addValue(per->courseName());
             tblItem->addValue(DatetimeUtils::date2String(per->joinDate()));
             tblItem->addValue(DatetimeUtils::date2String(per->vowsDate()));
             tblItem->addValue(DatetimeUtils::date2String(per->eternalVowsDate()));
-            tblItem->addValue(per->courseName());
-            tblItem->addValue(DatetimeUtils::date2String(per->deadDate()));
-            tblItem->addValue(per->tel().join(";"));
-            tblItem->addValue(per->email().join(";"));
             tblItem->addValue(per->specialistNameList().join(","));
             tblItem->addValue(per->currentWorkName());
+            tblItem->addValue(per->tel().join(";"));
+            tblItem->addValue(per->email().join(";"));
+            tblItem->addValue(DatetimeUtils::date2String(per->deadDate()));
 
             // TODO: show thumb image??? if support, need to verify performance
         } else {
@@ -170,6 +237,7 @@ ErrCode UIPersonListView::fillValueTableRowItem(DbModel *item, UITableItem *tblI
 ErrCode UIPersonListView::onAddItem(UITableCellWidgetItem *item)
 {
     tracein;
+    UNUSED(item);
     ErrCode ret = ErrNone;
     MainWindow::showAddEditPerson();
     traceret(ret);
@@ -180,45 +248,31 @@ ErrCode UIPersonListView::onEditItem(UITableCellWidgetItem *item)
 {
     tracein;
     ErrCode err = ErrNone;
-    DbModel* model = item->itemData();
-    //    logd("idx=%d",idx);
-    if (model){
+    DbModel* model = nullptr;
+    if (!item) {
+        err = ErrInvalidArg;
+        loge("invalid argument");
+    }
+    if (err == ErrNone) {
+        model = item->itemData();
+        if (!model || !IS_MODEL_NAME(model, KModelNamePerson)) {
+            loge("Invalid model '%s'", MODELSTR2CHA(model));
+            err = ErrInvalidModel;
+        }
+    }
+    if (err == ErrNone) {
         Person* per = (Person*)model;
         DlgPerson* dlg = DlgPerson::buildDlg(this, per, (per == nullptr));
-        dlg->exec();
-        delete dlg;
-
-    } else {
-        loge("Invalid item data");
-        err = ErrInvalidArg;
-        // TODO: popup message???
+        if (dlg) {
+            dlg->exec();
+            delete dlg;
+        } else {
+            err = ErrNoMemory;
+            loge("failed to create dialog, not memory?");
+        }
     }
     traceret(err);
     return err;
-}
-
-
-void UIPersonListView::initHeader()
-{
-    tracein;
-    mHeader.append(tr("Mã"));
-    mHeader.append(tr("Tên Thánh"));
-    mHeader.append(tr("Họ tên"));
-    mHeader.append(STR_COURSE);
-    mHeader.append(tr("Cộng đoàn"));
-    mHeader.append(tr("Năm sinh"));
-    mHeader.append(tr("Nơi sinh"));
-    mHeader.append(tr("Ngày bổn mạng"));
-    mHeader.append(tr("Ngày Nhập Dòng"));
-    mHeader.append(tr("Ngày Tiên Khấn"));
-    mHeader.append(tr("Ngày Vĩnh Khấn"));
-    mHeader.append(tr("Lớp khấn"));
-    mHeader.append(tr("Ngày an nghỉ"));
-    mHeader.append(tr("Chuyên môn"));
-    mHeader.append(tr("Công tác xã hội"));
-    mHeader.append(tr("Điện thoại"));
-    mHeader.append(tr("Email"));
-    traceout;
 }
 
 ModelController *UIPersonListView::getController()
@@ -227,84 +281,42 @@ ModelController *UIPersonListView::getController()
 }
 
 
-
-void UIPersonListView::importRequested(const QString &fpath)
-{
-    tracein;
-    QList<DbModel*> list;
-    logd("Import from file %s", fpath.toStdString().c_str());
-    ErrCode ret = INSTANCE(PersonCtl)->importFromFile(KModelHdlPerson, ImportType::IMPORT_CSV_LIST, fpath, &list);
-    logd("Import result %d", ret);
-    logd("No of import item %d", list.count());
-    DlgImportPersonListResult* dlg = new DlgImportPersonListResult();
-    dlg->setup(list);
-    dlg->exec();
-    delete dlg;
-}
-
-QList<UITableMenuAction *> UIPersonListView::getMenuCommonActions(const QMenu *menu)
-{
-    tracein;
-    QList<UITableMenuAction*> actionList = UITableView::getMenuCommonActions(menu);
-    actionList.append(UITableMenuAction::build(tr("Nhập từ tập tin"), this)
-                                                   ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
-                                                       return this->onMenuActionImport(m, a);
-                                                   }));
-    actionList.append(UITableMenuAction::build(tr("Xuất danh sách nữ tu"), this)
-                                                   ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
-                                                       return this->onMenuActionExportListPerson(m, a);
-                                                   }));
-    traceout;
-    return actionList;
-}
-
-QList<UITableMenuAction *> UIPersonListView::getMenuSingleSelectedItemActions(const QMenu *menu, UITableCellWidgetItem *item)
+QList<UITableMenuAction *> UIPersonListView::getMenuSingleSelectedItemActions(
+    const QMenu *menu, UITableCellWidgetItem *item)
 {
     tracein;
     QList<UITableMenuAction*> actionList = UITableView::getMenuSingleSelectedItemActions(menu, item);
-    actionList.append(UITableMenuAction::build(tr("Đổi cộng đoàn"), this, item)
-                                                   ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
-                                                       return this->onMenuActionChangeCommunity(m, a);
-                                                   }));
+    actionList.append(BUILD_MENU_ACTION_IMPL(STR_CHANGE_COMMUNITY, item, onMenuActionChangeCommunity));
 
     actionList.append(BUILD_MENU_SEPARATE);
 
-    actionList.append(UITableMenuAction::build(tr("Xem thông tin Cộng đoàn"), this, item)
-                                                    ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
-                                                        return this->onMenuActionViewCommunity(m, a);
-                                                    }));
-    actionList.append(UITableMenuAction::build(tr("Xem thông tin sự kiện"), this, item)
-                                                   ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
-                                                       return this->onMenuActionViewPersonEvent(m, a);
-                                                   }));
+    actionList.append(BUILD_MENU_ACTION_IMPL(STR_ADD_EVENT, item, onMenuActionAddPersonEvent));
 
     actionList.append(BUILD_MENU_SEPARATE);
 
-    actionList.append(UITableMenuAction::build(tr("Thêm thông tin sự kiện"), this, item)
-                                                    ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
-                                                        return this->onMenuActionAddPersonEvent(m, a);
-                                                    }));
+    actionList.append(BUILD_MENU_ACTION_IMPL(STR_VIEW_COMMUNITY, item, onMenuActionViewCommunity));
+
+    actionList.append(BUILD_MENU_ACTION_IMPL(STR_VIEW_EVENT, item, onMenuActionViewPersonEvent));
 
     actionList.append(BUILD_MENU_SEPARATE);
 
-    actionList.append(UITableMenuAction::build(tr("Xuất thông tin Nữ tu"), this, item)
-                                                    ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
-                                                        return this->exportPersonInfo(m, a);
-                                                    }));
+    actionList.append(BUILD_MENU_ACTION_IMPL(STR_EXPORT_PERSON_INFO, item, exportPersonInfo));
+
     traceout;
     return actionList;
 }
 
-QList<UITableMenuAction *> UIPersonListView::getMenuMultiSelectedItemActions(const QMenu *menu, const QList<UITableItem *> &items)
+QList<UITableMenuAction *> UIPersonListView::getMenuMultiSelectedItemActions(
+    const QMenu *menu, const QList<UITableItem *> &items)
 {
     tracein;
     QList<UITableMenuAction*> actionList = UITableView::getMenuMultiSelectedItemActions(menu, items);
-    actionList.append(UITableMenuAction::buildMultiItem(tr("Đổi cộng đoàn"), this, &items)
+    actionList.append(UITableMenuAction::buildMultiItem(STR_CHANGE_COMMUNITY, this, &items)
                                                    ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                        return this->onMenuActionChangeCommunity(m, a);
                                                    }));
     actionList.append(BUILD_MENU_SEPARATE);
-    actionList.append(UITableMenuAction::buildMultiItem(tr("Thêm thông tin sự kiện"), this, &items)
+    actionList.append(UITableMenuAction::buildMultiItem(STR_ADD_EVENT, this, &items)
                                                  ->setCallback([this](QMenu *m, UITableMenuAction *a)-> ErrCode{
                                                      return this->onMenuActionAddPersonEvent(m, a);
                                                  }));
@@ -312,117 +324,261 @@ QList<UITableMenuAction *> UIPersonListView::getMenuMultiSelectedItemActions(con
     return actionList;
 }
 
-ErrCode UIPersonListView::onMenuActionImport(QMenu *menu, UITableMenuAction *act)
-{
-    tracein;
-    ErrCode ret = ErrNone;
-    ret = MainWindow::showImportDlg(IMPORT_TARGET_PERSON);
-    traceret(ret);
-    return ret;
-}
-
-ErrCode UIPersonListView::onMenuActionExportListPerson(QMenu *menu, UITableMenuAction *act)
-{
-    tracein;
-    ErrCode err = ErrNone;
-    QList<DbModel*> list = PERSONCTL->getAllItemsFromDb();
-    if (!list.empty()) {
-        logd("Export %d items", list.size());
-        err = MainWindow::exportListItems(&list, KModelNamePerson, PERSONCTL, tr("Xuất danh sách nữ tu"), EXPORT_XLSX);
-    } else {
-        logw("nothing to export");
-    }
-    RELEASE_LIST_DBMODEL(list);
-    traceret(err);
-    return err;
-}
-
 ErrCode UIPersonListView::onMenuActionChangeCommunity(QMenu *menu, UITableMenuAction *act)
 {
     tracein;
+    UNUSED(menu);
     ErrCode ret = ErrNone;
-    DlgSearchCommunity* dlg = DlgSearchCommunity::build(this, false);
-    dlg->setIsMultiSelection(false);
-    dlg->enableGetAllSupport();
+    DlgSearchCommunity* dlg = nullptr;
+    Community* comm = nullptr;
+    QList<DbModel*> peopleList;
+    bool addCommPer = false;
+    bool addPersonEvent = false;
+    int dlgret = 0;
 
-    if (dlg->exec() == QDialog::Accepted){
+    QList<PersonEvent*> perEventList;
+    QList<CommunityPerson *> inActiveCommPerList;
+    QList<CommunityPerson *> activeCommPerList;
+    if (!act) {
+        ret = ErrInvalidArg;
+        loge("invalid arg");
+    }
+    if (ret == ErrNone) {
+        dlg = DlgSearchCommunity::build(this, false);
+        if (dlg) {
+            dlg->setIsMultiSelection(false);
+            dlg->enableGetAllSupport();
+        } else {
+            ret = ErrNoMemory;
+            loge("failed to build search comm dlg, no memory?");
+        }
+    }
+    if (ret == ErrNone && ((dlgret = dlg->exec()) != QDialog::Accepted)){
+        ret = ErrCancelled;
+        loge("user cancel? dlgret=%d", dlgret);
+    }
+    if (ret == ErrNone) {
         const DbModel* item = dlg->selectedItem();
-        Community* comm = nullptr;
-        if (item != nullptr) {
+        if (item != nullptr && IS_MODEL_NAME(item, KModelNameCommunity)) {
             comm = (Community*)item->clone();
             if (!comm) {
-                loge("cannot clone community '%s', no memory?", MODELSTR2CHA(comm));
+                loge("cannot clone community '%s', no memory?", MODELSTR2CHA(item));
                 ret = ErrNoMemory;
             }
         } else {
             ret = ErrInvalidData;
-            loge("no selected community");
+            loge("invalid selected community '%s'", MODELSTR2CHA(item));
         }
-        if (ret == ErrNone) {
-            logd("community to be changed '%s'", MODELSTR2CHA(comm));
-            QString msg = QString(tr("Đổi sang cộng đoàn '%1'?")).arg(comm->name());
-            QList<DbModel*> items;
-            int cnt = act->itemListData(items);
-            logd("No. selected person %d", cnt);
-            if (cnt > 0) {
-
-                DlgConfirmUpdatePeopleComm dlgConfirmChange;
-                dlgConfirmChange.setCommunity(comm);
-                dlgConfirmChange.setPersonList(items);
-                bool addHistory = dlgConfirmChange.addCommunityHistory();
-                bool addEvent = dlgConfirmChange.addPersonEvent();
-
-                if (dlgConfirmChange.exec() == QDialog::Accepted){
-                    mSuspendReloadOnDbUpdate = true;
-                    logd("change community '%s'", MODELSTR2CHA(comm));
-                    ret = MainWindow::showProcessingDialog(
-                        QString(tr("Đổi sang cộng đoàn '%1'")).arg(comm->name()),
-                            nullptr, // prepare
-                            [items, comm](ErrCode* err, void* data, DlgWait* dlg) { // run
-                                ErrCode tmpErr = ErrNone;
-                                UNUSED(data);
-                                UNUSED(dlg);
-                                foreach (DbModel* item, items){
-                                    logd("Add person '%s' to community", MODELSTR2CHA(item));
-                                    tmpErr = COMMUNITYCTL->addPerson2Community(comm, (Person*)item);
-                                    if (tmpErr != ErrNone) {
-                                        loge("Failed to add person '%s' to community '%s', err %d",
-                                             MODELSTR2CHA(item), MODELSTR2CHA(comm), tmpErr);
-                                        break;
-                                    }
-                                }
-                                if (err) *err = tmpErr;
-                                return nullptr;//nothing to return
-                            },
-                            [this, items, comm, addHistory, addEvent](ErrCode err, void* data, void* result, DlgWait* dlg) { // finish
-                                logd("Save result %d", err);
-                                UNUSED(data);
-                                UNUSED(dlg);
-                                UNUSED(result);
-                                // TODO: risk of access freed resource (use-after-free),
-                                // as perList/community is managed by confirm dialog
-                                emit this->changeCommunityDone(err,
-                                                               CLONE_LIST_DBMODEL(items),
-                                                               CLONE_MODEL(comm, Community),
-                                                               addHistory, addEvent);
-                                return err;
-                            }, nullptr);
-                }
-            } else {
-                DialogUtils::showMsgBox(tr("Danh sách nữ tu trống)"));
-                ret = ErrNoData;
-            }
-            RELEASE_LIST_DBMODEL(items);
-            FREE_PTR(comm);
-        } else {
-            logi("No community selected");
-        }
-    } else {
-        logd("not accept???");
     }
-    // TODO: update history of person/community??
-    // TODO: update event of person???
-    delete dlg;
+    if (ret == ErrNone) {
+        int cnt = act->itemListData(peopleList);
+        if (!(cnt > 0 && peopleList.size() > 0)) {
+            loge("not item selected");
+            ret = ErrNoData;
+        }
+    }
+    // validate communit with current selected person
+    if (ret == ErrNone) {
+        foreach (DbModel* item, peopleList) {
+            if (!item || !IS_MODEL_NAME(item, KModelNamePerson)) {
+                loge("invalid model data '%s'", MODELSTR2CHA(item));
+                ret = ErrInvalidModel;
+                break;
+            }
+            Person* per = (Person*) item;
+            // check if new community already current community of person
+            if (per->communityUid() == comm->uid()) {
+                ret = ErrExisted;
+                loge("community '%s' already current community of person '%s'",
+                     MODELSTR2CHA(comm), MODELSTR2CHA(per));
+                break;
+            }
+        }
+    }
+    if (ret == ErrNone) {
+        DlgConfirmUpdatePeopleComm dlgConfirmChange;
+        dlgConfirmChange.setCommunity(comm);
+        dlgConfirmChange.setPersonList(peopleList);
+        addCommPer = dlgConfirmChange.addCommunityHistory();
+        addPersonEvent = dlgConfirmChange.addPersonEvent();
+
+        if (dlgConfirmChange.exec() != QDialog::Accepted){
+            ret = ErrAbort;
+            loge("abort to change community");
+        }
+    }
+
+    if (ret == ErrNone && addPersonEvent) {
+        ret = buildPersonCommunityChangeEventList(peopleList, comm, perEventList);
+    }
+
+    if (ret == ErrNone && addCommPer) {
+        ret = buildInActiveCommPersonList(peopleList, inActiveCommPerList);
+    }
+
+    if (ret == ErrNone && addCommPer) {
+        ret = buildActiveCommPersonList(peopleList, comm, activeCommPerList);
+    }
+
+    if (ret == ErrNone) {
+        logd("perEventList sz %lld", perEventList.size());
+        logd("inActiveCommPerList sz %lld", inActiveCommPerList.size());
+        logd("activeCommPerList sz %lld", activeCommPerList.size());
+
+#ifdef DEBUG_LOG
+        foreach(PersonEvent* item, perEventList) {
+            logd("perevent '%s'", MODELSTR2CHA(item));
+        }
+        foreach(CommunityPerson* item, inActiveCommPerList) {
+            logd("commper '%s'", MODELSTR2CHA(item));
+        }
+        foreach(CommunityPerson* item, activeCommPerList) {
+            logd("active commper '%s'", MODELSTR2CHA(item));
+        }
+#endif
+    }
+    if (ret == ErrNone) {
+        mSuspendReloadOnDbUpdate = true;
+        logd("start change to community '%s'", MODELSTR2CHA(comm));
+        ret = MainWindow::showProcessingDialog(
+            QString(STR_CHANGE_TO_COMMUNITY).arg(comm->name()),
+            nullptr, // prepare
+            [peopleList, comm,
+             addCommPer, addPersonEvent,
+             perEventList, inActiveCommPerList, activeCommPerList]
+            (ErrCode* err, void* data, DlgWait* dlg) { // run
+                ErrCode tmpErr = ErrNone;
+                UNUSED(data);
+                UNUSED(dlg);
+                logd("change to community '%s'", MODELSTR2CHA(comm));
+                foreach (DbModel* item, peopleList){
+                    logi("Add person '%s' to community '%s'",
+                         MODELSTR2CHA(item), MODELSTR2CHA(comm));
+                    tmpErr = COMMUNITYCTL->addPerson2Community(comm, (Person*)item);
+                    if (tmpErr != ErrNone) {
+                        loge("Failed to add person '%s' to community '%s', err %d",
+                             MODELSTR2CHA(item), MODELSTR2CHA(comm), tmpErr);
+                        break;
+                    }
+                }
+                if (tmpErr == ErrNone && addPersonEvent) {
+                    logd("add person event list, no item %lld", perEventList.size());
+                    foreach (DbModel* item, perEventList){
+                        logi("Save event '%s'", MODELSTR2CHA(item));
+                        if (item) {
+                            tmpErr = item->save();
+                            if (tmpErr != ErrNone) {
+                                loge("Failed to save pervent item '%s'",
+                                     MODELSTR2CHA(item));
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (tmpErr == ErrNone && addCommPer) {
+                    logd("update inActiveCommPerList , no item %lld", inActiveCommPerList.size());
+                    foreach (DbModel* item, inActiveCommPerList){
+                        logi("Save inactive commper '%s'", MODELSTR2CHA(item));
+                        if (item) {
+                            tmpErr = item->update();
+                            if (tmpErr != ErrNone) {
+                                loge("Failed to update inactive commper item '%s'",
+                                     MODELSTR2CHA(item));
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (tmpErr == ErrNone) {
+                    logd("add activeCommPerList , no item %lld", activeCommPerList.size());
+                    foreach (DbModel* item, activeCommPerList){
+                        logi("Save active commper '%s'", MODELSTR2CHA(item));
+                        if (item) {
+                            tmpErr = item->save();
+                            if (tmpErr != ErrNone) {
+                                loge("Failed to save active commper item '%s'",
+                                     MODELSTR2CHA(item));
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (err) *err = tmpErr;
+                return nullptr;//nothing to return
+            },
+            nullptr, nullptr);
+    }
+    if (ret == ErrNone) {
+        MAINWIN->showMessageBox(QString(tr("Đổi sang Cộng đoàn %1 cho %2 Nữ tu"))
+                                    .arg(comm->name())
+                                    .arg(peopleList.size())
+                                );
+    } else {
+        loge("Change community failed, err=%d", ret);
+        MAINWIN->showErrorDlgSignal(ret, QString(tr("Đổi cộng đoàn thất bại")));
+    }
+
+    this->mSuspendReloadOnDbUpdate = false;
+    requestReload();
+    RELEASE_LIST_DBMODEL(peopleList);
+    RELEASE_LIST(perEventList, PersonEvent);
+    RELEASE_LIST(inActiveCommPerList, CommunityPerson);
+    RELEASE_LIST(activeCommPerList, CommunityPerson);
+    FREE_PTR(comm);
+    FREE_PTR(dlg);
+//    if (ret == ErrNone) {
+//        logd("community to be changed '%s'", MODELSTR2CHA(comm));
+//        QString msg = QString(STR_ASK_CHANGE_TO_COMMUNITY).arg(comm->name());
+//        int cnt = act->itemListData(peopleList);
+//        logd("No. selected person %d", cnt);
+//        if (cnt > 0) {
+
+//            DlgConfirmUpdatePeopleComm dlgConfirmChange;
+//            dlgConfirmChange.setCommunity(comm);
+//            dlgConfirmChange.setPersonList(peopleList);
+//            bool addHistory = dlgConfirmChange.addCommunityHistory();
+//            bool addEvent = dlgConfirmChange.addPersonEvent();
+
+//            if (dlgConfirmChange.exec() == QDialog::Accepted){
+//                mSuspendReloadOnDbUpdate = true;
+//                logd("change community '%s'", MODELSTR2CHA(comm));
+//                ret = MainWindow::showProcessingDialog(
+//                    QString(STR_CHANGE_TO_COMMUNITY).arg(comm->name()),
+//                        nullptr, // prepare
+//                        [peopleList, comm](ErrCode* err, void* data, DlgWait* dlg) { // run
+//                            ErrCode tmpErr = ErrNone;
+//                            UNUSED(data);
+//                            UNUSED(dlg);
+//                            foreach (DbModel* item, peopleList){
+//                                logi("Add person '%s' to community '%s'",
+//                                     MODELSTR2CHA(item), MODELSTR2CHA(comm));
+//                                tmpErr = COMMUNITYCTL->addPerson2Community(comm, (Person*)item);
+//                                if (tmpErr != ErrNone) {
+//                                    loge("Failed to add person '%s' to community '%s', err %d",
+//                                         MODELSTR2CHA(item), MODELSTR2CHA(comm), tmpErr);
+//                                    break;
+//                                }
+//                            }
+//                            if (err) *err = tmpErr;
+//                            return nullptr;//nothing to return
+//                        },
+//                        [this, peopleList, comm, addHistory, addEvent](ErrCode err, void* data, void* result, DlgWait* dlg) { // finish
+//                            logd("Save result %d", err);
+//                            UNUSED(data);
+//                            UNUSED(dlg);
+//                            UNUSED(result);
+//                            emit this->changeCommunityDone(err,
+//                                                           CLONE_LIST_DBMODEL(peopleList),
+//                                                           CLONE_MODEL(comm, Community),
+//                                                           addHistory, addEvent);
+//                            return err;
+//                        }, nullptr);
+//            }
+//        } else {
+//            DialogUtils::showMsgBox(STR_LIST_PERSON_EMPTY);
+//            ret = ErrNoData;
+//        }
+//    }
     traceret(ret);
     return ret;
 }
@@ -486,7 +642,7 @@ ErrCode UIPersonListView::onMenuActionAddPersonEvent(QMenu *menu, UITableMenuAct
     }
     if (err == ErrNone) {
         logd("is multi select %d", act->getIsMultiSelectedItem());
-        logd("no selected item %ld", act->itemList().size());
+        logd("no selected item %lld", act->itemList().size());
         int cnt = act->itemListData(perList);
         logd("no person %d", cnt);
         if (cnt <= 0) {
@@ -627,74 +783,279 @@ int UIPersonListView::onFilter(int catetoryid,
     RELEASE_LIST_DBMODEL(mItemList);
     ErrCode ret = PERSONCTL->filter(catetoryid, opFlags, keywords, KModelNamePerson, nullptr, &mItemList);
     logd("filter ret %d", ret);
-    logd("mItemList cnt %d", mItemList.count());
+    logd("mItemList cnt %lld", mItemList.count());
     traceout;
     return mItemList.count();
 }
 
 DbModel *UIPersonListView::onCreateDbModelObj(const QString& modelName)
 {
+    UNUSED(modelName);
     return Person::build();
 }
 
 
 void UIPersonListView::cleanUpItem()
 {
-    tracein;
-//    logd("Clean up %d items", mPersonList.count());
-//    foreach (Person* per, mPersonList){
-//        logd("Delet per %s", per->getFullName().toStdString().c_str());
-//        delete per;
-//    }
-    //    mPersonList.clear();
+    traced;
 }
 
-//void UIPersonListView::onConfirmChangeCommunity(const QList<DbModel *> &perList,
-//                                                const Community *comm)
-//{
-//    tracein;
-//    ErrCode err = ErrNone;
-//    if (!comm || perList.size() == 0) {
-//        err = ErrInvalidArg;
-//        loge("invalid comm or perList is zero");
-//    }
-//    if (err == ErrNone) {
-//        mSuspendReloadOnDbUpdate = true;
-//        logd("change community '%s'", MODELSTR2CHA(comm));
-//        err = MainWindow::showProcessingDialog(
-//            QString(tr("Đổi sang cộng đoàn '%1'")).arg(comm->name()),
-//            nullptr, // prepare
-//            [perList, comm](ErrCode* err, void* data, DlgWait* dlg) { // run
-//                ErrCode tmpErr = ErrNone;
-//                UNUSED(data);
-//                UNUSED(dlg);
-//                foreach (DbModel* item, perList){
-//                    logd("Add person '%s' to community", MODELSTR2CHA(item));
-//                    tmpErr = COMMUNITYCTL->addPerson2Community(comm, (Person*)item);
-//                    if (tmpErr != ErrNone) {
-//                        loge("Failed to add person '%s' to community '%s', err %d",
-//                             MODELSTR2CHA(item), MODELSTR2CHA(comm), tmpErr);
-//                        break;
-//                    }
-//                }
-//                if (err) *err = tmpErr;
-//                return nullptr;//nothing to return
-//            },
-//            [this, perList, comm](ErrCode err, void* data, void* result, DlgWait* dlg) { // finish
-//                logd("Save result %d", err);
-//                UNUSED(data);
-//                UNUSED(dlg);
-//                UNUSED(result);
-//                // TODO: risk of access freed resource (use-after-free),
-//                // as perList/community is managed by confirm dialog
-//                emit this->changeCommunityDone(err,
-//                                               CLONE_LIST(perList, DbModel),
-//                                               CLONE_MODEL(comm, Community));
-//                return err;
-//            }, nullptr);
-//    }
-//    traceout;
-//}
+ErrCode UIPersonListView::buildPersonCommunityChangeEventList(const QList<DbModel *> &perList,
+                                                               const Community *comm,
+                                                               QList<PersonEvent *> &perEventList)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    PersonEvent* perEvent = nullptr;
+    DlgAddPersonEvent* dlg = nullptr;
+    if (!comm || perList.empty()) {
+        err = ErrInvalidArg;
+        loge("cannot add per event, invalid arg");
+    }
+
+    if (err == ErrNone && (perEvent = (PersonEvent*)PersonEvent::build()) == nullptr) {
+        loge("no memory for perEvent");
+        err = ErrNoMemory;
+    }
+
+    if (err == ErrNone) {
+        err = perEvent->setEventNameId(CHANGE_COMMUNITY_NAMEID);
+    }
+
+    if (err == ErrNone) {
+        perEvent->setDate(QDateTime::currentDateTime().toString("dd.MM.yyyy"));
+        perEvent->setName(QString(tr("Chuyển Nữ tu sang Cộng Đoàn %1")).arg(comm->name()));
+    } else {
+        loge("Evnt name id '%s' not found, err=%d", CHANGE_COMMUNITY_NAMEID, err);
+    }
+
+    if (err == ErrNone) {
+        dlg = DlgAddPersonEvent::build(this, false, KModelNamePersonEvent, perEvent);
+        if (!dlg) {
+            err = ErrNoMemory;
+            loge("no memory");
+        }
+    }
+
+    if (err == ErrNone) {
+        dlg->setEvenInfoOnly(&perList);
+        if (dlg->exec() == QDialog::Accepted) {
+            // TODO something
+            PersonEvent* perEvent = (PersonEvent*)dlg->getModel();
+            Event* event = (Event*)dlg->getSelectedEvent();
+            if (perEvent && event) {
+                foreach (DbModel* per, perList) {
+                    if (IS_MODEL_NAME(per, KModelNamePerson)) {
+                        PersonEvent* tmp = (PersonEvent* )(((DbModel*)perEvent)->clone());
+                        if (tmp) {
+                            tmp->setPersonUid(per->uid());
+                            tmp->buildNameIdFromOthersNameId(per->nameId(), event->nameId());
+                            perEventList.append(tmp);
+                        } else {
+                            err = ErrNoMemory;
+                            loge("failed to clone person event, no memory");
+                            break;
+                        }
+                    } else {
+                        logw("something strange, per is invalid '%s'", MODELSTR2CHA(per));
+                        //TODO: break for error???
+                        break;
+                    }
+                }
+
+            } else {
+                loge("event %d or perEvent %d is null",
+                     (perEvent==nullptr), (event==nullptr));
+            }
+        } else {
+            err = ErrAbort;
+            loge("Abort to add person event");
+        }
+    }
+
+    if (err == ErrNone) {
+        err = dlg->acceptResult();
+    }
+    if (err == ErrNone && perEventList.size() == 0) {
+        err = ErrNoData;
+        loge("not event data to add");
+    }
+
+    if (err == ErrNone) {
+        foreach(PersonEvent* event, perEventList) {
+            if (IS_MODEL_NAME(event, KModelNamePersonEvent)) {
+                logd("validate perEvent '%s'", MODELSTR2CHA(event));
+                err = event->validateAllFields(true);
+                if (err == ErrNone) {
+                    continue;
+                } else if (err == ErrExisted) {
+                    loge("Event '%s' already existed", MODELSTR2CHA(event));
+                    break;
+                } else {
+                    loge("Event '%s' validateAllFields failed, err = %d",
+                         MODELSTR2CHA(event), err);
+                    break;
+                }
+            } else {
+                logw("something went wrong, event was invalid '%s'", MODELSTR2CHA(event));
+                err = ErrInvalidData;
+                break;
+            }
+        }
+    }
+
+    if (err != ErrNone) {
+        RELEASE_LIST(perEventList, PersonEvent);
+    }
+    FREE_PTR(dlg);
+    FREE_PTR(perEvent);
+    traceret(err);
+    return err;
+}
+
+ErrCode UIPersonListView::buildInActiveCommPersonList(const QList<DbModel *> &perList,
+                                                      QList<CommunityPerson *> &commPerListOut)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    QList<CommunityPerson*> listCommPer;
+
+    if (err == ErrNone && perList.size() == 0) {
+        err = ErrNoData;
+        loge("nothing to do, no data");
+    }
+
+    if (err == ErrNone) {
+        foreach (DbModel* model, perList) {
+            if (!IS_MODEL_NAME(model, KModelNamePerson)) {
+                err = ErrInvalidArg;
+                loge("invalid argument '%s'", MODELSTR2CHA(model));
+                // stupid error, should not happend, as stupid thing will occur
+                // just log here if this stupid happend
+                break;
+            }
+            Person* per = (Person*)model;
+            logd("per '%s', current commuid '%s'",
+                 MODELSTR2CHA(per), STR2CHA(per->communityUid()));
+
+            QList<DbModel*> listCommPerTmp;
+            logd("get list of active comm per of person '%s'", MODELSTR2CHA(per));
+            err = COMMUNITYCTL->getListActiveCommunityPersonOfPerson(per->uid(), listCommPerTmp);
+            logd("list commPer sz %lld", listCommPerTmp.size());
+            if (listCommPerTmp.size() == 0) {
+                logw("not active list commper");
+                // well, should not occur, but if it exist, just ignore
+                continue;
+            }
+            // let's set current community person to inactive
+            foreach (DbModel* item, listCommPerTmp) {
+                if (!IS_MODEL_NAME(item, KModelNameCommPerson)) {
+                    logw("commper '%s' is not CommPer", MODELSTR2CHA(item));
+                    // what, again? what did you do? why this can occur????
+                    break;
+                }
+                CommunityPerson* commper = (CommunityPerson*)item;
+                logd("Set commper '%s' to INACTIVE", MODELSTR2CHA(commper));
+                commper->setModelStatus(MODEL_STATUS_INACTIVE);
+                listCommPer.append(commper);
+            }
+        }
+    }
+
+    if (err == ErrNone && listCommPer.size() == 0) {
+        err = ErrNoData;
+        loge("nothing to do, no list comm per data");
+    }
+
+    if (err == ErrNone) {
+        DlgPersonCommunity* dlg = nullptr;
+
+        if (err == ErrNone && (dlg = DlgPersonCommunity::build(this, false)) == nullptr) {
+            loge("Cannot create/build dialog, no memory?");
+            err = ErrNoMemory;
+        }
+        if (err == ErrNone) {
+            dlg->setTitle(tr("Thay đổi thông tin cộng đoàn - Nữ tu chuyển khỏi Cộng đoàn hiện tại"));
+            dlg->setIsNew(false);
+            dlg->setSkipStartDate(true);// as we focus on end date only
+            dlg->setEndDate();
+            err = dlg->setCommunityPersonList(listCommPer, true);
+        }
+        if (err == ErrNone) {
+            err = dlg->setModelStatus(MODEL_STATUS_INACTIVE, false);
+        }
+        if (err == ErrNone && (dlg->exec() != QDialog::Accepted)) {
+            err = ErrAbort;
+            loge("Abort change");
+        }
+
+        if (err == ErrNone) {
+            err = dlg->acceptResult();
+        }
+
+        if (err == ErrNone) {
+            QList<CommunityPerson*> listCommPerTmp = dlg->communityPersonList();
+            logd("listCommPerTmp sz %lld", listCommPerTmp.size());
+            if (listCommPerTmp.size() > 0) {
+                commPerListOut = CLONE_LIST(listCommPerTmp, CommunityPerson);
+            } else {
+                loge("no data");
+                err = ErrNoData;
+            }
+        }
+
+        FREE_PTR(dlg);
+    }
+
+    RELEASE_LIST(listCommPer, CommunityPerson);
+    traceret(err);
+    return err;
+}
+
+ErrCode UIPersonListView::buildActiveCommPersonList(const QList<DbModel *> &perList,
+                                                    const Community *comm,
+                                                    QList<CommunityPerson *> &commPerList)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    DlgPersonCommunity* dlg = nullptr;
+    if (!comm || perList.empty()) {
+        err = ErrInvalidArg;
+        loge("cannot add comm history, invalid arg");
+    }
+    if (err == ErrNone && (dlg = DlgPersonCommunity::build(this, false)) == nullptr) {
+        loge("Cannot create/build dialog, no memory?");
+        err = ErrNoMemory;
+    }
+    if (err == ErrNone) {
+        dlg->setTitle(QString(tr("Thay đổi thông tin cộng đoàn - Nữ tu chuyển đến Cộng đoàn %1")).arg(comm->name()));
+        dlg->loadModelStatus(false);
+    }
+    if (err == ErrNone) {
+        logd("set comm '%s'", MODELSTR2CHA(comm));
+        dlg->setCommunity(comm);
+        err = dlg->setPersonList<DbModel>(perList);
+    }
+    if (err == ErrNone) {
+        dlg->setStartDate();
+        err = dlg->setModelStatus(MODEL_STATUS_ACTIVE, false);
+    }
+
+    if (err == ErrNone && (dlg->exec() != QDialog::Accepted)) {
+        err = ErrAbort;
+        loge("Abort change");
+    }
+    if (err == ErrNone) {
+        err = dlg->acceptResult();
+    }
+    if (err == ErrNone) {
+        commPerList = CLONE_LIST(dlg->communityPersonList(), CommunityPerson);
+    }
+
+    FREE_PTR(dlg);
+    traceret(err);
+    return err;
+}
 
 ErrCode UIPersonListView::onConfirmAddPersonEventChangeCommunity(const QList<DbModel *> &perList,
                                                               const Community *comm)
@@ -732,35 +1093,110 @@ ErrCode UIPersonListView::onConfirmAddHistoryCommunity(const QList<DbModel *> &p
 {
     tracein;
     ErrCode err = ErrNone;
-    DlgPersonCommunity* dlg = nullptr;
-    if (!comm || perList.empty()) {
+    logd("new community to be set '%s'", MODELSTR2CHA(comm));
+
+    if (!comm) {
+        loge("invalid comm");
         err = ErrInvalidArg;
-        loge("cannot add comm history, invalid arg");
     }
-    if (err == ErrNone && (dlg = DlgPersonCommunity::build(this)) == nullptr) {
-        loge("Cannot create/build dialog, no memory?");
-        err = ErrNoMemory;
-    }
-    if (err == ErrNone) {
-        err = dlg->setPersonList<DbModel>(perList);
-    }
-    if (err == ErrNone) {
-        logd("set comm '%s'", MODELSTR2CHA(comm));
-        dlg->setCommunity(comm);
+    if (err == ErrNone && perList.size() == 0) {
+        err = ErrNoData;
+        loge("nothing to do, no data");
     }
 
     if (err == ErrNone) {
-        dlg->exec();
+        foreach (DbModel* model, perList) {
+            if (!IS_MODEL_NAME(model, KModelNamePerson)) {
+                err = ErrInvalidArg;
+                loge("invalid argument '%s'", MODELSTR2CHA(model));
+                // stupid error, should not happend, as stupid thing will occur
+                // just log here if this stupid happend
+                break;
+            }
+            Person* per = (Person*)model;
+            logd("per '%s', current commuid '%s'",
+                 MODELSTR2CHA(per), STR2CHA(per->communityUid()));
+            if (per->communityUid() == comm->uid()) {
+                logw("same community '%s' of per '%s', continue",
+                     STR2CHA(per->communityUid()), MODELSTR2CHA(per));
+                // another stupid thing which should not occur
+                // but it's harmless, so just skip it.
+                continue;
+            }
+            logd("get list of active comm per of person '%s'", MODELSTR2CHA(per));
+            QList<DbModel*> listCommPer;
+            err = COMMUNITYCTL->getListActiveCommunityPersonOfPerson(per->uid(), listCommPer);
+            logd("list commPer sz %lld", listCommPer.size());
+            if (listCommPer.size() == 0) {
+                logw("not active list commper");
+                // well, should not occur, but if it exist, just ignore
+                continue;
+            }
+            // let's set current community person to inactive
+            foreach (DbModel* item, listCommPer) {
+                if (!IS_MODEL_NAME(item, KModelNameCommPerson)) {
+                    logw("commper '%s' is not CommPer", MODELSTR2CHA(item));
+                    // what, again? what did you do? why this can occur????
+                    break;
+                }
+                CommunityPerson* commper = (CommunityPerson*)item;
+                logd("Set commper '%s' to INACTIVE", MODELSTR2CHA(commper));
+                commper->setModelStatus(MODEL_STATUS_INACTIVE);
+                err = commper->update();
+                if (err == ErrNone) {
+                    logi("Updated inactive status for model '%s'", MODELSTR2CHA(commper));
+                } else {
+                    // please, don't jump to here, some thing bad will occur
+                    loge("update model status for commper '%s' failed, err %d",
+                         MODELSTR2CHA(commper), err);
+                    break;
+                }
+            }
+            RELEASE_LIST_DBMODEL(listCommPer);
+        }
     }
 
-    if (err != ErrNone) {
-        logd("Add community history failed, err=%d", err);
-        DialogUtils::showErrorBox(err, tr("Lỗi thêm dữ liệu Cộng đoàn"));
+    if (err == ErrNone) {
+        logd("add new comm per");
+
     }
-    if (dlg) delete dlg;
+
     traceret(err);
     return err;
 }
+//ErrCode UIPersonListView::onConfirmAddHistoryCommunity(const QList<DbModel *> &perList, const Community *comm)
+//{
+//    tracein;
+//    ErrCode err = ErrNone;
+//    DlgPersonCommunity* dlg = nullptr;
+//    if (!comm || perList.empty()) {
+//        err = ErrInvalidArg;
+//        loge("cannot add comm history, invalid arg");
+//    }
+//    if (err == ErrNone && (dlg = DlgPersonCommunity::build(this)) == nullptr) {
+//        loge("Cannot create/build dialog, no memory?");
+//        err = ErrNoMemory;
+//    }
+//    if (err == ErrNone) {
+//        err = dlg->setPersonList<DbModel>(perList);
+//    }
+//    if (err == ErrNone) {
+//        logd("set comm '%s'", MODELSTR2CHA(comm));
+//        dlg->setCommunity(comm);
+//    }
+
+//    if (err == ErrNone) {
+//        dlg->exec();
+//    }
+
+//    if (err != ErrNone) {
+//        logd("Add community history failed, err=%d", err);
+//        DialogUtils::showErrorBox(err, tr("Lỗi thêm dữ liệu Cộng đoàn"));
+//    }
+//    if (dlg) delete dlg;
+//    traceret(err);
+//    return err;
+//}
 
 
 void UIPersonListView::onChangeCommunityDone(ErrCode err,
@@ -775,20 +1211,22 @@ void UIPersonListView::onChangeCommunityDone(ErrCode err,
         loge("invalid arg");
     }
 
-    if (err == ErrNone) {
-        this->mSuspendReloadOnDbUpdate = false;
-        reload();
-    } else {
-        loge("Change community failed, err=%d", err);
-        DialogUtils::showErrorBox(err, QString(tr("Đổi cộng đoàn %1 thất bại")).arg(comm->name()));
-    }
+    // update event of person
     if (err == ErrNone && addEvent) {
         logd("Add person event");
         err = onConfirmAddPersonEventChangeCommunity(listPer, comm);
     }
+    // update community & people list
     if (err == ErrNone && addHistory) {
         err = onConfirmAddHistoryCommunity(listPer, comm);
     }
+    if (err != ErrNone) {
+        loge("Change community failed, err=%d", err);
+        DialogUtils::showErrorBox(err, QString(tr("Đổi cộng đoàn %1 thất bại")).arg(comm->name()));
+    }
+
+    this->mSuspendReloadOnDbUpdate = false;
+    requestReload();
     FREE_PTR(comm);
     RELEASE_LIST_DBMODEL(listPer);
     traceout;
@@ -832,7 +1270,8 @@ QString UIPersonListView::getMainModelName()
     return KModelNamePerson;
 }
 
-ErrCode UIPersonListView::updatePersonEvent(const QList<DbModel *>& perList, const PersonEvent *event)
+ErrCode UIPersonListView::updatePersonEvent(const QList<DbModel *>& perList,
+                                            const PersonEvent *event)
 {
     tracein;
     ErrCode err = ErrNone;

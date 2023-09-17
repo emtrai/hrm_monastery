@@ -250,6 +250,31 @@ QList<DbModel *> DbSqliteCommunity::getListCommunityPerson(const QString &commUi
 
 }
 
+QList<DbModel *> DbSqliteCommunity::getListCommunityPersonOfPerson(const QString &perUid, int modelStatus)
+{
+    tracein;
+    QList<DbModel *> list;
+    logd("get list comm-person for perUid '%s'", STR2CHA(perUid));
+    if(!perUid.isEmpty()) {
+        DbSqliteCommunityPersonTbl* tbl =
+            (DbSqliteCommunityPersonTbl*)DbSqlite::table(KTableCommPerson);
+        if (tbl) {
+            list = tbl->getListCommunityPerson(perUid, QString(), modelStatus);
+        } else {
+            THROWEX("Not found table '%s'", KTableCommPerson);
+        }
+    } else {
+        loge("invalid perUid '%s'", STR2CHA(perUid));
+    }
+    traceout;
+    return list;
+}
+
+QList<DbModel *> DbSqliteCommunity::getListActiveCommunityPersonOfPerson(const QString &perUid)
+{
+    return getListCommunityPersonOfPerson(perUid, MODEL_STATUS_ACTIVE);
+}
+
 ErrCode DbSqliteCommunity::addPerson2Community(const Community *comm,
                                                const Person *per, int status,
                                                qint64 startdate, qint64 enddate,
@@ -301,7 +326,8 @@ ErrCode DbSqliteCommunity::addPerson2Community(const Community *comm,
             QList<CommunityPerson*> listCommunitiesOfPerson =
                 tblCommPer->getListCommunityOfPerson(per->uid());
             if (listCommunitiesOfPerson.size() > 0) {
-                logd("found %d community which person uid belong to currently, change status to inactive", listCommunitiesOfPerson.size());
+                logd("found %lld community which person uid belong to currently"
+                    ", change status to inactive", listCommunitiesOfPerson.size());
                 foreach (CommunityPerson* model, listCommunitiesOfPerson) {
                     tblCommPer->updateModelStatusInDb(model->uid(), MODEL_STATUS_INACTIVE);
                 }

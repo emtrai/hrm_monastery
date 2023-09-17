@@ -85,8 +85,8 @@ ErrCode PersonEvent::buildNameIdFromOthersNameId(const QString &perNameId, const
     tracein;
     ErrCode err = ErrNone;
     QString dateString = date;
-    if (dateString.isEmpty() && mDate > 0) {
-        dateString = DatetimeUtils::date2String(mDate);
+    if (dateString.isEmpty()) {
+        dateString = DatetimeUtils::currentTimeToDatestring (QT_DATE_FORMAT_DMYHMS);
     }
     QString nameId = makeNameId(perNameId,
                                 eventNameId,
@@ -223,7 +223,7 @@ void PersonEvent::setPersonName(const QString &newPersonName)
 
 QString PersonEvent::toString() const
 {
-    return QString("%1:%2:%3").arg(
+    return QString("%1:date('%2'):event('%3')").arg(
         DbModel::toString(),DatetimeUtils::date2String(date()), STR2CHA(eventName()));
 }
 

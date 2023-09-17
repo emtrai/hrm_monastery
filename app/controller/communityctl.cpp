@@ -43,6 +43,7 @@
 #include "prebuiltdefs.h"
 #include "communityperson.h"
 #include "controllerdefs.h"
+#include "stringdefs.h"
 
 GET_INSTANCE_CONTROLLER_IMPL(CommunityCtl)
 
@@ -299,7 +300,48 @@ ErrCode CommunityCtl::getListCommunityPerson(const QString &communityUid,
     if (err != ErrNone) {
         loge("Get list of active person failed, err=%d", err);
         // we don't have error code return, so report error here.
-        REPORTERRCTL->reportErr(QObject::tr("Lỗi truy vấn danh sách nữ tu của cộng đoàn"), err, true);
+        REPORTERRCTL->reportErr(STR_QUERY_ERROR, err, true);
+    } else {
+        logd("Got %lld items", items.size());
+    }
+
+    traceout;
+    return err;
+
+}
+
+ErrCode CommunityCtl::getListActiveCommunityPersonOfPerson(const QString &perUid, QList<DbModel *> &outList)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    DbCommunityModelHandler* hdl = nullptr;
+    QList<DbModel *> items;
+    logd("get list of comm per of perUid '%s'", STR2CHA(perUid));
+    if (perUid.isEmpty()) {
+        err = ErrInvalidArg;
+        loge("Invalid args");
+    }
+
+    if (err == ErrNone) {
+        hdl = dynamic_cast<DbCommunityModelHandler*>(DB->getModelHandler(KModelHdlCommunity));
+        if (!hdl) {
+            err = ErrInvalidData;
+            loge("not found handler, something was wrong");
+        }
+    }
+
+    if (err == ErrNone) {
+        items = hdl->getListActiveCommunityPersonOfPerson(perUid);
+        if (items.size() > 0) {
+            outList.append(items);
+        } else {
+            logw("not found list comm per for perUid '%s'", STR2CHA(perUid));
+        }
+    }
+    if (err != ErrNone) {
+        loge("Get list of comm per  failed, err=%d", err);
+        // we don't have error code return, so report error here.
+        REPORTERRCTL->reportErr(STR_QUERY_ERROR, err, true);
     } else {
         logd("Got %lld items", items.size());
     }

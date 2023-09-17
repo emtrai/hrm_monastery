@@ -331,10 +331,16 @@ void DlgAddPersonEvent::setEvenInfoOnly(const QList<DbModel*>* listPerson)
     tracein;
     mEvenInfoOnly = true;
     logd("event info only, skip change name and search person");
-    ui->btnChangeNameId->setEnabled(false);
+
+    // just add event for multiple people, so not allow to add new people
     ui->btnSearch->setEnabled(false);
+
+    // there is multiple people, so not set name id here, as well as not allow
+    // to change name id. It'll be generate automatically
     ui->txtNameId->setText("");
     ui->txtNameId->setEnabled(false);
+    ui->btnChangeNameId->setEnabled(false);
+
     if (listPerson && listPerson->size() > 0) {
         logd("set list person");
         foreach (DbModel* item, *listPerson) {

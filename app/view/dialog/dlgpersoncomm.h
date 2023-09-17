@@ -49,7 +49,7 @@ public:
 
     const QList<CommunityPerson*>& getCommunityPersonList();
     void loadCommunity();
-    void loadModelStatus();
+    void loadModelStatus(bool skipActive = true);
 
     template<class T>
     ErrCode setPersonList(const QList<T *>&newList)
@@ -65,13 +65,14 @@ public:
         return err;
     }
 
-    ErrCode setModelStatus(int modelStatus);
+    ErrCode setModelStatus(int modelStatus, bool allowChange = true);
     int getModelStatus(bool* ok = nullptr);
 
     void setCommunity(const Community *newCommunity);
 
     const QList<CommunityPerson*>& communityPersonList();
-    ErrCode setCommunityPerson(const CommunityPerson* commPer);
+    ErrCode appendCommunityPerson(const CommunityPerson* commPer, bool ignoreCommunity = false);
+    ErrCode setCommunityPersonList(const QList<CommunityPerson*>& commPer, bool ignoreCommunity = false);
     ErrCode appendPerson(const Person* person);
 
 public:
@@ -79,6 +80,10 @@ public:
                                             const Community* comm,
                                             const QList<Person*>& perList);
     static ErrCode updateCommunityPerson(QWidget *parent, const CommunityPerson* model);
+    void setSkipStartDate(bool newSkipStartDate);
+    void setEndDate(qint64 timeInMs = 0);
+    void setStartDate(qint64 timeInMs = 0);
+
 protected:
     virtual QDialogButtonBox* buttonBox();
     virtual DbModel* newModel();
@@ -87,6 +92,7 @@ protected:
     virtual void accept();
 private:
     void updateModelStatus(int status);
+    void setDate(QLineEdit * txt, qint64 timeInMs = 0);
 
 private slots:
     void on_btnSearchPeople_clicked();
@@ -98,6 +104,7 @@ private:
     QList<Person*> mPersonList;
     QList<CommunityPerson*> mCommunityPersonList;
     Community* mCommunity;
+    bool mSkipStartDate;
 };
 
 #endif // DLGPERSONCOMM_H

@@ -28,6 +28,7 @@
 
 class PersonEvent;
 class QMessageBox;
+class CommunityPerson;
 
 class UIPersonListView : public UICommonListView, public ImportListener, public MainWindownImportListener
 {
@@ -52,8 +53,6 @@ protected:
     virtual ErrCode onEditItem(UITableCellWidgetItem *item);
 
     virtual ErrCode onLoad();
-    virtual void importRequested(const QString& fpath);
-    virtual QList<UITableMenuAction*> getMenuCommonActions(const QMenu* menu);
     /**
      * @brief Get menu actions list when an item is selected
      * @param menu
@@ -69,8 +68,8 @@ protected:
      */
     virtual QList<UITableMenuAction*> getMenuMultiSelectedItemActions(const QMenu* menu, const QList<UITableItem *>& items);
 
-    virtual ErrCode onMenuActionImport(QMenu* menu, UITableMenuAction* act);
-    virtual ErrCode onMenuActionExportListPerson(QMenu *menu, UITableMenuAction *act);
+//    virtual ErrCode onMenuActionImport(QMenu* menu, UITableMenuAction* act);
+//    virtual ErrCode onMenuActionExportListPerson(QMenu *menu, UITableMenuAction *act);
     virtual ErrCode onMenuActionViewPersonEvent(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionViewCommunity(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionAddPersonEvent(QMenu* menu, UITableMenuAction* act);
@@ -94,6 +93,14 @@ protected:
     virtual ErrCode updatePersonEvent(const QList<DbModel*>& perList, const PersonEvent* event = nullptr);
 private:
     void cleanUpItem();
+    ErrCode buildPersonCommunityChangeEventList(const QList<DbModel *> & perList,
+                                                const Community * comm,
+                                                QList<PersonEvent*>& perEventList);
+    ErrCode buildInActiveCommPersonList(const QList<DbModel *> & perList,
+                                QList<CommunityPerson*>& commPerList);
+    ErrCode buildActiveCommPersonList(const QList<DbModel *> & perList,
+                                      const Community * comm,
+                                    QList<CommunityPerson*>& commPerList);
 //    void onConfirmChangeCommunity(const QList<DbModel *> & perList, const Community * comm);
     ErrCode onConfirmAddPersonEventChangeCommunity(const QList<DbModel *> & perList,
                                                 const Community * comm);

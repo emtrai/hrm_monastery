@@ -166,6 +166,20 @@ void CommunityPerson::setCommunity(const Community *newCommunity)
     traceout;
 }
 
+QString CommunityPerson::toString() const
+{
+    QString str = MapDbModel::toString();
+    str += QString(":commuid('%1')")
+               .arg(community()?community()->uid():"null");
+    str += QString(":commnameid('%1')")
+               .arg(community()?community()->nameId():"null");
+    str += QString(":peruid('%1')")
+               .arg(person()?person()->uid():"null");
+    str += QString(":personnameid('%1')")
+               .arg(person()?person()->nameId():"null");
+    return str;
+}
+
 Person *CommunityPerson::person() const
 {
     return mPerson;

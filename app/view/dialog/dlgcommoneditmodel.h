@@ -95,6 +95,9 @@ public:
     void setModelName(const QString &newModelName);
     virtual const DbModel* getModel() const;
 
+    ErrCode acceptResult() const;
+    virtual void setTitle(const QString& title);
+
 protected:
     /**
      * @brief return current model object, create new if not created yes
@@ -129,6 +132,7 @@ protected:
     CommonEditModelListener* mListener;
     bool mCustomNameId;
     QString mModelName;
+    ErrCode mAcceptResult;
 };
 
 #endif // DLGCOMMONEDITMODEL_H

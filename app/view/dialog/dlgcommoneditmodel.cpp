@@ -36,7 +36,8 @@
 
 DlgCommonEditModel::DlgCommonEditModel(QWidget *parent): QDialog(parent),
     mModel(nullptr), mIsNew(false), mIsSelfSave(false),
-    mCustomNameId(false)
+    mCustomNameId(false),
+    mAcceptResult(ErrNone)
 {
     traced;
 
@@ -237,15 +238,18 @@ void DlgCommonEditModel::accept()
         logd("not mIsSelfSave, just call accept");
     }
     logd("ret=%d", ret);
+    mAcceptResult = ret;
     if (ret == ErrNone) {
         QDialog::accept();
     }
-    if (ret == ErrNone) {
-        logi("Save/update '%s' ok , close dialog", STR2CHA(item->toString()));
-//        DialogUtils::showMsgBox(QString(tr("Đã lưu %1")).arg(item->name()));
-        MAINWIN->showMessageBox(QString(tr("Đã lưu %1")).arg(item->name()));
-    } else {
-        DialogUtils::showErrorBox("Lỗi, không thể lưu thông tin");
+    if (mIsSelfSave) {
+        if (ret == ErrNone) {
+            logi("Save/update '%s' ok , close dialog", STR2CHA(item->toString()));
+    //        DialogUtils::showMsgBox(QString(tr("Đã lưu %1")).arg(item->name()));
+            MAINWIN->showMessageBox(QString(tr("Đã lưu %1")).arg(item->name()));
+        } else {
+            DialogUtils::showErrorBox("Lỗi, không thể lưu thông tin");
+        }
     }
     traceout;
 }
@@ -332,6 +336,16 @@ void DlgCommonEditModel::onEditnameId(QLineEdit *txtNameId)
         txtNameId->setText("");
     }
     traceout;
+}
+
+ErrCode DlgCommonEditModel::acceptResult() const
+{
+    return mAcceptResult;
+}
+
+void DlgCommonEditModel::setTitle(const QString &title)
+{
+    this->setWindowTitle(title);
 }
 
 void DlgCommonEditModel::setModelName(const QString &newModelName)
