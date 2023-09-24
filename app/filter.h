@@ -59,6 +59,15 @@ enum FilterOperation {
 
 QHash<int, QString> getFilterOpsList(int filterField);
 
+class FilterKeyworkItem {
+public:
+    int catetoryid;
+    const QString catetory;
+    qint64 opFlags;
+    const QString keywords;
+    const QVariant value;
+};
+
 class FilterItem {
 
     // TODO: copy constructor??

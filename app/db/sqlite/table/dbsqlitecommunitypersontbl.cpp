@@ -35,6 +35,7 @@
 #include "dbctl.h"
 #include "dbsqlite.h"
 #include "communityperson.h"
+#include "filter.h"
 
 const qint32 DbSqliteCommunityPersonTbl::KVersionCode = VERSION_CODE(0,0,1);
 
@@ -297,3 +298,52 @@ ErrCode DbSqliteCommunityPersonTbl::updateDbModelDataFromQuery(DbModel *item, co
     traceout;
     return err;
 }
+
+QString DbSqliteCommunityPersonTbl::getFilterQueryString(int fieldId, const QString &cond)
+{
+    tracein;
+    QString queryString;
+    logd("fieldId %d", fieldId);
+    if (fieldId == FILTER_FIELD_FULL_NAME) {
+
+        queryString = QString(  " SELECT *, "
+                                " (%2.%6 || ' ' || %2.%7) AS %8, "
+                                " %2.%9 AS %9a"
+                                " FROM %1 "
+                                " LEFT JOIN %2 ON %1.%4 = %2.%5"
+                                " WHERE (%3)")
+                          .arg(name(), KTablePerson) // 1, 2
+                          .arg(cond) // 3
+                          .arg(KFieldPersonUid, KFieldUid) // 4, 5
+                          .arg(KFieldLastName, KFieldFirstName) // 6, 7
+                          .arg(KFieldFullName) // 8
+                          .arg(KFieldCommunityUid) // 9
+
+            ;
+    } else {
+        logd("call default filer query for fieldId %d", fieldId);
+        queryString = DbSqliteMapTbl::getFilterQueryString(fieldId, cond);
+    }
+    logd("queryString '%s'", STR2CHA(queryString));
+    traceout;
+    return queryString;
+}
+
+//ErrCode DbSqliteCommunityPersonTbl::filterFieldCond(int fieldId, int operatorId,
+//                                                    QString fieldValueName,
+//                                                    const DbModel *parentModel,
+//                                                    QString &cond, int &dataType,
+//                                                    bool &isExact)
+//{
+//    tracein;
+//    ErrCode err = ErrNone;
+//    if (fieldId == FILTER_FIELD_FULL_NAME) {
+//        queryString = QString("SELECT * LEFT JOIN %1 ON WHERE %1").arg()
+//            ;
+//    } else {
+//        err = DbSqliteMapTbl::filterFieldCond(fieldId, operatorId, fieldValueName,
+//                                              parentModel, cond, dataType, isExact);
+//    }
+//    traceret(err);
+//    return err;
+//}

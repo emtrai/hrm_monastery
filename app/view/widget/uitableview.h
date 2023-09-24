@@ -263,6 +263,7 @@ protected:
 
     virtual void initFilterFields();
     virtual void loadFilterFields();
+    virtual void reloadFilterFields();
 
     virtual void loadFilterOperators(int fieldId);
 

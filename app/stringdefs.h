@@ -99,6 +99,8 @@
 #define STR_ERR_EDIT_DATA     QObject::tr("Lỗi chỉnh sửa dữ liệu")
 #define STR_XUAT_DANH_SACH_NU_TU     QObject::tr("Xuất danh sách Nữ tu")
 #define STR_XUAT_DU_LIEU_THANH_CONG     QObject::tr("Xuất dữ liệu thành công")
+#define STR_XUAT_DU_LIEU_LOI     QObject::tr("Xuất dữ liệu lỗi")
+#define STR_XUAT_DU_LIEU_LOI_MA_LOI     QObject::tr("Xuất dữ liệu lỗi, mã lỗi %1")
 #define STR_XUAT_DU_LIEU_THANH_CONG_FILE     QObject::tr("Xuất dữ liệu thành công. Lưu tại %1")
 #define STR_INFO     QObject::tr("Thông tin")
 #define STR_ERROR     QObject::tr("Lỗi!!!")
@@ -108,7 +110,7 @@
 
 #define STR_SPECIALIST     QObject::tr("Chuyên môn")
 #define STR_CHUYEN_MON     QObject::tr("Chuyên môn")
-#define STR_EDUCATION     QObject::tr("Giáo dục")
+#define STR_EDUCATION     QObject::tr("Học vấn")
 #define STR_EDUCATION_LEVEL     QObject::tr("Trình độ học vấn")
 #define STR_WORK     QObject::tr("Công việc")
 
@@ -135,6 +137,16 @@
 #define STR_VIEW_EVENT QObject::tr("Xem thông tin sự kiện")
 #define STR_EXPORT_PERSON_INFO QObject::tr("Xuất thông tin Nữ tu")
 #define STR_LIST_PERSON_EMPTY QObject::tr("Danh sách nữ tu trống")
+#define STR_LIST_PERSON QObject::tr("Danh sách nữ tu")
+
+#define STR_FAILED_CHANGE_COMMUNITY QObject::tr("Đổi cộng đoàn thất bại")
+#define STR_CHANGE_COMMUNITY_FOR_PERSON QObject::tr("Đổi sang Cộng đoàn %1 cho %2 Nữ tu")
+#define STR_SELECT_PERSON QObject::tr("Vui lòng chọn Nữ tu cần xem")
+#define STR_ERROR_VIEW_PERSON_EVENT QObject::tr("Lỗi xem thông tin sự kiện Nữ tu")
+#define STR_ERROR_VIEW_COMMUNITY QObject::tr("Lỗi xem thông tin Cộng đoàn")
+#define STR_CHANGE_PERSON_TO_COMMUNITY QObject::tr("Chuyển Nữ tu sang Cộng Đoàn %1")
+#define STR_PERSON_MOVE_OUT_COMMUNITY QObject::tr("Thay đổi thông tin cộng đoàn - Nữ tu chuyển khỏi Cộng đoàn hiện tại")
+#define STR_PERSON_MOVE_IN_COMMUNITY QObject::tr("Thay đổi thông tin cộng đoàn - Nữ tu chuyển đến Cộng đoàn %1")
 
 
 #endif // STRINGDEFS_H

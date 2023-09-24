@@ -276,7 +276,9 @@ QList<DbModel *> DbSqliteCommunity::getListActiveCommunityPersonOfPerson(const Q
 }
 
 ErrCode DbSqliteCommunity::addPerson2Community(const Community *comm,
-                                               const Person *per, int status,
+                                               const Person *per,
+                                               bool updateCommPer, // update mapping comm & per
+                                               int status,
                                                qint64 startdate, qint64 enddate,
                                                const QString &remark,
                                                bool notify)
@@ -308,8 +310,10 @@ ErrCode DbSqliteCommunity::addPerson2Community(const Community *comm,
             loge("not found handler %s", KModelHdlPerson);
         }
     }
-
-    if (err == ErrNone) {
+    if (!updateCommPer) {
+        logi("update community, but skip updating comm per mapping here");
+    }
+    if (err == ErrNone && updateCommPer) {
         bool newAdd = true;
         QList<DbModel*> listCommunitiesOfPerson =
             tblCommPer->getListItemsUids(per->uid(), comm->uid(), &CommunityPerson::build);
@@ -334,7 +338,7 @@ ErrCode DbSqliteCommunity::addPerson2Community(const Community *comm,
             }
             RELEASE_LIST(listCommunitiesOfPerson, CommunityPerson);
             logi("Save mapping community '%s' and person '%s'",
-                 STR2CHA(comm->toString()), STR2CHA(per->toString()));
+                 MODELSTR2CHA(comm), MODELSTR2CHA(per));
             // TODO: update status of old one?
             CommunityPerson* mapModel = (CommunityPerson*)MapDbModel::buildMapModel(&CommunityPerson::build,
                                                                             comm, per,

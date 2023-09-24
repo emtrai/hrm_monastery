@@ -34,9 +34,11 @@
 #include "communityperson.h"
 #include "dialogutils.h"
 #include "errreporterctl.h"
+#include "stringdefs.h"
 
 UIPeopleInCommunityListView::UIPeopleInCommunityListView(QWidget *parent):
-    UICommonListView(parent)
+    UICommonListView(parent),
+    mModelStatus(0)
 {
     tracein;
     // there is not much items, so skipping import
@@ -172,8 +174,9 @@ QList<DbModel *> UIPeopleInCommunityListView::getListDbModels()
         }
     }
     if (err == ErrNone) {
-        logd("Load people list of comm '%s'", MODELSTR2CHA(comm));
-        err = COMMUNITYCTL->getListCommunityPerson(uid, ret);
+        logd("Load people list of comm '%s', model status 0x%llx",
+             MODELSTR2CHA(comm), mModelStatus);
+        err = COMMUNITYCTL->getListCommunityPerson(uid, ret, mModelStatus?mModelStatus:MODEL_STATUS_MAX);
     }
 
     if (err != ErrNone) {
@@ -195,6 +198,18 @@ ErrCode UIPeopleInCommunityListView::setCommunity(const Community *newCommunity)
 {
     traced;
     return setParentModel(newCommunity);
+}
+
+void UIPeopleInCommunityListView::setModelStatus(qint64 modelStatus)
+{
+    logd("Set model status from 0x%llx to 0x%llx", mModelStatus, modelStatus);
+    mModelStatus = modelStatus;
+    reloadFilterFields();
+}
+
+void UIPeopleInCommunityListView::clearModelStatus()
+{
+    setModelStatus(0);
 }
 
 QString UIPeopleInCommunityListView::getMainModelName()
@@ -235,7 +250,18 @@ void UIPeopleInCommunityListView::initHeader()
 QString UIPeopleInCommunityListView::getTitle()
 {
     Community* comm = community();
-    return QString(tr("Danh sách nữ tu của cộng đoàn: %1")).arg(comm?comm->name():tr("Không rõ"));
+    return QString(tr("Danh sách nữ tu của cộng đoàn: %1")).arg(comm?comm->name():STR_UNKNOWN);
+}
+
+void UIPeopleInCommunityListView::initFilterFields()
+{
+    tracein;
+    appendFilterField(FILTER_FIELD_FULL_NAME, STR_FULLNAME);
+    logd("mModelStatus 0x%llx", mModelStatus);
+    if (!mModelStatus) {
+        appendFilterField(FILTER_FIELD_MODEL_STATUS, STR_MODELSTATUS);
+    }
+    traceout;
 }
 
 ErrCode UIPeopleInCommunityListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
@@ -249,7 +275,7 @@ ErrCode UIPeopleInCommunityListView::fillValueTableRowItem(DbModel *item, UITabl
         err = ErrInvalidArg;
         loge("invalid item '%s'", MODELSTR2CHA(item));
     }
-    loge("updateItem '%s'", item?STR2CHA(item->modelName()):"");
+    logd("updateItem '%s'", item?STR2CHA(item->modelName()):"");
     if (err == ErrNone) {
         commper = (CommunityPerson*) item;
         per = (Person*) commper->person();

@@ -817,12 +817,24 @@ QString DbSqlitePersonTbl::getFilterQueryString(int fieldId, const QString &cond
                         .arg(KFieldUid, KFieldEduUid)
             ;
         break;
+    case FILTER_FIELD_HOLLY_NAME:
+        selectQuery = QString("%1.%2 AS %3, %1.%4 AS %5, %1.%6 AS %7")
+                        .arg(KTableSaint) // 1
+                        .arg(KFieldUid, KFieldSaintUid) // 2 3
+                        .arg(KFieldName, KFieldSaintName) // 4 5
+                        .arg(KFieldFullName, KFieldSaintFullName) // 6 7
+            ;
+        joinQuery = QString("LEFT JOIN %2 ON %1.%4 = %2.%3")
+                        .arg(name(), KTableSaint) // 1, 2
+                        .arg(KFieldUid, KFieldSaintUid) // 3, 4
+            ;
+        break;
     case FILTER_FIELD_COMMUNITY:
         selectQuery = QString("%1.%2 AS %7, %1.%4 AS %5, %1.%3 AS %6")
-                        .arg(KTableCommunity) // 1
-                        .arg(KFieldUid, KFieldNameId) // 2 3
-                        .arg(KFieldName, KFieldCommunityName) // 4 5
-                        .arg(KFieldCommunityNameId, KFieldCommunityUid) // 6 7
+                          .arg(KTableCommunity) // 1
+                          .arg(KFieldUid, KFieldNameId) // 2 3
+                          .arg(KFieldName, KFieldCommunityName) // 4 5
+                          .arg(KFieldCommunityNameId, KFieldCommunityUid) // 6 7
             ;
         joinQuery = QString("LEFT JOIN %2 ON %1.%4 = %2.%3")
                         .arg(name(), KTableCommunity) // 1, 2

@@ -352,6 +352,7 @@ ErrCode CommunityCtl::getListActiveCommunityPersonOfPerson(const QString &perUid
 }
 
 ErrCode CommunityCtl::addPerson2Community(const Community *comm, const Person *per,
+                                          bool updateCommPer, // update mapping comm & per
                                           int status,
                                           qint64 startdate,
                                           qint64 enddate,
@@ -373,7 +374,7 @@ ErrCode CommunityCtl::addPerson2Community(const Community *comm, const Person *p
     }
     if (err == ErrNone) {
         logd("add person to community");
-        err = hdl->addPerson2Community(comm, per, status, startdate, enddate, remark);
+        err = hdl->addPerson2Community(comm, per, updateCommPer, status, startdate, enddate, remark);
     }
     traceret(err);
     return err;

@@ -41,7 +41,7 @@ class DlgPersonCommunity : public DlgCommonEditModel
     DLG_BUILDER(DlgPersonCommunity)
 public:
     explicit DlgPersonCommunity(QWidget *parent = nullptr);
-    ~DlgPersonCommunity();
+    virtual ~DlgPersonCommunity();
     virtual void setupUI();
 
     virtual ErrCode buildModel(DbModel* model, QString& errMsg);

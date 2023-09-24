@@ -744,6 +744,10 @@ ErrCode DbSqliteTbl::filterFieldCond(int fieldId,
             field = fieldName;
             dataType = INT64;
             break;
+        case FILTER_FIELD_FULL_NAME:
+            field = fieldName;
+            dataType = TEXT;
+            break;
             // TODO: support more filter???
         default:
             field = fieldName;
@@ -841,7 +845,7 @@ ErrCode DbSqliteTbl::filter(int fieldId,
         logd("Query String '%s'", queryString.toStdString().c_str());
 
         // TODO: check sql injection issue
-        logd("bind keyword='%s'", STR2CHA(keyword));
+        logd("bind fieldValueName %s='%s'", STR2CHA(fieldValueName), STR2CHA(keyword));
         if (isFieldValueExact) {
             qry.bindValue(fieldValueName, QString("%1").arg(keyword.trimmed().toLower()) );
         } else {

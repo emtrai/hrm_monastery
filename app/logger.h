@@ -38,13 +38,14 @@
 // TODO: check debug macro
 
 
-#define THREAD_ID static_cast<long>(reinterpret_cast<intptr_t>(QThread::currentThreadId()))
+//#define THREAD_ID static_cast<long>(reinterpret_cast<intptr_t>(QThread::currentThreadId()))
+#define THREAD_ID static_cast<long>(reinterpret_cast<intptr_t>(QThread::currentThread()))
 #define CUR_TIME_STR QTime::currentTime().toString("hh:mm:ss.zzz").toStdString().c_str()
 #define CUR_DATE_STR QDate::currentDate().toString("yyyyMMdd").toStdString().c_str()
 
 #define logit(logger, fmt,...) \
     do{ \
-        logger("%s@%s %s %s:%d : " fmt, CUR_DATE_STR, CUR_TIME_STR, THIS_FILE, __func__, __LINE__, ##__VA_ARGS__); \
+        logger("0x%08lx %s@%s %s %s:%d : " fmt, THREAD_ID, CUR_DATE_STR, CUR_TIME_STR, THIS_FILE, __func__, __LINE__, ##__VA_ARGS__); \
     } while(0)
 
 #ifdef DEBUG_LOG

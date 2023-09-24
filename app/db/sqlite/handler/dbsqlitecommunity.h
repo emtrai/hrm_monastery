@@ -87,6 +87,7 @@ public:
      */
     virtual ErrCode addPerson2Community(const Community *comm,
                                       const Person* per,
+                                      bool updateCommPer = true, // update mapping comm & per
                                       int status = 0,
                                       qint64 startdate = 0,
                                       qint64 enddate = 0,

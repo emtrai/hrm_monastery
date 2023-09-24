@@ -598,6 +598,15 @@ void UITableView::loadFilterFields()
     traceout;
 }
 
+void UITableView::reloadFilterFields()
+{
+    tracein;
+    ui->cbCategory->clear();
+    mFilterFields.clear();
+    loadFilterFields();
+    traceout;
+}
+
 void UITableView::onFilterFieldChange(int fieldId, const QString &fieldText)
 {
     tracein;
@@ -1115,7 +1124,7 @@ UITableCellWidgetItem::UITableCellWidgetItem(const QString &text):
     mItemIdx(0),
     mIdx(0)
 {
-    tracein;
+//    tracein;
 }
 
 UITableCellWidgetItem *UITableCellWidgetItem::build(const QString &txt, qint32 itemIdx, qint32 idx, UITableItem *item)

@@ -49,7 +49,6 @@ protected:
 
 
     virtual ErrCode onAddItem(UITableCellWidgetItem *item);
-//    virtual ErrCode onViewItem(UITableCellWidgetItem *item);
     virtual ErrCode onEditItem(UITableCellWidgetItem *item);
 
     virtual ErrCode onLoad();
@@ -68,8 +67,6 @@ protected:
      */
     virtual QList<UITableMenuAction*> getMenuMultiSelectedItemActions(const QMenu* menu, const QList<UITableItem *>& items);
 
-//    virtual ErrCode onMenuActionImport(QMenu* menu, UITableMenuAction* act);
-//    virtual ErrCode onMenuActionExportListPerson(QMenu *menu, UITableMenuAction *act);
     virtual ErrCode onMenuActionViewPersonEvent(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionViewCommunity(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionAddPersonEvent(QMenu* menu, UITableMenuAction* act);
@@ -101,17 +98,7 @@ private:
     ErrCode buildActiveCommPersonList(const QList<DbModel *> & perList,
                                       const Community * comm,
                                     QList<CommunityPerson*>& commPerList);
-//    void onConfirmChangeCommunity(const QList<DbModel *> & perList, const Community * comm);
-    ErrCode onConfirmAddPersonEventChangeCommunity(const QList<DbModel *> & perList,
-                                                const Community * comm);
-    ErrCode onConfirmAddHistoryCommunity(const QList<DbModel *> & perList,
-                                                const Community * comm);
 
-signals:
-    void changeCommunityDone(ErrCode err, QList<DbModel*>, Community*, bool, bool);
-    void confirmChangeCommunity(const QList<DbModel *> & perList, const Community * comm);
-private slots:
-    void onChangeCommunityDone(ErrCode err, QList<DbModel*>, Community*, bool, bool);
 };
 
 #endif // UIPERSONLISTVIEW_H

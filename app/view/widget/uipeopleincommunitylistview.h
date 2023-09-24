@@ -38,6 +38,8 @@ public:
 
     Community *community() const;
     ErrCode setCommunity(const Community *newCommunity);
+    void setModelStatus(qint64 modelStatus);
+    void clearModelStatus();
 
 protected:
     virtual int getViewType() { return VIEW_PEOPLE_IN_COMMUNITY_LIST;}
@@ -46,6 +48,7 @@ protected:
     virtual DbModel* onCreateDbModelObj(const QString& modelName);
     virtual QString getTitle();
 
+    virtual void initFilterFields();
     virtual void initHeader();
     virtual ErrCode fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
 
@@ -53,6 +56,8 @@ protected:
     virtual ErrCode onAddItem(UITableCellWidgetItem *item);
 
     virtual QList<DbModel*> getListDbModels();
+private:
+    qint64 mModelStatus;
 };
 
 #endif // UIPEOPLEINCOMMUNITYLISTVIEW_H

@@ -238,22 +238,7 @@ ErrCode PersonCtl::filter(int catetoryid, qint64 opFlags,
             controller = SPECIALISTCTL;
             modelHdl = DB->getModelHandler(KModelHdlSpecialist);
             break;
-//        case FILTER_FIELD_COMMUNITY:
-//            controller = COMMUNITYCTL;
-//            modelHdl = DB->getModelHandler(KModelHdlCommunity);
-//            break;
-//        case FILTER_FIELD_EDUCATION:
-//            controller = EDUCTL;
-//            modelHdl = DB->getModelHandler(KModelHdlEdu);
-//            break;
-//        case FILTER_FIELD_COURSE:
-//            controller = COURSECTL;
-//            modelHdl = DB->getModelHandler(KModelHdlCourse);
-//            break;
-//        case FILTER_FIELD_WORK:
-//            controller = WORKCTL;
-//            modelHdl = DB->getModelHandler(KModelHdlWork);
-//            break;
+        case FILTER_FIELD_HOLLY_NAME:
         case FILTER_FIELD_NAME:
         case FILTER_FIELD_FULL_NAME:
         case FILTER_FIELD_ADDRESS:
@@ -332,7 +317,7 @@ ErrCode PersonCtl::filter(int catetoryid, qint64 opFlags,
                         logd("uid %s, name %s",
                              item->uid().toStdString().c_str(),
                              item->name().toStdString().c_str());
-                        QList<DbModel *> perList = modelHdl->getAll(KModelHdlPerson);
+                        QList<DbModel *> perList = modelHdl->getAll(KModelNamePerson);
                         if (perList.count() > 0) {
                             logd("found %lld person", perList.count());
                             outList->append(perList);

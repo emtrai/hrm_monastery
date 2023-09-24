@@ -66,7 +66,7 @@ ErrCode DlgWait::show(void* data, WaitPrepare_t prepare,
         err = mResult;
         logd("thread completed, err %d", err);
     }
-//    emit closeDlg(err);
+    emit closeDlg(err);
     // TODO: delete mWorker?
     traceret(err);
     return err;

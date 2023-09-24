@@ -242,7 +242,10 @@ ErrCode UICommunityListView::showListPeople(UITableMenuAction *act, bool activeO
         logd("community to view person '%s'", MODELSTR2CHA(community));
         view->setCommunity(community);
         if (activeOnly) {
-            view->addFilter(KItemStatus, QString(), QVariant(MODEL_STATUS_ACTIVE));
+//            view->addFilter(KItemStatus, QString(), QVariant(MODEL_STATUS_ACTIVE));
+            view->setModelStatus(MODEL_STATUS_ACTIVE);
+        } else {
+            view->clearModelStatus();
         }
         MAINWIN->switchView(view);
     }

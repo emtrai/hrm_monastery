@@ -465,7 +465,7 @@ ErrCode DbSqliteMapTbl::filterFieldCond(int fieldId, int operatorId,
                                        parentModel, cond, dataType, isExact);
     if (err == ErrNone && parentModel && !parentModel->uid().isEmpty()) {
         logd("Append uid '%s'", STR2CHA(parentModel->uid()));
-        cond = QString("((%1) AND (%2 = '%3'))").arg(cond, getFieldNameUid1(), parentModel->uid());
+        cond = QString("((%1) AND (%2.%3 = '%4'))").arg(cond, name(), getFieldNameUid1(), parentModel->uid());
     }
     logd("cond: '%s'", STR2CHA(cond));
     traceret(err);
