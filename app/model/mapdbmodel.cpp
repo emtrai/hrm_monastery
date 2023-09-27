@@ -79,7 +79,7 @@ DbModel *MapDbModel::clone() const
     return DbModel::clone();
 }
 
-void MapDbModel::dump()
+void MapDbModel::dump() const
 {
     tracein;
     DbModel::dump();

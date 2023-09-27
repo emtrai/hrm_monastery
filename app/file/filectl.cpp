@@ -486,7 +486,7 @@ void FileCtl::cleanUpData()
     // TODO: implement it, clean up all data, i.e data in temp storage
 }
 
-QString FileCtl::getName()
+QString FileCtl::getName() const
 {
     return "FileCtl";
 }

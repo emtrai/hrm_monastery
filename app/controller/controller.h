@@ -49,7 +49,7 @@ public:
      * @brief Name of controller
      * @return
      */
-    virtual QString getName() = 0;
+    virtual QString getName() const = 0;
 
     virtual void onUnload() = 0;
 };

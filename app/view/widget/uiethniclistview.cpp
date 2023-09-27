@@ -123,7 +123,7 @@ ErrCode UIEthnicListView::onEditItem(UITableCellWidgetItem *item)
     tracein;
     ErrCode err = ErrNone;
     if (item) {
-        DbModel* ethnic = item->itemData();
+        const DbModel* ethnic = item->itemData();
         if (ethnic) {
             MainWindow::showAddEditEthnic(true, ethnic, this);
         } else {

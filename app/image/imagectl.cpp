@@ -51,7 +51,7 @@ ErrCode ImageCtl::onLoad()
     return ErrNone;
 }
 
-QString ImageCtl::getName()
+QString ImageCtl::getName() const
 {
     return IMG_CTL_NAME;
 }

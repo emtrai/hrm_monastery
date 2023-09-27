@@ -55,7 +55,7 @@ class DlgPerson : public QDialog, public UIMultiComboxViewListener, public Commo
                     Person *person(bool newone=false);
 
                 public:
-                    static DlgPerson* buildDlg(QWidget *parent = nullptr, Person* per = nullptr, bool isNew = true);
+                    static DlgPerson* buildDlg(QWidget *parent = nullptr, const Person* per = nullptr, bool isNew = true);
 
 //                    implemete it
 //                    add model name to common edit model, pass it to onNewModel

@@ -143,7 +143,7 @@ ErrCode UICommunityListView::onEditItem(UITableCellWidgetItem *item)
 {
     tracein;
     ErrCode err = ErrNone;
-    DbModel* comm = nullptr;
+    const DbModel* comm = nullptr;
     if (!item) {
         err = ErrInvalidArg;
         loge("invalid argument");
@@ -214,14 +214,14 @@ ErrCode UICommunityListView::showListPeople(UITableMenuAction *act, bool activeO
 {
     tracein;
     ErrCode ret = ErrNone;
-    Community* community = nullptr;
+    const Community* community = nullptr;
     UIPeopleInCommunityListView* view = nullptr;
     if (!act) {
         ret = ErrInvalidArg;
         loge("invalid argument");
     }
     if (ret == ErrNone) {
-        community = dynamic_cast<Community*>(act->getData());
+        community = dynamic_cast<const Community*>(act->getData());
         if (!community || !IS_MODEL_NAME(community, KModelNameCommunity)
             || community->uid().isEmpty()) {
             ret = ErrInvalidModel;
@@ -242,7 +242,6 @@ ErrCode UICommunityListView::showListPeople(UITableMenuAction *act, bool activeO
         logd("community to view person '%s'", MODELSTR2CHA(community));
         view->setCommunity(community);
         if (activeOnly) {
-//            view->addFilter(KItemStatus, QString(), QVariant(MODEL_STATUS_ACTIVE));
             view->setModelStatus(MODEL_STATUS_ACTIVE);
         } else {
             view->clearModelStatus();
@@ -262,7 +261,7 @@ ErrCode UICommunityListView::exportListPeople(UITableMenuAction *act, bool activ
 {
     tracein;
     ErrCode err = ErrNone;
-    Community* community = nullptr;
+    const Community* community = nullptr;
     QString uid;
     QString fpath;
     QList<DbModel*> items;
@@ -275,7 +274,7 @@ ErrCode UICommunityListView::exportListPeople(UITableMenuAction *act, bool activ
         loge("export list person failed, action no data");
     }
     if (err == ErrNone) {
-        community = dynamic_cast<Community*>(act->getData());
+        community = dynamic_cast<const Community*>(act->getData());
         if (community->uid().isEmpty()) {
             err = ErrInvalidData;
             loge("comunity '%s' has no uid", STR2CHA(community->toString()));
@@ -347,14 +346,14 @@ ErrCode UICommunityListView::onMenuActionListDepartment(QMenu *menu, UITableMenu
     tracein;
     UNUSED(menu);
     ErrCode ret = ErrNone;
-    Community* community = nullptr;
+    const Community* community = nullptr;
     UICommDeptListView* view  = nullptr;
     if (!act) {
         ret = ErrInvalidArg;
         loge("invalid argument");
     }
     if (ret == ErrNone) {
-        community = dynamic_cast<Community*>(act->getData());
+        community = dynamic_cast<const Community*>(act->getData());
         if (!community || !IS_MODEL_NAME(community, KModelNameCommunity)) {
             loge("invalid model '%s'", MODELSTR2CHA(community));
             ret = ErrInvalidModel;

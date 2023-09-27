@@ -36,7 +36,7 @@
 #define CSV_LIST_ITEM_SPLIT '|'
 #define NAME_ITEM_SPLIT ','
 
-#define SPECIAL_CHAR "`~!@#$%^&*()_-+={[}]|\\:;\"\'<,>.?/"
+#define SPECIAL_CHAR "`~!@#$%^&*()_-+={[}]|\\:;\"\'<,>.?/ "
 
 // TODO: just create empty object, is there any other better way???
 #define EMPTY_QSTRING QString()

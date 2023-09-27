@@ -158,7 +158,7 @@ ErrCode UIPersonEventListView::onAddItem(UITableCellWidgetItem *item)
 ErrCode UIPersonEventListView::onEditItem(UITableCellWidgetItem *item)
 {
     tracein;
-    DbModel* model = nullptr;
+    const DbModel* model = nullptr;
     ErrCode err = ErrNone;
     if (!item) {
         loge("invalid argument");

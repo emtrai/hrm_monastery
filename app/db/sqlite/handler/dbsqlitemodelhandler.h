@@ -174,6 +174,14 @@ public:
                        int noItems = 0,
                        int* total = nullptr);
 
+    virtual ErrCode filter(const QList<FilterKeyworkItem*> &filters,
+                           const char* targetModelName = nullptr,
+                           const DbModel* parentModel = nullptr,
+                           QList<DbModel*>* outList = nullptr,
+                           qint64 dbStatus = DB_RECORD_ACTIVE,
+                           int from = 0,
+                           int noItems = 0,
+                           int* total = nullptr);
     /**
      * @brief checkFields
      * @param inFields

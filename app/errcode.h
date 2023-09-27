@@ -74,6 +74,7 @@ typedef enum ErrCode {
     ErrInvalidView,
     ErrNotSelect,
     ErrAbort,
+    ErrInvalidQuery,
     ErrMax
     } ErrCode_t;
 

@@ -51,7 +51,7 @@ private:
     QHash<QString, Country*> mListCountry;
 
 public:
-    virtual QString getName();
+    virtual QString getName() const;
     virtual ErrCode onLoad();
     virtual void onUnload();
 };

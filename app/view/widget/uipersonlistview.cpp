@@ -243,7 +243,7 @@ ErrCode UIPersonListView::onEditItem(UITableCellWidgetItem *item)
 {
     tracein;
     ErrCode err = ErrNone;
-    DbModel* model = nullptr;
+    const DbModel* model = nullptr;
     if (!item) {
         err = ErrInvalidArg;
         loge("invalid argument");
@@ -256,7 +256,7 @@ ErrCode UIPersonListView::onEditItem(UITableCellWidgetItem *item)
         }
     }
     if (err == ErrNone) {
-        Person* per = (Person*)model;
+        const Person* per = (const Person*)model;
         DlgPerson* dlg = DlgPerson::buildDlg(this, per, (per == nullptr));
         if (dlg) {
             dlg->exec();
@@ -372,7 +372,7 @@ ErrCode UIPersonListView::onMenuActionChangeCommunity(QMenu *menu, UITableMenuAc
             ret = ErrNoData;
         }
     }
-    // validate communit with current selected person
+    // validate community with current selected person
     if (ret == ErrNone) {
         foreach (DbModel* item, peopleList) {
             if (!item || !IS_MODEL_NAME(item, KModelNamePerson)) {
@@ -449,31 +449,23 @@ ErrCode UIPersonListView::onMenuActionChangeCommunity(QMenu *menu, UITableMenuAc
                 UNUSED(data);
                 UNUSED(dlg);
                 logd("change to community '%s'", MODELSTR2CHA(comm));
-                foreach (DbModel* item, peopleList){
-                    logi("Add person '%s' to community '%s'",
-                         MODELSTR2CHA(item), MODELSTR2CHA(comm));
-                    tmpErr = COMMUNITYCTL->addPerson2Community(comm, (Person*)item, false);
-                    if (tmpErr != ErrNone) {
-                        loge("Failed to add person '%s' to community '%s', err %d",
-                             MODELSTR2CHA(item), MODELSTR2CHA(comm), tmpErr);
-                        break;
-                    }
-                }
-                // update persone event
-                if (tmpErr == ErrNone && addPersonEvent) {
-                    logd("add person event list, no item %lld", perEventList.size());
-                    foreach (DbModel* item, perEventList){
+
+                // add to community person active)
+                if (tmpErr == ErrNone && addCommPer) {
+                    logd("add activeCommPerList , no item %lld", activeCommPerList.size());
+                    foreach (DbModel* item, activeCommPerList){
                         if (item) {
-                            logi("Save event '%s'", MODELSTR2CHA(item));
+                            logi("Save active commper '%s'", MODELSTR2CHA(item));
                             tmpErr = item->save();
                             if (tmpErr != ErrNone) {
-                                loge("Failed to save person event item '%s'",
+                                loge("Failed to save active commper item '%s'",
                                      MODELSTR2CHA(item));
                                 break;
                             }
                         }
                     }
                 }
+
                 // add to community person (inactive)
                 if (tmpErr == ErrNone && addCommPer) {
                     logd("update inActiveCommPerList , no item %lld", inActiveCommPerList.size());
@@ -489,15 +481,31 @@ ErrCode UIPersonListView::onMenuActionChangeCommunity(QMenu *menu, UITableMenuAc
                         }
                     }
                 }
-                // add to community person active)
-                if (tmpErr == ErrNone && addCommPer) {
-                    logd("add activeCommPerList , no item %lld", activeCommPerList.size());
-                    foreach (DbModel* item, activeCommPerList){
+
+                foreach (DbModel* item, peopleList){
+                    logi("Add person '%s' to community '%s'",
+                         MODELSTR2CHA(item), MODELSTR2CHA(comm));
+                    // not auto update person comm mapping
+                    // when call addPerson2Community(), because we need to allow user
+                    // to set end time and start time when change community.
+                    // so here, we just update people table, with current community info
+                    tmpErr = COMMUNITYCTL->addPerson2Community(comm, (Person*)item, false);
+                    if (tmpErr != ErrNone) {
+                        loge("Failed to add person '%s' to community '%s', err %d",
+                             MODELSTR2CHA(item), MODELSTR2CHA(comm), tmpErr);
+                        break;
+                    }
+                }
+
+                // update persone event
+                if (tmpErr == ErrNone && addPersonEvent) {
+                    logd("add person event list, no item %lld", perEventList.size());
+                    foreach (DbModel* item, perEventList){
                         if (item) {
-                            logi("Save active commper '%s'", MODELSTR2CHA(item));
+                            logi("Save event '%s'", MODELSTR2CHA(item));
                             tmpErr = item->save();
                             if (tmpErr != ErrNone) {
-                                loge("Failed to save active commper item '%s'",
+                                loge("Failed to save person event item '%s'",
                                      MODELSTR2CHA(item));
                                 break;
                             }
@@ -541,7 +549,7 @@ ErrCode UIPersonListView::onMenuActionViewPersonEvent(QMenu *menu, UITableMenuAc
     tracein;
     UNUSED(menu);
     ErrCode ret = ErrNone;
-    Person* person = nullptr;
+    const Person* person = nullptr;
     QString errMsg = STR_ERROR_VIEW_PERSON_EVENT;
     UIPersonEventListView* view = nullptr;
     if (!act) {
@@ -550,7 +558,7 @@ ErrCode UIPersonListView::onMenuActionViewPersonEvent(QMenu *menu, UITableMenuAc
         errMsg = STR_SELECT_PERSON;
     }
     if (ret == ErrNone) {
-        person = dynamic_cast<Person*>(act->getData());
+        person = dynamic_cast<const Person*>(act->getData());
         if (!person || IS_MODEL_NAME(person, KModelNamePerson)) {
             ret = ErrNoData;
             loge("invalid model data '%s'", MODELSTR2CHA(person));
@@ -586,7 +594,7 @@ ErrCode UIPersonListView::onMenuActionViewCommunity(QMenu *menu, UITableMenuActi
 {
     tracein;
     ErrCode ret = ErrNone;
-    Person* person = nullptr;
+    const Person* person = nullptr;
     QString errMsg = STR_ERROR_VIEW_COMMUNITY;
     UICommunitiesOfPersonListView* view = nullptr;
     UNUSED(menu);
@@ -596,7 +604,7 @@ ErrCode UIPersonListView::onMenuActionViewCommunity(QMenu *menu, UITableMenuActi
         errMsg = STR_SELECT_PERSON;
     }
     if (ret == ErrNone) {
-        person = dynamic_cast<Person*>(act->getData());
+        person = dynamic_cast<const Person*>(act->getData());
         if (!person || IS_MODEL_NAME(person, KModelNamePerson)) {
             ret = ErrNoData;
             loge("invalid model data '%s'", MODELSTR2CHA(person));
@@ -1183,11 +1191,9 @@ ErrCode UIPersonListView::updatePersonEvent(const QList<DbModel *>& perList,
             }
         }
     }
-    //    verity/validate info
-    //            save info
-//    delete info
+
     RELEASE_LIST(perEventList, PersonEvent);
-    if (dlg) delete dlg;
+    FREE_PTR(dlg);
 
     traceret(err);
     return err;

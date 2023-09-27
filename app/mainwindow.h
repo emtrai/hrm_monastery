@@ -85,16 +85,19 @@ public:
                                          const QString& modelName = nullptr,
                                          const DbModel* targetModel = nullptr // import list will belong to this model
                                          );
-            static ErrCode showOnHtmlViewer(DbModel* model, const QString& subject);
-            static void showAddEditCommonModel(bool isSelfUpdate = true, DbModel* model = nullptr,
+            static ErrCode showOnHtmlViewer(const DbModel* model, const QString& subject);
+            static void showAddEditCommonModel(bool isSelfUpdate = true,
+                                               const DbModel* model = nullptr,
                                              CommonEditModelListener* listener = nullptr);
-            static void showAddEditCourse(bool isSelfUpdate = true, DbModel* com = nullptr,
+            static void showAddEditCourse(bool isSelfUpdate = true, const DbModel* com = nullptr,
                                              CommonEditModelListener* listener = nullptr);
-            static void showAddEditCommDept(bool isSelfUpdate = true, DbModel* comm = nullptr, DbModel* dept = nullptr,
+            static void showAddEditCommDept(bool isSelfUpdate = true,
+                                            const DbModel* comm = nullptr,
+                                            const DbModel* dept = nullptr,
                                           CommonEditModelListener* listener = nullptr);
-            static void showAddEditArea(bool isSelfUpdate = true, DbModel* com = nullptr,
+            static void showAddEditArea(bool isSelfUpdate = true, const DbModel* com = nullptr,
                                              CommonEditModelListener* listener = nullptr);
-            static void showAddEditEthnic(bool isSelfUpdate = true, DbModel* com = nullptr,
+            static void showAddEditEthnic(bool isSelfUpdate = true, const DbModel* com = nullptr,
                                              CommonEditModelListener* listener = nullptr);
             static ErrCode exportListItems(const QList<DbModel*>* items,
                                            const QString& datatype,
@@ -155,15 +158,17 @@ protected:
                                 ModelController* controller,
                                 const QString& modelName,
                                 const DbModel* targetModel = nullptr);
-     void doShowAddEditCommonModel(bool isSelfUpdate = true, DbModel* model = nullptr,
+     void doShowAddEditCommonModel(bool isSelfUpdate = true, const DbModel* model = nullptr,
                                         CommonEditModelListener* listener = nullptr);
-     void doShowAddEditCourse(bool isSelfUpdate = true, DbModel* model = nullptr,
+     void doShowAddEditCourse(bool isSelfUpdate = true, const DbModel* model = nullptr,
                                    CommonEditModelListener* listener = nullptr);
-     void doShowAddEditCommDept(bool isSelfUpdate = true, DbModel* comm = nullptr, DbModel* model = nullptr,
-                              CommonEditModelListener* listener = nullptr);
-     void doShowAddEditArea(bool isSelfUpdate = true, DbModel* model = nullptr,
+     void doShowAddEditCommDept(bool isSelfUpdate = true,
+                                const DbModel* comm = nullptr,
+                                const DbModel* model = nullptr,
+                                CommonEditModelListener* listener = nullptr);
+     void doShowAddEditArea(bool isSelfUpdate = true, const DbModel* model = nullptr,
                                    CommonEditModelListener* listener = nullptr);
-     void doShowAddEditEthnic(bool isSelfUpdate = true, DbModel* model = nullptr,
+     void doShowAddEditEthnic(bool isSelfUpdate = true, const DbModel* model = nullptr,
                                    CommonEditModelListener* listener = nullptr);
 
      ErrCode doExportListItems(const QList<DbModel*>* items,

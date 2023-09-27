@@ -61,11 +61,13 @@ QHash<int, QString> getFilterOpsList(int filterField);
 
 class FilterKeyworkItem {
 public:
+    FilterKeyworkItem();
+    FilterKeyworkItem(int catetoryid, qint64 opFlags, QString keyword);
     int catetoryid;
-    const QString catetory;
+    QString catetory;
     qint64 opFlags;
-    const QString keywords;
-    const QVariant value;
+    QString keyword;
+    QVariant value;
 };
 
 class FilterItem {

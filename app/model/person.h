@@ -98,7 +98,7 @@ public:
     QString displayName() const;
     ErrCode fromCSVFile(const QString& fname);
 
-    virtual DataExporter* getExporter();
+    virtual const DataExporter* getExporter() const;
 
     qint64 christenDate() const;
     void setChristenDate(qint64 newChristenDate);
@@ -138,7 +138,7 @@ public:
     void setNationalityName(const QString &newNationalityName);
 
 
-    virtual void dump();
+    virtual void dump() const;
 
     const QString &ethnicUid() const;
     void setEthnicUid(const QString &newEthnicUid);

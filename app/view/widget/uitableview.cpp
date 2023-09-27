@@ -74,7 +74,10 @@ UITableView::~UITableView()
         mMenu->clear();
         delete mMenu;
     }
+
+    RELEASE_LIST(mFilterList, FilterItem);
     delete ui;
+    traceout;
 }
 
 QStringList UITableView::getHeader()
@@ -278,17 +281,22 @@ ErrCode UITableView::onDeleteItem(const QList<UITableItem *>& selectedItems)
                     int total = selectedItems.size();
                     foreach (UITableItem* item, selectedItems) {
                         if (item && item->data()) {
-                            DbModel* model = item->data();
-//                            dlg->setMessage(QString(tr("Xóa %1")).arg(model->name()));
-                            *err = model->remove(true, &msg);
-                            if (*err == ErrNone) {
-                                cnt++;
+                            DbModel* model = CLONE_DBMODEL(item->data());
+                            if (model) {
+                                *err = model->remove(true, &msg);
+                                if (*err == ErrNone) {
+                                    cnt++;
+                                } else {
+                                    loge("Delete '%s' err = %d", STR2CHA(model->toString()), err);
+                                    break;
+                                }
+                                if (cnt % 4 == 0) {
+                                    dlg->setMessage(QString(tr("Đã xóa %1 / %2")).arg(cnt, total));
+                                }
+                                FREE_PTR(model);
                             } else {
-                                loge("Delete '%s' err = %d", STR2CHA(model->toString()), err);
-                                break;
-                            }
-                            if (cnt % 4 == 0) {
-                                dlg->setMessage(QString(tr("Đã xóa %1 / %2")).arg(cnt, total));
+                                loge("failed to delete '%s', no memory?",
+                                     MODELSTR2CHA(item->data()));
                             }
                         }
                     }
@@ -554,6 +562,14 @@ int UITableView::onFilter(int catetoryid, const QString &catetory, qint64 opFlag
     return -1;
 }
 
+int UITableView::onFilter(const QList<FilterKeyworkItem *> &filters)
+{
+    tracein;
+    logi("DEFAULT filter, should not called here, DERIVED CLASS implement this");
+    traceout;
+    return -1;
+}
+
 ErrCode UITableView::setFilter(const QString &item, const QString &keywords, const QVariant *value)
 {
     tracein;
@@ -748,7 +764,7 @@ UITableItem::~UITableItem()
 
 UITableItem *UITableItem::build(const DbModel *data)
 {
-    return new UITableItem(data->clone());
+    return new UITableItem(data);
 }
 
 UITableItem *UITableItem::addValue(const QString &val)
@@ -757,13 +773,17 @@ UITableItem *UITableItem::addValue(const QString &val)
     return this;
 }
 
-UITableItem::UITableItem(DbModel* data):
-    mData(data)
+UITableItem::UITableItem(const DbModel* data):
+    mData(nullptr)
 {
     tracein;
+    if (data) {
+        mData = CLONE_DBMODEL(data);
+    }
+    traceout;
 }
 
-DbModel *UITableItem::data() const
+const DbModel *UITableItem::data() const
 {
     return mData;
 }
@@ -809,11 +829,6 @@ UITableItem::UITableItem(const UITableItem &item):UITableItem()
 const QStringList &UITableItem::valueList() const
 {
     return mValueList;
-}
-
-void UITableItem::setValueList(const QStringList &newValueList)
-{
-    mValueList = newValueList;
 }
 
 void UITableView::on_btnImport_clicked()
@@ -1069,7 +1084,7 @@ UITableMenuAction* UITableMenuAction::setCallback(const std::function<ErrCode (Q
     return this;
 }
 
-DbModel *UITableMenuAction::getData()
+const DbModel *UITableMenuAction::getData()
 {
     tracein;
     if (mTblCellItem != nullptr) {
@@ -1141,10 +1156,10 @@ UITableItem *UITableCellWidgetItem::item() const
     return mItem;
 }
 
-DbModel *UITableCellWidgetItem::itemData() const
+const DbModel *UITableCellWidgetItem::itemData() const
 {
     tracein;
-    DbModel* model = nullptr;
+    const DbModel* model = nullptr;
     if (mItem != nullptr) {
         model = mItem->data();
     } else {

@@ -49,7 +49,7 @@ public:
      * @brief Name of controller
      * @return
      */
-    virtual QString getName();
+    virtual QString getName() const;
 
     ErrCode backup(const QString& fpath);
 };

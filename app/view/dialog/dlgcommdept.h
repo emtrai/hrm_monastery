@@ -52,7 +52,7 @@ protected:
     void loadStatus();
 public:
     DbModel *community() const;
-    void setCommunity(DbModel *newCommunity);
+    void setCommunity(const DbModel *newCommunity);
 
 private slots:
     void on_cbDept_currentIndexChanged(int index);

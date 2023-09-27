@@ -121,7 +121,16 @@ ErrCode DbSqliteModelHandler::deleteSoft(DbModel *model)
     // TODO: should check if some sub-item not exist???
     // i.e.import person, but country, holly name, etc. not exist, need to check and add it
 
-    if (model != nullptr){
+    if (!model){
+        err = ErrInvalidArg;
+        loge("invalid argument");
+
+    }
+    if (err == ErrNone && !model->allowRemove()) {
+        loge("model '%s' not allow to remove", MODELSTR2CHA(model));
+        err = ErrNotAllow;
+    }
+    if (err == ErrNone){
         DbSqliteTbl* tbl = getTable(model->modelName());
         if (tbl->isExist(model)){
             err = tbl->deleteSoft(model);
@@ -130,10 +139,7 @@ ErrCode DbSqliteModelHandler::deleteSoft(DbModel *model)
             loge("model %s not exist", model->name().toStdString().c_str());
         }
     }
-    else{
-        err = ErrInvalidArg;
-        loge("invalid argument");
-    }
+
     if (err == ErrNone) {
         notifyDataChange(model, DBMODEL_CHANGE_DELETE, err);
     }
@@ -186,6 +192,10 @@ ErrCode DbSqliteModelHandler::doDeleteHard(DbSqliteTbl *tbl, DbModel *model, boo
     if (!tbl || !model) {
         err = ErrInvalidArg;
         loge("Invalid argument");
+    }
+    if (err == ErrNone && !model->allowRemove()) {
+        loge("model '%s' not allow to remove", MODELSTR2CHA(model));
+        err = ErrNotAllow;
     }
     if (err == ErrNone) {
         if (tbl->isExist(model)){
@@ -353,6 +363,39 @@ ErrCode DbSqliteModelHandler::filter(int fieldId,
     Q_ASSERT(builder != nullptr);
 
     ErrCode ret = tbl->filter(fieldId, operatorId, keyword, builder,
+                              parentModel,
+                              outList,
+                              dbStatus, from, noItems, total);
+    traceret(ret);
+    return ret;
+}
+
+
+ErrCode DbSqliteModelHandler::filter(const QList<FilterKeyworkItem*> &filters,
+                                     const char* targetModelName,
+                                     const DbModel* parentModel,
+                                     QList<DbModel *> *outList,
+                                     qint64 dbStatus,
+                                     int from,
+                                     int noItems,
+                                     int* total)
+{
+    tracein;
+    DbSqliteTbl* tbl = nullptr;
+    DbModelBuilder builder = nullptr;
+    if (targetModelName) {
+        builder = getBuilder(targetModelName);
+        tbl = getTable(targetModelName);
+    } else {
+        builder = getMainBuilder();
+        tbl = getMainTbl();
+    }
+    // assume main tbl is not null, if not programming error,
+    // and require override search function
+    Q_ASSERT(tbl != nullptr);
+    Q_ASSERT(builder != nullptr);
+
+    ErrCode ret = tbl->filter(filters, builder,
                               parentModel,
                               outList,
                               dbStatus, from, noItems, total);

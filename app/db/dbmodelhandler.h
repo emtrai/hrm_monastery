@@ -27,6 +27,7 @@
 #include "dbmodel.h"
 
 class DbModel;
+class FilterKeyworkItem;
 
 enum DbModelChangeType {
     DBMODEL_CHANGE_ADD = 0,
@@ -37,7 +38,7 @@ enum DbModelChangeType {
 
 class onDbModelHandlerListener {
 public:
-    virtual QString getName() = 0;
+    virtual QString getName() const = 0;
     /**
      * @brief onDbModelHandlerDataUpdate
      * @param model
@@ -132,6 +133,15 @@ public:
                        int from = 0,
                        int noItems = 0,
                        int* total = nullptr) = 0;
+
+    virtual ErrCode filter(const QList<FilterKeyworkItem*> &filters,
+                           const char* targetModelName = nullptr,
+                           const DbModel* parentModel = nullptr,
+                           QList<DbModel*>* outList = nullptr,
+                           qint64 dbStatus = DB_RECORD_ACTIVE,
+                           int from = 0,
+                           int noItems = 0,
+                           int* total = nullptr) = 0;
 
     // TODO: implement filter with operator (equal, greater, in range, etc.)
 

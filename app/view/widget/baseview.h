@@ -88,6 +88,12 @@ public:
     virtual void onStopped();
     virtual void onPaused();
     virtual void onShown();
+    /**
+     * @brief view is ready to fetch data or not
+     *        in some case, view needs to do some initialization before it can fetch
+     *        data to update.
+     * @return true if view is ready to fetch data
+     */
     virtual bool ready2FetchData();
     /**
      * @brief view type \ref ViewType of view

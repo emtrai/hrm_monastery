@@ -90,7 +90,7 @@ ErrCode UICourseListView::onEditItem(UITableCellWidgetItem *item)
     tracein;
     ErrCode err = ErrNone;
     if (item) {
-        DbModel* course = item->itemData();
+        const DbModel* course = item->itemData();
         if (course) {
             MainWindow::showAddEditCourse(true, course, this);
         } else {

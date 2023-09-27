@@ -861,6 +861,93 @@ ErrCode DbSqliteTbl::filter(int fieldId,
     return err;
 }
 
+ErrCode DbSqliteTbl::filterFieldCond(const QList<FilterKeyworkItem *> &filters,
+                                     QString &cond,
+                                     QHash<QString, QString> &bindValues,
+                                     const DbModel* parentModel)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    int fieldDataType = 0;
+    bool isFieldValueExact = false;
+    logd("no of filters %lld", filters.size());
+    if (filters.size() > 0) {
+        int cnt = 0;
+        foreach (FilterKeyworkItem* item, filters) {
+            if (!item) continue;
+            QString fieldValueName = QString(":fieldValue_%1_%2").arg(item->catetoryid).arg(cnt++);
+            QString conditem;
+            err = filterFieldCond(item->catetoryid, item->opFlags, fieldValueName,
+                                  parentModel, conditem, fieldDataType, isFieldValueExact);
+            if (err != ErrNone) {
+                loge("failed to filter filed cond, err %d", err);
+                break;
+            }
+            if (cond.isEmpty()) {
+                cond = conditem;
+            } else {
+                cond = QString("(%1) AND (%2)").arg(cond).arg(conditem);
+            }
+            if (isFieldValueExact) {
+                bindValues.insert(fieldValueName,
+                                  QString("%1").arg(item->keyword.trimmed().toLower()) );
+            } else {
+                bindValues.insert(fieldValueName,
+                                  QString("\%%1\%").arg(item->keyword.trimmed().toLower()) );
+            }
+        }
+    } else {
+        loge("No filter!!");
+        err = ErrNoData;
+    }
+    traceret(err);
+    return err;
+}
+
+ErrCode DbSqliteTbl::filter(const QList<FilterKeyworkItem *> &filters,
+                            const DbModelBuilder &builder,
+                            const DbModel* parentModel,
+                            QList<DbModel *> *outList, qint64 dbStatus,
+                            int from, int noItems, int *total)
+{
+    tracein;
+    QSqlQuery qry(SQLITE->currentDb());
+    qint32 cnt = 0;
+    ErrCode err = ErrNone;
+    QString cond;
+    QHash<QString, QString> bindValues;
+    QString queryString;
+    logd("no filter item %lld", filters.size());
+    err = filterFieldCond(filters, cond, bindValues, parentModel);
+    if (err == ErrNone) {
+        appendDbStatusCond(cond, dbStatus);
+    }
+    if (err == ErrNone) {
+        logd("Query cond '%s'", STR2CHA(cond));
+        queryString = getFilterQueryString(filters, cond);
+        if (queryString.isEmpty()) {
+            err = ErrInvalidQuery;
+            loge("Invalid query string");
+        }
+    }
+    if (err == ErrNone) {
+        qry.prepare(queryString);
+        logd("Query String '%s'", STR2CHA(queryString));
+
+        foreach (QString key, bindValues.keys()) {
+            logd("bind key %s='%s'", STR2CHA(key), STR2CHA(bindValues.value(key)));
+            qry.bindValue(key, bindValues.value(key));
+        }
+        cnt = runQuery(qry, builder, outList);
+
+        logi("Found %d items", cnt);
+    } else {
+        loge("get filter cond failed err %d", err);
+    }
+    traceret(err);
+    return err;
+}
+
 //ErrCode DbSqliteTbl::filter(int fieldId,
 //                        int operatorId,
 //                        const QString& keyword,
@@ -1560,6 +1647,16 @@ QString DbSqliteTbl::getFilterQueryString(int fieldId, const QString &cond)
 {
     tracein;
     UNUSED(fieldId);
+    QString queryString = getSearchQueryString(cond);
+    traceout;
+    return queryString;
+}
+
+QString DbSqliteTbl::getFilterQueryString(const QList<FilterKeyworkItem *> &filters,
+                                          const QString &cond)
+{
+    tracein;
+    UNUSED(filters);
     QString queryString = getSearchQueryString(cond);
     traceout;
     return queryString;

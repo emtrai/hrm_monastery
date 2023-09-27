@@ -228,7 +228,7 @@ void PersonDept::setCourseName(const QString &newCourseName)
 }
 
 
-void PersonDept::dump()
+void PersonDept::dump() const
 {
     tracein;
     DbModel::dump();

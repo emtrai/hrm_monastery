@@ -472,3 +472,19 @@ ErrCode DbSqliteMapTbl::filterFieldCond(int fieldId, int operatorId,
     return err;
 }
 
+ErrCode DbSqliteMapTbl::filterFieldCond(const QList<FilterKeyworkItem *> &filters,
+                                        QString &cond, QHash<QString, QString> &bindValues,
+                                        const DbModel *parentModel)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    err = DbSqliteTbl::filterFieldCond(filters, cond, bindValues, nullptr);
+    if (err == ErrNone && parentModel && !parentModel->uid().isEmpty()) {
+        logd("Append uid '%s'", STR2CHA(parentModel->uid()));
+        cond = QString("((%1) AND (%2.%3 = '%4'))").arg(cond, name(), getFieldNameUid1(), parentModel->uid());
+    }
+    logd("cond: '%s'", STR2CHA(cond));
+    traceret(err);
+    return err;
+}
+

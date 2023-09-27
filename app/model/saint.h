@@ -69,7 +69,7 @@ class Saint: public DbModel
         virtual QString fullName() const;
         void setFullName(const QString &newFullName);
 
-        virtual void dump();
+        virtual void dump() const;
 
     public:
         const QString &countryUid() const;

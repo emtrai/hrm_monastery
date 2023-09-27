@@ -367,11 +367,12 @@ int UICommonListView::onFilter(int catetoryid, const QString &catetory,
             logd("searchKeyWork %s", STR2CHA(searchKeyWork));
             logd("modelName %s", STR2CHA(modelName));
             logd("ctrl %s", STR2CHA(ctrl->getName()));
-            err = ctrl->filter(catetoryid,
-                              opFlags, searchKeyWork,
-                              modelName.toStdString().c_str(),
-                              mParentModel,
-                              &mItemList);
+            err = _onFilter(ctrl,
+                            catetoryid,
+                            opFlags, searchKeyWork,
+                            modelName.toStdString().c_str(),
+                            mParentModel,
+                            &mItemList);
         }
         logd("filter err %d", err);
         logd("mItemList cnt %lld", mItemList.count());
@@ -380,12 +381,27 @@ int UICommonListView::onFilter(int catetoryid, const QString &catetory,
     return mItemList.count();
 }
 
+ErrCode UICommonListView::_onFilter(ModelController* ctrl,
+                                int catetoryid, qint64 opFlags, const QString &searchKeyWork,
+                                const char *targetModelName, const DbModel *parentModel,
+                                QList<DbModel *> *outList)
+{
+    traceout;
+    ErrCode err = ctrl->filter(catetoryid,
+                       opFlags, searchKeyWork,
+                       targetModelName,
+                       parentModel,
+                       outList);
+    traceret(err);
+    return err;
+}
+
 
 ErrCode UICommonListView::onViewItem(UITableCellWidgetItem *item)
 {
     tracein;
     ErrCode err = ErrNone;
-    DbModel* model = nullptr;
+    const DbModel* model = nullptr;
 
     if (!item) {
         err = ErrInvalidArg;
@@ -427,7 +443,7 @@ ErrCode UICommonListView::onEditItem(UITableCellWidgetItem *item)
         err = ErrInvalidArg;
     }
     if (err == ErrNone) {
-        DbModel* comm = item->itemData();
+        const DbModel* comm = item->itemData();
         if (comm) {
             MainWindow::showAddEditCommonModel(true, comm, this);
         } else {

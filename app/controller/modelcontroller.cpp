@@ -60,7 +60,7 @@ void ModelController::init()
     traceout;
 }
 
-QString ModelController::getName()
+QString ModelController::getName() const
 {
     return mName;
 }
@@ -404,6 +404,24 @@ ErrCode ModelController::filter(int fieldId,
                           targetModelName, parentModel,
                           outList,
                           DB_RECORD_ACTIVE, from, noItems, total);
+    } else {
+        loge("Unknown handler, DERIVED class should implement this");
+        ret = ErrNoHandler;
+    }
+
+    traceret(ret);
+    return ret;
+}
+
+ErrCode ModelController::filter(const QList<FilterKeyworkItem *> &filters,
+                                const char *targetModelName, const DbModel *parentModel, QList<DbModel *> *outList, int from, int noItems, int *total)
+{
+    ErrCode ret = ErrNone;
+    tracein;
+    DbModelHandler *hdl = getModelHandler();
+    if (hdl != nullptr) {
+        ret = hdl->filter(filters, targetModelName, parentModel,
+                          outList, DB_RECORD_ACTIVE, from, noItems, total);
     } else {
         loge("Unknown handler, DERIVED class should implement this");
         ret = ErrNoHandler;

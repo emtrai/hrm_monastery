@@ -229,7 +229,7 @@ ErrCode MainWindow::showImportDlg(ImportTarget target,
     return err;
 }
 
-ErrCode MainWindow::showOnHtmlViewer(DbModel *model, const QString& subject)
+ErrCode MainWindow::showOnHtmlViewer(const DbModel *model, const QString& subject)
 {
     tracein;
     QString fpath;
@@ -265,7 +265,8 @@ ErrCode MainWindow::showOnHtmlViewer(DbModel *model, const QString& subject)
     return ret;
 }
 
-void MainWindow::showAddEditCommonModel(bool isSelfUpdate, DbModel *model, CommonEditModelListener *listener)
+void MainWindow::showAddEditCommonModel(bool isSelfUpdate, const DbModel *model,
+                                        CommonEditModelListener *listener)
 {
     tracein;
     getInstance()->doShowAddEditCommonModel(isSelfUpdate, model, listener);
@@ -273,7 +274,7 @@ void MainWindow::showAddEditCommonModel(bool isSelfUpdate, DbModel *model, Commo
 
 }
 
-void MainWindow::showAddEditCourse(bool isSelfUpdate, DbModel *com, CommonEditModelListener *listener)
+void MainWindow::showAddEditCourse(bool isSelfUpdate, const DbModel *com, CommonEditModelListener *listener)
 {
     tracein;
     getInstance()->doShowAddEditCourse(isSelfUpdate, com, listener);
@@ -281,7 +282,8 @@ void MainWindow::showAddEditCourse(bool isSelfUpdate, DbModel *com, CommonEditMo
 
 }
 
-void MainWindow::showAddEditCommDept(bool isSelfUpdate, DbModel* comm, DbModel *dept, CommonEditModelListener *listener)
+void MainWindow::showAddEditCommDept(bool isSelfUpdate, const DbModel* comm,
+                                     const DbModel *dept, CommonEditModelListener *listener)
 {
     tracein;
     getInstance()->doShowAddEditCommDept(isSelfUpdate, comm, dept, listener);
@@ -289,14 +291,14 @@ void MainWindow::showAddEditCommDept(bool isSelfUpdate, DbModel* comm, DbModel *
 
 }
 
-void MainWindow::showAddEditArea(bool isSelfUpdate, DbModel *com, CommonEditModelListener *listener)
+void MainWindow::showAddEditArea(bool isSelfUpdate, const DbModel *com, CommonEditModelListener *listener)
 {
     tracein;
     getInstance()->doShowAddEditArea(isSelfUpdate, com, listener);
     traceout;
 }
 
-void MainWindow::showAddEditEthnic(bool isSelfUpdate, DbModel *com, CommonEditModelListener *listener)
+void MainWindow::showAddEditEthnic(bool isSelfUpdate, const DbModel *com, CommonEditModelListener *listener)
 {
     tracein;
     getInstance()->doShowAddEditEthnic(isSelfUpdate, com, listener);
@@ -668,7 +670,8 @@ ErrCode MainWindow::doShowCommonImport(ImportTarget target,
     return err;
 }
 
-void MainWindow::doShowAddEditCommonModel(bool isSelfUpdate, DbModel *model, CommonEditModelListener *listener)
+void MainWindow::doShowAddEditCommonModel(bool isSelfUpdate, const DbModel *model,
+                                          CommonEditModelListener *listener)
 {
     tracein;
     logd("isSelfUpdate %d, model '%s' listener '%s'",
@@ -682,7 +685,7 @@ void MainWindow::doShowAddEditCommonModel(bool isSelfUpdate, DbModel *model, Com
     traceout;
 }
 
-void MainWindow::doShowAddEditCourse(bool isSelfUpdate, DbModel *model,
+void MainWindow::doShowAddEditCourse(bool isSelfUpdate, const DbModel *model,
                                      CommonEditModelListener *listener)
 {
     tracein;
@@ -695,8 +698,8 @@ void MainWindow::doShowAddEditCourse(bool isSelfUpdate, DbModel *model,
 
 }
 
-void MainWindow::doShowAddEditCommDept(bool isSelfUpdate, DbModel* comm,
-                                       DbModel *model, CommonEditModelListener *listener)
+void MainWindow::doShowAddEditCommDept(bool isSelfUpdate, const DbModel* comm,
+                                       const DbModel *model, CommonEditModelListener *listener)
 {
     tracein;
     logd("isSelfUpdate %d", isSelfUpdate);
@@ -707,17 +710,21 @@ void MainWindow::doShowAddEditCommDept(bool isSelfUpdate, DbModel* comm,
     traceout;
 }
 
-void MainWindow::doShowAddEditArea(bool isSelfUpdate, DbModel *model, CommonEditModelListener *listener)
+void MainWindow::doShowAddEditArea(bool isSelfUpdate, const DbModel *model, CommonEditModelListener *listener)
 {
     tracein;
     logd("isSelfUpdate %d", isSelfUpdate);
     DlgArea* dlg = DlgArea::build(this, isSelfUpdate, KModelNameArea, model, listener);
-    dlg->exec();
-    delete dlg;
+    if (dlg) {
+        dlg->exec();
+        delete dlg;
+    } else {
+        loge("failed to build dlgarea dialog, no memory?");
+    }
     traceout;
 }
 
-void MainWindow::doShowAddEditEthnic(bool isSelfUpdate, DbModel *model, CommonEditModelListener *listener)
+void MainWindow::doShowAddEditEthnic(bool isSelfUpdate, const DbModel *model, CommonEditModelListener *listener)
 {
     tracein;
     logd("isSelfUpdate %d", isSelfUpdate);

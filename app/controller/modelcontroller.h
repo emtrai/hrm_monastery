@@ -14,6 +14,7 @@
 #include "controller.h"
 #include "dbmodelhandler.h"
 
+class FilterKeyworkItem;
 class DbModel;
 class DbModelHandler;
 class OnModelControllerListener {
@@ -38,7 +39,7 @@ public:
     ModelController(const ModelController&) = delete; // not allow copy constructor
     virtual void init();
 
-    virtual QString getName();
+    virtual QString getName() const;
     virtual QString getMainModelHandlerName();
 
     virtual DbModelHandler* getModelHandler();
@@ -110,6 +111,13 @@ public:
                        int from = 0,
                        int noItems = 0,
                        int* total = nullptr);
+    virtual ErrCode filter(const QList<FilterKeyworkItem*> &filters,
+                           const char* targetModelName = nullptr,
+                           const DbModel* parentModel = nullptr,
+                           QList<DbModel*>* outList = nullptr,
+                           int from = 0,
+                           int noItems = 0,
+                           int* total = nullptr);
 
     /**
      * @brief Get list of uid & name from name

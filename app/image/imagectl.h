@@ -48,7 +48,7 @@ public:
      * @brief Name of controller
      * @return
      */
-    virtual QString getName();
+    virtual QString getName() const;
 
     virtual void onUnload();
     QString getImageDirPath(const QString& subDir = nullptr);

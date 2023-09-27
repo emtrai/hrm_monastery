@@ -1100,7 +1100,7 @@ Person *DlgPerson::person(bool newone)
     return mPerson;
 }
 
-DlgPerson *DlgPerson::buildDlg(QWidget *parent, Person *per, bool isNew)
+DlgPerson *DlgPerson::buildDlg(QWidget *parent, const Person *per, bool isNew)
 {
     tracein;
     DlgPerson* dlg = nullptr;

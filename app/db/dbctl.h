@@ -37,7 +37,7 @@ public:
     static DbCtl* getInstance();
     static IDatabase* getDb();
     IDatabase *database() const;
-    virtual QString getName();
+    virtual QString getName() const;
 
 private:
     DbCtl();

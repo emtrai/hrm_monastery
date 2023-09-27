@@ -46,7 +46,7 @@ public:
     virtual const QStringList getListExportKeyWord() const;
     virtual ErrCode getExportDataString(const QString& item, QString* data) const;
 
-    virtual QString getName() = 0;
+    virtual QString getName() const = 0;
     /**
      * @brief Get data to be exported
      * @param[in] item keyword/data/item to be exported

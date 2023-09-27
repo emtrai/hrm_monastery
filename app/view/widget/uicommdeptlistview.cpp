@@ -132,7 +132,7 @@ ErrCode UICommDeptListView::onEditItem(UITableCellWidgetItem *item)
     tracein;
     ErrCode err = ErrNone;
     if (item) {
-        DbModel* comm = item->itemData();
+        const DbModel* comm = item->itemData();
         if (comm) {
             MainWindow::showAddEditCommDept(true, community(), comm, this);
         } else {
@@ -152,14 +152,14 @@ ErrCode UICommDeptListView::onMenuActionListPerson(QMenu *menu, UITableMenuActio
     tracein;
     UNUSED(menu);
     ErrCode ret = ErrNone;
-    CommunityDept* item = nullptr;
+    const CommunityDept* item = nullptr;
     UIDepartmentPersonListView* view = nullptr;
     if (!act) {
         ret = ErrInvalidArg;
         loge("invalid argument, no act");
     }
     if (ret == ErrNone) {
-        item = dynamic_cast<CommunityDept*>(act->getData());
+        item = dynamic_cast<const CommunityDept*>(act->getData());
         if (!item) {
             loge("no department info");
             ret = ErrNoData;

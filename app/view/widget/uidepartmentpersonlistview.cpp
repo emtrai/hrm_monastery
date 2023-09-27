@@ -120,8 +120,8 @@ ErrCode UIDepartmentPersonListView::onEditItem(UITableCellWidgetItem *item)
 {
     tracein;
     ErrCode err = ErrNone;
-    DbModel* model = nullptr;
-    PersonDept* per = nullptr;
+    const DbModel* model = nullptr;
+    const PersonDept* per = nullptr;
     DlgDeptPerson* dlg = nullptr;
     CommunityDept* dept = communityDept();
     if (!item) {
@@ -135,7 +135,7 @@ ErrCode UIDepartmentPersonListView::onEditItem(UITableCellWidgetItem *item)
     if (err == ErrNone) {
         model = item->itemData();
         if (model && IS_MODEL_NAME(model, KModelNamePersonDept)) {
-            per = (PersonDept*)model;
+            per = (const PersonDept*)model;
         } else {
             loge("no or invalid model data '%s'", MODELSTR2CHA(model));
             err = ErrNoData;

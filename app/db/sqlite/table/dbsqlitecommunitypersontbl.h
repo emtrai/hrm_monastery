@@ -49,6 +49,8 @@ public:
 protected:
     virtual ErrCode updateDbModelDataFromQuery(DbModel* item, const QSqlQuery& qry);
     virtual QString getFilterQueryString(int fieldId, const QString& cond = nullptr);
+    virtual QString getFilterQueryString(const QList<FilterKeyworkItem *> &filters,
+                                         const QString& cond = nullptr);
 //    virtual ErrCode filterFieldCond(int fieldId,
 //                                    int operatorId,
 //                                    QString fieldValueName,

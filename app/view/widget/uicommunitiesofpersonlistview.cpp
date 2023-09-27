@@ -91,7 +91,7 @@ ErrCode UICommunitiesOfPersonListView::onEditItem(UITableCellWidgetItem *item)
 {
     ErrCode err = ErrNone;
     DlgPersonCommunity* dlg = nullptr;
-    DbModel* model = nullptr;
+    const DbModel* model = nullptr;
     const Person* per = person();
     tracein;
     if (!item) {
@@ -177,7 +177,8 @@ QString UICommunitiesOfPersonListView::getTitle()
         .arg(per?per->displayName():STR_UNKNOWN);
 }
 
-ErrCode UICommunitiesOfPersonListView::fillValueTableRowItem(DbModel *item, UITableItem *tblItem, int idx)
+ErrCode UICommunitiesOfPersonListView::fillValueTableRowItem(DbModel *item,
+                                                             UITableItem *tblItem, int idx)
 {
     tracein;
     UNUSED(idx);

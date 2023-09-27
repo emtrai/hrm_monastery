@@ -182,7 +182,7 @@ void Saint::setFullName(const QString &newFullName)
     CHECK_MODIFIED_THEN_SET(mFullName, newFullName, KItemFullName);
 }
 
-void Saint::dump()
+void Saint::dump() const
 {
     tracein;
     DbModel::dump();

@@ -320,13 +320,13 @@ public:
     virtual void setDbStatus(qint32 newDbStatus);
 
     virtual bool isValid();
-    virtual void dump();
+    virtual void dump() const;
     virtual QString toString() const;
 
-    virtual QString getName();
+    virtual QString getName() const;
 
     void setNameId(const QString &newNameId);
-    virtual DataExporter* getExporter();
+    virtual const DataExporter* getExporter() const;
 
     /**
      * @brief validate if data is all valid
@@ -367,7 +367,7 @@ public:
     void setMarkModified(bool newMarkModified);
 
     virtual ErrCode exportTo(const QString &fpath, ExportType type);
-    virtual ErrCode exportToFile(ExportType type, QString* fpath);
+    virtual ErrCode exportToFile(ExportType type, QString* fpath) const;
     virtual QString exportHtmlTemplateFile(const QString& name) const;
     virtual ErrCode exportTemplatePath(FileExporter* exporter,
                                        const QString& name,
@@ -388,6 +388,12 @@ public:
 
     quint32 refCnt() const;
 
+    /**
+     * @brief return if model is deleted or not
+     * @param msg: informative message
+     * @return true: allow to delete, false otherwise
+     */
+    virtual bool allowRemove(QString* msg = nullptr);
 protected:
     virtual DbModelHandler* getDbModelHandler() const = 0;
     virtual ErrCode prepare2Save();
@@ -396,12 +402,6 @@ protected:
     virtual void checkModifiedThenSet(qint32& cur, qint32 next, const QString& itemName);
     virtual void checkModifiedThenSet(qint64& cur, qint64 next, const QString& itemName);
 
-    /**
-     * @brief return if model is deleted or not
-     * @param msg: informative message
-     * @return true: allow to delete, false otherwise
-     */
-    virtual bool allowRemove(QString* msg = nullptr);
 protected:
     bool mDeletable; // model can be deleted from db or not
     QHash<QString, ExportCallbackFunc> mExportCallbacks;

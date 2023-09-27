@@ -153,3 +153,17 @@ void FilterItem::setItem(const QString &newItem)
     mItem = newItem;
 }
 
+
+FilterKeyworkItem::FilterKeyworkItem():
+    catetoryid(0),
+    opFlags(0)
+{
+
+}
+
+FilterKeyworkItem::FilterKeyworkItem(int catetoryid, qint64 opFlags, QString keyword)
+{
+    this->catetoryid = catetoryid;
+    this->opFlags = opFlags;
+    this->keyword = keyword;
+}

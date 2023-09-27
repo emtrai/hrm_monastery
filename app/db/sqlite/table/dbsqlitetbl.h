@@ -37,6 +37,7 @@ class DbSqliteUpdateBuilder;
 class DbSqliteDeleteBuilder;
 class QSqlQuery;
 class FieldValue;
+class FilterKeyworkItem;
 
 class DbSqliteTbl
 {
@@ -204,6 +205,20 @@ public:
                        int noItems = 0,
                        int* total = nullptr);
 
+    virtual ErrCode filterFieldCond(const QList<FilterKeyworkItem*> &filters,
+                                    QString& cond,
+                                    QHash<QString, QString> &bindValues,
+                                    const DbModel* parentModel = nullptr
+                                    );
+    virtual ErrCode filter(const QList<FilterKeyworkItem*> &filters,
+                           const DbModelBuilder& builder,
+                           const DbModel* parentModel = nullptr,
+                           QList<DbModel*>* outList = nullptr,
+                           qint64 dbStatus = DB_RECORD_ACTIVE,
+                           int from = 0,
+                           int noItems = 0,
+                           int* total = nullptr);
+
     virtual ErrCode updateQueryromFields(const QHash<QString, QString>& fields,
                                          QSqlQuery &query,
                                          bool isMatchAllField = false,
@@ -260,6 +275,8 @@ protected:
     virtual QString getSearchQueryString(const QString& cond = nullptr);
     virtual QString getSearchQueryStringWithTag(const QString& cond = nullptr, const QString& tag = nullptr);
     virtual QString getFilterQueryString(int fieldId, const QString& cond = nullptr);
+    virtual QString getFilterQueryString(const QList<FilterKeyworkItem *> &filters,
+                                         const QString& cond = nullptr);
     virtual QSqlQuery *getAllQuery(qint64 dbstatus = DB_RECORD_ACTIVE);
     virtual QString getAllQueryString(qint64 dbstatus = DB_RECORD_ACTIVE);
     virtual DbModelBuilder mainModelBuilder();

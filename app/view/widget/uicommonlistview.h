@@ -96,7 +96,13 @@ protected:
                          const QString& catetory,
                          qint64 opFlags,
                          const QString& keywords, const QVariant *value);
-
+    virtual ErrCode _onFilter(ModelController* ctrl,
+                          int catetoryid,
+                          qint64 opFlags,
+                          const QString& keywords,
+                          const char* targetModelName = nullptr,
+                          const DbModel* parentModel = nullptr,
+                          QList<DbModel*>* outList = nullptr);
 
     virtual ErrCode onMenuActionImport(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionExport(QMenu *menu, UITableMenuAction *act);

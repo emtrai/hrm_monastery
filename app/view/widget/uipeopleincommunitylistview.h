@@ -56,6 +56,13 @@ protected:
     virtual ErrCode onAddItem(UITableCellWidgetItem *item);
 
     virtual QList<DbModel*> getListDbModels();
+    virtual ErrCode _onFilter(ModelController* ctrl,
+                              int catetoryid,
+                              qint64 opFlags,
+                              const QString& keywords,
+                              const char* targetModelName = nullptr,
+                              const DbModel* parentModel = nullptr,
+                              QList<DbModel*>* outList = nullptr);
 private:
     qint64 mModelStatus;
 };

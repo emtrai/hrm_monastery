@@ -57,7 +57,7 @@ public:
     const QString &courseName() const;
     void setCourseName(const QString &newCourseName);
 
-    virtual void dump();
+    virtual void dump() const;
 
     qint64 startDate() const;
     void setStartDate(qint64 newStartDate);

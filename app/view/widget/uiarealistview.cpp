@@ -150,7 +150,7 @@ ErrCode UIAreaListView::onEditItem(UITableCellWidgetItem *item)
     tracein;
     ErrCode err = ErrNone;
     if (item) {
-        DbModel* area = item->itemData();
+        const DbModel* area = item->itemData();
         if (area && area->modelName() == KModelNameArea) {
             MainWindow::showAddEditArea(true, area, this);
         } else {
@@ -184,8 +184,8 @@ ErrCode UIAreaListView::onMenuActionViewContactPeople(QMenu *menu, UITableMenuAc
     tracein;
     UNUSED(menu);
     ErrCode ret = ErrNone;
-    Area* area = nullptr;
-    DbModel* dataModel = nullptr;
+    const Area* area = nullptr;
+    const DbModel* dataModel = nullptr;
     UIAreaContactPeopleListView* view = nullptr;
     if (act) {
         dataModel = act->getData();
@@ -200,7 +200,7 @@ ErrCode UIAreaListView::onMenuActionViewContactPeople(QMenu *menu, UITableMenuAc
     }
 
     if (ret == ErrNone) {
-        area = dynamic_cast<Area*>(act->getData());
+        area = dynamic_cast<const Area*>(dataModel);
     }
     if (ret == ErrNone) {
         view = (UIAreaContactPeopleListView*)

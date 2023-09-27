@@ -70,6 +70,7 @@ const char* const KModelNameWork = "model@work"; //
 
 const char* const KModelNameIdNone = "KHONG";
 const char* const KModelNameIdNone2 = "VN_KHONG";
+const char* const KModelNameHoiDong = "HOI_DONG";
 
 const char* const KUidNone = "";
 const char* const KNameIdUnkown = "KHONG_XAC_DINH";

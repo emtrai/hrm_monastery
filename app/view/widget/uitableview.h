@@ -40,12 +40,9 @@ namespace Ui {
 class UITableView;
 }
 
-//enum MenuAction {
-//    ACTION_NEW,
-//    ACTION_DELETE,
-//    ACTION_MAX
-//};
-
+/**
+ * @brief A item (line) in table list view
+ */
 class UITableItem
 {
 public:
@@ -57,22 +54,22 @@ public:
     const QStringList &valueList() const;
     void setValueList(const QStringList &newValueList);
 
-    DbModel *data() const;
+    const DbModel *data() const;
     UITableItem* clone();
     void clone(const UITableItem* item);
 
 private:
     UITableItem();
     UITableItem(const UITableItem& item);
-    UITableItem(DbModel* data);
+    UITableItem(const DbModel* data);
 private:
-    QStringList mValueList;
-    DbModel* mData;
+    QStringList mValueList;// list of display value of each cell
+    DbModel* mData; // data ow by table item, will be released in destructor
 };
 
 
 /**
- * @brief Re-present for a item in table
+ * @brief Re-present for an item cell in table
  */
 class UITableCellWidgetItem: public QTableWidgetItem
 {
@@ -80,7 +77,7 @@ public:
     UITableCellWidgetItem(const QString &text);
     static UITableCellWidgetItem* build(const QString& txt, qint32 itemIdx = 0, qint32 idx = 0, UITableItem* mItem = nullptr);
     UITableItem *item() const;
-    DbModel *itemData() const;
+    const DbModel *itemData() const;
     void setItem(UITableItem *newItem);
     qint32 itemIdx() const;
     void setItemIdx(qint32 newItemIdx);
@@ -111,7 +108,7 @@ public:
 
     const std::function<ErrCode (QMenu *, UITableMenuAction *)> &callback() const;
     UITableMenuAction* setCallback(const std::function<ErrCode (QMenu *, UITableMenuAction *)> &newCallback);
-    DbModel* getData();
+    const DbModel* getData();
     UITableMenuAction* addItemList(UITableItem* newItemList);
 
     UITableMenuActionType menuType() const;
@@ -240,7 +237,6 @@ protected:
      * @return
      */
     virtual QList<UITableMenuAction*> getMenuMultiSelectedItemActions(const QMenu* menu, const QList<UITableItem *>& items);
-//    virtual ErrCode onMenuActionTrigger(QMenu* menu, UITableMenuAction*);
     virtual ErrCode onMenuActionAdd(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionDelete(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionEdit(QMenu* menu, UITableMenuAction* act);
@@ -256,6 +252,7 @@ protected:
      * @return >= 0: the number of items, < 0: error
      */
     virtual int onFilter(int catetoryid, const QString& catetory, qint64 opFlags, const QString& keywords, const QVariant *value);
+    virtual int onFilter(const QList<FilterKeyworkItem*> &filters);
     virtual ErrCode setFilter(const QString& item, const QString& keywords, const QVariant *value);
 
     virtual QHash<int, QString> getFilterFields();
@@ -290,7 +287,6 @@ private slots:
     void on_tblList_itemDoubleClicked(QTableWidgetItem *item);
     void customMenuRequested(QPoint pos);
     void on_btnFilter_clicked();
-//    void on_cbKeyword_returnPressed();
 
     void on_btnAdd_clicked();
 

@@ -920,7 +920,7 @@ ErrCode Person::fromCSVFile(const QString &fname)
 
 }
 
-DataExporter *Person::getExporter()
+const DataExporter *Person::getExporter() const
 {
     return this;
 }
@@ -1424,7 +1424,7 @@ void Person::setNationalityName(const QString &newNationalityName)
     CHECK_MODIFIED_THEN_SET(mNationalityName, newNationalityName, KItemNationality);
 }
 
-void Person::dump()
+void Person::dump() const
 {
     tracein;
     DbModel::dump();

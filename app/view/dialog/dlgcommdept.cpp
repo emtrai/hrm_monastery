@@ -199,7 +199,7 @@ DbModel *DlgCommDept::community() const
     return mCommunity;
 }
 
-void DlgCommDept::setCommunity(DbModel *newCommunity)
+void DlgCommDept::setCommunity(const DbModel *newCommunity)
 {
     if (mCommunity) delete mCommunity;
     if (newCommunity) {

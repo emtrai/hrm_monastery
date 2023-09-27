@@ -71,7 +71,7 @@ public:
     const QString &tmpDirPath() const;
 
     static void cleanUpData();
-    virtual QString getName();
+    virtual QString getName() const;
     virtual ErrCode onLoad();
     virtual void onUnload();
 

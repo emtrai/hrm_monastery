@@ -240,7 +240,7 @@ ErrCode UIAreaContactPeopleListView::onEditItem(UITableCellWidgetItem *item)
     tracein;
     ErrCode err = ErrNone;
     DlgAreaPerson* dlg = nullptr;
-    DbModel* model = nullptr;
+    const DbModel* model = nullptr;
     Area* ar = area();
     if (!item) {
         loge("Invalid argument");

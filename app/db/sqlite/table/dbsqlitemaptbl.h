@@ -85,6 +85,12 @@ protected:
                                     int& dataType,
                                     bool& isExact
                                     );
+
+    virtual ErrCode filterFieldCond(const QList<FilterKeyworkItem*> &filters,
+                                    QString& cond,
+                                    QHash<QString, QString> &bindValues,
+                                    const DbModel* parentModel = nullptr
+                                    );
 protected:
     QString mFieldNameUid1;
     QString mFieldNameDbId1;

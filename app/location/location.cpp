@@ -112,7 +112,7 @@ ErrCode Location::onCsvParseOneItemCallback(const QStringList &items, void* call
     return getInstance()->doCsvParseOneItem(items, param);
 }
 
-QString Location::getName()
+QString Location::getName() const
 {
     return "Location";
 }

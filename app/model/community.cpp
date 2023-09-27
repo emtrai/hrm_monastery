@@ -357,13 +357,16 @@ DbModelHandler *Community::getDbModelHandler() const
 bool Community::allowRemove(QString *msg)
 {
     tracein;
-    bool allow = (level() != 0) || (!mParentUid.isEmpty());
+    bool allow = ((level() != 0) || !mParentUid.isEmpty()) && (nameId() != KModelNameHoiDong);
     logd("level %d, parent uid '%s', allow %d", level(), STR2CHA(mParentUid), allow); // TODO: level only is enought???
     if (msg) {
         if (level() == 0 && !mParentUid.isEmpty()) {
             loge("Not allow to delete root community");
             *msg = QObject::tr("Không được phép xóa cộng đoàn gốc");
         }
+    }
+    if (!allow) {
+        loge("not allow to delete '%s'", MODELSTR2CHA(this));
     }
     traceout;
     return allow; // not allow to deleve root community, only update is allowed
@@ -768,7 +771,7 @@ bool Community::isValid()
     return !name().isEmpty() && !nameId().isEmpty();
 }
 
-void Community::dump()
+void Community::dump() const
 {
     tracein;
 #ifdef DEBUG_TRACE
@@ -780,7 +783,7 @@ void Community::dump()
     logd("- Feastday %s", DatetimeUtils::date2String(mFeastDate).toStdString().c_str());
     logd("- CEO Uid %s", currentCEOUid().toStdString().c_str());
     logd("- Aread uid %s", areaUid().toStdString().c_str());
-    logd("- Aread name %s", areaName().toStdString().c_str());
+//    logd("- Aread name %s", areaName().toStdString().c_str());
     logd("- Status %d", getStatus());
 #endif //DEBUG_TRACE
 }

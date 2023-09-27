@@ -55,7 +55,7 @@ void BackupCtl::onUnload()
     traced;
 }
 
-QString BackupCtl::getName()
+QString BackupCtl::getName() const
 {
     return KControllerBackup;
 }

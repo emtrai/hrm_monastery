@@ -104,7 +104,7 @@ public:
     ErrCode setFeastDateFromString(const QString& date, const QString& format="D.M");
 
     virtual bool isValid();
-    virtual void dump();
+    virtual void dump() const;
     const QString &imgPath() const;
     void setImgPath(const QString &newImgPath);
 

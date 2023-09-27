@@ -68,7 +68,7 @@ IDatabase *DbCtl::database() const
     return mDatabase;
 }
 
-QString DbCtl::getName()
+QString DbCtl::getName() const
 {
     return KControllerDb;
 }

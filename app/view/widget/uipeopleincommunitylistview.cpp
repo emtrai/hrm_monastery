@@ -64,8 +64,8 @@ ErrCode UIPeopleInCommunityListView::onEditItem(UITableCellWidgetItem *item)
 {
     tracein;
     ErrCode err = ErrNone;
-    DbModel* model = nullptr;
-    CommunityPerson* commPer = nullptr;
+    const DbModel* model = nullptr;
+    const CommunityPerson* commPer = nullptr;
 
     if (!item) {
         err = ErrInvalidArg;
@@ -83,7 +83,7 @@ ErrCode UIPeopleInCommunityListView::onEditItem(UITableCellWidgetItem *item)
     }
     if (err == ErrNone) {
         if (model->modelName() == KModelNameCommPerson) {
-            commPer = (CommunityPerson*) model;
+            commPer = (const CommunityPerson*) model;
         } else {
             err = ErrIncompatible;
             loge("Invalid model name, model '%s'", MODELSTR2CHA(model));
@@ -188,6 +188,30 @@ QList<DbModel *> UIPeopleInCommunityListView::getListDbModels()
     traceout;
     return ret;
 }
+
+ErrCode UIPeopleInCommunityListView::_onFilter(ModelController *ctrl,
+                                               int catetoryid, qint64 opFlags,
+                                               const QString &keywords,
+                                               const char *targetModelName,
+                                               const DbModel *parentModel,
+                                               QList<DbModel *> *outList)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    QList<FilterKeyworkItem*> filters;
+    if (!mModelStatus) {
+        err = UICommonListView::_onFilter(ctrl, catetoryid, opFlags, keywords,
+                                          targetModelName, parentModel, outList);
+    } else {
+        filters.append(new FilterKeyworkItem(catetoryid, opFlags, keywords));
+        filters.append(new FilterKeyworkItem(FILTER_FIELD_MODEL_STATUS, FILTER_OP_EQUAL, QString::number(mModelStatus)));
+        err = ctrl->filter(filters,targetModelName, parentModel, outList);
+    }
+    RELEASE_LIST(filters, FilterKeyworkItem);
+    traceret(err);
+    return err;
+}
+
 
 Community *UIPeopleInCommunityListView::community() const
 {

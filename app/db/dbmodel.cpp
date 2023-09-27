@@ -472,7 +472,7 @@ void DbModel::setMarkModified(bool newMarkModified)
     mMarkModified = newMarkModified;
 }
 
-ErrCode DbModel::exportToFile(ExportType type, QString *fpath)
+ErrCode DbModel::exportToFile(ExportType type, QString *fpath) const
 {
     tracein;
     ErrCode ret = ErrNone;
@@ -786,7 +786,7 @@ bool DbModel::isValid()
     return isValid;
 }
 
-void DbModel::dump()
+void DbModel::dump() const
 {
     tracein;
     // TODO: dump to stdout, sdderr or file???
@@ -808,7 +808,7 @@ QString DbModel::toString() const
         .arg(modelName(), uid(), nameId(),name());
 }
 
-QString DbModel::getName()
+QString DbModel::getName() const
 {
     return modelName();
 }
@@ -824,7 +824,7 @@ void DbModel::setNameId(const QString &newNameId)
     markItemAsModified(KItemNameId);
 }
 
-DataExporter *DbModel::getExporter()
+const DataExporter *DbModel::getExporter() const
 {
     return this;
 }
