@@ -140,14 +140,14 @@ ErrCode Image::loadImageFromUid(const QString &uid, const QString& tag)
         loge("path from uid '%s' failed", STR2CHA(uid));
         err = ErrFailed;
     }
-    if (err == ErrNone && !QFile::exists(fpath)) {
+    if (err == ErrNone && !QFileInfo::exists(fpath)) {
         err = ErrNotExist;
         loge("file '%s' not exist", STR2CHA(fpath));
     }
     if (err == ErrNone) {
         thumbPath = THUMB_IMG_PATH(fpath);
         logd("thumPath '%s'", STR2CHA(thumbPath));
-        if (!QFile::exists(thumbPath)) {
+        if (!QFileInfo::exists(thumbPath)) {
             err = ErrNotExist;
             loge("file thump '%s' not exist", STR2CHA(thumbPath));
         }

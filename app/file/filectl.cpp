@@ -54,9 +54,9 @@ void FileCtl::init()
     tracein;
 }
 
-QString FileCtl::getAppWorkingDataDir(const QString &subDir)
+QString FileCtl::getAppDataSubdir(const QString& dirName, const QString &subDir)
 {
-    QString appPath = FileCtl::getAppDataDir(KWorkingDirName);
+    QString appPath = FileCtl::getAppDataDir(dirName);
     QDir appDirPath(appPath);
     logd("App path %s", appPath.toStdString().c_str());
 
@@ -72,7 +72,23 @@ QString FileCtl::getAppWorkingDataDir(const QString &subDir)
     }
 }
 
+QString FileCtl::getAppWorkingDataDir(const QString &subDir)
+{
+    return getAppDataSubdir(KWorkingDirName, subDir);
+}
+
 QString FileCtl::getAppWorkingDataDir()
+{
+    traced;
+    return getAppWorkingDataDir(QString());
+}
+
+QString FileCtl::getAppBackupDataDir(const QString &subDir)
+{
+    return getAppDataSubdir(KBackupDirName, subDir);
+}
+
+QString FileCtl::getAppBackupDataDir()
 {
     traced;
     return getAppWorkingDataDir(QString());

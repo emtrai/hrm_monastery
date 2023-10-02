@@ -47,7 +47,7 @@ UICommonListView::UICommonListView(QWidget *parent):
 UICommonListView::~UICommonListView()
 {
     tracein;
-    RELEASE_LIST_DBMODEL(mItemList);
+    RELEASE_LIST_DBMODEL(mModelList);
     FREE_PTR(mParentModel);
     traceout;
 }
@@ -135,7 +135,7 @@ ErrCode UICommonListView::getListTableRowItems(
     UNUSED(page);
     UNUSED(perPage);
     UNUSED(totalPages);
-    foreach (DbModel* item, mItemList) {
+    foreach (DbModel* item, mModelList) {
         UITableItem* tblItem = UITableItem::build(item);
         if (tblItem) {
             err = fillValueTableRowItem(item, tblItem, ++idx);
@@ -185,10 +185,10 @@ ErrCode UICommonListView::fillValueTableRowItem(DbModel *item, UITableItem *tblI
     return err;
 }
 
-void UICommonListView::onUpdatePageDone(qint32 page, qint32 totalpages, qint32 totalItems)
+void UICommonListView::onUpdatePageDone(ErrCode err, qint32 page, qint32 totalpages, qint32 totalItems)
 {
     tracein;
-    UITableView::onUpdatePageDone(page, totalpages, totalItems);
+    UITableView::onUpdatePageDone(err, page, totalpages, totalItems);
     logd("Sort %d", mSortItem);
     if (mSortItem) {
         // data from db was sorted, by data is stored in hashlist, which is not sorted
@@ -200,10 +200,10 @@ void UICommonListView::onUpdatePageDone(qint32 page, qint32 totalpages, qint32 t
     traceout;
 }
 
-qint32 UICommonListView::getTotalItems()
+qint32 UICommonListView::getTotalModelItems()
 {
     tracein;
-    return mItemList.count();
+    return mModelList.count();
 }
 
 QList<DbModel *> UICommonListView::getListDbModels()
@@ -226,7 +226,7 @@ ErrCode UICommonListView::onLoad()
     tracein;
     ErrCode err = ErrNone;
     if (ready2FetchData()) {
-        RELEASE_LIST_DBMODEL(mItemList);
+        RELEASE_LIST_DBMODEL(mModelList);
         if (mFilterList.size() > 0) {
             logd("Do filter");
             foreach (FilterItem* item, this->mFilterList) {
@@ -241,7 +241,7 @@ ErrCode UICommonListView::onLoad()
             RELEASE_LIST(mFilterList, FilterItem);
         } else {
             logd("load all data");
-            mItemList = getListDbModels();
+            mModelList = getListDbModels();
             clearFilter();
         }
         err = ErrNone;
@@ -354,7 +354,7 @@ int UICommonListView::onFilter(int catetoryid, const QString &catetory,
             err = ErrInvalidModel;
         }
         if (err == ErrNone) {
-            RELEASE_LIST_DBMODEL(mItemList);
+            RELEASE_LIST_DBMODEL(mModelList);
             QString searchKeyWork;
             if (value && value->isValid()) {
                 searchKeyWork = value->toString();
@@ -372,13 +372,13 @@ int UICommonListView::onFilter(int catetoryid, const QString &catetory,
                             opFlags, searchKeyWork,
                             modelName.toStdString().c_str(),
                             mParentModel,
-                            &mItemList);
+                            &mModelList);
         }
         logd("filter err %d", err);
-        logd("mItemList cnt %lld", mItemList.count());
+        logd("mItemList cnt %lld", mModelList.count());
     }
     traceout;
-    return mItemList.count();
+    return mModelList.count();
 }
 
 ErrCode UICommonListView::_onFilter(ModelController* ctrl,
@@ -555,8 +555,8 @@ ErrCode UICommonListView::onMenuActionExport(QMenu *menu, UITableMenuAction *act
         loge("export list failed, Empty menu action");
     }
     if (err == ErrNone) {
-        if (!mItemList.empty()) {
-            err = MainWindow::exportListItems(&mItemList,
+        if (!mModelList.empty()) {
+            err = MainWindow::exportListItems(&mModelList,
                                               getMainModelName(),
                                               exportController(),
                                               QString("%1: %2").arg(STR_EXPORT_TO_FILE, getTitle()),

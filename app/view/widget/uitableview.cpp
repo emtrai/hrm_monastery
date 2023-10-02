@@ -34,6 +34,341 @@
 #include "viewutils.h"
 #include "stringdefs.h"
 
+
+/****************************************************************************
+ * UITableItem
+ ****************************************************************************/
+
+UITableItem::UITableItem(const DbModel* data):UITableItem()
+{
+    tracein;
+    mData = CLONE_DBMODEL(data);
+    traceout;
+}
+
+UITableItem::UITableItem():mData(nullptr)
+{
+    traced;
+}
+
+UITableItem::UITableItem(const UITableItem &item):UITableItem()
+{
+    tracein;
+    clone(&item);
+    traceout;
+}
+
+UITableItem::~UITableItem()
+{
+    tracein;
+    FREE_PTR(mData);
+    traceout;
+}
+
+UITableItem *UITableItem::build(const DbModel *data)
+{
+    return new UITableItem(data);
+}
+
+UITableItem *UITableItem::addValue(const QString &val)
+{
+    // accept null/empty value as it's empty value
+    mValueList.append(val);
+    return this;
+}
+
+const DbModel *UITableItem::data() const
+{
+    return mData;
+}
+
+UITableItem *UITableItem::clone()
+{
+    tracein;
+    UITableItem* item = new UITableItem();
+    if (item) {
+        item->clone(this);
+    } else {
+        loge("failed to clone, no memory to allocate new UITableItem?");
+    }
+    traceout;
+    return item;
+}
+
+void UITableItem::clone(const UITableItem *item)
+{
+    tracein;
+    if (item) {
+        FREE_PTR(mData);
+        mData = CLONE_DBMODEL(item->mData);
+        mValueList = item->mValueList;
+    } else {
+        loge("failed to clone, invalid value");
+    }
+    traceout;
+}
+
+
+const QStringList &UITableItem::valueList() const
+{
+    return mValueList;
+}
+
+
+/****************************************************************************
+ * UITableCellWidgetItem
+ ****************************************************************************/
+
+
+UITableCellWidgetItem::UITableCellWidgetItem(const QString &text):
+    QTableWidgetItem(text),
+    mItem(nullptr),
+    mItemIdx(0),
+    mIdx(0)
+{}
+
+UITableCellWidgetItem *UITableCellWidgetItem::build(const QString &txt,
+                                                    qint32 itemIdx,
+                                                    qint32 idx,
+                                                    UITableItem *item)
+{
+    UITableCellWidgetItem* wg = new UITableCellWidgetItem(txt);
+    wg->setItem(item);
+    wg->setItemIdx(itemIdx);
+    wg->setIdx(idx);
+    return wg; // TODO: when this item is deleted??? check carefuly please
+}
+
+UITableItem *UITableCellWidgetItem::item() const
+{
+    return mItem;
+}
+
+const DbModel *UITableCellWidgetItem::itemData() const
+{
+    tracein;
+    const DbModel* model = nullptr;
+    if (mItem != nullptr) {
+        model = mItem->data();
+    } else {
+        logd("mItem is nullptr");
+    }
+    traceout;
+    return model;
+}
+
+void UITableCellWidgetItem::setItem(UITableItem *newItem)
+{
+    mItem = newItem;
+}
+
+qint32 UITableCellWidgetItem::itemIdx() const
+{
+    return mItemIdx;
+}
+
+void UITableCellWidgetItem::setItemIdx(qint32 newItemIdx)
+{
+    mItemIdx = newItemIdx;
+}
+
+qint32 UITableCellWidgetItem::idx() const
+{
+    return mIdx;
+}
+
+void UITableCellWidgetItem::setIdx(qint32 newIdx)
+{
+    mIdx = newIdx;
+}
+
+
+/****************************************************************************
+ * UITableMenuAction
+ ****************************************************************************/
+
+UITableMenuAction::UITableMenuAction(QObject *parent):
+    QAction(parent),
+    mTblCellItem(nullptr),
+    mMenuType(MENU_ACTION_NORMAL),
+    isMultiSelectedItem(false)
+{
+
+}
+
+UITableMenuAction::~UITableMenuAction()
+{
+    tracein;
+    RELEASE_LIST(mItemList, UITableItem);
+    traceout;
+}
+
+UITableMenuAction::UITableMenuAction(const QString &text, QObject *parent):
+    QAction(text, parent),
+    mTblCellItem(nullptr),
+    mMenuType(MENU_ACTION_NORMAL)
+{
+    tracein;
+}
+
+UITableCellWidgetItem *UITableMenuAction::tblItem() const
+{
+    return mTblCellItem;
+}
+
+UITableMenuAction* UITableMenuAction::setTblCellItem(UITableCellWidgetItem *newTblItem)
+{
+    mTblCellItem = newTblItem;
+    return this;
+}
+
+UITableMenuAction *UITableMenuAction::build(const QString &text, QObject *parent,
+                                            UITableCellWidgetItem *item, qint32 idx)
+{
+    tracein;
+    UNUSED(idx);
+    // TODO: should has ID for menu/action? so that other can judge state of action/menu, i.e. should in disable state or not
+    UITableMenuAction* menu = new UITableMenuAction(text, parent);
+    if (menu) {
+        if (item) {
+            menu->addItemList(item->item());
+            menu->setTblCellItem(item);
+        } else {
+            logd("item is null");
+        }
+        menu->setIsMultiSelectedItem(false);
+    } else {
+        loge("No memory to allocate UITableMenuAction");
+    }
+    traceout;
+    return menu;
+}
+
+UITableMenuAction *UITableMenuAction::buildMultiItem(const QString &text, QObject *parent,
+                                                     const QList<UITableItem *> *items, qint32 idx)
+{
+    tracein;
+    UNUSED(idx);
+    UITableMenuAction* menu = new UITableMenuAction(text, parent);
+    if (menu) {
+        if (items != nullptr && !items->empty()) {
+            foreach (UITableItem* item, *items) {
+                menu->addItemList(item);
+            }
+        } else {
+            logd("Not UITableItem to add");
+        }
+        menu->setIsMultiSelectedItem(true);
+    } else {
+        loge("no memory to build UITableMenuAction");
+    }
+    traceout;
+    return menu;
+}
+
+UITableMenuAction *UITableMenuAction::buildSeparateAction()
+{
+    tracein;
+    UITableMenuAction* act = new UITableMenuAction();
+    if (act) {
+        act->setMenuType(MENU_ACTION_SEPARATE);
+    } else {
+        loge("no memory to allocate UITableMenuAction");
+    }
+    traceout;
+    return act;
+}
+
+const QList<UITableItem *> &UITableMenuAction::itemList() const
+{
+    return mItemList;
+}
+
+/**
+ * @brief Get item data (model).
+ *        NOTE: Data is cloned, so caller MUST FREE after use (i.e. use RELEASE_LIST_DBMODEL)
+ * @param outList
+ * @return the number of item
+ */
+int UITableMenuAction::itemListData(QList<DbModel *>&outList)
+{
+    tracein;
+    if (mItemList.count() > 0) {
+        logd("selected %lld items", mItemList.count());
+        foreach (UITableItem* item, mItemList) {
+            if (item->data() != nullptr) {
+                outList.append(item->data()->clone());
+            }
+        }
+    } else {
+        logi("no selected item for menu");
+    }
+    traceret(outList.count());
+    return outList.count();
+}
+
+bool UITableMenuAction::getIsMultiSelectedItem() const
+{
+    return isMultiSelectedItem;
+}
+
+void UITableMenuAction::setIsMultiSelectedItem(bool newIsMultiSelectedItem)
+{
+    isMultiSelectedItem = newIsMultiSelectedItem;
+}
+
+const std::function<ErrCode (QMenu *, UITableMenuAction *)> &UITableMenuAction::callback() const
+{
+    return mCallback;
+}
+
+UITableMenuAction* UITableMenuAction::setCallback(const std::function<ErrCode (QMenu *, UITableMenuAction *)> &newCallback)
+{
+    mCallback = newCallback;
+    return this;
+}
+
+const DbModel *UITableMenuAction::getData()
+{
+    const DbModel* ret = nullptr;
+    if (mTblCellItem != nullptr) {
+        UITableItem* item = mTblCellItem->item();
+        if (item != nullptr) {
+            ret = item->data();
+        } else {
+            loge("invalid UITableItem, null?");
+        }
+    } else {
+        loge("invaid mTblCellItem item");
+    }
+    return ret;
+}
+
+UITableMenuAction *UITableMenuAction::addItemList(UITableItem *newItemList)
+{
+    tracein;
+    if (newItemList != nullptr) {
+        mItemList.append(newItemList->clone());
+    }
+    traceout;
+    return this;
+}
+
+UITableMenuActionType UITableMenuAction::menuType() const
+{
+    return mMenuType;
+}
+
+void UITableMenuAction::setMenuType(UITableMenuActionType newMenuType)
+{
+    mMenuType = newMenuType;
+}
+
+/****************************************************************************
+ * UITableView
+ ****************************************************************************/
+
+
 UITableView::UITableView(QWidget *parent) :
     QFrame(parent),
     BaseView(),
@@ -62,20 +397,18 @@ UITableView::UITableView(QWidget *parent) :
                  SLOT(onRequestReload()))) {
         loge("Failed to connect signalRequestReload to onRequestReload");
     }
-//    QObject::connect(ui->cbKeyword, SIGNAL(returnPressed()), this, SLOT(on_cbKeyword_returnPressed()));
 }
 
 UITableView::~UITableView()
 {
     tracein;
-    if (mMenu != nullptr){
-        // TODO: action may be allocated, need to check again if action is really clear???
-        // see: https://doc.qt.io/qt-6/qmenu.html#clear
-        mMenu->clear();
-        delete mMenu;
-    }
-
+    // TODO: action may be allocated, need to check again if action is really clear???
+    // see: https://doc.qt.io/qt-6/qmenu.html#clear
+    cleanupMenuActions();
+    if (mMenu) mMenu->clear();
+    FREE_PTR(mMenu);
     RELEASE_LIST(mFilterList, FilterItem);
+    cleanupTableItems();
     delete ui;
     traceout;
 }
@@ -129,6 +462,8 @@ void UITableView::reload()
     if (!mSuspendReloadOnDbUpdate) {
         onReload();
         onUpdatePage(1);
+    } else {
+        logi("reload is temporary suspended");
     }
     traceout;
 }
@@ -151,7 +486,7 @@ void UITableView::showEvent(QShowEvent *ev)
     traceout;
 }
 
-void UITableView::onUpdatePage(qint32 page)
+ErrCode UITableView::onUpdatePage(qint32 page)
 {
     QTableWidget* tbl = ui->tblList;
     qint32 totalPages = 0;
@@ -161,67 +496,62 @@ void UITableView::onUpdatePage(qint32 page)
     // TODO: is it really remove all data?
     // Is there any risk of leakage memory here??
     logd("Clear all");
-    tbl->clearContents();
-    tbl->model()->removeRows(0, tbl->rowCount());
-    // TODO: clear saints???
+    cleanupTableItems();
 
-//    if (mFpTotalDataReq == nullptr || mFpDataReq == nullptr)
-//        return;
-
-    qint32 total = getTotalItems();
+    qint32 total = getTotalModelItems();
     if (total > 0){
         // TODO: remove paging, as it not need????
         qint32 perPage = ((mItemPerPage != 0) && (mItemPerPage < total))?mItemPerPage:total;
         totalPages = total/perPage;
         logd("total %d perpage %d totaPage %d", total, perPage, totalPages);
-        QList<UITableItem*> items;
-        err = getListTableRowItems(page, perPage, totalPages, items);
-        int idx = tbl->rowCount();
-        foreach (UITableItem* item, items){
-            tbl->insertRow(idx);
-            QStringList values = item->valueList();
-            for (int i = 0; i < values.count(); ++i) {
-                tbl->setItem(idx, i, UITableCellWidgetItem::build(values.value(i), i, idx, item));
-
+        err = getListTableRowItems(page, perPage, totalPages, mItemList);
+        if (err == ErrNone) {
+            int idx = tbl->rowCount();
+            foreach (UITableItem* item, mItemList){
+                if (!item) continue;
+                tbl->insertRow(idx);
+                QStringList values = item->valueList();
+                for (int i = 0; i < values.count(); ++i) {
+                    UITableCellWidgetItem* cell =
+                        UITableCellWidgetItem::build(values.value(i), i, idx, item);
+                    if (!cell) {
+                        loge("No memory to allocate cell");
+                        err = ErrNoMemory;
+                        break;
+                    }
+                    tbl->setItem(idx, i, cell);
+                }
+                if (err != ErrNone) {
+                    break;
+                }
+                idx ++;
             }
-
-            idx ++;
+        } else {
+            loge("failed to get list of table row items, err %d", err);
         }
     }
-    onUpdatePageDone(total, totalPages, total);
+    onUpdatePageDone(err, total, totalPages, total);
     traceout;
+    return err;
 }
 
-void UITableView::onUpdatePageDone(qint32 page, qint32 totalpages, qint32 totalItems)
+void UITableView::onUpdatePageDone(ErrCode err, qint32 page, qint32 totalpages, qint32 totalItems)
 {
     tracein;
+    UNUSED(err);
+    UNUSED(page);
+    UNUSED(totalpages);
+    UNUSED(totalItems);
     logd("page %d, totalPages %d, totalItems %d", page, totalpages, totalItems);
     traceout;
 }
 
 QList<UITableItem *> UITableView::getListAllTableRowItems()
 {
-    tracein;
-    QList<UITableItem*> items;
-    ErrCode err = ErrNone;
-    // TODO: fix me please!!!
-    qint32 total = getTotalItems();
-    logd("total item %d", total);
-    if (total > 0){
-        // TODO: remove paging, as it not need????
-        qint32 perPage = ((mItemPerPage != 0) && (mItemPerPage < total))?mItemPerPage:total;
-        qint32 totalPages = total/perPage;
-        logd("total %d perpage %d totaPage %d", total, perPage, totalPages);
-
-        err = getListTableRowItems(0, perPage, totalPages, items);
-    } else {
-        logd("Not item to load");
-    }
-    tracein;
-    return items;
+    return mItemList;
 }
 
-qint32 UITableView::getTotalItems()
+qint32 UITableView::getTotalModelItems()
 {
     return 0;
 }
@@ -240,24 +570,21 @@ ErrCode UITableView::onReload()
 
 void UITableView::importRequested(const QString& fpath)
 {
-    tracein;
+    UNUSED(fpath);
 }
 
 ErrCode UITableView::onViewItem(UITableCellWidgetItem *item)
 {
-    tracein;
+    UNUSED(item);
     logd("parent class, nothing to do");
-    traceout;
     return ErrNoData;
 }
 
 ErrCode UITableView::onEditItem(UITableCellWidgetItem *item)
 {
-    tracein;
-    ErrCode err = ErrNone;
+    UNUSED(item);
     logd("parent class, nothing to do");
-    traceret(err);
-    return err;
+    return ErrNone;
 
 }
 
@@ -317,16 +644,6 @@ ErrCode UITableView::onDeleteItem(const QList<UITableItem *>& selectedItems)
                     emit this->signalDeleteDone(err, errMsg);
                     return err;
                 });
-//            logd("delete result %d", err);
-//            if (err != ErrNone) {
-//                loge("failed to delete item, err=%d", err);
-////                DialogUtils::showErrorBox(QString(tr("Lỗi, mã lỗi: %1")).arg(err));
-//            } else {
-//                logi("Deleted %d item", cnt);
-//                DialogUtils::showMsgBox(QString(tr("Đã xóa '%1' mục")).arg(cnt));
-//                mSuspendReloadOnDbUpdate = false;
-//                reload();
-//            }
         }
     }
 
@@ -341,6 +658,26 @@ ErrCode UITableView::onAddItem(UITableCellWidgetItem *item)
     return ErrNone;
 }
 
+ErrCode UITableView::addMenuActionCallback(QList<UITableMenuAction *> &actionList)
+{
+    logd("Add callback for menu action, no. item %ld", actionList.size());
+    foreach (UITableMenuAction* act, actionList) {
+        if (act->menuType() != MENU_ACTION_SEPARATE) {
+            logd("connect for act '%s'", STR2CHA(act->text()));
+            disconnect(SIGNAL(QAction::triggered), this);
+            connect(act, &QAction::triggered, this, [this, act](){
+                QAction *sentAct = qobject_cast<QAction *>(sender());
+                logd("lambda trigger call for menu sentAct '%s'", STR2CHA(sentAct->text()));
+                logd("lambda trigger call for menu '%s'", STR2CHA(act->text()));
+                act->callback()(this->menu(), act);
+                // TODO: handle return???
+            });
+        } else {
+            logd("action menuType separation, skip it");
+        }
+    }
+}
+
 
 QMenu* UITableView::buildPopupMenu(UITableCellWidgetItem* wgitem, const QList<UITableItem*>& items)
 {
@@ -349,39 +686,40 @@ QMenu* UITableView::buildPopupMenu(UITableCellWidgetItem* wgitem, const QList<UI
         logd("build menu actions");
         mMenu = new QMenu(this);
     }
-    mMenu->clear();
-
-    QList<UITableMenuAction*> actions = getMenuCommonActions(mMenu);
-    // TODO: cache actions for later use, to improve performance
-
-    if (items.count() > 1){
-        actions.append(UITableMenuAction::buildSeparateAction());
-        QList<UITableMenuAction*> itemActions = getMenuMultiSelectedItemActions(mMenu, items);
-        if (!itemActions.empty()) {
-            actions.append(itemActions);
+    mMenu->clear(); // just clear menu, not actions, as they're reused
+    cleanupMenuActions();
+    // TODO: cache menu action?
+    // a little bit stupid that menu item store information of model in menu action
+    // so keep/caching menu action causes data is incorrect
+    // so we need to re-create menu action with new items
+    // stupid, how can we cache????
+    if (mCommonMenuActionList.size() == 0) {
+        mCommonMenuActionList = getMenuCommonActions(mMenu);
+        addMenuActionCallback(mCommonMenuActionList);
+    }
+    mMenuActions.append(mCommonMenuActionList);
+    if (items.count() > 1) { // more than one items are selected
+        if (mMultiSelectedMenuActionList.size() == 0) {
+            mMultiSelectedMenuActionList.append(UITableMenuAction::buildSeparateAction());
+            mMultiSelectedMenuActionList = getMenuMultiSelectedItemActions(mMenu, items);
+            addMenuActionCallback(mMultiSelectedMenuActionList);
         }
+        mMenuActions.append(mMultiSelectedMenuActionList);
     } else {
         if (wgitem != nullptr){
-
-            actions.append(UITableMenuAction::buildSeparateAction());
-            QList<UITableMenuAction*> itemActions = getMenuSingleSelectedItemActions(mMenu, wgitem);
-            // add one more callback/lister to call to derived class, if item action should be in disable state or not???
-            if (!itemActions.empty()) {
-                actions.append(itemActions);
+            if (mSingleSelectedMenuActionList.size() == 0) {
+                mSingleSelectedMenuActionList.append(UITableMenuAction::buildSeparateAction());
+                mSingleSelectedMenuActionList = getMenuSingleSelectedItemActions(mMenu, wgitem);
+                addMenuActionCallback(mSingleSelectedMenuActionList);
+                // add one more callback/lister to call to derived class, if item action should be in disable state or not???
             }
+            mMenuActions.append(mSingleSelectedMenuActionList);
         }
     }
-//    mMenu->addSeparator();
-    // TODO: free memory allocated for actions!!!!
-    foreach (UITableMenuAction* act, actions) {
+    foreach (UITableMenuAction* act, mMenuActions) {
         if (act->menuType() == MENU_ACTION_SEPARATE) {
             mMenu->addSeparator();
         } else {
-            connect(act, &QAction::triggered, [this, act](){
-                logd("lambda trigger call");
-                act->callback()(this->menu(), act);
-                        // TODO: handle return???
-                });
             mMenu->addAction(act);
         }
     }
@@ -491,7 +829,6 @@ ErrCode UITableView::onMenuActionDelete(QMenu *menu, UITableMenuAction *act)
 
     if (err != ErrNone) {
         loge("delete model err %d", err);
-//        DialogUtils::showErrorBox(err, tr("Lỗi xóa dữ liệu"));
     }
     traceret(err);
     return err;
@@ -687,6 +1024,38 @@ void UITableView::requestReload()
     traceout;
 }
 
+void UITableView::cleanupTableItems()
+{
+    tracein;
+
+    QTableWidget* tbl = ui->tblList;
+    int rowCnt = tbl->rowCount();
+    int colCnt = tbl->columnCount();
+    logd("rowCnt %d colCnt %d", rowCnt, colCnt);
+    for (int i = 0; i < rowCnt; i++) {
+        for (int j = 0; j < colCnt; j++) {
+            QTableWidgetItem* item =tbl->takeItem(i, j);
+            if (item) {
+                delete item;
+            }
+        }
+    }
+    tbl->clearContents();
+    tbl->model()->removeRows(0, tbl->rowCount());
+    RELEASE_LIST(mItemList, UITableItem);
+    traceout;
+}
+
+void UITableView::cleanupMenuActions()
+{
+    tracein;
+    RELEASE_LIST(mCommonMenuActionList, UITableMenuAction);
+    RELEASE_LIST(mSingleSelectedMenuActionList, UITableMenuAction);
+    RELEASE_LIST(mMultiSelectedMenuActionList, UITableMenuAction);
+    mMenuActions.clear();
+    traceout;
+}
+
 void UITableView::onHandleSignalDeleteDone(ErrCode err, QString msg)
 {
     if (err != ErrNone) {
@@ -753,82 +1122,6 @@ void UITableView::initHeader()
 void UITableView::setHeader(const QStringList &newHeader)
 {
     mHeader = newHeader;
-}
-
-UITableItem::~UITableItem()
-{
-    tracein;
-    if (mData) delete mData;
-    traceout;
-}
-
-UITableItem *UITableItem::build(const DbModel *data)
-{
-    return new UITableItem(data);
-}
-
-UITableItem *UITableItem::addValue(const QString &val)
-{
-    mValueList.append(val);
-    return this;
-}
-
-UITableItem::UITableItem(const DbModel* data):
-    mData(nullptr)
-{
-    tracein;
-    if (data) {
-        mData = CLONE_DBMODEL(data);
-    }
-    traceout;
-}
-
-const DbModel *UITableItem::data() const
-{
-    return mData;
-}
-
-UITableItem *UITableItem::clone()
-{
-    tracein;
-    UITableItem* item = new UITableItem();
-    if (item) {
-        item->clone(this);
-    }
-    traceout;
-    return item;
-}
-
-void UITableItem::clone(const UITableItem *item)
-{
-    tracein;
-    if (item) {
-        if (mData) {
-            delete mData;
-            mData = nullptr;
-        }
-        mData = item->mData->clone();
-        mValueList = item->mValueList;
-    }
-    traceout;
-}
-
-UITableItem::UITableItem():mData(nullptr)
-{
-    tracein;
-}
-
-UITableItem::UITableItem(const UITableItem &item):UITableItem()
-{
-    tracein;
-    mData = item.mData->clone();
-    mValueList = item.mValueList;
-    traceout;
-}
-
-const QStringList &UITableItem::valueList() const
-{
-    return mValueList;
 }
 
 void UITableView::on_btnImport_clicked()
@@ -958,168 +1251,6 @@ void UITableView::on_btnFilter_clicked()
 //}
 
 
-UITableMenuAction::UITableMenuAction(QObject *parent):
-    QAction(parent),
-    mTblCellItem(nullptr),
-    mMenuType(MENU_ACTION_NORMAL),
-    isMultiSelectedItem(false)
-{
-
-}
-
-UITableMenuAction::~UITableMenuAction()
-{
-    tracein;
-    RELEASE_LIST(mItemList, UITableItem);
-    traceout;
-}
-
-UITableMenuAction::UITableMenuAction(const QString &text, QObject *parent):
-    QAction(text, parent),
-    mTblCellItem(nullptr),
-    mMenuType(MENU_ACTION_NORMAL)
-{
-    tracein;
-}
-
-UITableCellWidgetItem *UITableMenuAction::tblItem() const
-{
-    return mTblCellItem;
-}
-
-UITableMenuAction* UITableMenuAction::setTblCellItem(UITableCellWidgetItem *newTblItem)
-{
-    mTblCellItem = newTblItem;
-    return this;
-}
-
-UITableMenuAction *UITableMenuAction::build(const QString &text, QObject *parent,
-                                            UITableCellWidgetItem *item, qint32 idx)
-{
-    tracein;
-    // TODO: should has ID for menu/action? so that other can judge state of action/menu, i.e. should in disable state or not
-    UITableMenuAction* menu = new UITableMenuAction(text, parent);
-    if (item)
-        menu->addItemList(item->item());
-    else
-        logd("item is null");
-    menu->setTblCellItem(item);
-    menu->setIsMultiSelectedItem(false);
-    traceout;
-    return menu;
-}
-
-UITableMenuAction *UITableMenuAction::buildMultiItem(const QString &text, QObject *parent,
-                                                     const QList<UITableItem *> *items, qint32 idx)
-{
-    tracein;
-    UITableMenuAction* menu = new UITableMenuAction(text, parent);
-    if (items != nullptr && !items->empty()) {
-        foreach (UITableItem* item, *items) {
-            menu->addItemList(item);
-        }
-    } else {
-        logd("Not UITableItem to add");
-    }
-    menu->setIsMultiSelectedItem(true);
-    traceout;
-    return menu;
-}
-
-UITableMenuAction *UITableMenuAction::buildSeparateAction()
-{
-    tracein;
-    UITableMenuAction* act = new UITableMenuAction();
-    act->setMenuType(MENU_ACTION_SEPARATE);
-    traceout;
-    return act;
-}
-
-const QList<UITableItem *> &UITableMenuAction::itemList() const
-{
-    return mItemList;
-}
-
-/**
- * @brief Get item data (model).
- *        NOTE: Data is cloned, so caller MUST FREE after use (i.e. use RELEASE_LIST_DBMODEL)
- * @param outList
- * @return the number of item
- */
-int UITableMenuAction::itemListData(QList<DbModel *>&outList)
-{
-    tracein;
-    if (mItemList.count() > 0) {
-        logd("selected %lld items", mItemList.count());
-        foreach (UITableItem* item, mItemList) {
-            if (item->data() != nullptr) {
-                outList.append(item->data()->clone());
-            }
-        }
-    } else {
-        logi("no selected item for menu");
-    }
-    traceret(outList.count());
-    return outList.count();
-}
-
-bool UITableMenuAction::getIsMultiSelectedItem() const
-{
-    return isMultiSelectedItem;
-}
-
-void UITableMenuAction::setIsMultiSelectedItem(bool newIsMultiSelectedItem)
-{
-    isMultiSelectedItem = newIsMultiSelectedItem;
-}
-
-const std::function<ErrCode (QMenu *, UITableMenuAction *)> &UITableMenuAction::callback() const
-{
-    return mCallback;
-}
-
-UITableMenuAction* UITableMenuAction::setCallback(const std::function<ErrCode (QMenu *, UITableMenuAction *)> &newCallback)
-{
-    mCallback = newCallback;
-    return this;
-}
-
-const DbModel *UITableMenuAction::getData()
-{
-    tracein;
-    if (mTblCellItem != nullptr) {
-        UITableItem* item = mTblCellItem->item();
-        if (item != nullptr) {
-            return item->data();
-        } else {
-            loge("invalid tbl item");
-        }
-    } else {
-        loge("invaid widget item");
-    }
-    logi("invalid data");
-    return nullptr;
-}
-
-UITableMenuAction *UITableMenuAction::addItemList(UITableItem *newItemList)
-{
-    tracein;
-    if (newItemList != nullptr) {
-        mItemList.append(newItemList->clone());
-    }
-    traceout;
-    return this;
-}
-
-UITableMenuActionType UITableMenuAction::menuType() const
-{
-    return mMenuType;
-}
-
-void UITableMenuAction::setMenuType(UITableMenuActionType newMenuType)
-{
-    mMenuType = newMenuType;
-}
 
 void UITableView::on_btnAdd_clicked()
 {
@@ -1130,68 +1261,6 @@ void UITableView::on_btnAdd_clicked()
 QMenu *UITableView::menu() const
 {
     return mMenu;
-}
-
-
-UITableCellWidgetItem::UITableCellWidgetItem(const QString &text):
-    QTableWidgetItem(text),
-    mItem(nullptr),
-    mItemIdx(0),
-    mIdx(0)
-{
-//    tracein;
-}
-
-UITableCellWidgetItem *UITableCellWidgetItem::build(const QString &txt, qint32 itemIdx, qint32 idx, UITableItem *item)
-{
-    UITableCellWidgetItem* wg = new UITableCellWidgetItem(txt);
-    wg->setItem(item);
-    wg->setItemIdx(itemIdx);
-    wg->setIdx(idx);
-    return wg; // TODO: when this item is deleted??? check carefuly please
-}
-
-UITableItem *UITableCellWidgetItem::item() const
-{
-    return mItem;
-}
-
-const DbModel *UITableCellWidgetItem::itemData() const
-{
-    tracein;
-    const DbModel* model = nullptr;
-    if (mItem != nullptr) {
-        model = mItem->data();
-    } else {
-        logd("mItem is nullptr");
-    }
-    traceout;
-    return model;
-}
-
-void UITableCellWidgetItem::setItem(UITableItem *newItem)
-{
-    mItem = newItem;
-}
-
-qint32 UITableCellWidgetItem::itemIdx() const
-{
-    return mItemIdx;
-}
-
-void UITableCellWidgetItem::setItemIdx(qint32 newItemIdx)
-{
-    mItemIdx = newItemIdx;
-}
-
-qint32 UITableCellWidgetItem::idx() const
-{
-    return mIdx;
-}
-
-void UITableCellWidgetItem::setIdx(qint32 newIdx)
-{
-    mIdx = newIdx;
 }
 
 void UITableView::on_cbCategory_currentIndexChanged(int index)

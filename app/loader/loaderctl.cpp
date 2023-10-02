@@ -82,14 +82,14 @@ void LoaderCtl::registerAll()
     /* Beware, order is important*/
 //    add2Loader(Location::getInstance());
     add2Loader(SAINTCTL);
-    add2Loader(EduCtl::getInstance());
+    add2Loader(EDUCTL);
     add2Loader(SPECIALISTCTL);
     add2Loader(MISSIONCTL);
     add2Loader(CountryCtl::getInstance());
 #ifndef SKIP_PERSON_PROVINE
     add2Loader(ProvinceCtl::getInstance());
 #endif
-    add2Loader(EthnicCtl::getInstance());
+    add2Loader(ETHNIC);
     add2Loader(MissionCtl::getInstance());
     add2Loader(INSTANCE(CourseCtl));
     add2Loader(INSTANCE(WorkCtl));

@@ -34,8 +34,30 @@ public:
     static FileCtl* getInstance();
     virtual void init();
 
+
+    /**
+     * @brief Get subdir in app data dir
+     * @param dirName
+     * @param subDir
+     * @return
+     */
+    static QString getAppDataSubdir(const QString& dirName, const QString& subDir);
+
+    /**
+     * @brief working data subdir in app data dir
+     * @param subDir
+     * @return
+     */
     static QString getAppWorkingDataDir(const QString& subDir);
     static QString getAppWorkingDataDir();
+
+    /**
+     * @brief backup subdir in app data dir
+     * @param subDir
+     * @return
+     */
+    static QString getAppBackupDataDir(const QString& subDir);
+    static QString getAppBackupDataDir();
 
     static ErrCode copyFile(const QString& src, const QString& dest, bool force = false);
     static ErrCode removeFile(const QString& fpath, bool markRemove = false);
@@ -47,10 +69,12 @@ public:
     static QString getAppLocalDataDir(const QString& subDir);
     static QString getAppDataDir(const QString& subDir);
     static QString getAppDataDir();
+
     QString tmpDataDir(const QString& subDir);
     QString tmpDataFile(const QString& fname);
     static QString getTmpDataDir(const QString& subDir = nullptr);
     static QString getTmpDataFile(const QString& fname);
+
     static QString getAppInstallDir(const QString& subDir = nullptr);
 
     static QString getOrCreatePrebuiltDataDir();

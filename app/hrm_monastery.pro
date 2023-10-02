@@ -65,7 +65,6 @@ SOURCES += \
     address.cpp \
     backup/backupctl.cpp \
     backup/backupmetainfo.cpp \
-    cache/cachectl.cpp \
     controller/areactl.cpp \
     controller/communityctl.cpp \
     config/config.cpp \
@@ -273,7 +272,7 @@ HEADERS += \
     address.h \
     backup/backupctl.h \
     backup/backupmetainfo.h \
-    cache/cachectl.h \
+    config/configdefs.h \
     controller/areactl.h \
     controller/communityctl.h \
     config/config.h \

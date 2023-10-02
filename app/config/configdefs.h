@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Ngo Huy Anh
+ * Copyright (C) 2023 Ngo Huy Anh
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,17 @@
  * limitations under the License.
  *
  *
- * Filename: cachectl.cpp
+ * Filename: configfield.h
  * Author: Anh, Ngo Huy
- * Created date:7/16/2022
+ * Created date:9/30/2023
  * Brief:
  */
-#include "cachectl.h"
+#ifndef CONFIGDEFS_H
+#define CONFIGDEFS_H
 
-CacheCtl::CacheCtl()
-{
+#define DEFAULT_CODE_LENGTH (8)
+const char* const DEFAULT_PREFIX_PERSON = "NUTU_";
+const char* const CONFIG_PREFIX = "codeprefix";
+const char* const CONFIG_CODE_LENGTH = "codelength";
 
-}
+#endif // CONFIGDEFS_H

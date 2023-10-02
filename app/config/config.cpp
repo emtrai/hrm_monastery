@@ -30,6 +30,8 @@
 #include "dbctl.h"
 #include "utils.h"
 
+#include "configdefs.h"
+
 Config* Config::gInstance = nullptr;
 
 Config *Config::getInstance()
@@ -48,16 +50,19 @@ ErrCode Config::init()
 }
 
 
-QString Config::getNextPersonalCode(qint64* code)
+QString Config::getNextPersonalCode(qint64* code, ErrCode *outErr)
 {
     tracein;
-    return getInstance()->doGetNextPersonalCode(code);
+    return getInstance()->doGetNextPersonalCode(code, outErr);
 }
 
-QString Config::doGetNextPersonalCode(qint64* code)
+QString Config::doGetNextPersonalCode(qint64* code, ErrCode *outErr)
 {
     tracein;
-    qint64 seq = 0;
+    ulong seq = 0;
+    ErrCode err = ErrNone;
+    int maxSeqChar = getValue(CONFIG_CODE_LENGTH, DEFAULT_CODE_LENGTH);
+    QString prefix = mConfigKeyValue.value(CONFIG_PREFIX);
     if (!code) {
         logd("get from db");
         bool ok = false;
@@ -66,7 +71,7 @@ QString Config::doGetNextPersonalCode(qint64* code)
             loge("Get sequence number failed, restart from 0");
             seq = 1;
         } else {
-            logd("Increase '%d' by one", seq);
+            logd("Increase '%lld' by one", seq);
             seq++;
         }
     } else {
@@ -74,24 +79,68 @@ QString Config::doGetNextPersonalCode(qint64* code)
         seq = *code;
     }
 
-    // TODO: this is just dummy persone code, IMPLEMENT IT AGAIN
-//    int id = DatetimeUtils::currentTimeMs(qint64 code);
-    logd("seq %d", seq);
-//    QString code = "MS" + QString::number(id).rightJustified(8, '0');
-    QString id = QString("%1%2").arg(mConfigKeyValue.value("codeprefix"),
-                                       QString::number(seq));
+    logd("seq %ld", seq);
+    QString id = prefix + QString("%1").arg((ulong)seq, 8, 10, QChar('0'));
     logd("MS id %s", STR2CHA(id));
+
+    if (err != ErrNone) {
+        loge("Failed to get next personal code, err=%d", err);
+    }
+    if (outErr) {
+        *outErr = err;
+    }
     traceout;
     return id;
 
 
 }
 
+QString Config::getValue(QString key, QString* defaultValue, bool *ok)
+{
+    QString value;
+    bool isOk = false;
+    if (mConfigKeyValue.contains(key)) {
+        value = mConfigKeyValue.value(key);
+        isOk = true;
+    } else {
+        logw("Not found key, use default if any");
+        if (defaultValue) value = *defaultValue;
+    }
+    logd("Key '%s':'%s'", STR2CHA(key), STR2CHA(value));
+    if (ok) *ok = isOk;
+    return value;
+}
+
+quint64 Config::getValue(QString key, quint64 defaultValue, bool *ok)
+{
+    QString value;
+    quint64 valueInt;
+    QString defaultValueString = QString::number(defaultValue);
+    bool isOk = false;
+    value = getValue(key, &defaultValueString, &isOk);
+    if (!value.isEmpty()) {
+        bool converok = false;
+        valueInt = value.toULong(&converok);
+        if (!converok) {
+            loge("Convert from '%s' to int failed", STR2CHA(value));
+        }
+        if (isOk) isOk = converok; // only set to this value if previous call is ok
+    } else {
+        if (isOk) isOk = false; // only set to false if previous call is ok
+    }
+    if (ok) *ok = isOk;
+
+    logd("Key '%s':%lu", STR2CHA(key), valueInt);
+
+    return valueInt;
+}
+
 
 
 ErrCode Config::loadConfig()
 {
-    mConfigKeyValue["codeprefix"] = "NUTU_";
+
+    mConfigKeyValue[CONFIG_PREFIX] = DEFAULT_PREFIX_PERSON;
     dumpConfig();
     return ErrNone;
 }

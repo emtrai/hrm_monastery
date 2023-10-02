@@ -37,12 +37,12 @@ GET_INSTANCE_CONTROLLER_IMPL(AreaCtl)
 
 AreaCtl::AreaCtl():ModelController(KControllerArea, KModelHdlArea)
 {
-    tracein;
+    traced;
 }
 
 AreaCtl::~AreaCtl()
 {
-    tracein;
+    traced;
 }
 
 ErrCode AreaCtl::getContactPeopleList(const QString &areaUid, QList<DbModel *> &outList,
@@ -52,7 +52,7 @@ ErrCode AreaCtl::getContactPeopleList(const QString &areaUid, QList<DbModel *> &
     ErrCode err = ErrNone;
     DbAreaModelHandler* hdl = nullptr;
     QList<DbModel *> items;
-    logd("get list of person for areaUid '%s', status 0x%x", STR2CHA(areaUid), modelStatus);
+    logd("get list of person for areaUid '%s', status 0x%llx", STR2CHA(areaUid), modelStatus);
     if (areaUid.isEmpty()) {
         err = ErrInvalidArg;
         loge("Get person failed invalid args");

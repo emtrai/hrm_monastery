@@ -403,18 +403,23 @@ ErrCode DlgPerson::fromPerson(const Person *model)
 {
     tracein;
     ErrCode ret = ErrNone;
+    QList<DbModel*> events;
+    QList<DbModel*> specialistList;
+    Person* per = person();
 
     mInitDone = false;
     if (model == nullptr) {
         loge("Invalid person info to clone");
-        return ErrInvalidData;
+        ret = ErrInvalidData;
+        goto out;
     }
-    Person* per = person();
-    per->clone(model);
-    per->validateAllFields(); // TODO: should call validate here???
     if (per == nullptr){
         ret = ErrInvalidArg; // TODO: should raise assert instead???
+        goto out;
     }
+    per->clone(model);
+    logd("fromPerson '%s'", MODELSTR2CHA(per));
+    per->validateAllFields(); // TODO: should call validate here???
     // TODO: check and valid data??
     if (!per->imgPath().isEmpty()) {
         // TODO: validate image path
@@ -452,7 +457,7 @@ ErrCode DlgPerson::fromPerson(const Person *model)
     Utils::setSelectItemComboxByData(ui->cbEdu, per->eduUid());
 
     // cbSpecialist
-    QList<DbModel*> specialistList = per->getSpecialistList();
+    specialistList = per->getSpecialistList();
     logd("set specialist, no. item %d", specialistList.count());
     foreach (DbModel* item, specialistList) {
         cbSpecialist->addSelectedItemByData(item->uid());
@@ -554,7 +559,7 @@ ErrCode DlgPerson::fromPerson(const Person *model)
     Utils::setSelectItemComboxByData(ui->cbCommunity, per->communityUid());
 
     logd("load person event");
-    const QList<DbModel*> events = per->personEventList();
+    events = per->personEventList();
     if (!events.empty()) {
         RELEASE_LIST_DBMODEL(mListPersonEvent);
         foreach (DbModel* item, events) {
@@ -575,7 +580,7 @@ ErrCode DlgPerson::fromPerson(const Person *model)
     } else {
         logd("no event to load");
     }
-
+out:
     traceret(ret);
     mInitDone = true; // TODO: check setting mInitDone again, should offer api to mark init done?
     return ret;
@@ -692,11 +697,10 @@ void DlgPerson::loadEdu()
 {
     tracein;
     logd("Load Education");
-    QList<DbModel*> list = EduCtl::getInstance()->getAllItemsFromDb();
+    QList<DbModel*> list = EDUCTL->getAllItemsFromDb();
     ui->cbEdu->clear();
     ui->cbEdu->addItem(STR_UNKNOWN, KUidNone);
     foreach(DbModel* edu, list){
-
         ui->cbEdu->addItem(edu->name(), edu->uid());
     }
 }
@@ -749,6 +753,7 @@ void DlgPerson::loadEthnic()
     logd("Reload course");
     ui->cbEthic->clear();
     QList<DbModel*> list = ETHNIC->getAllItemsFromDb();
+    ui->cbEthic->addItem(STR_UNKNOWN, KUidNone);
     foreach(DbModel* item, list){
         ui->cbEthic->addItem(item->name(), item->uid()); // TODO: name include country?
     }
@@ -763,8 +768,8 @@ void DlgPerson::loadCountry()
     QList<DbModel*> listCountry = COUNTRYCTL->getAllItemsFromDb();
     ui->cbNationality->clear();
     ui->cbCountry->clear();
-    ui->cbNationality->addItem(STR_UNKNOWN, "");
-    ui->cbCountry->addItem(STR_UNKNOWN, "");
+    ui->cbNationality->addItem(STR_UNKNOWN, KUidNone);
+    ui->cbCountry->addItem(STR_UNKNOWN, KUidNone);
     foreach(DbModel* item, listCountry){
 
         ui->cbNationality->addItem(item->name(), item->uid());
@@ -794,7 +799,7 @@ void DlgPerson::loadWork()
     tracein;
     ui->cbWork->clear();
     QList<DbModel*> list = INSTANCE(WorkCtl)->getAllItemsFromDb();
-    ui->cbWork->addItem(tr("Không xác đinh"), KUidNone);
+    ui->cbWork->addItem(STR_UNKNOWN, KUidNone);
     foreach(DbModel* item, list){
         ui->cbWork->addItem(item->name(), item->uid());
     }
@@ -883,7 +888,7 @@ void DlgPerson::loadCommunity()
     logd("Load community");
     QList<DbModel*> listCommunity = COMMUNITYCTL->getAllItems();
     ui->cbCommunity->clear();
-    ui->cbCommunity->addItem(tr("Không xác đinh"), KUidNone);
+    ui->cbCommunity->addItem(STR_UNKNOWN, KUidNone);
     foreach(DbModel* item, listCommunity){
         ui->cbCommunity->addItem(item->name(), item->uid());
     }
@@ -895,7 +900,7 @@ void DlgPerson::loadStatus()
     tracein;
     ui->cbStatus->clear();
     QList<DbModel*> listItems = INSTANCE(PersonStatusCtl)->getAllItemsFromDb(); // TODO: getAllItem??
-    ui->cbStatus->addItem(tr("Không rõ"), KUidNone);
+    ui->cbStatus->addItem(STR_UNKNOWN, KUidNone);
     foreach(DbModel* item, listItems){
         ui->cbStatus->addItem(item->name(), item->uid());
     }

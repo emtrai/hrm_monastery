@@ -49,19 +49,37 @@ public:
     virtual ~UITableItem();
 public:
     static UITableItem* build(const DbModel* data);
+    /**
+     * @brief Add a value to display on list view
+     *        Order of adding will be mapped to col of a line
+     *        i.e 1st add, is 1st col, 2nd add, 2nd col and vice versa
+     * @param val value to display on list
+     * @return UITableItem itself to add new value
+     */
     UITableItem* addValue(const QString& val);
 
+    /**
+     * @brief return list of value to display
+     * @return
+     */
     const QStringList &valueList() const;
-    void setValueList(const QStringList &newValueList);
 
+    /**
+     * @brief DbModel data which each line present to
+     * @return
+     */
     const DbModel *data() const;
+    /**
+     * @brief clone to new item, caller will take ownership of new item
+     * @return
+     */
     UITableItem* clone();
-    void clone(const UITableItem* item);
 
 private:
     UITableItem();
     UITableItem(const UITableItem& item);
     UITableItem(const DbModel* data);
+    void clone(const UITableItem* item);
 private:
     QStringList mValueList;// list of display value of each cell
     DbModel* mData; // data ow by table item, will be released in destructor
@@ -86,7 +104,7 @@ public:
     void setIdx(qint32 newIdx);
 
 private:
-    UITableItem* mItem; // item value
+    UITableItem* mItem; // item value, reference only, will not be freed in this class
     qint32 mItemIdx; // idx of field in a row of table
     qint32 mIdx; // idx of items (row id)
 };
@@ -187,6 +205,8 @@ public:
 
     void requestReload();
 protected:
+    virtual void cleanupTableItems();
+    virtual void cleanupMenuActions();
     virtual void sort(int column);
     /**
      * @brief List view has filter or not
@@ -196,12 +216,12 @@ protected:
     virtual QString getTitle();
     virtual QStringList getHeader();
     virtual void showEvent(QShowEvent *ev);
-    virtual void onUpdatePage(qint32 page);
-    virtual void onUpdatePageDone(qint32 page, qint32 totalpages, qint32 totalItems);
+    virtual ErrCode onUpdatePage(qint32 page);
+    virtual void onUpdatePageDone(ErrCode err, qint32 page, qint32 totalpages, qint32 totalItems);
     virtual ErrCode getListTableRowItems(qint32 page, qint32 perPage, qint32 totalPages,
                                                       QList<UITableItem*>& items) = 0;
     virtual QList<UITableItem*> getListAllTableRowItems();
-    virtual qint32 getTotalItems();
+    virtual qint32 getTotalModelItems();
     virtual ErrCode onLoad();
     /**
      * @brief Reload data, may need to re-fetch data from db instead of cache
@@ -216,6 +236,7 @@ protected:
 //    virtual void onDeleteItem(UITableItem *item);
 
     // MENU
+    virtual ErrCode addMenuActionCallback(QList<UITableMenuAction*> &actionList);
     virtual QMenu* buildPopupMenu(UITableCellWidgetItem* item, const QList<UITableItem*>& items);
     /**
      * @brief Common menu action, always show
@@ -300,10 +321,15 @@ protected:
     quint32 mCurrentPage;
     quint32 mTotalPages;
     QMenu* mMenu;
+    QList<UITableMenuAction*> mMenuActions;
     QHash<int, QString> mFilterFields;
     QList<FilterItem*> mFilterList; // filters, OR condition?
     // TODO: should be OR or AND condition? can select???
     bool mSuspendReloadOnDbUpdate;
+    QList<UITableItem*> mItemList;
+    QList<UITableMenuAction*> mCommonMenuActionList;
+    QList<UITableMenuAction*> mSingleSelectedMenuActionList;
+    QList<UITableMenuAction*> mMultiSelectedMenuActionList;
 
 };
 

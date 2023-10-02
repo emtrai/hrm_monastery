@@ -73,6 +73,7 @@ public:
     virtual void buildUidIfNotSet();
     virtual QString buildUid(const QString* seed = nullptr);
     virtual QString modelName() const;
+    virtual QString toString() const;
     // cannot override name here, as this return a reference
     // but name of person is constructed from last name & first name,
     // which cannot return from reference, but value
@@ -352,9 +353,9 @@ public:
     const QString &deadPlace() const;
     void setDeadPlace(const QString &newDeadPlace);
 
-    QString imgId();
+    QString imgId() const;
     void setImgId(const QString &newImgId);
-    void markImageDelete();
+    void markImageDelete(bool del = true);
 
     const QStringList &eventUidList() const;
     void setEventUidList(const QStringList &newEventUidList);

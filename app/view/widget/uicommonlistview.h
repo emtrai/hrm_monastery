@@ -57,7 +57,7 @@ protected:
 
     virtual ErrCode getListTableRowItems(qint32 page, qint32 perPage, qint32 totalPages,
                                                       QList<UITableItem*>& items);
-    virtual qint32 getTotalItems();
+    virtual qint32 getTotalModelItems();
     virtual ErrCode fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
 
     /**
@@ -72,7 +72,7 @@ protected:
 
     virtual void initHeader();
 
-    virtual void onUpdatePageDone(qint32 page, qint32 totalpages, qint32 totalItems);
+    virtual void onUpdatePageDone(ErrCode err, qint32 page, qint32 totalpages, qint32 totalItems);
     virtual void initFilterFields();
     /**
      * @brief Preset keyword to filter, i.e. list of status to be filtered, etc.
@@ -115,15 +115,9 @@ protected:
     virtual QString getName();
     virtual QString getMainModelName();
     virtual void onModelControllerDataUpdated(const DbModel *model);
-    template<class T>
-    void setListItem(const QList<T*>& list){
-        RELEASE_LIST_DBMODEL(mItemList);
-        foreach(T* item, list) {
-            mItemList.append((DbModel*) item);
-        }
-    }
+
 protected:
-    QList<DbModel*> mItemList;
+    QList<DbModel*> mModelList;
     /**
      * set true if view supports import
      * derived class should set this value accordingly

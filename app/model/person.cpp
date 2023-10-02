@@ -254,6 +254,15 @@ QString Person::modelName() const
     return KModelNamePerson;
 }
 
+QString Person::toString() const
+{
+    QString str = DbModel::toString();
+    str += QString(":name('%1')").arg(displayName());
+    str += QString(":imageid('%1')").arg(imgId());
+    str += QString(":imagepath('%1')").arg(imgPath());
+    return str;
+}
+
 // cannot override name here, as this return a reference
 // but name of person is constructed from last name & first name,
 // which cannot return from reference, but value
@@ -282,8 +291,10 @@ void Person::initExportFields()
     mExportCallbacks.insert(KItemImgPath, [](const DbModel* model, const QString& item){
         QString imgPath = ((Person*)model)->imgPath();
         if (imgPath.isEmpty()){
+            logd("Image path is empty, use default one");
             imgPath = ":/icon/icon/unknown.png";
         }
+        logd("imgPath: '%s'", STR2CHA(imgPath));
         return imgPath;
     });
     mExportCallbacks.insert(KItemFullName, [](const DbModel* model, const QString& item){
@@ -1230,19 +1241,34 @@ ErrCode Person::save()
 ErrCode Person::update(bool allFields)
 {
     tracein;
-    ErrCode err = DbModel::update(allFields);
-    if (err == ErrNone && (isFieldUpdated(KItemImg) || allFields)) {
+    ErrCode err = ErrNone;
+    bool pendingDelImg = false;
+    bool imageSaved = false;
+    if ((isFieldUpdated(KItemImg) || allFields)) {
         if (!mIsDeleteImg) {
             logd("update image");
             err = mImage.save();
+            imageSaved = true;
             if (err != ErrNone) {
                 loge("Save image, failed, err=%d", err);
                 err = ErrNone; // TODO: handle error case?
             }
         } else {
-            logd("remove image");
-            mImage.remove(true);
+            logd("mark to remove image");
+            pendingDelImg = true;
         }
+    }
+    // there is a risk that while storing, notification is raised, but image not store
+    // yet, causing data mark that image file not exist
+    // therefore, we save first, then update later, if error, just remove it
+    if (err == ErrNone) {
+        err = DbModel::update(allFields);
+    }
+    // delete image if pending dele image, or error and image saved
+    if ((err == ErrNone && pendingDelImg) || (err != ErrNone && imageSaved)) {
+        logd("remove image, err=%d, pendingDelImg=%d, imageSaved=%d",
+             err, pendingDelImg, imageSaved);
+        mImage.remove(true);
     }
     traceret(err);
     return err;
@@ -1526,7 +1552,7 @@ void Person::addEventUid(const QString &eventUid)
     mEventUidList.append(eventUid);
 }
 
-QString Person::imgId()
+QString Person::imgId() const
 {
     if (!mIsDeleteImg) {
         return mImgId.isEmpty()?mImage.uid():mImgId;
@@ -1540,6 +1566,7 @@ void Person::setImgId(const QString &newImgId)
     tracein;
     CHECK_MODIFIED_THEN_SET(mImgId, newImgId, KItemImg);
     if (!mImgId.isEmpty()) {
+        logd("set image for person '%s'", MODELSTR2CHA(this));
         ErrCode err = mImage.loadImageFromUid(newImgId, IMG_TAG_PEOPLE);
         if (err == ErrNone) {
             markItemAsModified(KItemImg);
@@ -1549,14 +1576,15 @@ void Person::setImgId(const QString &newImgId)
     } else {
         logw("img id is empty, nothing to load");
         // TODO: remove existing file???
+        markItemAsModified(KItemImg);
     }
     traceout;
     //    mImgId = newImgId;
 }
 
-void Person::markImageDelete()
+void Person::markImageDelete(bool del)
 {
-    mIsDeleteImg = true;
+    mIsDeleteImg = del;
 }
 
 const QString &Person::deadPlace() const
@@ -2492,6 +2520,7 @@ ErrCode Person::setImgPath(const QString &newImgPath)
     if (!newImgPath.isEmpty() && mImage.fullImgPath() != newImgPath) {
         err = mImage.loadImage(newImgPath, IMG_TAG_PEOPLE);
         if (err == ErrNone) {
+            mImgId = mImage.uid();
             markItemAsModified(KItemImg);
         }
     } else {

@@ -140,10 +140,10 @@ ErrCode UIPersonListView::onLoad()
             UNUSED(result);
             UNUSED(dlg);
             logd("Save result %d", err);
-            RELEASE_LIST_DBMODEL(this->mItemList);
+            RELEASE_LIST_DBMODEL(this->mModelList);
             if (err == ErrNone) {
                 if (items.size() > 0) {
-                    this->mItemList.append(items);
+                    this->mModelList.append(items);
                 } else {
                     logd("no data to load");
                 }
@@ -693,8 +693,8 @@ ErrCode UIPersonListView::exportPersonInfo(QMenu *menu, UITableMenuAction *act)
     if (err == ErrNone) {
         int idx = item->idx();
         logd("idx=%d",idx);
-        if (idx < mItemList.length()){
-            per = (Person*)mItemList.value(idx);
+        if (idx < mModelList.length()){
+            per = (Person*)mModelList.value(idx);
             if (!per) {
                 loge("not person data");
                 err = ErrNoData;
@@ -768,12 +768,12 @@ int UIPersonListView::onFilter(int catetoryid,
     tracein;
     UNUSED(catetory);
     UNUSED(value);
-    RELEASE_LIST_DBMODEL(mItemList);
-    ErrCode ret = PERSONCTL->filter(catetoryid, opFlags, keywords, KModelNamePerson, nullptr, &mItemList);
+    RELEASE_LIST_DBMODEL(mModelList);
+    ErrCode ret = PERSONCTL->filter(catetoryid, opFlags, keywords, KModelNamePerson, nullptr, &mModelList);
     logd("filter ret %d", ret);
-    logd("mItemList cnt %lld", mItemList.count());
+    logd("mItemList cnt %lld", mModelList.count());
     traceout;
-    return mItemList.count();
+    return mModelList.count();
 }
 
 DbModel *UIPersonListView::onCreateDbModelObj(const QString& modelName)

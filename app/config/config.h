@@ -30,27 +30,27 @@
 
 #define CONFIG Config::getInstance()
 
-class Config:public QObject
+class Config
 {
-    Q_OBJECT
-        public:
-            static Config* getInstance();
-            static ErrCode init();
+public:
+    static Config* getInstance();
+    static ErrCode init();
 
 
-            static QString getNextPersonalCode(qint64* code = nullptr);
+    static QString getNextPersonalCode(qint64* code = nullptr, ErrCode *outErr = nullptr);
 
-            ErrCode loadConfig();
-            void dumpConfig();
+    ErrCode loadConfig();
+    void dumpConfig();
 
-//            QString getFilePath()
-        private:
-            Config();
-            ErrCode doInit();
-            QString doGetNextPersonalCode(qint64* code = nullptr);
-        private:
-            static Config* gInstance;
-            QMap<QString, QString> mConfigKeyValue;
+private:
+    Config();
+    ErrCode doInit();
+    QString doGetNextPersonalCode(qint64* code = nullptr, ErrCode *outErr = nullptr);
+    QString getValue(QString key, QString* defaultValue = nullptr, bool* ok = nullptr);
+    quint64 getValue(QString key, quint64 defaultValue, bool* ok = nullptr);
+private:
+    static Config* gInstance;
+    QMap<QString, QString> mConfigKeyValue;
 };
 
 #endif // CONFIG_H

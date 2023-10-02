@@ -55,6 +55,7 @@ const char* const KManagementDeptNameId = "QUAN_LY";
 
 const char* const KPrebuiltDirName = "prebuilt";
 const char* const KWorkingDirName = "data";
+const char* const KBackupDirName = "backup";
 const char* const KImageDirName = "image";
 const char* const KPeopleImageDirName = "people";
 const char* const KDataDirName = ".appdata";
