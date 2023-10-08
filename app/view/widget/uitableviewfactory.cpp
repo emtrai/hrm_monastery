@@ -41,6 +41,7 @@
 #include "view/widget/uitextbrowser.h"
 #include "view/widget/uipersoneventlistview.h"
 #include "view/widget/uicommunitiesofpersonlistview.h"
+#include "view/widget/uipersonstatuslistview.h"
 
 BaseView *UITableViewFactory::getView(ViewType type, QWidget *parent )
 {
@@ -107,6 +108,9 @@ BaseView *UITableViewFactory::getView(ViewType type, QWidget *parent )
         break;
     case VIEW_PERSON_EVENT:
         view = new UIPersonEventListView(parent);
+        break;
+    case VIEW_PERSON_STATUS:
+        view = new UIPersonStatusListView(parent);
         break;
     default:
         loge("invalid view type %d", type);

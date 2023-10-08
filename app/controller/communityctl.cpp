@@ -27,7 +27,6 @@
 #include <QFile>
 #include <QDate>
 #include "defs.h"
-#include "filectl.h"
 #include "dbctl.h"
 #include <QByteArray>
 #include <QJsonDocument>
@@ -41,7 +40,6 @@
 #include "missionctl.h"
 #include "jsondefs.h"
 #include "prebuiltdefs.h"
-#include "communityperson.h"
 #include "controllerdefs.h"
 #include "stringdefs.h"
 
@@ -49,12 +47,12 @@ GET_INSTANCE_CONTROLLER_IMPL(CommunityCtl)
 
 CommunityCtl::CommunityCtl():ModelController(KControllerCommunity, KModelHdlCommunity)
 {
-    tracein;
+    traced;
 }
 
 CommunityCtl::~CommunityCtl()
 {
-    tracein;
+    traced;
 }
 
 DbModel* CommunityCtl::onJsonParseOneItem(const QJsonObject& jobj, bool* ok )
@@ -62,12 +60,19 @@ DbModel* CommunityCtl::onJsonParseOneItem(const QJsonObject& jobj, bool* ok )
     // TODO: use import instead???
     tracein;
     ErrCode err = ErrNone;
-    Community* ret = static_cast<Community*>(ModelController::onJsonParseOneItem(jobj, ok));
-    if (!ret) {
+    DbModel* model = ModelController::onJsonParseOneItem(jobj, ok);
+    Community* ret = nullptr;
+    if (!model) {
         err = ErrNoMemory;
         loge("no memory");
     }
+    if (err == ErrNone && !IS_MODEL_NAME(model, KModelNameCommunity)) {
+        err = ErrInvalidModel;
+        loge("model '%s' is not community model", MODELSTR2CHA(model));
+    }
     if (err == ErrNone) {
+        ret = static_cast<Community*>(model);
+        logd("parse model '%s'", MODELSTR2CHA(model));
         JSON_GET_TO_SET_STR(jobj, JSON_BRIEF, ret->setBrief);
         JSON_GET_TO_SET_STR(jobj, JSON_CHURCH, ret->setChurch);
         JSON_GET_TO_SET_STR(jobj, JSON_ADDR, ret->setAddr);
@@ -83,14 +88,15 @@ DbModel* CommunityCtl::onJsonParseOneItem(const QJsonObject& jobj, bool* ok )
         if (!tmp.isEmpty()) {
             logd("area nameid '%s'", STR2CHA(tmp));
             DbModel* area = AREACTL->getModelByNameId(tmp);
-            if (area) {
+            if (IS_MODEL_NAME(area, KModelNameArea)) {
                 ret->setAreaUid(area->uid());
                 ret->setAreaName(area->name());
-                delete area;
             } else {
-                err = ErrNotFound;
-                loge("Not found area '%s'", STR2CHA(tmp));
+                err = ErrInvalidModel;
+                loge("Not found uid '%s' or invalid model area '%s'",
+                     STR2CHA(tmp), MODELSTR2CHA(area));
             }
+            FREE_PTR(area);
         } else {
             logw("%s defined but no data", JSON_AREA_NAMEID);
         }
@@ -101,15 +107,16 @@ DbModel* CommunityCtl::onJsonParseOneItem(const QJsonObject& jobj, bool* ok )
         if (!tmp.isEmpty()) {
             logd("parent nameid '%s'", STR2CHA(tmp));
             Community* comm = static_cast<Community*>(getModelByNameId(tmp));
-            if (comm) {
+            if (IS_MODEL_NAME(comm, KModelNameCommunity)) {
                 ret->setParentUid(comm->uid());
                 ret->setParentName(comm->name());
                 ret->setLevel(comm->level() + 1);
-                delete comm;
             } else {
                 err = ErrNotFound;
-                loge("Not found parent community '%s'", STR2CHA(tmp));
+                loge("Not found uid '%s' or invalid model comm '%s'",
+                     STR2CHA(tmp), MODELSTR2CHA(comm));
             }
+            FREE_PTR(comm);
         } else {
             logw("%s defined but no data", JSON_PARENT_NAMEID);
         }
@@ -121,14 +128,15 @@ DbModel* CommunityCtl::onJsonParseOneItem(const QJsonObject& jobj, bool* ok )
         if (!tmp.isEmpty()) {
             logd("country nameid '%s'", STR2CHA(tmp));
             DbModel* model = COUNTRYCTL->getModelByNameId(tmp);
-            if (model) {
+            if (IS_MODEL_NAME(model, KModelNameCountry)) {
                 ret->setCountryUid(model->uid());
                 ret->setCountryName(model->name());
-                delete model;
             } else {
                 err = ErrNotFound;
-                loge("Not found country '%s'", STR2CHA(tmp));
+                loge("Not found uid '%s' or invalid model '%s'",
+                     STR2CHA(tmp), MODELSTR2CHA(model));
             }
+            FREE_PTR(model);
         } else {
             logw("%s defined but no data", JSON_COUNTRY_NAMEID);
         }
@@ -145,16 +153,18 @@ DbModel* CommunityCtl::onJsonParseOneItem(const QJsonObject& jobj, bool* ok )
                 foreach (QString missionNameId, missionList) {
                     logd("missionNameId '%s'", STR2CHA(missionNameId));
                     DbModel* model = MISSIONCTL->getModelByNameId(missionNameId);
-                    if (model) {
+                    if (IS_MODEL_NAME(model, KModelNameMission)) {
                         ret->addMissionUid(model->uid());
                         ret->addMissionName(model->name());
-                        delete model;
                     } else {
                         err = ErrNotFound;
-                        loge("Not found mission '%s'", STR2CHA(missionNameId));
+                        loge("Not found missionNameId uid '%s' or invalid model '%s'",
+                             STR2CHA(missionNameId), MODELSTR2CHA(model));
+                    }
+                    FREE_PTR(model);
+                    if (err != ErrNone) {
                         break;
                     }
-
                 }
             } else {
                 logw("%s defined but no data", JSON_MISSION_NAMEID);
@@ -185,8 +195,7 @@ DbModel* CommunityCtl::onJsonParseOneItem(const QJsonObject& jobj, bool* ok )
     logd("Parse result %d", err);
     if (ok) *ok = (err == ErrNone);
     if (err != ErrNone) {
-        delete ret;
-        ret = nullptr;
+        FREE_PTR(ret);
     }
     traceout;
     return ret;
@@ -208,11 +217,14 @@ const QString CommunityCtl::exportListPrebuiltTemplateName(const QString& modelN
     return tmplate;
 }
 
-ErrCode CommunityCtl::onImportDataStart(const QString &importName, int importFileType, const QString &fname)
+ErrCode CommunityCtl::onImportDataStart(const QString &importName,
+                                        int importFileType,
+                                        const QString &fname)
 {
     tracein;
+    UNUSED(importFileType);
     logi("start import '%s', fname '%s'", STR2CHA(importName), STR2CHA(fname));
-    mImportFields.clear();
+    mImportHeaderFields.clear();
     traceout;
     return ErrNone;
 }
@@ -221,7 +233,8 @@ ErrCode CommunityCtl::getActivePersonList(const QString &communityUid, QList<Per
 {
     tracein;
     ErrCode err = getPersonList(communityUid, outList, MODEL_STATUS_MAX);
-    traceout;
+    logife(err, "get active person list failed");
+    traceret(err);
     return err;
 }
 
@@ -232,7 +245,8 @@ ErrCode CommunityCtl::getPersonList(const QString &communityUid,
     ErrCode err = ErrNone;
     DbCommunityModelHandler* hdl = nullptr;
     QList<Person *> items;
-    logd("get list of person for community uid '%s', status 0x%x", STR2CHA(communityUid), modelStatus);
+    logd("get list of person for community uid '%s', status 0x%llx",
+         STR2CHA(communityUid), modelStatus);
     if (communityUid.isEmpty()) {
         err = ErrInvalidArg;
         loge("Get person failed invalid args");
@@ -249,18 +263,13 @@ ErrCode CommunityCtl::getPersonList(const QString &communityUid,
     if (err == ErrNone) {
         items = hdl->getListPerson(communityUid, modelStatus);
         if (items.size() > 0) {
+            logd("got %lld item", items.size());
             outList.append(items);
         } else {
             logw("not found list person of communit uid '%s'", STR2CHA(communityUid));
         }
     }
-    if (err != ErrNone) {
-        loge("Get list of active person failed, err=%d", err);
-        // we don't have error code return, so report error here.
-        REPORTERRCTL->reportErr(QObject::tr("Lỗi truy vấn danh sách nữ tu của cộng đoàn"), err, true);
-    } else {
-        logd("Got %lld items", items.size());
-    }
+    logife(err, "Get list of active person failed");
 
     traceout;
     return err;
@@ -274,7 +283,7 @@ ErrCode CommunityCtl::getListCommunityPerson(const QString &communityUid,
     ErrCode err = ErrNone;
     DbCommunityModelHandler* hdl = nullptr;
     QList<DbModel *> items;
-    logd("get list of person for community uid '%s', status 0x%x",
+    logd("get list of person for community uid '%s', status 0x%llx",
          STR2CHA(communityUid), modelStatus);
     if (communityUid.isEmpty()) {
         err = ErrInvalidArg;
@@ -292,25 +301,22 @@ ErrCode CommunityCtl::getListCommunityPerson(const QString &communityUid,
     if (err == ErrNone) {
         items = hdl->getListCommunityPerson(communityUid, modelStatus);
         if (items.size() > 0) {
+            logd("Got %lld items", items.size());
             outList.append(items);
         } else {
             logw("not found list person of communit uid '%s'", STR2CHA(communityUid));
         }
     }
-    if (err != ErrNone) {
-        loge("Get list of active person failed, err=%d", err);
-        // we don't have error code return, so report error here.
-        REPORTERRCTL->reportErr(STR_QUERY_ERROR, err, true);
-    } else {
-        logd("Got %lld items", items.size());
-    }
+
+    logife(err, "Get list of active person failed");
 
     traceout;
     return err;
 
 }
 
-ErrCode CommunityCtl::getListActiveCommunityPersonOfPerson(const QString &perUid, QList<DbModel *> &outList)
+ErrCode CommunityCtl::getListActiveCommunityPersonOfPerson(const QString &perUid,
+                                                           QList<DbModel *> &outList)
 {
     tracein;
     ErrCode err = ErrNone;
@@ -333,18 +339,13 @@ ErrCode CommunityCtl::getListActiveCommunityPersonOfPerson(const QString &perUid
     if (err == ErrNone) {
         items = hdl->getListActiveCommunityPersonOfPerson(perUid);
         if (items.size() > 0) {
+            logd("Got %lld items", items.size());
             outList.append(items);
         } else {
             logw("not found list comm per for perUid '%s'", STR2CHA(perUid));
         }
     }
-    if (err != ErrNone) {
-        loge("Get list of comm per  failed, err=%d", err);
-        // we don't have error code return, so report error here.
-        REPORTERRCTL->reportErr(STR_QUERY_ERROR, err, true);
-    } else {
-        logd("Got %lld items", items.size());
-    }
+    logife(err, "Get list of comm per failed");
 
     traceout;
     return err;
@@ -376,8 +377,17 @@ ErrCode CommunityCtl::addPerson2Community(const Community *comm, const Person *p
         logd("add person to community");
         err = hdl->addPerson2Community(comm, per, updateCommPer, status, startdate, enddate, remark);
     }
+    logife(err, "Add person to community failed");
     traceret(err);
     return err;
+}
+
+const Community *CommunityCtl::getRootCommunity()
+{
+    DbCommunityModelHandler* hdl =
+        dynamic_cast<DbCommunityModelHandler*>(DB->getCommunityModelHandler());
+    ASSERT((hdl != nullptr), "Not found community model handler");
+    return hdl->getRootCommunity();
 }
 
 const char *CommunityCtl::getPrebuiltFileName()
@@ -407,11 +417,11 @@ DbModel *CommunityCtl::doImportOneItem(const QString& importName, int importFile
     logd("idx = %d", idx);
     logd("no items %lld", items.count());
     logd("importName '%s'", STR2CHA(importName));
-    if (idx == 0) {
+    if (idx == 0) { // first item is header
         logd("HEADER, save it");
         foreach (QString item, items) {
             logd("Header %s", item.toStdString().c_str());
-            mImportFields.append(item.trimmed());
+            mImportHeaderFields.append(item.trimmed());
         }
     } else {
         if (importName == KModelHdlCommunity)
@@ -424,7 +434,7 @@ DbModel *CommunityCtl::doImportOneItem(const QString& importName, int importFile
         if (err == ErrNone) {
             foreach (QString item, items) { // items must be in order with fields
                 // TODO: this is not safe, should not be used???
-                QString field = mImportFields[i++];
+                QString field = mImportHeaderFields[i++];
                 logd("Import field %s", field.toStdString().c_str());
                 err = model->onImportParseDataItem(importName, importFileType, field, item, idx);
                 if (err != ErrNone) {
@@ -443,48 +453,8 @@ DbModel *CommunityCtl::doImportOneItem(const QString& importName, int importFile
         }
     }
 
-    logd("err = %d", err);
+    traceret(err);
     return model;
 }
 
-//DbModel *CommunityCtl::doImportOneItem(const QString& importName, int importFileType,
-//                                       const QHash<QString, QString> &items, quint32 idx)
-//{
-//    ErrCode err = ErrNone;
-//    DbModel* model = nullptr;
-//    logd("idx = %d", idx);
-//    if (importName == KModelHdlCommunity)
-//        model = Community::build();
-//    else { // TODO: import person to community
-//        err = ErrNotSupport;
-//        loge("import '%s' not support", STR2CHA(importName));
-//    }
-//    if (err == ErrNone) {
-//        foreach (QString field, items.keys()) {
-//            QString value = items.value(field);
-//            logd("Import field %s", field.toStdString().c_str());
-//            logd("Import value %s", value.toStdString().c_str());
-//            err = model->onImportParseDataItem(importName, importFileType, field, value, idx);
-//            if (err != ErrNone) {
-//                loge("on import item failed, %d", err);
-//                break;
-//            }
-//        }
-//        if (err == ErrNone && model->nameId().isEmpty() && !model->name().isEmpty()) {
-//            QString nameid = Utils::UidFromName(model->name(), NO_VN_MARK_UPPER);
-//            logd("auto buid community nameid '%s'", STR2CHA(nameid));
-//            model->setNameId(nameid);
-//            // TODO: numer is increased, but not save --> may cause much dummy code?
-//        }
-//     }
-
-//    if (err != ErrNone) {
-//        if (model) {
-//            delete model;
-//            model = nullptr;
-//        }
-//    }
-//    traceout;
-//    return model;
-//}
 

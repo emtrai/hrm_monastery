@@ -27,15 +27,15 @@
 
 class Specialist : public DbModel
 {
-        public:
-            explicit Specialist();
-            virtual ~Specialist();
-        public:
-            static DbModel *build();
-            virtual DbModelBuilder getBuilder() const;
-            virtual QString modelName() const;
-        protected:
-            virtual DbModelHandler *getDbModelHandler() const;
+public:
+    explicit Specialist();
+    virtual ~Specialist();
+public:
+    static DbModel *build();
+    virtual DbModelBuilder getBuilder() const;
+    virtual QString modelName() const;
+protected:
+    virtual DbModelHandler *getDbModelHandler() const;
 
 signals:
 

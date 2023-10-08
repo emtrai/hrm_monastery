@@ -258,6 +258,7 @@ SOURCES += \
     view/widget/uipeopleincommunitylistview.cpp \
     view/widget/uipersoneventlistview.cpp \
     view/widget/uipersonlistview.cpp \
+    view/widget/uipersonstatuslistview.cpp \
     view/widget/uirolelistview.cpp \
     view/widget/uisaintlistview.cpp \
     view/widget/uispecialistlistview.cpp \
@@ -478,6 +479,7 @@ HEADERS += \
     view/widget/uipeopleincommunitylistview.h \
     view/widget/uipersoneventlistview.h \
     view/widget/uipersonlistview.h \
+    view/widget/uipersonstatuslistview.h \
     view/widget/uirolelistview.h \
     view/widget/uisaintlistview.h \
     view/widget/uispecialistlistview.h \

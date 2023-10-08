@@ -207,6 +207,7 @@ protected:
     BaseView* mDepartView;
     BaseView* mRoleView;
     BaseView* mCourseView;
+    BaseView* mPersonStatusView;
     QHash<int, BaseView*> mViewList;
     UITextBrowser* mHomeView;
     BaseView* mCurrentView;
@@ -270,6 +271,7 @@ protected:
      void on_actionRole_triggered();
      void on_actionDept_triggered();
      void on_actionCourse_triggered();
+     void on_actionPersonStatus_triggered();
 
      void on_action_ExportPersonList_triggered();
      void on_action_ExportCommunityList_triggered();

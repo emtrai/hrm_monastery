@@ -142,56 +142,8 @@ DbModel *SaintCtl::buildModel(void *params, const QString &fmt)
         QString remark = items->mid(idx).join(DEFAULT_CSV_ITEM_SPLIT);
         saint->setRemark(remark);
     }
-
-    // country
-    // TODO: check if country exist in db, then insert it????
-//    if (ret == ErrNone)
-//        saint->setCountry(items->at(idx++).simplified());
-
-    // brief info
-//    if (ret == ErrNone)
-//    {
-//        QString brief;
-//        for (;idx < items.length(); idx++){
-//            if (!brief.isEmpty())
-//                brief += SPLIT;
-//            brief += items->at(idx++);
-//        }
-//    }
-
     return saint;
 }
-
-//ErrCode SaintCtl::parsePrebuiltFile(const QString &fpath, const QString &ftype)
-//{
-//    ErrCode ret = ErrNone;
-//    tracein;
-//    // TODO: should we add meta field in beginning of file to know status of information???
-//    // i.e.: version, last update time.
-//    // This can be used to check/compare witl one stored in db
-//    if (ftype == KFileTypeCSV) {
-
-//        QList<DbModel*> list;
-//        logd("Import saint file %s", fpath.toStdString().c_str());
-//        ret = importFromFile(KModelHdlSaint, ImportType::IMPORT_CSV_LIST, fpath, &list);
-//        logd("Import result %d", ret);
-//        logd("No of import item %d", list.count());
-//        if (ret == ErrNone) {
-//            if (list.count() > 0) {
-//                foreach (DbModel* item, list) {
-//                    logd("Save item");
-//                    item->dump();
-//                    item->save();
-//                }
-//            } else {
-//                logi("Nothing to import saint");
-//            }
-//        }
-//    } else {
-//        ret = ErrNotSupport;
-//    }
-//    return ret;
-//}
 
 const char *SaintCtl::getPrebuiltFileName()
 {

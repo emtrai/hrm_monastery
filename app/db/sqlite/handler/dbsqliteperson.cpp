@@ -42,6 +42,7 @@
 #include "specialistperson.h"
 #include "dbsqlite.h"
 #include "exception.h"
+#include "dbcommunitymodelhandler.h"
 
 GET_INSTANCE_IMPL(DbSqlitePerson)
 
@@ -55,6 +56,7 @@ ErrCode DbSqlitePerson::add(DbModel *model, bool notify)
 
     tracein;
     ErrCode_t err = ErrNone;
+    Community* comm = nullptr;
 
     // TODO: should check if some sub-item not exist???
     // i.e.import person, but country, holly name, etc. not exist, need to check and add it
@@ -75,9 +77,14 @@ ErrCode DbSqlitePerson::add(DbModel *model, bool notify)
 
         err = add2Table(model, tbl);
         if (err == ErrNone && name == KModelNamePerson) {
+
+            Person* per = dynamic_cast<Person*>(model);
+            // save community info
+            logd("Check to add community");
+            check2UpdateCommunity(per);
+
             // mapping saint - person
             logd("Check to add saint - person ");
-            Person* per = dynamic_cast<Person*>(model);
             QStringList saintList = per->saintUidList();
             if (!saintList.empty()) {
                 logd("set saintList for person, no saintList %d", saintList.count());
@@ -88,16 +95,14 @@ ErrCode DbSqlitePerson::add(DbModel *model, bool notify)
                         saint->setPersonDbId(per->dbId());
                         saint->setPersonUid(per->uid());
                         saint->setSaintUid(item);
-                        logd("Save saint/person, saint uid '%s'", item.toStdString().c_str());
-                        err = saint->save();
-                        if (err != ErrNone) {
-                            loge("Save saint-person '%s' failed, err=%d",
-                                 STR2CHA(saint->toString()), err);
-                        }
+                        logi("Save saint/person, saint uid '%s'", MODELSTR2CHA(saint));
+                        err = saint->save(false);
+                        logife(err, "Save saint-person '%s' failed for model '%s'",
+                               MODELSTR2CHA(saint), MODELSTR2CHA(model));
                         // TODO: handle error case
                         delete saint;
                     } else {
-                        loge("Create saint person faield,no memory");
+                        loge("Create saint person failed,no memory");
                     }
                 }
             } else {
@@ -115,12 +120,11 @@ ErrCode DbSqlitePerson::add(DbModel *model, bool notify)
                     if (spelistPerson) {
                         spelistPerson->setPersonUid(per->uid());
                         spelistPerson->setSpecialistUid(item);
-                        logd("Save specialist/person, model uid '%s'", STR2CHA(spelistPerson->toString()));
-                        err = spelistPerson->save();
-                        if (err != ErrNone) {
-                            loge("Save specialist-person '%s' failed, err=%d",
-                                 STR2CHA(model->toString()), err);
-                        }
+                        logi("Save specialist/person, model uid '%s'",
+                             MODELSTR2CHA(spelistPerson));
+                        err = spelistPerson->save(false);
+                        logife(err, "Save specialist-person '%s' failed for model '%s'",
+                               MODELSTR2CHA(spelistPerson), MODELSTR2CHA(model));
                         // TODO: handle error case
                         delete spelistPerson;
                     } else {
@@ -139,11 +143,11 @@ ErrCode DbSqlitePerson::add(DbModel *model, bool notify)
                     PersonEvent* event = (PersonEvent*)item;
                     if (event) {
                         event->setPersonUid(per->uid());
-                        logd("Save person event '%s'", STR2CHA(event->toString()));
-                        err = event->save();
+                        logi("Save person event '%s'", MODELSTR2CHA(event));
+                        err = event->save(false);
                         if (err != ErrNone) {
-                            loge("Save event-person '%s' failed, err=%d",
-                                 STR2CHA(model->toString()), err);
+                            logife(err, "Save event-person '%s' failed for model '%s'",
+                                   MODELSTR2CHA(event), MODELSTR2CHA(model));
                         }
                     } else {
                         loge("invalid person event, null value");
@@ -160,34 +164,10 @@ ErrCode DbSqlitePerson::add(DbModel *model, bool notify)
     if (err == ErrNone && notify) {
         notifyDataChange(model, DBMODEL_CHANGE_ADD, err);
     }
+    FREE_PTR(comm);
     traceret(err);
     return err;
 }
-
-//ErrCode DbSqlitePerson::update(DbModel *model)
-//{
-//    tracein;
-//    ErrCode_t err = ErrNone;
-
-//    // TODO: should check if some sub-item not exist???
-//    // i.e.import person, but country, holly name, etc. not exist, need to check and add it
-
-//    if (model != nullptr){
-//        DbSqliteTbl* tbl = getMainTbl(); // TODO: check model name to get proper table??
-//        if (tbl->isExist(model)){
-//            err = tbl->update(model);
-//        } else {
-//            err = ErrNotExist;
-//            loge("model %s not exist", model->name().toStdString().c_str());
-//        }
-//    }
-//    else{
-//        err = ErrInvalidArg;
-//        loge("invalid argument");
-//    }
-
-//    return err;
-//}
 
 ErrCode DbSqlitePerson::add2Table(DbModel *model, DbSqliteTbl *tbl)
 {
@@ -195,9 +175,9 @@ ErrCode DbSqlitePerson::add2Table(DbModel *model, DbSqliteTbl *tbl)
     ErrCode err = ErrNone;
     if (tbl != nullptr){
         if (!tbl->isExist(model)){
+            logi("Add model '%s' to db table", MODELSTR2CHA(model));
             err = tbl->add(model);
-        }
-        else{
+        } else {
             err = ErrExisted;
             loge("Item '%s' already exist in table '%s'",
                  MODELSTR2CHA(model), STR2CHA(tbl->name()));
@@ -502,11 +482,17 @@ ErrCode DbSqlitePerson::getListCommunitesOfPerson(const QString &perUid,
     return err;
 }
 
-ErrCode DbSqlitePerson::update(DbModel *model)
+ErrCode DbSqlitePerson::update(DbModel *model, bool notify)
 {
     tracein;
     ErrCode err = ErrNone;
-    err = DbSqliteModelHandler::update(model);
+    if (!model) {
+        loge("Invalid model, null one");
+        err = ErrInvalidArg;
+    }
+    if (err == ErrNone) {
+        err = DbSqliteModelHandler::update(model, false);
+    }
     if (err == ErrNone && (model->modelName() == KModelNamePerson)) {
         Person* per = (Person*) model;
         if (per->isFieldUpdated(KItemSpecialist)) {
@@ -528,7 +514,7 @@ ErrCode DbSqlitePerson::update(DbModel *model)
                         model->setPersonUid(per->uid());
                         model->setSpecialistUid(item);
                         logd("Save specialist/person, model uid '%s'", item.toStdString().c_str());
-                        err = model->save();
+                        err = model->save(false);
                         // TODO: handle error case
                         delete model;
                     }
@@ -540,6 +526,14 @@ ErrCode DbSqlitePerson::update(DbModel *model)
             logd("field %s is not updated", KItemSpecialist);
         }
 
+        if (per->isFieldUpdated(KItemCommunity)) {
+            logd("Check to update community");
+            check2UpdateCommunity(per);
+            // TODO: handle error case?
+            // currently, jus keep & continue other changes
+        } else {
+            logd("skip update community");
+        }
 
         if (per->isFieldUpdated(KItemPersonEvent) && per->personEventListUpdated()) {
             // person event
@@ -557,7 +551,7 @@ ErrCode DbSqlitePerson::update(DbModel *model)
                             if (event) {
                                 event->setPersonUid(per->uid());
                                 logd("Save person event '%s'", STR2CHA(event->toString()));
-                                err = event->save();
+                                err = event->save(false);
                                 if (err != ErrNone) {
                                     loge("Save event-person '%s' failed, err=%d",
                                          STR2CHA(model->toString()), err);
@@ -603,7 +597,7 @@ ErrCode DbSqlitePerson::update(DbModel *model)
                                     currentEvent->setMarkModified(true);
                                     err = currentEvent->copyData(updateEvent);
                                     if (err == ErrNone) {
-                                        err = currentEvent->update(true);
+                                        err = currentEvent->update(true, false);
                                     } else {
                                         loge("failed to copy update data, out");
                                         break;
@@ -628,7 +622,7 @@ ErrCode DbSqlitePerson::update(DbModel *model)
                                     logd("key '%s' to exist yet, save as new data");
                                     DbModel* newModel = events.value(key);
                                     if (newModel) {
-                                        err = newModel->save();
+                                        err = newModel->save(false);
                                     } else {
                                         loge("newModel with key '%s' is empty",
                                              STR2CHA(key));
@@ -647,13 +641,82 @@ ErrCode DbSqlitePerson::update(DbModel *model)
                  per->isFieldUpdated(KItemPersonEvent), per->personEventListUpdated());
         }
     }
+    if (err == ErrNone && notify) {
+        notifyDataChange(model, DBMODEL_CHANGE_UPDATE, err);
+    }
     traceret(err);
     return err;
 }
 
-ErrCode DbSqlitePerson::update(DbModel *model, const QHash<QString, QString> &inFields, const QString &tableName)
+// this function is called mainly for updating data when delete model, so should
+// we update data like community change here??? let God answer, Godbless us
+ErrCode DbSqlitePerson::update(DbModel *model, const QHash<QString, QString> &inFields,
+                               const QString &tableName, bool notifyDataChange)
 {
-    return DbSqliteModelHandler::update(model, inFields, tableName);
+    return DbSqliteModelHandler::update(model, inFields, tableName, notifyDataChange);
+}
+
+ErrCode DbSqlitePerson::check2UpdateCommunity(Person* per)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    DbCommunityModelHandler* hdlComm = dynamic_cast<DbCommunityModelHandler*>(DB->getCommunityModelHandler());
+    const Community* rootComm = nullptr;
+    Community* comm = nullptr;
+    if (!per) {
+        err = ErrInvalidArg;
+        loge("invalid argument");
+    }
+    if (err == ErrNone && !hdlComm) {
+        err = ErrNoHandler;
+        loge("not found community handler");
+    }
+    if (err == ErrNone) {
+        logd("get root community");
+        rootComm = hdlComm->getRootCommunity();
+    }
+    // save community info
+    logd("Check to add community");
+    if (err == ErrNone) {
+        if (!per->communityUid().isEmpty()) {
+            logd("get community for uid '%s'", STR2CHA(per->communityUid()));
+            comm = static_cast<Community*>(DB->getCommunityModelHandler()->getByUid(per->communityUid()));
+            logd("community '%s'", MODELSTR2CHA(comm));
+            if (!comm) {
+                loge("communit uid '%s' is set, but not found!",
+                     STR2CHA(per->communityUid()));
+                err = ErrNotFound;
+            }
+        } else { // empty, use root community
+            if (rootComm) {
+                logi("No community uid was found, use root comm one");
+                comm = CLONE_MODEL(rootComm, Community);
+                if (!comm) {
+                    loge("cannot clone root comm, no memory?");
+                    err = ErrNoMemory;
+                }
+            } else {
+                logw("No root community to add");
+            }
+        }
+    }
+    if (err == ErrNone && comm) {
+        logi("Add per '%s' to comm '%s'", MODELSTR2CHA(per), MODELSTR2CHA(comm));
+        err = hdlComm->addPerson2Community(comm, per, true,
+                                                      MODEL_STATUS_ACTIVE, 0, 0,
+                                                      nullptr, false);
+        // TODO: handle error case?
+        logife(err, "Failed to add comm '%s' to person '%s'",
+               MODELSTR2CHA(comm), MODELSTR2CHA(per));
+
+    } else {
+        logd("No community to add for person '%s'", MODELSTR2CHA(per));
+    }
+    logife(err, "Failed to add comm '%s' to person '%s'",
+           MODELSTR2CHA(comm), MODELSTR2CHA(per));
+    FREE_PTR(comm);
+    traceret(err);
+    return err;
 }
 
 

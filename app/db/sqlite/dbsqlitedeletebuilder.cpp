@@ -73,7 +73,7 @@ QSqlQuery *DbSqliteDeleteBuilder::buildSqlQuery(const QString *cond)
     foreach( QString field, mCondition.keys() )
     {
         QString id = ":cond_" + field;
-        logd("Bind delete cond field '%s', value '%s'",
+        logd("Bind cond field '%s', value '%s'",
              id.toStdString().c_str(), mCondition.value(field).value.toStdString().c_str());
         qry->bindValue(id, mCondition.value(field).value); // TODO: check datat type????
 

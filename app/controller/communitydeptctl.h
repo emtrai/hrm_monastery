@@ -59,6 +59,12 @@ public:
                                          int modelStatus = MODEL_STATUS_MAX,
                                          bool* ok = nullptr);
 
+    /**
+     * @brief Get list of active people of comm dept
+     * @param commDeptUid
+     * @param ok
+     * @return
+     */
     const QList<DbModel*> getListActivePeople(const QString& commDeptUid,
                                          bool* ok = nullptr);
 
@@ -79,14 +85,6 @@ protected:
     const QString exportListPrebuiltTemplateName(const QString& modelName) const;
 
     virtual DbModelBuilder getMainBuilder();
-
-    /**
-     * @brief parse prebuilt file
-     * @param fpath path to prebuilt file
-     * @param ftype file type, i.e json
-     * @return
-     */
-//    virtual ErrCode parsePrebuiltFile(const QString &fpath, const QString &ftype);
 
     /**
      * @brief parse one item of prebuilt file

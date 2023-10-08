@@ -56,7 +56,7 @@ public:
     DbModelHandler();
 
     virtual ErrCode add(DbModel* model, bool notifyDataChange = true) = 0;
-    virtual ErrCode update(DbModel* model) = 0;
+    virtual ErrCode update(DbModel* model, bool notifyDataChange = true) = 0;
     /**
      * @brief delete by change status to delete
      * @param model

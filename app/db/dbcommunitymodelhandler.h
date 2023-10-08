@@ -54,6 +54,11 @@ public:
     virtual QList<DbModel*> getListCommunityPersonOfPerson(const QString& perUid,
                                                             int modelStatus = MODEL_STATUS_MAX) = 0;
     virtual QList<DbModel*> getListActiveCommunityPersonOfPerson(const QString& perUid) = 0;
+    /**
+     * @brief Root/Top level community
+     * @return Community model, null if not exist
+     */
+    virtual const Community* getRootCommunity() = 0;
 };
 
 #endif // DBCOMMUNITYMODELHANDLER_H

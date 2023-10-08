@@ -38,7 +38,6 @@
 #include <QDesktopServices>
 
 #include "view/dialog/dlgimportpersonlistresult.h"
-#include "view/dialog/dlgimportcommunitylistresult.h"
 #include "view/dialog/dlghtmlviewer.h"
 #include "view/dialog/dlgeditmodel.h"
 #include "view/dialog/dlgcourse.h"
@@ -126,6 +125,7 @@ MainWindow::MainWindow(QWidget *parent)
     mDepartView = UITableViewFactory::getView(ViewType::VIEW_DEPARTMENT);
     mRoleView = UITableViewFactory::getView(ViewType::VIEW_ROLE);
     mCourseView = UITableViewFactory::getView(ViewType::VIEW_COURSE);
+    mPersonStatusView = UITableViewFactory::getView(ViewType::VIEW_PERSON_STATUS);
 
     mHomeView = new UITextBrowser(this);
     mHomeView->clearHistory();
@@ -134,8 +134,18 @@ MainWindow::MainWindow(QWidget *parent)
     loadHomePageFile();
     // TODO: load all memory, consume much memory and performance
     mHomeView->setSearchPaths(QStringList(FileCtl::getOrCreatePrebuiltDataDir()));
-    mHomeView->setHtml(Utils::readAll(
-        FileCtl::getUpdatePrebuiltDataFilePath(KPrebuiltHomeHtmlFileName, false)));
+
+    // get home.html file from install dir first, if not exist, load from prebuilt folder
+    // which is copied from app's resource
+    QString homePath;
+    homePath = FileCtl::getAppInstallDir(KPrebuiltHomeHtmlFileName);
+    logd("install dir homePath '%s'", STR2CHA(homePath));
+    if (homePath.isEmpty() || !QFileInfo::exists(homePath)) {
+        logd("homePath '%s' not exist", STR2CHA(homePath));
+        homePath = FileCtl::getUpdatePrebuiltDataFilePath(KPrebuiltHomeHtmlFileName, false);
+    }
+    logd("homePath '%s'", STR2CHA(homePath));
+    mHomeView->setHtml(Utils::readAll(homePath));
 
 
     mViewList.insert(VIEW_SUMMARY, (BaseView*)mSummarizeView);
@@ -147,6 +157,7 @@ MainWindow::MainWindow(QWidget *parent)
     mViewList.insert(VIEW_DEPARTMENT, (BaseView*)mDepartView);
     mViewList.insert(VIEW_ROLE, (BaseView*)mRoleView);
     mViewList.insert(VIEW_COURSE, (BaseView*)mCourseView);
+    mViewList.insert(VIEW_PERSON_STATUS, (BaseView*)mPersonStatusView);
 
     switchView(mHomeView);
 
@@ -929,21 +940,10 @@ void MainWindow::loadOtherMenu()
                     STR_COURSE_TERM,
                     ICON_COURSE);
 
-    //    QAction* act = nullptr;
-
-    //    act = otherMenu->addAction(QIcon(QString::fromUtf8(":/icon/icon/icons8-earth-planet-80")),
-    //                               tr("Khu vực"));
-    //    QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionArea_triggered()));
-
-    // TODO: when other menu clear? check it
-    //    act = otherMenu->addAction(QIcon(QString::fromUtf8(":/icon/icon/icons8-saint-64")),
-    //                                        tr("Thánh"));
-    //                   QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionSaints_2_triggered()));
-
-
-    //    act = otherMenu->addAction(QIcon(QString::fromUtf8(":/icon/icon/icons8-unit-80.png")),
-    //                               tr("Vị trí/vai trò"));
-    //    QObject::connect(act, SIGNAL(triggered()), this, SLOT(on_actionRole_triggered()));
+    ADD_ACTION_ITEM(otherMenu,
+                    on_actionPersonStatus_triggered,
+                    STR_PERSON_STATUS,
+                    ICON_PERSON);
 }
 
 void MainWindow::loadImportMenu()
@@ -1367,6 +1367,14 @@ void MainWindow::on_actionCourse_triggered()
     tracein;
     switchView(mCourseView);
     traceout;
+}
+
+void MainWindow::on_actionPersonStatus_triggered()
+{
+    tracein;
+    switchView(mPersonStatusView);
+    traceout;
+
 }
 
 

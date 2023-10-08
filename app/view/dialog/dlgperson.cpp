@@ -556,7 +556,11 @@ ErrCode DlgPerson::fromPerson(const Person *model)
     logd("load community");
     // TODO: handle the case that adding community dialog is shown when no community found
     // before showing person add dialog
-    Utils::setSelectItemComboxByData(ui->cbCommunity, per->communityUid());
+    if (ErrNotFound == Utils::setSelectItemComboxByData(ui->cbCommunity, per->communityUid())) {
+        const Community* rootComm = COMMUNITYCTL->getRootCommunity();
+        Utils::setSelectItemComboxByData(ui->cbCommunity, rootComm->uid());
+        updateCommunityNote(tr("Không tìm thấy Cộng đoàn, gán cộng đoàn mặc định"));
+    }
 
     logd("load person event");
     events = per->personEventList();
@@ -658,6 +662,11 @@ void DlgPerson::multiComboxItemUpdate(UIMultiComboxView *cb, QLineEdit* txt)
     }
     if (txt) txt->setText(str);
     traceout;
+}
+
+void DlgPerson::updateCommunityNote(const QString &msg)
+{
+    ui->lblCommNote->setText(msg);
 }
 
 
@@ -887,9 +896,13 @@ void DlgPerson::loadCommunity()
     tracein;
     logd("Load community");
     QList<DbModel*> listCommunity = COMMUNITYCTL->getAllItems();
+    const Community* rootComm = COMMUNITYCTL->getRootCommunity();
     ui->cbCommunity->clear();
-    ui->cbCommunity->addItem(STR_UNKNOWN, KUidNone);
+    if (rootComm) {
+        ui->cbCommunity->addItem(rootComm->name(), rootComm->uid());
+    }
     foreach(DbModel* item, listCommunity){
+        if (!item || (rootComm && (rootComm->uid() == item->uid()))) continue;
         ui->cbCommunity->addItem(item->name(), item->uid());
     }
     traceout;
@@ -1519,5 +1532,11 @@ void DlgPerson::on_btnModifyEvent_clicked()
         loge("no person event model to modify");
     }
     traceout;
+}
+
+
+void DlgPerson::on_cbCommunity_currentIndexChanged(int index)
+{
+    updateCommunityNote(tr("Nếu thay đổi khi chỉnh sửa thông tin, sự kiện đổi cộng đoàn sẽ KHÔNG được cập nhật"));
 }
 

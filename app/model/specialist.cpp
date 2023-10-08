@@ -20,12 +20,9 @@
  * Brief:
  */
 #include "specialist.h"
-#include "crypto.h"
-#include "errcode.h"
 #include "logger.h"
 
 #include "dbctl.h"
-#include "defs.h"
 
 Specialist::Specialist():DbModel()
 {

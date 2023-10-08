@@ -29,7 +29,6 @@
 #include "model/communityperson.h"
 #include "person.h"
 #include "community.h"
-#include "handler/dbsqliteperson.h"
 #include "dbpersonmodelhandler.h"
 #include "communitydept.h"
 #include "exception.h"
@@ -38,9 +37,18 @@ GET_INSTANCE_IMPL(DbSqliteCommunity)
 
 #define MAX_CHECK_DUP_TIME 1024
 
-DbSqliteCommunity::DbSqliteCommunity():DbSqliteModelHandler(KModelHdlCommunity)
+DbSqliteCommunity::DbSqliteCommunity():DbSqliteModelHandler(KModelHdlCommunity),
+    mRootCommunity(nullptr)
+{
+    traced;
+    mRootCommunity = nullptr;
+}
+
+DbSqliteCommunity::~DbSqliteCommunity()
 {
     tracein;
+    FREE_PTR(mRootCommunity);
+    traceout;
 }
 
 DbSqliteTbl *DbSqliteCommunity::getMainTbl()
@@ -139,7 +147,7 @@ ErrCode DbSqliteCommunity::add(DbModel *model, bool notify)
                     commdept->setName(dept->name());
                     commdept->setModelStatus(MODEL_STATUS_ACTIVE);
                     logi("Add dept '%s' to community '%s'", STR2CHA(dept->toString()), STR2CHA(model->toString()));
-                    err = commdept->save();
+                    err = commdept->save(false);
                     delete commdept;
                     logd("add result=%d", err);
                 } else {
@@ -205,7 +213,8 @@ ErrCode DbSqliteCommunity::deleteHard(DbModel *model, bool force, QString *msg)
 }
 
 
-QList<Person *> DbSqliteCommunity::getListPerson(const QString &commUid, int modelStatus, const QString* perStatusUid)
+QList<Person *> DbSqliteCommunity::getListPerson(const QString &commUid, int modelStatus,
+                                                 const QString* perStatusUid)
 {
     tracein;
     QList<Person *> list;
@@ -250,7 +259,8 @@ QList<DbModel *> DbSqliteCommunity::getListCommunityPerson(const QString &commUi
 
 }
 
-QList<DbModel *> DbSqliteCommunity::getListCommunityPersonOfPerson(const QString &perUid, int modelStatus)
+QList<DbModel *> DbSqliteCommunity::getListCommunityPersonOfPerson(const QString &perUid,
+                                                                   int modelStatus)
 {
     tracein;
     QList<DbModel *> list;
@@ -346,7 +356,7 @@ ErrCode DbSqliteCommunity::addPerson2Community(const Community *comm,
                                                                             enddate, remark);
             if (mapModel) {
                 mapModel->setModelStatus(MODEL_STATUS_ACTIVE); // TODO: set active here is suitable???
-                err = mapModel->save();
+                err = mapModel->save(notify);
                 delete mapModel;
             } else {
                 err = ErrNoMemory;
@@ -364,6 +374,34 @@ ErrCode DbSqliteCommunity::addPerson2Community(const Community *comm,
     }
     traceret(err);
     return err;
+}
+
+const Community *DbSqliteCommunity::getRootCommunity()
+{
+    tracein;
+    DbModel* model = nullptr;
+    // TODO: should we mark if root community is loaded? to avoid re-query data multiple
+    // times when no root community found.
+    // but there is a case that root community can be added later, so mark as loadded may cause
+    // it not up-to-date
+    // solution can be when  community is added, check if it's root community, then
+    // clear flag, but a little bit complicated, so do it later.
+    if (!mRootCommunity) {
+        logd("query root model with name '%s'", KModelNameIdRootCommunity);
+        model = getByNameId(KModelNameIdRootCommunity, &Community::build);
+        if (IS_MODEL_NAME(model, KModelNameCommunity)) {
+            logd("found root community '%s'", MODELSTR2CHA(model));
+            mRootCommunity = static_cast<Community*>(model);
+        } else {
+            loge("not found root community with name '%s' or invalid model '%s'",
+                 KModelNameIdRootCommunity, MODELSTR2CHA(model));
+        }
+    } else {
+        logd("use existing root community '%s'", MODELSTR2CHA(mRootCommunity));
+    }
+    logd("mRootCommunity '%s", MODELSTR2CHA(mRootCommunity));
+    traceout;
+    return mRootCommunity;
 }
 
 

@@ -172,24 +172,30 @@ void Person::clone(const DbModel *model)
         mJoinDate = per->joinDate();
         mJoinPICUid = per->joinPICUid();
         mJoinPICName = per->joinPICName();
+        mJoinPICNameId = per->joinPICNameId();
 
         mPreTrainJoinDate = per->preTrainJoinDate();
         mPreTrainPICUid = per->preTrainPICUid();
         mPreTrainPICName = per->preTrainPICName();
+        mPreTrainPICNameId = per->preTrainPICNameId();
         mTrainJoinDate = per->trainJoinDate();
 
         mTrainPICUid = per->trainPICUid();
         mTrainPICName = per->trainPICName();
+        mTrainPICNameId = per->trainPICNameId();
 
         mVowsDate = per->vowsDate();
         mVowsCEOUid = per->vowsCEOUid();
         mVowsCEOName = per->vowsCEOName();
+        mVowsCEONameId = per->vowsCEONameId();
 
         mEternalVowsDate = per->eternalVowsDate();
         mEternalVowsCEOUid = per->eternalVowsCEOUid();
         mEternalVowsCEOName = per->eternalVowsCEOName();
+        mEternalVowsCEONameId = per->eternalVowsCEONameId();
         mEternalVowsPICUid = per->eternalVowsPICUid();
         mEternalVowsPICName = per->eternalVowsPICName();
+        mEternalVowsPICNameId = per->eternalVowsPICNameId();
 
         mBankDate = per->bankDate();
         mBankPlace = per->bankPlace();
@@ -1222,10 +1228,10 @@ void Person::setCommunityNameId(const QString &newCommunityNameId)
     mCommunityNameId = newCommunityNameId;
 }
 
-ErrCode Person::save()
+ErrCode Person::save(bool notifyDataChange)
 {
     tracein;
-    ErrCode err = DbModel::save();
+    ErrCode err = DbModel::save(notifyDataChange);
     if (err == ErrNone && !mImage.fullImgPath().isEmpty()) {
         logd("save image");
         err = mImage.save();
@@ -1238,7 +1244,7 @@ ErrCode Person::save()
     return err;
 }
 
-ErrCode Person::update(bool allFields)
+ErrCode Person::update(bool allFields, bool notifyDataChange)
 {
     tracein;
     ErrCode err = ErrNone;
@@ -1262,7 +1268,7 @@ ErrCode Person::update(bool allFields)
     // yet, causing data mark that image file not exist
     // therefore, we save first, then update later, if error, just remove it
     if (err == ErrNone) {
-        err = DbModel::update(allFields);
+        err = DbModel::update(allFields, notifyDataChange);
     }
     // delete image if pending dele image, or error and image saved
     if ((err == ErrNone && pendingDelImg) || (err != ErrNone && imageSaved)) {
@@ -2276,8 +2282,10 @@ void Person::addSpecialistName(const QString &newSpecialist)
 
 void Person::clearSpecialistUid()
 {
-    mSpecialistUidList.clear();
-    markItemAsModified(KItemSpecialist);
+    if (mSpecialistUidList.size() > 0) {
+        mSpecialistUidList.clear();
+        markItemAsModified(KItemSpecialist);
+    }
 }
 
 void Person::addSpecialistUid(const QString &uid)

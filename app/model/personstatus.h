@@ -27,9 +27,11 @@
 class PersonStatus : public DbModel
 {
 public:
-    PersonStatus();
+    explicit PersonStatus();
+    virtual ~PersonStatus();
     static DbModel *build();
     virtual DbModelBuilder getBuilder() const;
+    virtual QString modelName() const;
 
 
 protected:

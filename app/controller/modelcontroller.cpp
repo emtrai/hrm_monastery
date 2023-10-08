@@ -1072,7 +1072,7 @@ DbModel* ModelController::doImportOneItem(const QString& importName, int importF
 {
     tracein;
     loge("DEFAULT doImportOneItem, MUST BE IMPLEMENTED IN DERIVED CLASS");
-    FAIL("DEFAULT doImportOneItem, MUST BE IMPLEMENTED IN DERIVED CLASS");
+//    FAIL("DEFAULT doImportOneItem, MUST BE IMPLEMENTED IN DERIVED CLASS");
     // TODO: make it abstract????
     return nullptr;
 }

@@ -24,7 +24,7 @@
 
 #include <dbmodel.h>
 
-#define SAVE_MAP_MODEL(MODEL, field1, field2, status, startdate, enddate, remark) \
+#define SAVE_MAP_MODEL(MODEL, field1, field2, status, startdate, enddate, remark, notify) \
 do { \
         MODEL* model = new MODEL(); \
         model->setDbId1(field1->dbId()); \
@@ -37,7 +37,7 @@ do { \
         if (!remark.isEmpty()) \
         model->setRemark(remark); \
         logd("Add to db"); \
-        err = model->save(); \
+        err = model->save(notify); \
         delete model; \
         model = nullptr; \
 } while (0)

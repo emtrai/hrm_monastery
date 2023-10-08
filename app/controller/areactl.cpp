@@ -74,14 +74,7 @@ ErrCode AreaCtl::getContactPeopleList(const QString &areaUid, QList<DbModel *> &
             logw("not found list person of areaUid '%s'", STR2CHA(areaUid));
         }
     }
-    if (err != ErrNone) {
-        loge("Get list of active person failed, err=%d", err);
-        // we don't have error code return, so report error here.
-        REPORTERRCTL->reportErr(QObject::tr("Lỗi truy vấn danh sách nữ tu liên lạc của khu vực"),
-                                err, true);
-    } else {
-        logd("Got %lld items", items.size());
-    }
+    logife(err, "Get list of active person failed");
 
     traceout;
     return err;
@@ -160,10 +153,7 @@ DbModel* AreaCtl::buildModel(void *items, const QString &fmt)
         }
     } else {
         loge("failed to import/build model for area, err=%d", err);
-        if (item) {
-            delete item;
-            item = nullptr;
-        }
+        FREE_PTR(item);
     }
     traceout;
     return item;

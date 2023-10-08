@@ -55,6 +55,7 @@ do { \
 } while(0)
 
 // if (markModified()) logd("value is different '%s'", QString("'%1' vs '%2'").arg(cur, next).toStdString().c_str());
+// if (markModified()) logd("%s", STR2CHA(QString("cur '%1' next '%2'").arg(cur, next)));
 #define CHECK_MODIFIED_THEN_SET(cur, next, itemName) \
     do { \
         if (cur != next) { \
@@ -299,14 +300,14 @@ public:
      * All information will be stored/replaced
      * @return Error code
      */
-    virtual ErrCode save();
+    virtual ErrCode save(bool notifyDataChange = true);
 
     virtual DbModel* addFieldToBeUpdated(const QString& field);
     /**
      * @brief Update modified info
      * @return Error code
      */
-    virtual ErrCode update(bool allFields = false);
+    virtual ErrCode update(bool allFields = false, bool notifyDataChange = true);
 
     /**
      * @brief remove data from db
@@ -401,6 +402,7 @@ protected:
     virtual void checkModifiedThenSet(QString& cur, const QString& next, const QString& itemName);
     virtual void checkModifiedThenSet(qint32& cur, qint32 next, const QString& itemName);
     virtual void checkModifiedThenSet(qint64& cur, qint64 next, const QString& itemName);
+    virtual void appendDbHistory(const QString& msg);
 
 protected:
     bool mDeletable; // model can be deleted from db or not

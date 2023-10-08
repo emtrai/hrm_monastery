@@ -24,12 +24,10 @@
 #include "logger.h"
 #include "errcode.h"
 #include "communitydept.h"
-#include "person.h"
 #include "utils.h"
 #include <QFile>
 #include <QDate>
 #include "defs.h"
-#include "filectl.h"
 #include "dbctl.h"
 #include <QByteArray>
 #include <QJsonDocument>
@@ -148,7 +146,7 @@ CommunityDept* CommunityDeptCtl::onJsonParseOneItem(const QJsonObject& jobj, boo
 
     logd("Parse result %d", err);
     if (ok) *ok = (err == ErrNone);
-    if (err != ErrNone) {
+    if (err != ErrNone && ret) {
         delete ret;
         ret = nullptr;
     }
@@ -157,89 +155,16 @@ CommunityDept* CommunityDeptCtl::onJsonParseOneItem(const QJsonObject& jobj, boo
 
 }
 
-ErrCode CommunityDeptCtl::onImportDataStart(const QString &importName, int importFileType, const QString &fname)
+ErrCode CommunityDeptCtl::onImportDataStart(const QString &importName,
+                                            int importFileType, const QString &fname)
 {
     tracein;
+    UNUSED(importFileType);
     logi("start import '%s', fname '%s'", STR2CHA(importName), STR2CHA(fname));
     mImportFields.clear();
     traceout;
     return ErrNone;
 }
-
-//ErrCode CommunityDeptCtl::parsePrebuiltFile(const QString &fpath, const QString &ftype)
-//{
-//    ErrCode ret = ErrNone;
-//    tracein;
-//    logi("Parse prebuilt file for community dept, fpath '%s', ftype '%s'",
-//         STR2CHA(fpath), STR2CHA(ftype));
-
-//    if (fpath.isEmpty() || ftype.isEmpty()) {
-//        ret = ErrInvalidArg;
-//        loge("invalid argument");
-//    }
-//    if (ret == ErrNone) {
-//        if (ftype == KFileTypeJson) {
-
-//            logd("Load file %s", fpath.toStdString().c_str());
-//            QFile loadFile(fpath);
-//            QByteArray importData;
-
-//            if (!loadFile.open(QIODevice::ReadOnly)) {
-//                loge("Couldn't open file %s", fpath.toStdString().c_str());
-//                ret = ErrFileRead;
-//            }
-
-//            if (ret == ErrNone){
-//                logd("Parse json");
-//                importData = loadFile.readAll();
-//                logd("importData length %d", (int)importData.length());
-//                if (importData.size() == 0) {
-//                    ret = ErrNoData;
-//                    loge("not json data to parse");
-//                }
-//            }
-
-//            if (ret == ErrNone) {
-//                QJsonDocument loadDoc = QJsonDocument::fromJson(importData);
-
-//                logd("loadDoc isEmpty %d", loadDoc.isEmpty());
-//                QJsonObject jRootObj = loadDoc.object();
-//                if (jRootObj.contains(JSON_ITEMS) && jRootObj[JSON_ITEMS].isArray()) {
-//                    QJsonArray jlist = jRootObj[JSON_ITEMS].toArray();
-//                    for (int levelIndex = 0; levelIndex < jlist.size() && (ret == ErrNone); ++levelIndex) {
-//                        QJsonObject jObj = jlist[levelIndex].toObject();
-//                        bool ok = false;
-//                        CommunityDept* dept = onJsonParseOneItem(jObj, &ok);
-//                        if (dept) {
-//                            if (ok && dept->isValid()) {
-//                                ret = dept->save();
-//                                if (ret == ErrExisted) { // already exist, mean ok
-//                                    ret = ErrNone;
-//                                    logw("'%s' already exist", STR2CHA(dept->toString()));
-//                                }
-//                            }
-
-//                            delete dept;
-
-//                        } else {
-//                            ret = ErrFailed;
-//                            loge("parse json one item failed");
-//                        }
-//                    }
-//                } else {
-//                    loge("Invalid data, not found %s", JSON_DEPARTMENTS);
-//                    ret = ErrInvalidData;
-//                }
-//            }
-
-//        } else {
-//            ret = ErrNotSupport;
-//            loge("ftype '%s' is not support", STR2CHA(ftype));
-//        }
-//    }
-//    traceret(ret);
-//    return ret;
-//}
 
 QList<DbModel *> CommunityDeptCtl::getListDept(const QString &communityUid, bool* ok)
 {

@@ -23,9 +23,7 @@
 
 #include "logger.h"
 #include "personstatus.h"
-#include "dbctl.h"
 #include "utils.h"
-#include "defs.h"
 #include "prebuiltdefs.h"
 #include "controllerdefs.h"
 

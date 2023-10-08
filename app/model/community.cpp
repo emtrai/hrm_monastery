@@ -357,7 +357,7 @@ DbModelHandler *Community::getDbModelHandler() const
 bool Community::allowRemove(QString *msg)
 {
     tracein;
-    bool allow = ((level() != 0) || !mParentUid.isEmpty()) && (nameId() != KModelNameHoiDong);
+    bool allow = ((level() != 0) || !mParentUid.isEmpty()) && (nameId() != KModelNameIdRootCommunity);
     logd("level %d, parent uid '%s', allow %d", level(), STR2CHA(mParentUid), allow); // TODO: level only is enought???
     if (msg) {
         if (level() == 0 && !mParentUid.isEmpty()) {

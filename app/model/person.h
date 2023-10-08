@@ -433,8 +433,8 @@ public:
     const QString &communityNameId() const;
     void setCommunityNameId(const QString &newCommunityNameId);
 
-    virtual ErrCode save();
-    virtual ErrCode update(bool allFields = false);
+    virtual ErrCode save(bool notifyDataChange = true);
+    virtual ErrCode update(bool allFields = false, bool notifyDataChange = true);
     virtual ErrCode remove(bool force = false, QString* msg = nullptr);
 
     virtual const QList<DbModel *> personEventList(bool reload = false);

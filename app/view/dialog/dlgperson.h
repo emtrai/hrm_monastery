@@ -47,65 +47,66 @@ class DlgPerson : public QDialog, public UIMultiComboxViewListener, public Commo
         MAX
     };
 
-        protected:
-                 explicit DlgPerson(QWidget *parent = nullptr);
-        public:
-                    ~DlgPerson();
+protected:
+         explicit DlgPerson(QWidget *parent = nullptr);
+public:
+            ~DlgPerson();
 
-                    Person *person(bool newone=false);
+            Person *person(bool newone=false);
 
-                public:
-                    static DlgPerson* buildDlg(QWidget *parent = nullptr, const Person* per = nullptr, bool isNew = true);
+public:
+    static DlgPerson* buildDlg(QWidget *parent = nullptr, const Person* per = nullptr, bool isNew = true);
 
 //                    implemete it
 //                    add model name to common edit model, pass it to onNewModel
-                    virtual QString getName();
-                    virtual void onDbModelReady(ErrCode ret, DbModel* model, DlgCommonEditModel* dlg);
-                    virtual DbModel* onCreateDbModelObj(const QString& modelName);
-             private:
-                Ui::DlgPerson *ui;
+    virtual QString getName();
+    virtual void onDbModelReady(ErrCode ret, DbModel* model, DlgCommonEditModel* dlg);
+    virtual DbModel* onCreateDbModelObj(const QString& modelName);
+private:
+    Ui::DlgPerson *ui;
 
-             private:
-                void setupUI();
-                Person *getPerson();
-                ErrCode buildPerson(Person* person);
-                ErrCode fromPerson(const Person* person);
-                void multiComboxItemUpdate(UIMultiComboxView *cb, QLineEdit* txt = nullptr);
-             public:
-                virtual ErrCode onComboxNewItem(UIMultiComboxView* ui, const QString& value, bool silent);
-                virtual void onComboxItemAdded(UIMultiComboxView* ui, const QString& name, const QVariant& value);
-                virtual void onComboxItemDeleted(UIMultiComboxView* ui, const QString& name, const QVariant& value);
-                virtual void onComboxClearAll();
+private:
+    void setupUI();
+    Person *getPerson();
+    ErrCode buildPerson(Person* person);
+    ErrCode fromPerson(const Person* person);
+    void multiComboxItemUpdate(UIMultiComboxView *cb, QLineEdit* txt = nullptr);
+    void updateCommunityNote(const QString& msg);
+public:
+    virtual ErrCode onComboxNewItem(UIMultiComboxView* ui, const QString& value, bool silent);
+    virtual void onComboxItemAdded(UIMultiComboxView* ui, const QString& name, const QVariant& value);
+    virtual void onComboxItemDeleted(UIMultiComboxView* ui, const QString& name, const QVariant& value);
+    virtual void onComboxClearAll();
 
-//protected:
-                //    virtual void accept();
-                DlgPerson::Mode editMode() const;
-                void setEditMode(DlgPerson::Mode newEditMode);
+    //protected:
+    //    virtual void accept();
+    DlgPerson::Mode editMode() const;
+    void setEditMode(DlgPerson::Mode newEditMode);
 
-                bool isNew() const;
-                void setIsNew(bool newIsNew);
+    bool isNew() const;
+    void setIsNew(bool newIsNew);
 
-                bool isSelfSave() const;
-                void setIsSelfSave(bool newIsSelfSave);
+    bool isSelfSave() const;
+    void setIsSelfSave(bool newIsSelfSave);
 
-            private:
-                void loadPersonCode();
-                void loadEdu();
-                void loadSaints();
-                void loadSpecialist();
-                void loadEthnic();
-                void loadCourse();
-                void loadCountry();
-#ifndef SKIP_PERSON_PROVINE
-                void loadProvince();
-#endif
-                void loadWork();
-                void loadCommunity();
-                void loadStatus();
+    private:
+    void loadPersonCode();
+    void loadEdu();
+    void loadSaints();
+    void loadSpecialist();
+    void loadEthnic();
+    void loadCourse();
+    void loadCountry();
+    #ifndef SKIP_PERSON_PROVINE
+    void loadProvince();
+    #endif
+    void loadWork();
+    void loadCommunity();
+    void loadStatus();
 
-                void loadEvent(bool reloadAll = false);
-                void cleanEvent();
-                void searchPerson(QLineEdit* wget);
+    void loadEvent(bool reloadAll = false);
+    void cleanEvent();
+    void searchPerson(QLineEdit* wget);
 private slots:
     void on_btnImport_clicked();
     void on_buttonBox_clicked( QAbstractButton * button );
@@ -150,6 +151,8 @@ private slots:
 
 
     void on_btnModifyEvent_clicked();
+
+    void on_cbCommunity_currentIndexChanged(int index);
 
 private:
     Person* mPerson;

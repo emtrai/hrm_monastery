@@ -21,17 +21,19 @@
  */
 #include "personstatus.h"
 #include "logger.h"
-#include "errcode.h"
-#include "filectl.h"
-#include "utils.h"
 #include "dbctl.h"
-#include "defs.h"
 #include "dbmodel.h"
 
 PersonStatus::PersonStatus():DbModel()
 {
     traced;
 }
+
+PersonStatus::~PersonStatus()
+{
+    traced;
+}
+
 DbModel *PersonStatus::build()
 {
     PersonStatus* model = new PersonStatus();
@@ -42,6 +44,12 @@ DbModel *PersonStatus::build()
 DbModelBuilder PersonStatus::getBuilder() const
 {
     return &PersonStatus::build;
+}
+
+QString PersonStatus::modelName() const
+{
+    return KModelNamePersonStatus;
+
 }
 
 DbModelHandler *PersonStatus::getDbModelHandler() const

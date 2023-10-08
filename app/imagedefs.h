@@ -49,6 +49,7 @@
 #define ICON_DEPT ICON_PATH("icons8-diversity-64.png")
 #define ICON_ADD_COMMUNITY ICON_PATH("icons8-community-64")
 #define ICON_ADD_PERSON_EVENT ICON_PATH("icons8-add-64")
-#define ICON_ADD QString::fromUtf8(":/icon/icon/icons8-add-64")
+#define ICON_ADD ICON_PATH("icons8-add-64")
+#define ICON_PERSON ICON_PATH("icons8-nun-64")
 
 #endif // IMAGEDEFS_H

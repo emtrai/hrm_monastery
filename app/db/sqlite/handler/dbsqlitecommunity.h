@@ -36,6 +36,7 @@ class DbSqliteCommunity : public DbSqliteModelHandler, public DbCommunityModelHa
     GET_INSTANCE_DECL(DbSqliteCommunity);
 public:
     DbSqliteCommunity();
+    virtual ~DbSqliteCommunity();
     /**
      * @brief add model to db
      * @param model
@@ -52,7 +53,8 @@ public:
      * @return list of Person
      */
     virtual QList<Person*> getListPerson(const QString& communityUid,
-                                           int modelStatus = MODEL_STATUS_MAX, const QString* perStatusUid = nullptr);
+                                           int modelStatus = MODEL_STATUS_MAX,
+                                          const QString* perStatusUid = nullptr);
     /**
      * @brief getListCommunityPerson
      * @param commUid
@@ -93,11 +95,17 @@ public:
                                       qint64 enddate = 0,
                                       const QString& remark = nullptr,
                                       bool notifyDbChange = true);
+    /**
+     * @brief Root/Top level community
+     * @return Community model, null if not exist
+     */
+    virtual const Community* getRootCommunity();
 protected:
     virtual DbSqliteTbl* getMainTbl();
     virtual DbSqliteTbl* getTable(const QString& modelName);
     virtual DbModelBuilder getMainBuilder();
-
+private:
+    Community* mRootCommunity;
 };
 
 #endif // DBSQLITECOMMUNITY_H

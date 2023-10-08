@@ -26,6 +26,8 @@
 #include "utils.h"
 #include <QList>
 
+#define PERSONSTATUSCTL PersonStatusCtl::getInstance()
+
 class PersonStatus;
 
 class PersonStatusCtl : public ModelController

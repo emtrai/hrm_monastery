@@ -30,6 +30,7 @@
 #include "errcode.h"
 
 class DbSqlitePersonTbl;
+class Person;
 class DbSqlitePerson : public DbSqliteModelHandler, public DbPersonModelHandler
 {
     GET_INSTANCE_DECL(DbSqlitePerson);
@@ -105,8 +106,12 @@ public:
     virtual ErrCode getListPersonInCommunity(const QString& communityUid, qint32 status, QList<DbModel*>& list);
     virtual ErrCode getListCommunitesOfPerson(const QString& perUid, qint32 modelStatus, QList<CommunityPerson*>& list);
 
-    virtual ErrCode update(DbModel* model);
-    virtual ErrCode update(DbModel* model, const QHash<QString, QString> &inFields, const QString& tableName);
+    virtual ErrCode update(DbModel* model, bool notifyDataChange = true);
+    virtual ErrCode update(DbModel* model,
+                           const QHash<QString, QString> &inFields,
+                           const QString& tableName, bool notifyDataChange = true);
+
+    virtual ErrCode check2UpdateCommunity(Person* per);
 protected:
     virtual DbSqliteTbl* getMainTbl();
     virtual DbModelBuilder getMainBuilder();

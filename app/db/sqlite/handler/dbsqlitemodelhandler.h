@@ -47,7 +47,7 @@ do { \
         } else { \
             foreach (DbModel* model, list) { \
                 logi("force Update '%s'", STR2CHA(model->toString())); \
-                tmpErr = update(model, itemToSet, tableName); \
+                tmpErr = update(model, itemToSet, tableName, false); \
                 logi("Update result=%d", tmpErr); \
             } \
         } \
@@ -100,8 +100,11 @@ public:
      */
     virtual ErrCode add(DbModel* model, bool notifyDataChange = true);
 
-    virtual ErrCode update(DbModel* model);
-    virtual ErrCode update(DbModel* model, const QHash<QString, QString> &inFields, const QString& tableName);
+    virtual ErrCode update(DbModel* model, bool notifyDataChange = true);
+    virtual ErrCode update(DbModel* model,
+                           const QHash<QString, QString> &inFields,
+                           const QString& tableName,
+                           bool notifyDataChange = true);
 
     /**
      * @brief delete by change status to delete

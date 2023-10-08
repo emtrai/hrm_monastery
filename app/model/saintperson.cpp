@@ -89,6 +89,15 @@ void SaintPerson::setSaintDbId(qint64 newSaintDbId)
     mSaintDbId = newSaintDbId;
 }
 
+QString SaintPerson::toString() const
+{
+    QString str = DbModel::toString();
+    str += QString(":saintUid(%1):personUid('%2')")
+               .arg(saintUid())
+               .arg(personUid());
+    return str;
+}
+
 const QString &SaintPerson::saintUid() const
 {
     return mSaintUid;

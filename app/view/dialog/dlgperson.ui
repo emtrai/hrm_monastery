@@ -38,9 +38,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-1635</y>
+        <y>-1907</y>
         <width>679</width>
-        <height>3135</height>
+        <height>4123</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -414,6 +414,9 @@
             <widget class="QLabel" name="lblImgPath">
              <property name="text">
               <string/>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -862,13 +865,6 @@
             <string>Tại</string>
            </property>
           </widget>
-         </item>
-         <item row="35" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="0">
-           <item>
-            <widget class="QComboBox" name="cbCommunity"/>
-           </item>
-          </layout>
          </item>
          <item row="6" column="1">
           <widget class="QLineEdit" name="txtBirthplace"/>
@@ -1673,6 +1669,32 @@
          </item>
          <item row="34" column="1">
           <widget class="QPlainTextEdit" name="txtWorkHistory"/>
+         </item>
+         <item row="35" column="1">
+          <layout class="QVBoxLayout" name="verticalLayout_9">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QComboBox" name="cbCommunity"/>
+           </item>
+           <item>
+            <widget class="QLabel" name="lblCommNote">
+             <property name="font">
+              <font>
+               <pointsize>11</pointsize>
+               <italic>true</italic>
+              </font>
+             </property>
+             <property name="text">
+              <string>Nếu thay đổi khi chỉnh sửa thông tin, sự kiện đổi cộng đoàn sẽ KHÔNG được cập nhật</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
         </layout>
        </item>

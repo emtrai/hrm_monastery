@@ -41,7 +41,12 @@ private:
     virtual ~AreaCtl();
 protected:
 
-    // build model from data
+    /**
+     * @brief build model from string list
+     * @param items string list
+     * @param fmt
+     * @return
+     */
     virtual DbModel *buildModel(void *items, const QString &fmt);
 
     // prebuilt data file name

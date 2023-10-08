@@ -49,6 +49,7 @@ public:
 
     qint64 saintDbId() const;
     void setSaintDbId(qint64 newSaintDbId);
+    virtual QString toString() const;
 
 protected:
     virtual DbModelHandler *getDbModelHandler() const;

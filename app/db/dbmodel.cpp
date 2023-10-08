@@ -35,6 +35,8 @@
 #include "stringdefs.h"
 #include "datetimeutils.h"
 
+#define MAX_HISTORY_LENGTH 500
+
 DbModel::DbModel():
     mDeletable(true)
     , mDbId(0)
@@ -443,6 +445,20 @@ void DbModel::checkModifiedThenSet(qint64 &cur, qint64 next, const QString &item
     CHECK_MODIFIED_THEN_SET(cur, next, itemName);
 }
 
+void DbModel::appendDbHistory(const QString &msg)
+{
+    tracein;
+    QString history = dbHistory();
+    history += QString("%1:%2;")
+                   .arg(DatetimeUtils::currentTimeToDatestring(QT_DATE_FORMAT_DMYHMS))
+                   .arg(msg);
+    if (history.length() > MAX_HISTORY_LENGTH) {
+        history = history.right(MAX_HISTORY_LENGTH);
+    }
+    setDbHistory(history);
+    traceout;
+}
+
 const QString &DbModel::remark() const
 {
     return mRemark;
@@ -633,7 +649,7 @@ void DbModel::setDbCreatedTime(qint64 newCreatedTime)
     markItemAsModified(KItemCreateTime);
 }
 
-ErrCode DbModel::save()
+ErrCode DbModel::save(bool notifyDataChange)
 {
     tracein;
     ErrCode ret = ErrNone;
@@ -641,7 +657,8 @@ ErrCode DbModel::save()
     if (dbModelHdl != nullptr){
         ret = prepare2Save();
         if (ret == ErrNone) {
-            ret = dbModelHdl->add(this);
+            appendDbHistory("Add");
+            ret = dbModelHdl->add(this, notifyDataChange);
         }
 //        if (ret == ErrExisted){ // alrady exist, judge as ok
 //            ret = ErrNone;
@@ -666,14 +683,15 @@ DbModel *DbModel::addFieldToBeUpdated(const QString &field)
     return this;
 }
 
-ErrCode DbModel::update(bool allFields)
+ErrCode DbModel::update(bool allFields, bool notifyDataChange)
 {
     tracein;
     ErrCode ret = ErrNone;
     // TODO: support "allFields"
     DbModelHandler* dbModelHdl = getDbModelHandler();
     if (dbModelHdl != nullptr){
-        ret = dbModelHdl->update(this);
+        appendDbHistory("Update");
+        ret = dbModelHdl->update(this, notifyDataChange);
     }
     else{
         ret = ErrDbNotReady;

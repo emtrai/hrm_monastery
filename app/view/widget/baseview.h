@@ -46,6 +46,7 @@ enum ViewType {
     VIEW_COURSE,
     VIEW_SUMMARY,
     VIEW_PERSON_EVENT,
+    VIEW_PERSON_STATUS,
     VIEW_MAX,
     };
 

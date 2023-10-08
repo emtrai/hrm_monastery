@@ -23,9 +23,7 @@
 #define EDUCTL_H
 
 #include "modelcontroller.h"
-#include "errcode.h"
 #include <QStringList>
-#include "education.h"
 
 #define EDUCTL EduCtl::getInstance()
 

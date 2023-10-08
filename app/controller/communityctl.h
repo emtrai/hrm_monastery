@@ -57,7 +57,15 @@ public:
      * @param modelStatus
      * @return
      */
-    ErrCode getListCommunityPerson(const QString& communityUid, QList<DbModel*>& outList, qint64 modelStatus = MODEL_STATUS_MAX);
+    ErrCode getListCommunityPerson(const QString& communityUid, QList<DbModel*>& outList,
+                                   qint64 modelStatus = MODEL_STATUS_MAX);
+
+    /**
+     * @brief get list of active community-person mapping of person
+     * @param perUid
+     * @param outList list of CommunityPerson objects
+     * @return
+     */
     ErrCode getListActiveCommunityPersonOfPerson(const QString& perUid, QList<DbModel*>& outList);
 
     /**
@@ -77,7 +85,11 @@ public:
                       qint64 startdate = 0,
                       qint64 enddate = 0,
                       const QString& remark = nullptr);
-
+    /**
+     * @brief get root community, i.e. HOI_DONG
+     * @return
+     */
+    const Community* getRootCommunity();
 protected:
 
     virtual const char* getPrebuiltFileName();
@@ -116,18 +128,8 @@ protected:
      */
     virtual DbModel* doImportOneItem(const QString& importName, int importFileType, const QStringList& items, quint32 idx);
 
-    /**
-     * @brief import one item, this called by IDataImport callback when import
-     * @param importName
-     * @param importFileType
-     * @param items hash/map, key is field name, value is value...
-     * @param idx
-     * @return
-     */
-//    virtual DbModel* doImportOneItem(const QString& importName, int importFileType, const QHash<QString, QString>& items, quint32 idx);
-
 protected:
-    QList<QString> mImportFields;// import fields/headers, main used in CSV importing
+    QList<QString> mImportHeaderFields;// import fields/headers, main used in CSV importing
 };
 
 #endif // COMMUNITYCTL_H

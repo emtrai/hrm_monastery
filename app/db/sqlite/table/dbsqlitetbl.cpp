@@ -227,6 +227,8 @@ ErrCode DbSqliteTbl::updateBuilderFieldFromModel(DbSqliteUpdateBuilder *builder,
             builder->addValue(KFieldNameId, item->nameId());
         } else if (field == KItemRemark){
             builder->addValue(KFieldRemark, item->remark());
+        } else if (field == KItemDbHistory){
+            builder->addValue(KFieldDbHistory, item->dbHistory());
         }  else {
             logw("Field '%s' not support here, may supported by derive class",
                  STR2CHA(field));

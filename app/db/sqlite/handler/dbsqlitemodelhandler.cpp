@@ -66,7 +66,7 @@ ErrCode DbSqliteModelHandler::add(DbModel *model, bool notify)
     return err;
 }
 
-ErrCode DbSqliteModelHandler::update(DbModel *model)
+ErrCode DbSqliteModelHandler::update(DbModel *model, bool notify)
 {
     tracein;
     ErrCode_t err = ErrNone;
@@ -88,7 +88,7 @@ ErrCode DbSqliteModelHandler::update(DbModel *model)
         loge("invalid argument");
     }
 
-    if (err == ErrNone) {
+    if (err == ErrNone && notify) {
         notifyDataChange(model, DBMODEL_CHANGE_UPDATE, err);
     }
     return err;
@@ -96,7 +96,8 @@ ErrCode DbSqliteModelHandler::update(DbModel *model)
 
 ErrCode DbSqliteModelHandler::update(DbModel *model,
                                      const QHash<QString, QString> &inFields,
-                                     const QString &tableName)
+                                     const QString &tableName,
+                                     bool notifyDataChange)
 {
     tracein;
     DbSqliteTbl* tbl = nullptr;
@@ -311,7 +312,12 @@ DbModel *DbSqliteModelHandler::getByNameId(const QString &nameId, const DbModelB
     // assume main tbl is not null, if not programming error,
     // and require override search function
     Q_ASSERT(tbl != nullptr);
-    return tbl->getByNameId(nameId, builder);
+    DbModel* model = tbl->getByNameId(nameId, builder);
+    if (!model) {
+        loge("Not found model for name id '%s'", STR2CHA(nameId));
+    }
+    traceout;
+    return model;
 }
 
 

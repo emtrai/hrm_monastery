@@ -64,7 +64,7 @@ DbModel *DbModelHandler::getItem(const QString &uid, DbModelBuilder builder, con
 
 DbModelBuilder DbModelHandler::getMainBuilder()
 {
-    FAIL("DEFAULT getMainBuilder, should not be called");
+//    FAIL("DEFAULT getMainBuilder, should not be called");
     return nullptr;
 }
 

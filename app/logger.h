@@ -81,6 +81,10 @@
 // TODO: Show crash/critical error on dialog
 #define loge(fmt, ...) logit(qCritical, fmt, ##__VA_ARGS__)
 
+// print log if error, else do nothing
+#define logife(err, fmt, ...) \
+    do { if (err != ErrNone) loge(fmt ". err=%d", ##__VA_ARGS__, err); } while (0)
+
 #define logi(fmt, ...) logit(qInfo, fmt, ##__VA_ARGS__)
 
 /* Warning something */

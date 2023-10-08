@@ -61,6 +61,7 @@ DbCtl::DbCtl()
 //    mDbCommunity = new DbSqliteCommunity();
 //    mDbEdu = new DbSqliteEdu();
 //    mDbSpecialist = new DbSqliteSpecialist();
+    traceout;
 }
 
 IDatabase *DbCtl::database() const
@@ -75,11 +76,9 @@ QString DbCtl::getName() const
 
 
 DbCtl* DbCtl::getInstance(){
-    tracein;
     if (gInstance == nullptr){
         gInstance = new DbCtl();
     }
-
     return gInstance;
 }
 

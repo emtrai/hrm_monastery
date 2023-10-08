@@ -149,4 +149,6 @@
 #define STR_PERSON_MOVE_IN_COMMUNITY QObject::tr("Thay đổi thông tin cộng đoàn - Nữ tu chuyển đến Cộng đoàn %1")
 
 
+#define STR_PERSON_STATUS     QObject::tr("Tình trạng Nữ tu")
+
 #endif // STRINGDEFS_H

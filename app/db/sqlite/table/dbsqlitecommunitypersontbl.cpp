@@ -51,10 +51,10 @@ DbSqliteCommunityPersonTbl::DbSqliteCommunityPersonTbl(DbSqlite *db):
 }
 
 QList<Person *> DbSqliteCommunityPersonTbl::getListPerson(const QString &communityUid,
-                                                           int modelStatus, const QString* perStatusUid)
+                                                           int modelStatus,
+                                                          const QString* perStatusUid)
 {
     tracein;
-//    DB->openDb();
     QSqlQuery qry (SQLITE->currentDb());
     qint32 cnt = 0;
     QString cond;
@@ -64,12 +64,20 @@ QList<Person *> DbSqliteCommunityPersonTbl::getListPerson(const QString &communi
         return QList<Person*>();
     }
     logi("CommunityUid '%s'", communityUid.toStdString().c_str());
-    QString queryString = QString("SELECT *, %2.%3 AS %4, %2.%5 AS %6 FROM %1 LEFT JOIN %2 ON %1.%4 = %2.%3")
+    QString queryString = QString(" SELECT *, %2.%3 AS %4, %2.%5 AS %6"
+                                  " FROM %1"
+                                  " LEFT JOIN %2"
+                                  " ON %1.%4 = %2.%3")
                               .arg(name(), KTablePerson) // 1 & 2
                               .arg(KFieldUid, KFieldPersonUid) // 3 & 4
                               .arg(KFieldNameId, KFieldPersonNameId) // 5 & 6
                               ;
-    cond = QString("%1.%5 = :uid").arg(name(), KFieldCommunityUid);
+    cond = QString("%1.%2 = :uid").arg(name(), KFieldCommunityUid);
+    if (perStatusUid) {
+        if (!cond.isEmpty())
+            cond += " AND ";
+        cond += QString("%1.%2 = :perstatus").arg(KTablePerson, KFieldPersonStatusUid);
+    }
     appendModelStatusCond(cond, modelStatus);
     if (!cond.isEmpty()) {
         queryString += " WHERE " + cond;
@@ -80,8 +88,12 @@ QList<Person *> DbSqliteCommunityPersonTbl::getListPerson(const QString &communi
 
     // TODO: check sql injection issue
     qry.bindValue( ":uid", communityUid);
-    // TODO: add query status
-//    qry.bindValue( ":status", status); // TODO: support multiple status???
+    logd("bind uid '%s'", STR2CHA(communityUid));
+    if (perStatusUid) {
+        qry.bindValue( ":perstatus", *perStatusUid);
+        logd("bind uid '%s'", STR2CHA(*perStatusUid));
+    }
+
     QList<Person *> outList;
     cnt = runQueryT<Person>(qry, &Person::build, outList);
 

@@ -177,7 +177,7 @@ ErrCode DbSqliteArea::deleteHardArea(DbModel *model, bool force, QString *msg)
             } else {
                 foreach (DbModel* model, list) {
                     logd("force Update '%s'", STR2CHA(model->toString()));
-                    tmpErr = update(model, itemToSet, KTableCommunity);
+                    tmpErr = update(model, itemToSet, KTableCommunity, false);
                     logd("Update result=%d", tmpErr);
                     // TODO: handler error???
                 }
