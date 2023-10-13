@@ -562,6 +562,9 @@ ErrCode DlgPerson::fromPerson(const Person *model)
         updateCommunityNote(tr("Không tìm thấy Cộng đoàn, gán cộng đoàn mặc định"));
     }
 
+    logd("load person status");
+    Utils::setSelectItemComboxByData(ui->cbStatus, per->personStatusUid());
+
     logd("load person event");
     events = per->personEventList();
     if (!events.empty()) {

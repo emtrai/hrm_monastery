@@ -43,6 +43,7 @@
 #include "rolectl.h"
 #include "communitydeptctl.h"
 #include "filectl.h"
+#include "backup/backupctl.h"
 
 LoaderCtl* LoaderCtl::gInstance = nullptr;
 
@@ -78,6 +79,7 @@ void LoaderCtl::registerAll()
 {
     tracein;
     add2PreLoader(FileCtl::getInstance());
+    add2Loader(BACKUP);
     add2PreLoader(DbCtl::getInstance());
     /* Beware, order is important*/
 //    add2Loader(Location::getInstance());

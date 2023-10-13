@@ -27,6 +27,8 @@
 #include "errcode.h"
 #include <QTemporaryDir>
 
+#define DEFAULT_MAX_DEPTH_SEARCH_FILE (10)
+
 class FileCtl:public Controller
 {
 public:
@@ -85,6 +87,7 @@ public:
     // Check if prebuilt data file match with hash file
     static bool checkPrebuiltDataFileHash(const QString& fname);
     static ErrCode readPrebuiltDataFileHash(const QString& fname, QString* hashOut);
+    static ErrCode readFileString(const QString& fpath, QString& out);
     static ErrCode updatePrebuiltDataFileHash(const QString& fname);
     static QString getFullFilePath(const QString &fileName);
 
@@ -98,6 +101,9 @@ public:
     virtual QString getName() const;
     virtual ErrCode onLoad();
     virtual void onUnload();
+
+    static ErrCode getListFilesRecursive(QDir dir, QList<QFileInfo>& fileInfos,
+                                         int depth = 0, int maxdept = DEFAULT_MAX_DEPTH_SEARCH_FILE);
 
 private:
     FileCtl();

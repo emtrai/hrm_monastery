@@ -79,11 +79,11 @@ public:
 
     /**
      * @brief Add person to community
-     * @param comm
+     * @param comm target community
      * @param per
-     * @param status
-     * @param startdate
-     * @param enddate
+     * @param status model status of mapping (active, inactive,etc.)
+     * @param startdate start date
+     * @param enddate end date
      * @param remark
      * @return
      */

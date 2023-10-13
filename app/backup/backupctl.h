@@ -25,17 +25,21 @@
 #include <controller.h>
 #include "utils.h"
 #include "errcode.h"
+#include <QObject>
+#include <QAtomicInt>
 
 #define BACKUP (BackupCtl::getInstance())
 
-class BackupCtl : public Controller
+class QTimer;
+class QThread;
+class BackupCtl;
+class BackupCtl : public QObject, public Controller
 {
+    Q_OBJECT
     GET_INSTANCE_DECL(BackupCtl);
 public:
-
-
-public:
     BackupCtl();
+    virtual ~BackupCtl();
 
     virtual void init();
     /**
@@ -51,7 +55,33 @@ public:
      */
     virtual QString getName() const;
 
-    ErrCode backup(const QString& fpath);
+    /**
+     * @brief Do backup data
+     * @param fpath backup file. Metadata will be "<fpath>.json"
+     * @param dataOnly true if to backup database data only, false to backup al
+     *                 i.e include images
+     * @param force true to force to overide existing backup file
+     *              false to return error if file existed
+     * @return
+     */
+    ErrCode backup(const QString& fpath, bool dataOnly = false, bool force = true);
+
+    /**
+     * @brief do auto backup
+     * @param fdir folder to store auto backup data
+     * @return error code
+     */
+    ErrCode autoBackup(const QString& fdir);
+private:
+    void startAutoBackup();
+    void stopAutoBackup();
+public slots:
+    void autoBackupTimerCallback();
+    void initThread();
+private:
+    QTimer* mAutoBackupTimer;
+    QThread mAutoBackupThread;
+    QAtomicInt mAutoBackupThreadStop;
 };
 
 #endif // BACKUPCTL_H

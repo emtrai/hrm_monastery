@@ -66,6 +66,7 @@ typedef enum ErrCode {
     ErrLoadFailed,
     ErrOperatorFailed,
     ErrSaveFailed,
+    ErrCreateDirFailed,
     ErrFileOp,
     ErrNotAllow,
     ErrPermDenied,

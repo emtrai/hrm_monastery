@@ -35,12 +35,12 @@ GET_INSTANCE_IMPL(DbSqliteArea)
 
 DbSqliteArea::DbSqliteArea():DbSqliteModelHandler(KModelHdlArea)
 {
-    tracein;
+    traced;
 }
 
 DbSqliteArea::~DbSqliteArea()
 {
-    tracein;
+    traced;
 }
 
 QList<DbModel *> DbSqliteArea::getListContactPeople(const QString &areaUid, int status)

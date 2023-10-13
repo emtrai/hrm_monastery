@@ -377,7 +377,7 @@ ErrCode DbSqlitePersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQ
     Q_ASSERT(tblspecialist != nullptr);
     logd("search specialis for per uid: %s", STR2CHA(cmm->uid()));
     QList<DbModel *> listspecialist = tblspecialist->getListSpecialist(cmm->uid());
-    logd("no specialist: %d", listspecialist.size());
+    logd("no specialist: %lld", listspecialist.size());
     if (listspecialist.size() > 0) {
         foreach(DbModel* model, listspecialist) {
             logd("model: '%s'", model?STR2CHA(model->toString()):"(null)");

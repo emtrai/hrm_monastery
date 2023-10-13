@@ -29,6 +29,7 @@
 #include <QDir>
 #include "dbctl.h"
 #include "utils.h"
+#include "filectl.h"
 
 #include "configdefs.h"
 
@@ -152,6 +153,17 @@ void Config::dumpConfig()
         logd("%s:%s", key.toStdString().c_str(),
              mConfigKeyValue[key].toStdString().c_str());
     }
+}
+
+bool Config::autoBackupEnable()
+{
+    // TODO: implement this, read from file
+    return true;
+}
+
+QString Config::getAutoBackupDirPath()
+{
+    return FileCtl::getAppBackupDataDir();
 }
 
 

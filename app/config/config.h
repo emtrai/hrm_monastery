@@ -42,6 +42,9 @@ public:
     ErrCode loadConfig();
     void dumpConfig();
 
+    bool autoBackupEnable();
+    QString getAutoBackupDirPath();
+
 private:
     Config();
     ErrCode doInit();

@@ -34,9 +34,16 @@
 
 FileCtl* FileCtl::gInstance = nullptr;
 
+
+
+FileCtl::FileCtl():Controller()
+{
+    traced;
+}
+
 FileCtl::~FileCtl()
 {
-    tracein;
+    traced;
 }
 
 FileCtl *FileCtl::getInstance()
@@ -91,7 +98,7 @@ QString FileCtl::getAppBackupDataDir(const QString &subDir)
 QString FileCtl::getAppBackupDataDir()
 {
     traced;
-    return getAppWorkingDataDir(QString());
+    return getAppBackupDataDir(QString());
 }
 
 ErrCode FileCtl::copyFile(const QString &src, const QString &dest, bool force)
@@ -472,6 +479,44 @@ ErrCode FileCtl::readPrebuiltDataFileHash(const QString &fname, QString* hashOut
         loge("Hash of %s file not exisst", fname.toStdString().c_str());
         ret = ErrNotExist;
     }
+    traceret(ret);
+    return ret;
+}
+
+ErrCode FileCtl::readFileString(const QString &fpath, QString &out)
+{
+    tracein;
+    ErrCode ret = ErrNone;
+    QFile file(fpath);
+    QString path;
+    if (fpath.isEmpty()) {
+        loge("invalid arg, fpath is empty");
+        ret = ErrInvalidArg;
+    }
+    if (ret == ErrNone && !file.exists()) {
+        loge("file '%s' not exisst", STR2CHA(fpath));
+        ret = ErrNotExist;
+    }
+    logd("fpath %s, file %s", STR2CHA(fpath), STR2CHA(file.fileName()));
+    if (ret == ErrNone) {
+        if (file.open(QIODevice::ReadOnly | QIODevice::Text)){
+            logd("read text file");
+            QTextStream stream(&file);
+            QString value = stream.readAll();
+            if (!value.isEmpty()) {
+                logd("value %s", STR2CHA(value));
+                out = value;
+            } else {
+                ret = ErrNoData;
+                loge("read file with no data");
+            }
+            file.close();
+        } else {
+            ret = ErrFileRead;
+            loge("Read file '%s' failed", STR2CHA(fpath));
+        }
+    }
+    traceret(ret);
     return ret;
 }
 
@@ -485,11 +530,6 @@ ErrCode FileCtl::updatePrebuiltDataFileHash(const QString &fname)
     return writeStringToFile(hash, fHashpath);
 }
 
-
-FileCtl::FileCtl()
-{
-
-}
 
 const QString &FileCtl::tmpDirPath() const
 {
@@ -525,4 +565,44 @@ void FileCtl::onUnload()
         loge("remove tmp dir '%s' failed", STR2CHA(mTmpDir.path()));
     }
     traceout;
+}
+
+ErrCode FileCtl::getListFilesRecursive(QDir dir, QList<QFileInfo>& fileInfos,
+                                       int depth, int maxdepth)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    logd("scan dir '%s'", STR2CHA(dir.absolutePath()));
+    logd("depth %d, maxdepth %d", depth, maxdepth);
+    if (depth < maxdepth || (maxdepth == 0)) {
+        dir.setFilter(QDir::Files | QDir::NoDotAndDotDot | QDir::NoSymLinks);
+
+        QFileInfoList fileList = dir.entryInfoList();
+        logd("found %lld file", fileList.size());
+        foreach(QFileInfo finfo, fileList) {
+            if (finfo.isFile()) {
+                logd("add file '%s'", STR2CHA(finfo.absoluteFilePath()));
+                fileInfos.append(finfo);
+            } else {
+                logd("file '%s' not a file", STR2CHA(finfo.absoluteFilePath()));
+            }
+        }
+
+        dir.setFilter(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
+        QFileInfoList dirList = dir.entryInfoList();
+        logd("found %lld dir", dirList.size());
+        foreach(QFileInfo finfo, dirList) {
+            if (finfo.isDir()) {
+                err = getListFilesRecursive(QDir(finfo.absoluteFilePath()),
+                                            fileInfos, ++depth, maxdepth);
+                if (err != ErrNone) {
+                    break;
+                }
+            } else {
+                logd("file '%s' not a dir", STR2CHA(finfo.absoluteFilePath()));
+            }
+        }
+    }
+    traceret(err);
+    return err;
 }

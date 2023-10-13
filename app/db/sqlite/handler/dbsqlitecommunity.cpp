@@ -33,8 +33,13 @@
 #include "communitydept.h"
 #include "exception.h"
 
+// if defined, only one mapping community-person allow
+// else, can exist multiple same mapping community-person
+//#define SINGLE_COMMUNITY_PERSON_MAP
+
 GET_INSTANCE_IMPL(DbSqliteCommunity)
 
+// maximum number of times to check duplicate items
 #define MAX_CHECK_DUP_TIME 1024
 
 DbSqliteCommunity::DbSqliteCommunity():DbSqliteModelHandler(KModelHdlCommunity),
@@ -146,7 +151,8 @@ ErrCode DbSqliteCommunity::add(DbModel *model, bool notify)
                     commdept->setDepartmentUid(dept->uid());
                     commdept->setName(dept->name());
                     commdept->setModelStatus(MODEL_STATUS_ACTIVE);
-                    logi("Add dept '%s' to community '%s'", STR2CHA(dept->toString()), STR2CHA(model->toString()));
+                    logi("Add dept '%s' to community '%s'",
+                         STR2CHA(dept->toString()), STR2CHA(model->toString()));
                     err = commdept->save(false);
                     delete commdept;
                     logd("add result=%d", err);
@@ -188,17 +194,23 @@ ErrCode DbSqliteCommunity::deleteHard(DbModel *model, bool force, QString *msg)
             // KFieldAreaUid delete map, community, person
             QHash<QString, QString> itemToSearch; // for searching
             QHash<QString, QString> itemToSet; // for update
-            QList<DbModel*> list;
-            int count = 0;
-            ErrCode tmpErr = ErrNone;
+
             bool errDependency = false;
 
             itemToSearch.insert(KFieldCommunityUid, model->uid());
             itemToSet.insert(KFieldCommunityUid, ""); // update to null/empty
 
-            CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency, msg, force, itemToSearch, itemToSet, KTablePerson, &Person::build);
-            CHECK_REMOVE_TO_DELETE(err, errDependency, msg, force, itemToSearch, KTableCommPerson, &CommunityPerson::build);
-            CHECK_REMOVE_TO_DELETE(err, errDependency, msg, force, itemToSearch, KTableCommDept, &CommunityDept::build);
+            // community can exist in: person, community-person mapping, community-dept mapping
+
+            // clear community info on person
+            CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency, msg, force, itemToSearch, itemToSet,
+                                       KTablePerson, &Person::build);
+            // clear mapping community - person
+            CHECK_REMOVE_TO_DELETE(err, errDependency, msg, force, itemToSearch,
+                                   KTableCommPerson, &CommunityPerson::build);
+            // delete community - dept
+            CHECK_REMOVE_TO_DELETE(err, errDependency, msg, force, itemToSearch,
+                                   KTableCommDept, &CommunityDept::build);
 
             if (errDependency) {
                 err = ErrDependency;
@@ -213,7 +225,8 @@ ErrCode DbSqliteCommunity::deleteHard(DbModel *model, bool force, QString *msg)
 }
 
 
-QList<Person *> DbSqliteCommunity::getListPerson(const QString &commUid, int modelStatus,
+QList<Person *> DbSqliteCommunity::getListPerson(const QString &commUid,
+                                                 int modelStatus,
                                                  const QString* perStatusUid)
 {
     tracein;
@@ -223,7 +236,8 @@ QList<Person *> DbSqliteCommunity::getListPerson(const QString &commUid, int mod
         // Get from commumity&person mapping table, how about community uid info in person tble??
         // TODO: need to sync information with communityuid on person table
         // RISK OF INCONSITANT!!!!!!!
-        DbSqliteCommunityPersonTbl* tbl = (DbSqliteCommunityPersonTbl*)DbSqlite::table(KTableCommPerson);
+        DbSqliteCommunityPersonTbl* tbl =
+            static_cast<DbSqliteCommunityPersonTbl*>(DbSqlite::table(KTableCommPerson));
         if (tbl) {
             list = tbl->getListPerson(commUid, modelStatus, perStatusUid);
         } else {
@@ -245,7 +259,8 @@ QList<DbModel *> DbSqliteCommunity::getListCommunityPerson(const QString &commUi
         // Get from commumity&person mapping table, how about community uid info in person tble??
         // TODO: need to sync information with communityuid on person table
         // RISK OF INCONSITANT!!!!!!!
-        DbSqliteCommunityPersonTbl* tbl = (DbSqliteCommunityPersonTbl*)DbSqlite::table(KTableCommPerson);
+        DbSqliteCommunityPersonTbl* tbl =
+            static_cast<DbSqliteCommunityPersonTbl*>(DbSqlite::table(KTableCommPerson));
         if (tbl) {
             list = tbl->getListCommunityPerson(commUid, modelStatus);
         } else {
@@ -267,7 +282,7 @@ QList<DbModel *> DbSqliteCommunity::getListCommunityPersonOfPerson(const QString
     logd("get list comm-person for perUid '%s'", STR2CHA(perUid));
     if(!perUid.isEmpty()) {
         DbSqliteCommunityPersonTbl* tbl =
-            (DbSqliteCommunityPersonTbl*)DbSqlite::table(KTableCommPerson);
+            static_cast<DbSqliteCommunityPersonTbl*>(DbSqlite::table(KTableCommPerson));
         if (tbl) {
             list = tbl->getListCommunityPerson(perUid, QString(), modelStatus);
         } else {
@@ -310,7 +325,9 @@ ErrCode DbSqliteCommunity::addPerson2Community(const Community *comm,
     }
 
     if (err == ErrNone) {
-        DbPersonModelHandler* hdl = dynamic_cast<DbPersonModelHandler*>(DbSqlite::handler(KModelHdlPerson));
+        // update community info in person info
+        DbPersonModelHandler* hdl =
+            dynamic_cast<DbPersonModelHandler*>(DbSqlite::handler(KModelHdlPerson));
         if (hdl) {
             logi("update community '%s' for per '%s'",
                  STR2CHA(comm->toString()), STR2CHA(per->toString()));
@@ -323,18 +340,24 @@ ErrCode DbSqliteCommunity::addPerson2Community(const Community *comm,
     if (!updateCommPer) {
         logi("update community, but skip updating comm per mapping here");
     }
+    // start updating person - community mapping
     if (err == ErrNone && updateCommPer) {
         bool newAdd = true;
+#ifdef SINGLE_COMMUNITY_PERSON_MAP
         QList<DbModel*> listCommunitiesOfPerson =
             tblCommPer->getListItemsUids(per->uid(), comm->uid(), &CommunityPerson::build);
+        // check if mapping exist or not, if exit, set it active again
+        // TODO: if person is moved arround in multiple time?
         if (listCommunitiesOfPerson.size() > 0) {
-            logd("found %d community which person uid belong to, set it as active", listCommunitiesOfPerson.size());
+            logd("found %lld community which person uid belong to, set it as active",
+                 listCommunitiesOfPerson.size());
             foreach (DbModel* model, listCommunitiesOfPerson) {
                 newAdd = false;
                 tblCommPer->updateModelStatusInDb(model->uid(), MODEL_STATUS_ACTIVE);
             }
         }
         RELEASE_LIST_DBMODEL(listCommunitiesOfPerson);
+#endif //SINGLE_COMMUNITY_PERSON_MAP
         logd("newAdd=%d", newAdd);
         if (newAdd) {
             QList<CommunityPerson*> listCommunitiesOfPerson =
