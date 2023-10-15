@@ -468,3 +468,10 @@ DbModelBuilder PersonCtl::getMainBuilder()
 {
     return &Person::build;
 }
+
+int PersonCtl::getTotalItemsByPersonStatus(const QString &statusUid)
+{
+    dbg(LOG_DEBUG, "get total item by person status uid '%s'", STR2CHA(statusUid));
+    return personModelHdl()->getTotalItemsByPersonStatus(statusUid);
+}
+

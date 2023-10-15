@@ -1153,6 +1153,57 @@ ErrCode DbSqliteTbl::getListItems(const QHash<QString, QString>& inFields,
     return err;
 }
 
+int DbSqliteTbl::getTotalItemCount(qint64 modelStatus,const QString& req, qint64 dbStatus)
+{
+
+    tracein;
+    QSqlQuery qry(SQLITE->currentDb());
+    int cnt = 0;
+    int ret = 0;
+    QString cond;
+    ErrCode err = ErrNone;
+    dbg(LOG_DEBUG, "Get tital item count modelStatus '%lld', dbStatus '%lld' req '%s'",
+        modelStatus, dbStatus, STR2CHA(req));
+    appendDbStatusCond(cond, dbStatus);
+    if (mFieldDataTypeMap.contains(KFieldModelStatus)) {
+        appendModelStatusCond(cond, modelStatus);
+    } else {
+        logd("field %s not exist in table '%s'", KFieldModelStatus, STR2CHA(name()));
+    }
+    QString queryString = getCountTotalQueryString(cond, req);
+
+    qry.prepare(queryString);
+    dbg(LOG_DEBUG, "Query String '%s'", STR2CHA(queryString));
+
+    try {
+        if (qry.exec() && qry.next()) {
+            cnt = qry.value(0).toInt();;
+        }
+    } catch(const std::runtime_error& ex) {
+        loge("Runtime Exception! %s", ex.what());
+        cnt = 0;
+        err = ErrException;
+    } catch (const std::exception& ex) {
+        loge("Exception! %s", ex.what());
+        cnt = 0;
+        err = ErrException;
+    } catch (...) {
+        loge("Exception! Unknown");
+        cnt = 0;
+        err = ErrException;
+    }
+
+    dbg(LOG_DEBUG, "Found %d", cnt);
+    if (err == ErrNone) {
+        ret = cnt;
+    } else {
+        ret = -(err);
+        loge("get total count err=%d", err);
+    }
+    traceret(ret);
+    return ret;
+}
+
 int DbSqliteTbl::runQuery(QSqlQuery &qry, const DbModelBuilder& builder,
                        QList<DbModel *> *outList)
 {
@@ -1228,6 +1279,17 @@ DbModelBuilder DbSqliteTbl::mainModelBuilder()
     return nullptr;
 }
 
+QString DbSqliteTbl::getCountTotalQueryString(const QString &cond, const QString &req)
+{
+    tracein;
+    QString ret = QString("SELECT count(*) FROM %1").arg(name());
+    if (!cond.isEmpty()) {
+        ret += QString(" WHERE %1").arg(cond);
+    }
+    logd("Querry string '%s'", STR2CHA(ret));
+    traceout;
+    return ret;
+}
 
 
 QList<DbModel *> DbSqliteTbl::getAll(const DbModelBuilder& builder, qint64 status,

@@ -90,6 +90,7 @@ public:
      * @return
      */
     const Community* getRootCommunity();
+
 protected:
 
     virtual const char* getPrebuiltFileName();

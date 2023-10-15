@@ -53,6 +53,13 @@ public:
     // this function will try to get list of person in community using data (communityuid) in person table
     virtual ErrCode getListPersonInCommunity(const QString& communityUid, qint32 status, QList<DbModel*>& list) = 0;
     virtual ErrCode getListCommunitesOfPerson(const QString& perUid, qint32 modelStatus, QList<CommunityPerson*>& list) = 0;
+
+    /**
+     * @brief Get total number of items (count) by person status
+     * @param statusUid person status uid
+     * @return > 0: the number of item, < 0: error code
+     */
+    virtual int getTotalItemsByPersonStatus(const QString& statusUid) = 0;
 };
 
 #endif // DBPERSONMODELHANDLER_H

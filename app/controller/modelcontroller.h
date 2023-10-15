@@ -75,7 +75,18 @@ public:
     virtual QList<DbModel*> getAllItems(bool readFromDb = false, int from = 0,
                                          int noItems = 0, int* total = nullptr);
 
-
+    /**
+     * @brief Get total number of items (count)
+     * @param modelStatus
+     * @return > 0: the number of item, < 0: error code
+     */
+    int getTotalItems(qint32 modelstatus = MODEL_STATUS_MAX);
+    /**
+     * @brief Get total number of items (count)
+     * @param modelStatus
+     * @return > 0: the number of item, < 0: error code
+     */
+    int getTotalActiveItems();
     /**
      * @brief Search model from keyword. Search anything, only search active model
      * @param[in] keyword
@@ -212,22 +223,17 @@ protected:
                                        QString* ftype = nullptr) const;
 
     /**
-     * @brief get path to export file
-     * @param[in] type export type, i.e CSV, xlsx
-     * @param[in] fnameNoExt fname without extention
-     * @param[in/out] fpath output path. if null, tmpdir is used
-     * @return
-     */
-    virtual ErrCode getExportFileName(ExportType type, QString fnameNoExt, QString* fpath);
-
-    /**
      * @brief Get data to be exported
      * @param[in] item keyword/data/item to be exported
      * @param[in] data Model
      * @param[in] exportData data to be exported
      * @return
      */
-    virtual ErrCode getExportDataString(const QString& item, const DbModel* data, QString* exportData) const;
+    virtual ErrCode getExportDataString(const QString& item,
+                                        const FileExporter* fileexporter,
+                                        const QString& datatype,
+                                        const DbModel* data,
+                                        QString* exportData) const;
 
     virtual ErrCode onImportParseDataItem(const QString& importName, int importFileType,
                                  const QStringList& items, quint32 idx = 0,

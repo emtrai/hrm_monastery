@@ -88,6 +88,16 @@ public:
                                     const char* modelName = nullptr, int from = 0,
                                     int noItems = 0, int* total = nullptr) = 0;
     /**
+     * @brief Get total number of items (count)
+     * @param modelStatus
+     * @param req
+     * @param dbStatus
+     * @return > 0: the number of item, < 0: error code
+     */
+    virtual int getTotalItemCount(qint64 modelStatus = MODEL_STATUS_MAX,
+                                      const QString& req = nullptr,
+                                      qint64 dbStatus = DB_RECORD_ACTIVE) = 0;
+    /**
      * @brief Get All, return as dictionary, map b/w uid and model
      * @param builder
      * @param modelName

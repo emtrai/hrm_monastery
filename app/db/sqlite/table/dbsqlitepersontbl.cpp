@@ -904,6 +904,68 @@ ErrCode DbSqlitePersonTbl::updateCommunity(const QString &uid, const QString &co
     return ret;
 }
 
+int DbSqlitePersonTbl::getTotalItemsByPersonStatus(const QString &statusUid,
+                                                   qint64 dbStatus)
+{
+    tracein;
+    QSqlQuery qry(SQLITE->currentDb());
+    int cnt = 0;
+    int ret = 0;
+    QString cond;
+    ErrCode err = ErrNone;
+    dbg(LOG_DEBUG, "Get tital item count statusUid '%s' dbStatus 0x%llx",
+        STR2CHA(statusUid), dbStatus);
+    appendDbStatusCond(cond, dbStatus);
+
+    QString queryString;
+    if (!statusUid.isEmpty()) {
+        queryString =
+            QString("SELECT count(*) FROM %1 WHERE "
+                    " %2 = :statusUid AND %3")
+                                  .arg(name(), KFieldPersonStatusUid, cond)
+            ;
+    } else {
+
+        queryString =
+            QString("SELECT count(*) FROM %1 WHERE (%2 IS NULL OR %2 = '') AND %3")
+                          .arg(name(), KFieldPersonStatusUid, cond)
+            ;
+    }
+
+    qry.prepare(queryString);
+    dbg(LOG_DEBUG, "Query String '%s'", STR2CHA(queryString));
+    dbg(LOG_DEBUG, "bind statusUid'%s'", STR2CHA(statusUid));
+
+    qry.bindValue(":statusUid", statusUid);
+    try {
+        if (qry.exec() && qry.next()) {
+            cnt = qry.value(0).toInt();;
+        }
+    } catch(const std::runtime_error& ex) {
+        loge("Runtime Exception! %s", ex.what());
+        cnt = 0;
+        err = ErrException;
+    } catch (const std::exception& ex) {
+        loge("Exception! %s", ex.what());
+        cnt = 0;
+        err = ErrException;
+    } catch (...) {
+        loge("Exception! Unknown");
+        cnt = 0;
+        err = ErrException;
+    }
+
+    dbg(LOG_DEBUG, "Found %d", cnt);
+    if (err == ErrNone) {
+        ret = cnt;
+    } else {
+        ret = -(err);
+        loge("get total count err=%d", err);
+    }
+    traceret(ret);
+    return ret;
+}
+
 QHash<QString, QString> DbSqlitePersonTbl::getFieldsCheckExists(const DbModel *item)
 {
     tracein;

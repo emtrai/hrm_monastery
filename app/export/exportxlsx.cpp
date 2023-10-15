@@ -111,7 +111,7 @@ ErrCode ExportXlsx::saveTo(const DataExporter *exporter,
             foreach (auto item, keywordMap) {
                 QString data;
                 logd("keyword '%s'", STR2CHA(item.first));
-                ret = exporter->getExportDataString(item.first, dataExport, &data);
+                ret = exporter->getExportDataString(item.first, this, datatype, dataExport, &data);
                 if (ret == ErrNone) {
                     xlsx.write(row, col++, data);
                 } else {
@@ -133,7 +133,7 @@ ErrCode ExportXlsx::saveTo(const DataExporter *exporter,
     return ret;
 }
 
-ExportType ExportXlsx::getExportType()
+ExportType ExportXlsx::getExportType() const
 {
     return EXPORT_XLSX;
 }

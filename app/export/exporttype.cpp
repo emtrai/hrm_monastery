@@ -24,6 +24,7 @@
 #include "logger.h"
 #include "utils.h"
 #include "stringdefs.h"
+#include "filectl.h"
 
 static void getListExportTypeName(QHash<int, QString>* list)
 {
@@ -186,4 +187,37 @@ QString exportItem2Name(const QString &item, bool* isOk)
     }
     traceout;
     return name;
+}
+
+
+ErrCode getExportFileName(ExportType type,
+                       QString fnameNoExt,
+                       QString *fpath)
+{
+    tracein;
+    ErrCode ret = ErrNone;
+    QString ext;
+    QString fname;
+    bool isExtOk = false;
+    if (!fpath) {
+        ret = ErrInvalidArg;
+        loge("invalid arg");
+    }
+    if (ret == ErrNone) {
+        ext = typeToExt(type, &isExtOk);
+        if (!isExtOk) {
+            ret = ErrInvalidArg;
+            loge("invalid export type %d", type);
+        }
+    }
+    if (ret == ErrNone) {
+        fname = QString("%1.%2").arg(Utils::normalizeFileName(fnameNoExt), ext);
+        logd("fname '%s'", STR2CHA(fname));
+        if (fpath && fpath->isEmpty()) {
+            *fpath = FileCtl::getTmpDataFile(fname);
+            logd("fpath '%s'", STR2CHA((*fpath)));
+        }
+    }
+    traceret(ret);
+    return ret;
 }

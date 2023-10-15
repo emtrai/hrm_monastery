@@ -152,7 +152,8 @@ void Area::setModelStatusName(QString newModelStatusName)
 ErrCode Area::exportTemplatePath(FileExporter *exporter,
                                  const QString& name,
                                        QString& fpath, QString *ftype) const
-{    tracein;
+{
+    tracein;
     ErrCode err = ErrNone;
     if (exporter) {
         ExportType type = exporter->getExportType();

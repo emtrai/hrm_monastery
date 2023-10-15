@@ -89,14 +89,20 @@ const QStringList DataExporter::getListExportKeyWord() const
     return QStringList();
 }
 
-ErrCode DataExporter::getExportDataString(const QString &item, QString* data) const
+ErrCode DataExporter::getExportDataString(const QString &item,
+                                          const FileExporter* fileexporter,
+                                          const QString& datatype,
+                                          QString* data) const
 {
     tracein;
     loge("Not support here");
     return ErrNotSupport;
 }
 
-ErrCode DataExporter::getExportDataString(const QString &item, const DbModel *data, QString *exportData) const
+ErrCode DataExporter::getExportDataString(const QString &item,
+                                          const FileExporter* fileexporter,
+                                          const QString& datatype,
+                                          const DbModel *data, QString *exportData) const
 {
     tracein;
     loge("Not support here");

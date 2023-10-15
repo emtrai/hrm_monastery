@@ -69,12 +69,14 @@ void BackupCtl::init()
 
 ErrCode BackupCtl::onLoad()
 {
+    tracein;
     if (CONFIG->autoBackupEnable()) {
         logi("Check & do auto backup");
         startAutoBackup();
     } else {
         logi("Skip auto backup");
     }
+    traceout;
     return ErrNone;
 }
 
@@ -317,10 +319,11 @@ void BackupCtl::startAutoBackup()
     autoBackup(CONFIG->getAutoBackupDirPath());
 
     // Start timer to do auto backup
-    logi("Start timer to do auto backup, time %d ms", AUTO_BACKUP_MAX_DELTA_TIME_MS);
+    dbg(LOG_INFO, "Start timer to check & do auto backup, time %d ms",
+        AUTO_BACKUP_MAX_DELTA_TIME_MS);
 
     this->moveToThread(&mAutoBackupThread);
-    connect(&mAutoBackupThread, SIGNAL(started()), this, SLOT(initThread()));
+    connect(&mAutoBackupThread, SIGNAL(started()), this, SLOT(autobackupThreadRun()));
     QObject::connect(&mAutoBackupThread, &QThread::finished, this, &QObject::deleteLater);
     mAutoBackupThread.start();
 
@@ -347,7 +350,7 @@ void BackupCtl::stopAutoBackup()
 void BackupCtl::autoBackupTimerCallback()
 {
     tracein;
-    logi("Autobackup time interval, do check autobackup");
+    dbg(LOG_INFO, "Autobackup time interval, do check autobackup");
     if (!mAutoBackupThreadStop) {
         autoBackup(CONFIG->getAutoBackupDirPath());
     } else {
@@ -357,16 +360,17 @@ void BackupCtl::autoBackupTimerCallback()
     traceout;
 }
 
-void BackupCtl::initThread()
+void BackupCtl::autobackupThreadRun()
 {
     tracein;
+    dbg(LOG_DEBUG,"in autobackup thread");
     mAutoBackupTimer = new QTimer(this);
     if (mAutoBackupTimer) {
         mAutoBackupTimer->moveToThread(&mAutoBackupThread);
         QObject::connect(mAutoBackupTimer, &QTimer::timeout, this,
                          &BackupCtl::autoBackupTimerCallback);
 
-        logd("start timer %d ms", AUTO_BACKUP_MAX_DELTA_TIME_MS);
+        dbg(LOG_VERBOSE, "start timer %d ms", AUTO_BACKUP_MAX_DELTA_TIME_MS);
         mAutoBackupTimer->start(AUTO_BACKUP_MAX_DELTA_TIME_MS);
     } else {
         loge("failed to create mAutoBackupTimer, no memory?");

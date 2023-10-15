@@ -22,11 +22,45 @@
 #ifndef STATISTIC_H
 #define STATISTIC_H
 
+#include "idataimporter.h"
+#include "dataexporter.h"
+#include "utils.h"
+#include "fileexporter.h"
 
-class Statistic
+#define STAT Statistic::getInstance()
+typedef std::function<QString(const FileExporter*,const QString&)> StatExportCallbackFunc;
+
+
+class Statistic: public DataExporter
 {
+    GET_INSTANCE_DECL(Statistic);
 public:
     Statistic();
+    virtual QString getName() const;
+
+    ErrCode exportGeneralStatistic(QString* fpath, ExportType type = EXPORT_HTML);
+
+    virtual ErrCode exportTemplatePath(FileExporter* exporter,
+                                       const QString& name,
+                                       QString& fpath,
+                                       QString* ftype = nullptr) const;
+
+    /**
+     * @brief Get data to be exported
+     * @param[in] item keyword/data/item to be exported
+     * @param[out] data data to be exported
+     * @return
+     */
+    virtual ErrCode getExportDataString(const QString& item,
+                                        const FileExporter* fileexporter,
+                                        const QString& datatype, QString* data) const;
+
+    virtual quint64 getExportTypeList();
+    virtual const QStringList getListExportKeyWord() const;
+private:
+    void initExportFields();
+private:
+    QHash<QString, StatExportCallbackFunc> mExportCallbacks;
 };
 
 #endif // STATISTIC_H

@@ -35,7 +35,7 @@ public:
     ExportCSVList();
 //    virtual ErrCode saveTo(const DataExporter* item, const QString& fpath);
     virtual ErrCode saveTo(const DataExporter* exporter, const QString& datatype, const QList<DbModel*> data, const QString& fpath);
-    virtual ExportType getExportType();
+    virtual ExportType getExportType() const ;
 };
 
 #endif // EXPORTCSVLIST_H

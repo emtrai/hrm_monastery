@@ -38,8 +38,13 @@ public:
 
 
     static QString getNextPersonalCode(qint64* code = nullptr, ErrCode *outErr = nullptr);
+    static int getLogLevel();
 
+    ErrCode initDefaultConfig();
     ErrCode loadConfig();
+    ErrCode parseConfig(const QString& fpath, QMap<QString, QString>& config);
+    ErrCode saveConfig(const QString& fpath, const QMap<QString, QString>& config);
+    ErrCode saveConfig(const QString& fpath);
     void dumpConfig();
 
     bool autoBackupEnable();

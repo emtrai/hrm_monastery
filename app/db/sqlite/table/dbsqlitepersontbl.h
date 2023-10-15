@@ -42,6 +42,13 @@ public:
                                                 const QString &field,
                                                 const DbModel *item);
     virtual ErrCode updateCommunity(const QString& uid, const QString& communityUid);
+    /**
+     * @brief Get total number of items (count) by person status
+     * @param statusUid person status uid
+     * @return > 0: the number of item, < 0: error code
+     */
+    virtual int getTotalItemsByPersonStatus(const QString& statusUid,
+                                            qint64 dbStatus = DB_RECORD_ACTIVE);
 protected:
     virtual void addTableField(DbSqliteTableBuilder* builder);
     virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);

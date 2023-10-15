@@ -39,4 +39,14 @@ QString typeToExt(ExportType type, bool* isOk = nullptr);
 
 QString exportItem2Name(const QString& item, bool* isOk = nullptr);
 
+/**
+ * @brief get path to export file
+ * @param[in] type export type, i.e CSV, xlsx
+ * @param[in] fnameNoExt fname without extention
+ * @param[in/out] fpath output path. if null, tmpdir is used
+ * @return
+ */
+ErrCode getExportFileName(ExportType type,
+                       QString fnameNoExt,
+                       QString *fpath);
 #endif // EXPORTTYPE_H

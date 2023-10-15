@@ -45,5 +45,6 @@ const char* const KControllerPersonStatus = "controller@person_status";
 const char* const KControllerRole = "controller@role";
 const char* const KControllerPersonEvent = "controller@person_event";
 const char* const KControllerEvent = "controller@event";
+const char* const KControllerStatistic = "controller@statistic";
 
 #endif // CONTROLLERDEFS_H

@@ -112,6 +112,12 @@ public:
                            const QString& tableName, bool notifyDataChange = true);
 
     virtual ErrCode check2UpdateCommunity(Person* per);
+    /**
+     * @brief Get total number of items (count) by person status
+     * @param statusUid person status uid
+     * @return > 0: the number of item, < 0: error code
+     */
+    virtual int getTotalItemsByPersonStatus(const QString& statusUid);
 protected:
     virtual DbSqliteTbl* getMainTbl();
     virtual DbModelBuilder getMainBuilder();

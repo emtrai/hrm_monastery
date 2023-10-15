@@ -129,6 +129,12 @@ public:
      * @return model builder
      */
     virtual DbModelBuilder getMainBuilder();
+    /**
+     * @brief Get total number of items (count) by person status
+     * @param statusUid person status uid
+     * @return > 0: the number of item, < 0: error code
+     */
+    int getTotalItemsByPersonStatus(const QString& statusUid);
 private:
     QList<QString> mImportFields;
 };

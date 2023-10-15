@@ -233,6 +233,17 @@ public:
                                int noItems = 0,
                                int* total = nullptr);
 
+    /**
+     * @brief Get total number of items (count)
+     * @param modelStatus
+     * @param req
+     * @param dbStatus
+     * @return > 0: the number of item, < 0: error code
+     */
+    virtual int getTotalItemCount(qint64 modelStatus = MODEL_STATUS_MAX,
+                                      const QString& req = nullptr,
+                                      qint64 dbStatus = DB_RECORD_ACTIVE);
+
 protected:
     virtual DbSqliteTableBuilder* getTableBuilder();
     virtual void addTableField(DbSqliteTableBuilder* builder);
@@ -280,6 +291,9 @@ protected:
     virtual QSqlQuery *getAllQuery(qint64 dbstatus = DB_RECORD_ACTIVE);
     virtual QString getAllQueryString(qint64 dbstatus = DB_RECORD_ACTIVE);
     virtual DbModelBuilder mainModelBuilder();
+
+    virtual QString getCountTotalQueryString(const QString& cond = nullptr,
+                                        const QString& req = nullptr);
 public:
 
     virtual DbSqlite *db() const;

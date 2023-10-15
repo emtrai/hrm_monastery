@@ -31,6 +31,7 @@
 #define MAX_LOG_LEN 128
 
 Logger* Logger::gInstance = nullptr;
+QAtomicInt Logger::gLogLevel = LOG_INFO;
 
 LogWorker::LogWorker():isRunning(false), mThead(nullptr)
 {
@@ -286,6 +287,19 @@ void Logger::reqWriteLog(const QString &log)
 QString Logger::logDirPath()
 {
     return getInstance()->getLogDirPath();
+}
+
+void Logger::setLogLevel(int level)
+{
+    logi("Set log level %d", level);
+    gLogLevel = level;
+    if (gLogLevel > LOG_DEBUG)
+        gLogLevel = LOG_DEBUG;
+}
+
+QAtomicInt Logger::getLogLevel()
+{
+    return gLogLevel;
 }
 
 void Logger::init()

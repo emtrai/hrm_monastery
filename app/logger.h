@@ -29,6 +29,7 @@
 #include <QQueue>
 #include <QMutex>
 #include <QWaitCondition>
+#include <QAtomicInt>
 
 #ifndef THISFILE
 #define THIS_FILE __FILE__
@@ -37,6 +38,10 @@
 #define NO_OP do {} while (0)
 // TODO: check debug macro
 
+#define LOG_ERROR (0)
+#define LOG_INFO (1)
+#define LOG_VERBOSE (2)
+#define LOG_DEBUG (3)
 
 //#define THREAD_ID static_cast<long>(reinterpret_cast<intptr_t>(QThread::currentThreadId()))
 #define THREAD_ID static_cast<long>(reinterpret_cast<intptr_t>(QThread::currentThread()))
@@ -44,18 +49,28 @@
 #define CUR_DATE_STR QDate::currentDate().toString("yyyyMMdd").toStdString().c_str()
 
 #define logit(logger, fmt,...) \
-    do{ \
+    do { \
         logger("0x%08lx %s@%s %s %s:%d : " fmt, THREAD_ID, CUR_DATE_STR, CUR_TIME_STR, THIS_FILE, __func__, __LINE__, ##__VA_ARGS__); \
     } while(0)
+
+
 
 #ifdef DEBUG_LOG
 // TODO: add process id???
 #define logd(fmt,...) logit(qDebug, fmt, ##__VA_ARGS__)
 
+#define dbg(level, fmt, ...) logd(fmt, ##__VA_ARGS__)
 
 #else // !DEBUG_LOG
 
 #define logd(fmt,...) NO_OP
+
+#define dbg(level, fmt, ...) \
+    do { \
+        if (level <= Logger::getLogLevel()) { \
+            logi(fmt, ##__VA_ARGS__); \
+        } \
+    } while (0)
 
 #endif // DEBUG_LOG
 
@@ -89,6 +104,7 @@
 
 /* Warning something */
 #define logw(fmt,...) logit(qWarning, fmt, ##__VA_ARGS__)
+
 
 class Logger;
 
@@ -126,6 +142,8 @@ public:
     static void printLog2File(const QString& log);
     static void reqWriteLog(const QString& log);
     static QString logDirPath();
+    static void setLogLevel(int level);
+    static QAtomicInt getLogLevel();
 private:
     Logger();
     ~Logger();
@@ -142,6 +160,7 @@ signals:
     void log2File(QString);
 private:
     static Logger* gInstance;
+    static QAtomicInt gLogLevel;
     QString mLogFilePath;
     QFile mLogFile;
     LogWorker* mWorker;

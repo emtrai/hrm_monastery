@@ -60,7 +60,7 @@ ErrCode ExportCSVList::saveTo(const DataExporter* exporter, const QString& datat
             foreach (QString item, items) {
                 QString data;
                 logd("item '%s'", STR2CHA(item));
-                ret = exporter->getExportDataString(item.trimmed(), dataExport, &data);
+                ret = exporter->getExportDataString(item.trimmed(), this, datatype, dataExport, &data);
                 if (ret == ErrNone) {
                     logd("data '%s'", STR2CHA(data));
                     if (dataLine.length() > 0) {
@@ -89,7 +89,7 @@ ErrCode ExportCSVList::saveTo(const DataExporter* exporter, const QString& datat
     return ret;
 }
 
-ExportType ExportCSVList::getExportType()
+ExportType ExportCSVList::getExportType() const
 {
     return EXPORT_CSV_LIST;
 }

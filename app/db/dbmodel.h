@@ -376,7 +376,10 @@ public:
                                        QString* ftype = nullptr) const;
 
     virtual const QStringList getListExportKeyWord() const;
-    virtual ErrCode getExportDataString(const QString& item, QString* data) const;
+    virtual ErrCode getExportDataString(const QString& item,
+                                        const FileExporter* fileexporter,
+                                        const QString& datatype,
+                                        QString* data) const;
     const QString &nameId() const;
 
     const QString &remark() const;

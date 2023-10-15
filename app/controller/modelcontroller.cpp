@@ -198,6 +198,31 @@ QList<DbModel *> ModelController::getAllItems(bool readFromDb, int from, int noI
     return list;
 }
 
+int ModelController::getTotalItems(qint32 modelstatus)
+{
+    tracein;
+    int ret = 0;
+    DbModelHandler *hdl = getModelHandler();
+    if (hdl != nullptr) {
+        ret = hdl->getTotalItemCount(modelstatus);
+    } else {
+        loge("Unknown handler, DERIVED class should implement this");
+        ret = -(ErrUnknown);
+        // TODO: should throw exception???
+    }
+    if (ret < 0) {
+        loge("get total item failed, err=%d", ret);
+    }
+    traceout;
+    return ret;
+}
+
+int ModelController::getTotalActiveItems()
+{
+    return getTotalItems(MODEL_STATUS_ACTIVE);
+    
+}
+
 quint64 ModelController::getExportTypeList()
 {
     // default supported one
@@ -915,39 +940,11 @@ ErrCode ModelController::exportTemplatePath(
     return err;
 }
 
-ErrCode ModelController::getExportFileName(ExportType type,
-                                           QString fnameNoExt,
-                                           QString *fpath)
-{
-    tracein;
-    ErrCode ret = ErrNone;
-    QString ext;
-    QString fname;
-    bool isExtOk = false;
-    if (!fpath) {
-        ret = ErrInvalidArg;
-        loge("invalid arg");
-    }
-    if (ret == ErrNone) {
-        ext = typeToExt(type, &isExtOk);
-        if (!isExtOk) {
-            ret = ErrInvalidArg;
-            loge("invalid export type %d", type);
-        }
-    }
-    if (ret == ErrNone) {
-        fname = QString("%1.%2").arg(Utils::normalizeFileName(fnameNoExt), ext);
-        logd("fname '%s'", STR2CHA(fname));
-        if (fpath && fpath->isEmpty()) {
-            *fpath = FileCtl::getTmpDataFile(fname);
-            logd("fpath '%s'", STR2CHA((*fpath)));
-        }
-    }
-    traceret(ret);
-    return ret;
-}
-
-ErrCode ModelController::getExportDataString(const QString &item, const DbModel *data, QString *exportData) const
+ErrCode ModelController::getExportDataString(const QString &item,
+                                             const FileExporter* fileexporter,
+                                             const QString& datatype,
+                                             const DbModel *data,
+                                             QString *exportData) const
 {
     tracein;
     ErrCode err = ErrNone;
@@ -958,7 +955,7 @@ ErrCode ModelController::getExportDataString(const QString &item, const DbModel 
     }
     /* item may not found in DbModel, need extra checking by controller */
     if (err == ErrNone) {
-        err = data->getExportDataString(item, exportData);
+        err = data->getExportDataString(item, fileexporter, datatype, exportData);
     }
     logd("Expoted data '%s", exportData?STR2CHA((*exportData)):"(null)");
     traceret(err);

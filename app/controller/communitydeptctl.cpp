@@ -330,11 +330,10 @@ DbModel *CommunityDeptCtl::doImportOneItem(const QString& importName, int import
 {
     ErrCode ret = ErrNone;
     CommunityDept* model = nullptr;
-    int i = 0;
     logd("idx = %d", idx);
-    if (importName == KModelHdlCommDept)
+    if (importName == KModelHdlCommDept) {
         model = (CommunityDept*)CommunityDept::build();
-    else { // TODO: import person to community
+    } else { // TODO: import person to community
         ret = ErrNotSupport;
         loge("import '%s' not support", STR2CHA(importName));
     }

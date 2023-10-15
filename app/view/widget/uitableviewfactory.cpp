@@ -42,6 +42,7 @@
 #include "view/widget/uipersoneventlistview.h"
 #include "view/widget/uicommunitiesofpersonlistview.h"
 #include "view/widget/uipersonstatuslistview.h"
+#include "view/widget/uisummarizeview.h"
 
 BaseView *UITableViewFactory::getView(ViewType type, QWidget *parent )
 {
@@ -111,6 +112,9 @@ BaseView *UITableViewFactory::getView(ViewType type, QWidget *parent )
         break;
     case VIEW_PERSON_STATUS:
         view = new UIPersonStatusListView(parent);
+        break;
+    case VIEW_SUMMARY:
+        view = new UISummarizeView(parent);
         break;
     default:
         loge("invalid view type %d", type);

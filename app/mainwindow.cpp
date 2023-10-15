@@ -59,6 +59,7 @@
 #include "dlgimportlistresultfactory.h"
 #include "stringdefs.h"
 #include "imagedefs.h"
+#include "statistic/statistic.h"
 
 
 #define ADD_MENU_ITEM(menu, func, name, iconPath) \
@@ -95,6 +96,9 @@ MainWindow::MainWindow(QWidget *parent)
     gInstance = this;
     ui->setupUi(this);
 
+    logd("init config");
+    Config::init();
+
     LOADERCTL->setOnFinishLoadListener(this, this);
     LOADERCTL->preLoad();
     // TODO: sync data?
@@ -116,8 +120,6 @@ MainWindow::MainWindow(QWidget *parent)
     loadExportMenu();
     loadOtherAddMenu();
 
-    mSummarizeView = new UISummarizeView();
-
     mCommunityView = UITableViewFactory::getView(ViewType::VIEW_COMMUNITY);
     mSaintsView = UITableViewFactory::getView(ViewType::VIEW_SAINT);
     mPersonView = UITableViewFactory::getView(ViewType::VIEW_PERSON);
@@ -126,6 +128,7 @@ MainWindow::MainWindow(QWidget *parent)
     mRoleView = UITableViewFactory::getView(ViewType::VIEW_ROLE);
     mCourseView = UITableViewFactory::getView(ViewType::VIEW_COURSE);
     mPersonStatusView = UITableViewFactory::getView(ViewType::VIEW_PERSON_STATUS);
+//    mSummarizeView = UITableViewFactory::getView(ViewType::VIEW_SUMMARY);
 
     mHomeView = new UITextBrowser(this);
     mHomeView->clearHistory();
@@ -157,12 +160,10 @@ MainWindow::MainWindow(QWidget *parent)
     mViewList.insert(VIEW_DEPARTMENT, (BaseView*)mDepartView);
     mViewList.insert(VIEW_ROLE, (BaseView*)mRoleView);
     mViewList.insert(VIEW_COURSE, (BaseView*)mCourseView);
-    mViewList.insert(VIEW_PERSON_STATUS, (BaseView*)mPersonStatusView);
+//    mViewList.insert(VIEW_PERSON_STATUS, (BaseView*)mPersonStatusView);
 
     switchView(mHomeView);
 
-    logd("init config");
-    Config::init();
 
     logd("connect");
 //    QObject::connect(this, SIGNAL(load()), loader, SLOT(onLoad()));
@@ -1557,8 +1558,24 @@ void MainWindow::on_actionSummarizeReport_triggered()
     // BAO CAO TONG QUAN HOI DONG
     tracein;
     // TODO: implemen this
-    UNDER_DEV(tr("Báo cáo tổng quan Hội dòng, xuất báo cáo ra tập tin"));
+//    UNDER_DEV(tr("Báo cáo tổng quan Hội dòng, xuất báo cáo ra tập tin"));
+    QString fpath;
+    ErrCode err = STAT->exportGeneralStatistic(&fpath);
+    dlgHtmlViewer* viewer = nullptr;
 
+    if (err == ErrNone && ((viewer = new dlgHtmlViewer()) == nullptr)) {
+        loge("faie to allocate viewer dialog");
+        err = ErrNoMemory;
+    }
+    if (err == ErrNone) {
+        logd("show html viewer");
+        viewer->setHtmlPath(fpath);
+        viewer->setSubject(STR_GENERAL_STAT);
+        viewer->exec();
+    }
+    QFile::remove(fpath);
+    FREE_PTR(viewer);
+    if (err != ErrNone) DialogUtils::showErrorBox(err, STR_GENERAL_STAT_ERR);
     traceout;
 }
 

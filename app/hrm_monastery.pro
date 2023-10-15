@@ -336,6 +336,7 @@ HEADERS += \
     dialogutils.h \
     eventdefs.h \
     exception/exception.h \
+    exportdefs.h \
     image/image.h \
     image/imagectl.h \
     imagedefs.h \
@@ -557,6 +558,7 @@ DISTFILES += \
     res/edu_vi.csv \
     res/ethnic_info_template_vi.html \
     res/event_category_vi.csv \
+    res/general_statistic_template.html \
     res/home.html \
     res/people_in_community_export_template_vi.json \
     res/person_event_info_template.html \

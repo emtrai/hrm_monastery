@@ -541,7 +541,10 @@ const QStringList DbModel::getListExportKeyWord() const
     return mExportCallbacks.keys();
 }
 
-ErrCode DbModel::getExportDataString(const QString &item, QString *data) const
+ErrCode DbModel::getExportDataString(const QString &item,
+                                     const FileExporter* fileexporter,
+                                     const QString& datatype,
+                                     QString *data) const
 {
     ErrCode ret = ErrNone;
     tracein;

@@ -34,7 +34,7 @@ class ExportHtml : public FileExporter
 public:
     ExportHtml();
     virtual ErrCode saveTo(const DataExporter* item, const QString& datatype, const QString& fpath);
-    virtual ExportType getExportType();
+    virtual ExportType getExportType() const ;
 
 
 };

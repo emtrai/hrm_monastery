@@ -38,8 +38,15 @@ public:
     virtual QWidget* getWidget() {return this; }
 protected:
     virtual int getViewType() { return VIEW_SUMMARY;}
+    virtual void showEvent(QShowEvent *ev);
+private slots:
+    void on_btnExport_clicked();
+//    void load();
+private slots:
+    void onLoad();
 private:
     Ui::UISummarizeView *ui;
+    QString mGeneralStatFpath;
 };
 
 #endif // UISUMMARIZEVIEW_H

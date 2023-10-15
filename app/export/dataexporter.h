@@ -44,7 +44,10 @@ public:
                                                   QList<QPair<QString,QString>>& outMap) const;
 
     virtual const QStringList getListExportKeyWord() const;
-    virtual ErrCode getExportDataString(const QString& item, QString* data) const;
+    virtual ErrCode getExportDataString(const QString& item,
+                                        const FileExporter* fileexporter,
+                                        const QString& datatype,
+                                        QString* data) const;
 
     virtual QString getName() const = 0;
     /**
@@ -54,7 +57,11 @@ public:
      * @param[in] exportData data to be exported
      * @return
      */
-    virtual ErrCode getExportDataString(const QString& item, const DbModel* data, QString* exportData) const;
+    virtual ErrCode getExportDataString(const QString& item,
+                                        const FileExporter* fileexporter,
+                                        const QString& datatype,
+                                        const DbModel* data,
+                                        QString* exportData) const;
 
     virtual quint64 getExportTypeList();
 protected:

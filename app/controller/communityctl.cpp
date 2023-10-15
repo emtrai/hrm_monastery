@@ -33,7 +33,6 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include "dbcommunitymodelhandler.h"
-#include "errreporterctl.h"
 #include "dbmodel.h"
 #include "areactl.h"
 #include "countryctl.h"
@@ -41,7 +40,6 @@
 #include "jsondefs.h"
 #include "prebuiltdefs.h"
 #include "controllerdefs.h"
-#include "stringdefs.h"
 
 GET_INSTANCE_CONTROLLER_IMPL(CommunityCtl)
 

@@ -199,6 +199,16 @@ public:
                                 int* total = nullptr,
                                 QList<DbModel*>* outList = nullptr,
                                 const DbModelBuilder& builder = nullptr);
+    /**
+     * @brief Get total number of items (count)
+     * @param modelStatus
+     * @param req
+     * @param dbStatus
+     * @return > 0: the number of item, < 0: error code
+     */
+    virtual int getTotalItemCount(qint64 modelStatus = MODEL_STATUS_MAX,
+                                      const QString& req = nullptr,
+                                      qint64 dbStatus = DB_RECORD_ACTIVE);
 protected:
     virtual DbSqliteTbl* getMainTbl() = 0;
     virtual DbSqliteTbl* getTable(const QString& modelName);

@@ -1099,7 +1099,7 @@ void DlgPerson::on_btnPreview_clicked()
         if (QFile::exists(fpath)){
             dlgHtmlViewer* viewer = new dlgHtmlViewer();
             viewer->setHtmlPath(fpath);
-            viewer->setSubject("Person");
+            viewer->setSubject(STR_NU_TU);
             viewer->exec();
         }
     } else {

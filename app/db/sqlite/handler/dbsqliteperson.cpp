@@ -286,6 +286,7 @@ QList<DbModel *> DbSqlitePerson::getAll(DbModelBuilder builder, qint64 status,
     DbSqliteTbl* tbl = nullptr;
     logd("model name %s", modelName);
     QString name(modelName);
+    QList<DbModel *> ret;
     if (name == KModelNamePerson || name.isEmpty()) {
         //            tbl = getMainTbl();
         tbl = DbSqlite::table(KTablePerson);
@@ -295,12 +296,12 @@ QList<DbModel *> DbSqlitePerson::getAll(DbModelBuilder builder, qint64 status,
         loge("Unknow model name %s", name.toStdString().c_str());
     }
     if (tbl != nullptr){
-        return tbl->getAll(builder, status, from, noItems, total);
+        ret = tbl->getAll(builder, status, from, noItems, total);
     } else {
         loge("Not found corresponding table");
-        return QList<DbModel *>();
     }
-
+    traceout;
+    return ret;
 }
 
 QHash<QString, DbModel *> DbSqlitePerson::getAllInDict(DbModelBuilder builder, qint64 status, const char *modelName)
@@ -717,6 +718,23 @@ ErrCode DbSqlitePerson::check2UpdateCommunity(Person* per)
     FREE_PTR(comm);
     traceret(err);
     return err;
+}
+
+int DbSqlitePerson::getTotalItemsByPersonStatus(const QString &statusUid)
+{
+    tracein;
+    DbSqliteTbl* tbl = nullptr;
+    int ret = 0;
+    tbl = DbSqlite::table(KTablePerson);
+    logd("statusUid '%s'", STR2CHA(statusUid));
+    if (tbl != nullptr){
+        ret = (static_cast<DbSqlitePersonTbl*>(tbl))->getTotalItemsByPersonStatus(statusUid);
+    } else {
+        loge("Not found table '%s'", KTablePerson);
+        ret = -(ErrNoTable);
+    }
+    traceret(ret);
+    return ret;
 }
 
 

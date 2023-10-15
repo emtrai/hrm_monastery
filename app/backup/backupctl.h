@@ -77,7 +77,7 @@ private:
     void stopAutoBackup();
 public slots:
     void autoBackupTimerCallback();
-    void initThread();
+    void autobackupThreadRun();
 private:
     QTimer* mAutoBackupTimer;
     QThread mAutoBackupThread;

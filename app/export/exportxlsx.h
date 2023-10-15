@@ -35,7 +35,7 @@ public:
     virtual ErrCode saveTo(const DataExporter* exporter,
                            const QString& datatype, const QList<DbModel*> data,
                            const QString &fpath);
-    virtual ExportType getExportType();
+    virtual ExportType getExportType() const ;
 };
 
 #endif // EXPORTXLSX_H

@@ -76,6 +76,9 @@ const char* const KPrebuiltCommunityPersonExportTemplateName = "people_in_commun
 const char* const KPrebuiltCommonTemplateFileName = "common_template";
 const char* const KPrebuiltDefaultExportTemplateName = "default_export_template";
 
-
+/**
+ * @brief Generate statistic template
+ */
+const char* const KPrebuiltGeneralStatExportTemplateName = "general_statistic_template";
 
 #endif // PREBUILTDEFS_H

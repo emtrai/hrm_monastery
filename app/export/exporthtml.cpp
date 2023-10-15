@@ -87,7 +87,7 @@ ErrCode ExportHtml::saveTo(const DataExporter *item, const QString& datatype, co
             QString data;
 
             if (keywordStatus.value(word)){
-                ret = item->getExportDataString(word, &data);
+                ret = item->getExportDataString(word, this, datatype, &data);
             } else {
                 data = "";
             }
@@ -102,7 +102,7 @@ ErrCode ExportHtml::saveTo(const DataExporter *item, const QString& datatype, co
     return ret;
 }
 
-ExportType ExportHtml::getExportType()
+ExportType ExportHtml::getExportType() const
 {
     return EXPORT_HTML;
 }

@@ -436,6 +436,14 @@ ErrCode DbSqliteModelHandler::getListItems(const QHash<QString, QString> &inFiel
     return err;
 }
 
+int DbSqliteModelHandler::getTotalItemCount(qint64 modelStatus,
+                                                const QString &req,
+                                                qint64 dbStatus)
+{
+    tracein;
+    return getMainTbl()->getTotalItemCount(modelStatus, req, dbStatus);
+}
+
 
 DbSqliteTbl *DbSqliteModelHandler::getTable(const QString& modelName)
 {

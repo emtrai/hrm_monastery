@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+
+body {
+<!--    background-image: url(':/icon/icon/background.jpeg');-->
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    min-height: 100%;
+    }
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    }
+.right {
+    text-align: right;
+    }
+.header {
+<!--    background-color:rgb(208, 244, 246);-->
+    padding: 5px;
+    width: 30%;
+}
+.value {
+    padding: 5px;
+    width: 80%;
+}
+.header2 {
+    background-color:rgb(224, 224, 224);
+    padding: 5px;
+    font-weight: bold;
+    text-align: left;
+    font-size: large;
+    width: 100%;
+
+}
+.header3 {
+    padding: 5px;
+    font-weight: bold;
+    text-align: left;
+    font-size: medium;
+    width: 100%;
+
+}
+.avatar {
+    vertical-align: middle;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    max-width: 50px;
+    max-height: 50px;
+  }
+</style>
+</head>
+<body>
+<div style="padding: 5%">
+<table style="border: none;border-collapse: collapse;display: block;" width="100%">
+    <colgroup>
+    <col width="30%"/>
+    <col width="80%"/>
+    </colgroup>
+    <tr>
+        <td class="header2" colspan="2">Thông tin Hội dòng</td>
+    </tr>
+    <tr>
+        <td class="header" width="30%">Tổng số nữ tu</td>
+        <td class="value">{{TONG_NU_TU}}</td>
+    </tr>
+    <tr>
+        <td class="header" width="30%">Tổng số nữ tu hiện tại</td>
+        <td class="value">{{TONG_NU_TU_HIEN_TAI}}</td>
+    </tr>
+    <tr>
+        <td class="header">Thống kê Nữ tu theo trạng thái</td>
+        <td>
+        <table>
+            {{TONG_NU_TU_TRANG_THAI}}
+        </table>
+        </td>
+    </tr>
+    <tr>
+        <td class="header" width="30%">Tổng số Cộng đoàn</td>
+        <td class="value">{{TONG_CONG_DOAN}}</td>
+    </tr>
+    <tr>
+        <td class="header" width="30%">Tổng số Khu vực</td>
+        <td class="value">{{TONG_KHU_VUC}}</td>
+    </tr>
+    <tr>
+        <td class="header" width="30%">Chị Tổng phụ trách</td>
+        <td class="value">{{TONG_PHU_TRACH}}</td>
+    </tr>
+    <tr>
+        <td class="header" width="30%">Nhiệm kỳ</td>
+        <td class="value">{{TONG_PHU_TRACH_NHIEM_KY}}</td>
+    </tr>
+</table>
+</div>
+</body>
+
+</html>

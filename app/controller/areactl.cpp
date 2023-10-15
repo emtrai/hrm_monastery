@@ -45,6 +45,7 @@ AreaCtl::~AreaCtl()
     traced;
 }
 
+
 ErrCode AreaCtl::getContactPeopleList(const QString &areaUid, QList<DbModel *> &outList,
                                       qint64 modelStatus)
 {

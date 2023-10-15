@@ -199,7 +199,7 @@ protected:
 
  private:
     Ui::MainWindow *ui;
-    UISummarizeView* mSummarizeView;
+    BaseView* mSummarizeView;
     BaseView* mCommunityView;
     BaseView* mSaintsView;
     BaseView* mPersonView;

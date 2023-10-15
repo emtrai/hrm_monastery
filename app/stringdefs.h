@@ -151,4 +151,7 @@
 
 #define STR_PERSON_STATUS     QObject::tr("Tình trạng Nữ tu")
 
+#define STR_GENERAL_STAT    QObject::tr("Thống kê")
+#define STR_GENERAL_STAT_ERR    QObject::tr("Thống kê lỗi")
+
 #endif // STRINGDEFS_H
