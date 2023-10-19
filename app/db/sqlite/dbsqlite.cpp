@@ -53,6 +53,7 @@
 #include "table/dbsqliteareamgrtbl.h"
 #include "table/dbsqlitespecialistpersontbl.h"
 #include "table/dbsqlitecommunitydepttbl.h"
+#include "table/dbsqlitecommunitymanagertbl.h"
 #include "table/dbmetadatatbl.h"
 #include "table/dbsqlsequencetbl.h"
 
@@ -207,6 +208,7 @@ void DbSqlite::setupTables()
     appendTable(new DbSqliteCommDeptPersonTbl(this));
     appendTable(new DbSqliteAreaMgrTbl(this));
     appendTable(new DbSqliteSpecialistPersonTbl(this));
+    appendTable(new DbSqliteCommunityManagerTbl(this));
 }
 
 void DbSqlite::setupModelHandler()
@@ -341,7 +343,28 @@ DbSqliteTbl *DbSqlite::getTable(const QString &tblName)
         loge("Not found table %s", tblName.toStdString().c_str());
         // TODO: reload system? or what should we do?
     }
+    traceout;
+    return tbl;
+}
 
+DbSqliteTbl *DbSqlite::getTableFromModelName(const QString &name)
+{
+    tracein;
+    DbSqliteTbl* tbl = nullptr;
+    logd("get table for model name '%s'", STR2CHA(name));
+    if (!name.isEmpty()) {
+        foreach (DbSqliteTbl* item, mListTbl) {
+            if (tbl && tbl->getHandleModelName() == name) {
+                tbl = item;
+            }
+        }
+    } else {
+        loge("invalid model name to search table");
+    }
+    if (!tbl){
+        loge("Not found table for model '%s'", STR2CHA(name));
+    }
+    traceout;
     return tbl;
 }
 

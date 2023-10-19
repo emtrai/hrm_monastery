@@ -56,6 +56,13 @@ DbSqliteTbl::DbSqliteTbl(DbSqlite* db, const QString& baseName, const QString& n
     mVersionCode = versionCode;
 }
 
+DbSqliteTbl::DbSqliteTbl(DbSqlite *db, const QString &baseName,
+                         const QString &name, qint32 versionCode,
+                         const QString &modelName):DbSqliteTbl(db, baseName, name, versionCode)
+{
+    mHandleModelName = modelName;
+}
+
 const QString &DbSqliteTbl::baseName() const
 {
     return mBaseName;
@@ -74,6 +81,11 @@ const QString &DbSqliteTbl::name() const
 void DbSqliteTbl::setName(const QString &newName)
 {
     mName = newName;
+}
+
+const QString& DbSqliteTbl::getHandleModelName() const
+{
+    return mHandleModelName;
 }
 
 uint32_t DbSqliteTbl::versionCode() const

@@ -39,7 +39,8 @@ DbSqliteRoleTbl::DbSqliteRoleTbl():
     DbSqliteRoleTbl(nullptr)
 {}
 DbSqliteRoleTbl::DbSqliteRoleTbl(DbSqlite* db)
-    :DbSqliteTbl(db, KTableRole, KTableRole, KVersionCode)
+    :DbSqliteTbl(db, KTableRole, KTableRole, KVersionCode,
+                  KModelNameRole)
 {
-    tracein;
+    traced;
 }

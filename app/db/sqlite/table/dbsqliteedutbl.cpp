@@ -34,7 +34,8 @@
 const qint32 DbSqliteEduTbl::KVersionCode = VERSION_CODE(0,0,1);
 
 DbSqliteEduTbl::DbSqliteEduTbl(DbSqlite* db)
-    :DbSqliteTbl(db, KTableEdu, KTableEdu, KVersionCode)
+    :DbSqliteTbl(db, KTableEdu, KTableEdu, KVersionCode,
+                  KModelNameEducation)
 {
     tracein;
 

@@ -31,6 +31,7 @@
 #include "mainwindow.h"
 #include "uipeopleincommunitylistview.h"
 #include "uicommdeptlistview.h"
+#include "uicommunitymgrlistview.h"
 #include "uitableview.h"
 #include <QFileDialog>
 #include "personctl.h"
@@ -380,6 +381,46 @@ ErrCode UICommunityListView::onMenuActionListDepartment(QMenu *menu, UITableMenu
     return ret;
 }
 
+ErrCode UICommunityListView::onMenuActionListManagers(QMenu *menu, UITableMenuAction *act)
+{
+    tracein;
+    UNUSED(menu);
+    ErrCode ret = ErrNone;
+    const Community* community = nullptr;
+    UICommunityMgrListView* view  = nullptr;
+    if (!act) {
+        ret = ErrInvalidArg;
+        loge("invalid argument");
+    }
+    if (ret == ErrNone) {
+        community = dynamic_cast<const Community*>(act->getData());
+        if (!community || !IS_MODEL_NAME(community, KModelNameCommunity)) {
+            loge("invalid model '%s'", MODELSTR2CHA(community));
+            ret = ErrInvalidModel;
+        }
+    }
+    if (ret == ErrNone) {
+        view = (UICommunityMgrListView*)MAINWIN->getView(ViewType::VIEW_COMMUNITY_MGR);
+        if (!view) {
+            ret = ErrInvalidView;
+            loge("not found view community mgr");
+        }
+    }
+
+    if (ret == ErrNone) {
+        ret = view->setCommunity(community);
+    }
+
+    if (ret == ErrNone) {
+        logd("switch to view VIEW_COMMUNITY_MGR, community '%s'",
+             MODELSTR2CHA(community));
+        MAINWIN->switchView(view);
+    }
+    traceret(ret);
+    return ret;
+
+}
+
 QList<UITableMenuAction *> UICommunityListView::getMenuSingleSelectedItemActions(const QMenu* menu,
                                                                    UITableCellWidgetItem* item)
 {
@@ -397,6 +438,10 @@ QList<UITableMenuAction *> UICommunityListView::getMenuSingleSelectedItemActions
     actionList.append(BUILD_MENU_ACTION_IMPL(tr("Danh sách phòng ban"),
                                              item,
                                              onMenuActionListDepartment));
+
+    actionList.append(BUILD_MENU_ACTION_IMPL(tr("Danh sách quản lý"),
+                                                item,
+                                                onMenuActionListManagers));
 
     actionList.append(BUILD_MENU_SEPARATE);
 

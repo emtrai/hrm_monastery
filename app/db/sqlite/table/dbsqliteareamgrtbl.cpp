@@ -57,7 +57,7 @@
 const qint32 DbSqliteAreaMgrTbl::KVersionCode = VERSION_CODE_2;
 
 DbSqliteAreaMgrTbl::DbSqliteAreaMgrTbl(DbSqlite *db):
-    DbSqliteMapTbl(db, KTableAreaPerson, KTableAreaPerson, KVersionCode)
+    DbSqliteMapTbl(db, KTableAreaPerson, KTableAreaPerson, KVersionCode, KModelNameAreaPerson)
 {
     tracein;
 

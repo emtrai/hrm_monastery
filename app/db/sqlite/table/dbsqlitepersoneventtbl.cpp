@@ -52,14 +52,15 @@ DbSqlitePersonEventTbl::DbSqlitePersonEventTbl():
     DbSqlitePersonEventTbl(nullptr)
 {}
 DbSqlitePersonEventTbl::DbSqlitePersonEventTbl(DbSqlite* db)
-    :DbSqliteTbl(db, KTablePersonEvent, KTablePersonEvent, KVersionCode)
+    :DbSqliteTbl(db, KTablePersonEvent, KTablePersonEvent, KVersionCode,
+                  KModelNamePersonEvent)
 {
-    tracein;
+    traced;
 }
 
 DbSqlitePersonEventTbl::~DbSqlitePersonEventTbl()
 {
-    tracein;
+    traced;
 }
 
 void DbSqlitePersonEventTbl::addTableField(DbSqliteTableBuilder *builder)

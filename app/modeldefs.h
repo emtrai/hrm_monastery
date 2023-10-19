@@ -43,6 +43,7 @@ const char* const KModelHdlPersonEvent = "modelhdl@person_event";
 const char* const KModelHdlEvent = "modelhdl@event";
 
 const char* const KModelNamePerson = "model@person";
+const char* const KModelNameProvince = "model@province";
 const char* const KModelNameCountry = "model@country";
 const char* const KModelNameArea = "model@area";
 const char* const KModelNamePersonEvent = "model@person_event";
@@ -50,6 +51,7 @@ const char* const KModelNameSaintPerson = "model@saint_person";
 const char* const KModelNameCommDept = "model@comm_dept";
 const char* const KModelNameMapDeptMgr = "model@dept_mgr";
 const char* const KModelNameCommPerson = "model@comm_pers";
+const char* const KModelNameCommManager = "model@comm_manager";
 const char* const KModelNameMap = "model@map_model";
 const char* const KModelNamePersonDept = "model@person_dept";
 const char* const KModelNameRole = "model@role";

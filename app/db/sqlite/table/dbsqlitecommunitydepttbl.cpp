@@ -40,7 +40,8 @@
 const qint32 DbSqliteCommunityDeptTbl::KVersionCode = VERSION_CODE(0,0,1);
 
 DbSqliteCommunityDeptTbl::DbSqliteCommunityDeptTbl(DbSqlite* db)
-    :DbSqliteTbl(db, KTableCommDept, KTableCommDept, KVersionCode)
+    :DbSqliteTbl(db, KTableCommDept, KTableCommDept, KVersionCode,
+                  KModelNameCommDept)
 {
     tracein;
 }

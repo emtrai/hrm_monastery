@@ -130,7 +130,7 @@ public:
      */
     virtual bool exist(const DbModel* edu);
 
-    virtual bool isNameidExist(const QString& nameId, const char* modelName = nullptr);
+    virtual bool isNameidExist(const QString& nameId, const QString& modelName = nullptr);
     virtual QList<DbModel*> getAll(DbModelBuilder builder, qint64 status = DB_RECORD_ACTIVE,
                                     const char* modelName = nullptr, int from = 0,
                                     int noItems = 0, int* total = nullptr);

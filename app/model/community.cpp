@@ -32,7 +32,9 @@
 #include "countryctl.h"
 #include "personctl.h"
 #include "prebuiltdefs.h"
-
+#include "stringdefs.h"
+#include "communitymanager.h"
+#include "stringdefs.h"
 DbModel *Community::build()
 {
     tracein;
@@ -147,6 +149,22 @@ void Community::initExportFields()
     });
     mExportCallbacks.insert(KItemMissionNameId, [](const DbModel* model, const QString& item){
         return ((Community*)model)->missionNameIdString();
+    });
+    mExportCallbacks.insert(KItemManagers, [](const DbModel* model, const QString& item){
+        QString managers;
+        QList<DbModel *> managerList;
+        ErrCode err = ErrNone;
+        if (!model) {
+            err = ErrInvalidModel;
+        }
+        if (err == ErrNone) {
+            err = COMMUNITYCTL->getManagersListInString(model->uid(), "\n", managers);
+            logife(err, "failed to get managers list for ''%s'", MODELSTR2CHA(model));
+        }
+        if (err != ErrNone && managers.isEmpty()) {
+            managers = QString(STR_DATA_ERROR_CODE).arg(err);
+        }
+        return managers;
     });
     // TODO: implement more
     traceout;

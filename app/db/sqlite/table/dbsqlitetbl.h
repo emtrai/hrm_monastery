@@ -44,6 +44,7 @@ class DbSqliteTbl
 public:
     DbSqliteTbl(DbSqlite* db);
     DbSqliteTbl(DbSqlite* db, const QString& baseName, const QString& name, qint32 versionCode);
+    DbSqliteTbl(DbSqlite* db, const QString& baseName, const QString& name, qint32 versionCode, const QString&modelName);
     virtual ~DbSqliteTbl();
 
     virtual const QString &baseName() const;
@@ -51,6 +52,8 @@ public:
 
     virtual const QString &name() const;
     virtual void setName(const QString &newName);
+
+    virtual const QString& getHandleModelName() const;
 
     virtual uint32_t versionCode() const;
     virtual void setVersionCode(uint32_t newVersionCode);
@@ -301,6 +304,7 @@ public:
 protected: // allow derived class can get info
     QString mBaseName;
     QString mName;
+    QString mHandleModelName;
     uint32_t mVersionCode;
     DbSqlite* mDb;
     QHash<QString, int> mFieldDataTypeMap;

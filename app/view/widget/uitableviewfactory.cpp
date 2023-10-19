@@ -43,6 +43,7 @@
 #include "view/widget/uicommunitiesofpersonlistview.h"
 #include "view/widget/uipersonstatuslistview.h"
 #include "view/widget/uisummarizeview.h"
+#include "view/widget/uicommunitymgrlistview.h"
 
 BaseView *UITableViewFactory::getView(ViewType type, QWidget *parent )
 {
@@ -61,6 +62,9 @@ BaseView *UITableViewFactory::getView(ViewType type, QWidget *parent )
         break;
     case VIEW_COMMUNITY:
         view = new UICommunityListView(parent);
+        break;
+    case VIEW_COMMUNITY_MGR:
+        view = new UICommunityMgrListView(parent);
         break;
     case VIEW_AREA:
         view = new UIAreaListView(parent);

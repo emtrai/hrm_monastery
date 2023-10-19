@@ -54,6 +54,14 @@ DbSqliteMapTbl::DbSqliteMapTbl(DbSqlite *db,
     mFieldNameDbId2 = "DBID2";
 }
 
+DbSqliteMapTbl::DbSqliteMapTbl(DbSqlite *db, const QString &baseName,
+                               const QString &name, qint32 versionCode,
+                               const QString &modelName):
+    DbSqliteMapTbl(db, baseName, name, versionCode)
+{
+    mHandleModelName = modelName;
+}
+
 /*
  * SELECT * FROM "mapTblName"
  *  JOIN "modelTblName"

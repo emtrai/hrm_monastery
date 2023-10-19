@@ -40,7 +40,8 @@
 const qint32 DbSqliteCommunityPersonTbl::KVersionCode = VERSION_CODE(0,0,1);
 
 DbSqliteCommunityPersonTbl::DbSqliteCommunityPersonTbl(DbSqlite *db):
-    DbSqliteMapTbl(db, KTableCommPerson, KTableCommPerson, KVersionCode)
+    DbSqliteMapTbl(db, KTableCommPerson, KTableCommPerson, KVersionCode,
+                     KModelNameCommPerson)
 {
     tracein;
 
@@ -48,6 +49,7 @@ DbSqliteCommunityPersonTbl::DbSqliteCommunityPersonTbl(DbSqlite *db):
     mFieldNameDbId1 = KFieldCommunityDbId;
     mFieldNameUid2 = KFieldPersonUid;
     mFieldNameDbId2 = KFieldPersonDbId;
+    traceout;
 }
 
 QList<Person *> DbSqliteCommunityPersonTbl::getListPerson(const QString &communityUid,

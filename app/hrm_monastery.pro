@@ -119,6 +119,7 @@ SOURCES += \
     db/sqlite/handler/dbsqliteethnic.cpp \
     db/sqlite/handler/dbsqliteevent.cpp \
     db/sqlite/table/dbmetadatatbl.cpp \
+    db/sqlite/table/dbsqlitecommunitymanagertbl.cpp \
     db/sqlite/table/dbsqlitepersonstatustbl.cpp \
     db/sqlite/table/dbsqlsequencetbl.cpp \
     dbmodelutils.cpp \
@@ -130,6 +131,7 @@ SOURCES += \
     import/importxlsx.cpp \
     model/areacommunity.cpp \
     model/areaperson.cpp \
+    model/communitymanager.cpp \
     model/communityperson.cpp \
     model/dbmodelfactory.cpp \
     model/mapdbmodel.cpp \
@@ -215,6 +217,7 @@ SOURCES += \
     view/dialog/dlgarea.cpp \
     view/dialog/dlgareaperson.cpp \
     view/dialog/dlgcommdept.cpp \
+    view/dialog/dlgcommmgr.cpp \
     view/dialog/dlgcommoneditmodel.cpp \
     view/dialog/dlgcommunity.cpp \
     view/dialog/dlgconfirmupdatepeoplecomm.cpp \
@@ -246,6 +249,7 @@ SOURCES += \
     view/widget/uicommonlistview.cpp \
     view/widget/uicommunitiesofpersonlistview.cpp \
     view/widget/uicommunitylistview.cpp \
+    view/widget/uicommunitymgrlistview.cpp \
     view/widget/uicountrylistview.cpp \
     view/widget/uicourselistview.cpp \
     view/widget/uidepartmentlistview.cpp \
@@ -330,6 +334,7 @@ HEADERS += \
     db/sqlite/handler/dbsqlitespecialist.h \
     db/sqlite/handler/dbsqlitework.h \
     db/sqlite/table/dbmetadatatbl.h \
+    db/sqlite/table/dbsqlitecommunitymanagertbl.h \
     db/sqlite/table/dbsqlitepersonstatustbl.h \
     db/sqlite/table/dbsqlsequencetbl.h \
     dbmodelutils.h \
@@ -347,6 +352,7 @@ HEADERS += \
     jsondefs.h \
     model/areacommunity.h \
     model/areaperson.h \
+    model/communitymanager.h \
     model/communityperson.h \
     model/dbmodelfactory.h \
     model/mapdbmodel.h \
@@ -437,6 +443,7 @@ HEADERS += \
     view/dialog/dlgarea.h \
     view/dialog/dlgareaperson.h \
     view/dialog/dlgcommdept.h \
+    view/dialog/dlgcommmgr.h \
     view/dialog/dlgcommoneditmodel.h \
     view/dialog/dlgcommunity.h \
     view/dialog/dlgconfirmupdatepeoplecomm.h \
@@ -468,6 +475,7 @@ HEADERS += \
     view/widget/uicommonlistview.h \
     view/widget/uicommunitiesofpersonlistview.h \
     view/widget/uicommunitylistview.h \
+    view/widget/uicommunitymgrlistview.h \
     view/widget/uicountrylistview.h \
     view/widget/uicourselistview.h \
     view/widget/uidepartmentlistview.h \
@@ -500,6 +508,7 @@ FORMS += \
     view/dialog/dlgarea.ui \
     view/dialog/dlgareaperson.ui \
     view/dialog/dlgcommdept.ui \
+    view/dialog/dlgcommmgr.ui \
     view/dialog/dlgcommunity.ui \
     view/dialog/dlgconfirmupdatepeoplecomm.ui \
     view/dialog/dlgcountry.ui \
@@ -544,6 +553,7 @@ DISTFILES += \
     res/area_person_info_template.html \
     res/area_vi.csv \
     res/comm_dept_vi.json \
+    res/comm_mgr_info_template.html \
     res/common_template.html \
     res/communities_of_person_export_template_vi.json \
     res/communities_of_person_info_template.html \

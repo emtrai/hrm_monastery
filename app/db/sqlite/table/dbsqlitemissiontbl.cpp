@@ -38,7 +38,8 @@ const qint32 DbSqliteMissionTbl::KVersionCode = VERSION_CODE(0,0,1);
 DbSqliteMissionTbl::DbSqliteMissionTbl(): DbSqliteMissionTbl(nullptr)
 {}
 DbSqliteMissionTbl::DbSqliteMissionTbl(DbSqlite* db)
-    :DbSqliteTbl(db, KTableMission, KTableMission, KVersionCode)
+    :DbSqliteTbl(db, KTableMission, KTableMission, KVersionCode,
+                  KModelNameMission)
 {
     tracein;
 }

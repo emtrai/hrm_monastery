@@ -35,7 +35,8 @@ DbSqlitePersonStatusTbl::DbSqlitePersonStatusTbl():
     DbSqlitePersonStatusTbl(nullptr)
 {}
 DbSqlitePersonStatusTbl::DbSqlitePersonStatusTbl(DbSqlite* db)
-    :DbSqliteTbl(db, KTableStatus, KTableStatus, KVersionCode)
+    :DbSqliteTbl(db, KTableStatus, KTableStatus, KVersionCode,
+                  KModelNamePersonStatus)
 {
-    tracein;
+    traced;
 }

@@ -62,6 +62,21 @@
 
 #define NAMEID(item1, item2) (item1 + "_" + item2)
 
+#define STR2CHA(val) (!(val).isEmpty()?(val).toStdString().c_str():"(empty)")
+#define MODELSTR2CHA(model) (model?STR2CHA(model->toString()):"(null)")
+#define MODELNAME2CHA(model) (model?STR2CHA(model->modelName()):"(null)")
+
+// TODO: re-implement this one!!!!!
+#define ASSERT(cond, msg) \
+do { \
+        if (!(cond)) { \
+            loge("FATAL ERROR! %s", msg); \
+            qFatal(msg); \
+    } \
+} while(0)
+
+#define FAIL(msg) ASSERT(false, msg)
+
 #define DIALOG_SIZE_SHOW(dlg) \
                 do {\
                     int h = 0;\
@@ -95,6 +110,41 @@ do { \
                 } \
             }\
     } while (0)
+//                QString uid = value.toString();\
+//                logd("uid %s", STR2CHA(uid));\
+//                DbModel* model = ctrl->getModelByUid(uid); \
+//                if (model) { \
+//                    func((DbModelType*)model); \
+//                } else { \
+//                    loge("uid '%s' not found in ctrl '%s'", \
+//                        STR2CHA(uid), STR2CHA(ctl->getName());\
+//                } \
+
+#define SET_MODEL_FROM_CBOX(widget,func, ctrl, DbModelType, err) \
+do { \
+    QString currtxt = widget->currentText().trimmed();\
+    if (!currtxt.isEmpty()){ \
+        int index = widget->findText(currtxt);\
+        logd("item '%s', index %d", STR2CHA(currtxt), index);\
+        if (index >= 0){ \
+            QVariant value = widget->itemData(index);\
+            if (!value.isNull()) {\
+                QString uid = value.toString();\
+                logd("uid %s", STR2CHA(uid));\
+                DbModel* model = ctrl->getModelByUid(uid); \
+                if (model) { \
+                    func((DbModelType*)model); \
+                } else { \
+                    loge("set model from cbox failed, uid '%s' not found in ctrl '%s'", \
+                        STR2CHA(uid), STR2CHA(ctrl->getName()));\
+                } \
+            }\
+        } else { \
+                loge("item '%s' not found", STR2CHA(currtxt));\
+                err = ErrNotFound; \
+        } \
+    }\
+} while (0)
 
 // TODO: should common with above macro???
 // TODO: should check if value is actually integer??? exception???
@@ -128,6 +178,30 @@ do { \
         }\
     }\
 } while (0)
+
+#define SET_MODEL_FROM_TEXTBOX(widget, itemName, func, ctrl, DbModelType, err) \
+    do { \
+        logd("SET_MODEL_FROM_TEXTBOX, itemName %s", itemName);\
+        QString currtxt = widget->text().trimmed();\
+        if (!currtxt.isEmpty()){ \
+            logd("currtxt %s", currtxt.toStdString().c_str());\
+            QVariant value = widget->property(itemName);\
+            if (!value.isNull()) { \
+                QString uid = value.toString();\
+                logd("uid %s", STR2CHA(uid));\
+                DbModel* model = ctrl->getModelByUid(uid); \
+                if (model) { \
+                    func((DbModelType*)model); \
+                } else { \
+                    loge("set model from textbox failed, uid '%s' not found in ctrl '%s'", \
+                        STR2CHA(uid), STR2CHA(ctrl->getName()));\
+                    err = ErrNotFound; \
+                } \
+            } else {\
+                logd("%s has no data", itemName);\
+            }\
+        }\
+    } while (0)
 
 #define SET_VAL_FROM_EDITBOX(widget, itemName, func, functxt) \
 do { \
@@ -175,20 +249,6 @@ do { \
     } while (0)
 
 
-#define STR2CHA(val) (!(val).isEmpty()?(val).toStdString().c_str():"(empty)")
-#define MODELSTR2CHA(model) (model?STR2CHA(model->toString()):"(null)")
-#define MODELNAME2CHA(model) (model?STR2CHA(model->modelName()):"(null)")
-
-// TODO: re-implement this one!!!!!
-#define ASSERT(cond, msg) \
-        do { \
-            if (!(cond)) { \
-                loge("FATAL ERROR! %s", msg); \
-                qFatal(msg); \
-            } \
-        } while(0)
-
-#define FAIL(msg) ASSERT(false, msg)
 
 #define FULLNAME(firstName, lastName) QString("%1 %2").arg(lastName, firstName)
 

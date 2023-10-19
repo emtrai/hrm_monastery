@@ -90,7 +90,11 @@ public:
      * @return
      */
     const Community* getRootCommunity();
-
+    ErrCode getManagersList(const QString &communityUid, QList<DbModel *> &outList,
+                            qint64 modelStatus = MODEL_STATUS_MAX);
+    ErrCode getManagersListInString(const QString &communityUid, const QString& sep,
+                            QString &outString,
+                            qint64 modelStatus = MODEL_STATUS_MAX);
 protected:
 
     virtual const char* getPrebuiltFileName();

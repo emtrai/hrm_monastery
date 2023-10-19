@@ -39,7 +39,8 @@ DbSqliteEthnicTbl::DbSqliteEthnicTbl():
     DbSqliteEthnicTbl(nullptr)
 {}
 DbSqliteEthnicTbl::DbSqliteEthnicTbl(DbSqlite* db)
-    :DbSqliteTbl(db, KTableEthnic, KTableEthnic, KVersionCode)
+    :DbSqliteTbl(db, KTableEthnic, KTableEthnic, KVersionCode,
+                  KModelNameEthnic)
 {
     tracein;
 }

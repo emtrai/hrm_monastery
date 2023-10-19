@@ -37,7 +37,8 @@
 const qint32 DbSqliteCourseTbl::KVersionCode = VERSION_CODE(0,0,1);
 
 DbSqliteCourseTbl::DbSqliteCourseTbl(DbSqlite* db)
-    : DbSqliteTbl(db, KTableCourse, KTableCourse, KVersionCode)
+    : DbSqliteTbl(db, KTableCourse, KTableCourse, KVersionCode,
+                  KModelNameCourse)
 {
     traced;
 }

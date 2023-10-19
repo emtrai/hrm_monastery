@@ -96,6 +96,7 @@ public:
     QSqlDatabase getDbConnection();
 //    virtual ErrCode_t addCommunity(const Community* comm);
     virtual DbSqliteTbl* getTable(const QString& tblName);
+    virtual DbSqliteTbl* getTableFromModelName(const QString& name);
     virtual DbModelHandler *getEduModelHandler();
     virtual DbModelHandler *getSaintModelHandler();
     virtual DbModelHandler* getSpecialistModelHandler();

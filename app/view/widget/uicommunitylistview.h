@@ -54,6 +54,7 @@ protected:
     virtual ErrCode onMenuActionListActivePerson(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionListAllPerson(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionListDepartment(QMenu* menu, UITableMenuAction* act);
+    virtual ErrCode onMenuActionListManagers(QMenu* menu, UITableMenuAction* act);
 
     virtual ErrCode onAddItem(UITableCellWidgetItem *item);
     virtual ErrCode onEditItem(UITableCellWidgetItem *item);

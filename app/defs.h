@@ -201,6 +201,7 @@ const char* const KItemPersonEvent= "SU_KIEN_NU_TU";
 const char* const KItemDate= "NGAY_THANG";
 const char* const KItemMember= "THANH_VIEN";
 const char* const KItemTitle= "TIEU_DE";
+const char* const KItemManagers= "DANH_SACH_QUAN_LY";
 
 // Special item name
 const char* const KItemDbStatus = "DB_STATUS";

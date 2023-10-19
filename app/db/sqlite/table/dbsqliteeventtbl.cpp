@@ -37,7 +37,8 @@ DbSqliteEventTbl::DbSqliteEventTbl():
     DbSqliteEventTbl(nullptr)
 {}
 DbSqliteEventTbl::DbSqliteEventTbl(DbSqlite* db)
-    :DbSqliteTbl(db, KTableEvent, KTableEvent, KVersionCode)
+    :DbSqliteTbl(db, KTableEvent, KTableEvent, KVersionCode,
+                  KModelNameEvent)
 {
     tracein;
 }

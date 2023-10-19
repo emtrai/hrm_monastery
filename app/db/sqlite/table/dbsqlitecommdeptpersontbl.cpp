@@ -43,7 +43,8 @@
 const qint32 DbSqliteCommDeptPersonTbl::KVersionCode = VERSION_CODE(0,0,1);
 
 DbSqliteCommDeptPersonTbl::DbSqliteCommDeptPersonTbl(DbSqlite *db):
-    DbSqliteTbl(db, KTableCommDepartPerson, KTableCommDepartPerson, KVersionCode)
+    DbSqliteTbl(db, KTableCommDepartPerson, KTableCommDepartPerson, KVersionCode,
+                  KModelNamePersonDept)
 {
     tracein;
 

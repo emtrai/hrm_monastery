@@ -91,6 +91,7 @@
 #define STR_AREA     QObject::tr("Khu vực")
 #define STR_DATA_EXISTED     QObject::tr("Dữ liệu đã tồn tại")
 #define STR_DATA_ERROR     QObject::tr("Dữ liệu lỗi!!!")
+#define STR_DATA_ERROR_CODE     QObject::tr("Dữ liệu lỗi!!!. Mã Lỗi %1")
 
 
 #define STR_TONG_PHU_TRACH     QObject::tr("Tổng phụ trách")
@@ -153,5 +154,6 @@
 
 #define STR_GENERAL_STAT    QObject::tr("Thống kê")
 #define STR_GENERAL_STAT_ERR    QObject::tr("Thống kê lỗi")
+#define STR_ERR_QUERY_COMMUNITY_MANAGER    QObject::tr("Lỗi truy vấn thông tin quản lý cộng đoàn")
 
 #endif // STRINGDEFS_H

@@ -32,6 +32,8 @@ class DbSqliteMapTbl : public DbSqliteTbl
 public:
     DbSqliteMapTbl(DbSqlite* db);
     DbSqliteMapTbl(DbSqlite* db, const QString& baseName, const QString& name, qint32 versionCode);
+    DbSqliteMapTbl(DbSqlite* db, const QString& baseName, const QString& name, qint32 versionCode, const QString&modelName);
+
     virtual QList<DbModel*> getListItems(const QString &mapTblName,
                                   const QString &modelTblName,
                                   const QString &fieldUid2Join,

@@ -38,7 +38,8 @@
 const qint32 DbSqliteCommunityTbl::KVersionCode = VERSION_CODE(0,0,1);
 
 DbSqliteCommunityTbl::DbSqliteCommunityTbl(DbSqlite* db)
-    :DbSqliteTbl(db, KTableCommunity, KTableCommunity, KVersionCode)
+    :DbSqliteTbl(db, KTableCommunity, KTableCommunity, KVersionCode,
+                  KModelNameCommunity)
 {}
 
 QList<DbModel *> DbSqliteCommunityTbl::getListCommunitiesInArea(const QString &areaUid, int status)

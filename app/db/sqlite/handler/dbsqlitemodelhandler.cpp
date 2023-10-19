@@ -49,7 +49,7 @@ ErrCode DbSqliteModelHandler::add(DbModel *model, bool notify)
 
     if (model != nullptr){
         DbSqliteTbl* tbl = getTable(model->modelName());
-        if (!tbl->isExist(model)){
+        if (!tbl->isExist(model)) {
             err = tbl->add(model);
         } else{
             err = ErrExisted;
@@ -230,13 +230,13 @@ bool DbSqliteModelHandler::exist(const DbModel *model)
     return exist;
 }
 
-bool DbSqliteModelHandler::isNameidExist(const QString &nameId, const char *modelName)
+bool DbSqliteModelHandler::isNameidExist(const QString &nameId, const QString& modelName)
 {
     tracein;
     DbSqliteTbl* tbl = nullptr;
     bool exist = false;
-    logd("check nameid exist for model '%s'", modelName?modelName:"(null)");
-    if (modelName) {
+    logd("check nameid exist for model '%s'", STR2CHA(modelName));
+    if (!modelName.isEmpty()) {
         tbl = getTable(modelName);
     } else {
         logd("get main table");
@@ -447,7 +447,13 @@ int DbSqliteModelHandler::getTotalItemCount(qint64 modelStatus,
 
 DbSqliteTbl *DbSqliteModelHandler::getTable(const QString& modelName)
 {
-    return getMainTbl();
+    if (!modelName.isEmpty()) {
+        dbg(LOG_DEBUG, "get table for modelName '%s'", STR2CHA(modelName));
+        return SQLITE->getTableFromModelName(modelName);
+    } else {
+        dbg(LOG_DEBUG, "get default/main table");
+        return getMainTbl();
+    }
 }
 DbModelBuilder DbSqliteModelHandler::getBuilder(const QString &modelName)
 {

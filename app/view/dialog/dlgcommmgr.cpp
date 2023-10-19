@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Ngo Huy Anh
+ * Copyright (C) 2023 Ngo Huy Anh
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
  * limitations under the License.
  *
  *
- * Filename: DlgAreaPerson.cpp
+ * Filename: dlgcommmgr.cpp
  * Author: Anh, Ngo Huy
- * Created date:10/22/2022
+ * Created date:10/15/2023
  * Brief:
  */
-#include "dlgareaperson.h"
-#include "areaperson.h"
-#include "ui_DlgAreaPerson.h"
+#include "dlgcommmgr.h"
+#include "ui_dlgcommmgr.h"
+#include "communitymanager.h"
 #include "logger.h"
 #include "personctl.h"
 #include "utils.h"
@@ -30,31 +30,32 @@
 #include "coursectl.h"
 #include "rolectl.h"
 #include "dialog/dlgsearchperson.h"
-#include "area.h"
 #include "stringdefs.h"
+#include "community.h"
+#include "communityctl.h"
 
-DlgAreaPerson::DlgAreaPerson(QWidget *parent) :
+DlgCommMgr::DlgCommMgr(QWidget *parent) :
     DlgCommonEditModel(parent),
-    ui(new Ui::DlgAreaPerson),
-    mArea(nullptr)
+    ui(new Ui::DlgCommMgr),
+    mCommunity(nullptr)
 {
     tracein;
     ui->setupUi(this);
     loadCourse();
     loadRole();
     loadStatus();
+    traceout;
 }
 
-DlgAreaPerson::~DlgAreaPerson()
+DlgCommMgr::~DlgCommMgr()
 {
+    tracein;
     delete ui;
-    if (mArea) {
-        delete mArea;
-        mArea = nullptr;
-    }
+    FREE_PTR(mCommunity);
+    traceout;
 }
 
-ErrCode DlgAreaPerson::buildModel(DbModel *model, QString &errMsg)
+ErrCode DlgCommMgr::buildModel(DbModel *model, QString &errMsg)
 {
     tracein;
     ErrCode err = ErrNone;
@@ -63,51 +64,53 @@ ErrCode DlgAreaPerson::buildModel(DbModel *model, QString &errMsg)
         loge("Invalid argument, null model");
     }
 
-    if (err == ErrNone && !mArea) {
+    if (err == ErrNone && !mCommunity) {
         err = ErrNoData;
-        loge("No area object to be set");
+        loge("No mCommunity object to be set");
     }
     if (err == ErrNone && ui->txtSearch->text().isEmpty()) {
         err = ErrNoData;
         loge("No person is set");
     }
+    if (!model){
+        err = ErrInvalidArg;
+        loge("Invalid arg");
+    }
     if (err == ErrNone) {
-        AreaPerson* per = (AreaPerson*) model;
-        if (!model){
-            err = ErrInvalidArg;
-            loge("Invalid arg");
-        }
-        if (err == ErrNone){
-            per->setMarkModified(true); // start marking fields which are modified
-        }
-        per->setModelStatus(MODEL_STATUS_ACTIVE);
-        per->setAreaUid(mArea->uid());
-        SET_VAL_FROM_TEXTBOX(ui->txtSearch, KItemUid, per->setPersonUid, per->setPersonName);
-        SET_VAL_FROM_CBOX(ui->cbRole, per->setRoleUid, per->setRoleName, err);
-        SET_VAL_FROM_CBOX(ui->cbTerm, per->setCourseUid, per->setCourseName, err);
-        SET_INT_VAL_FROM_CBOX(ui->cbStatus, per->setModelStatus, per->setModelStatusName);
-        SET_DATE_VAL_FROM_WIDGET(ui->txtStartDate, per->setStartDate);
-        SET_DATE_VAL_FROM_WIDGET(ui->txtEndDate, per->setEndDate);
+        CommunityManager* comm = (CommunityManager*) model;
+        comm->setMarkModified(true); // start marking fields which are modified
+        comm->setModelStatus(MODEL_STATUS_ACTIVE);
+        comm->setCommunity(mCommunity);
+        SET_MODEL_FROM_TEXTBOX(ui->txtSearch, KItemUid, comm->setPerson, PERSONCTL, Person, err);
+        SET_MODEL_FROM_CBOX(ui->cbRole, comm->setRole, ROLECTL, Role, err);
+        SET_MODEL_FROM_CBOX(ui->cbTerm, comm->setCourse, COURSECTL, Course, err);
+        SET_INT_VAL_FROM_CBOX(ui->cbStatus, comm->setModelStatus, comm->setModelStatusName);
+        SET_DATE_VAL_FROM_WIDGET(ui->txtStartDate, comm->setStartDate);
+        SET_DATE_VAL_FROM_WIDGET(ui->txtEndDate, comm->setEndDate);
         QString nameid = ui->txtNameId->text().trimmed();
+        QString availNameId;
         if (!nameid.isEmpty()) {
-            per->setNameId(nameid);
-        } else {
             err = ErrNoData;
             loge("Lack of nameId");
         }
-    } else {
+        err = COMMUNITYCTL->getAvailableNameId(KModelNameCommManager, nameid, availNameId);
+        if (err == ErrNone && !availNameId.isEmpty()) {
+            comm->setNameId(availNameId);
+        }
+        logife(err, "not found suitable name id '%s', input nameid",
+               STR2CHA(availNameId), STR2CHA(nameid));
     }
     traceret(err);
     return err;
 }
 
-ErrCode DlgAreaPerson::fromModel(const DbModel *item)
+ErrCode DlgCommMgr::fromModel(const DbModel *item)
 {
     tracein;
     ErrCode err = ErrNone;
-    if (item && item->modelName() == KModelNameAreaPerson) {
+    if (item && item->modelName() == KModelNameCommManager) {
         err = DlgCommonEditModel::fromModel(item);
-        AreaPerson* comm = (AreaPerson*)model();
+        CommunityManager* comm = (CommunityManager*)model();
         if (err == ErrNone) {
             Utils::setSelectItemComboxByData(ui->cbTerm, comm->courseUid());
             Utils::setSelectItemComboxByData(ui->cbRole, comm->roleUid());
@@ -125,7 +128,7 @@ ErrCode DlgAreaPerson::fromModel(const DbModel *item)
                                            per->uid(), per->fullName());
                     logd("found person '%s'", STR2CHA(per->toString()));
                     if (nameid.isEmpty()) {
-                        nameid = QString("%1_%2").arg(comm->areaNameId(), per->nameId());
+                        nameid = QString("%1_%2").arg(comm->communityNameId(), per->nameId());
                         comm->setNameId(nameid);
                     }
 
@@ -146,7 +149,7 @@ ErrCode DlgAreaPerson::fromModel(const DbModel *item)
     return err;
 }
 
-void DlgAreaPerson::loadCourse()
+void DlgCommMgr::loadCourse()
 {
     tracein;
     ui->cbTerm->clear();
@@ -158,7 +161,7 @@ void DlgAreaPerson::loadCourse()
 
 }
 
-void DlgAreaPerson::loadRole()
+void DlgCommMgr::loadRole()
 {
     ui->cbRole->clear();
     QList<DbModel*> list = INSTANCE(RoleCtl)->getAllItemsFromDb(); // TODO: getAllItem???
@@ -167,7 +170,7 @@ void DlgAreaPerson::loadRole()
     }
 }
 
-void DlgAreaPerson::loadStatus()
+void DlgCommMgr::loadStatus()
 {
     tracein;
     ui->cbStatus->clear();
@@ -179,7 +182,7 @@ void DlgAreaPerson::loadStatus()
     traceout;
 }
 
-void DlgAreaPerson::on_btnSearch_clicked()
+void DlgCommMgr::on_btnSearch_clicked()
 {
 
     tracein;
@@ -197,8 +200,8 @@ void DlgAreaPerson::on_btnSearch_clicked()
             logd("setProperty %s", per->uid().toStdString().c_str());
             ui->txtSearch->setProperty(KItemUid, per->uid());
             QString nameid;
-            if (mArea) {
-                nameid = QString("%1_%2").arg(mArea->nameId(), per->nameId());
+            if (mCommunity) {
+                nameid = QString("%1_%2").arg(mCommunity->nameId(), per->nameId());
             }
             ui->txtNameId->setText(nameid);
         } else {
@@ -209,44 +212,34 @@ void DlgAreaPerson::on_btnSearch_clicked()
     traceout;
 }
 
-ErrCode DlgAreaPerson::setArea(const Area *newArea)
+ErrCode DlgCommMgr::setCommunity(const Community *comm)
 {
     tracein;
     ErrCode err = ErrNone;
-    FREE_PTR(mArea);
-    if (newArea) {
-        logd("clone new area");
-        mArea = CLONE_MODEL(newArea, Area);
-        if (!mArea) {
+    FREE_PTR(mCommunity);
+    if (comm) {
+        logd("clone new comm");
+        mCommunity = CLONE_MODEL(comm, Community);
+        if (!mCommunity) {
             err = ErrNoMemory;
-            loge("Clone new area fail, no memory?");
+            loge("Clone new comm fail, no memory?");
         }
     }
     traceret(err);
     return err;
 }
 
-void DlgAreaPerson::setAreaUid(const QString &id)
-{
-    mAreaUid = id;
-}
-
-void DlgAreaPerson::setAreaNameId(const QString &id)
-{
-    mAreaNameId = id;
-}
-
-QDialogButtonBox *DlgAreaPerson::buttonBox()
+QDialogButtonBox *DlgCommMgr::buttonBox()
 {
     return ui->buttonBox;
 }
 
-DbModel *DlgAreaPerson::newModel()
+DbModel *DlgCommMgr::newModel()
 {
-    return AreaPerson::build();
+    return CommunityManager::build();
 }
 
-bool DlgAreaPerson::onValidateData(QString &msg)
+bool DlgCommMgr::onValidateData(QString &msg)
 {
     tracein;
     bool isValid = true;

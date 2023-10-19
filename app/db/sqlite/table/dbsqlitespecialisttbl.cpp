@@ -37,9 +37,10 @@ const qint32 DbSqliteSpecialistTbl::KVersionCode = VERSION_CODE(0,0,1);
 
 
 DbSqliteSpecialistTbl::DbSqliteSpecialistTbl(DbSqlite* db)
-    :DbSqliteTbl(db, KTableSpecialist, KTableSpecialist, KVersionCode)
+    :DbSqliteTbl(db, KTableSpecialist, KTableSpecialist, KVersionCode,
+                  KModelNameSpecialist)
 {
-    tracein;
+    traced;
 }
 
 ErrCode DbSqliteSpecialistTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQuery &qry)

@@ -47,9 +47,9 @@ public:
     static ErrCode updateField(DbSqliteUpdateBuilder *builder,
                                 const QString& uidFieldname,
                                 const QString& hdlName,
-                                const QString& uid,
-                                const QString& nameid,
-                                const QString& name);
+                                const QString& uid = nullptr,
+                                const QString& nameid = nullptr,
+                                const QString& name = nullptr);
 };
 
 #endif // DBMODELUTILS_H

@@ -59,6 +59,8 @@ public:
      * @return Community model, null if not exist
      */
     virtual const Community* getRootCommunity() = 0;
+    virtual ErrCode getManagersList(const QString &communityUid, QList<DbModel *> &outList,
+                                          qint64 modelStatus) = 0;
 };
 
 #endif // DBCOMMUNITYMODELHANDLER_H

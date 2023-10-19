@@ -40,6 +40,8 @@
 #include "jsondefs.h"
 #include "prebuiltdefs.h"
 #include "controllerdefs.h"
+#include "communitymanager.h"
+#include "stringdefs.h"
 
 GET_INSTANCE_CONTROLLER_IMPL(CommunityCtl)
 
@@ -388,6 +390,7 @@ const Community *CommunityCtl::getRootCommunity()
     return hdl->getRootCommunity();
 }
 
+
 const char *CommunityCtl::getPrebuiltFileName()
 {
     // TODO: use import instead???
@@ -455,4 +458,75 @@ DbModel *CommunityCtl::doImportOneItem(const QString& importName, int importFile
     return model;
 }
 
+ErrCode CommunityCtl::getManagersList(const QString &communityUid, QList<DbModel *> &outList,
+                                      qint64 modelStatus)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    DbCommunityModelHandler* hdl = nullptr;
+    QList<DbModel *> items;
+    logd("get list of person for communityUid '%s', status 0x%llx", STR2CHA(communityUid), modelStatus);
+    if (communityUid.isEmpty()) {
+        err = ErrInvalidArg;
+        loge("Get person failed invalid args");
+    }
 
+    if (err == ErrNone) {
+        hdl = dynamic_cast<DbCommunityModelHandler*>(DB->getModelHandler(KModelHdlCommunity));
+        if (!hdl) {
+            err = ErrInvalidData;
+            loge("not found handler, something was wrong");
+        }
+    }
+
+    if (err == ErrNone) {
+        err = hdl->getManagersList(communityUid, items, modelStatus);
+        if (items.size() > 0) {
+            outList.append(items);
+        } else {
+            logw("not found list person of communityUid '%s'", STR2CHA(communityUid));
+        }
+    }
+    logife(err, "Get list of community manager failed");
+
+    traceout;
+    return err;
+
+}
+
+ErrCode CommunityCtl::getManagersListInString(const QString &communityUid, const QString &sep,
+                                              QString &managers, qint64 modelStatus)
+{
+    tracein;
+    QList<DbModel *> managerList;
+    ErrCode err = ErrNone;
+    if (communityUid.isEmpty()) {
+        err = ErrInvalidModel;
+    }
+    if (err == ErrNone) {
+        err = getManagersList(communityUid, managerList);
+        logife(err, "failed to get managers list for comm uid ''%s'",
+               STR2CHA(communityUid));
+    }
+    foreach (DbModel* item, managerList) {
+        if (IS_MODEL_NAME(item, KModelNameCommManager)) {
+            CommunityManager* mgr = static_cast<CommunityManager*>(item);
+            managers += QString("%1: %2 (%3)")
+                            .arg(mgr->personName(), mgr->roleName(), mgr->modelStatusName());
+            managers += sep;
+        } else {
+            loge("invalid model '%s', expect model name '%s'",
+                 MODELSTR2CHA(item), KModelNameCommManager);
+        }
+    }
+
+    if (err != ErrNone) {
+        managers = QString(STR_DATA_ERROR_CODE).arg(err);
+    }
+    if (managers.isEmpty()) {
+        managers = STR_NO_DATA;
+    }
+    RELEASE_LIST_DBMODEL(managerList);
+    traceout;
+    return err;
+}

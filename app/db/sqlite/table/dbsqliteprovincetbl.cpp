@@ -31,6 +31,7 @@
 #include "province.h"
 #include "dbsqlitetablebuilder.h"
 #include "dbsqliteinsertbuilder.h"
+#include "modeldefs.h"
 
 const qint32 DbSqliteProvinceTbl::KVersionCode = VERSION_CODE(0,0,1);
 
@@ -38,7 +39,8 @@ DbSqliteProvinceTbl::DbSqliteProvinceTbl():
     DbSqliteProvinceTbl(nullptr)
 {}
 DbSqliteProvinceTbl::DbSqliteProvinceTbl(DbSqlite* db)
-    :DbSqliteTbl(db, KTableProvince, KTableProvince, KVersionCode)
+    :DbSqliteTbl(db, KTableProvince, KTableProvince, KVersionCode,
+                  KModelNameProvince)
 {
     tracein;
 }

@@ -40,7 +40,8 @@ const qint32 DbSqliteSaintTbl::KVersionCode = VERSION_CODE_2;
 
 
 DbSqliteSaintTbl::DbSqliteSaintTbl(DbSqlite* db)
-    : DbSqliteTbl(db, KTableSaint, KTableSaint, KVersionCode)
+    : DbSqliteTbl(db, KTableSaint, KTableSaint, KVersionCode,
+                  KModelNameSaint)
 {
     tracein;
 }

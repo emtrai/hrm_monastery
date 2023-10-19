@@ -42,9 +42,10 @@
 const qint32 DbSqliteSpecialistPersonTbl::KVersionCode = VERSION_CODE(0,0,1);
 
 DbSqliteSpecialistPersonTbl::DbSqliteSpecialistPersonTbl(DbSqlite *db):
-    DbSqliteMapTbl(db, KTableSpecialistPerson, KTableSpecialistPerson, KVersionCode)
+    DbSqliteMapTbl(db, KTableSpecialistPerson, KTableSpecialistPerson, KVersionCode,
+                     KModelNameSpecialistPerson)
 {
-    tracein;
+    traced;
 
     mFieldNameUid1 = KFieldPersonUid;
     mFieldNameDbId1 = KFieldPersonDbId;

@@ -199,6 +199,14 @@ public:
                                  ExportType type,
                                  QString* fpath = nullptr);
     virtual void reloadDb();
+
+    /**
+     * @brief find avaible nameid which does not exist in db yet
+     * @param initNameId initial nameid to search
+     * @param availableNameId
+     * @return ErrNone to succeed or error code
+     */
+    virtual ErrCode getAvailableNameId(const QString& modelName, const QString& initNameId, QString& availableNameId);
 protected:
     /**
      * @brief Return list of supported export file type, i.e. xlsx, csv

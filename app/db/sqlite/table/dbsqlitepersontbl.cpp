@@ -41,7 +41,8 @@ const qint32 DbSqlitePersonTbl::KVersionCode = VERSION_CODE(0,0,1);
 
 
 DbSqlitePersonTbl::DbSqlitePersonTbl(DbSqlite* db):
-    DbSqliteTbl(db, KTablePerson, KTablePerson, KVersionCode)
+    DbSqliteTbl(db, KTablePerson, KTablePerson, KVersionCode,
+                  KModelNamePerson)
 {}
 
 void DbSqlitePersonTbl::addTableField(DbSqliteTableBuilder *builder)
@@ -156,6 +157,7 @@ void DbSqlitePersonTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldWorkHistory, TEXT);
     // THIS IS IMPORTANT NOTE, DON'T REMOVE IT
     // - ANY UPDATE ON THIS, MUST UPDATE Person::clone() as well
+    traceout;
 }
 
 ErrCode DbSqlitePersonTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)

@@ -42,7 +42,7 @@ public:
      * @param model
      * @return ErrNone on success, error code otherwise
      */
-    virtual ErrCode add(DbModel* model, bool notifyDataChange = true);
+//    virtual ErrCode add(DbModel* model, bool notifyDataChange = true);
     virtual ErrCode deleteHard(DbModel* model, bool force = false, QString* msg = nullptr);
 
     // TODO: mapping community & person stored in person tbl and community&person mapping table
@@ -100,6 +100,9 @@ public:
      * @return Community model, null if not exist
      */
     virtual const Community* getRootCommunity();
+
+    virtual ErrCode getManagersList(const QString &communityUid, QList<DbModel *> &outList,
+                                    qint64 modelStatus = MODEL_STATUS_MAX);
 protected:
     virtual DbSqliteTbl* getMainTbl();
     virtual DbSqliteTbl* getTable(const QString& modelName);

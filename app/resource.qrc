@@ -40,6 +40,7 @@
         <file alias="ethnic_info_template">res/ethnic_info_template_vi.html</file>
         <file alias="person_event_info_template">res/person_event_info_template.html</file>
         <file alias="general_statistic_template">res/general_statistic_template.html</file>
+        <file alias="comm_mgr_info_template">res/comm_mgr_info_template.html</file>
     </qresource>
     <qresource prefix="/template"/>
 </RCC>

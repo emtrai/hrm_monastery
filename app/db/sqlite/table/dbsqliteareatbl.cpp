@@ -56,7 +56,7 @@ DbSqliteAreaTbl::DbSqliteAreaTbl():
     DbSqliteAreaTbl(nullptr)
 {}
 DbSqliteAreaTbl::DbSqliteAreaTbl(DbSqlite* db)
-    :DbSqliteTbl(db, KTableArea, KTableArea, KVersionCode)
+    :DbSqliteTbl(db, KTableArea, KTableArea, KVersionCode, KModelNameArea)
 {
     tracein;
 }

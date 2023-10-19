@@ -35,7 +35,8 @@
 const qint32 DbSqliteSaintPersonMapTbl::KVersionCode = VERSION_CODE(0,0,1);
 
 DbSqliteSaintPersonMapTbl::DbSqliteSaintPersonMapTbl(DbSqlite* db)
-    : DbSqliteTbl(db, KTableSaintPerson, KTableSaintPerson, KVersionCode)
+    : DbSqliteTbl(db, KTableSaintPerson, KTableSaintPerson, KVersionCode,
+                  KModelNameSaintPerson)
 {
     tracein;
 }

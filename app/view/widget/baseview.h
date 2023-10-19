@@ -30,6 +30,7 @@ enum ViewType {
     VIEW_COMMUNITIES_OF_PERSON_LIST, // list of communities of person
     VIEW_SAINT,
     VIEW_COMMUNITY,
+    VIEW_COMMUNITY_MGR,
     VIEW_AREA,
     VIEW_AREA_PERSON,
     VIEW_PEOPLE_IN_COMMUNITY_LIST, // list of people of community
