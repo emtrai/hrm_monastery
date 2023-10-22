@@ -41,6 +41,7 @@ public:
     bool getIsMultiSelection() const;
     void setIsMultiSelection(bool newIsMultiSelection);
     void enableGetAllSupport();
+    void enableGetManagerSupport();
 
     virtual void setupUi();
 
@@ -61,6 +62,7 @@ protected:
 
     virtual int onSearch(const QString& keyword) = 0;
     virtual int onGetAll();
+    virtual int onGetManagers();
     virtual DbModel* getItemAtIdx(int idx) = 0;
     virtual QString getValueOfItemAt(int idx, int col, QString header, DbModel* item);
     virtual int query(std::function<int()> queryfunc);
@@ -68,6 +70,8 @@ private slots:
     void on_btnSearch_clicked();
 
     void on_btnAll_clicked();
+
+    void on_btnManagers_clicked();
 
 protected:
     Ui::DlgSearch *ui;

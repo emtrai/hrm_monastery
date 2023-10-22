@@ -28,6 +28,7 @@
 #include "role.h"
 #include "areaperson.h"
 #include "persondept.h"
+#include "communitymanager.h"
 
 GET_INSTANCE_IMPL(DbSqliteRole)
 
@@ -49,7 +50,7 @@ ErrCode DbSqliteRole::deleteHard(DbModel *model, bool force, QString *msg)
         logi("Delete hard model '%s', force %d", MODELSTR2CHA(model), force);
 
         if (model->modelName() == KModelNameRole) {
-            // KFieldAreaUid delete map, community, person
+
             QHash<QString, QString> itemToSearch; // for searching
             QHash<QString, QString> itemToSet; // for update
             bool errDependency = false;
@@ -67,6 +68,13 @@ ErrCode DbSqliteRole::deleteHard(DbModel *model, bool force, QString *msg)
                                            msg, force,
                                            itemToSearch, itemToSet,
                                            KTableCommDepartPerson, &PersonDept::build);
+            }
+
+            if (err == ErrNone && !errDependency) {
+                CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency,
+                                           msg, force,
+                                           itemToSearch, itemToSet,
+                                           KTableCommManager, &CommunityManager::build);
             }
 
             if (errDependency) {
@@ -88,7 +96,7 @@ ErrCode DbSqliteRole::deleteHard(DbModel *model, bool force, QString *msg)
 
 DbSqliteTbl *DbSqliteRole::getMainTbl()
 {
-    return (DbSqliteTbl*)DbSqlite::getInstance()->getTable(KTableRole);
+    return (DbSqliteTbl*)SQLITE->getTable(KTableRole);
 }
 
 DbModelBuilder DbSqliteRole::getMainBuilder()

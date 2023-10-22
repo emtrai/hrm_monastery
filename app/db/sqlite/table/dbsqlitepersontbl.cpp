@@ -376,7 +376,7 @@ ErrCode DbSqlitePersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQ
     DbSqliteSpecialistPersonTbl* tblspecialist = (DbSqliteSpecialistPersonTbl*)SQLITE->getTable(KTableSpecialistPerson);
     // assume main tbl is not null, if not programming error,
     // and require override search function
-    Q_ASSERT(tblspecialist != nullptr);
+    ASSERT2(tblspecialist != nullptr);
     logd("search specialis for per uid: %s", STR2CHA(cmm->uid()));
     QList<DbModel *> listspecialist = tblspecialist->getListSpecialist(cmm->uid());
     logd("no specialist: %lld", listspecialist.size());

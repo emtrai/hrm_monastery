@@ -29,19 +29,14 @@ class DbSqliteSaintTbl;
 
 class DbSqliteSaint : public DbSqliteModelHandler
 {
+    GET_INSTANCE_DECL(DbSqliteSaint)
 public:
     DbSqliteSaint();
-    static DbSqliteSaint* getInstance();
-    virtual const QString getName();
-    virtual DbModel *getByUid(const QString& name);
+    virtual ErrCode deleteHard(DbModel* model, bool force = false, QString* msg = nullptr);
 
 protected:
     virtual DbSqliteTbl* getMainTbl();
     virtual DbModelBuilder getMainBuilder();
-private:
-
-private:
-    static DbSqliteSaint* gInstance;
 };
 
 #endif // DBSQLITESAINT_H

@@ -69,13 +69,20 @@ public:
                                     qint64 enddate = 0,
                                     const QString& remark = nullptr);
     /**
-     * @brief delete completely from db
+     * @brief delete completely from db, can be area, ara-person model, etc.
      * @param[in] model
      * @param[in] force if set true, it'll delete all dependence, else return error if found dependency
      * @param[out] msg Message in case of error
      * @return
      */
     virtual ErrCode deleteHard(DbModel* model, bool force = false, QString* msg = nullptr);
+    /**
+     * @brief delete area model
+     * @param model
+     * @param force
+     * @param msg
+     * @return
+     */
     ErrCode deleteHardArea(DbModel* model, bool force = false, QString* msg = nullptr);
 protected:
     /**

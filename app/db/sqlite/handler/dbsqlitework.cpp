@@ -31,7 +31,7 @@
 GET_INSTANCE_IMPL(DbSqliteWork)
 
 
-DbSqliteWork::DbSqliteWork()
+DbSqliteWork::DbSqliteWork():DbSqliteModelHandler(KModelHdlWork)
 {
     tracein;
 }
@@ -49,7 +49,7 @@ ErrCode DbSqliteWork::deleteHard(DbModel *model, bool force, QString *msg)
         logi("Delete hard model '%s', force %d", MODELSTR2CHA(model), force);
 
         if (model->modelName() == KModelNameWork) {
-            // KFieldAreaUid delete map, community, person
+            
             QHash<QString, QString> itemToSearch; // for searching
             QHash<QString, QString> itemToSet; // for update
             bool errDependency = false;
@@ -78,10 +78,6 @@ ErrCode DbSqliteWork::deleteHard(DbModel *model, bool force, QString *msg)
     return err;
 }
 
-const QString DbSqliteWork::getName()
-{
-    return KModelHdlWork;
-}
 
 DbModelBuilder DbSqliteWork::getMainBuilder()
 {

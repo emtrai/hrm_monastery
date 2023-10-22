@@ -38,8 +38,22 @@ public:
     Statistic();
     virtual QString getName() const;
 
+    /**
+     * @brief export general statistic to file
+     * @param fpath output file path, if it's null, returned with file in tmp folder
+     * @param type export type, i.e. HTML
+     * @return
+     */
     ErrCode exportGeneralStatistic(QString* fpath, ExportType type = EXPORT_HTML);
 
+    /**
+     * @brief get path of template to export
+     * @param exporter
+     * @param name
+     * @param fpath
+     * @param ftype
+     * @return
+     */
     virtual ErrCode exportTemplatePath(FileExporter* exporter,
                                        const QString& name,
                                        QString& fpath,
@@ -55,7 +69,17 @@ public:
                                         const FileExporter* fileexporter,
                                         const QString& datatype, QString* data) const;
 
+    /**
+     * @brief return supported export type/target, i.e HTMO
+     *        in bitwise form, \ref ExportType
+     * @return bitwise form of supported export type, \ref ExportType
+     */
     virtual quint64 getExportTypeList();
+
+    /**
+     * @brief get list of supported keyword, i.e "TONG_NU_TU", etc.
+     * @return \ref exportdefs.h
+     */
     virtual const QStringList getListExportKeyWord() const;
 private:
     void initExportFields();

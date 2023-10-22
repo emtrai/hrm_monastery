@@ -43,7 +43,7 @@ DbModel* DbModelUtils::getDbModel(const QString& modelHdlName,
         err = ErrInvalidData;
         loge("not found model handler '%s'", STR2CHA(modelHdlName));
     }
-    logd("name id to check %s", STR2CHA(nameId));
+    logd("uid to check %s", STR2CHA(uid));
     if (err == ErrNone && !model && !uid.isEmpty()) {
         logd("get model by uid '%s'", STR2CHA(uid));
         model = hdl->getByUid(uid);
@@ -52,6 +52,7 @@ DbModel* DbModelUtils::getDbModel(const QString& modelHdlName,
             loge("not found uid '%s'", STR2CHA(uid));
         }
     }
+    logd("name id to check %s", STR2CHA(nameId));
     if (err == ErrNone && !model && !nameId.isEmpty()) {
         logd("get model by nameId '%s'", STR2CHA(nameId));
         model = hdl->getByNameId(nameId);
@@ -60,6 +61,7 @@ DbModel* DbModelUtils::getDbModel(const QString& modelHdlName,
             loge("not found nameid '%s'", STR2CHA(nameId));
         }
     }
+    logd("name to check %s", STR2CHA(name));
     if (err == ErrNone && !model && !name.isEmpty()) {
         logd("get model by name '%s'", STR2CHA(name));
         model = hdl->getByName(name);

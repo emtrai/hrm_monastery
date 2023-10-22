@@ -28,6 +28,10 @@
 #include "dbmodel.h"
 #include "prebuiltdefs.h"
 #include "filectl.h"
+#include "exportdefs.h"
+#include "areactl.h"
+#include "areaperson.h"
+#include "stringdefs.h"
 
 Area::Area():DbModel(),
       mCountryDbId(0),
@@ -74,8 +78,7 @@ qint64 Area::countryDbId() const
 
 void Area::setCountryDbId(qint64 newCountryDbId)
 {
-    mCountryDbId = newCountryDbId;
-    markItemAsModified(KItemCountry);
+    CHECK_MODIFIED_THEN_SET(mCountryDbId, newCountryDbId, KItemCountry);
 
 }
 
@@ -96,8 +99,7 @@ const QString &Area::countryUid() const
 
 void Area::setCountryUid(const QString &newCountryUid)
 {
-    mCountryUid = newCountryUid;
-    markItemAsModified(KItemCountry);
+    CHECK_MODIFIED_THEN_SET(mCountryUid, newCountryUid, KItemCountry);
 }
 
 QString Area::countryNameId() const
@@ -204,6 +206,39 @@ void Area::initExportFields()
     mExportCallbacks.insert(KItemChangeHistory, [](const DbModel* model, const QString& item){
         return ((Area*)model)->changeHistory();
     });
+    mExportCallbacks.insert(KItemContactPeopleList, [](const DbModel* model, const QString& item){
+        QString contactListStr;
+        QList<DbModel *> contactList;
+        ErrCode err = ErrNone;
+        if (!model) {
+            err = ErrInvalidModel;
+        }
+        dbg(LOG_VERBOSE, "get contact list for model '%s'", MODELSTR2CHA(model));
+        if (err == ErrNone) {
+            err = AREACTL->getContactPeopleList(model->uid(), contactList, MODEL_STATUS_ACTIVE);
+            logife(err, "failed to get managers list for ''%s'", MODELSTR2CHA(model));
+        }
+
+        if (err == ErrNone) {
+            foreach (DbModel* item, contactList) {
+                if (IS_MODEL_NAME(item, KModelNameAreaPerson)) {
+                    AreaPerson* per = static_cast<AreaPerson*>(item);
+                    contactListStr += QString("%1: %2\n").arg(per->personName(), per->roleName());
+                    contactListStr += QString("- Điện thoại: %1\n").arg(per->personTel());
+                    contactListStr += QString("- Email: %1\n").arg(per->personEmail());
+                } else {
+                    loge("invalid model '%s', expected %s", MODELSTR2CHA(item), KModelNameAreaPerson);
+                }
+            }
+        }
+        if (err != ErrNone) {
+            contactListStr = QString(STR_DATA_ERROR_CODE).arg(err);
+        }
+        if (contactListStr.isEmpty()) {
+            contactListStr = STR_NO_DATA;
+        }
+        return contactListStr;
+    });
     // TODO: implement more
     traceout;
 
@@ -216,8 +251,7 @@ const QString &Area::addr() const
 
 void Area::setAddr(const QString &newAddr)
 {
-    mAddr = newAddr;
-    markItemAsModified(KItemAddress);
+    CHECK_MODIFIED_THEN_SET(mAddr, newAddr, KItemAddress);
 }
 
 const QString &Area::email() const
@@ -227,8 +261,7 @@ const QString &Area::email() const
 
 void Area::setEmail(const QString &newEmail)
 {
-    mEmail = newEmail;
-    markItemAsModified(KItemEmail);
+    CHECK_MODIFIED_THEN_SET(mEmail, newEmail, KItemEmail);
 }
 
 const QString &Area::tel() const
@@ -238,8 +271,7 @@ const QString &Area::tel() const
 
 void Area::setTel(const QString &newTel)
 {
-    mTel = newTel;
-    markItemAsModified(KItemTel);
+    CHECK_MODIFIED_THEN_SET(mTel, newTel, KItemTel);
 }
 
 const QString &Area::changeHistory() const
@@ -249,8 +281,7 @@ const QString &Area::changeHistory() const
 
 void Area::setChangeHistory(const QString &newChangeHistory)
 {
-    mChangeHistory = newChangeHistory;
-    markItemAsModified(KItemChangeHistory);
+    CHECK_MODIFIED_THEN_SET(mChangeHistory, newChangeHistory, KItemChangeHistory);
 }
 
 qint32 Area::modelStatus() const
@@ -260,8 +291,7 @@ qint32 Area::modelStatus() const
 
 void Area::setModelStatus(qint32 newModelStatus)
 {
-    mModelStatus = newModelStatus;
-    markItemAsModified(KItemStatus);
+    CHECK_MODIFIED_THEN_SET(mModelStatus, newModelStatus, KItemStatus);
 }
 
 qint64 Area::endDate() const
@@ -271,8 +301,7 @@ qint64 Area::endDate() const
 
 void Area::setEndDate(qint64 newEndDate)
 {
-    mEndDate = newEndDate;
-    markItemAsModified(KItemEndDate);
+    CHECK_MODIFIED_THEN_SET(mEndDate, newEndDate, KItemEndDate);
 }
 
 qint64 Area::startDate() const
@@ -282,6 +311,5 @@ qint64 Area::startDate() const
 
 void Area::setStartDate(qint64 newStartDate)
 {
-    mStartDate = newStartDate;
-     markItemAsModified(KItemStartDate);
+    CHECK_MODIFIED_THEN_SET(mStartDate, newStartDate, KItemStartDate);
 }

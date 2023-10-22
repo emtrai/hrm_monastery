@@ -43,6 +43,8 @@
 #include "dbsqlite.h"
 #include "exception.h"
 #include "dbcommunitymodelhandler.h"
+#include "communitymanager.h"
+#include "persondept.h"
 
 GET_INSTANCE_IMPL(DbSqlitePerson)
 
@@ -72,10 +74,13 @@ ErrCode DbSqlitePerson::add(DbModel *model, bool notify)
         } else if (name == KModelNameSaintPerson){
             tbl = DbSqlite::table(KTableSaintPerson);
         } else {
-            loge("Unknow model name %s", name.toStdString().c_str());
+            loge("Unknow model name %s", STR2CHA(name));
+            err = ErrUnknown;
+        }
+        if (err == ErrNone) {
+            err = add2Table(model, tbl);
         }
 
-        err = add2Table(model, tbl);
         if (err == ErrNone && name == KModelNamePerson) {
 
             Person* per = dynamic_cast<Person*>(model);
@@ -87,7 +92,7 @@ ErrCode DbSqlitePerson::add(DbModel *model, bool notify)
             logd("Check to add saint - person ");
             QStringList saintList = per->saintUidList();
             if (!saintList.empty()) {
-                logd("set saintList for person, no saintList %d", saintList.count());
+                logd("set saintList for person, no saintList %lld", saintList.count());
 
                 foreach (QString item, saintList) {
                     SaintPerson* saint = (SaintPerson*)SaintPerson::build();
@@ -106,7 +111,7 @@ ErrCode DbSqlitePerson::add(DbModel *model, bool notify)
                     }
                 }
             } else {
-                logd("no saint for person");
+                dbg(LOG_VERBOSE, "no saint for person");
             }
 
             // map person specialist
@@ -132,7 +137,7 @@ ErrCode DbSqlitePerson::add(DbModel *model, bool notify)
                     }
                 }
             } else {
-                logd("no specialist for person");
+                dbg(LOG_VERBOSE, "no specialist for person");
             }
 
             // person event
@@ -153,11 +158,13 @@ ErrCode DbSqlitePerson::add(DbModel *model, bool notify)
                         loge("invalid person event, null value");
                     }
                 }
+            } else {
+                dbg(LOG_VERBOSE, "no event for person");
             }
 
+
         }
-    }
-    else{
+    } else {
         err = ErrInvalidArg;
         loge("invalid argument");
     }
@@ -197,16 +204,16 @@ ErrCode DbSqlitePerson::deleteSoft(DbModel *model)
     // TODO: should check if some sub-item not exist???
     // i.e.import person, but country, holly name, etc. not exist, need to check and add it
 
-    if (model != nullptr){
+    if (model != nullptr) {
         DbSqliteTbl* tbl = getMainTbl();
+        ASSERT2(tbl != nullptr);
         if (tbl->isExist(model)){
             err = tbl->deleteSoft(model);
         } else {
             err = ErrNotExist;
-            loge("model %s not exist", model->name().toStdString().c_str());
+            loge("model %s not exist", MODELSTR2CHA(model));
         }
-    }
-    else{
+    } else {
         err = ErrInvalidArg;
         loge("invalid argument");
     }
@@ -228,35 +235,66 @@ ErrCode DbSqlitePerson::deleteHard(DbModel *model, bool force, QString* msg)
         logi("Delete hard model '%s', force %d", STR2CHA(model->toString()), force);
 
         if (model->modelName() == KModelNamePerson){
-            // KFieldAreaUid delete map, community, person
             QHash<QString, QString> itemToSearch; // for searching
             QHash<QString, QString> itemToSearchInComm; // for searching
             QHash<QString, QString> itemToSetInComm; // for searching
             QHash<QString, QString> itemToSearchInPerson; // for searching
             QHash<QString, QString> itemToSetInPerson; // for searching
             QHash<QString, QString> itemToSet; // for update
-            QList<DbModel*> list;
-            int count = 0;
-            ErrCode tmpErr = ErrNone;
+
             bool errDependency = false;
 
             itemToSearch.insert(KFieldPersonUid, model->uid());
+            itemToSet.insert(KFieldPersonUid, ""); // update to null/emptys
+
             itemToSearchInPerson.insert(KFieldVowsCEOUid, model->uid());
             itemToSearchInPerson.insert(KFieldEternalVowsPICUid, model->uid());
             itemToSearchInPerson.insert(KFieldEternalVowsCEOUid, model->uid());
-            itemToSearchInComm.insert(KFieldCEOUid, model->uid());
-            itemToSet.insert(KFieldPersonUid, ""); // update to null/emptys
-            itemToSetInComm.insert(KFieldCEOUid, ""); // update to null/emptys
+
             itemToSetInPerson.insert(KFieldVowsCEOUid, ""); // update to null/emptys
             itemToSetInPerson.insert(KFieldEternalVowsPICUid, ""); // update to null/emptys
             itemToSetInPerson.insert(KFieldEternalVowsCEOUid, ""); // update to null/emptys
 
-            CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency, msg, force, itemToSearchInPerson, itemToSetInPerson, KTablePerson, &Person::build);
-            CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency, msg, force, itemToSearchInComm, itemToSetInComm, KTableCommunity, &Community::build);
-            CHECK_REMOVE_TO_DELETE(err, errDependency, msg, force, itemToSearch, KTableCommPerson, &CommunityPerson::build);
-            CHECK_REMOVE_TO_DELETE(err, errDependency, msg, force, itemToSearch, KTableAreaPerson, &AreaPerson::build);
-            CHECK_REMOVE_TO_DELETE(err, errDependency, msg, force, itemToSearch, KTableSaintPerson, &SaintPerson::build);
-            CHECK_REMOVE_TO_DELETE(err, errDependency, msg, force, itemToSearch, KTableSpecialistPerson, &SpecialistPerson::build);
+            itemToSearchInComm.insert(KFieldCEOUid, model->uid());
+            itemToSetInComm.insert(KFieldCEOUid, ""); // update to null/emptys
+
+            // person
+            CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency, msg, force,
+                                       itemToSearchInPerson, itemToSetInPerson,
+                                       KTablePerson,
+                                       &Person::build);
+            // dept person
+            CHECK_REMOVE_TO_DELETE(err, errDependency, msg, force,
+                                   itemToSearch, KTableCommDepartPerson,
+                                   &PersonDept::build);
+            // community
+            CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency, msg, force,
+                                       itemToSearchInComm, itemToSetInComm,
+                                       KTableCommunity,
+                                       &Community::build);
+            // community person
+            CHECK_REMOVE_TO_DELETE(err, errDependency, msg, force,
+                                   itemToSearch, KTableCommPerson,
+                                   &CommunityPerson::build);
+            // community manager
+            CHECK_REMOVE_TO_DELETE(err, errDependency, msg, force,
+                                   itemToSearch, KTableCommManager,
+                                   &CommunityManager::build);
+            //arae person
+            CHECK_REMOVE_TO_DELETE(err, errDependency, msg, force,
+                                   itemToSearch,
+                                   KTableAreaPerson,
+                                   &AreaPerson::build);
+            // saint person
+            CHECK_REMOVE_TO_DELETE(err, errDependency, msg, force,
+                                   itemToSearch,
+                                   KTableSaintPerson,
+                                   &SaintPerson::build);
+            // specialist person
+            CHECK_REMOVE_TO_DELETE(err, errDependency, msg, force,
+                                   itemToSearch,
+                                   KTableSpecialistPerson,
+                                   &SpecialistPerson::build);
 
             if (errDependency) {
                 err = ErrDependency;
@@ -272,7 +310,7 @@ ErrCode DbSqlitePerson::deleteHard(DbModel *model, bool force, QString* msg)
 
 bool DbSqlitePerson::exist(const DbModel *edu)
 {
-    tracein;
+    traced;
 
     return getMainTbl()->isExist(edu);;
 }
@@ -287,8 +325,7 @@ QList<DbModel *> DbSqlitePerson::getAll(DbModelBuilder builder, qint64 status,
     logd("model name %s", modelName);
     QString name(modelName);
     QList<DbModel *> ret;
-    if (name == KModelNamePerson || name.isEmpty()) {
-        //            tbl = getMainTbl();
+    if (name.isEmpty() || (name == KModelNamePerson)) {
         tbl = DbSqlite::table(KTablePerson);
     } else if (name == KModelNamePersonEvent){
         tbl = DbSqlite::table(KTablePersonEvent);
@@ -298,13 +335,15 @@ QList<DbModel *> DbSqlitePerson::getAll(DbModelBuilder builder, qint64 status,
     if (tbl != nullptr){
         ret = tbl->getAll(builder, status, from, noItems, total);
     } else {
-        loge("Not found corresponding table");
+        loge("Not found corresponding table for model '%s'", modelName);
     }
     traceout;
     return ret;
 }
 
-QHash<QString, DbModel *> DbSqlitePerson::getAllInDict(DbModelBuilder builder, qint64 status, const char *modelName)
+QHash<QString, DbModel *> DbSqlitePerson::getAllInDict(DbModelBuilder builder,
+                                                       qint64 status,
+                                                       const char *modelName)
 {
     tracein;
     QList<DbModel *> list = getAll(builder, status, modelName);
@@ -318,36 +357,49 @@ QHash<QString, DbModel *> DbSqlitePerson::getAllInDict(DbModelBuilder builder, q
     return map;
 }
 
-DbModel *DbSqlitePerson::getModel(qint64 dbId)
-{
-    tracein;
-    return nullptr;
-}
-
 ErrCode DbSqlitePerson::addEvent(const QString &personUid, const QString &eventUid,
                                  qint64 date, const QString& title, const QString &remark)
 {
     tracein;
     ErrCode ret = ErrNone;
     PersonEvent* pe = new PersonEvent();
-    pe->setPersonUid(personUid);
-    pe->setEventUid(eventUid);
-    pe->setDate(date);
-    pe->setName(title);
-    pe->setRemark(remark);
-    pe->save();
+    if (!pe) {
+        ret = ErrNoMemory;
+        loge("failed to add person event, no memory?");
+    }
+    if (ret == ErrNone) {
+        pe->setPersonUid(personUid);
+        pe->setEventUid(eventUid);
+        pe->setDate(date);
+        pe->setName(title);
+        pe->setRemark(remark);
+        ret = pe->save();
+    }
+    logife(ret, "failed to add person event");
     traceret(ret);
     return ret;
 }
 
 ErrCode DbSqlitePerson::getListEvents(const QString& personUid,
-                                                   QList<DbModel*>& list,
-                                                    const QString* eventUid,
-                                                    qint64 date)
+                                    QList<DbModel*>& list,
+                                    const QString* eventUid,
+                                    qint64 date)
 {
     tracein;
+    ErrCode err = ErrNone;
     DbSqlitePersonEventTbl* tbl = (DbSqlitePersonEventTbl*)DbSqlite::table(KTablePersonEvent);
-    return tbl->getListEvents(personUid, list, eventUid, date);
+    if (!tbl) {
+        err = ErrNoTable;
+        loge("not found table for person event");
+    }
+
+    if (err == ErrNone) {
+        dbg(LOG_VERBOSE, "get list event for person '%s' from table '%s'",
+            STR2CHA(personUid), STR2CHA(tbl->name()));
+        err = tbl->getListEvents(personUid, list, eventUid, date);
+    }
+    traceret(err);
+    return err;
 }
 
 
@@ -362,7 +414,7 @@ ErrCode DbSqlitePerson::search(const QString &keyword,
     DbSqliteTbl* tbl = getMainTbl();
     // assume main tbl is not null, if not programming error,
     // and require override search function
-    Q_ASSERT(tbl != nullptr);
+    ASSERT2(tbl != nullptr);
     return tbl->search(keyword, &Person::build, outList, dbStatus, from, noItems, total);
 }
 
@@ -380,7 +432,7 @@ ErrCode DbSqlitePerson::filter(int fieldId, int operatorId,
     DbSqliteTbl* tbl = getMainTbl();
     // assume main tbl is not null, if not programming error,
     // and require override search function
-    Q_ASSERT(tbl != nullptr);
+    ASSERT2(tbl != nullptr);
 
     ErrCode ret = tbl->filter(fieldId, operatorId, keyword,  &Person::build,
                               parentModel, outList,
@@ -392,25 +444,29 @@ ErrCode DbSqlitePerson::filter(int fieldId, int operatorId,
 QList<DbModel *> DbSqlitePerson::getSpecialistList(const QString &personUid)
 {
     tracein;
-    DbSqliteSpecialistPersonTbl* tbl = (DbSqliteSpecialistPersonTbl*)DbSqlite::getInstance()->getTable(KTableSpecialistPerson);
+    DbSqliteSpecialistPersonTbl* tbl =
+        (DbSqliteSpecialistPersonTbl*)DbSqlite::getInstance()->getTable(KTableSpecialistPerson);
     // assume main tbl is not null, if not programming error,
     // and require override search function
-    Q_ASSERT(tbl != nullptr);
+    ASSERT2(tbl != nullptr);
     QList<DbModel *> list = tbl->getListSpecialist(personUid);
     QList<DbModel *> outList;
     foreach (DbModel* model, list) {
-        if (model) {
-            if (model->modelName() == KModelNameSpecialistPerson) {
-                SpecialistPerson* specialist = (SpecialistPerson*) model;
-                if (specialist->specialist())
-                    outList.push_back(specialist->specialist()->clone());
-            } else if (model->modelName() == KModelNameSpecialist) {
-                outList.push_back(model);
+        if (IS_MODEL_NAME(model, KModelNameSpecialistPerson)) {
+            SpecialistPerson* specialist = (SpecialistPerson*) model;
+            if (specialist->specialist()) {
+                outList.push_back(specialist->specialist()->clone());
+            } else {
+                loge("no specialist info for model '%s'", MODELSTR2CHA(model));
             }
+        } else if (IS_MODEL_NAME(model, KModelNameSpecialist)) {
+            outList.push_back(model);
+        } else {
+            loge("invalid/not support for model '%s'", MODELSTR2CHA(model));
         }
     }
     RELEASE_LIST_DBMODEL(list);
-    logd("found %d", outList.count());
+    logd("found %lld", outList.count());
     traceout;
     return outList;
 }
@@ -419,7 +475,7 @@ ErrCode DbSqlitePerson::updateCommunity(const QString &personUid, const QString 
 {
     tracein;
     ErrCode ret = ErrNone;
-    DbSqlitePersonTbl* tbl = (DbSqlitePersonTbl*)DbSqlite::getInstance()->getTable(KTablePerson);
+    DbSqlitePersonTbl* tbl = static_cast<DbSqlitePersonTbl*>(SQLITE->getTable(KTablePerson));
     if (tbl) {
         ret = tbl->updateCommunity(personUid, communityUid);
     } else {
@@ -430,16 +486,18 @@ ErrCode DbSqlitePerson::updateCommunity(const QString &personUid, const QString 
     return ret;
 }
 
-ErrCode DbSqlitePerson::getListPersonInCommunity(const QString &communityUid, qint32 status, QList<DbModel*>& list)
+ErrCode DbSqlitePerson::getListPersonInCommunity(const QString &communityUid,
+                                                 qint32 status, QList<DbModel*>& list)
 {
     tracein;
     ErrCode err = ErrNone;
-    DbSqlitePersonTbl* tbl = (DbSqlitePersonTbl*)DbSqlite::getInstance()->getTable(KTablePerson);
+    DbSqlitePersonTbl* tbl = static_cast<DbSqlitePersonTbl*>(SQLITE->getTable(KTablePerson));
     QHash<QString, int> inFields;
+    ASSERT2(tbl != nullptr);
     inFields[KFieldCommunityUid] = TEXT;
-    logd("Search wit community uid %s", STR2CHA(communityUid));
+    logd("Search with community uid %s", STR2CHA(communityUid));
     err = tbl->search(communityUid, inFields, &Person::build, &list, true);
-    logd("Search community err=%d", err);
+    logife(err, "Search community failed");
     traceout;
     return err;
 }
@@ -449,7 +507,7 @@ ErrCode DbSqlitePerson::getListCommunitesOfPerson(const QString &perUid,
 {
     tracein;
     ErrCode err = ErrNone;
-    logd("get list community of person uid '%s'", STR2CHA(perUid));
+    dbg(LOG_DEBUG, "get list community of person uid '%s'", STR2CHA(perUid));
     if(!perUid.isEmpty()) {
         DbSqliteCommunityPersonTbl* tbl = (DbSqliteCommunityPersonTbl*)DbSqlite::table(KTableCommPerson);
         if (tbl) {
@@ -463,7 +521,7 @@ ErrCode DbSqlitePerson::getListCommunitesOfPerson(const QString &perUid,
         err = ErrInvalidArg;
     }
     if (err == ErrNone) {
-        logd("found %d item, let get community", list.size());
+        logd("found %lld item, let get community", list.size());
         foreach (CommunityPerson* item, list) {
             if (item) {
                 logd("get community id '%s'", STR2CHA(item->communityUid()));
@@ -472,7 +530,8 @@ ErrCode DbSqlitePerson::getListCommunitesOfPerson(const QString &perUid,
                     logd("set community '%s'", MODELSTR2CHA(community));
                     item->setCommunity((Community*)community);
                 } else {
-                    logw("not found community id '%s' on db", STR2CHA(item->communityUid()));
+                    logw("not found community id '%s' on db",
+                         STR2CHA(item->communityUid()));
                 }
             } else {
                 logw("something stupid occurs, null in list????");
@@ -500,22 +559,27 @@ ErrCode DbSqlitePerson::update(DbModel *model, bool notify)
             logd("field '%s' is updated", KItemSpecialist);
             DbSqliteTbl* tbl = DbSqlite::table(KTableSpecialistPerson);
             QHash<QString, QString> condition;
+            ASSERT2(tbl != nullptr);
             condition.insert(KFieldPersonUid, model->uid());
             logd("Delete old mapping specilist vs version for person");
             err = tbl->deleteHard(condition);
+            logife(err, "delete old specialist mapping for model '%s' failed",
+                   MODELSTR2CHA(model));
             if (err == ErrNone) {
                 // map person specialist
                 logd("Check to add person - specialist ");
                 QStringList list = per->specialistUidList();
                 if (!list.empty()) {
-                    logd("set specialist for person, no. specialist %d", list.count());
+                    logd("set specialist for person, no. specialist %lld", list.count());
 
                     foreach (QString item, list) {
                         SpecialistPerson* model = (SpecialistPerson*)SpecialistPerson::build();
                         model->setPersonUid(per->uid());
                         model->setSpecialistUid(item);
-                        logd("Save specialist/person, model uid '%s'", item.toStdString().c_str());
+                        dbg(LOG_DEBUG, "Save specialist/person, model uid '%s'",
+                            item.toStdString().c_str());
                         err = model->save(false);
+                        logife(err, "save model '%s' failed", MODELSTR2CHA(model));
                         // TODO: handle error case
                         delete model;
                     }
@@ -620,7 +684,7 @@ ErrCode DbSqlitePerson::update(DbModel *model, bool notify)
                             logd("check if all keys in upated event are updated");
                             foreach(QString key, events.keys()) {
                                 if (!keyList.contains(key)) {
-                                    logd("key '%s' to exist yet, save as new data");
+                                    logd("key '%s' to exist yet, save as new data", STR2CHA(key));
                                     DbModel* newModel = events.value(key);
                                     if (newModel) {
                                         err = newModel->save(false);

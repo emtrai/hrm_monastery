@@ -24,36 +24,65 @@
 #include "dbsqlitedefs.h"
 #include "table/dbsqlitesainttbl.h"
 #include "logger.h"
-#include "defs.h"
 #include "saint.h"
-DbSqliteSaint* DbSqliteSaint::gInstance = nullptr;
+#include "person.h"
+#include "saintperson.h"
 
+GET_INSTANCE_IMPL(DbSqliteSaint)
 
-DbSqliteSaint::DbSqliteSaint():DbSqliteModelHandler()
-//    mSaintTbl(nullptr)
+DbSqliteSaint::DbSqliteSaint():DbSqliteModelHandler(KModelHdlSaint)
 {
     tracein;
 }
 
-DbSqliteSaint *DbSqliteSaint::getInstance()
+ErrCode DbSqliteSaint::deleteHard(DbModel *model, bool force, QString *msg)
 {
-    if (gInstance == nullptr){
-        gInstance = new DbSqliteSaint();
+
+    tracein;
+    ErrCode err = ErrNone;
+    if (!model) {
+        err = ErrInvalidArg;
+        loge("Invalid model");
     }
 
-    return gInstance;
-}
+    if (err == ErrNone) {
+        logi("Delete hard model '%s', force %d", MODELSTR2CHA(model), force);
 
-const QString DbSqliteSaint::getName()
-{
-    return KModelHdlSaint;
-}
+        if (model->modelName() == KModelNameSaint) {
 
+            QHash<QString, QString> itemToSearch; // for searching
+            QHash<QString, QString> itemToSet; // for update
+            bool errDependency = false;
 
-DbModel *DbSqliteSaint::getByUid(const QString &name)
-{
-    tracein;
-    return DbSqliteModelHandler::getByUid(name, &Saint::build);
+            itemToSearch.insert(KFieldSaintUid, model->uid());
+            itemToSet.insert(KFieldSaintUid, ""); // update to null/empty
+
+            CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency,
+                                       msg, force,
+                                       itemToSearch, itemToSet,
+                                       KTablePerson, &Person::build);
+
+            if (err == ErrNone && !errDependency) {
+                CHECK_REMOVE_TO_DELETE(err, errDependency, msg, force,
+                                       itemToSearch,
+                                       KTableSaintPerson,
+                                       &SaintPerson::build);
+            }
+
+            if (errDependency) {
+                err = ErrDependency;
+                loge("cannot delete, has dependency '%s'", msg?STR2CHA((*msg)):"");
+            } else {
+                logi("Delete model '%s'", MODELSTR2CHA(model));
+                err = DbSqliteModelHandler::deleteHard(model, force, msg);
+            }
+        } else {
+            err = ErrInvalidData;
+            loge("invalid model '%s'", MODELSTR2CHA(model));
+        }
+    }
+    traceret(err);
+    return err;
 }
 
 DbSqliteTbl *DbSqliteSaint::getMainTbl()

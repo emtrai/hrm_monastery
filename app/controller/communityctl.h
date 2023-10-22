@@ -81,7 +81,7 @@ public:
     ErrCode addPerson2Community(const Community* comm,
                       const Person* per,
                       bool updateCommPer = true, // update mapping comm & per
-                      int status = 0, // it's DbModelStatus
+                      int status = MODEL_STATUS_ACTIVE, // it's DbModelStatus
                       qint64 startdate = 0,
                       qint64 enddate = 0,
                       const QString& remark = nullptr);
@@ -90,7 +90,16 @@ public:
      * @return
      */
     const Community* getRootCommunity();
+    /**
+     * @brief Get manager list of community
+     * @param communityUid
+     * @param outList list of CommunityManager model
+     * @param modelStatus
+     * @return
+     */
     ErrCode getManagersList(const QString &communityUid, QList<DbModel *> &outList,
+                            qint64 modelStatus = MODEL_STATUS_MAX);
+    ErrCode getAllManagersList(QList<DbModel *> &outList,
                             qint64 modelStatus = MODEL_STATUS_MAX);
     ErrCode getManagersListInString(const QString &communityUid, const QString& sep,
                             QString &outString,

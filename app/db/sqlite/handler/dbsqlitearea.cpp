@@ -61,7 +61,8 @@ QList<DbModel *> DbSqliteArea::getListContactPeople(const QString &areaUid, int 
         }
     }
     if (err == ErrNone) {
-        logd("Get list contact people from area uid %s, status=%d", STR2CHA(areaUid), status);
+        dbg(LOG_VERBOSE, "Get list contact people from area uid %s, status=%d",
+                        STR2CHA(areaUid), status);
         list = tbl->getListPerson(areaUid, status);
         logd("found %lld item", list.size());
     }
@@ -80,6 +81,7 @@ QList<DbModel *> DbSqliteArea::getListCommunities(const QString &areaUid, int st
         loge("Invalig arg, no area uid");
     }
     if (err == ErrNone) {
+        // there is no area community mapping, information is stored directly in community table
         tbl = (DbSqliteCommunityTbl*)DbSqlite::table(KTableCommunity);
         if (!tbl) {
             loge("not found table %s", KTableCommunity);
@@ -87,7 +89,8 @@ QList<DbModel *> DbSqliteArea::getListCommunities(const QString &areaUid, int st
         }
     }
     if (err == ErrNone) {
-        logd("Get list community from area uid %s, status=%d", STR2CHA(areaUid), status);
+        dbg(LOG_VERBOSE, "Get list community from area uid %s, status=%d",
+            STR2CHA(areaUid), status);
         list = tbl->getListCommunitiesInArea(areaUid, status);
         logd("found %lld item", list.size());
     }
@@ -110,14 +113,15 @@ ErrCode DbSqliteArea::addContactPerson(const DbModel* area,
                                                                 enddate, remark);
     if (mapModel) {
         mapModel->setRoleUid(roleUid);
-        logi("save map db model to db");
+        logi("save map db model to db area '%s' person '%s', roleUid '%s'",
+             MODELSTR2CHA(area), MODELSTR2CHA(person), STR2CHA(roleUid));
         err = mapModel->save();
-        delete mapModel;
     } else {
         err = ErrNoData;
         loge("Failed to create map db model");
     }
 
+    FREE_PTR(mapModel);
     traceret(err);
     return err;
 }
@@ -132,12 +136,15 @@ ErrCode DbSqliteArea::deleteHard(DbModel *model, bool force, QString *msg)
     }
 
     if (err == ErrNone) {
-        logi("Delete hard model '%s', force %d", STR2CHA(model->toString()), force);
+        logi("Delete hard model '%s', force %d", MODELSTR2CHA(model), force);
 
-        if (model->modelName() == KModelNameAreaPerson) {
+        if (IS_MODEL_NAME(model, KModelNameAreaPerson)) {
             err = DbSqliteModelHandler::deleteHard(model, force, msg);
-        } else if (model->modelName() == KModelNameArea){
+        } else if (IS_MODEL_NAME(model, KModelNameArea)){
             err = deleteHardArea(model, force, msg);
+        } else {
+            err = ErrNotSupport;
+            loge("not support delete model '%s' here", MODELSTR2CHA(model));
         }
     }
     traceout;
@@ -148,15 +155,15 @@ ErrCode DbSqliteArea::deleteHardArea(DbModel *model, bool force, QString *msg)
 {
     tracein;
     ErrCode err = ErrNone;
-    if (!model || (model->modelName() != KModelNameArea)) {
+    if (!IS_MODEL_NAME(model, KModelNameArea)) {
         err = ErrInvalidArg;
         loge("Invalid model '%s'", MODELSTR2CHA(model));
     }
 
     if (err == ErrNone) {
-        logi("Delete hard model '%s', force %d", STR2CHA(model->toString()), force);
+        logi("Delete hard model '%s', force %d", MODELSTR2CHA(model), force);
 
-        // KFieldAreaUid delete map, community, person
+
         QHash<QString, QString> itemToSearch; // for searching
         QHash<QString, QString> itemToSet; // for update
         QList<DbModel*> list;
@@ -168,6 +175,7 @@ ErrCode DbSqliteArea::deleteHardArea(DbModel *model, bool force, QString *msg)
         itemToSet.insert(KFieldAreaUid, ""); // update to null/empty
         itemToSet.insert(KFieldAreaDbId, ""); // update to null/empty
 
+        // clear all area uid to be deleted in community
         logd("Check to delete value in table %s", KTableCommunity);
         err = getListItems(itemToSearch, KTableCommunity, true, &count, &list, &Community::build);
         if (err == ErrNone && count > 0) {
@@ -225,8 +233,6 @@ DbSqliteTbl *DbSqliteArea::getTable(const QString &modelName)
     logd("getTable modelname '%s'", STR2CHA(modelName));
     if (modelName.isEmpty() || modelName == KModelNameArea) {
         tbl = getMainTbl();
-    } else if (modelName == KModelNameAreaComm) {
-        tbl = DbSqlite::table(KTableAreaCommunity);
     } else if (modelName == KModelNameAreaPerson) {
         tbl = DbSqlite::table(KTableAreaPerson);
     } else {

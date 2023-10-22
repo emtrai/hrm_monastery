@@ -38,7 +38,6 @@ public:
     DbSqlitePerson();
     virtual const QString getName();
     virtual ErrCode add(DbModel* model, bool notifyDataChange = true);
-//    virtual ErrCode update(DbModel* model);
     virtual ErrCode add2Table(DbModel* model, DbSqliteTbl* tbl);
 
     /**
@@ -65,8 +64,6 @@ public:
      * @return
      */
     virtual QHash<QString, DbModel*> getAllInDict(DbModelBuilder builder, qint64 status = DB_RECORD_ACTIVE, const char* modelName = nullptr);
-
-    virtual DbModel* getModel(qint64 dbId);
 
     virtual ErrCode addEvent(const QString& personUid, const QString& eventUid,
                              qint64 date, const QString& title, const QString& remark);

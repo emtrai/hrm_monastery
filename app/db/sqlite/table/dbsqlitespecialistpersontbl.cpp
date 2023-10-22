@@ -84,7 +84,7 @@ QList<DbModel *> DbSqliteSpecialistPersonTbl::getListPerson(
      *  ON "mapTblName"."fieldUid2Join" = "modelTblName"."fieldModelUid"
      *  WHERE "mapTblName"."fieldUid1Cond" = :uid
      */
-    QList<DbModel *> list = DbSqliteMapTbl::getListItems(name(), /*mapTblName*/
+    QList<DbModel *> list = DbSqliteMapTbl::getListItemsWithUid(name(), /*mapTblName*/
                                                          KTablePerson, /*modelTblName*/
                                                          KFieldPersonUid,/*fieldUid2Join*/
                                                          KFieldUid,/*fieldModelUid*/
@@ -120,7 +120,7 @@ QList<DbModel *> DbSqliteSpecialistPersonTbl::getListSpecialist(const QString &p
      *  ON "mapTblName"."fieldUid2Join" = "modelTblName"."fieldModelUid"
      *  WHERE "mapTblName"."fieldUid1Cond" = :uid
      */
-    QList<DbModel *> list = DbSqliteMapTbl::getListItems(name(), /*mapTblName*/
+    QList<DbModel *> list = DbSqliteMapTbl::getListItemsWithUid(name(), /*mapTblName*/
                                                          KTableSpecialist, /*modelTblName*/
                                                          KFieldSpecialistUid,/*fieldUid2Join*/
                                                          KFieldUid,/*fieldModelUid*/

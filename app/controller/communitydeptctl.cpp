@@ -166,7 +166,7 @@ ErrCode CommunityDeptCtl::onImportDataStart(const QString &importName,
     return ErrNone;
 }
 
-QList<DbModel *> CommunityDeptCtl::getListDept(const QString &communityUid, bool* ok)
+QList<DbModel *> CommunityDeptCtl::getListDept(const QString &communityUid, bool* ok, int status)
 {
     tracein;
     QList<DbModel *> items;
@@ -174,7 +174,7 @@ QList<DbModel *> CommunityDeptCtl::getListDept(const QString &communityUid, bool
     if (!communityUid.isEmpty()) {
         DbCommDeptModelHandler* modelHdl =  dynamic_cast<DbCommDeptModelHandler*>(DB->getModelHandler(KModelHdlCommDept));
         if (modelHdl) {
-            items = modelHdl->getListDept(communityUid, MODEL_STATUS_MAX, ok);
+            items = modelHdl->getListDept(communityUid, status, ok);
         } else {
             if (ok) *ok = false;
             loge("not found commdept handler");

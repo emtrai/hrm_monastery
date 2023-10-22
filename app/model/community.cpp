@@ -152,7 +152,6 @@ void Community::initExportFields()
     });
     mExportCallbacks.insert(KItemManagers, [](const DbModel* model, const QString& item){
         QString managers;
-        QList<DbModel *> managerList;
         ErrCode err = ErrNone;
         if (!model) {
             err = ErrInvalidModel;
@@ -306,21 +305,6 @@ void Community::setParentUid(const QString &newParentUid)
     } else {
         loge("Cannot set parent to itself");
     }
-    // TODO: check logic of level again!!!
-//    if (mLevel < 0) {
-//        logd("reset level");
-//        DbModelHandler* hdl = getDbModelHandler();
-//        logd("get parent model uid '%s'", STR2CHA(mParentUid));
-//        Community* model = (Community*)hdl->getByUid(mParentUid);
-//        if (model) {
-//            mLevel = model->level() + 1;
-//            logd("new level = %d", mLevel);
-//            delete model;
-//        } else {
-//            logw("uid '%s' not found", STR2CHA(newParentUid));
-//        }
-//    }
-
     markItemAsModified(KItemParentCommunity);
 }
 

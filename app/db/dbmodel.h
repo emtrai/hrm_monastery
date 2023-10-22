@@ -197,6 +197,8 @@ enum DbModelStatus{
                                     MODEL_STATUS_NOT_READY
 };
 
+#define IS_STATUS(status, target) ((status & target) == target)
+
 typedef std::shared_ptr<DbModel> DbModel_sp;
 
 class OnDBModelListener {

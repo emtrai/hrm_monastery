@@ -65,7 +65,7 @@
 #define ADD_MENU_ITEM(menu, func, name, iconPath) \
 do { \
         QAction* act = new QAction(this);\
-        act->setText(tr(name));\
+        act->setText(name);\
         QIcon icon;\
         icon.addFile(QString::fromUtf8(iconPath), QSize(), QIcon::Normal, QIcon::On);\
         act->setIcon(icon);\
@@ -73,6 +73,14 @@ do { \
         menu->addAction(act);\
 } while (0)
 
+
+#define ADD_ACTION_ITEM(menu, func, name, iconPath) \
+do { \
+        QAction* act = nullptr;\
+        act = menu->addAction(QIcon(QString::fromUtf8(iconPath)), \
+                          name); \
+        QObject::connect(act, SIGNAL(triggered()), this, SLOT(func())); \
+} while (0)
 
 
 MainWindow* MainWindow::gInstance = nullptr;
@@ -91,12 +99,20 @@ MainWindow::MainWindow(QWidget *parent)
     , mAppState(APP_STATE_NOT_READY)
 {
     tracein;
+
+    QCoreApplication::setApplicationName(STR_APP_TITLE);
+    setWindowTitle( QCoreApplication::applicationName() );
+
+    // init order is important, take care of this
+
+    // init log to get log as soon as possible
     Logger::init();
-    mAppState = APP_STATE_INITING;
+
+    setAppState(APP_STATE_INITING);
     gInstance = this;
     ui->setupUi(this);
 
-    logd("init config");
+    dbg(LOG_VERBOSE, "init config");
     Config::init();
 
     LOADERCTL->setOnFinishLoadListener(this, this);
@@ -110,16 +126,14 @@ MainWindow::MainWindow(QWidget *parent)
     // Purpose: easy to update software
     // TODO: verson control for each component???
 
-
-    QCoreApplication::setApplicationName( QString(tr("Quản lý hội dòng")) );
-    setWindowTitle( QCoreApplication::applicationName() );
-
-
+    dbg(LOG_DEBUG, "init menu");
     loadImportMenu();
     loadOtherMenu();
     loadExportMenu();
     loadOtherAddMenu();
 
+
+    dbg(LOG_DEBUG, "init views");
     mCommunityView = UITableViewFactory::getView(ViewType::VIEW_COMMUNITY);
     mSaintsView = UITableViewFactory::getView(ViewType::VIEW_SAINT);
     mPersonView = UITableViewFactory::getView(ViewType::VIEW_PERSON);
@@ -130,6 +144,8 @@ MainWindow::MainWindow(QWidget *parent)
     mPersonStatusView = UITableViewFactory::getView(ViewType::VIEW_PERSON_STATUS);
 //    mSummarizeView = UITableViewFactory::getView(ViewType::VIEW_SUMMARY);
 
+
+    dbg(LOG_DEBUG, "setup home view");
     mHomeView = new UITextBrowser(this);
     mHomeView->clearHistory();
     mHomeView->clear();
@@ -147,7 +163,7 @@ MainWindow::MainWindow(QWidget *parent)
         logd("homePath '%s' not exist", STR2CHA(homePath));
         homePath = FileCtl::getUpdatePrebuiltDataFilePath(KPrebuiltHomeHtmlFileName, false);
     }
-    logd("homePath '%s'", STR2CHA(homePath));
+    dbg(LOG_VERBOSE, "homePath '%s'", STR2CHA(homePath));
     mHomeView->setHtml(Utils::readAll(homePath));
 
 
@@ -165,10 +181,13 @@ MainWindow::MainWindow(QWidget *parent)
     switchView(mHomeView);
 
 
-    logd("connect");
-//    QObject::connect(this, SIGNAL(load()), loader, SLOT(onLoad()));
-    QObject::connect(this, SIGNAL(load()), this, SLOT(onLoad()));
-    QObject::connect(this, SIGNAL(unload()), this, SLOT(onUnload()));
+    dbg(LOG_DEBUG, "setup signal/slot connect");
+    if (!QObject::connect(this, SIGNAL(load()), this, SLOT(onLoad()))) {
+        loge("Failed to connect load to onLoad");
+    }
+    if (!QObject::connect(this, SIGNAL(unload()), this, SLOT(onUnload()))){
+        loge("Failed to connect unload to onUnload");
+    }
     if (!QObject::connect(this,
                           SIGNAL(showMsgDlgSignal(QString)),
                           this,
@@ -181,22 +200,36 @@ MainWindow::MainWindow(QWidget *parent)
                           SLOT(onShowErrorMsgDlg(ErrCode,QString)))) {
         loge("Failed to connect showErrorDlgSignal to onShowErrorMsgDlg");
     }
+
+    if (!QObject::connect(this, &MainWindow::importPeople,
+                          this, &MainWindow::onImportPeople)){
+        loge("Failed to connect importPeople to onImportPeople");
+    }
+    setAppState(APP_STATE_INITED);
+    dbg(LOG_VERBOSE, "init app done");
     traceout;
 }
 
 
 void MainWindow::showEvent(QShowEvent *ev)
 {
+    tracein;
     QMainWindow::showEvent(ev);
-    logd("On load");
+    dbg(LOG_VERBOSE, "On show window, start loading at app state '%d'", appState());
 
     logd("emit load, curr state %d", appState());
-    if (appState() == APP_STATE_INITING)
+    if (appState() == APP_STATE_INITED) {
         emit load();
+    } else {
+        loge("window not finish initialize yet!, current state '%d'", appState());
+    }
+    traceout;
 }
 
 MainWindow::~MainWindow()
 {
+    // TODO: handle anything when window is freed?
+    logi("on deleted window");
     delete ui;
 }
 
@@ -222,19 +255,20 @@ ErrCode MainWindow::showImportDlg(ImportTarget target,
 {
     tracein;
     ErrCode err = ErrNone;
-    logd("import target %d", target);
+    dbg(LOG_DEBUG, "show import target %d", target);
     switch (target) {
     case IMPORT_TARGET_PERSON:
-        getInstance()->doShowImportPerson();
+        err = getInstance()->doShowImportPerson();
         break;
     case IMPORT_TARGET_COMMUNITY:
-        getInstance()->doShowImportCommunity();
+        err = getInstance()->doShowImportCommunity();
         break;
     default:
         logw("import target %d not support, use commone one", target);
         err = getInstance()->doShowCommonImport(target, controller, modelName, targetModel);
         break;
     }
+    logife(err, "Show import dialog failed");
     // TODO: return value to handle error case???
     // TODO: use function pointer instead?
     traceret(err);
@@ -253,21 +287,22 @@ ErrCode MainWindow::showOnHtmlViewer(const DbModel *model, const QString& subjec
     }
 
     if (ret == ErrNone) {
-        logd("export to html file");
+        dbg(LOG_DEBUG, "export temporary to html file");
         ret = model->exportToFile(ExportType::EXPORT_HTML, &fpath);
-        logd("exported file '%s'", STR2CHA(fpath));
+        dbg(LOG_INFO, "exported file '%s'", STR2CHA(fpath));
     }
 
     if (ret == ErrNone && !QFile::exists(fpath)){
         loge("Export html file %s not exist", STR2CHA(fpath));
         ret = ErrNotExist;
     }
+
     if (ret == ErrNone && ((viewer = new dlgHtmlViewer()) == nullptr)) {
         loge("faie to allocate viewer dialog");
         ret = ErrNoMemory;
     }
     if (ret == ErrNone) {
-        logd("show html viewer");
+        dbg(LOG_INFO, "show html viewer");
         viewer->setHtmlPath(fpath);
         viewer->setSubject(subject);
         viewer->exec();
@@ -283,7 +318,6 @@ void MainWindow::showAddEditCommonModel(bool isSelfUpdate, const DbModel *model,
     tracein;
     getInstance()->doShowAddEditCommonModel(isSelfUpdate, model, listener);
     traceout;
-
 }
 
 void MainWindow::showAddEditCourse(bool isSelfUpdate, const DbModel *com, CommonEditModelListener *listener)
@@ -372,33 +406,48 @@ ErrCode MainWindow::doShowProcessingDialog(const QString& title,
     waitdlg.setMessage(title);
     waitdlg.setAllowCancel(false);
     err = waitdlg.show(data, prepare, run, finish);
+    logife(err, "show waiting dialg failed");
     traceout;
     return err;
 }
 
-ErrCode MainWindow::doShowAddPersonEvent(bool isSelfUpdate, DbModel* person, DbModel *model, CommonEditModelListener *listener)
+ErrCode MainWindow::doShowAddPersonEvent(bool isSelfUpdate, DbModel* person,
+                                         DbModel *model, CommonEditModelListener *listener)
 {
     tracein;
+    ErrCode err = ErrNone;
+    dbg(LOG_VERBOSE, "show add person event for model '%s'", MODELSTR2CHA(model));
     logd("isSelfUpdate %d", isSelfUpdate);
     logd("Set person '%s'", MODELSTR2CHA(person));
     logd("Set model '%s'", MODELSTR2CHA(model));
     DlgAddPersonEvent* dlg = DlgAddPersonEvent::build(this, isSelfUpdate,
                                                       KModelNamePersonEvent, model, listener);
-    if (person) {
+    if (!dlg) {
+        err = ErrNoMemory;
+        loge("not memory to create add person event dialg");
+    }
+    if (err == ErrNone && person) {
         dlg->setPerson((Person*)person);
     }
-    dlg->exec();
-    delete dlg;
-    traceout;
+    if (err == ErrNone) {
+        dlg->exec();
+    }
+    logife(err, "failed to show add person event dlg");
+    FREE_PTR(dlg);
+    traceret(err);
+    return err;
 }
 
 void MainWindow::switchView(ViewType type, void* data)
 {
     tracein;
+    dbg(LOG_DEBUG, "swith to view '%d'", type);
     BaseView *nextView = getView(type);
     if (nextView != nullptr) {
         nextView->setData(data);
         switchView(nextView);
+    } else {
+        loge("nextview is null, view type '%d' seem not found?", type);
     }
     traceout;
 }
@@ -406,43 +455,29 @@ void MainWindow::switchView(ViewType type, void* data)
 void MainWindow::switchView(BaseView *nextView, bool fromStack)
 {
     tracein;
-    logd("fromStack=%d", fromStack);
-    if (mCurrentView != nextView) {
+    dbg(LOG_DEBUG, "get view '%d' fromStack=%d",
+        nextView?nextView->getViewType():-1, fromStack);
+    if (nextView && mCurrentView != nextView) {
         if (mCurrentView && !fromStack) {
-            logd("push view to stack");
+            dbg(LOG_DEBUG, "push curent view '%d' to stack",
+                mCurrentView->getViewType());
             pushViewToStack(mCurrentView);
         }
-        if (mCurrentView != nullptr) {
+        if (mCurrentView) {
             logd("hide currentl widget");
             mCurrentView->getWidget()->hide();
             mCurrentView->onPaused();
             ui->centralLayout->replaceWidget(mCurrentView->getWidget(), nextView->getWidget());
-    //        ui->centralwidget->layout()->replaceWidget(mCurrentView, nextView);
-            // TODO: make this as stack????
-    //        if (!mViewList.contains(mCurrentView)) {
-    //            logd("Not in cached view, remove");
-    //            delete mCurrentView;
-                // TODO: delete here cause something terrible, i.e UICommDeptListView --> uidepartmentpersonlistview.cpp
-                // UICommDeptListView is deleted, but its function is still called, because
-                // uidepartmentpersonlistview is created in menu UICommDeptListView::onMenuActionListPerson
-                // cause use-after-free issue
-                // Need to rethink this again!!!!!
-    //            mCurrentView = nullptr;
-    //        } else {
-    //            logd("In cache view, keep current, just hide");
-    //        }
         }
         else{
-    //        ui->centralwidget->layout()->addWidget(nextView);
             ui->centralLayout->addWidget(nextView->getWidget());
-
         }
         logd("show next");
         mCurrentView = nextView;
         mCurrentView->onShown();
         mCurrentView->getWidget()->show();
     } else {
-        logd("Same view!");
+        logw("%s!", nextView?"Same view":"Next view is NULL");
     }
     traceout;
 }
@@ -465,24 +500,6 @@ BaseView *MainWindow::getView(ViewType type)
             loge("invalid type '%d' or no memory", type);
         }
     }
-//    switch (type) {
-//    case ViewType::VIEW_DEPARTMENT:
-//        nextView = mDepartView;
-//        break;
-//    case ViewType::VIEW_PERSON:
-//        nextView = mPersonView;
-//        break;
-//    default:
-//        {
-//            BaseView* view = UITableViewFactory::getView(type);
-//            if (view) {
-//                nextView = (BaseView*) view;
-//            } else {
-//                loge("Unknown type %d", type);
-//            }
-//        }
-//        break;
-//    }
     traceout;
     return nextView;
 }
@@ -490,17 +507,21 @@ BaseView *MainWindow::getView(ViewType type)
 void MainWindow::onLoadController (Controller* ctl)
 {
     tracein;
-    logd("on load ctrl %s", ctl->getName().toStdString().c_str());
-    if (mWaitDlg != nullptr) {
-        mWaitDlg->setMessage(QString(tr("Khởi tạo %1")).arg(ctl->getName()));
+    if (ctl) {
+        logi("on load ctrl %s", STR2CHA(ctl->getName()));
+        if (mWaitDlg != nullptr) {
+            mWaitDlg->setMessage(QString(STR_INIT_COMPONENT).arg(ctl->getName()));
+        }
+    } else {
+        loge("invalid controller");
     }
-//    QThread::msleep(500);
     traceout;
 }
 
 void MainWindow::onUnloadController(Controller *ctl)
 {
     tracein;
+    UNUSED(ctl);
     // TODO: unload controller???
     traceout;
 }
@@ -510,82 +531,82 @@ void MainWindow::doShowAddEditPerson(bool isSelfUpdate, Person *per, bool isNew)
     tracein;
     logd("isSelfUpdate %d", isSelfUpdate);
     DlgPerson* dlg = DlgPerson::buildDlg(this, per, isNew);
-    dlg->setIsSelfSave(isSelfUpdate);
-    dlg->exec();
-    delete dlg;
+    if (!dlg) {
+        dlg->setIsSelfSave(isSelfUpdate);
+        dlg->exec();
+        delete dlg;
+    } else {
+        loge("no memory to build edit person dlg?");
+    }
     traceout;
 }
 
-void MainWindow::doShowAddEditCommunity(bool isSelfUpdate, const Community *com, CommonEditModelListener* listener)
+void MainWindow::doShowAddEditCommunity(bool isSelfUpdate, const Community *com,
+                                        CommonEditModelListener* listener)
 {
     tracein;
     logd("isSelfUpdate %d", isSelfUpdate);
-    DlgCommunity* dlg = DlgCommunity::build(this, isSelfUpdate, KModelNameCommunity, (DbModel*)com, listener);
-    dlg->setListener(listener);
-    dlg->exec();
-    delete dlg;
+    DlgCommunity* dlg = DlgCommunity::build(this, isSelfUpdate, KModelNameCommunity,
+                                            (DbModel*)com, listener);
+    if (!dlg) {
+        dlg->setListener(listener);
+        dlg->exec();
+        delete dlg;
+    } else {
+        loge("no memory to build DlgCommunity?");
+    }
     traceout;
 }
 
-void MainWindow::doShowImportPerson()
+ErrCode MainWindow::doShowImportPerson()
 {
-//    tracein;
-//    ErrCode err = ErrNone;
-//    // TODO: show dialog to select which type of file to be imported???
-//    QString fname = QFileDialog::getOpenFileName(
-//        this,
-//        tr("Open file"),
-//        FileCtl::getAppDataDir(),
-//        tr("CSV Files (*.csv);;Excel (*.xls *.xlsx)"));
-//    // TODO: this is duplicate code, make it common please
-//    if (!fname.isEmpty()){
-//        logd("File %s is selected", fname.toStdString().c_str());
-//        QList<DbModel*> list;
-//        logd("Import from file %s", fname.toStdString().c_str());
-//        ErrCode ret = INSTANCE(PersonCtl)->importFromFile(KModelHdlPerson, ImportType::IMPORT_CSV, fname, &list);
-//        logd("Import result %d", ret);
-//        logd("No of import item %d", list.count());
-//        DlgImportPersonListResult* dlg = new DlgImportPersonListResult();
-//        dlg->setup(list);
-//        dlg->exec();
-//        delete dlg;
-//    }
-//    traceout;
     tracein;
     ErrCode ret = ErrNone;
+    dbg(LOG_VERBOSE, "show import person");
     // TODO: show dialog to select which type of file to be imported???
     QString fname = QFileDialog::getOpenFileName(
-        this,
-        tr("Open file"),
-        FileCtl::getAppDataDir(),
-        tr("Excel (*.xlsx))"));
-//        tr("Excel (*.xlsx);;CSV Files (*.csv);;All Files (*.*)"));
+                                        this,
+                                        STR_SELECT_TO_IMPORT,
+                                        FileCtl::getAppDataDir(),
+                                        tr("Excel (*.xlsx))"));
     // TODO: this is duplicate code, make it common please
     if (!fname.isEmpty()){
-//        QList<DbModel*> list;
-        connect(this, &MainWindow::importPeople, this, &MainWindow::onImportPeople);
         notifyMainWindownImportListenerStart(IMPORT_TARGET_PERSON);
-        ret = showProcessingDialog(tr("Nhập dữ liệu"), nullptr,
-            [this, fname](ErrCode* err, void* data, DlgWait* dlg) {
-                QList<DbModel*>*list = new QList<DbModel*>();
-                logd("Import from file %s", STR2CHA(fname));
-                ImportType type = ImportFactory::importTypeFromExt(fname, true);
-                if (type == IMPORT_XLSX || type == IMPORT_CSV_LIST || type == IMPORT_CSV) {
-                    *err = PERSONCTL->importFromFile(KModelHdlPerson, type, fname, list);
-                } else {
-                    *err = ErrNotSupport;
-                    loge("Import type %d not support (fname = '%s'", type, STR2CHA(fname));
+        ret = showProcessingDialog(STR_IMPORT_DATA, nullptr,
+            [fname](ErrCode* err, void* data, DlgWait* dlg) {
+                UNUSED(data);
+                UNUSED(dlg);
+                ErrCode tmperr = ErrNone;
+                QList<DbModel*> *list = new QList<DbModel*>();
+                dbg(LOG_INFO, "Import from file %s", STR2CHA(fname));
+                if (!list) {
+                    loge("no memory to allocat list mode");
+                    tmperr = ErrNoMemory;
                 }
+                if (tmperr == ErrNone) {
+                    ImportType type = ImportFactory::importTypeFromExt(fname, true);
+                    if (type == IMPORT_XLSX || type == IMPORT_CSV_LIST || type == IMPORT_CSV) {
+                        tmperr = PERSONCTL->importFromFile(KModelHdlPerson, type, fname, list);
+                    } else {
+                        tmperr = ErrNotSupport;
+                        loge("Import type %d not support (fname = '%s'", type, STR2CHA(fname));
+                    }
+                }
+                logife(tmperr, "import person failed");
+                if (tmperr != ErrNone) {
+                    delete list;
+                    list = nullptr;
+                }
+                if (err) *err = tmperr;
                 return list;
                 },
             [this, fname](ErrCode err, void* data, void* result, DlgWait* dlg) {
+                UNUSED(data);
+                UNUSED(dlg);
                 logd("Import result %d", err);
-                QList<DbModel*>* list = (QList<DbModel*>*)(result);
-                if (result) {
-                    logd("No of import item %d", list->count());
-                }
-//                dlg->forceClose();
-                if (err == ErrNone) {
+                if (err == ErrNone && result) {
+                    QList<DbModel*>* list = static_cast<QList<DbModel*>*>(result);
+                    logd("No of import item %lld", list->count());
                     emit this->importPeople(err, list);
                 }
                 return err;
@@ -594,37 +615,50 @@ void MainWindow::doShowImportPerson()
             loge("Failed to import, notify listener err = %d", ret);
             notifyMainWindownImportListenerEnd(IMPORT_TARGET_PERSON, ret, nullptr);
         }
+    } else {
+        loge("no file selected to import person?");
     }
-    traceout;
+    traceret(ret);
+    return ret;
 }
 
-void MainWindow::doShowImportCommunity()
+ErrCode MainWindow::doShowImportCommunity()
 {
     tracein;
     ErrCode err = ErrNone;
+    dbg(LOG_VERBOSE, "show import community");
     // TODO: show dialog to select which type of file to be imported???
     QString fname = QFileDialog::getOpenFileName(
-        this,
-        tr("Open file"),
-        FileCtl::getAppDataDir(),
-        tr("Excel (*.xlsx)"));
-//        tr("CSV Files (*.csv);;Excel (*.xls *.xlsx)"));
+                                    this,
+                                    STR_SELECT_TO_IMPORT,
+                                    FileCtl::getAppDataDir(),
+                                    tr("Excel (*.xlsx)"));
     // TODO: this is duplicate code, make it common please
     if (!fname.isEmpty()){
-        logd("File %s is selected", fname.toStdString().c_str());
         QList<DbModel*> list;
-        logd("Import from file %s", fname.toStdString().c_str());
-        ErrCode ret = COMMUNITYCTL->importFromFile(KModelHdlCommunity, ImportType::IMPORT_XLSX, fname, &list);
-        logd("Import result %d", ret);
-        logd("No of import item %d", list.count());
+        dbg(LOG_VERBOSE, "Import community from file %s", STR2CHA(fname));
+        ErrCode ret = COMMUNITYCTL->importFromFile(KModelHdlCommunity,
+                                                   ImportType::IMPORT_XLSX,
+                                                   fname, &list);
+        dbg(LOG_DEBUG, "Import result %d, number item '%lld'",
+            ret, list.count());
         DlgImportListResult* dlg = nullptr;
         err = DlgImportListResultFactory::getImportListResult(
                             IMPORT_TARGET_COMMUNITY, &dlg, this);
-        dlg->setup(list);
-        dlg->exec();
-        delete dlg;
+        if (dlg) {
+            dlg->setup(list);
+            dlg->exec();
+            delete dlg;
+        } else {
+            err = ErrNoMemory;
+            loge("no memory to craete result dialog");
+        }
+        RELEASE_LIST_DBMODEL(list);
+    } else {
+        logw("no file selected to import community?");
     }
-    traceout;
+    traceret(err);
+    return err;
 }
 
 ErrCode MainWindow::doShowCommonImport(ImportTarget target,
@@ -636,20 +670,27 @@ ErrCode MainWindow::doShowCommonImport(ImportTarget target,
     ErrCode err = ErrNone;
     QList<DbModel*> list;
     DlgImportListResult* dlg = nullptr;
-    logd("import for target %d", target);
+    dbg(LOG_VERBOSE, "import for target %d", target);
     logd("model name '%s'", STR2CHA(modelName));
     // TODO: show dialog to select which type of file to be imported???
-    QString fname = QFileDialog::getOpenFileName(
-        this,
-        tr("Open file"),
-        FileCtl::getAppDataDir(),
-        tr("Excel (*.xlsx)"));
-    if (fname.isEmpty()) {
-        loge("no file name selected");
-        err = ErrNoFile;
+    QString fname;
+
+    if (!controller) {
+        loge("no controller");
+        err = ErrInvalidArg;
     }
     if (err == ErrNone) {
-        logd("Import from file %s", STR2CHA(fname));
+        fname = QFileDialog::getOpenFileName(this,
+                                            STR_SELECT_TO_IMPORT,
+                                            FileCtl::getAppDataDir(),
+                                            tr("Excel (*.xlsx)"));
+        if (fname.isEmpty()) {
+            loge("no file name selected");
+            err = ErrNoFile;
+        }
+    }
+    if (err == ErrNone) {
+        dbg(LOG_VERBOSE, "Import from file %s", STR2CHA(fname));
         err = controller->importFromFile(modelName,
                                         ImportType::IMPORT_XLSX, fname, &list);
         logd("Import result %d", err);
@@ -659,7 +700,7 @@ ErrCode MainWindow::doShowCommonImport(ImportTarget target,
         err = ErrNoData;
     }
     if (err == ErrNone) {
-        logd("No of import item %d", list.size());
+        logd("No of import item %lld", list.size());
         err = DlgImportListResultFactory::getImportListResult(target, &dlg, this);
     }
     if (err == ErrNone && !dlg) {
@@ -671,12 +712,13 @@ ErrCode MainWindow::doShowCommonImport(ImportTarget target,
         dlg->setTargetModel(targetModel);
     }
     if (err == ErrNone) {
-        logd("Set up list, no. item %d", list.size());
+        logd("Set up list, no. item %lld", list.size());
         err = dlg->setup(list);
     }
     if (err == ErrNone) {
         dlg->exec();
     }
+    RELEASE_LIST_DBMODEL(list);
     FREE_PTR(dlg);
     traceret(err);
     return err;
@@ -691,9 +733,13 @@ void MainWindow::doShowAddEditCommonModel(bool isSelfUpdate, const DbModel *mode
              model?STR2CHA(model->toString()):"null",
              listener?STR2CHA(listener->getName()):"null");
     DlgEditModel* dlg = DlgEditModel::build(this, isSelfUpdate, nullptr, model, listener);
-    dlg->setListener(listener);
-    dlg->exec();
-    delete dlg;
+    if (dlg) {
+        dlg->setListener(listener);
+        dlg->exec();
+        delete dlg;
+    } else {
+        loge("no memory to create DlgEditModel");
+    }
     traceout;
 }
 
@@ -703,9 +749,13 @@ void MainWindow::doShowAddEditCourse(bool isSelfUpdate, const DbModel *model,
     tracein;
     logd("isSelfUpdate %d", isSelfUpdate);
     DlgCourse* dlg = DlgCourse::build(this, isSelfUpdate, nullptr, model, listener);
-    dlg->setListener(listener);
-    dlg->exec();
-    delete dlg;
+    if (dlg) {
+        dlg->setListener(listener);
+        dlg->exec();
+        delete dlg;
+    } else {
+        loge("no memory to create DlgCourse");
+    }
     traceout;
 
 }
@@ -716,13 +766,18 @@ void MainWindow::doShowAddEditCommDept(bool isSelfUpdate, const DbModel* comm,
     tracein;
     logd("isSelfUpdate %d", isSelfUpdate);
     DlgCommDept* dlg = DlgCommDept::build(this, isSelfUpdate, KModelNameCommDept, model, listener);
-    dlg->setCommunity(comm);
-    dlg->exec();
-    delete dlg;
+    if (dlg) {
+        dlg->setCommunity(comm);
+        dlg->exec();
+        delete dlg;
+    } else {
+        loge("no memory to create DlgCommDept");
+    }
     traceout;
 }
 
-void MainWindow::doShowAddEditArea(bool isSelfUpdate, const DbModel *model, CommonEditModelListener *listener)
+void MainWindow::doShowAddEditArea(bool isSelfUpdate, const DbModel *model,
+                                   CommonEditModelListener *listener)
 {
     tracein;
     logd("isSelfUpdate %d", isSelfUpdate);
@@ -741,8 +796,12 @@ void MainWindow::doShowAddEditEthnic(bool isSelfUpdate, const DbModel *model, Co
     tracein;
     logd("isSelfUpdate %d", isSelfUpdate);
     DlgEthnic* dlg = DlgEthnic::build(this, isSelfUpdate, KModelNameEthnic, model, listener);
-    dlg->exec();
-    delete dlg;
+    if (dlg) {
+        dlg->exec();
+        delete dlg;
+    } else {
+        loge("failed to build DlgEthnic dialog, no memory?");
+    }
     traceout;
 }
 
@@ -773,7 +832,7 @@ ErrCode MainWindow::doExportListItems(const QList<DbModel *> *items,
             err = ErrNoMemory;
         }
     }
-    logd("datatype '%s', exportTypeList %d controller '%s'",
+    dbg(LOG_DEBUG, "datatype '%s', exportTypeList %lld controller '%s'",
          STR2CHA(datatype), exportTypeList,
          controller?STR2CHA(controller->getName()):"null");
     if (err == ErrNone) {
@@ -800,246 +859,266 @@ ErrCode MainWindow::doExportListItems(const QList<DbModel *> *items,
     return err;
 }
 
-
-
 void MainWindow::loadHomePageFile()
 {
     tracein;
     ErrCode ret = ErrNone;
     ret = FileCtl::checkAndUpdatePrebuiltFile(KPrebuiltHomeHtmlFileName, true);
-    if (ret == ErrNone)
+    if (ret == ErrNone) {
         ret = FileCtl::checkAndUpdatePrebuiltFile(KPrebuiltLogoFileName, true);
-
-    logd("Load home page file ret %d", ret);
+    }
+    logife(ret, "load home page file failed");
     // TODO: should log to file???
+    traceout;
 }
-
-#define ADD_ACTION_ITEM(menu, func, name, iconPath) \
-    do { \
-        QAction* act = nullptr;\
-        act = menu->addAction(QIcon(QString::fromUtf8(iconPath)), \
-                                   name); \
-        QObject::connect(act, SIGNAL(triggered()), this, SLOT(func())); \
-    } while (0)
-
 
 void MainWindow::loadOtherAddMenu()
 {
     tracein;
-
+    ErrCode err = ErrNone;
     QToolButton *otherButton = new QToolButton(this);
-    // TODO: when other button be clear? check it
-    otherButton->setText(tr("&Khác"));
-    otherButton->setPopupMode(QToolButton::InstantPopup);
-    otherButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-    QIcon icon;
-    icon.addFile(ICON_ADD, QSize(), QIcon::Normal, QIcon::On);
-    otherButton->setIcon(icon);
+    QMenu *otherMenu = nullptr;
+    // TODO: when those are freed?
 
-    QMenu *otherMenu = new QMenu(otherButton);
+    if (!otherButton) {
+        err = ErrNoMemory;
+        loge("no memory to create otherButton");
+    }
+    if (err == ErrNone) {
+        // TODO: when other button be clear? check it
+        otherButton->setText(tr("&Khác"));
+        otherButton->setPopupMode(QToolButton::InstantPopup);
+        otherButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+        QIcon icon;
+        icon.addFile(ICON_ADD, QSize(), QIcon::Normal, QIcon::On);
+        otherButton->setIcon(icon);
+    }
 
-    otherButton->setMenu(otherMenu);
-    // actionDummy? stupid? but it works
-    ui->toolBar->insertWidget(ui->actionDummyAdd, otherButton);
+    if (err == ErrNone) {
+        otherMenu = new QMenu(otherButton);
+        if (!otherMenu) {
+            err = ErrNoMemory;
+            loge("no memory to create otherMenu");
+        }
 
-    ADD_ACTION_ITEM(otherMenu,
-                    on_actionNew_Community_triggered,
-                    STR_ADD_COMMUNITY,
-                    ICON_ADD_COMMUNITY);
+    }
+
+    if (err == ErrNone) {
+        otherButton->setMenu(otherMenu);
+        // actionDummy? stupid? but it works
+        ui->toolBar->insertWidget(ui->actionDummyAdd, otherButton);
+
+        ADD_ACTION_ITEM(otherMenu,
+                        on_actionNew_Community_triggered,
+                        STR_ADD_COMMUNITY,
+                        ICON_ADD_COMMUNITY);
 
 
-    ADD_ACTION_ITEM(otherMenu,
-                    on_actionNew_PersonEvent_triggered,
-                    STR_ADD_PERSON_EVENT,
-                    ICON_ADD_PERSON_EVENT);
-
-
-
+        ADD_ACTION_ITEM(otherMenu,
+                        on_actionNew_PersonEvent_triggered,
+                        STR_ADD_PERSON_EVENT,
+                        ICON_ADD_PERSON_EVENT);
+    }
+    logife(err, "failed to prepare other add memu");
+    traceout;
 }
 
 void MainWindow::loadOtherMenu()
 {
     tracein;
-
+    ErrCode err = ErrNone;
     QToolButton *otherButton = new QToolButton(this);
-    // TODO: when other button be clear? check it
-    otherButton->setText(tr("&Khác"));
+    QMenu *otherMenu = nullptr;
+    // TODO: when those are freed?
+
+    if (!otherButton) {
+        err = ErrNoMemory;
+        loge("no memory otherButton");
+    }
+
+    if (err == ErrNone) {
+        // TODO: when other button be clear? check it
+        otherButton->setText(tr("&Khác"));
         otherButton->setPopupMode(QToolButton::InstantPopup);
-    otherButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-    QIcon icon;
-    icon.addFile(QString::fromUtf8(":/icon/icon/icons8-diversity-64"), QSize(), QIcon::Normal, QIcon::On);
-    otherButton->setIcon(icon);
+        otherButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(":/icon/icon/icons8-diversity-64"),
+                     QSize(), QIcon::Normal, QIcon::On);
+        otherButton->setIcon(icon);
+    }
 
-    QMenu *otherMenu = new QMenu(otherButton);
+    if (err == ErrNone) {
+        otherMenu = new QMenu(otherButton);
+        if (!otherMenu) {
+            loge("no memory to allocate otherMenu");
+            err = ErrNoMemory;
+        }
+    }
 
-    otherButton->setMenu(otherMenu);
-    // actionDummy? stupid? but it works
-    ui->toolBar->insertWidget(ui->actionDummy, otherButton);
+    if (err == ErrNone) {
+        otherButton->setMenu(otherMenu);
+        // actionDummy? stupid? but it works
+        ui->toolBar->insertWidget(ui->actionDummy, otherButton);
 
-//    ADD_ACTION_ITEM(otherMenu,
-//                    on_actionArea_triggered,
-//                    "Khu vực/Vùng",
-//                    ICON_PATH("icons8-earth-planet-80"));
+        ADD_ACTION_ITEM(otherMenu,
+                        on_actionDept_triggered,
+                        STR_DEPARTMENT,
+                        ICON_DEPT);
 
-    ADD_ACTION_ITEM(otherMenu,
-                    on_actionDept_triggered,
-                    STR_DEPARTMENT,
-                    ICON_DEPT);
-
-    ADD_ACTION_ITEM(otherMenu,
-                    on_actionSaints_2_triggered,
-                    STR_HOLLYNAME,
-                    ICON_SAINT);
-
-
-    ADD_ACTION_ITEM(otherMenu,
-                    on_actionRole_triggered,
-                    STR_ROLE,
-                    ICON_ROLE);
+        ADD_ACTION_ITEM(otherMenu,
+                        on_actionSaints_2_triggered,
+                        STR_HOLLYNAME,
+                        ICON_SAINT);
 
 
-    ADD_ACTION_ITEM(otherMenu,
-                    on_actionCountry_triggered,
-                    STR_COUNTRY,
-                    ICON_COUNTRY);
+        ADD_ACTION_ITEM(otherMenu,
+                        on_actionRole_triggered,
+                        STR_ROLE,
+                        ICON_ROLE);
 
 
-#ifndef SKIP_PERSON_PROVINE
-    ADD_ACTION_ITEM(otherMenu,
-                    on_actionProvince_triggered,
-                    "Tỉnh/Thành phố/Bang",
-                    ICON_PATH("icons8-catholic-64"));
-#endif
-    ADD_ACTION_ITEM(otherMenu,
-                    on_actionMisson_triggered,
-                    STR_NHIEM_VU_XA_HOI,
-                    ICON_MISSION);
+        ADD_ACTION_ITEM(otherMenu,
+                        on_actionCountry_triggered,
+                        STR_COUNTRY,
+                        ICON_COUNTRY);
 
 
-    ADD_ACTION_ITEM(otherMenu,
-                    on_actionSpeclialist_triggered,
-                    STR_CHUYEN_MON,
-                    ICON_SPECIALIST);
+    #ifndef SKIP_PERSON_PROVINE
+        ADD_ACTION_ITEM(otherMenu,
+                        on_actionProvince_triggered,
+                        "Tỉnh/Thành phố/Bang",
+                        ICON_PATH("icons8-catholic-64"));
+    #endif
+        ADD_ACTION_ITEM(otherMenu,
+                        on_actionMisson_triggered,
+                        STR_NHIEM_VU_XA_HOI,
+                        ICON_MISSION);
 
-    ADD_ACTION_ITEM(otherMenu,
-                    on_actionEducation_triggered,
-                    STR_EDUCATION,
-                    ICON_EDU);
 
-    ADD_ACTION_ITEM(otherMenu,
-                    on_actionWork_triggered,
-                    STR_WORK,
-                    ICON_WORK);
+        ADD_ACTION_ITEM(otherMenu,
+                        on_actionSpeclialist_triggered,
+                        STR_CHUYEN_MON,
+                        ICON_SPECIALIST);
 
-    ADD_ACTION_ITEM(otherMenu,
-                    on_actionEthnic_triggered,
-                    STR_ETHNIC,
-                    ICON_ETHNIC);
+        ADD_ACTION_ITEM(otherMenu,
+                        on_actionEducation_triggered,
+                        STR_EDUCATION,
+                        ICON_EDU);
 
-    ADD_ACTION_ITEM(otherMenu,
-                    on_actionCourse_triggered,
-                    STR_COURSE_TERM,
-                    ICON_COURSE);
+        ADD_ACTION_ITEM(otherMenu,
+                        on_actionWork_triggered,
+                        STR_WORK,
+                        ICON_WORK);
 
-    ADD_ACTION_ITEM(otherMenu,
-                    on_actionPersonStatus_triggered,
-                    STR_PERSON_STATUS,
-                    ICON_PERSON);
+        ADD_ACTION_ITEM(otherMenu,
+                        on_actionEthnic_triggered,
+                        STR_ETHNIC,
+                        ICON_ETHNIC);
+
+        ADD_ACTION_ITEM(otherMenu,
+                        on_actionCourse_triggered,
+                        STR_COURSE_TERM,
+                        ICON_COURSE);
+
+        ADD_ACTION_ITEM(otherMenu,
+                        on_actionPersonStatus_triggered,
+                        STR_PERSON_STATUS,
+                        ICON_PERSON);
+    }
+    logife(err, "Faile to prepare other menu");
+    traceout;
 }
 
 void MainWindow::loadImportMenu()
 {
     tracein;
-
+    ErrCode err = ErrNone;
+    QMenu *importMenu = nullptr;
     mImportButton = new QToolButton(this);
-    // TODO: when import button be clear? check it
-    mImportButton->setText(tr("&Nhập dữ liệu"));
-    mImportButton->setPopupMode(QToolButton::InstantPopup);
-    mImportButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-    QIcon icon;
-    icon.addFile(QString::fromUtf8(":/icon/icon/icons8-import-64"), QSize(), QIcon::Normal, QIcon::On);
-    mImportButton->setIcon(icon);
+    if (!mImportButton) {
+        loge("no memory for mImportButton");
+        err = ErrNoMemory;
+    }
+    if (err == ErrNone) {
+        // TODO: when import button be clear? check it
+        mImportButton->setText(tr("&Nhập dữ liệu"));
+        mImportButton->setPopupMode(QToolButton::InstantPopup);
+        mImportButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(":/icon/icon/icons8-import-64"), QSize(), QIcon::Normal, QIcon::On);
+        mImportButton->setIcon(icon);
+    }
 
-    QMenu *importMenu = new QMenu(mImportButton);
+    if (err == ErrNone) {
+        importMenu = new QMenu(mImportButton);
+        if (!importMenu) {
+            loge("no memory for importMenu");
+            err = ErrNoMemory;
+        }
+    }
 
-    // TODO: when menu is clear???? check it careffully
-    mImportButton->setMenu(importMenu);
-    ui->toolBar->insertWidget(ui->action_New, mImportButton);
+    if (err == ErrNone) {
+        // TODO: when menu is clear???? check it careffully
+        mImportButton->setMenu(importMenu);
+        ui->toolBar->insertWidget(ui->action_New, mImportButton);
 
-//    ADD_MENU_ITEM(importMenu,
-//                  on_action_ImportPersonList_triggered,
-//                  "Danh sách Nữ Tu",
-//                  ":/icon/icon/icons8-nun-64.png");
+        ADD_MENU_ITEM(importMenu,
+                      on_action_ImportPerson_triggered,
+                      STR_DS_NU_TU,
+                      ICON_PERSON);
 
-    ADD_MENU_ITEM(importMenu,
-                  on_action_ImportPerson_triggered,
-                  "Danh sách Nữ Tu",
-                  ":/icon/icon/icons8-nun-64.png");
+        ADD_MENU_ITEM(importMenu,
+                      on_action_ImportCommunityList_triggered,
+                      STR_COMMUNITY_LIST,
+                      ICON_ADD_COMMUNITY);
 
-    ADD_MENU_ITEM(importMenu,
-                  on_action_ImportCommunityList_triggered,
-                  "Danh sách Cộng đoàn",
-                  ":/icon/icon/icons8-community-64.png");
-
-//    ADD_MENU_ITEM(importMenu,
-//                  on_action_ImportCommunity_triggered,
-//                  "Cộng đoàn",
-//                  ":/icon/icon/icons8-community-64.png");
-
-//    mActionImportPersonList = new QAction(this);
-//    mActionImportPersonList->setObjectName(QString::fromUtf8("action_ImportPersonList"));
-//    mActionImportPersonList->setText(tr("Danh sách Nữ tu"));
-//    QIcon mImportPersonListIcon;
-//    mImportPersonListIcon.addFile(QString::fromUtf8(":/icon/icon/icons8-nun-64.png"), QSize(), QIcon::Normal, QIcon::On);
-//    mActionImportPersonList->setIcon(mImportPersonListIcon);
-//    QObject::connect(mActionImportPersonList, SIGNAL(triggered()), this, SLOT(on_action_ImportPersonList_triggered()));
-//    importMenu->addAction(mActionImportPersonList);
-
-//    mActionImportPerson = new QAction(this);
-//    mActionImportPerson->setObjectName(QString::fromUtf8("action_ImportPerson"));
-//    mActionImportPerson->setText(tr("Nữ tu"));
-//    mActionImportPerson->setIcon(mImportPersonListIcon);
-////    QObject::connect(mActionImportPerson, SIGNAL(triggered()), this, SLOT(on_action_ImportPersonList_triggered()));
-//    importMenu->addAction(mActionImportPerson);
-
-//    mActionImportCommunityList = new QAction(this);
-//    mActionImportCommunityList->setObjectName(QString::fromUtf8("action_ImportCommunityList"));
-//    mActionImportCommunityList->setText(tr("Danh sách Cộng đoàn"));
-//    QIcon mImportCommunityIcon;
-//    mImportCommunityIcon.addFile(QString::fromUtf8(":/icon/icon/icons8-community-64 (1).png"), QSize(), QIcon::Normal, QIcon::On);
-//    mActionImportCommunityList->setIcon(mImportCommunityIcon);
-//    importMenu->addAction(mActionImportCommunityList);
-
+    }
+    logife(err, "failed to prepare import menu");
     traceout;
 }
 
 void MainWindow::loadExportMenu()
 {
     tracein;
-
+    ErrCode err = ErrNone;
+    QMenu *exportMenu = nullptr;
     mExportButton = new QToolButton(this);
-    // TODO: when import button be clear? check it
-    mExportButton->setText(tr("&Xuất dữ liệu"));
-    mExportButton->setPopupMode(QToolButton::InstantPopup);
-    mExportButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-    QIcon icon;
-    icon.addFile(QString::fromUtf8(":/icon/icon/icons8-export-100"), QSize(), QIcon::Normal, QIcon::On);
-    mExportButton->setIcon(icon);
+    if (!mExportButton) {
+        loge("no memory mExportButton");
+        err = ErrNoMemory;
+    }
+    if (err == ErrNone) {
+        // TODO: when import button be clear? check it
+        mExportButton->setText(tr("&Xuất dữ liệu"));
+        mExportButton->setPopupMode(QToolButton::InstantPopup);
+        mExportButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(":/icon/icon/icons8-export-100"), QSize(), QIcon::Normal, QIcon::On);
+        mExportButton->setIcon(icon);
+    }
 
-    QMenu *exportMenu = new QMenu(mExportButton);
-    // TODO: when menu is clear???? check it careffully
-    mExportButton->setMenu(exportMenu);
-    ui->toolBar->insertWidget(ui->action_New, mExportButton);
+    if (err == ErrNone) {
+        exportMenu = new QMenu(mExportButton);
+        if (!exportMenu) {
+            loge("no memory exportMenu");
+            err = ErrNoMemory;
+        }
+    }
+    if (err == ErrNone) {
+        // TODO: when menu is clear???? check it careffully
+        mExportButton->setMenu(exportMenu);
+        ui->toolBar->insertWidget(ui->action_New, mExportButton);
 
-    ADD_MENU_ITEM(exportMenu,
-                  on_action_ExportPersonList_triggered,
-                  "Danh sách Nữ tu",
-                  ICON_PATH("icons8-nun-64.png"));
-    ADD_MENU_ITEM(exportMenu,
-                  on_action_ExportCommunityList_triggered,
-                  "Danh sách cộng đoàn",
-                  ICON_PATH("icons8-community-64.png"));
-
+        ADD_MENU_ITEM(exportMenu,
+                      on_action_ExportPersonList_triggered,
+                      STR_DS_NU_TU,
+                      ICON_PERSON);
+        ADD_MENU_ITEM(exportMenu,
+                      on_action_ExportCommunityList_triggered,
+                      STR_COMMUNITY_LIST,
+                      ICON_ADD_COMMUNITY);
+    }
+    logife(err, "failed to prepare loadExportMenu");
 
     traceout;
 
@@ -1052,7 +1131,7 @@ AppState MainWindow::appState() const
 
 void MainWindow::setAppState(AppState newAppState)
 {
-    logd("set app state %d --> %d", mAppState, newAppState);
+    dbg(LOG_VERBOSE, "set app state %d --> %d", mAppState, newAppState);
     mAppState = newAppState;
 }
 
@@ -1075,13 +1154,18 @@ void MainWindow::pushViewToStack(BaseView* view)
     // TODO: implement this
     // TODO: should limit max view, auto clean up old view
     tracein;
-    mViewStack.push(view);
+    if (view) {
+        mViewStack.push(view);
+    } else {
+        logw("no view push to stack");
+    }
     traceout;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     tracein;
+    logi("Windonw Close event!");
     // TODO: call unload directly here instead of emit?
     // because QMainWindow::closeEvent may free resource before slot Unload is called....
     emit unload();
@@ -1126,9 +1210,11 @@ void MainWindow::doRemoveMainWindownImportListener(MainWindownImportListener *li
 void MainWindow::notifyMainWindownImportListenerStart(ImportTarget target)
 {
     tracein;
+    dbg(LOG_VERBOSE, "Notify import start, target '%d'", target);
     foreach (MainWindownImportListener* listener, mMainWindowImportListener) {
         if (listener) {
-            logd("Call onMainWindownImportStart target %d name '%s'", target, STR2CHA(listener->getName()));
+            dbg(LOG_DEBUG, "Call onMainWindownImportStart target %d name '%s'",
+                target, STR2CHA(listener->getName()));
             listener->onMainWindownImportStart(target);
         }
     }
@@ -1138,9 +1224,11 @@ void MainWindow::notifyMainWindownImportListenerStart(ImportTarget target)
 void MainWindow::notifyMainWindownImportListenerEnd(ImportTarget target, ErrCode err, void *importData)
 {
     tracein;
+    logi("Notify import end, target '%d' err '%d'", target, err);
     foreach (MainWindownImportListener* listener, mMainWindowImportListener) {
         if (listener) {
-            logd("Call onMainWindownImportEnd target %d name '%s'", target, STR2CHA(listener->getName()));
+            dbg(LOG_DEBUG, "Call onMainWindownImportEnd target %d name '%s'",
+                target, STR2CHA(listener->getName()));
             listener->onMainWindownImportEnd(target, err, importData);
         }
     }
@@ -1150,34 +1238,43 @@ void MainWindow::notifyMainWindownImportListenerEnd(ImportTarget target, ErrCode
 void MainWindow::onLoad()
 {
     tracein;
-    mAppState = APP_STATE_LOADING;
-    if (!mWaitDlg)
+    setAppState(APP_STATE_LOADING);
+    if (!mWaitDlg) {
         mWaitDlg = new DlgWait(this);
-    mWaitDlg->setMessage(tr("Đang khởi tạo"));
-    mWaitDlg->setAllowCancel(false);
-    mWaitDlg->show(nullptr,
-          nullptr,
-          [this](ErrCode* err, void* data, DlgWait* dlg) {
-            logd("Call loader on load");
-            LoaderCtl::getInstance()->onLoad();
-            return nullptr;
-          },
-        [this](ErrCode err, void* data, void* result, DlgWait* dlg) {
-            logd("Finished, close wait dlg");
-//            dlg->forceClose();
-            this->setAppState(APP_STATE_READY);
-            return ErrNone;
-        }
+    }
+    if (mWaitDlg) {
+        mWaitDlg->setMessage(STR_INITING);
+        mWaitDlg->setAllowCancel(false);
+        mWaitDlg->show(nullptr,
+              nullptr,
+              [](ErrCode* err, void* data, DlgWait* dlg) {
+                UNUSED(err);
+                UNUSED(data);
+                UNUSED(dlg);
+                logi("Call loaders on load");
+                LoaderCtl::getInstance()->onLoad();
+                return nullptr;
+              },
+            [this](ErrCode err, void* data, void* result, DlgWait* dlg) {
+                UNUSED(err);
+                UNUSED(data);
+                UNUSED(result);
+                UNUSED(dlg);
+                logi("Finished on load, close wait dlg");
+                this->setAppState(APP_STATE_READY);
+                return ErrNone;
+            }
         );
-//    LoaderCtl::getInstance()->onLoad();
-//    this->setAppState(APP_STATE_READY);
+    } else {
+        logi("no wait dialog");
+    }
     traceout;
 }
 
 void MainWindow::onUnload()
 {
     tracein;
-    logd("unload from loader");
+    logi("unload from loader");
     LoaderCtl::getInstance()->onUnload();
     traceout;
 }
@@ -1185,20 +1282,28 @@ void MainWindow::onUnload()
 void MainWindow::onImportPeople(ErrCode err, QList<DbModel *> *list)
 {
     tracein;
+    DlgImportPersonListResult* dlg = nullptr;
     if (err == ErrNone && (!list || (list->size() == 0))) {
-        err = ErrNone;
+        err = ErrNoData;
         loge("Import ok, but no data?");
     }
+    if (err == ErrNone && (dlg = new DlgImportPersonListResult()) == nullptr) {
+        err = ErrNoMemory;
+        loge("no memory for dlg");
+    }
     if (err == ErrNone) {
-        DlgImportPersonListResult* dlg = new DlgImportPersonListResult();
         dlg->setup(*list);
         dlg->exec();
         notifyMainWindownImportListenerEnd(IMPORT_TARGET_PERSON, err, list);
-        delete list;
-        delete dlg; // no clean list, as dlg will take over it
-    } else {
+        FREE_PTR(dlg);
+        if (list) {
+            // no clean list element, as dlg will take over it and release it when it's deleted
+            delete list;
+        }
+    }
+    if (err != ErrNone) {
         loge("Import failed, err=%d", err);
-        DialogUtils::showErrorBox(QString(tr("Nhập dữ liệu lỗi, mã lỗi %1")).arg(err));
+        DialogUtils::showErrorBox(QString(STR_IMPORT_DATA_ERR_CODE).arg(err));
         notifyMainWindownImportListenerEnd(IMPORT_TARGET_PERSON, err, nullptr);
     }
     traceout;
@@ -1231,30 +1336,38 @@ void MainWindow::on_action_ImportPersonList_triggered()
     ErrCode ret = ErrNone;
     // TODO: show dialog to select which type of file to be imported???
     QString fname = QFileDialog::getOpenFileName(
-        this,
-        tr("Open file"),
-        FileCtl::getAppDataDir(),
-        tr("CSV Files (*.csv);;Excel (*.xls *.xlsx)"));
+                                    this,
+                                    STR_SELECT_TO_IMPORT,
+                                    FileCtl::getAppDataDir(),
+                                    tr("CSV Files (*.csv);;Excel (*.xls *.xlsx)"));
     // TODO: this is duplicate code, make it common please
     if (!fname.isEmpty()){
         QList<DbModel*> list;
-        logd("Import from file %s", STR2CHA(fname));
+        dbg(LOG_INFO, "Import from file %s", STR2CHA(fname));
         ImportType type = ImportFactory::importTypeFromExt(fname, true);
         if (type == IMPORT_XLSX || type == IMPORT_CSV_LIST || type == IMPORT_CSV) {
             ret = INSTANCE(PersonCtl)->importFromFile(KModelHdlPerson, type, fname, &list);
         } else {
             ret = ErrNotSupport;
-            loge("Import type %d not support (fname = '%s'", type, STR2CHA(fname));
+            loge("Import type %d not support, fname = '%s'", type, STR2CHA(fname));
         }
-        logd("Import result %d", ret);
-        logd("No of import item %d", list.count());
+        dbg(LOG_INFO, "Import result %d, No of import item %lld",
+            ret, list.count());
         if (ret == ErrNone) {
             DlgImportPersonListResult* dlg = new DlgImportPersonListResult();
-            dlg->setup(list);
-            dlg->exec();
-            delete dlg; // no clean list, as dlg will take over it
+            if (dlg) {
+                dlg->setup(list);
+                dlg->exec();
+                delete dlg; // no clean list, as dlg will take over it
+            } else {
+                loge("failed to allocate memory for DlgImportPersonListResult");
+                ret = ErrNoMemory;
+            }
         }
+    } else {
+        logw("no file selected to import");
     }
+    logife(ret, "import person list failed");
     traceout;
 }
 
@@ -1262,7 +1375,6 @@ void MainWindow::on_action_ImportCommunityList_triggered()
 {
     tracein;
     MainWindow::showImportDlg(ImportTarget::IMPORT_TARGET_COMMUNITY);
-    // TODO: implement it
     traceout;
 }
 
@@ -1271,33 +1383,31 @@ void MainWindow::on_action_ImportCommunity_triggered()
     tracein;
     UNDER_DEV(tr("Nhập Cộng Đoàn từ tập tin"));
     // TODO: handle error case??
-
+    traceout;
 }
 
 void MainWindow::on_action_New_triggered()
 {
     tracein;
-//    Person* person = TestCtl::genRandomPerson();
-//    person->save();
-
-//    delete person;
+    dbg(LOG_VERBOSE, "new community click");
     DlgPerson *dlg = DlgPerson::buildDlg(this);
-    //    w.setWindowState(Qt::WindowState::WindowMaximized);
-    dlg->exec();
-    delete dlg;
+    if (!dlg) {
+        dlg->exec();
+        delete dlg;
+    } else {
+        loge("no memory for DlgPerson");
+    }
+    traceout;
 }
 
 
 void MainWindow::on_actionNew_Community_triggered()
 {
     tracein;
-//    Community* comm = TestCtl::genRandomCommunity();
-//    comm->save();
-
-//    delete comm;
+    dbg(LOG_VERBOSE, "new community click");
     DlgCommunity w;
-//    w.setWindowState(Qt::WindowState::WindowMaximized);
     w.exec();
+    traceout;
 }
 
 
@@ -1346,6 +1456,7 @@ void MainWindow::on_actionSearch_triggered()
 {
     tracein;
     UNDER_DEV(tr("Tìm kiếm thông tin"));
+    traceout;
 }
 
 void MainWindow::on_actionArea_triggered()
@@ -1396,37 +1507,36 @@ void MainWindow::on_actionDept_triggered()
 void MainWindow::on_action_ExportPersonList_triggered()
 {
     tracein;
+    dbg(LOG_INFO, "export person");
     QList<DbModel*> list = PERSONCTL->getAllItemsFromDb();
-//    UNDER_DEV(tr("Xuất danh sách nữ tu ra tập tin"));
-//    doExportListItems(&list, PERSONCTL, "Danh sách nữ tu", ExportType::EXPORT_XLSX | ExportType::EXPORT_CSV_LIST);
-    doExportListItems(&list, KModelNamePerson, PERSONCTL, "Danh sách nữ tu", ExportType::EXPORT_XLSX);
+    doExportListItems(&list, KModelNamePerson, PERSONCTL, STR_DS_NU_TU, ExportType::EXPORT_XLSX);
     RELEASE_LIST_DBMODEL(list);
+    traceout;
 }
 
 void MainWindow::on_action_ExportCommunityList_triggered()
 {
     tracein;
+    dbg(LOG_INFO, "export community");
     QList<DbModel*> list = COMMUNITYCTL->getAllItemsFromDb();
-//    UNDER_DEV(tr("Xuất danh sách nữ tu ra tập tin"));
-    doExportListItems(&list, KModelNameCommunity, COMMUNITYCTL, "Danh sách cộng đoàn", ExportType::EXPORT_XLSX);
+    doExportListItems(&list, KModelNameCommunity, COMMUNITYCTL,
+                      STR_COMMUNITY_LIST, ExportType::EXPORT_XLSX);
     RELEASE_LIST_DBMODEL(list);
+    traceout;
 }
 
 
 void MainWindow::on_action_About_triggered()
 {
-    DlgAbout* dlg = new DlgAbout(this);
-    dlg->exec();
-    delete dlg;
+    DlgAbout dlg(this);
+    dlg.exec();
 }
 
 
 void MainWindow::on_action_Backup_triggered()
 {
     tracein;
-//    UNDER_DEV(tr("Sao lưu dữ liệu"));
-    // TODO: implement it
-    QString fpath = DialogUtils::saveFileDialog(this, tr("Sao lưu dữ liệu"),
+    QString fpath = DialogUtils::saveFileDialog(this, STR_BACKUP,
                                   QString("saoluu.zip"),
                                   QString("zip (*.zip)")
                                   );
@@ -1435,10 +1545,12 @@ void MainWindow::on_action_Backup_triggered()
         ErrCode err = BACKUP->backup(fpath);
         logi("Backup file result=%d", err);
         if (err == ErrNone) {
-            DialogUtils::showMsgBox(QString(tr("Sao lưu file vào: %1")).arg(fpath));
+            DialogUtils::showMsgBox(QString(STR_BACKUP_TO).arg(fpath));
         } else {
-            DialogUtils::showErrorBox(QString(tr("Sao lưu file thất bại, mã lỗi %1")).arg(err));
+            DialogUtils::showErrorBox(QString(STR_BACKUP_ERRCODE).arg(err));
         }
+    } else {
+        logw("not file to backup");
     }
     traceout;
 }
@@ -1449,7 +1561,7 @@ void MainWindow::on_actionRestore_triggered()
     tracein;
     UNDER_DEV(tr("Phục hồi dữ liệu đã sao lưu"));
     // TODO: implement it
-
+    traceout;
 }
 
 
@@ -1458,7 +1570,7 @@ void MainWindow::on_actionRevert_triggered()
     tracein;
     UNDER_DEV(tr("Khôi phục dữ liệu (khôi phục dữ liệu cũ, trong trường hợp dữ liệu hiện tại bị lỗi)"));
     // TODO: implement it
-
+    traceout;
 }
 
 
@@ -1467,15 +1579,15 @@ void MainWindow::on_action_Help_triggered()
     tracein;
     UNDER_DEV(tr("Hướng dẫn sử dụng phần mềm"));
     // TODO: implement it
+    traceout;
 
 }
 
 void MainWindow::on_actionEthnic_triggered()
 {
     tracein;
-//    UNDER_DEV(tr("Dân tộc"));
-    // TODO: implement it
     switchView(VIEW_ETHNIC);
+    traceout;
 }
 
 void MainWindow::on_actionWork_triggered()
@@ -1483,32 +1595,28 @@ void MainWindow::on_actionWork_triggered()
 
     tracein;
     switchView(VIEW_WORK);
-    // TODO: implement it
-
+    traceout;
 }
 
 void MainWindow::on_actionEducation_triggered()
 {
 
     tracein;
-//    UNDER_DEV(tr("Giáo dục"));
-    // TODO: implement it
     switchView(VIEW_EDUCATION);
+    traceout;
 }
 
 void MainWindow::on_actionSpeclialist_triggered()
 {
     tracein;
-//    UNDER_DEV(tr("Chuyên môn"));
 
     switchView(VIEW_SPECIALIST);
+    traceout;
 }
 
 void MainWindow::on_actionMisson_triggered()
 {
     tracein;
-//    UNDER_DEV(tr("Nhiệm vụ"));
-    // TODO: implement it
     switchView(VIEW_MISSION);
     traceout;
 }
@@ -1518,28 +1626,25 @@ void MainWindow::on_actionProvince_triggered()
     tracein;
     UNDER_DEV(tr("Tỉnh/Thành phố/Bang"));
     // TODO: implement it
+    traceout;
 }
 
 void MainWindow::on_actionCountry_triggered()
 {
     tracein;
-//    UNDER_DEV(tr("Quốc gia"));
-    // TODO: implement it
-
     switchView(VIEW_COUNTRY);
+    traceout;
 }
 
 
 void MainWindow::on_actionBack_triggered()
 {
     tracein;
-    // TODO: implemen this
-    // TODO: how about forward/redo???? show we support it?
-//    popViewFromStackAndShow();
-//    UNDER_DEV(tr("Quay lại màn hình trước"));
     BaseView* view = popViewFromStackAndShow();
     if (view) {
         switchView(view, true);
+    } else {
+        logw("no view to back");
     }
     traceout;
 }
@@ -1548,17 +1653,14 @@ void MainWindow::on_actionBack_triggered()
 void MainWindow::on_actionLogFile_triggered()
 {
     QString logDir = Logger::logDirPath();
-    logd("Open log dir=%s", STR2CHA(logDir));
+    logi("Open log dir=%s", STR2CHA(logDir));
     QDesktopServices::openUrl(QUrl::fromLocalFile(logDir));
 }
 
 
 void MainWindow::on_actionSummarizeReport_triggered()
 {
-    // BAO CAO TONG QUAN HOI DONG
     tracein;
-    // TODO: implemen this
-//    UNDER_DEV(tr("Báo cáo tổng quan Hội dòng, xuất báo cáo ra tập tin"));
     QString fpath;
     ErrCode err = STAT->exportGeneralStatistic(&fpath);
     dlgHtmlViewer* viewer = nullptr;
@@ -1575,7 +1677,10 @@ void MainWindow::on_actionSummarizeReport_triggered()
     }
     QFile::remove(fpath);
     FREE_PTR(viewer);
-    if (err != ErrNone) DialogUtils::showErrorBox(err, STR_GENERAL_STAT_ERR);
+    if (err != ErrNone) {
+        loge("failed to show dlg err = %d", err);
+        DialogUtils::showErrorBox(err, STR_GENERAL_STAT_ERR);
+    }
     traceout;
 }
 

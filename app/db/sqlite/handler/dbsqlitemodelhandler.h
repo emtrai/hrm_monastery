@@ -142,8 +142,6 @@ public:
      */
     virtual QHash<QString, DbModel*> getAllInDict(DbModelBuilder builder, qint64 status = DB_RECORD_ACTIVE, const char* modelName = nullptr);
 
-    virtual DbModel* getModel(qint64 dbId);
-
     virtual DbModel *getByUid(const QString& uid, const DbModelBuilder& builder);
     virtual DbModel *getByUid(const QString& uid);
     virtual DbModel *getByNameId(const QString& nameId, const DbModelBuilder& builder);

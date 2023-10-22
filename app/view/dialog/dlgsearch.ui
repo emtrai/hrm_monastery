@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>580</width>
     <height>300</height>
    </rect>
   </property>
@@ -61,6 +61,13 @@
         <widget class="QPushButton" name="btnAll">
          <property name="text">
           <string>Tất cả</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnManagers">
+         <property name="text">
+          <string>Quản lý</string>
          </property>
         </widget>
        </item>

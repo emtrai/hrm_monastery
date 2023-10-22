@@ -466,10 +466,6 @@ ErrCode CommunityCtl::getManagersList(const QString &communityUid, QList<DbModel
     DbCommunityModelHandler* hdl = nullptr;
     QList<DbModel *> items;
     logd("get list of person for communityUid '%s', status 0x%llx", STR2CHA(communityUid), modelStatus);
-    if (communityUid.isEmpty()) {
-        err = ErrInvalidArg;
-        loge("Get person failed invalid args");
-    }
 
     if (err == ErrNone) {
         hdl = dynamic_cast<DbCommunityModelHandler*>(DB->getModelHandler(KModelHdlCommunity));
@@ -494,15 +490,43 @@ ErrCode CommunityCtl::getManagersList(const QString &communityUid, QList<DbModel
 
 }
 
+ErrCode CommunityCtl::getAllManagersList(QList<DbModel *> &outList, qint64 modelStatus)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    DbCommunityModelHandler* hdl = nullptr;
+    QList<DbModel *> items;
+    logd("get all managers of community for status 0x%llx",  modelStatus);
+
+    if (err == ErrNone) {
+        hdl = dynamic_cast<DbCommunityModelHandler*>(DB->getModelHandler(KModelHdlCommunity));
+        if (!hdl) {
+            err = ErrInvalidData;
+            loge("not found handler, something was wrong");
+        }
+    }
+
+    if (err == ErrNone) {
+        err = hdl->getAllManagersList(items, modelStatus);
+        if (items.size() > 0) {
+            outList.append(items);
+        } else {
+            logw("not found all managers for status 0x%llx", modelStatus);
+        }
+    }
+    logife(err, "Get list of all community manager failed");
+
+    traceout;
+    return err;
+
+}
+
 ErrCode CommunityCtl::getManagersListInString(const QString &communityUid, const QString &sep,
                                               QString &managers, qint64 modelStatus)
 {
     tracein;
     QList<DbModel *> managerList;
     ErrCode err = ErrNone;
-    if (communityUid.isEmpty()) {
-        err = ErrInvalidModel;
-    }
     if (err == ErrNone) {
         err = getManagersList(communityUid, managerList);
         logife(err, "failed to get managers list for comm uid ''%s'",

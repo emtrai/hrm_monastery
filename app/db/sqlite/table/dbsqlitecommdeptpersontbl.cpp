@@ -51,38 +51,6 @@ DbSqliteCommDeptPersonTbl::DbSqliteCommDeptPersonTbl(DbSqlite *db):
 
 }
 
-
-//QList<DbModel *> DbSqliteCommDeptPersonTbl::getListPerson(const QString &commDeptUid, int status)
-//{
-//    tracein;
-////    DB->openDb();
-//    QSqlQuery qry(SQLITE->currentDb());
-//    qint32 cnt = 0;
-//    if (commDeptUid.isEmpty()){
-//        loge("Invalid departUid uid");
-//        return QList<DbModel*>();
-//    }
-//    logi("commDeptUid '%s'", commDeptUid.toStdString().c_str());
-//    QString queryString = QString("SELECT * FROM %1 LEFT JOIN %2 ON %1.%3 = %2.%4 WHERE %1.%5 = :uid")
-//                              .arg(KTableCommDepartPerson, KTablePerson) // 1 & 2
-//                              .arg(KFieldPersonUid, KFieldUid, KFieldDepartmentUid) // 3 & 4 & 5
-
-//                                ;
-
-//    qry.prepare(queryString);
-//    logd("Query String '%s'", queryString.toStdString().c_str());
-
-//    // TODO: check sql injection issue
-//    qry.bindValue( ":uid", commDeptUid);
-//    // TODO: add query status
-//    //    qry.bindValue( ":status", status); // TODO: support multiple status???
-//    QList<DbModel *> outList;
-//    cnt = runQuery(qry, &PersonDept::build, &outList);
-
-//    logi("Found %d", cnt);
-
-//    return outList;
-//}
 QList<DbModel *> DbSqliteCommDeptPersonTbl::getListPerson(const QString &commDeptUid, int status)
 {
     tracein;

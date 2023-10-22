@@ -34,7 +34,24 @@ public:
     DbSqliteMapTbl(DbSqlite* db, const QString& baseName, const QString& name, qint32 versionCode);
     DbSqliteMapTbl(DbSqlite* db, const QString& baseName, const QString& name, qint32 versionCode, const QString&modelName);
 
-    virtual QList<DbModel*> getListItems(const QString &mapTblName,
+    /**
+     * @brief getListItems
+     * SELECT * FROM "mapTblName"
+     *  JOIN "modelTblName"
+     *  ON "mapTblName"."fieldUid2Join" = "modelTblName"."fieldModelUid"
+     *  WHERE "mapTblName"."fieldUid1Cond" = :uid
+     * @param mapTblName
+     * @param modelTblName
+     * @param fieldUid2Join
+     * @param fieldModelUid
+     * @param fieldUid1Cond
+     * @param builder
+     * @param uid
+     * @param status
+     * @param selectedField
+     * @return
+     */
+    virtual QList<DbModel*> getListItemsWithUid(const QString &mapTblName,
                                   const QString &modelTblName,
                                   const QString &fieldUid2Join,
                                   const QString &fieldModelUid,
@@ -50,7 +67,7 @@ public:
                                           const QString &cond = nullptr,
                                           int status = MODEL_STATUS_MAX,
                                           const QString& selectedField = "*");
-    virtual QList<DbModel*> getListItems(const QString &mapTblName,
+    virtual QList<DbModel*> getListItemsWithCond(const QString &mapTblName,
                                           const QString &modelTblName,
                                           const QString &fieldUid2Join,
                                           const QString &fieldModelUid,

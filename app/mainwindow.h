@@ -25,14 +25,10 @@
 #include <QMainWindow>
 #include <QTextBrowser>
 #include <QToolButton>
-#include "view/widget/uisummarizeview.h"
-#include "view/widget/uitableview.h"
-#include "view/widget/uitableviewfactory.h"
 #include <QAction>
 #include "loader/loaderctl.h"
 #include "view/widget/baseview.h"
 #include "view/dialog/dlgcommoneditmodel.h"
-#include "importfactory.h"
 #include <QStack>
 #include <QHash>
 #include "view/widget/baseview.h"
@@ -46,9 +42,13 @@ QT_END_NAMESPACE
 #define MAINWIN MainWindow::getInstance()
 
 // TODO: full state machine/state transition check/report incident
+/**
+ * @brief applicat state
+ */
 enum AppState {
     APP_STATE_NOT_READY = 0,
     APP_STATE_INITING,
+    APP_STATE_INITED,
     APP_STATE_LOADING,
     APP_STATE_READY,
     APP_STATE_LOAD_ERR,
@@ -68,59 +68,59 @@ public:
     virtual void onMainWindownImportEnd(ImportTarget target, ErrCode err, void* importData = nullptr) = 0;
 };
 
-    class MainWindow : public QMainWindow, public LoaderListener
+class MainWindow : public QMainWindow, public LoaderListener
 {
     Q_OBJECT
 
-        public:
-                 MainWindow(QWidget *parent = nullptr);
-            ~MainWindow();
-            static MainWindow *getInstance();
+public:
+    MainWindow(QWidget *parent = nullptr);
+    ~MainWindow();
+    static MainWindow *getInstance();
 
-            static void showAddEditPerson(bool isSelfUpdate = true, Person* per = nullptr, bool isNew = true);
-            static void showAddEditCommunity(bool isSelfUpdate = true, const Community* com = nullptr,
-                                             CommonEditModelListener* listener = nullptr);
-            static ErrCode showImportDlg(ImportTarget target = IMPORT_TARGET_MAX,
-                                         ModelController* controller = nullptr,
-                                         const QString& modelName = nullptr,
-                                         const DbModel* targetModel = nullptr // import list will belong to this model
-                                         );
-            static ErrCode showOnHtmlViewer(const DbModel* model, const QString& subject);
-            static void showAddEditCommonModel(bool isSelfUpdate = true,
-                                               const DbModel* model = nullptr,
-                                             CommonEditModelListener* listener = nullptr);
-            static void showAddEditCourse(bool isSelfUpdate = true, const DbModel* com = nullptr,
-                                             CommonEditModelListener* listener = nullptr);
-            static void showAddEditCommDept(bool isSelfUpdate = true,
-                                            const DbModel* comm = nullptr,
-                                            const DbModel* dept = nullptr,
-                                          CommonEditModelListener* listener = nullptr);
-            static void showAddEditArea(bool isSelfUpdate = true, const DbModel* com = nullptr,
-                                             CommonEditModelListener* listener = nullptr);
-            static void showAddEditEthnic(bool isSelfUpdate = true, const DbModel* com = nullptr,
-                                             CommonEditModelListener* listener = nullptr);
-            static ErrCode exportListItems(const QList<DbModel*>* items,
-                                           const QString& datatype,
-                                           ModelController* controller,
-                                           const QString& title = nullptr,
-                                           quint64 exportTypeList = ExportType::EXPORT_XLSX, // List of supported export type, bitwise
-                                           QString* fpath = nullptr
-                                    );
-            static ErrCode showProcessingDialog(const QString& title,
-                                                WaitPrepare_t prepare,
-                                                WaitRunt_t run,
-                                                WaitFinished_t finish = nullptr,
-                                                void *data = nullptr);
-            static void addMainWindownImportListener(MainWindownImportListener* listener);
-            static void removeMainWindownImportListener(MainWindownImportListener* listener);
+    static void showAddEditPerson(bool isSelfUpdate = true, Person* per = nullptr, bool isNew = true);
+    static void showAddEditCommunity(bool isSelfUpdate = true, const Community* com = nullptr,
+                                     CommonEditModelListener* listener = nullptr);
+    static ErrCode showImportDlg(ImportTarget target = IMPORT_TARGET_MAX,
+                                 ModelController* controller = nullptr,
+                                 const QString& modelName = nullptr,
+                                 const DbModel* targetModel = nullptr // import list will belong to this model
+                                 );
+    static ErrCode showOnHtmlViewer(const DbModel* model, const QString& subject);
+    static void showAddEditCommonModel(bool isSelfUpdate = true,
+                                       const DbModel* model = nullptr,
+                                     CommonEditModelListener* listener = nullptr);
+    static void showAddEditCourse(bool isSelfUpdate = true, const DbModel* com = nullptr,
+                                     CommonEditModelListener* listener = nullptr);
+    static void showAddEditCommDept(bool isSelfUpdate = true,
+                                    const DbModel* comm = nullptr,
+                                    const DbModel* dept = nullptr,
+                                  CommonEditModelListener* listener = nullptr);
+    static void showAddEditArea(bool isSelfUpdate = true, const DbModel* com = nullptr,
+                                     CommonEditModelListener* listener = nullptr);
+    static void showAddEditEthnic(bool isSelfUpdate = true, const DbModel* com = nullptr,
+                                     CommonEditModelListener* listener = nullptr);
+    static ErrCode exportListItems(const QList<DbModel*>* items,
+                                   const QString& datatype,
+                                   ModelController* controller,
+                                   const QString& title = nullptr,
+                                   quint64 exportTypeList = ExportType::EXPORT_XLSX, // List of supported export type, bitwise
+                                   QString* fpath = nullptr
+                            );
+    static ErrCode showProcessingDialog(const QString& title,
+                                        WaitPrepare_t prepare,
+                                        WaitRunt_t run,
+                                        WaitFinished_t finish = nullptr,
+                                        void *data = nullptr);
+    static void addMainWindownImportListener(MainWindownImportListener* listener);
+    static void removeMainWindownImportListener(MainWindownImportListener* listener);
 
-            void showMessageBox(const QString& msg);
-            /**
-             * @brief showErrorBox
-             * @param msg error code string to be showed.
-             * @param err error code, if ErrNone, just show \ref msg, not show error code string
-             */
-            void showErrorBox(const QString& msg, ErrCode err = ErrNone);
+    void showMessageBox(const QString& msg);
+    /**
+     * @brief showErrorBox
+     * @param msg error code string to be showed.
+     * @param err error code, if ErrNone, just show \ref msg, not show error code string
+     */
+    void showErrorBox(const QString& msg, ErrCode err = ErrNone);
 protected:
     void showEvent(QShowEvent *ev);
     /**
@@ -128,7 +128,7 @@ protected:
     * @param event
     */
     void closeEvent(QCloseEvent *event);
- public:
+public:
      void switchView(ViewType type, void* data = nullptr);
      void switchView(BaseView* nextView, bool fromStack = false);
      BaseView* getView(ViewType type);
@@ -142,7 +142,7 @@ protected:
      BaseView* popViewFromStackAndShow();
      void pushViewToStack(BaseView* view);
 
- public:
+public:
      void doAddMainWindownImportListener(MainWindownImportListener* listener);
      void doRemoveMainWindownImportListener(MainWindownImportListener* listener);
      void notifyMainWindownImportListenerStart(ImportTarget target);
@@ -152,8 +152,8 @@ protected:
      void doShowAddEditPerson(bool isSelfUpdate = true, Person* per = nullptr, bool isNew = true);
      void doShowAddEditCommunity(bool isSelfUpdate = true, const Community* com = nullptr,
                                  CommonEditModelListener* listener = nullptr);
-     void doShowImportPerson();
-     void doShowImportCommunity();
+     ErrCode doShowImportPerson();
+     ErrCode doShowImportCommunity();
      ErrCode doShowCommonImport(ImportTarget target,
                                 ModelController* controller,
                                 const QString& modelName,
@@ -187,9 +187,7 @@ protected:
      ErrCode doShowAddPersonEvent(bool isSelfUpdate = true, DbModel* person = nullptr,
                                   DbModel* model = nullptr,
                                   CommonEditModelListener* listener = nullptr);
-//     ErrCode doShowAddPersonCommEvent(bool isSelfUpdate = true, DbModel* person = nullptr,
-//                                  DbModel* model = nullptr,
-//                                  CommonEditModelListener* listener = nullptr);
+
  private:
      void loadHomePageFile();
      void loadOtherMenu();

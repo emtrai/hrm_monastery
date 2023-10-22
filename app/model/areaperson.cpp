@@ -454,9 +454,11 @@ const QString &AreaPerson::areaUid() const
 
 void AreaPerson::setAreaUid(const QString &newAreaUid)
 {
-    mAreaUid = newAreaUid;
-    markItemAsModified(KItemArea);
-    setUid1(mAreaUid);
+    if (mAreaUid != newAreaUid) {
+        mAreaUid = newAreaUid;
+        markItemAsModified(KItemArea);
+        setUid1(mAreaUid);
+    }
 }
 
 const QString &AreaPerson::personName() const
@@ -476,9 +478,11 @@ const QString &AreaPerson::personUid() const
 
 void AreaPerson::setPersonUid(const QString &newPersonUid)
 {
-    mPersonUid = newPersonUid;
-    setUid2(mPersonUid);
-    markItemAsModified(KItemPerson);
+    if (mPersonUid != newPersonUid) {
+        mPersonUid = newPersonUid;
+        setUid2(mPersonUid);
+        markItemAsModified(KItemPerson);
+    }
 }
 
 const QString &AreaPerson::courseName() const
@@ -498,8 +502,7 @@ const QString &AreaPerson::courseUid() const
 
 void AreaPerson::setCourseUid(const QString &newCourseUid)
 {
-    mCourseUid = newCourseUid;
-    markItemAsModified(KItemCourse);
+    CHECK_MODIFIED_THEN_SET(mCourseUid, newCourseUid, KItemCourse);
 }
 
 const QString &AreaPerson::roleName()
@@ -529,6 +532,5 @@ const QString &AreaPerson::roleUid() const
 
 void AreaPerson::setRoleUid(const QString &newRoleUid)
 {
-    mRoleUid = newRoleUid;
-    markItemAsModified(KItemRole);
+    CHECK_MODIFIED_THEN_SET(mRoleUid, newRoleUid, KItemRole);
 }

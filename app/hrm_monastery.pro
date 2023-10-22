@@ -129,7 +129,6 @@ SOURCES += \
     image/imagectl.cpp \
     import/importlistener.cpp \
     import/importxlsx.cpp \
-    model/areacommunity.cpp \
     model/areaperson.cpp \
     model/communitymanager.cpp \
     model/communityperson.cpp \
@@ -350,7 +349,6 @@ HEADERS += \
     import/importxlsx.h \
     importexportdefs.h \
     jsondefs.h \
-    model/areacommunity.h \
     model/areaperson.h \
     model/communitymanager.h \
     model/communityperson.h \

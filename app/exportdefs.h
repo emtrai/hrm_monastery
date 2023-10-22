@@ -27,9 +27,10 @@ const char* const KItemTotalPeople = "TONG_NU_TU";
 const char* const KItemTotalCommunity = "TONG_CONG_DOAN";
 const char* const KItemTotalArea = "TONG_KHU_VUC";
 
-const char* const KItemTongPhuTrach = "TONG_PHU_TRACH_NHIEM_KY";
-const char* const KItemTongPhuTrachNhiemKy = "TONG_PHU_TRACH_NHIEM_KY";
+const char* const KItemDepartments = "DANH_SACH_PHONG_BAN";
 const char* const KItemTotalActivePeople = "TONG_NU_TU_HIEN_TAI";
 const char* const KItemTotalPeopleStatus = "TONG_NU_TU_TRANG_THAI";
+
+const char* const KItemContactPeopleList = "DANH_SACH_LIEN_LAC";
 
 #endif // EXPORTDEFS_H

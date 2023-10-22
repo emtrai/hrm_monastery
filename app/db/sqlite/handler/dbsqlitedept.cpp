@@ -48,7 +48,6 @@ ErrCode DbSqliteDept::deleteHard(DbModel *model, bool force, QString *msg)
         logi("Delete hard model '%s', force %d", MODELSTR2CHA(model), force);
 
         if (model->modelName() == KModelNameDepartment) {
-            // KFieldAreaUid delete map, community, person
             QHash<QString, QString> itemToSearch; // for searching
             QHash<QString, QString> itemToSet; // for update
             bool errDependency = false;

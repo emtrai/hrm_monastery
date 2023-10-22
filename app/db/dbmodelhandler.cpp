@@ -170,6 +170,8 @@ void DbModelHandler::delListener(onDbModelHandlerListener *listener)
 void DbModelHandler::notifyDataChange(DbModel *model, int type, ErrCode err)
 {
     tracein;
+    dbg(LOG_DEBUG, "notify data change for model '%s', type=%d, err=%d",
+        MODELSTR2CHA(model), type, err);
     // TODO: call on thread???
     foreach (onDbModelHandlerListener* listener, mListeners) {
         if (listener) {

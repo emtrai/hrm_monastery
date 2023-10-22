@@ -47,6 +47,7 @@ DlgSearch::DlgSearch(QWidget *parent, bool isMulti) :
     ui->tblList->setMinimumHeight(500); // TODO: define default fix?
 
     ui->btnAll->setVisible(false);
+    ui->btnManagers->setVisible(false);
 
 }
 
@@ -140,8 +141,15 @@ void DlgSearch::setIsMultiSelection(bool newIsMultiSelection)
 
 void DlgSearch::enableGetAllSupport()
 {
-    tracein;
+    traced;
     ui->btnAll->setVisible(true);
+}
+
+void DlgSearch::enableGetManagerSupport()
+{
+    traced;
+    ui->btnManagers->setVisible(true);
+
 }
 
 void DlgSearch::setupUi()
@@ -218,6 +226,15 @@ int DlgSearch::onGetAll()
     return 0;
 }
 
+int DlgSearch::onGetManagers()
+{
+    tracein;
+    loge("MUST BE CALLED BY DERIVED CLASS, NOT CALL HERE");
+    traceout;
+    return 0;
+
+}
+
 QString DlgSearch::getValueOfItemAt(int idx, int col, QString header, DbModel *item)
 {
     tracein;
@@ -287,5 +304,16 @@ void DlgSearch::on_btnAll_clicked()
         return this->onGetAll();
     });
     traceout;
+}
+
+
+void DlgSearch::on_btnManagers_clicked()
+{
+    tracein;
+    query([this](){
+        return this->onGetManagers();
+    });
+    traceout;
+
 }
 

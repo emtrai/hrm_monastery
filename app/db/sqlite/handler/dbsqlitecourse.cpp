@@ -26,6 +26,7 @@
 #include "dbsqlite.h"
 #include "persondept.h"
 #include "areaperson.h"
+#include "communitymanager.h"
 
 GET_INSTANCE_IMPL(DbSqliteCourse)
 
@@ -48,7 +49,6 @@ ErrCode DbSqliteCourse::deleteHard(DbModel *model, bool force, QString *msg)
         logi("Delete hard model '%s', force %d", MODELSTR2CHA(model), force);
 
         if (model->modelName() == KModelNameCourse) {
-            // KFieldAreaUid delete map, community, person
             QHash<QString, QString> itemToSearch; // for searching
             QHash<QString, QString> itemToSet; // for update
             bool errDependency = false;
@@ -56,23 +56,31 @@ ErrCode DbSqliteCourse::deleteHard(DbModel *model, bool force, QString *msg)
             itemToSearch.insert(KFieldCourseUid, model->uid());
             itemToSet.insert(KFieldCourseUid, ""); // update to null/empty
 
+            //person
             CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency,
                                        msg, force,
                                        itemToSearch, itemToSet,
                                        KTablePerson, &Person::build);
-
+            // person commdept
             if (err == ErrNone && !errDependency) {
                 CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency,
                                            msg, force,
                                            itemToSearch, itemToSet,
                                            KTableCommDepartPerson, &PersonDept::build);
             }
-
+            // area person
             if (err == ErrNone && !errDependency) {
                 CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency,
                                            msg, force,
                                            itemToSearch, itemToSet,
                                            KTableAreaPerson, &AreaPerson::build);
+            }
+            // community manager
+            if (err == ErrNone && !errDependency) {
+                CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency,
+                                           msg, force,
+                                           itemToSearch, itemToSet,
+                                           KTableCommManager, &CommunityManager::build);
             }
 
             if (errDependency) {

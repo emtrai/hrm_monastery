@@ -48,7 +48,6 @@ Config *Config::getInstance()
 {
     if (gInstance == nullptr){
         gInstance = new Config();
-
     }
     return gInstance;
 }

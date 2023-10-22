@@ -67,8 +67,8 @@ void UIImportItem::setValueList(const QStringList &newValueList)
 
 DlgImportListResult::DlgImportListResult(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::DlgImportListResult),
-    mTargetModel(nullptr)
+    mTargetModel(nullptr),
+    ui(new Ui::DlgImportListResult)
 {
     tracein;
     ui->setupUi(this);

@@ -51,27 +51,26 @@ ErrCode DbSqliteCountry::deleteHard(DbModel *model, bool force, QString *msg)
     if (err == ErrNone) {
         logi("Delete hard model '%s', force %d", MODELSTR2CHA(model), force);
 
-        if (model->modelName() == KModelNameCountry) {
-            // KFieldAreaUid delete map, community, person
+        if (IS_MODEL_NAME(model, KModelNameCountry)) {
             QHash<QString, QString> itemToSearch; // for searching
             QHash<QString, QString> itemToSet; // for update
             bool errDependency = false;
 
             itemToSearch.insert(KFieldCountryUid, model->uid());
             itemToSet.insert(KFieldCountryUid, ""); // update to null/empty
-
+            //person
             CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency,
                                        msg, force,
                                        itemToSearch, itemToSet,
                                        KTablePerson, &Person::build);
-
+            //community
             if (err == ErrNone && !errDependency) {
                 CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency,
                                            msg, force,
                                            itemToSearch, itemToSet,
                                            KTableCommunity, &Community::build);
             }
-
+            //saint
             if (err == ErrNone && !errDependency) {
                 CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency,
                                            msg, force,
@@ -84,14 +83,14 @@ ErrCode DbSqliteCountry::deleteHard(DbModel *model, bool force, QString *msg)
                 itemToSearch.insert(KFieldCountryDbId, QString::number(model->dbId()));
                 itemToSet.insert(KFieldCountryDbId, ""); // update to null/empty
             }
-
+            //area
             if (err == ErrNone && !errDependency) {
                 CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency,
                                            msg, force,
                                            itemToSearch, itemToSet,
                                            KTableArea, &Area::build);
             }
-
+            //ethnic
             if (err == ErrNone && !errDependency) {
                 CHECK_REMOVE_TO_CLEAR_DATA(err, errDependency,
                                            msg, force,

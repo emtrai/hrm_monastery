@@ -47,7 +47,7 @@ public:
      * @param ok true if success, false otherwise
      * @return list of department, model CommunityDept. Caller must free after use
      */
-    QList<DbModel*> getListDept(const QString& communityUid, bool* ok = nullptr);
+    QList<DbModel*> getListDept(const QString& communityUid, bool* ok = nullptr, int status = MODEL_STATUS_MAX);
 
     /**
      * @brief Get list of people in department of a community \ref PersonDept

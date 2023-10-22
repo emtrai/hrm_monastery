@@ -33,6 +33,10 @@
 #include "areactl.h"
 #include "personstatusctl.h"
 #include "stringdefs.h"
+#include "communitymanager.h"
+#include "communitydeptctl.h"
+#include "communitydept.h"
+#include "persondept.h"
 
 GET_INSTANCE_IMPL(Statistic)
 
@@ -124,21 +128,159 @@ void Statistic::initExportFields()
         UNUSED(datatype);
         return QString::number(AREACTL->getTotalActiveItems());
     });
-    mExportCallbacks.insert(KItemTongPhuTrach, [](const FileExporter* fileexporter,
+    // list up manager of root community
+    mExportCallbacks.insert(KItemManagers, [](const FileExporter* fileexporter,
                                                   const QString& datatype){
+        tracein;
         UNUSED(fileexporter);
         UNUSED(datatype);
-        return "";
+        QList<DbModel *> managerList;
+        ErrCode err = ErrNone;
+        QString managers;
+        // get root community
+        const Community* rootCommunity = COMMUNITYCTL->getRootCommunity();
+        logd("root community '%s'", MODELSTR2CHA(rootCommunity));
+        if (!rootCommunity) {
+            err = ErrNoData;
+            loge("not found root community");
+        }
+        // get list of manager list of root community
+        if (err == ErrNone) {
+            err = COMMUNITYCTL->getManagersList(rootCommunity->uid(), managerList);
+            logife(err, "failed to get managers list for root comm ''%s'",
+                   MODELSTR2CHA(rootCommunity));
+        }
+        // build manager list string
+        if (err == ErrNone) {
+            foreach (DbModel* item, managerList) {
+                if (IS_MODEL_NAME(item, KModelNameCommManager)) {
+                    CommunityManager* mgr = static_cast<CommunityManager*>(item);
+                    QString course = mgr->courseName();
+                    if (!course.isEmpty()) {
+                        course = QString("(%1)").arg(course);
+                    }
+                    // TODO: handle export type (from fileexporter), i.e. HTML
+                    // current, this is for HTML or text-based only
+                    managers += QString("%1: %2 %3, %4\n")
+                                    .arg(mgr->personName(),
+                                         mgr->roleName(),
+                                         course,
+                                         mgr->modelStatusName());
+                } else {
+                    loge("invalid model '%s', expect model name '%s'",
+                         MODELSTR2CHA(item), KModelNameCommManager);
+                    err = ErrInvalidData;
+                    break;
+                }
+            }
+        }
+
+        if (err != ErrNone) {
+            managers = QString(STR_DATA_ERROR_CODE).arg(err);
+        }
+        if (managers.isEmpty()) {
+            managers = STR_NO_DATA;
+        }
+        RELEASE_LIST_DBMODEL(managerList);
+        traceout;
+        return managers;
     });
-    mExportCallbacks.insert(KItemTongPhuTrachNhiemKy, [](const FileExporter* fileexporter,
-                                                         const QString& datatype){
+
+    // export list of departments of community and members
+    mExportCallbacks.insert(KItemDepartments, [](const FileExporter* fileexporter,
+                                              const QString& datatype){
+        tracein;
         UNUSED(fileexporter);
         UNUSED(datatype);
-        return "";
+        ErrCode err = ErrNone;
+        QString outputString;
+        bool ok = false;
+        QList<DbModel*> listDept;
+        const Community* rootCommunity = COMMUNITYCTL->getRootCommunity();
+        logd("root community '%s'", MODELSTR2CHA(rootCommunity));
+        if (!rootCommunity) {
+            err = ErrNoData;
+            loge("not found root community");
+        }
+        if (err == ErrNone) {
+            dbg(LOG_DEBUG, "Get list dept for community '%s'",
+                MODELSTR2CHA(rootCommunity));
+            listDept = COMMUNITYDEPTCTL->getListDept(rootCommunity->uid(), &ok,
+                                                     MODEL_STATUS_ACTIVE);
+            dbg(LOG_DEBUG, "found %lld listDept", listDept.size());
+            if (!ok) {
+                err = ErrNoData;
+                loge("failed to get list dept for root community '%s'",
+                     MODELSTR2CHA(rootCommunity));
+            }
+        }
+        if (err == ErrNone) {
+            // iterating througth list community dept and print members with their roles
+            foreach (DbModel* item, listDept) {
+                if (IS_MODEL_NAME(item, KModelNameCommDept)) {
+                    CommunityDept* dept = static_cast<CommunityDept*>(item);
+                    dbg(LOG_DEBUG, "Get list active people for dept '%s'",
+                        MODELSTR2CHA(dept));
+
+                    QList<DbModel*> listPeople =
+                        COMMUNITYDEPTCTL->getListActivePeople(dept->uid(), &ok);
+
+                    dbg(LOG_DEBUG, "found %lld listPeople", listPeople.size());
+
+                    // TODO: handle export type (from fileexporter), i.e. HTML
+                    // current, this is for HTML or text-based only
+
+                    outputString += QString("%1\n")
+                                        .arg(dept->name());
+                    if (!ok) {
+                        err = ErrNoData;
+                        loge("failed to get list people for dept '%s'",
+                             MODELSTR2CHA(dept));
+                        break;
+                    }
+                    foreach (DbModel* item2, listPeople) {
+                        if (IS_MODEL_NAME(item2, KModelNamePersonDept)) {
+                            PersonDept* per =static_cast<PersonDept*>(item2);
+                            QString course = per->courseName();
+                            if (!course.isEmpty()) {
+                                course = QString("(%1)").arg(course);
+                            }
+                            outputString += QString("- %1:%2 %3, %4\n")
+                                                .arg(per->personName(),
+                                                     per->roleName(),
+                                                     course,
+                                                     per->modelStatusName());
+                        } else {
+                            loge("invalid model '%s', expect model name '%s'",
+                                 MODELSTR2CHA(item2), KModelNamePersonDept);
+                            err = ErrInvalidData;
+                            break;
+                        }
+                    }
+                    RELEASE_LIST_DBMODEL(listPeople);
+                } else {
+                    loge("invalid model '%s', expect model name '%s'",
+                         MODELSTR2CHA(item), KModelNameCommDept);
+                    err = ErrInvalidData;
+                }
+                if (err != ErrNone) break;
+            }
+        }
+
+        if (err != ErrNone) {
+            outputString = QString(STR_DATA_ERROR_CODE).arg(err);
+        }
+        if (outputString.isEmpty()) {
+            outputString = STR_NO_DATA;
+        }
+        RELEASE_LIST_DBMODEL(listDept);
+        traceout;
+        return outputString;
     });
 
     traceout;
 }
+
 ErrCode Statistic::exportGeneralStatistic(QString *fpath, ExportType type)
 {
     tracein;
@@ -150,6 +292,7 @@ ErrCode Statistic::exportGeneralStatistic(QString *fpath, ExportType type)
     logd("fpath '%s'", fpath?STR2CHA(*fpath):"(unknown)");
 
     if (ret == ErrNone) {
+        dbg(LOG_VERBOSE, "export statistic to file '%s'", STR2CHA(*fpath));
         ret = ExportFactory::exportTo(this,
                                       EXPORT_GENERAL_STAT,
                                       *fpath,
@@ -197,12 +340,16 @@ ErrCode Statistic::getExportDataString(const QString &item,
     dbg(LOG_DEBUG, "export keyword '%s'", STR2CHA(item));
     if (mExportCallbacks.contains(item)) {
         StatExportCallbackFunc func = mExportCallbacks.value(item);
-        if (func != nullptr) *data = func(fileexporter, datatype);
+        if (func != nullptr) {
+            *data = func(fileexporter, datatype);
+        } else {
+            logw("No export callback for keyword '%s'", STR2CHA(item));
+        }
     } else {
-        dbg(LOG_INFO, "export keyword '%s' not found", STR2CHA(item));
+        dbg(LOG_INFO, "export keyword '%s' not found/supported", STR2CHA(item));
     }
     // TODO: raise exception when error occur???
-
+    traceret(ret);
     return ret;
 }
 

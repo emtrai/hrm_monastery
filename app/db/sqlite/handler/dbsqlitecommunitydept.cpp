@@ -72,7 +72,6 @@ ErrCode DbSqliteCommunityDept::deleteHard(DbModel *model, bool force, QString *m
 
         if (IS_MODEL_NAME(model, KModelNameCommDept)){
             QHash<QString, QString> itemToSearch; // for searching
-            ErrCode tmpErr = ErrNone;
             bool errDependency = false;
             logi("Check to delete item '%s' in dept manager table '%s'",
                  MODELSTR2CHA(model), KTableCommDepartPerson);

@@ -27,6 +27,8 @@
 #include "utils.h"
 #include "datetimeutils.h"
 #include "dialogutils.h"
+#include "communityctl.h"
+#include "communitymanager.h"
 
 DlgSearchPerson::~DlgSearchPerson()
 {
@@ -42,6 +44,7 @@ DlgSearchPerson *DlgSearchPerson::build(QWidget *parent, bool isMulti)
     DlgSearchPerson* ret = new DlgSearchPerson(parent, isMulti);
     ret->setupUi();
     ret->enableGetAllSupport();
+    ret->enableGetManagerSupport();
     traceout;
     return ret;
 }
@@ -105,6 +108,47 @@ int DlgSearchPerson::onGetAll()
     logd("found %d", cnt);
     traceout;
     return cnt;
+}
+
+int DlgSearchPerson::onGetManagers()
+{
+    tracein;
+    clearAll();
+    int cnt = 0;
+    ErrCode err = MainWindow::showProcessingDialog(tr("Đang truy vấn dữ liệu"), nullptr,
+                         [this, &cnt](ErrCode* err, void* data, DlgWait* dlg) {
+                             RELEASE_LIST_DBMODEL(this->mListItems);
+                             QList<DbModel*> managerList;
+                             ErrCode tmperr = COMMUNITYCTL->getAllManagersList(managerList);
+                             logd("get all cnt=%d", this->mListItems.count());
+                             if (tmperr == ErrNone && managerList.size() > 0) {
+                                 foreach (DbModel* item, managerList) {
+                                     if (IS_MODEL_NAME(item, KModelNameCommManager)) {
+                                         CommunityManager* mgr = static_cast<CommunityManager*>(item);
+                                         Person* per = CLONE_MODEL(mgr->person(), Person);
+                                         if (per) {
+                                             this->mListItems.append(per);
+                                         }
+                                     }
+                                 }
+                             }
+                             RELEASE_LIST_DBMODEL(managerList);
+                             if (err) *err = tmperr;
+                             cnt = this->mListItems.count();
+                             return nullptr;//nothing to return
+                         },
+        [this](ErrCode err, void* data, void* result, DlgWait* dlg) {
+            logd("Search result %d", err);
+
+            return err;
+        });
+
+    //    mListItems = PERSONCTL->getAllItemsFromDb();
+    //    logd("get all cnt=%d", mListItems.count());
+    logd("found %d", cnt);
+    traceout;
+    return cnt;
+
 }
 
 DbModel *DlgSearchPerson::getItemAtIdx(int idx)

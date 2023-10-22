@@ -230,7 +230,6 @@ const char* const KTableCommPerson = "comm_person";
 const char* const KTableCommManager = "comm_manager";
 const char* const KTableAreaPerson = "area_person";
 const char* const KTableCommDepartPerson = "com_depart_person";
-const char* const KTableAreaCommunity = "area_community";
 const char* const KTableSpecialistPerson = "specialist_person";
 
 

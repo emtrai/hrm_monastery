@@ -212,6 +212,9 @@
    <property name="toolTip">
     <string>Summarize</string>
    </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
    </property>

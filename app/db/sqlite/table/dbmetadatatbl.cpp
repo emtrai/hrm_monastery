@@ -45,7 +45,7 @@ DbMetadataTbl::DbMetadataTbl():
 DbMetadataTbl::DbMetadataTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableMetadata, KTableMetadata, KVersionCode)
 {
-    tracein;
+    traced;
 }
 
 void DbMetadataTbl::addTableField(DbSqliteTableBuilder *builder)
@@ -93,8 +93,7 @@ ErrCode DbMetadataTbl::getMetadataValue(const QString &key, QString& value)
                     logd("value of key '%s' is empty", STR2CHA(key));
                 }
             }
-        }
-        else {
+        } else {
             loge( "Failed to execute %s", STR2CHA(qry.executedQuery()) );
             loge( "Last error %s", STR2CHA(qry.lastError().text()) );
         }
@@ -150,19 +149,13 @@ ErrCode DbMetadataTbl::addMetadataValue(const QString &key, const QString &value
         }
     }
     if (err == ErrNone) {
-        logd("Execute query");
+        dbg(LOG_DEBUG, "Execute query to add meta data value");
         err = db()->execQuery(qry);
     }
+    logife(err, "failed to add meta data");
 
-    if (builder) {
-        delete builder;
-        builder = nullptr;
-    }
-
-    if (qry) {
-        delete qry;
-        qry = nullptr;
-    }
+    FREE_PTR(builder);
+    FREE_PTR(qry);
     traceret(err);
     return err;
 }
@@ -199,17 +192,12 @@ ErrCode DbMetadataTbl::updateMetadataValue(const QString &key, const QString &va
         }
     }
     if (err == ErrNone) {
-        logd("Execute query");
+        dbg(LOG_DEBUG, "Execute query to update meta data value");
         err = db()->execQuery(updateQry);
     }
-    if (builder) {
-        delete builder;
-        builder = nullptr;
-    }
-    if (updateQry) {
-        delete updateQry;
-        updateQry = nullptr;
-    }
+    logife(err, "failed to update meta data");
+    FREE_PTR(builder);
+    FREE_PTR(updateQry);
     traceret(err);
     return err;
 }

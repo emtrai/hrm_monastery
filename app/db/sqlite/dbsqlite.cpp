@@ -526,7 +526,7 @@ ErrCode DbSqlite::getMetadataValue(const QString& key, QString& value)
         loge("Invalid argument");
     }
     if (err == ErrNone) {
-    logd("Get value for key '%s'", STR2CHA(key));
+        logd("Get value for key '%s'", STR2CHA(key));
         if (tbl) {
             err = tbl->getMetadataValue(key, value);
         } else {

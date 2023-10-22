@@ -73,7 +73,7 @@ QList<DbModel *> DbSqliteCommunityManagerTbl::getListPerson(const QString &commu
      *  ON "KTableCommManager"."KFieldPersonUid" = "KTablePerson"."KFieldUid"
      *  WHERE "KTableCommManager"."KFieldCommunityUid" = :uid
      */
-    QList<DbModel *> list = DbSqliteMapTbl::getListItems(name(),
+    QList<DbModel *> list = DbSqliteMapTbl::getListItemsWithUid(name(),
                                                          KTablePerson,
                                                          KFieldPersonUid,
                                                          KFieldUid,
@@ -93,6 +93,38 @@ QList<DbModel *> DbSqliteCommunityManagerTbl::getListPerson(const QString &commu
 
     traceout;
     return list;
+}
+
+QList<DbModel *> DbSqliteCommunityManagerTbl::getListPersonAll(int status)
+{
+    tracein;
+    logi("getListPersonAll model status 0x%x", status);
+    /*
+     * SELECT * FROM "KTableCommManager"
+     *  JOIN "KTablePerson"
+     *  ON "KTableCommManager"."KFieldPersonUid" = "KTablePerson"."KFieldUid"
+     *  WHERE "KTableCommManager"."KFieldCommunityUid" = :uid
+     */
+    QList<DbModel *> list = DbSqliteMapTbl::getListItemsWithCond(name(),
+                                                                KTablePerson,
+                                                                KFieldPersonUid,
+                                                                KFieldUid,
+                                                                &CommunityManager::build,
+                                                                "",
+                                                                status,
+                                                                QString("*, %1.%2 AS %3, %1.%4 AS %5, (%6 || ' ' || %7) AS %8")
+                                                                    .arg(KTablePerson, KFieldNameId)
+                                                                    .arg(KFieldPersonNameId)
+                                                                    .arg(KFieldUid)
+                                                                    .arg(KFieldPersonUid)
+                                                                    .arg(KFieldLastName)
+                                                                    .arg(KFieldFirstName)
+                                                                    .arg(KFieldFullName)
+                                                                );
+
+    traceout;
+    return list;
+
 }
 
 ErrCode DbSqliteCommunityManagerTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
@@ -260,6 +292,11 @@ ErrCode DbSqliteCommunityManagerTbl::updateBuilderFieldFromModel(DbSqliteUpdateB
                                                 comm->communityUid());
             } else {
                 err = DbSqliteMapTbl::updateBuilderFieldFromModel(builder, field, item);
+            }
+            if (err == ErrNotFound) {
+                logw("not found model for field '%s', skip to update, model '%s'",
+                     STR2CHA(field), MODELSTR2CHA(item));
+                err = ErrNone;
             }
         } else {
             loge("Model '%s' is no support",

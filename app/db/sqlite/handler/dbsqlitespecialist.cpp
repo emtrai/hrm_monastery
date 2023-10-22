@@ -25,16 +25,16 @@
 #include "dbsqlite.h"
 #include "table/dbsqlitespecialisttbl.h"
 #include "table/dbsqlitespecialistpersontbl.h"
-#include "defs.h"
 #include "dbsqlitedefs.h"
 #include "specialist.h"
 
+#include "specialistperson.h"
 
 GET_INSTANCE_IMPL(DbSqliteSpecialist)
 
 DbSqliteSpecialist::DbSqliteSpecialist():DbSqliteModelHandler(KModelHdlSpecialist)
 {
-    tracein;
+    traced;
 }
 
 
@@ -45,14 +45,12 @@ QList<DbModel *> DbSqliteSpecialist::getListPerson(const QString &specialistUid)
         (DbSqliteSpecialistPersonTbl*)DbSqlite::getInstance()->getTable(KTableSpecialistPerson);
     // assume main tbl is not null, if not programming error,
     // and require override search function
-    Q_ASSERT(tbl != nullptr);
+    ASSERT2(tbl != nullptr);
     QList<DbModel *> list = tbl->getListPerson(specialistUid);
     logd("found %lld", list.count());
     traceout;
     return list;
 }
-#include "person.h"
-#include "specialistperson.h"
 
 ErrCode DbSqliteSpecialist::deleteHard(DbModel *model, bool force, QString *msg)
 {
@@ -67,13 +65,13 @@ ErrCode DbSqliteSpecialist::deleteHard(DbModel *model, bool force, QString *msg)
         logi("Delete hard model '%s', force %d", MODELSTR2CHA(model), force);
 
         if (model->modelName() == KModelNameSpecialist) {
-            // KFieldAreaUid delete map, community, person
+            
             QHash<QString, QString> itemToSearch; // for searching
             QHash<QString, QString> itemToSet; // for update
             bool errDependency = false;
 
             itemToSearch.insert(KFieldSpecialistUid, model->uid());
-            itemToSet.insert(KFieldRoleUid, ""); // update to null/empty
+            itemToSet.insert(KFieldSpecialistUid, ""); // update to null/empty
 
             CHECK_REMOVE_TO_DELETE( err, errDependency,
                                     msg, force,

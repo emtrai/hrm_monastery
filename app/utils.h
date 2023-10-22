@@ -75,6 +75,14 @@ do { \
     } \
 } while(0)
 
+#define ASSERT2(cond) \
+do { \
+        if (!(cond)) { \
+            loge("FATAL ERROR! %s", #cond); \
+            qFatal(#cond); \
+    } \
+} while(0)
+
 #define FAIL(msg) ASSERT(false, msg)
 
 #define DIALOG_SIZE_SHOW(dlg) \

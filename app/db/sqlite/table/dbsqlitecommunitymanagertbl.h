@@ -33,6 +33,7 @@ class DbSqliteCommunityManagerTbl : public DbSqliteMapTbl
 public:
     DbSqliteCommunityManagerTbl(DbSqlite* db);
     QList<DbModel*> getListPerson(const QString& communityUid, int status = MODEL_STATUS_MAX);
+    QList<DbModel*> getListPersonAll(int status = MODEL_STATUS_MAX);
 
 protected:
     ErrCode insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item);

@@ -48,18 +48,22 @@
  * + KFieldPersonUid
  * + KFieldPersonDbId
  * + KFieldRoleUid
+ */
+
+#define VERSION_CODE_1 VERSION_CODE(0,0,1)
+
+/**
  * VERSION 0.0.2: Add:
  * + KFieldCourseUid
  */
 
-#define VERSION_CODE_1 VERSION_CODE(0,0,1)
 #define VERSION_CODE_2 VERSION_CODE(0,0,2)
 const qint32 DbSqliteAreaMgrTbl::KVersionCode = VERSION_CODE_2;
 
 DbSqliteAreaMgrTbl::DbSqliteAreaMgrTbl(DbSqlite *db):
     DbSqliteMapTbl(db, KTableAreaPerson, KTableAreaPerson, KVersionCode, KModelNameAreaPerson)
 {
-    tracein;
+    traced;
 
     mFieldNameUid1 = KFieldAreaUid;
     mFieldNameDbId1 = KFieldAreaDbId;
@@ -70,14 +74,14 @@ DbSqliteAreaMgrTbl::DbSqliteAreaMgrTbl(DbSqlite *db):
 QList<DbModel *> DbSqliteAreaMgrTbl::getListPerson(const QString &areaUid, int status)
 {
     tracein;
-    logi("areaUid '%s'", areaUid.toStdString().c_str());
+    logi("get lis person for areaUid '%s'", STR2CHA(areaUid));
     /*
      * SELECT * FROM "KTableAreaPerson"
      *  JOIN "KTablePerson"
      *  ON "KTableAreaPerson"."KFieldPersonUid" = "KTablePerson"."KFieldUid"
      *  WHERE "KTableAreaPerson"."KFieldAreaUid" = :uid
      */
-    QList<DbModel *> list = DbSqliteMapTbl::getListItems(KTableAreaPerson,
+    QList<DbModel *> list = DbSqliteMapTbl::getListItemsWithUid(KTableAreaPerson,
                                                          KTablePerson,
                                                          KFieldPersonUid,
                                                          KFieldUid,
@@ -85,14 +89,18 @@ QList<DbModel *> DbSqliteAreaMgrTbl::getListPerson(const QString &areaUid, int s
                                                          &AreaPerson::build,
                                                          areaUid,
                                                          status,
-                                                         QString("*, %1.%2 AS %3, %1.%4 AS %5, (%6 || ' ' || %7) AS %8")
-                                                             .arg(KTablePerson, KFieldNameId)
-                                                             .arg(KFieldPersonNameId)
-                                                             .arg(KFieldUid)
-                                                             .arg(KFieldPersonUid)
-                                                             .arg(KFieldLastName)
-                                                             .arg(KFieldFirstName)
-                                                             .arg(KFieldFullName)
+                                                         QString("*, "
+                                                                 "%1.%2 AS %3, "
+                                                                 "%1.%4 AS %5, "
+                                                                 "(%6 || ' ' || %7) AS %8")
+                                                             .arg(KTablePerson, // 1
+                                                                  KFieldNameId, // 2
+                                                                  KFieldPersonNameId, // 3
+                                                                  KFieldUid, // 4
+                                                                  KFieldPersonUid, // 5
+                                                                  KFieldLastName, // 6
+                                                                  KFieldFirstName, // 7
+                                                                  KFieldFullName) // 8
                                                          );
 
     traceout;
@@ -103,19 +111,26 @@ ErrCode DbSqliteAreaMgrTbl::insertTableField(DbSqliteInsertBuilder *builder, con
 {
     tracein;
     ErrCode ret = ErrNone;
+    if (!item) {
+        loge("invalid arg, item is null");
+        ret = ErrInvalidArg;
+    }
 
-    ret = DbSqliteMapTbl::insertTableField(builder, item); // TODO: handle error code
-    QString modelName = item->modelName();
-    logd("model name to insert '%s'", modelName.toStdString().c_str());
-    if (modelName == KModelNameAreaPerson ) {
+    if ((ret == ErrNone) && !IS_MODEL_NAME(item, KModelNameAreaPerson)) {
+        ret = ErrInvalidArg;
+        loge("Invali model name '%s', expect %s", MODELSTR2CHA(item), KModelNameAreaPerson);
+    }
+
+    if (ret == ErrNone) {
+        ret = DbSqliteMapTbl::insertTableField(builder, item); // TODO: handle error code
+    }
+
+    if (ret == ErrNone) {
+        logd("model to insert '%s'", MODELSTR2CHA(item));
         AreaPerson* model = (AreaPerson*) item;
 
         builder->addValue(KFieldRoleUid, model->roleUid());
         builder->addValue(KFieldCourseUid, model->courseUid());
-
-    } else {
-        ret = ErrInvalidArg;
-        loge("Invali model name '%s'", modelName.toStdString().c_str());
     }
     traceret(ret);
     return ret;
@@ -148,7 +163,8 @@ ErrCode DbSqliteAreaMgrTbl::updateDbModelDataFromQuery(DbModel *item, const QSql
         QString modelName = item->modelName();
         if (modelName == KModelNameAreaPerson) {
             AreaPerson* areaPerson = (AreaPerson*)item;
-            DbSqlitePersonTbl* tblPerson = dynamic_cast<DbSqlitePersonTbl*>(DbSqlite::table(KTablePerson));
+            DbSqlitePersonTbl* tblPerson =
+                dynamic_cast<DbSqlitePersonTbl*>(DbSqlite::table(KTablePerson));
             areaPerson->setRoleUid(qry.value(KFieldRoleUid).toString());
             if (!areaPerson->roleUid().isEmpty()){
                 logd("search role uid '%s'", STR2CHA(areaPerson->roleUid()));
@@ -248,7 +264,8 @@ ErrCode DbSqliteAreaMgrTbl::onTblMigration(qint64 oldVer)
 {
     tracein;
     ErrCode err = ErrNone;
-    logi("tbl '%s' version upgrade, from version 0x%lx to 0x%lx", STR2CHA(mName), oldVer, mVersionCode);
+    logi("tbl '%s' version upgrade, from version 0x%llx to 0x%llx",
+         STR2CHA(mName), oldVer, mVersionCode);
     switch (oldVer) {
         case VERSION_CODE_1:
         {
@@ -265,86 +282,6 @@ ErrCode DbSqliteAreaMgrTbl::onTblMigration(qint64 oldVer)
     traceret(err);
     return err;
 }
-
-//ErrCode DbSqliteAreaMgrTbl::updateBuilderFromModel(DbSqliteUpdateBuilder *builder,
-//                                             const QList<QString> &updateField,
-//                                             const DbModel *item)
-//{
-//    tracein;
-//    ErrCode err = ErrNone;
-//    logd("update table for model '%s'", MODELSTR2CHA(item));
-//    if (!builder || !item) {
-//        err = ErrInvalidArg;
-//        loge("invalid arg");
-//    }
-
-//    if (err == ErrNone) {
-//        err = DbSqliteMapTbl::updateBuilderFromModel(builder, updateField, item);
-//    }
-
-//    if (err == ErrNone) {
-//        if (item->modelName() == KModelNameAreaPerson) {
-//            AreaPerson* comm = (AreaPerson*) item;
-//            foreach (QString field, updateField) {
-//                logd("Update field %s", STR2CHA(field));
-//                if (field == KItemRole) {
-//                    err = DbModelUtils::updateField(builder,
-//                                                    KFieldRoleUid,
-//                                                    KModelHdlArea,
-//                                                    comm->roleUid(),
-//                                                    comm->roleNameId(),
-//                                                    comm->roleName());
-//                } else if (field == KItemCourse) {
-//                    err = DbModelUtils::updateField(builder,
-//                                                    KFieldCourseUid,
-//                                                    KModelHdlCourse,
-//                                                    comm->courseUid(),
-//                                                    comm->courseNameId(),
-//                                                    comm->courseName());
-////                    builder->addValue(KFieldCourseUid, comm->courseUid());
-//                } else if (field == KItemChangeHistory) {
-//                    builder->addValue(KFieldChangeHistory, comm->changeHistory());
-//                } else if (field == KItemPerson) {
-
-//                    err = DbModelUtils::updateField(builder,
-//                                                    KFieldPersonUid,
-//                                                    KModelHdlPerson,
-//                                                    comm->personUid(),
-//                                                    comm->personNameId(),
-//                                                    comm->personName());
-////                    builder->addValue(KFieldPersonUid, comm->personUid());
-//                } else if (field == KItemArea) {
-
-//                    err = DbModelUtils::updateField(builder,
-//                                                    KFieldAreaUid,
-//                                                    KModelHdlArea,
-//                                                    comm->areaUid(),
-//                                                    comm->areaNameId(),
-//                                                    comm->areaName());
-////                    builder->addValue(KFieldAreaUid, comm->areaUid());
-//                } else if (field == KItemStatus) {
-//                    builder->addValue(KFieldModelStatus, comm->modelStatus());
-//                } else if (field == KItemEndDate) {
-//                    builder->addValue(KFieldEndDate, comm->endDate());
-//                } else if (field == KItemStartDate) {
-//                    builder->addValue(KFieldStartDate, comm->startDate());
-//                } else {
-//                    logw("Field '%s' not support here", STR2CHA(field));
-//                }
-//                if (err != ErrNone) {
-//                    loge("not found '%s', err=%d, field '%s'",
-//                         MODELSTR2CHA(comm), err, STR2CHA(field));
-//                    break;
-//                }
-//            }
-//        } else {
-//            logw("Model name '%s' is no support",
-//                 STR2CHA(item->modelName()));
-//        }
-//    }
-//    traceret(err);
-//    return err;
-//}
 
 ErrCode DbSqliteAreaMgrTbl::updateBuilderFieldFromModel(DbSqliteUpdateBuilder *builder,
                                                         const QString &field,
@@ -393,14 +330,13 @@ ErrCode DbSqliteAreaMgrTbl::updateBuilderFieldFromModel(DbSqliteUpdateBuilder *b
                                                 comm->areaUid(),
                                                 comm->areaNameId(),
                                                 comm->areaName());
-            } else if (field == KItemStatus) {
-                builder->addValue(KFieldModelStatus, comm->modelStatus());
-            } else if (field == KItemEndDate) {
-                builder->addValue(KFieldEndDate, comm->endDate());
-            } else if (field == KItemStartDate) {
-                builder->addValue(KFieldStartDate, comm->startDate());
             } else {
                 err = DbSqliteMapTbl::updateBuilderFieldFromModel(builder, field, item);
+            }
+            if (err == ErrNotFound) {
+                logw("not found model for field '%s', skip to update, model '%s'",
+                     STR2CHA(field), MODELSTR2CHA(item));
+                err = ErrNone;
             }
         } else {
             loge("Model '%s' is no support",
@@ -412,9 +348,11 @@ ErrCode DbSqliteAreaMgrTbl::updateBuilderFieldFromModel(DbSqliteUpdateBuilder *b
     return err;
 }
 
-QString DbSqliteAreaMgrTbl::getSearchQueryStringWithTag(const QString &cond, const QString &tag)
+QString DbSqliteAreaMgrTbl::getSearchQueryStringWithTag(const QString &cond,
+                                                        const QString &tag)
 {
     tracein;
+    UNUSED(tag);
     QString queryStr = getListItemsQueryString(KTableAreaPerson,
                                             KTablePerson,
                                             KFieldPersonUid,
@@ -422,14 +360,14 @@ QString DbSqliteAreaMgrTbl::getSearchQueryStringWithTag(const QString &cond, con
                                             cond,
                                             MODEL_STATUS_MAX, // TODO: status?
                                             QString("*, %1.%2 AS %3, %1.%4 AS %5, (%6 || ' ' || %7) AS %8")
-                                                .arg(KTablePerson)
-                                                .arg(KFieldNameId)
-                                                .arg(KFieldPersonNameId)
-                                                .arg(KFieldUid)
-                                                .arg(KFieldPersonUid)
-                                                .arg(KFieldLastName)
-                                                .arg(KFieldFirstName)
-                                                .arg(KFieldFullName)
+                                                .arg(KTablePerson,
+                                                     KFieldNameId,
+                                                     KFieldPersonNameId,
+                                                     KFieldUid,
+                                                     KFieldPersonUid,
+                                                     KFieldLastName,
+                                                     KFieldFirstName,
+                                                     KFieldFullName)
                                             );
     traceout;
     return queryStr;

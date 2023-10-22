@@ -46,7 +46,7 @@ public:
     virtual ErrCode addPerson2Community(const Community *comm,
                                         const Person* per,
                                         bool updateCommPer = true, // update mapping comm & per
-                                      int status = 0,
+                                      int status = MODEL_STATUS_ACTIVE,
                                       qint64 startdate = 0,
                                       qint64 enddate = 0,
                                       const QString& remark = nullptr,
@@ -59,8 +59,18 @@ public:
      * @return Community model, null if not exist
      */
     virtual const Community* getRootCommunity() = 0;
+
+    /**
+     * @brief Get manager list of community
+     * @param communityUid
+     * @param outList list of CommunityManager model
+     * @param modelStatus
+     * @return
+     */
     virtual ErrCode getManagersList(const QString &communityUid, QList<DbModel *> &outList,
                                           qint64 modelStatus) = 0;
+    virtual ErrCode getAllManagersList(QList<DbModel *> &outList,
+                               qint64 modelStatus = MODEL_STATUS_MAX) = 0;
 };
 
 #endif // DBCOMMUNITYMODELHANDLER_H
