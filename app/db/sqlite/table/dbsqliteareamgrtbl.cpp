@@ -167,7 +167,7 @@ ErrCode DbSqliteAreaMgrTbl::updateDbModelDataFromQuery(DbModel *item, const QSql
                 dynamic_cast<DbSqlitePersonTbl*>(DbSqlite::table(KTablePerson));
             areaPerson->setRoleUid(qry.value(KFieldRoleUid).toString());
             if (!areaPerson->roleUid().isEmpty()){
-                logd("search role uid '%s'", STR2CHA(areaPerson->roleUid()));
+                dbg(LOG_DEBUG, "search role uid '%s'", STR2CHA(areaPerson->roleUid()));
                 DbModel* model = ROLECTL->getModelByUid(areaPerson->roleUid());
                 if (model) {
                     areaPerson->setRoleName(model->name());
@@ -182,7 +182,7 @@ ErrCode DbSqliteAreaMgrTbl::updateDbModelDataFromQuery(DbModel *item, const QSql
 
             areaPerson->setCourseUid(qry.value(KFieldCourseUid).toString());
             if (!areaPerson->courseUid().isEmpty()){
-                logd("search courseUid '%s'", STR2CHA(areaPerson->courseUid()));
+                dbg(LOG_DEBUG, "search courseUid '%s'", STR2CHA(areaPerson->courseUid()));
                 DbModel* model = COURSECTL->getModelByUid(areaPerson->courseUid());
                 if (model) {
                     Course* course = (Course*)model;
@@ -204,7 +204,7 @@ ErrCode DbSqliteAreaMgrTbl::updateDbModelDataFromQuery(DbModel *item, const QSql
 
             areaPerson->setAreaUid(qry.value(KFieldAreaUid).toString());
             if (!areaPerson->areaUid().isEmpty()){
-                logd("search areaUid '%s'", STR2CHA(areaPerson->areaUid()));
+                dbg(LOG_DEBUG, "search areaUid '%s'", STR2CHA(areaPerson->areaUid()));
                 DbModel* model = AREACTL->getModelByUid(areaPerson->areaUid());
                 if (model) {
                     areaPerson->setAreaName(model->name());
@@ -220,6 +220,7 @@ ErrCode DbSqliteAreaMgrTbl::updateDbModelDataFromQuery(DbModel *item, const QSql
             if (!qry.isNull(KFieldPersonUid)) {
                 areaPerson->setPersonUid(qry.value(KFieldPersonUid).toString());
                 Person* person = nullptr;
+                dbg(LOG_DEBUG, "search personUid '%s'", STR2CHA(areaPerson->personUid()));
                 if (!qry.isNull(KFieldPersonNameId)) {
                     person = (Person*)Person::build();
                     if (person) {
@@ -369,6 +370,7 @@ QString DbSqliteAreaMgrTbl::getSearchQueryStringWithTag(const QString &cond,
                                                      KFieldFirstName,
                                                      KFieldFullName)
                                             );
+    dbg(LOG_DEBUG, "queryString '%s'", STR2CHA(queryStr));
     traceout;
     return queryStr;
 }

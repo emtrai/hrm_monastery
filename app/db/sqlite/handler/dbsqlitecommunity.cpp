@@ -129,6 +129,8 @@ ErrCode DbSqliteCommunity::deleteHard(DbModel *model, bool force, QString *msg)
             } else {
                 err = DbSqliteModelHandler::deleteHard(model, force, msg);
             }
+        } else {
+            err = DbSqliteModelHandler::deleteHard(model, force, msg);
         }
     }
     traceout;

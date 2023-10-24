@@ -25,6 +25,7 @@
 #include "dbsqlite.h"
 #include "dbsqlitedefs.h"
 #include "table/dbsqliteedutbl.h"
+#include "person.h"
 
 GET_INSTANCE_IMPL(DbSqliteEdu)
 

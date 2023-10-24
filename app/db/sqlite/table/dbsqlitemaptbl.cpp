@@ -141,7 +141,7 @@ QList<DbModel *> DbSqliteMapTbl::getListItemsWithCond(const QString &mapTblName,
     QString queryString = getListItemsQueryString(mapTblName, modelTblName,
                                                   fieldUid2Join, fieldModelUid,
                                                   cond, status, selectedField);
-    logd("Query String '%s'", STR2CHA(queryString));
+    dbg(LOG_DEBUG, "Query String '%s'", STR2CHA(queryString));
     qry.prepare(queryString);
 
     // TODO: status check???
@@ -152,42 +152,6 @@ QList<DbModel *> DbSqliteMapTbl::getListItemsWithCond(const QString &mapTblName,
     traceout;
     return outList;
 }
-
-//QList<DbModel *> DbSqliteMapTbl::getListItemsOfUid2(const QString &uid2,
-//                                                    const DbModelBuilder &builder,
-//                                                    int modelStatus)
-//{
-//    tracein;
-//    //    DB->openDb();
-//    QSqlQuery qry(SQLITE->currentDb());
-//    qint32 cnt = 0;
-//    QString cond;
-//    if (uid2.isEmpty()){
-//        loge("Invalid uid");
-//        return QList<DbModel*>();
-//    }
-//    cond = QString("%1 = :uid").arg(getFieldNameUid2());
-//    appendModelStatusCond(cond, modelStatus);
-//    logi("Get list model of uid2 '%s'", uid2.toStdString().c_str());
-//    QString queryString = QString("SELECT * FROM %1 WHERE %2 ORDER BY NAME ASC")
-//                              .arg(name(), cond)
-//        ;
-//    qry.prepare(queryString);
-//    logd("Query String '%s'", queryString.toStdString().c_str());
-
-//    // TODO: check sql injection issue
-//    logd("Bind uid2='%s'", STR2CHA(uid2));
-//    qry.bindValue( ":uid", uid2);
-//    // TODO: status check???
-//    QList<DbModel *> outList;
-//    cnt = runQuery(qry, builder, &outList);
-
-//    logi("Found %d", cnt);
-//    traceout;
-//    return outList;
-//    traced;
-//    return getListItemsUids(nullptr, uid2, builder, modelStatus);
-//}
 
 QList<DbModel *> DbSqliteMapTbl::getListItemsUids(const QString &uid1, const QString &uid2,
                                                   const DbModelBuilder &builder,

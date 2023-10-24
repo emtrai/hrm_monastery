@@ -25,9 +25,6 @@
 #include "dbsqlitedefs.h"
 #include "defs.h"
 #include "logger.h"
-#include "dbsqlitetablebuilder.h"
-#include "model/saintperson.h"
-#include "dbsqliteinsertbuilder.h"
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QHash>
@@ -36,6 +33,7 @@
 #include "dbsqlite.h"
 #include "communityperson.h"
 #include "filter.h"
+#include "person.h"
 
 const qint32 DbSqliteCommunityPersonTbl::KVersionCode = VERSION_CODE(0,0,1);
 
@@ -61,11 +59,8 @@ QList<Person *> DbSqliteCommunityPersonTbl::getListPerson(const QString &communi
     qint32 cnt = 0;
     QString cond;
 
-    if (communityUid.isEmpty()){
-        loge("Invalid community uid");
-        return QList<Person*>();
-    }
-    logi("CommunityUid '%s'", communityUid.toStdString().c_str());
+    logi("getListPerson CommunityUid '%s', modelStatus 0x%x perStatusUid '%s'",
+         STR2CHA(communityUid), modelStatus, perStatusUid?STR2CHA(*perStatusUid):"(null)");
     QString queryString = QString(" SELECT *, %2.%3 AS %4, %2.%5 AS %6"
                                   " FROM %1"
                                   " LEFT JOIN %2"
@@ -74,7 +69,11 @@ QList<Person *> DbSqliteCommunityPersonTbl::getListPerson(const QString &communi
                               .arg(KFieldUid, KFieldPersonUid) // 3 & 4
                               .arg(KFieldNameId, KFieldPersonNameId) // 5 & 6
                               ;
-    cond = QString("%1.%2 = :uid").arg(name(), KFieldCommunityUid);
+    if (!communityUid.isEmpty()) {
+        cond = QString("%1.%2 = :uid").arg(name(), KFieldCommunityUid);
+    } else {
+        cond = NULL_FIELD(name(), KFieldCommunityUid);
+    }
     if (perStatusUid) {
         if (!cond.isEmpty())
             cond += " AND ";
@@ -86,11 +85,13 @@ QList<Person *> DbSqliteCommunityPersonTbl::getListPerson(const QString &communi
     }
     queryString += " ORDER BY name ASC";
     qry.prepare(queryString);
-    logd("Query String '%s'", queryString.toStdString().c_str());
+    dbg(LOG_DEBUG, "Query String '%s'", STR2CHA(queryString));
 
     // TODO: check sql injection issue
-    qry.bindValue( ":uid", communityUid);
-    logd("bind uid '%s'", STR2CHA(communityUid));
+    if (!communityUid.isEmpty()) {
+        qry.bindValue( ":uid", communityUid);
+        logd("bind uid '%s'", STR2CHA(communityUid));
+    }
     if (perStatusUid) {
         qry.bindValue( ":perstatus", *perStatusUid);
         logd("bind uid '%s'", STR2CHA(*perStatusUid));
@@ -104,14 +105,15 @@ QList<Person *> DbSqliteCommunityPersonTbl::getListPerson(const QString &communi
     return outList;
 }
 
-QList<CommunityPerson *> DbSqliteCommunityPersonTbl::getListCommunityOfPerson(const QString &personUid,
-                                                                      int modelStatus)
+QList<CommunityPerson *> DbSqliteCommunityPersonTbl::getListCommunityOfPerson(
+    const QString &personUid,
+    int modelStatus)
 {
     tracein;
-    logd("get community of personUid '%s', status 0x%x", STR2CHA(personUid), modelStatus);
+    logi("get community of personUid '%s', status 0x%x", STR2CHA(personUid), modelStatus);
     QList<DbModel*> list = getListItemsUids(nullptr, personUid, &CommunityPerson::build, modelStatus);
     QList<CommunityPerson*> outList;
-    logd("found %d", list.size());
+    logd("found %lld", list.size());
     if (list.size() > 0) {
         foreach (DbModel* item, list) {
             if (item) {
@@ -128,54 +130,6 @@ QList<CommunityPerson *> DbSqliteCommunityPersonTbl::getListCommunityOfPerson(co
     return outList;
 }
 
-//QList<CommunityPerson *> DbSqliteCommunityPersonTbl::getListCommunityPerson(
-//                                        const QString &communityUid, int modelStatus)
-//{
-//    tracein;
-//    QSqlQuery qry(SQLITE->currentDb());
-//    qint32 cnt = 0;
-//    QString cond;
-//    logd("Get list model of communityUid='%s'", STR2CHA(communityUid));
-//    if (!communityUid.isEmpty()){
-//        cond = QString("%1.%2 = :communityUid").arg(name(), getFieldNameUid1());
-//    } else {
-//        cond = "1";
-//    }
-//    appendModelStatusCond(cond, modelStatus);
-//    logi("cond='%s'", STR2CHA(cond));
-//    QString queryString = QString("SELECT *, %2.%5 AS %6, %2.%7 AS %8, "
-//                                  "%2.%9 AS %10, %2.%11 AS %12 "
-//                                  "FROM %1 LEFT JOIN %2 ON %1.%4 = %2.%5 "
-//                                  "WHERE %3 ORDER BY NAME ASC")
-//                                .arg(name(), KTablePerson, cond) // 1, 2, 3
-//                                .arg(getFieldNameUid2(), KFieldUid, KFieldPersonUid) // 4, 5, 6
-//                                .arg(KFieldNameId, KFieldPersonNameId) // 7, 8
-//                                .arg(KFieldId, KFieldPersonDbId) // 9, 10
-//                                .arg(KFieldRemark, KFieldPersonRemark) // 11, 12
-//        ;
-
-//    qry.prepare(queryString);
-//    logd("Query String '%s'", queryString.toStdString().c_str());
-
-//    // TODO: check sql injection issue
-//    if (!communityUid.isEmpty()){
-//        logd("Bind communityUid='%s'", STR2CHA(communityUid));
-//        qry.bindValue( ":communityUid", communityUid);
-//    }
-//    // TODO: status check???
-//    QList<DbModel *> items;
-//    QList<CommunityPerson *> outList;
-//    cnt = runQuery(qry, &CommunityPerson::build, &items);
-
-//    logi("Found %d", cnt);
-//    if (cnt > 0) {
-//        outList = CLONE_LIST_FROM_DBMODEL(items, CommunityPerson);
-//    }
-//    RELEASE_LIST_DBMODEL(items);
-//    traceout;
-//    return outList;
-//}
-
 QList<DbModel *> DbSqliteCommunityPersonTbl::getListCommunityPerson(
     const QString &communityUid, int modelStatus)
 {
@@ -183,11 +137,12 @@ QList<DbModel *> DbSqliteCommunityPersonTbl::getListCommunityPerson(
     QSqlQuery qry(SQLITE->currentDb());
     qint32 cnt = 0;
     QString cond;
-    logd("Get list model of communityUid='%s'", STR2CHA(communityUid));
+    logi("Get list model of communityUid='%s' modelStatus=0x%x",
+         STR2CHA(communityUid), modelStatus);
     if (!communityUid.isEmpty()){
         cond = QString("%1.%2 = :communityUid").arg(name(), getFieldNameUid1());
     } else {
-        cond = "1";
+        cond = NULL_FIELD(name(), getFieldNameUid1());
     }
     appendModelStatusCond(cond, modelStatus);
     logi("cond='%s'", STR2CHA(cond));
@@ -206,14 +161,9 @@ QList<DbModel *> DbSqliteCommunityPersonTbl::getListCommunityPerson(
     }
     // TODO: status check???
     QList<DbModel *> items;
-//    QList<CommunityPerson *> outList;
     cnt = runQuery(qry, &CommunityPerson::build, &items);
 
     logi("Found %d", cnt);
-//    if (cnt > 0) {
-//        outList = CLONE_LIST_FROM_DBMODEL(items, CommunityPerson);
-//    }
-//    RELEASE_LIST_DBMODEL(items);
     traceout;
     return items;
 }
@@ -234,8 +184,7 @@ ErrCode DbSqliteCommunityPersonTbl::updateDbModelDataFromQuery(DbModel *item, co
     DbSqlitePersonTbl* tblPerson = dynamic_cast<DbSqlitePersonTbl*>(DbSqlite::table(KTablePerson));
     DbModelHandler* commHdl = DB->getCommunityModelHandler();
     DbModelHandler* personHdl = DB->getPersonModelHandler();
-    err = DbSqliteMapTbl::updateDbModelDataFromQuery(item, qry);
-    if (err == ErrNone && !item) {
+    if (!item) {
         loge("invalid input model, it's NULL!");
         err = ErrInvalidArg;
     }
@@ -252,6 +201,9 @@ ErrCode DbSqliteCommunityPersonTbl::updateDbModelDataFromQuery(DbModel *item, co
         loge("not found handler personHdl");
     }
     if (err == ErrNone) {
+        err = DbSqliteMapTbl::updateDbModelDataFromQuery(item, qry);
+    }
+    if (err == ErrNone) {
         if (modelName == KModelNamePerson) {
             logd("update for person model");
             if (tblPerson) {
@@ -262,18 +214,9 @@ ErrCode DbSqliteCommunityPersonTbl::updateDbModelDataFromQuery(DbModel *item, co
             }
         } else if (modelName == KModelNameCommPerson) {
             CommunityPerson* commPer = (CommunityPerson*)item;
-//            Person* person = (Person*)Person::build();
-//            if (person) {
-//                tblPerson->updateDbModelDataFromQuery(person, qry);
-//                commPer->setPerson(person);
-//                delete person;
-//            } else {
-//                err = ErrNoMemory;
-//                loge("no memory, cannot allocat person");
-//            }
 
             if (!commPer->personUid().isEmpty()) {
-                logd("Search person uid '%s'", STR2CHA(commPer->personUid()));
+                dbg(LOG_DEBUG, "Search person uid '%s'", STR2CHA(commPer->personUid()));
                 DbModel* model = personHdl->getByUid(commPer->personUid());
                 if (model) {
                     logd("Found person '%s'", STR2CHA(model->toString()));
@@ -289,7 +232,7 @@ ErrCode DbSqliteCommunityPersonTbl::updateDbModelDataFromQuery(DbModel *item, co
             }
             if (err == ErrNone) {
                 if (!commPer->communityUid().isEmpty()) {
-                    logd("Search community uid '%s'", STR2CHA(commPer->communityUid()));
+                    dbg(LOG_DEBUG, "Search community uid '%s'", STR2CHA(commPer->communityUid()));
                     DbModel* model = commHdl->getByUid(commPer->communityUid());
                     if (model) {
                         logd("Found community '%s'", STR2CHA(model->toString()));
@@ -309,6 +252,7 @@ ErrCode DbSqliteCommunityPersonTbl::updateDbModelDataFromQuery(DbModel *item, co
             err = ErrNotSupport;
         }
     }
+    logife(err, "updateDbModelDataFromQuery failed");
     traceout;
     return err;
 }
@@ -326,19 +270,19 @@ QString DbSqliteCommunityPersonTbl::getFilterQueryString(int fieldId, const QStr
                                 " FROM %1 "
                                 " LEFT JOIN %2 ON %1.%4 = %2.%5"
                                 " WHERE (%3)")
-                          .arg(name(), KTablePerson) // 1, 2
-                          .arg(cond) // 3
-                          .arg(KFieldPersonUid, KFieldUid) // 4, 5
-                          .arg(KFieldLastName, KFieldFirstName) // 6, 7
-                          .arg(KFieldFullName) // 8
-                          .arg(KFieldCommunityUid) // 9
+                          .arg(name(), KTablePerson, // 1, 2
+                            cond, // 3
+                            KFieldPersonUid, KFieldUid, // 4, 5
+                            KFieldLastName, KFieldFirstName, // 6, 7
+                            KFieldFullName, // 8
+                            KFieldCommunityUid) // 9
 
             ;
     } else {
         logd("call default filer query for fieldId %d", fieldId);
         queryString = DbSqliteMapTbl::getFilterQueryString(fieldId, cond);
     }
-    logd("queryString '%s'", STR2CHA(queryString));
+    dbg(LOG_DEBUG, "queryString '%s'", STR2CHA(queryString));
     traceout;
     return queryString;
 }
@@ -354,36 +298,17 @@ QString DbSqliteCommunityPersonTbl::getFilterQueryString(const QList<FilterKeywo
                           " FROM %1 "
                           " LEFT JOIN %2 ON %1.%4 = %2.%5"
                           " WHERE (%3)")
-                      .arg(name()) // 1
-                      .arg(KTablePerson) // 2
-                      .arg(cond) // 3
-                      .arg(KFieldPersonUid) // 4
-                      .arg(KFieldUid) // 5
-                      .arg(KFieldLastName) // 6
-                      .arg(KFieldFirstName) // 7
-                      .arg(KFieldFullName) // 8
-                      .arg(KFieldCommunityUid) // 9
+                      .arg(name(), // 1
+                          KTablePerson, // 2
+                          cond, // 3
+                          KFieldPersonUid, // 4
+                          KFieldUid, // 5
+                          KFieldLastName, // 6
+                          KFieldFirstName, // 7
+                          KFieldFullName, // 8
+                          KFieldCommunityUid) // 9
         ;
-    logd("queryString '%s'", STR2CHA(queryString));
+    dbg(LOG_DEBUG, "queryString '%s'", STR2CHA(queryString));
     traceout;
     return queryString;
 }
-
-//ErrCode DbSqliteCommunityPersonTbl::filterFieldCond(int fieldId, int operatorId,
-//                                                    QString fieldValueName,
-//                                                    const DbModel *parentModel,
-//                                                    QString &cond, int &dataType,
-//                                                    bool &isExact)
-//{
-//    tracein;
-//    ErrCode err = ErrNone;
-//    if (fieldId == FILTER_FIELD_FULL_NAME) {
-//        queryString = QString("SELECT * LEFT JOIN %1 ON WHERE %1").arg()
-//            ;
-//    } else {
-//        err = DbSqliteMapTbl::filterFieldCond(fieldId, operatorId, fieldValueName,
-//                                              parentModel, cond, dataType, isExact);
-//    }
-//    traceret(err);
-//    return err;
-//}

@@ -33,7 +33,6 @@
 #include <QSqlRecord>
 #include <QHash>
 #include "table/dbsqlitepersontbl.h"
-#include "areactl.h"
 #include "person.h"
 #include "personctl.h"
 #include "communitymanager.h"
@@ -60,6 +59,7 @@ DbSqliteCommunityManagerTbl::DbSqliteCommunityManagerTbl(DbSqlite *db):
     mFieldNameDbId1 = KFieldCommunityDbId;
     mFieldNameUid2 = KFieldPersonUid;
     mFieldNameDbId2 = KFieldPersonDbId;
+    traceout;
 }
 
 QList<DbModel *> DbSqliteCommunityManagerTbl::getListPerson(const QString &communityUid,
@@ -82,13 +82,14 @@ QList<DbModel *> DbSqliteCommunityManagerTbl::getListPerson(const QString &commu
                                                          communityUid,
                                                          status,
                                                          QString("*, %1.%2 AS %3, %1.%4 AS %5, (%6 || ' ' || %7) AS %8")
-                                                             .arg(KTablePerson, KFieldNameId)
-                                                             .arg(KFieldPersonNameId)
-                                                             .arg(KFieldUid)
-                                                             .arg(KFieldPersonUid)
-                                                             .arg(KFieldLastName)
-                                                             .arg(KFieldFirstName)
-                                                             .arg(KFieldFullName)
+                                                             .arg(KTablePerson,
+                                                                KFieldNameId,
+                                                                KFieldPersonNameId,
+                                                                KFieldUid,
+                                                                KFieldPersonUid,
+                                                                KFieldLastName,
+                                                                KFieldFirstName,
+                                                                KFieldFullName)
                                                          );
 
     traceout;
@@ -113,13 +114,14 @@ QList<DbModel *> DbSqliteCommunityManagerTbl::getListPersonAll(int status)
                                                                 "",
                                                                 status,
                                                                 QString("*, %1.%2 AS %3, %1.%4 AS %5, (%6 || ' ' || %7) AS %8")
-                                                                    .arg(KTablePerson, KFieldNameId)
-                                                                    .arg(KFieldPersonNameId)
-                                                                    .arg(KFieldUid)
-                                                                    .arg(KFieldPersonUid)
-                                                                    .arg(KFieldLastName)
-                                                                    .arg(KFieldFirstName)
-                                                                    .arg(KFieldFullName)
+                                                                    .arg(KTablePerson,
+                                                                        KFieldNameId,
+                                                                        KFieldPersonNameId,
+                                                                        KFieldUid,
+                                                                        KFieldPersonUid,
+                                                                        KFieldLastName,
+                                                                        KFieldFirstName,
+                                                                        KFieldFullName)
                                                                 );
 
     traceout;
@@ -127,26 +129,32 @@ QList<DbModel *> DbSqliteCommunityManagerTbl::getListPersonAll(int status)
 
 }
 
-ErrCode DbSqliteCommunityManagerTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
+ErrCode DbSqliteCommunityManagerTbl::insertTableField(DbSqliteInsertBuilder *builder,
+                                                      const DbModel *item)
 {
     tracein;
-    ErrCode ret = ErrNone;
+    ErrCode err = ErrNone;
+    if (!item || !builder) {
+        loge("invalid argument");
+        err = ErrInvalidArg;
+    }
+    if (err == ErrNone) {
+        err = DbSqliteMapTbl::insertTableField(builder, item); // TODO: handle error code
+    }
+    if (err == ErrNone && !IS_MODEL_NAME(item, KModelNameCommManager)) {
+        err = ErrInvalidModel;
+        loge("invalid model '%s'", MODELSTR2CHA(item));
+    }
 
-    ret = DbSqliteMapTbl::insertTableField(builder, item); // TODO: handle error code
-    QString modelName = item->modelName();
-    logd("model name to insert '%s'", modelName.toStdString().c_str());
-    if (modelName == KModelNameCommManager ) {
+    if (err == ErrNone) {
         CommunityManager* model = (CommunityManager*) item;
 
         builder->addValue(KFieldRoleUid, model->roleUid());
         builder->addValue(KFieldCourseUid, model->courseUid());
 
-    } else {
-        ret = ErrInvalidArg;
-        loge("Invali model name '%s'", modelName.toStdString().c_str());
     }
-    traceret(ret);
-    return ret;
+    traceret(err);
+    return err;
 }
 
 void DbSqliteCommunityManagerTbl::addTableField(DbSqliteTableBuilder *builder)
@@ -184,6 +192,7 @@ ErrCode DbSqliteCommunityManagerTbl::updateDbModelDataFromQuery(DbModel *item, c
                     DbModel* model = ROLECTL->getModelByUid(roleUid);
                     if (model) {
                         commmgr->setRole(static_cast<Role*>(model));
+                        FREE_PTR(model);
                     } else {
                         logw("not found role uid '%s'", STR2CHA(roleUid));
                     }
@@ -201,6 +210,7 @@ ErrCode DbSqliteCommunityManagerTbl::updateDbModelDataFromQuery(DbModel *item, c
                     DbModel* model = COURSECTL->getModelByUid(courseUid);
                     if (model) {
                         commmgr->setCourse(static_cast<Course*>(model));
+                        FREE_PTR(model);
                     } else {
                         logw("not found courseUid '%s'", STR2CHA(courseUid));
                     }
@@ -218,6 +228,7 @@ ErrCode DbSqliteCommunityManagerTbl::updateDbModelDataFromQuery(DbModel *item, c
                     DbModel* model = COMMUNITYCTL->getModelByUid(commUid);
                     if (model) {
                         commmgr->setCommunity(static_cast<Community*>(model));
+                        FREE_PTR(model);
                     } else {
                         logw("not found commUid '%s'", STR2CHA(commUid));
                     }

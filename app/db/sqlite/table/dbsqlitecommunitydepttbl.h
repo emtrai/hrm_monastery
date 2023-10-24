@@ -29,12 +29,17 @@ class DbSqliteCommunityDeptTbl : public DbSqliteTbl
 {
 public:
     DbSqliteCommunityDeptTbl(DbSqlite* db);
+    /**
+     * @brief Get list department of community
+     * @param commUid
+     * @param status modelstatus
+     * @return
+     */
     QList<DbModel *> getListDept(const QString &commUid, int status = MODEL_STATUS_MAX);
 protected:
     virtual void addTableField(DbSqliteTableBuilder* builder);
     virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
     virtual ErrCode updateDbModelDataFromQuery(DbModel* item, const QSqlQuery& qry);
-//    virtual QString getSearchQueryStringWithTag(const QString& cond = nullptr, const QString& condTag = nullptr);
 
     virtual DbModelBuilder mainModelBuilder();
     virtual ErrCode updateBuilderFieldFromModel(DbSqliteUpdateBuilder* builder,

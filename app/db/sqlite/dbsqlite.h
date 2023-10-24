@@ -24,7 +24,6 @@
 
 #include <idatabase.h>
 #include "errcode.h"
-#include "person.h"
 #include <QSqlQuery>
 #include <QMap>
 #include <QSqlDatabase>
@@ -38,6 +37,8 @@
 #define DB_VERSION_MINOR    0
 #define DB_VERSION_PATCH    1
 #define DB_VERSION      ((DB_VERSION_MAJOR << 24) | (DB_VERSION_MINOR << 8) | DB_VERSION_PATCH)
+
+#define NULL_FIELD(tbl, field) QString("%1.%2 IS NULL OR %1.%2 = ''").arg((tbl), (field))
 
 #define SQLITE (DbSqlite::getInstance())
 

@@ -411,6 +411,10 @@ ErrCode UIPersonListView::onMenuActionChangeCommunity(QMenu *menu, UITableMenuAc
     //inactive comm person
     if (ret == ErrNone && addCommPer) {
         ret = buildInActiveCommPersonList(peopleList, inActiveCommPerList);
+        if (ret == ErrNoData) {
+            logw("no inactive comm person list, just ignore");
+            ret = ErrNone;
+        }
     }
 
     //active comm person

@@ -37,6 +37,11 @@
  * VERSION 0.0.1:
  * + KFieldCountryUid
  * + KFieldCountryDbId
+ */
+
+#define VERSION_CODE_1 VERSION_CODE(0,0,1)
+
+/**
  * VERSION 0.0.2: Add:
  * + KFieldAddress
  * + KFieldEmail
@@ -46,8 +51,6 @@
  * + KFieldEndDate
  * + KFieldChangeHistory
  */
-
-#define VERSION_CODE_1 VERSION_CODE(0,0,1)
 #define VERSION_CODE_2 VERSION_CODE(0,0,2)
 
 const qint32 DbSqliteAreaTbl::KVersionCode = VERSION_CODE_2;
@@ -58,7 +61,7 @@ DbSqliteAreaTbl::DbSqliteAreaTbl():
 DbSqliteAreaTbl::DbSqliteAreaTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableArea, KTableArea, KVersionCode, KModelNameArea)
 {
-    tracein;
+    traced;
 }
 
 void DbSqliteAreaTbl::addTableField(DbSqliteTableBuilder *builder)
@@ -89,6 +92,7 @@ ErrCode DbSqliteAreaTbl::insertTableField(DbSqliteInsertBuilder *builder,
     builder->addValue(KFieldCountryUid, model->countryUid());
     builder->addValue(KFieldCountryDbId, model->countryDbId());
 
+    // from 0.0.2
     builder->addValue(KFieldAddr, model->addr());
     builder->addValue(KFieldEmail, model->email());
     builder->addValue(KFieldTel, model->tel());
@@ -111,12 +115,14 @@ ErrCode DbSqliteAreaTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQue
             Area* model = (Area*) item;
             model->setCountryUid(qry.value(KFieldCountryUid).toString());//TODO: load country obj
             model->setCountryDbId(qry.value(KFieldCountryDbId).toInt());//TODO: load country obj
+
             if (qry.value(KFieldCountryName).isValid()) {
                 model->setCountryName(qry.value(KFieldCountryName).toString());
             }
             if (qry.value(KFieldCountryNameId).isValid()) {
                 model->setCountryNameId(qry.value(KFieldCountryNameId).toString());
             }
+            //v0.2
             model->setAddr(qry.value(KFieldAddr).toString());
             model->setEmail(qry.value(KFieldEmail).toString());
             model->setTel(qry.value(KFieldTel).toString());
@@ -127,12 +133,15 @@ ErrCode DbSqliteAreaTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQue
             model->setEndDate(qry.value(KFieldEndDate).toInt());
             model->setChangeHistory(qry.value(KFieldChangeHistory).toString());
         } else {
-            logw("Not support model '%s'", STR2CHA(item->modelName()));
+            loge("Not support model '%s', expect model name %s",
+                 MODELSTR2CHA(item), KModelNameArea);
+            err = ErrInvalidModel;
         }
     } else {
         loge("Invalid argument");
         err = ErrInvalidArg;
     }
+    logife(err, "update model data from query failed");
     traceout;
     return err;
 }
@@ -140,7 +149,12 @@ ErrCode DbSqliteAreaTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQue
 QString DbSqliteAreaTbl::getSearchQueryString(const QString &cond)
 {
     tracein;
-    QString queryString = QString("SELECT *, %2.%5 AS %6, %2.%7 AS %8, %2.%4 AS %9 FROM %1 LEFT JOIN %2 ON %1.%3 = %2.%4")
+    QString queryString = QString("SELECT *, "
+                                  "%2.%5 AS %6, "
+                                  "%2.%7 AS %8, "
+                                  "%2.%4 AS %9 "
+                                  "FROM %1 LEFT JOIN %2 "
+                                  "ON %1.%3 = %2.%4")
                               .arg(name(), KTableCountry) // 1, 2
                               .arg(KFieldCountryUid, KFieldUid) // 3, 4
                               .arg(KFieldName, KFieldCountryName) // 5, 6
@@ -159,7 +173,7 @@ ErrCode DbSqliteAreaTbl::onTblMigration(qint64 oldVer)
 {
     tracein;
     ErrCode err = ErrNone;
-    logi("tbl '%s' version upgrade, from version 0x%lx to 0x%lx",
+    logi("tbl '%s' version upgrade, from version 0x%llx to 0x%llx",
          STR2CHA(mName), oldVer, mVersionCode);
     switch (oldVer) {
         case VERSION_CODE_1:
@@ -234,56 +248,3 @@ ErrCode DbSqliteAreaTbl::updateBuilderFieldFromModel(DbSqliteUpdateBuilder *buil
     return err;
 }
 
-//ErrCode DbSqliteAreaTbl::updateBuilderFromModel(DbSqliteUpdateBuilder *builder, const QList<QString> &updateField, const DbModel *item)
-//{
-//    tracein;
-//    ErrCode err = ErrNone;
-//    if (!builder || !item) {
-//            err = ErrInvalidArg;
-//            loge("invalid arg");
-//    }
-//    if (err == ErrNone) {
-//            err = DbSqliteTbl::updateBuilderFromModel(builder, updateField, item);
-//    }
-
-//    if (err == ErrNone) {
-//            if (item->modelName() == KModelNameArea) {
-//            Area* comm = (Area*) item;
-//            foreach (QString field, updateField) {
-//                logd("Update field %s", STR2CHA(field));
-//                if (field == KItemCountry) {
-//                    builder->addValue(KFieldCountryUid, comm->countryUid());
-
-//                } else if (field == KItemAddress) {
-//                    builder->addValue(KFieldAddr, comm->addr());
-
-//                } else if (field == KItemEmail) {
-//                    builder->addValue(KFieldEmail, comm->email());
-
-//                } else if (field == KItemTel) {
-//                    builder->addValue(KFieldTel, comm->tel());
-
-//                } else if (field == KItemChangeHistory) {
-//                    builder->addValue(KFieldChangeHistory, comm->changeHistory());
-
-//                } else if (field == KItemStatus) {
-//                    builder->addValue(KFieldModelStatus, comm->modelStatus());
-
-//                } else if (field == KItemEndDate) {
-//                    builder->addValue(KFieldEndDate, comm->endDate());
-
-//                } else if (field == KItemStartDate) {
-//                    builder->addValue(KFieldStartDate, comm->startDate());
-
-//                } else {
-//                    logw("Field '%s' not support here", STR2CHA(field));
-//                }
-//            }
-//            } else {
-//            logw("Model name '%s' is no support",
-//                 STR2CHA(item->modelName()));
-//            }
-//    }
-//    traceret(err);
-//    return err;
-//}

@@ -50,7 +50,8 @@ QList<DbModel *> DbSqliteCommunityTbl::getListCommunitiesInArea(const QString &a
     QHash<QString, int> fields;
     fields.insert(KFieldAreaUid, TEXT);
     // TODO: check status???
-    logd("Start search area uid %s", areaUid.toStdString().c_str());
+    dbg(LOG_DEBUG, "Start search getListCommunitiesInArea area uid %s",
+        STR2CHA(areaUid));
     ret = search(areaUid, fields, &Community::build, &olist, true);
     logd("ret=%d", ret);
     traceout;
@@ -119,6 +120,7 @@ ErrCode DbSqliteCommunityTbl::updateDbModelDataFromQuery(DbModel *item, const QS
     cmm->setLevel(qry.value(KFieldLevel).toInt());
     cmm->setParentUid(qry.value(KFieldParentUid).toString().trimmed());
     if (!cmm->parentUid().isEmpty() && cmm->parentUid() != cmm->uid()) {
+        dbg(LOG_DEBUG, "get parent uid '%s'", STR2CHA(cmm->parentUid()));
         // TODO: caching data (i.e. list of person in management board) for fast accessing?
         // TODO: is it ok to call here? does it break any design?
         // as table calls directly to model handler
@@ -137,6 +139,7 @@ ErrCode DbSqliteCommunityTbl::updateDbModelDataFromQuery(DbModel *item, const QS
     if (qry.value(KFieldAreaName).isValid())
         cmm->setAreaName(qry.value(KFieldAreaName).toString());
     if (!cmm->areaUid().isEmpty() && cmm->areaName().isEmpty()) {
+        dbg(LOG_DEBUG, "get areaUid '%s'", STR2CHA(cmm->areaUid()));
         // TODO: caching data (i.e. list of person in management board) for fast accessing?
         // TODO: is it ok to call here? does it break any design?
         // as table calls directly to model handler
@@ -152,6 +155,7 @@ ErrCode DbSqliteCommunityTbl::updateDbModelDataFromQuery(DbModel *item, const QS
 
     cmm->setCountryUid(qry.value(KFieldCountryUid).toString());
     if (!cmm->countryUid().isEmpty()) {
+        dbg(LOG_DEBUG, "get countryUid '%s'", STR2CHA(cmm->countryUid()));
         // TODO: caching data (i.e. list of person in management board) for fast accessing?
         // TODO: is it ok to call here? does it break any design?
         // as table calls directly to model handler
@@ -172,22 +176,20 @@ ErrCode DbSqliteCommunityTbl::updateDbModelDataFromQuery(DbModel *item, const QS
     cmm->setModelStatus((DbModelStatus)qry.value(KFieldModelStatus).toInt());
     cmm->setCurrentCEOUid(qry.value(KFieldCEOUid).toString().trimmed()); // TODO: check and set name as well
     if (!cmm->currentCEOUid().isEmpty()) {
+        dbg(LOG_DEBUG, "get currentCEOUid '%s'", STR2CHA(cmm->currentCEOUid()));
         // WARNING WARNING WARNING: RECURSIVE!!!:
         // person -> current community --> get current CEO (person) --> current community --> blablala
         // TODO: caching data (i.e. list of person in management board) for fast accessing?
         // TODO: is it ok to call here? does it break any design?
         // as table calls directly to model handler
         logd("get current CEO by Uid");
-//        Person* per = (Person*)SQLITE->getPersonModelHandler()->getByUid(cmm->currentCEOUid());
-//        if (per) {
-//            cmm->setCurrentCEOName(per->fullName());
-//            delete per;
-//        }
+        // SKIP THIS, CEO got from Community Managers
     }
     cmm->setContact(qry.value(KFieldContact).toString());
     cmm->setMissionUid(qry.value(KFieldMissionUid).toString().trimmed());
     if (!cmm->missionUid().isEmpty()) {
         logd("get Mission by Uid");
+        dbg(LOG_DEBUG, "get missionUid '%s'", STR2CHA(cmm->missionUidString()));
         foreach (QString uid, cmm->missionUid()) {
             DbModel* model = SQLITE->getMissionModelHandler()->getByUid(uid);
             if (model) {
@@ -221,51 +223,9 @@ QString DbSqliteCommunityTbl::getSearchQueryString(const QString &cond)
         queryString += QString(" WHERE %1").arg(cond);
     }
     queryString += " ORDER BY name ASC";
-    logd("queryString: %s", queryString.toStdString().c_str());
+    dbg(LOG_DEBUG, "queryString: %s", queryString.toStdString().c_str());
     return queryString;
 }
-
-//ErrCode DbSqliteCommunityTbl::updateBuilderFromModel(DbSqliteUpdateBuilder *builder, const QList<QString> &updateField, const DbModel *item)
-//{
-//    tracein;
-//    ErrCode err = DbSqliteTbl::updateBuilderFromModel(builder, updateField, item);
-//    if (err == ErrNone) {
-//        Community* comm = (Community*) item;
-//        foreach (QString field, updateField) {
-//            logd("Update field %s", STR2CHA(field));
-//            if (field == KItemFeastDay) {
-//                builder->addValue(KFieldFeastDay, comm->feastDate());
-//            } else if (field == KItemArea) {
-//                builder->addValue(KFieldAreaUid, comm->areaUid());
-//                builder->addValue(KFieldAreaDbId, comm->areaDbId());
-//            } else if (field == KItemTel) {
-//                builder->addValue(KFieldTel, comm->tel());
-//            } else if (field == KItemAddress) {
-//                builder->addValue(KFieldAddr, comm->addr());
-//            } else if (field == KItemEmail) {
-//                builder->addValue(KFieldEmail, comm->email());
-//            } else if (field == KItemCountry) {
-//                builder->addValue(KFieldCountryUid, comm->countryUid());
-//            } else if (field == KItemChurchAddress) {
-//                builder->addValue(KFieldChurchAddr, comm->church());
-//            } else if (field == KItemStatus) {
-//                builder->addValue(KFieldModelStatus, comm->getStatus());
-//            } else if (field == KItemCreateTime) {
-//                builder->addValue(KFieldCreateDate, comm->createDate());
-//            } else if (field == KItemParentCommunity) {
-//                builder->addValue(KFieldParentUid, comm->parentUid());
-//            } else if (field == KItemContact) {
-//                builder->addValue(KFieldContact, comm->contact());
-//            } else if (field == KItemBrief) {
-//                builder->addValue(KFieldBrief, comm->brief());
-//            } else {
-//                logw("Field '%s' not support here", STR2CHA(field));
-//            }
-//        }
-//    }
-//    traceout;
-//    return err;
-//}
 
 ErrCode DbSqliteCommunityTbl::updateBuilderFieldFromModel(DbSqliteUpdateBuilder *builder, const QString &field, const DbModel *item)
 {
@@ -281,29 +241,49 @@ ErrCode DbSqliteCommunityTbl::updateBuilderFieldFromModel(DbSqliteUpdateBuilder 
             Community* comm = (Community*) item;
             if (field == KItemFeastDay) {
                 builder->addValue(KFieldFeastDay, comm->feastDate());
+
+            } else if (field == KItemLevel) {
+                builder->addValue(KFieldLevel, comm->level());
+
             } else if (field == KItemArea) {
                 builder->addValue(KFieldAreaUid, comm->areaUid());
                 builder->addValue(KFieldAreaDbId, comm->areaDbId());
+
             } else if (field == KItemTel) {
                 builder->addValue(KFieldTel, comm->tel());
+
             } else if (field == KItemAddress) {
                 builder->addValue(KFieldAddr, comm->addr());
+
             } else if (field == KItemEmail) {
                 builder->addValue(KFieldEmail, comm->email());
+
             } else if (field == KItemCountry) {
                 builder->addValue(KFieldCountryUid, comm->countryUid());
+
             } else if (field == KItemChurchAddress) {
                 builder->addValue(KFieldChurchAddr, comm->church());
+
             } else if (field == KItemStatus) {
                 builder->addValue(KFieldModelStatus, comm->getStatus());
+
             } else if (field == KItemCreateTime) {
                 builder->addValue(KFieldCreateDate, comm->createDate());
+
+            } else if (field == KItemCloseDate) {
+                builder->addValue(KFieldCloseDate, comm->closeDate());
+
             } else if (field == KItemParentCommunity) {
                 builder->addValue(KFieldParentUid, comm->parentUid());
+
             } else if (field == KItemContact) {
                 builder->addValue(KFieldContact, comm->contact());
+
             } else if (field == KItemBrief) {
                 builder->addValue(KFieldBrief, comm->brief());
+
+            } else if (field == KItemFullIntro) {
+                builder->addValue(KFieldFullInfo, comm->fullInfo());
             } else {
                 err = DbSqliteTbl::updateBuilderFieldFromModel(builder, field, item);
             }

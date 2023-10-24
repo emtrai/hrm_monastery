@@ -37,7 +37,6 @@
 #include "dbctl.h"
 #include "role.h"
 #include "course.h"
-#include "department.h"
 #include "dbsqlite.h"
 
 const qint32 DbSqliteCommDeptPersonTbl::KVersionCode = VERSION_CODE(0,0,1);
@@ -46,9 +45,7 @@ DbSqliteCommDeptPersonTbl::DbSqliteCommDeptPersonTbl(DbSqlite *db):
     DbSqliteTbl(db, KTableCommDepartPerson, KTableCommDepartPerson, KVersionCode,
                   KModelNamePersonDept)
 {
-    tracein;
-
-
+    traced;
 }
 
 QList<DbModel *> DbSqliteCommDeptPersonTbl::getListPerson(const QString &commDeptUid, int status)
@@ -67,7 +64,8 @@ QList<DbModel *> DbSqliteCommDeptPersonTbl::getListPerson(const QString &commDep
     return olist;
 }
 
-QString DbSqliteCommDeptPersonTbl::getSearchQueryStringWithTag(const QString &cond, const QString &condTag)
+QString DbSqliteCommDeptPersonTbl::getSearchQueryStringWithTag(const QString &cond,
+                                                               const QString &condTag)
 {
     tracein;
     // TODO: check with condTag????
@@ -86,7 +84,7 @@ QString DbSqliteCommDeptPersonTbl::getSearchQueryStringWithTag(const QString &co
         queryString += QString(" WHERE %1").arg(cond);
     }
     queryString += " ORDER BY name ASC";
-    logd("queryString: %s", queryString.toStdString().c_str());
+    dbg(LOG_DEBUG, "queryString: %s", STR2CHA(queryString));
     return queryString;
 }
 
@@ -127,7 +125,7 @@ ErrCode DbSqliteCommDeptPersonTbl::insertTableField(DbSqliteInsertBuilder *build
 
     } else {
         ret = ErrInvalidArg;
-        loge("Invali model name '%s'", modelName.toStdString().c_str());
+        loge("Invalid model name '%s'", modelName.toStdString().c_str());
     }
     traceret(ret);
     return ret;
@@ -137,115 +135,97 @@ ErrCode DbSqliteCommDeptPersonTbl::updateDbModelDataFromQuery(DbModel *item, con
 {
     tracein;
     ErrCode err = ErrNone;
-    DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
-    QString modelName = item->modelName();
-    logd("update for map model '%s'", modelName.toStdString().c_str());
-    if (modelName == KModelNamePerson )
-    {
-        logd("update for person model");
-        DbSqlitePersonTbl* tbl = dynamic_cast<DbSqlitePersonTbl*>(DbSqlite::table(KTablePerson));
-        tbl->updateDbModelDataFromQuery(item, qry);
-    } else if (modelName == KModelNamePersonDept) {
+    QString modelName;
+    if (!item) {
+        loge("Invalid argument");
+        err = ErrInvalidArg;
+    }
+    if (err == ErrNone) {
+        err = DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
+    }
+    if (err == ErrNone) {
+        modelName = item->modelName();
+    }
 
-        PersonDept* model = (PersonDept*) item;
+    logd("update for map model '%s'", STR2CHA(modelName));
+    if (err == ErrNone) {
+        if (modelName == KModelNamePerson ) {
+            logd("update for person model");
+            DbSqlitePersonTbl* tbl = dynamic_cast<DbSqlitePersonTbl*>(DbSqlite::table(KTablePerson));
+            ASSERT2((tbl != nullptr));
+            err = tbl->updateDbModelDataFromQuery(item, qry);
+        } else if (modelName == KModelNamePersonDept) {
+            PersonDept* model = (PersonDept*) item;
+            DbModelHandler* hdl = nullptr;
+            hdl = DB->getModelHandler(KModelHdlCommDept);
+            ASSERT2(hdl != nullptr);
 
-        model->setCommDeptUid(qry.value(KFieldCommDeptUid).toString());
-        DbModelHandler* hdlCommDept = DB->getModelHandler(KModelHdlCommDept);
-        if (!model->commDeptUid().isEmpty()) {
-            DbModel* commDept = hdlCommDept->getByUid(model->commDeptUid());
-            if (commDept) {
-                model->setCommDeptName(commDept->name());
-                model->setCommDeptNameId(commDept->nameId());
-                delete commDept;
-            } else {
-                loge("not found Comm Dept uid '%s'", STR2CHA(model->commDeptUid()));
+            model->setCommDeptUid(qry.value(KFieldCommDeptUid).toString());
+            if (!model->commDeptUid().isEmpty()) {
+                dbg(LOG_DEBUG, "commDeptUid '%s'", STR2CHA(model->commDeptUid()));
+                DbModel* commDept = hdl->getByUid(model->commDeptUid());
+                if (commDept) {
+                    model->setCommDeptName(commDept->name());
+                    model->setCommDeptNameId(commDept->nameId());
+                    delete commDept;
+                } else {
+                    logw("not found Comm Dept uid '%s'", STR2CHA(model->commDeptUid()));
+                }
             }
-        }
-        model->setRoleUid(qry.value(KFieldRoleUid).toString());
-        model->setPersonUid(qry.value(KFieldPersonUid).toString());
-        model->setPersonNameId(qry.value(KFieldPersonNameId).toString());
-        model->setPersonHollyName(qry.value(KFieldHollyName).toString());
-        model->setPersonEmail(qry.value(KFieldPersonEmail).toString());
-        model->setPersonTel(qry.value(KFieldPersonTel).toString());
-        model->setPersonName(FULLNAME(qry.value(KFieldFirstName).toString(),
-                                      qry.value(KFieldLastName).toString()));
-        DbModelHandler* hdl = DB->getModelHandler(KModelHdlRole);
-        if (hdl != nullptr) {
-            DbModel* tmp = hdl->getItem(model->roleUid(), &Role::build);
-            if (tmp != nullptr) {
-                model->setRoleName(tmp->name());
-                model->setRoleNameId(tmp->nameId());
-                delete tmp;
-            } else {
-                logi("Not found role uid");
+            model->setRoleUid(qry.value(KFieldRoleUid).toString());
+            hdl = DB->getModelHandler(KModelHdlRole);
+            ASSERT2(hdl != nullptr);
+            if (!model->roleUid().isEmpty()) {
+                dbg(LOG_DEBUG, "roleUid '%s'", STR2CHA(model->roleUid()));
+                DbModel* tmp = hdl->getByUid(model->roleUid(), &Role::build);
+                if (tmp != nullptr) {
+                    model->setRoleName(tmp->name());
+                    model->setRoleNameId(tmp->nameId());
+                    delete tmp;
+                } else {
+                    logw("Not found role uid");
+                }
             }
+
+            model->setPersonUid(qry.value(KFieldPersonUid).toString());
+            model->setPersonNameId(qry.value(KFieldPersonNameId).toString());
+            model->setPersonHollyName(qry.value(KFieldHollyName).toString());
+            model->setPersonEmail(qry.value(KFieldPersonEmail).toString());
+            model->setPersonTel(qry.value(KFieldPersonTel).toString());
+            model->setPersonName(FULLNAME(qry.value(KFieldFirstName).toString(),
+                                          qry.value(KFieldLastName).toString()));
+
+            model->setCourseUid(qry.value(KFieldCourseUid).toString());
+            // TODO: make below code be re-used????
+            hdl = DB->getModelHandler(KModelHdlCourse);
+            ASSERT2(hdl != nullptr);
+            if (!model->courseUid().isEmpty()) {
+                dbg(LOG_DEBUG, "courseUid '%s'", STR2CHA(model->courseUid()));
+                DbModel* tmp = hdl->getItem(model->courseUid(), &Course::build);
+                if (tmp != nullptr) {
+                    model->setCourseName(tmp->name());
+                    model->setCourseNameId(tmp->nameId());
+                    delete tmp;
+                } else {
+                    logw("Not found course uid");
+                }
+            }
+
+            model->setModelStatus(qry.value(KFieldModelStatus).toInt());
+            model->setModelStatusName(DbModel::modelStatus2Name((DbModelStatus)model->modelStatus()));
+
+            model->setStartDate(qry.value(KFieldStartDate).toInt());
+            model->setEndDate(qry.value(KFieldEndDate).toInt());
+            model->setChangeHistory(qry.value(KFieldChangeHistory).toString());
+
         } else {
-            loge("not found role handler");
+            loge("Invalid mapp model '%s', do nothing", STR2CHA(modelName));
+            err = ErrInvalidModel;
         }
-
-        model->setCourseUid(qry.value(KFieldCourseUid).toString());
-        // TODO: make below code be re-used????
-        hdl = DB->getModelHandler(KModelHdlCourse);
-        if (hdl != nullptr) {
-            DbModel* tmp = hdl->getItem(model->courseUid(), &Course::build);
-            if (tmp != nullptr) {
-                model->setCourseName(tmp->name());
-                model->setCourseNameId(tmp->nameId());
-                delete tmp;
-            } else {
-                logi("Not found course uid");
-            }
-        } else {
-            loge("not found course handler");
-        }
-
-
-        model->setModelStatus(qry.value(KFieldModelStatus).toInt());
-        model->setModelStatusName(DbModel::modelStatus2Name((DbModelStatus)model->modelStatus()));
-
-        model->setStartDate(qry.value(KFieldStartDate).toInt());
-        model->setEndDate(qry.value(KFieldEndDate).toInt());
-        model->setChangeHistory(qry.value(KFieldChangeHistory).toString());
-
-    } else {
-        loge("Invalid mapp model '%s', do nothing", modelName.toStdString().c_str());
     }
     traceout;
     return err;
 }
-
-//ErrCode DbSqliteCommDeptPersonTbl::updateBuilderFromModel(DbSqliteUpdateBuilder *builder, const QList<QString> &updateField, const DbModel *item)
-//{
-//    tracein;
-//    ErrCode err = DbSqliteTbl::updateBuilderFromModel(builder, updateField, item);
-//    if (err == ErrNone) {
-//        PersonDept* comm = (PersonDept*) item;
-//        foreach (QString field, updateField) {
-//            logd("Update field %s", STR2CHA(field));
-//            if (field == KItemRole) {
-//                builder->addValue(KFieldRoleUid, comm->roleUid());
-//            } else if (field == KItemCourse) {
-//                builder->addValue(KFieldCourseUid, comm->courseUid());
-//            } else if (field == KItemChangeHistory) {
-//                builder->addValue(KFieldChangeHistory, comm->changeHistory());
-//            } else if (field == KItemPerson) {
-//                builder->addValue(KFieldPersonUid, comm->personUid());
-//            } else if (field == KItemCommunityDept) {
-//                builder->addValue(KFieldCommDeptUid, comm->commDeptUid());
-//            } else if (field == KItemStatus) {
-//                builder->addValue(KFieldModelStatus, comm->modelStatus());
-//            } else if (field == KItemEndDate) {
-//                builder->addValue(KFieldEndDate, comm->endDate());
-//            } else if (field == KItemStartDate) {
-//                builder->addValue(KFieldStartDate, comm->startDate());
-//            } else {
-//                logw("Field '%s' not support here", STR2CHA(field));
-//            }
-//        }
-//    }
-//    traceout;
-//    return err;
-//}
 
 ErrCode DbSqliteCommDeptPersonTbl::updateBuilderFieldFromModel(DbSqliteUpdateBuilder *builder, const QString &field, const DbModel *item)
 {
