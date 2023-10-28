@@ -118,15 +118,6 @@ do { \
                 } \
             }\
     } while (0)
-//                QString uid = value.toString();\
-//                logd("uid %s", STR2CHA(uid));\
-//                DbModel* model = ctrl->getModelByUid(uid); \
-//                if (model) { \
-//                    func((DbModelType*)model); \
-//                } else { \
-//                    loge("uid '%s' not found in ctrl '%s'", \
-//                        STR2CHA(uid), STR2CHA(ctl->getName());\
-//                } \
 
 #define SET_MODEL_FROM_CBOX(widget,func, ctrl, DbModelType, err) \
 do { \
@@ -332,12 +323,6 @@ public:
     * M/D
     */
 
-//    static ErrCode parseCSVFile(const QString& filePath,
-//                            func_one_csv_item_t cb = nullptr,
-//                            void* caller = nullptr,
-//                            void* paramCb = nullptr,
-//                            QChar splitBy = DEFAULT_CSV_ITEM_SPLIT
-//                            );
     static ErrCode parseCSVFile(const QString& filePath,
                                 std::function<
                                     ErrCode(const QStringList& items, void* caller, void* param, quint32 idx)>

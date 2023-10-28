@@ -103,6 +103,7 @@ DbSqliteInsertBuilder *DbSqliteInsertBuilder::addValue(
     const QString &name, const QString &value)
 {
     tracein;
+    dbgtrace;
     logd("insert value name for table %s", STR2CHA(mName));
     if (!value.isEmpty()) {
         logd("insert value %s: %s", name.toStdString().c_str(), value.toStdString().c_str());
@@ -111,7 +112,7 @@ DbSqliteInsertBuilder *DbSqliteInsertBuilder::addValue(
         logd("Value for item '%s' is empty, do nothing", STR2CHA(mName));
     }
 
-
+    traceout;
     return this;
 }
 
@@ -120,9 +121,10 @@ DbSqliteInsertBuilder *DbSqliteInsertBuilder::addValue(
     const QString &name, qint32 value)
 {
     tracein;
+    dbgtrace;
     logd("addValue %s: %d", name.toStdString().c_str(), value);
     mFields.append(new TableInsertItem(name, value));
-
+    traceout;
     return this;
 }
 
@@ -131,6 +133,7 @@ QString DbSqliteInsertBuilder::buildSqlStatement(const QString* cond)
     QString fields;
     QString values;
     tracein;
+    dbgtrace;
     foreach( TableInsertItem* item, mFields )
     {
         fields += item->name() + ",";
@@ -160,6 +163,7 @@ QString DbSqliteInsertBuilder::buildSqlStatement(const QString* cond)
     }
 
     (void)cond;
+    traceout;
     // TODO: condition?
     return QStringLiteral(
                "INSERT INTO %1(%2) VALUES(%3)")
@@ -167,10 +171,6 @@ QString DbSqliteInsertBuilder::buildSqlStatement(const QString* cond)
 
     // TODO: USE BIND????
     // TODO: generate uid (random, unique)
-//    QSqlQuery qry;
-//    qry.prepare( "INSERT INTO tags (id, tag) VALUES (:id, :tag)" );
-//    qry.bindValue( ":id", id );
-//    qry.bindValue( ":tag", tag );
 
 }
 
@@ -179,6 +179,7 @@ QSqlQuery* DbSqliteInsertBuilder::buildSqlQuery(const QString *cond)
     QString fields;
     QString values;
     tracein;
+    dbgtrace;
     foreach( TableInsertItem* item, mFields )
     {
         fields += item->name() + ",";
@@ -197,7 +198,6 @@ QSqlQuery* DbSqliteInsertBuilder::buildSqlQuery(const QString *cond)
                "INSERT INTO %1(%2) VALUES(%3)")
         .arg(mName, fields, values)
         ;
-//    DB->openDb();
     QSqlQuery* qry = new QSqlQuery(SQLITE->currentDb());
     qry->prepare(queryString);
     logd("Query String '%s'", queryString.toStdString().c_str());
@@ -225,6 +225,7 @@ QSqlQuery* DbSqliteInsertBuilder::buildSqlQuery(const QString *cond)
         }
 
     }
+    traceout;
     return qry;
 }
 

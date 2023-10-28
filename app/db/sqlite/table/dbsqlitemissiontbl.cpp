@@ -23,48 +23,15 @@
 
 
 #include "dbsqlitedefs.h"
-#include "errcode.h"
-#include <QSqlQuery>
-#include <QSqlRecord>
-#include <QHash>
 #include "defs.h"
 #include "logger.h"
-#include "mission.h"
-#include "dbsqlitetablebuilder.h"
-#include "dbsqliteinsertbuilder.h"
 
 const qint32 DbSqliteMissionTbl::KVersionCode = VERSION_CODE(0,0,1);
 
-DbSqliteMissionTbl::DbSqliteMissionTbl(): DbSqliteMissionTbl(nullptr)
-{}
 DbSqliteMissionTbl::DbSqliteMissionTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableMission, KTableMission, KVersionCode,
                   KModelNameMission)
 {
-    tracein;
-}
-
-void DbSqliteMissionTbl::addTableField(DbSqliteTableBuilder *builder)
-{
-    tracein;
-    DbSqliteTbl::addTableField(builder);
-}
-
-ErrCode DbSqliteMissionTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
-{
-    tracein;
-    DbSqliteTbl::insertTableField(builder, item);
-    // TODO: remark field???
-    traceout;
-    return ErrNone;
-}
-
-ErrCode DbSqliteMissionTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQuery &qry)
-{
-    tracein;
-    ErrCode err = ErrNone;
-    err = DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
-    traceout;
-    return err;
+    traced;
 }
 

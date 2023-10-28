@@ -27,8 +27,6 @@
 class DbSqlSequenceTbl : public DbSqliteTbl
 {
 public:
-    DbSqlSequenceTbl();
-public:
     DbSqlSequenceTbl(DbSqlite *db);
     virtual ErrCode getValue(const QString& tblname, qint64& value);
     virtual ErrCode checkOrCreateTable();

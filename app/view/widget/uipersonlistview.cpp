@@ -563,7 +563,7 @@ ErrCode UIPersonListView::onMenuActionViewPersonEvent(QMenu *menu, UITableMenuAc
     }
     if (ret == ErrNone) {
         person = dynamic_cast<const Person*>(act->getData());
-        if (!person || IS_MODEL_NAME(person, KModelNamePerson)) {
+        if (!person || !IS_MODEL_NAME(person, KModelNamePerson)) {
             ret = ErrNoData;
             loge("invalid model data '%s'", MODELSTR2CHA(person));
             errMsg = STR_SELECT_PERSON;
@@ -609,7 +609,7 @@ ErrCode UIPersonListView::onMenuActionViewCommunity(QMenu *menu, UITableMenuActi
     }
     if (ret == ErrNone) {
         person = dynamic_cast<const Person*>(act->getData());
-        if (!person || IS_MODEL_NAME(person, KModelNamePerson)) {
+        if (!person || !IS_MODEL_NAME(person, KModelNamePerson)) {
             ret = ErrNoData;
             loge("invalid model data '%s'", MODELSTR2CHA(person));
             errMsg = STR_SELECT_PERSON;

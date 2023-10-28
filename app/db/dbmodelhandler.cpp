@@ -35,18 +35,20 @@ void DbModelHandler::cleanUpModelList(QList<DbModel *> &list)
 
 DbModelHandler::DbModelHandler()
 {
-    tracein;
+    traced;
 }
 
-QList<DbModel *> DbModelHandler::getAll(const char *modelName, qint64 status, int from, int noItems, int *total)
+QList<DbModel *> DbModelHandler::getAll(const char *modelName, qint64 status,
+                                        int from, int noItems, int *total)
 {
     return getAll(getMainBuilder(), status, modelName, from, noItems, total);
 }
 
-DbModel *DbModelHandler::getItem(const QString &uid, DbModelBuilder builder, const char* modelName)
+DbModel *DbModelHandler::getItem(const QString &uid, DbModelBuilder builder,
+                                 const char* modelName)
 {
     tracein;
-    logd("uid %s", uid.toStdString().c_str());
+    dbgv("get item for uid %s", STR2CHA(uid));
     QHash<QString, DbModel*> list = getAllInDict(builder, DB_RECORD_ALL, modelName); // TODO: all status or action one only???
     DbModel* model = nullptr;
     if (list.count() > 0) {
@@ -64,7 +66,6 @@ DbModel *DbModelHandler::getItem(const QString &uid, DbModelBuilder builder, con
 
 DbModelBuilder DbModelHandler::getMainBuilder()
 {
-//    FAIL("DEFAULT getMainBuilder, should not be called");
     return nullptr;
 }
 
@@ -78,22 +79,26 @@ DbModelBuilder DbModelHandler::getBuilder(const QString &modelName)
 
 DbModel *DbModelHandler::getByUid(const QString &uid, const DbModelBuilder &builder)
 {
-
-    tracein;
+    traced;
+    UNUSED(uid);
+    UNUSED(builder);
     loge("Default one, do nothing");
     return nullptr;// TODO: throw exception????
 }
 
 DbModel *DbModelHandler::getByUid(const QString &uid)
 {
-    tracein;
+    traced;
+    UNUSED(uid);
     loge("Default one, do nothing");
     return nullptr; // TODO: throw exception????
 }
 
 DbModel *DbModelHandler::getByNameId(const QString &nameId, const DbModelBuilder &builder)
 {
-    tracein;
+    traced;
+    UNUSED(nameId);
+    UNUSED(builder);
     loge("Default one, do nothing");
     return nullptr; // TODO: throw exception????
 }
@@ -117,7 +122,10 @@ DbModel *DbModelHandler::getByName(const QString &name,
                                    const DbModelBuilder &builder,
                                    bool firstOrLastMatch)
 {
-    tracein;
+    traced;
+    UNUSED(name);
+    UNUSED(builder);
+    UNUSED(firstOrLastMatch);
     loge("Default one, do nothing");
     return nullptr; // TODO: throw exception????
 }

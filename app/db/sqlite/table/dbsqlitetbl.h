@@ -61,7 +61,6 @@ public:
 
     virtual ErrCode add(DbModel* item);
     virtual ErrCode update(DbModel* item);
-    virtual ErrCode updateUid(const DbModel* item, const QString& uid);
     /**
      * @brief update db
      * @param uid Uid for search
@@ -100,12 +99,23 @@ public:
     virtual DbModel* getModel(qint64 dbId, const DbModelBuilder& builder);
 
     virtual ErrCode getColumnList(QHash<QString, QString>& colList);
+    /**
+     * @brief add new column to table
+     * @param columnField hash map, key is column name, key is data type, i.e. uid:TEXT
+     * @return error code
+     */
     virtual ErrCode addTableColumn(const QHash<QString, TableFieldDatatype_t>& columnField);
     virtual ErrCode checkOrCreateTable();
     virtual ErrCode onDbMigration(qint64 oldVer, qint64 newVer);
     virtual ErrCode onTblMigration(qint64 oldVer);
 
     virtual QList<QString> getNameFields();
+    /**
+     * @brief get model by uid, return 1st match one if many uid exist
+     * @param uid
+     * @param builder
+     * @return
+     */
     virtual DbModel *getByUid(const QString& uid, const DbModelBuilder& builder);
     virtual DbModel *getByNameId(const QString& nameId, const DbModelBuilder& builder);
 

@@ -201,7 +201,7 @@ ErrCode DbSqliteCommDeptPersonTbl::updateDbModelDataFromQuery(DbModel *item, con
             ASSERT2(hdl != nullptr);
             if (!model->courseUid().isEmpty()) {
                 dbg(LOG_DEBUG, "courseUid '%s'", STR2CHA(model->courseUid()));
-                DbModel* tmp = hdl->getItem(model->courseUid(), &Course::build);
+                DbModel* tmp = hdl->getByUid(model->courseUid(), &Course::build);
                 if (tmp != nullptr) {
                     model->setCourseName(tmp->name());
                     model->setCourseNameId(tmp->nameId());

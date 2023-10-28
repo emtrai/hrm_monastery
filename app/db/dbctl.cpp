@@ -41,14 +41,6 @@ DbCtl::DbCtl()
     mDatabase = DbSqlite::getInstance();
     dbInfo = new DbInfo();
     // TODO: refactor this code
-//    QString appPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-//    QDir appDirPath(appPath);
-//    logd("App path %s", appPath.toStdString().c_str());
-
-//    if (!appDirPath.exists()){
-//        logi("App path not exist, create new one");
-//        appDirPath.mkpath(appDirPath.absolutePath());
-//    }
 
     QString dbPath = FileCtl::getAppWorkingDataDir(KDatabasename);
     QString dbMetaPath = FileCtl::getAppWorkingDataDir(KDatabaseMetaName);
@@ -57,10 +49,6 @@ DbCtl::DbCtl()
     dbInfo->setUri(dbPath);
     dbInfo->setMetaUri(dbMetaPath);
 
-//    mDbSaint = new DbSqliteSaint();
-//    mDbCommunity = new DbSqliteCommunity();
-//    mDbEdu = new DbSqliteEdu();
-//    mDbSpecialist = new DbSqliteSpecialist();
     traceout;
 }
 
@@ -88,6 +76,7 @@ IDatabase* DbCtl::getDb(){
 
 ErrCode DbCtl::onLoad(){
     tracein;
+    dbgtrace;
     ErrCode err = mDatabase->validateDbInfo(dbInfo);
     if (err == ErrNone) {
         err = mDatabase->loadDb(dbInfo);
@@ -101,5 +90,6 @@ ErrCode DbCtl::onLoad(){
 void DbCtl::onUnload()
 {
     traced;
+    dbgtrace;
     // TODO: unload db controller??
 }

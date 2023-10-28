@@ -23,9 +23,4 @@
 #include "logger.h"
 #include "errcode.h"
 
-//DbPersonModelHandler::DbPersonModelHandler()
-//{
-//    tracein;
-//}
-
 

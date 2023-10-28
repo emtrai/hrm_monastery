@@ -27,8 +27,6 @@
 class DbSqliteRoleTbl : public DbSqliteTbl
 {
 public:
-    DbSqliteRoleTbl();
-public:
     DbSqliteRoleTbl(DbSqlite *db);
 
 private:

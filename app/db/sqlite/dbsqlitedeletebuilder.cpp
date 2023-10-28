@@ -33,6 +33,7 @@ DbSqliteDeleteBuilder *DbSqliteDeleteBuilder::build(const QString &tblName)
 DbSqliteDeleteBuilder *DbSqliteDeleteBuilder::addCond(const QString &field, const QString &value, int dataType)
 {
     tracein;
+    dbgtrace;
     logd("add field %s, value %s", field.toStdString().c_str(), value.toStdString().c_str());
     if (!mCondition.contains(field)) {
         mCondition.insert(field, FieldValue(value, dataType));
@@ -48,8 +49,7 @@ QSqlQuery *DbSqliteDeleteBuilder::buildSqlQuery(const QString *cond)
     tracein;
     QString conds;
     QString values;
-    tracein;
-
+    dbgtrace;
     foreach( QString field, mCondition.keys() )
     {
         if (!conds.isEmpty()) {
@@ -65,7 +65,6 @@ QSqlQuery *DbSqliteDeleteBuilder::buildSqlQuery(const QString *cond)
     QString queryString = QStringLiteral(
                               "DELETE FROM %1 WHERE %2")
                               .arg(mName, conds);
-    //    DB->openDb();
     QSqlQuery* qry = new QSqlQuery(SQLITE->currentDb());
     qry->prepare(queryString);
     logd("Query String '%s'", queryString.toStdString().c_str());
@@ -78,6 +77,7 @@ QSqlQuery *DbSqliteDeleteBuilder::buildSqlQuery(const QString *cond)
         qry->bindValue(id, mCondition.value(field).value); // TODO: check datat type????
 
     }
+    traceout;
     return qry;
 }
 

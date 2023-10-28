@@ -21,34 +21,31 @@
  */
 #include "dbmodel.h"
 #include "logger.h"
-#include "crypto.h"
 #include "dbmodelhandler.h"
 #include "utils.h"
 #include "dataexporter.h"
 #include "dbdefs.h"
 #include "filectl.h"
 
-#include "person.h"
-#include "community.h"
-#include "specialist.h"
 #include "prebuiltdefs.h"
 #include "stringdefs.h"
 #include "datetimeutils.h"
+#include <QUuid>
 
 #define MAX_HISTORY_LENGTH 500
 
 DbModel::DbModel():
     mDeletable(true)
-    , mDbId(0)
     , mValidateResult(nullptr)
-    , mDbStatus(0)
+    , mDbId(0)
     , mMarkModified(false)
+    , mDbStatus(0)
     , mUpdateAllFields(false)
     , mDbCreatedTime(0)
     , mLastDbUpdatedTime(0)
 
 {
-    tracein;
+    traced;
     mRefCnt.storeRelease(0);
 //    init(); // TODO: should call init here?
 }
@@ -94,7 +91,7 @@ void DbModel::copy(const DbModel &model)
 
 DbModel::~DbModel()
 {
-    tracein;
+    traced;
 }
 
 void DbModel::init()
@@ -133,23 +130,25 @@ ErrCode DbModel::copyData(const DbModel *model)
     tracein;
     ErrCode err = ErrNone;
     if (model) {
-        mName = model->name();
-        markItemAsModified(KItemName);
-        mRemark = model->remark();
-        markItemAsModified(KItemRemark);
-//        mDeletable = model->mDeletable;
-//        mDbId = model->dbId();
-//        mUid = model->uid();
-//        mNameId = model->nameId();
-//        mDbStatus = model->dbStatus();
-//        mDbHistory = model->dbHistory();
-//        mDbCreatedTime = model->dbCreatedTime();
-//        mLastDbUpdatedTime = model->lastDbUpdatedTime();
-//        mMarkModified = model->markModified();
-//        mUpdateAllFields = model->updateAllFields();
-//        mExportCallbacks = model->mExportCallbacks;
-//        mImportCallbacks = model->mImportCallbacks;
-//        mUpdatedField = model->mUpdatedField;
+
+        mUpdateAllFields = model->updateAllFields();
+        setName(model->name());
+        setRemark(model->remark());
+        setNameId(model->nameId());
+        setUid(model->uid());
+        setDbId(model->dbId());
+        setDbStatus(model->dbStatus());
+        setDbHistory(model->dbHistory());
+        setDbCreatedTime(model->dbCreatedTime());
+        setLastDbUpdatedTime(model->lastDbUpdatedTime());
+        mDeletable = model->mDeletable;
+
+        mExportCallbacks = model->mExportCallbacks;
+        mImportCallbacks = model->mImportCallbacks;
+        mImportItemsType = model->mImportItemsType;
+        mImportFieldRequired = model->mImportFieldRequired;
+        mUpdatedField = model->updatedField();
+        mUpdateAllFields = model->mUpdateAllFields;
     } else {
         loge("copy data failed, empty model");
         err = ErrInvalidArg;
@@ -233,11 +232,11 @@ const QHash<int, QString> *DbModel::getModelStatusIdNameMap()
     static bool isInitiedStatusNameMap = false;
     static QHash<int, QString> map;
     if (!isInitiedStatusNameMap) {
-        map.insert(MODEL_STATUS_UNKNOWN, QObject::tr("Không rõ"));
-        map.insert(MODEL_STATUS_NOT_READY, QObject::tr("Chưa sẵn sàng")); // TODO: change to suitable name???
-        map.insert(MODEL_STATUS_INACTIVE, QObject::tr("Không hoạt động"));
-        map.insert(MODEL_STATUS_ACTIVE, QObject::tr("Đang hoạt động"));
-        map.insert(MODEL_STATUS_BUILDING, QObject::tr("Đang xây dựng"));
+        map.insert(MODEL_STATUS_UNKNOWN, STR_UNKNOWN);
+        map.insert(MODEL_STATUS_NOT_READY, STR_NOT_READY); // TODO: change to suitable name???
+        map.insert(MODEL_STATUS_INACTIVE, STR_INACTIVE);
+        map.insert(MODEL_STATUS_ACTIVE, STR_ACTIVE);
+        map.insert(MODEL_STATUS_BUILDING, STR_BUILDING);
         isInitiedStatusNameMap = true;
     }
     // TODO: make it as static to load once only???
@@ -297,26 +296,6 @@ const QList<int>* DbModel::getDbStatusList()
     return &dbstatusList;
 }
 
-//DbModelBuilder DbModel::getBuilderByModelName(const QString& modelName)
-//{
-//    tracein;
-//    static bool isInited = false;
-//    static QHash<QString, DbModelBuilder> map;
-//    DbModelBuilder builder = nullptr;
-//    if (!isInited) {
-//        map[KModelNamePerson] = &Person::build;
-//        map[KModelNameCommunity] = &Community::build;
-//        map[KModelHdlSpecialist] = &Specialist::build;
-//        isInited = true;
-//    }
-//    if (map.contains(modelName)) {
-//        builder = map.value(modelName);
-//    }
-//    // TODO: make it as static to load once only???
-//    traceout;
-//    return builder;
-//}
-
 const QString &DbModel::name() const
 {
     return mName;
@@ -329,9 +308,7 @@ QString DbModel::fullName() const
 
 void DbModel::setName(const QString &newName)
 {
-    mName = newName;
-
-    markItemAsModified(KItemName);
+    CHECK_MODIFIED_THEN_SET(mName, newName, KItemName);
 }
 
 qint64 DbModel::dbId() const
@@ -351,8 +328,7 @@ const QString &DbModel::uid() const
 
 void DbModel::setUid(const QString &newUid)
 {
-    mUid = newUid;
-    markItemAsModified(KItemUid);
+    CHECK_MODIFIED_THEN_SET(mUid, newUid, KItemUid);
 }
 
 void DbModel::buildUidIfNotSet()
@@ -368,13 +344,17 @@ void DbModel::buildUidIfNotSet()
 QString DbModel::buildUid(const QString* seed)
 {
     tracein;
+    QUuid uuid = QUuid::createUuid();
     QString value = QString("%1%2%3").arg(nameId(), name()).arg(DatetimeUtils::currentTimeMs());
+    if (!uuid.isNull()) {
+        value += uuid.toString();
+    }
     if (seed != nullptr) {
         value += "_" + *seed;
     }
     logd("value for uid calc: %s", STR2CHA(value));
     QString uid = Utils::UidFromName(value, UidNameConvertType::HASH_NAME);
-    logd("uid: %s", uid.toStdString().c_str());
+    dbgd("built uid: %s", STR2CHA(uid));
     traceout;
     return uid;
 }
@@ -412,20 +392,14 @@ ErrCode DbModel::prepare2Save()
 
 void DbModel::markItemAsModified(const QString &itemName)
 {
-//    tracein;
     if (markModified()) {
         logd("mark item %s as modified", itemName.toStdString().c_str());
 
         if (!mUpdatedField.contains(itemName)) {
             mUpdatedField.append(itemName);
         } else {
-//            logd("Item already existed");
         }
-    } else {
-//        logd("Skip mark modified for %s", itemName.toStdString().c_str());
-    }
-
-//    traceout;
+    }// avoid print log here, as there will be a lot of logs
 }
 
 
@@ -450,8 +424,8 @@ void DbModel::appendDbHistory(const QString &msg)
     tracein;
     QString history = dbHistory();
     history += QString("%1:%2;")
-                   .arg(DatetimeUtils::currentTimeToDatestring(QT_DATE_FORMAT_DMYHMS))
-                   .arg(msg);
+                   .arg(DatetimeUtils::currentTimeToDatestring(QT_DATE_FORMAT_DMYHMS),
+                        msg);
     if (history.length() > MAX_HISTORY_LENGTH) {
         history = history.right(MAX_HISTORY_LENGTH);
     }
@@ -466,8 +440,7 @@ const QString &DbModel::remark() const
 
 void DbModel::setRemark(const QString &newRemark)
 {
-    mRemark = newRemark;
-    markItemAsModified(KItemRemark);
+    CHECK_MODIFIED_THEN_SET(mRemark, newRemark, KItemRemark);
 }
 
 const QString &DbModel::nameId() const
@@ -492,13 +465,19 @@ ErrCode DbModel::exportToFile(ExportType type, QString *fpath) const
 {
     tracein;
     ErrCode ret = ErrNone;
-    QString fname = QString("%1.html").arg(uid());
-    logd("fname '%s'", STR2CHA(fname));
-    *fpath = FileCtl::getTmpDataFile(fname);
-    logd("fpath '%s'", STR2CHA((*fpath)));
+    QString path;
+    if (fpath && !fpath->isEmpty()) {
+        path = *fpath;
+    } else {
+        QString fname = QString("%1.html").arg(uid());
+        logd("fname '%s'", STR2CHA(fname));
+        path = FileCtl::getTmpDataFile(fname);
+        if (fpath) *fpath = path;
+    }
+    logd("fpath '%s'", STR2CHA(path));
     ret = ExportFactory::exportTo(getExporter(),
                                   getName(),
-                                  *fpath, type);
+                                  path, type);
     // TODO: how about exportTo() method??
     return ret;
 }
@@ -515,6 +494,7 @@ ErrCode DbModel::exportTemplatePath(FileExporter* exporter,
 {
     tracein;
     ErrCode err = ErrNone;
+    UNUSED(ftype);
     QString templateFname;
     if (exporter) {
         ExportType type = exporter->getExportType();
@@ -554,7 +534,7 @@ ErrCode DbModel::getExportDataString(const QString &item,
         if (func != nullptr) *data = func(this, item);
     }
     // TODO: raise exception when error occur???
-
+    traceret(ret);
     return ret;
 }
 
@@ -624,9 +604,9 @@ bool DbModel::isFieldUpdated(const QString &itemField)
 void DbModel::resetAllModifiedMark()
 {
     tracein;
-    logd("Total marked item: %d", mUpdatedField.count());
+    logd("Total marked item: %lld", mUpdatedField.count());
     mUpdatedField.clear();
-    logd("Total marked item after clear: %d", mUpdatedField.count());
+    logd("Total marked item after clear: %lld", mUpdatedField.count());
     traceout;
 }
 
@@ -637,8 +617,7 @@ qint64 DbModel::lastDbUpdatedTime() const
 
 void DbModel::setLastDbUpdatedTime(qint64 newLastUpdatedTime)
 {
-    mLastDbUpdatedTime = newLastUpdatedTime;
-    markItemAsModified(KItemLastUpdateTime);
+    CHECK_MODIFIED_THEN_SET(mLastDbUpdatedTime, newLastUpdatedTime, KItemLastUpdateTime);
 }
 
 qint64 DbModel::dbCreatedTime() const
@@ -648,25 +627,22 @@ qint64 DbModel::dbCreatedTime() const
 
 void DbModel::setDbCreatedTime(qint64 newCreatedTime)
 {
-    mDbCreatedTime = newCreatedTime;
-    markItemAsModified(KItemCreateTime);
+    CHECK_MODIFIED_THEN_SET(mDbCreatedTime, newCreatedTime, KItemCreateTime);
 }
 
 ErrCode DbModel::save(bool notifyDataChange)
 {
     tracein;
     ErrCode ret = ErrNone;
+    dbgtrace;
     DbModelHandler* dbModelHdl = getDbModelHandler();
     if (dbModelHdl != nullptr){
         ret = prepare2Save();
         if (ret == ErrNone) {
             appendDbHistory("Add");
+            logi("Save model '%s'", MODELSTR2CHA(this));
             ret = dbModelHdl->add(this, notifyDataChange);
         }
-//        if (ret == ErrExisted){ // alrady exist, judge as ok
-//            ret = ErrNone;
-//            logi("%s already exist", name().toStdString().c_str());
-//        }
     }
     else{
         ret = ErrDbNotReady;
@@ -689,11 +665,14 @@ DbModel *DbModel::addFieldToBeUpdated(const QString &field)
 ErrCode DbModel::update(bool allFields, bool notifyDataChange)
 {
     tracein;
+    UNUSED(allFields);
     ErrCode ret = ErrNone;
+    dbgtrace;
     // TODO: support "allFields"
     DbModelHandler* dbModelHdl = getDbModelHandler();
     if (dbModelHdl != nullptr){
         appendDbHistory("Update");
+        logi("Update model '%s'", MODELSTR2CHA(this));
         ret = dbModelHdl->update(this, notifyDataChange);
     }
     else{
@@ -726,15 +705,15 @@ const QString &DbModel::dbHistory() const
 
 void DbModel::setDbHistory(const QString &newDbHistory)
 {
-    mDbHistory = newDbHistory;
-
-    markItemAsModified(KItemDbHistory);
+    CHECK_MODIFIED_THEN_SET(mDbHistory, newDbHistory, KItemDbHistory);
 }
 
 ErrCode DbModel::remove(bool force, QString* msg)
 {
     tracein;
     ErrCode ret = ErrNone;
+    dbgtrace;
+    logi("Remove model '%s', force=%d", MODELSTR2CHA(this), force);
     if (!allowRemove()) {
         ret = ErrDenied;
         loge("No allow delete?");
@@ -757,6 +736,7 @@ ErrCode DbModel::markRemove()
 {
     tracein;
     ErrCode ret = ErrNone;
+    logi("markRemove model '%s'", MODELSTR2CHA(this));
     if (!allowRemove()) {
         ret = ErrDenied;
         loge("No allow delete?");
@@ -778,7 +758,6 @@ ErrCode DbModel::markRemove()
 ErrCode DbModel::exportTo(const QString &fpath, ExportType type)
 {
     tracein;
-    ErrCode ret = ErrNone;
 
     UNUSED(fpath);
     UNUSED(type);
@@ -793,8 +772,7 @@ qint32 DbModel::dbStatus() const
 
 void DbModel::setDbStatus(qint32 newDbStatus)
 {
-    mDbStatus = newDbStatus;
-    markItemAsModified(KItemDbStatus);
+    CHECK_MODIFIED_THEN_SET(mDbStatus, newDbStatus, KItemDbStatus);
 }
 
 bool DbModel::isValid()
@@ -841,8 +819,7 @@ void DbModel::setNameId(const QString &newNameId)
 //    mUid = Utils::UidFromName(newNameId);
     // TODO: should hash or use original value???
 //    mUid = newNameId;
-    mNameId = newNameId;
-    markItemAsModified(KItemNameId);
+    CHECK_MODIFIED_THEN_SET(mNameId, newNameId,KItemNameId);
 }
 
 const DataExporter *DbModel::getExporter() const

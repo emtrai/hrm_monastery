@@ -40,5 +40,5 @@ DbSqliteEventTbl::DbSqliteEventTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableEvent, KTableEvent, KVersionCode,
                   KModelNameEvent)
 {
-    tracein;
+    traced;
 }

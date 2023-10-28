@@ -40,7 +40,7 @@ DbSqliteCommunityDeptTbl::DbSqliteCommunityDeptTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableCommDept, KTableCommDept, KVersionCode,
                   KModelNameCommDept)
 {
-    tracein;
+    traced;
 }
 
 QList<DbModel *> DbSqliteCommunityDeptTbl::getListDept(const QString &commUid, int status)

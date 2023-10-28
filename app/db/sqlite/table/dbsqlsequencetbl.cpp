@@ -27,24 +27,16 @@
 #include <QHash>
 #include "defs.h"
 #include "logger.h"
-#include "area.h"
-#include "dbsqlitetablebuilder.h"
-#include "dbsqliteinsertbuilder.h"
-#include "dbsqliteupdatebuilder.h"
-#include "dbctl.h"
 #include "dbsqlite.h"
 #include "utils.h"
 #include <QSqlError>
 
 const qint32 DbSqlSequenceTbl::KVersionCode = VERSION_CODE(0,0,1);
 
-DbSqlSequenceTbl::DbSqlSequenceTbl():
-    DbSqlSequenceTbl(nullptr)
-{}
 DbSqlSequenceTbl::DbSqlSequenceTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableSqliteSequence, KTableSqliteSequence, KVersionCode)
 {
-    tracein;
+    traced;
 }
 
 ErrCode DbSqlSequenceTbl::getValue(const QString &tblname, qint64& value)
@@ -59,7 +51,7 @@ ErrCode DbSqlSequenceTbl::getValue(const QString &tblname, qint64& value)
 
 
     qry.prepare(queryString);
-    logd("Query String '%s'", queryString.toStdString().c_str());
+    dbgd("Query String '%s'", STR2CHA(queryString));
     logd("Bind value '%s'", STR2CHA(tblname));
 
     // TODO: check sql injection issue
@@ -77,7 +69,7 @@ ErrCode DbSqlSequenceTbl::getValue(const QString &tblname, qint64& value)
                     value = qry.value(KFieldSeq).toInt(&ok);
                     if (ok) {
                         cnt++;
-                        logd("Value '%ld'", value);
+                        logd("Value '%lld'", value);
                     }
                     break;
                 } else {
@@ -88,6 +80,7 @@ ErrCode DbSqlSequenceTbl::getValue(const QString &tblname, qint64& value)
         else {
             loge( "Failed to execute %s", STR2CHA(qry.executedQuery()) );
             loge( "Last error %s", STR2CHA(qry.lastError().text()) );
+            err = ErrFailSqlQuery;
         }
     } catch(const std::runtime_error& ex) {
         loge("Runtime Exception! %s", ex.what());

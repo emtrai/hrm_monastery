@@ -660,11 +660,11 @@ ErrCode UITableView::onAddItem(UITableCellWidgetItem *item)
 
 ErrCode UITableView::addMenuActionCallback(QList<UITableMenuAction *> &actionList)
 {
-    logd("Add callback for menu action, no. item %ld", actionList.size());
+    logd("Add callback for menu action, no. item %lld", actionList.size());
     foreach (UITableMenuAction* act, actionList) {
         if (act->menuType() != MENU_ACTION_SEPARATE) {
             logd("connect for act '%s'", STR2CHA(act->text()));
-            disconnect(SIGNAL(QAction::triggered), this);
+            disconnect(SIGNAL(QAction::triggered(bool)), this);
             connect(act, &QAction::triggered, this, [this, act](){
                 QAction *sentAct = qobject_cast<QAction *>(sender());
                 logd("lambda trigger call for menu sentAct '%s'", STR2CHA(sentAct->text()));

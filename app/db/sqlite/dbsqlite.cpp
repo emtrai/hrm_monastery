@@ -28,14 +28,12 @@
 #include <QThreadStorage>
 
 #include <QSqlDatabase>
-#include "dbsqlitetablebuilder.h"
 #include "table/dbsqlitepersontbl.h"
 #include "table/dbsqlitecommunitytbl.h"
 #include "table/dbsqlitesainttbl.h"
 #include "table/dbsqliteedutbl.h"
 #include "table/dbsqlitespecialisttbl.h"
 #include "table/dbsqlitecountrytbl.h"
-#include "table/dbsqliteprovincetbl.h"
 #include "table/dbsqliteethnictbl.h"
 #include "table/dbsqlitemissiontbl.h"
 #include "table/dbsqliteareatbl.h"
@@ -64,7 +62,6 @@
 #include "dbsqlitespecialist.h"
 #include "dbsqlitecountry.h"
 #include "dbsqliteethnic.h"
-#include "dbsqliteprovince.h"
 #include "dbsqlitemission.h"
 #include "dbsqlitearea.h"
 #include "dbsqlitedept.h"
@@ -78,7 +75,6 @@
 #include "dbsqlitecommunitydept.h"
 
 #include "defs.h"
-#include "dbdefs.h"
 #include "exception.h"
 
 
@@ -173,11 +169,13 @@ DbSqlite::DbSqlite()
     tracein;
     setupTables();
     setupModelHandler();
+    traceout;
 }
 
 void DbSqlite::setupTables()
 {
     tracein;
+    dbgd("add tables");
     // Append all tables need for db
     // TODO: append more table
     appendTable(new DbMetadataTbl(this));
@@ -203,17 +201,18 @@ void DbSqlite::setupTables()
     appendTable(new DbSqliteEventTbl(this));
     appendTable(new DbSqliteSaintPersonMapTbl(this));
     appendTable(new DbSqliteCommunityPersonTbl(this));
-//    appendTable(new DbSqliteCommunityMgrTbl(this));
     appendTable(new DbSqliteCommunityDeptTbl(this));
     appendTable(new DbSqliteCommDeptPersonTbl(this));
     appendTable(new DbSqliteAreaMgrTbl(this));
     appendTable(new DbSqliteSpecialistPersonTbl(this));
     appendTable(new DbSqliteCommunityManagerTbl(this));
+    traceout;
 }
 
 void DbSqlite::setupModelHandler()
 {
     tracein;
+    dbgd("add model handler");
     appendModelHandler(new DbSqliteSpecialist());
     appendModelHandler(new DbSqliteEdu());
     appendModelHandler(new DbSqliteSaint());
@@ -235,6 +234,7 @@ void DbSqlite::setupModelHandler()
     appendModelHandler(new DbSqliteEvent());
     appendModelHandler(new DbSqlitePersonEvent());
     appendModelHandler(new DbSqliteCommunityDept());
+    traceout;
 }
 
 DbMetadataTbl *DbSqlite::tableMetadata()
@@ -255,15 +255,14 @@ const QSqlDatabase &DbSqlite::db() const
 void DbSqlite::appendTable(DbSqliteTbl *tbl)
 {
     tracein;
-    if (nullptr != tbl)
-    {
+    if (nullptr != tbl) {
         logd("Add table '%s'", tbl->name().toStdString().c_str());
         mListTbl[tbl->name()] = tbl;
-    }
-    else
+    } else
     {
         // TODO: throw exception?????
     }
+    traceout;
 }
 
 
@@ -301,7 +300,7 @@ ErrCode_t DbSqlite::checkOrCreateAllTables()
         qint64 tblVer = mMetaDbInfo.tableVersion(key, &ok);
         if (ok) {
             if (tblVer > 0 && (tblVer != tbl->versionCode())) {
-                logi("Different version from db file and current one: 0x%lx --> 0x%lx",
+                logi("Different version from db file and current one: 0x%llx --> 0x%x",
                      tblVer, tbl->versionCode());
                 err = tbl->onTblMigration(tblVer);
             }
@@ -354,7 +353,7 @@ DbSqliteTbl *DbSqlite::getTableFromModelName(const QString &name)
     logd("get table for model name '%s'", STR2CHA(name));
     if (!name.isEmpty()) {
         foreach (DbSqliteTbl* item, mListTbl) {
-            if (tbl && tbl->getHandleModelName() == name) {
+            if (item && item->getHandleModelName() == name) {
                 tbl = item;
             }
         }
@@ -481,6 +480,7 @@ QSqlDatabase DbSqlite::currentDb()
     } else {
         THROWEX("NULL local data");
     }
+    traceout;
 }
 
 QSqlQuery DbSqlite::createQuery()
@@ -499,7 +499,7 @@ quint64 DbSqlite::getDbVersionInMetadata(bool* isOk)
     qint64 ver = 0;
     ErrCode err = getMetadataValue(KMetadataKeyVersion, ver);
     if (err == ErrNone) {
-        logd("Version = 0x%x", ver);
+        logd("Version = 0x%llx", ver);
     } else {
         loge("value for key '%s' failed, err=%d", KMetadataKeyVersion, err);
     }
@@ -550,7 +550,7 @@ ErrCode DbSqlite::getMetadataValue(const QString &key, qint64 &outvalue)
         if (!valueStr.isEmpty()) {
             value = valueStr.toInt(&ok);
             if (ok) {
-                logd("value = 0x%x", value);
+                logd("value = 0x%llx", value);
                 outvalue = value;
             } else {
                 loge("convert '%s' to in failed", STR2CHA(valueStr));
@@ -562,7 +562,7 @@ ErrCode DbSqlite::getMetadataValue(const QString &key, qint64 &outvalue)
             logd("No data for key '%s'", STR2CHA(key));
         }
     } else {
-        loge("value for key '%s' failed, err=", STR2CHA(key), err);
+        loge("value for key '%s' failed, err=%d", STR2CHA(key), err);
     }
     traceret(err);
     return err;
@@ -687,15 +687,15 @@ ErrCode_t DbSqlite::loadDb(const DbInfo* dbInfo){
         bool ok = false;
         quint64 dbVersion = getDbVersion();
         quint64 versionInDb = getDbVersionInMetadata(&ok);
-        logi("dbversion = 0x%08x, versionInDb = 0x%08x", dbVersion, versionInDb);
+        logi("dbversion = 0x%08llx, versionInDb = 0x%08x", dbVersion, versionInDb);
         bool updateversionindb = false;
         if (ok) {
             if (dbVersion == versionInDb) {
-                logi("Version is identical = 0x%08x", dbVersion);
+                logi("Version is identical = 0x%08llx", dbVersion);
             } else if (versionInDb == 0){
                 updateversionindb = true;
             } else {
-                logw("VERSION ARE DIFFERENT!! version = 0x%08x, versionInDb = 0x%08llx",
+                logw("VERSION ARE DIFFERENT!! version = 0x%08llx, versionInDb = 0x%08llx",
                         dbVersion, versionInDb);
                 // TODO: NEED TO DO ANY MIGRATION????
             }
@@ -728,7 +728,7 @@ ErrCode DbSqlite::validateDbInfo(const DbInfo *dbInfo)
         logi("meta uri = '%s'", STR2CHA(metaUri));
         if (!metaUri.isEmpty()) {
             if (!QFile::exists(metaUri)) {
-                logi("Meta db '%s' not exist, generate new one");
+                logi("Meta db '%s' not exist, generate new one", STR2CHA(metaUri));
                 mMetaDbInfo.setAppVersion(APP_VERSION_CODE);
                 mMetaDbInfo.setAppVersionString(APP_VERSION);
                 mMetaDbInfo.setDbVersion(DB_VERSION);
@@ -744,7 +744,7 @@ ErrCode DbSqlite::validateDbInfo(const DbInfo *dbInfo)
 
     if (err == ErrNone) {
         if (mMetaDbInfo.dbVersion() != DB_VERSION) {
-            logw("DB version change, from %d to %d", mMetaDbInfo.dbVersion(), DB_VERSION);
+            logw("DB version change, from %lld to %d", mMetaDbInfo.dbVersion(), DB_VERSION);
             // TODO: handle Db change version here
         }
     }
@@ -759,7 +759,6 @@ ErrCode_t DbSqlite::execQuery(const QString &sql)
     logd("Execute query %s", sql.toStdString().c_str());
 
     // TODO: re-implement this, race condition? resource leakage???
-//    err = openDb();
     QSqlQuery qry(currentDb());
     if (err == ErrNone) {
         currentDb().transaction();
@@ -767,8 +766,8 @@ ErrCode_t DbSqlite::execQuery(const QString &sql)
         qry.prepare(sql);
         if( !qry.exec() ) {
 
-            loge( "Failed to execute %s", qry.executedQuery().toStdString().c_str() );
-            loge( "Last error %s", qry.lastError().text().toStdString().c_str() );
+            loge( "Failed to execute %s", STR2CHA(qry.executedQuery()) );
+            loge( "Last error %s", STR2CHA(qry.lastError().text()) );
             err = ErrFailSqlQuery;
         }
 
@@ -817,7 +816,6 @@ ErrCode_t DbSqlite::startTransaction()
 {
     tracein;
     ErrCode err = ErrNone;
-//    err = openDb();
     if (err == ErrNone)
         currentDb().transaction();
     else
@@ -839,7 +837,7 @@ ErrCode_t DbSqlite::endTransaction()
 //    closeDb();
     // TODO: re-implement this, race condition? resource leakage???
     traceout;
-    return ErrNone;
+    return err;
 }
 
 QSqlDatabase DbSqlite::getDbConnection()

@@ -68,7 +68,11 @@ QString Config::getNextPersonalCode(qint64* code, ErrCode *outErr)
 int Config::getLogLevel()
 {
     traced;
+#ifdef DEBUG_LOG
+    return LOG_DEBUG;
+#else //!DEBUG_LOG
     return CONFIG->getValue(CONFIG_LOG_LEVEL, DEFAULT_LOGLEVEL);
+#endif //DEBUG_LOG
 }
 
 ErrCode Config::initDefaultConfig()

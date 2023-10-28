@@ -33,6 +33,7 @@ DbSqliteUpdateBuilder *DbSqliteUpdateBuilder::build(const QString &tblName)
 DbSqliteUpdateBuilder *DbSqliteUpdateBuilder::addValue(const QString &field, const QString &value, int dataType)
 {
     tracein;
+    dbgtrace;
     logd("add field %s, value %s", field.toStdString().c_str(), value.toStdString().c_str());
     if (!mValue.contains(field)) {
         mValue.insert(field, FieldValue(value, dataType));
@@ -46,6 +47,7 @@ DbSqliteUpdateBuilder *DbSqliteUpdateBuilder::addValue(const QString &field, con
 DbSqliteUpdateBuilder *DbSqliteUpdateBuilder::addValue(const QString &field, qint64 value)
 {
     tracein;
+    dbgtrace;
     logd("add field int %s, value %d", field.toStdString().c_str(), value);
     if (!mValue.contains(field)) {
         mValue.insert(field, FieldValue(value));
@@ -59,12 +61,14 @@ DbSqliteUpdateBuilder *DbSqliteUpdateBuilder::addValue(const QString &field, qin
 DbSqliteUpdateBuilder *DbSqliteUpdateBuilder::addCond(const QString &field, const QString &value, int dataType)
 {
     tracein;
+    dbgtrace;
     logd("add cond %s, value %s", field.toStdString().c_str(), value.toStdString().c_str());
     if (!mCondition.contains(field)) {
         mCondition.insert(field, FieldValue(value, dataType));
     } else {
         logi("Field %s already exist", field.toStdString().c_str());
     }
+    traceout;
     return this;
 }
 
@@ -73,7 +77,8 @@ QSqlQuery *DbSqliteUpdateBuilder::buildSqlQuery(const QString *cond)
     tracein;
     QString conds;
     QString values;
-    tracein;
+
+    dbgtrace;;
     foreach( QString field, mValue.keys() )
     {
         if (!values.isEmpty()) {
@@ -97,10 +102,9 @@ QSqlQuery *DbSqliteUpdateBuilder::buildSqlQuery(const QString *cond)
     QString queryString = QStringLiteral(
                               "UPDATE %1 SET %2 WHERE %3")
                               .arg(mName, values, conds);
-//    DB->openDb();
     QSqlQuery* qry = new QSqlQuery(SQLITE->currentDb());
     qry->prepare(queryString);
-    logd("Query String '%s'", queryString.toStdString().c_str());
+    dbgd("Query String '%s'", STR2CHA(queryString));
     foreach( QString field, mValue.keys() )
     {
         QString id = ":val_" + field;
@@ -124,6 +128,7 @@ QSqlQuery *DbSqliteUpdateBuilder::buildSqlQuery(const QString *cond)
         qry->bindValue(id, mCondition.value(field).value); // TODO: check datatype
 
     }
+    traceout;
     return qry;
 }
 

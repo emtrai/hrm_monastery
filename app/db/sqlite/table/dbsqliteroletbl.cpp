@@ -22,22 +22,15 @@
 #include "dbsqliteroletbl.h"
 
 #include "dbsqlitedefs.h"
-#include "errcode.h"
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QHash>
 #include "defs.h"
 #include "logger.h"
-#include "personstatus.h"
-#include "dbsqlitetablebuilder.h"
-#include "dbsqliteinsertbuilder.h"
 
 
 const qint32 DbSqliteRoleTbl::KVersionCode = VERSION_CODE(0,0,1);
 
-DbSqliteRoleTbl::DbSqliteRoleTbl():
-    DbSqliteRoleTbl(nullptr)
-{}
 DbSqliteRoleTbl::DbSqliteRoleTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableRole, KTableRole, KVersionCode,
                   KModelNameRole)

@@ -31,9 +31,7 @@
 #include <QSqlQuery>
 #include "logger.h"
 #include "errcode.h"
-#include "dbpersonmodelhandler.h"
 #include "dbsqlite.h"
-#include "dbsqliteperson.h"
 
 const qint32 DbSqliteCommunityTbl::KVersionCode = VERSION_CODE(0,0,1);
 

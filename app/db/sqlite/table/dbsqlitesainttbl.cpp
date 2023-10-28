@@ -43,7 +43,7 @@ DbSqliteSaintTbl::DbSqliteSaintTbl(DbSqlite* db)
     : DbSqliteTbl(db, KTableSaint, KTableSaint, KVersionCode,
                   KModelNameSaint)
 {
-    tracein;
+    traced;
 }
 
 void DbSqliteSaintTbl::addTableField(DbSqliteTableBuilder *builder)
@@ -55,36 +55,43 @@ void DbSqliteSaintTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldGender, INT32);
     builder->addField(KFieldFeastDay, INT64);
     builder->addField(KFieldCountry, TEXT);
+    traceout;
 }
 
 ErrCode DbSqliteSaintTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
 {
     tracein;
-    DbSqliteTbl::insertTableField(builder, item);
-    Saint* saint = (Saint*) item;
-    builder->addValue(KFieldFullName, saint->fullName());
-    builder->addValue(KFieldOriginName, saint->originName());
-    builder->addValue(KFieldGender, saint->gender());
-    builder->addValue(KFieldFeastDay, saint->feastDay());
-    builder->addValue(KFieldCountry, saint->country());
-    builder->addValue(KFieldCountryUid, saint->countryUid());
+    dbgd("insert table field for model '%s'", MODELSTR2CHA(item));
+    ErrCode err = DbSqliteTbl::insertTableField(builder, item);
+    if (err == ErrNone && IS_MODEL_NAME(item, KModelNameSaint)) {
+        Saint* saint = (Saint*) item;
+        builder->addValue(KFieldFullName, saint->fullName());
+        builder->addValue(KFieldOriginName, saint->originName());
+        builder->addValue(KFieldGender, saint->gender());
+        builder->addValue(KFieldFeastDay, saint->feastDay());
+        builder->addValue(KFieldCountry, saint->country());
+        builder->addValue(KFieldCountryUid, saint->countryUid());
+    }
     traceout;
-    return ErrNone;
+    return err;
 }
 
 ErrCode DbSqliteSaintTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     tracein;
+    dbgd("updateDbModelDataFromQuery model '%s'", MODELSTR2CHA(item));
     ErrCode err = ErrNone;
-    DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
-    Saint* saint = (Saint*) item;
-    saint->setFullName(qry.value(KFieldFullName).toString());
-    saint->setOriginName(qry.value(KFieldOriginName).toString());
-    saint->setGender((Gender)qry.value(KFieldGender).toInt());
-    saint->setFeastDay(qry.value(KFieldFeastDay).toInt());
-    saint->setCountry(qry.value(KFieldCountry).toString());
-    if (qry.value(KFieldCountryUid).isValid()) {
-        saint->setCountryUid(qry.value(KFieldCountryUid).toString());
+    err = DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
+    if (err == ErrNone && IS_MODEL_NAME(item, KModelNameSaint)) {
+        Saint* saint = (Saint*) item;
+        saint->setFullName(qry.value(KFieldFullName).toString());
+        saint->setOriginName(qry.value(KFieldOriginName).toString());
+        saint->setGender((Gender)qry.value(KFieldGender).toInt());
+        saint->setFeastDay(qry.value(KFieldFeastDay).toInt());
+        saint->setCountry(qry.value(KFieldCountry).toString());
+        if (qry.value(KFieldCountryUid).isValid()) {
+            saint->setCountryUid(qry.value(KFieldCountryUid).toString());
+        }
     }
     traceout;
     return err;
@@ -115,7 +122,7 @@ ErrCode DbSqliteSaintTbl::search(const QString &keyword, QList<DbModel *> *outLi
                              int noItems,
                              int* total)
 {
-    tracein;
+    traced;
     return DbSqliteTbl::search(keyword, &Saint::build, outList, dbStatus, from, noItems, total);
 }
 
@@ -148,7 +155,7 @@ ErrCode DbSqliteSaintTbl::updateBuilderFieldFromModel(DbSqliteUpdateBuilder *bui
 
     tracein;
     ErrCode err = ErrNone;
-    logd("update table field '%s' for model '%s'", STR2CHA(field), MODELSTR2CHA(item));
+    dbgd("update table field '%s' for model '%s'", STR2CHA(field), MODELSTR2CHA(item));
     if (!builder || !item || field.isEmpty()) {
         err = ErrInvalidArg;
         loge("invalid arg");

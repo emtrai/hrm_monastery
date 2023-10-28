@@ -20,18 +20,13 @@
  * Brief:
  */
 #include "dbsqlitedeparttbl.h"
-#include "department.h"
 
 #include "dbsqlitedefs.h"
-#include "errcode.h"
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QHash>
 #include "defs.h"
 #include "logger.h"
-#include "dbsqlitetablebuilder.h"
-#include "dbsqliteinsertbuilder.h"
-#include "dbctl.h"
 #include "dbsqlite.h"
 
 
@@ -41,5 +36,5 @@ DbSqliteDepartTbl::DbSqliteDepartTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableDepartment, KTableDepartment, KVersionCode,
                   KModelNameDepartment)
 {
-    tracein;
+    traced;
 }

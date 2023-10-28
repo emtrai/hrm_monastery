@@ -28,7 +28,6 @@ class DbSqliteSpecialistPersonTbl : public DbSqliteMapTbl
 {
 public:
     DbSqliteSpecialistPersonTbl(DbSqlite* db);
-    DbSqliteSpecialistPersonTbl(DbSqlite* db, const QString& baseName, const QString& name, qint32 versionCode);
     QList<DbModel*> getListPerson(const QString& specialistUid, int status = MODEL_STATUS_MAX);
     QList<DbModel*> getListSpecialist(const QString& personUid, int status = MODEL_STATUS_MAX);
 protected:

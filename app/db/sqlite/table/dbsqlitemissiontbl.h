@@ -24,22 +24,13 @@
 
 #include "dbsqlitetbl.h"
 
-
 class DbSqlite;
-class DbSqliteTableBuilder;
-class DbSqliteInsertBuilder;
-class DbModel;
-class QSqlQuery;
 
 
 class DbSqliteMissionTbl : public DbSqliteTbl
 {
 public:
-    DbSqliteMissionTbl();
     DbSqliteMissionTbl(DbSqlite *db);
-    virtual void addTableField(DbSqliteTableBuilder* builder);
-    virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
-    virtual ErrCode updateDbModelDataFromQuery(DbModel* item, const QSqlQuery& qry);
 
 private:
     static const qint32 KVersionCode;

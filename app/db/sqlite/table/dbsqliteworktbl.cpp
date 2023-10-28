@@ -26,9 +26,6 @@
 #include "defs.h"
 #include "logger.h"
 
-#include "dbsqlitetablebuilder.h"
-#include "work.h"
-#include "dbsqliteinsertbuilder.h"
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QHash>
@@ -39,5 +36,5 @@ DbSqliteWorkTbl::DbSqliteWorkTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableWork, KTableWork, KVersionCode,
                   KModelNameWork)
 {
-    tracein;
+    traced;
 }

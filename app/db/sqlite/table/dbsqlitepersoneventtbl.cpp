@@ -48,9 +48,6 @@
 
 const qint32 DbSqlitePersonEventTbl::KVersionCode = VERSION_CODE_1;
 
-DbSqlitePersonEventTbl::DbSqlitePersonEventTbl():
-    DbSqlitePersonEventTbl(nullptr)
-{}
 DbSqlitePersonEventTbl::DbSqlitePersonEventTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTablePersonEvent, KTablePersonEvent, KVersionCode,
                   KModelNamePersonEvent)
@@ -66,12 +63,17 @@ DbSqlitePersonEventTbl::~DbSqlitePersonEventTbl()
 void DbSqlitePersonEventTbl::addTableField(DbSqliteTableBuilder *builder)
 {
     tracein;
-    DbSqliteTbl::addTableField(builder);
-    builder->addField(KFieldDate, INT64);
-    builder->addField(KFieldEndDate, INT64);
-    builder->addField(KFieldEventUid, TEXT);
-    // person id instead of person uid, due to silly mistake so cannot change... f*c* me
-    builder->addField(KFieldPersonId, TEXT);
+    dbgtrace;
+    if (builder) {
+        DbSqliteTbl::addTableField(builder);
+        builder->addField(KFieldDate, INT64);
+        builder->addField(KFieldEndDate, INT64);
+        builder->addField(KFieldEventUid, TEXT);
+        // person id instead of person uid, due to silly mistake so cannot change... f*c* me
+        builder->addField(KFieldPersonId, TEXT);
+    } else {
+        loge("invalid builder");
+    }
     traceout;
 }
 
@@ -79,22 +81,32 @@ ErrCode DbSqlitePersonEventTbl::insertTableField(DbSqliteInsertBuilder *builder,
                                          const DbModel *item)
 {
     tracein;
-    DbSqliteTbl::insertTableField(builder, item);
-
-    PersonEvent* model = (PersonEvent*) item;
-    builder->addValue(KFieldDate, model->date());
-    builder->addValue(KFieldEndDate, model->endDate());
-    builder->addValue(KFieldName, model->name());
-    builder->addValue(KFieldEventUid, model->eventUid());
-    builder->addValue(KFieldPersonId, model->personUid());
+    ErrCode err = ErrNone;
+    dbgtrace;
+    dbgd("insert for model '%s'", MODELSTR2CHA(item));
+    err = DbSqliteTbl::insertTableField(builder, item);
+    if (err == ErrNone && !IS_MODEL_NAME(item, KModelNamePersonEvent)) {
+        loge("invalid model '%s'", MODELSTR2CHA(item));
+        err = ErrInvalidModel;
+    }
+    if (err == ErrNone) {
+        PersonEvent* model = (PersonEvent*) item;
+        builder->addValue(KFieldDate, model->date());
+        builder->addValue(KFieldEndDate, model->endDate());
+        builder->addValue(KFieldName, model->name());
+        builder->addValue(KFieldEventUid, model->eventUid());
+        builder->addValue(KFieldPersonId, model->personUid());
+    }
     traceout;
-    return ErrNone;
+    return err;
 }
 
 ErrCode DbSqlitePersonEventTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     tracein;
     ErrCode err = ErrNone;
+    dbgtrace;
+    dbgd("updated for model '%s'", MODELSTR2CHA(item));
     if (!item) {
         err = ErrInvalidArg;
         loge("invalid arg");
@@ -102,7 +114,7 @@ ErrCode DbSqlitePersonEventTbl::updateDbModelDataFromQuery(DbModel *item, const 
     if (err == ErrNone) {
         err = DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
     }
-    if (err == ErrNone) {
+    if (err == ErrNone && IS_MODEL_NAME(item, KModelNamePersonEvent)) {
         PersonEvent* model = (PersonEvent*) item;
         if (qry.value(KFieldPersonEventUid).isValid()) {
             model->setUid(qry.value(KFieldPersonEventUid).toString());
@@ -117,9 +129,7 @@ ErrCode DbSqlitePersonEventTbl::updateDbModelDataFromQuery(DbModel *item, const 
         model->setDate(qry.value(KFieldDate).toInt());
         model->setEndDate(qry.value(KFieldEndDate).toInt());
     }
-    if (err == ErrNone) {
-        logd("updated for model '%s'", STR2CHA(item->toString()));
-    }
+    logife(err, "failed to uodate db from data query");
     traceret(err);
     return err;
 }
@@ -130,20 +140,21 @@ ErrCode DbSqlitePersonEventTbl::getListEvents(const QString &personUid,
                                                             qint64 date)
 {
     tracein;
+    dbgtrace;
     QSqlQuery qry(SQLITE->currentDb());
     ErrCode ret = ErrNone;
-    tracein;
+    dbgd("getListEvents personUid '%s'", STR2CHA(personUid));
     QString queryString = QString("SELECT *, "
                                   "%2.%5 AS %6, "
                                   "%1.%4 AS %7, "
                                   "%1.%8 AS %9, "
                                   "%2.%8 AS %10 "
                                   "FROM %1 LEFT JOIN %2 ON %1.%3 = %2.%4")
-                              .arg(name(), KTableEvent) //1 & 2
-                              .arg(KFieldEventUid, KFieldUid) //3 & 4
-                              .arg(KFieldName, KFieldEventName) //5 & 6
-                              .arg(KFieldPersonEventUid, KFieldNameId) //7 & 8
-                              .arg(KFieldPersonEventNameId, KFieldEventNameId) //9 & 10
+                              .arg(name(), KTableEvent, //1 & 2
+                                  KFieldEventUid, KFieldUid, //3 & 4
+                                  KFieldName, KFieldEventName, //5 & 6
+                                  KFieldPersonEventUid, KFieldNameId, //7 & 8
+                                  KFieldPersonEventNameId, KFieldEventNameId) //9 & 10
                                 ;
     bool hasEid = false;
     bool hasDate = false;
@@ -165,7 +176,7 @@ ErrCode DbSqlitePersonEventTbl::getListEvents(const QString &personUid,
 
         queryString += " ORDER BY name ASC";
         qry.prepare(queryString);
-        logd("Query String '%s'", queryString.toStdString().c_str());
+        dbgd("Query String '%s'", queryString.toStdString().c_str());
 
         // TODO: check sql injection issue
         qry.bindValue( ":pid", personUid);
@@ -174,27 +185,21 @@ ErrCode DbSqlitePersonEventTbl::getListEvents(const QString &personUid,
         if (hasDate)
             qry.bindValue( ":date", date );
 
-        if( qry.exec() )
-        {
+        if( qry.exec() ) {
             while (qry.next()) {
                 PersonEvent* item = (PersonEvent*)PersonEvent::build();
+                if (!item) {
+                    loge("no memory?");
+                    continue;
+                }
                 ErrCode tmpret = updateDbModelDataFromQuery(item, qry);
                 if (tmpret == ErrNone) {
-    //                item->setDbId(qry.value(KFieldId).toInt());
-    //                item->setDbStatus(qry.value(KFieldDbStatus).toInt());
-    //                item->setName(qry.value(KFieldName).toString());
-    //                item->setUid(qry.value(KFieldUid).toString());
-    //                item->setPersonUid(qry.value(KFieldPersonId).toString());
-    //                item->setEventUid(qry.value(KFieldEventId).toString());
-    //                item->setDate(qry.value(KFieldDate).toInt());
-    //                item->setEndDate(qry.value(KFieldEndDate).toInt());
                     list.append(item); // TODO: when it cleaned up?????
                 } else {
                     loge("faield to update for item ret=%d", tmpret);
                 }
             }
-        }
-        else {
+        } else {
             loge( "Failed to execute %s", queryString.toStdString().c_str() );
             ret = ErrFailed;
         }

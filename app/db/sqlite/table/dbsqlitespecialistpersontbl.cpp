@@ -32,12 +32,11 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QHash>
-#include "persondept.h"
 #include "table/dbsqlitepersontbl.h"
 #include "table/dbsqlitespecialisttbl.h"
 #include "specialist.h"
-#include "dbctl.h"
 #include "dbsqlite.h"
+#include "person.h"
 
 const qint32 DbSqliteSpecialistPersonTbl::KVersionCode = VERSION_CODE(0,0,1);
 
@@ -53,31 +52,14 @@ DbSqliteSpecialistPersonTbl::DbSqliteSpecialistPersonTbl(DbSqlite *db):
     mFieldNameDbId2 = KFieldSpecialistDbId;
 }
 
-DbSqliteSpecialistPersonTbl::DbSqliteSpecialistPersonTbl(DbSqlite *db,
-                                                         const QString &baseName,
-                                                         const QString &name,
-                                                         qint32 versionCode)
-    : DbSqliteMapTbl(db, baseName, name, versionCode)
-{
-    tracein;
-    mFieldNameUid1 = KFieldPersonUid;
-    mFieldNameDbId1 = KFieldPersonDbId;
-    mFieldNameUid2 = KFieldSpecialistUid;
-    mFieldNameDbId2 = KFieldSpecialistDbId;
-}
 
 QList<DbModel *> DbSqliteSpecialistPersonTbl::getListPerson(
     const QString &specialistUid, int status)
 {
     tracein;
-//    DB->openDb();
     QSqlQuery qry(SQLITE->currentDb());
-    qint32 cnt = 0;
-    if (specialistUid.isEmpty()){
-        loge("Invalid specialistUid uid");
-        return QList<DbModel*>();
-    }
-    logi("specialistUid '%s'", specialistUid.toStdString().c_str());
+    dbgtrace;
+    logi("specialistUid '%s'", STR2CHA(specialistUid));
     /*
      * SELECT * FROM "mapTblName"
      *  JOIN "modelTblName"
@@ -93,10 +75,10 @@ QList<DbModel *> DbSqliteSpecialistPersonTbl::getListPerson(
                                                          specialistUid, /*uid*/
                                                          status,
                                                          QString("*, %1.%2 AS %3, %1.%4 AS %5")
-                                                             .arg(KTablePerson, KFieldNameId) // 1&2
-                                                             .arg(KFieldPersonNameId) // 3
-                                                             .arg(KFieldUid) // 4
-                                                             .arg(KFieldPersonUid) // 5
+                                                             .arg(KTablePerson, KFieldNameId, // 1&2
+                                                                 KFieldPersonNameId, // 3
+                                                                 KFieldUid, // 4
+                                                                 KFieldPersonUid) // 5
                                                          );
 
     traceout;
@@ -106,14 +88,7 @@ QList<DbModel *> DbSqliteSpecialistPersonTbl::getListPerson(
 QList<DbModel *> DbSqliteSpecialistPersonTbl::getListSpecialist(const QString &personUid, int status)
 {
     tracein;
-//    DB->openDb();
-//    QSqlQuery qry(SQLITE->currentDb());
-    qint32 cnt = 0;
-    if (personUid.isEmpty()){
-        loge("Invalid personUid uid");
-        return QList<DbModel*>();
-    }
-    logi("personUid '%s'", personUid.toStdString().c_str());
+    logi("personUid '%s'", STR2CHA(personUid));
     /*
      * SELECT * FROM "mapTblName"
      *  JOIN "modelTblName"
@@ -152,16 +127,23 @@ ErrCode DbSqliteSpecialistPersonTbl::insertTableField(DbSqliteInsertBuilder *bui
 {
     tracein;
     ErrCode ret = ErrNone;
-    QString modelName = item->modelName();
-    logd("model name to insert '%s'", modelName.toStdString().c_str());
-    if (modelName == KModelNameSpecialistPerson ) {
+    if (!item) {
+        ret = ErrInvalidArg;
+        loge("invalid argument");
+    }
+    dbgd("model to insert '%s'", MODELSTR2CHA(item));
+    if (ret == ErrNone) {
         ret = DbSqliteMapTbl::insertTableField(builder, item);
+    }
+    if (ret == ErrNone && !IS_MODEL_NAME(item, KModelNameSpecialistPerson )) {
+        ret = ErrInvalidArg;
+        loge("Invalid model '%s'", MODELSTR2CHA(item));
+    }
+    if (ret == ErrNone) {
         SpecialistPerson* model = (SpecialistPerson*) item;
         builder->addValue(KFieldExperienceHistory, model->experienceHistory());
-    } else {
-        ret = ErrInvalidArg;
-        loge("Invali model name '%s'", modelName.toStdString().c_str());
     }
+    logife(ret, "insert table field for model '%s' failed", MODELSTR2CHA(item));
     traceret(ret);
     return ret;
 }
@@ -171,9 +153,8 @@ ErrCode DbSqliteSpecialistPersonTbl::updateDbModelDataFromQuery(DbModel *item, c
     tracein;
     ErrCode err = ErrNone;
     QString modelName = item->modelName();
-    logd("update for map model '%s'", modelName.toStdString().c_str());
-    if (modelName == KModelNamePerson )
-    {
+    dbgd("update for map model '%s'", modelName.toStdString().c_str());
+    if (modelName == KModelNamePerson ) {
         logd("update for person model");
         DbSqlitePersonTbl* tbl = dynamic_cast<DbSqlitePersonTbl*>(DbSqlite::table(KTablePerson));
         err = tbl->updateDbModelDataFromQuery(item, qry);

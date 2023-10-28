@@ -38,10 +38,11 @@
 #define NO_OP do {} while (0)
 // TODO: check debug macro
 
-#define LOG_ERROR (0)
-#define LOG_INFO (1)
-#define LOG_VERBOSE (2)
-#define LOG_DEBUG (3)
+#define LOG_ERROR       (0) // error message only
+#define LOG_INFO        (1) // info + error message
+#define LOG_VERBOSE     (2) // info + error + verbose message
+#define LOG_DEBUG       (3) // debug + info + error + verbose message
+#define LOG_TRACE       (4) // all log messages
 
 //#define THREAD_ID static_cast<long>(reinterpret_cast<intptr_t>(QThread::currentThreadId()))
 #define THREAD_ID static_cast<long>(reinterpret_cast<intptr_t>(QThread::currentThread()))
@@ -59,20 +60,23 @@
 // TODO: add process id???
 #define logd(fmt,...) logit(qDebug, fmt, ##__VA_ARGS__)
 
-#define dbg(level, fmt, ...) logd(fmt, ##__VA_ARGS__)
-
 #else // !DEBUG_LOG
 
 #define logd(fmt,...) NO_OP
 
+#endif // DEBUG_LOG
+
 #define dbg(level, fmt, ...) \
     do { \
-        if (level <= Logger::getLogLevel()) { \
-            logi(fmt, ##__VA_ARGS__); \
+            if (level <= Logger::getLogLevel()) { \
+                logi(fmt, ##__VA_ARGS__); \
         } \
     } while (0)
 
-#endif // DEBUG_LOG
+#define dbgtrace dbg(LOG_TRACE, "<< call '%s' >>", __func__)
+#define dbgd(fmt, ...) dbg(LOG_DEBUG, fmt, ##__VA_ARGS__)
+#define dbgv(fmt, ...) dbg(LOG_VERBOSE, fmt, ##__VA_ARGS__)
+#define dbgi(fmt, ...) dbg(LOG_INFO, fmt, ##__VA_ARGS__)
 
 #ifdef DEBUG_TRACE
 #define traced logd("CALL << %s >>", __func__)

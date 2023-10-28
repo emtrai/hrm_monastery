@@ -49,12 +49,13 @@ void DbMetaInfo::setDbVersion(qint64 version)
 void DbMetaInfo::addTableVersion(const QString &tableName, qint64 version)
 {
     tracein;
-    logd("Add tbl '%s', ver 0x%x", STR2CHA(tableName), version);
+    dbgtrace;
+    dbgv("Add tbl '%s', ver 0x%llx", STR2CHA(tableName), version);
     if (!mListTableVersion.contains(tableName)) {
         logd("table not exist");
         mListTableVersion.insert(tableName, version);
     } else {
-        logd("table existe, set new version");
+        logd("table existed, set new version");
         mListTableVersion[tableName] = version;
     }
     traceout;
@@ -64,14 +65,17 @@ qint64 DbMetaInfo::tableVersion(const QString &tableName, bool *ok)
 {
     tracein;
     qint64 ver = 0;
+    dbgtrace;
+    dbgd("get table version for table '%s'", STR2CHA(tableName));
     if (mListTableVersion.contains(tableName)) {
         ver = mListTableVersion[tableName];
-        logd("Tbl '%s', ver 0x%x", STR2CHA(tableName), ver);
+        logd("Tbl '%s', ver 0x%llx", STR2CHA(tableName), ver);
         if (ok) *ok = true;
     } else {
         logw("table '%s' not exist", STR2CHA(tableName));
         if (ok) *ok = false;
     }
+    dbgd("version 0x%llx", ver);
     traceout;
     return ver;
 }
@@ -85,7 +89,7 @@ QString DbMetaInfo::toJson(bool *ok) const
     jRoot.insert("dbversion", mDbVersion);
     QJsonArray jListTables;
     foreach (QString table, mListTableVersion.keys()) {
-        logd("table='%s', version=%d", STR2CHA(table), mListTableVersion[table]);
+        logd("table='%s', version=%lld", STR2CHA(table), mListTableVersion[table]);
         QJsonObject jtable;
         jtable.insert("table", table);
         jtable.insert("version", mListTableVersion[table]);
@@ -109,7 +113,7 @@ ErrCode DbMetaInfo::saveJson(const QString &fpath) const
     bool ok = false;
     QString jstr = toJson(&ok);
     QFile file(fpath);
-    logd("Save to file '%s'", STR2CHA(fpath));
+    logi("Save metainfo to file '%s'", STR2CHA(fpath));
     if (!ok) {
         loge("conver json string failed");
         err = ErrFailedConvert;
@@ -132,13 +136,12 @@ ErrCode DbMetaInfo::fromJsonFile(const QString &fpath)
 {
     tracein;
     ErrCode err = ErrNone;
-    logd("Load file %s", fpath.toStdString().c_str());
-    logd("Load file %s", fpath.toStdString().c_str());
+    logi("Load meta json file %s", STR2CHA(fpath));
     QFile loadFile(fpath);
     QByteArray importData;
 
     if (!loadFile.open(QIODevice::ReadOnly)) {
-        loge("Couldn't open file %s", fpath.toStdString().c_str());
+        loge("Couldn't open file %s", STR2CHA(fpath));
         err = ErrFileRead;
     }
 

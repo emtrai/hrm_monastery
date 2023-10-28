@@ -35,9 +35,6 @@ public:
     virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
     virtual ErrCode updateDbModelDataFromQuery(DbModel* item, const QSqlQuery& qry);
 protected:
-//    virtual ErrCode updateBuilderFromModel(DbSqliteUpdateBuilder* builder,
-//                                     const QList<QString>& updateField,
-//                                     const DbModel *item);
     virtual ErrCode updateBuilderFieldFromModel(DbSqliteUpdateBuilder *builder,
                                         const QString &field,
                                         const DbModel *item);

@@ -40,7 +40,6 @@ class PersonEvent;
 class DbSqlitePersonEventTbl : public DbSqliteTbl
 {
 public:
-    DbSqlitePersonEventTbl();
     DbSqlitePersonEventTbl(DbSqlite* db);
     virtual ~DbSqlitePersonEventTbl();
 

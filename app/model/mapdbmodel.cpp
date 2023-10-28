@@ -89,8 +89,8 @@ void MapDbModel::dump() const
     logd("- mUid2 %s", STR2CHA(mUid2));
     logd("- mParentUid %s", STR2CHA(mParentUid));
     logd("- mModelStatus %d", mModelStatus);
-    logd("- mStartDate %d - %s", mStartDate, STR2CHA(DatetimeUtils::date2String(mStartDate)));
-    logd("- mEndDate %d - %s", mEndDate, STR2CHA(DatetimeUtils::date2String(mEndDate)));
+    logd("- mStartDate %lld - %s", mStartDate, STR2CHA(DatetimeUtils::date2String(mStartDate)));
+    logd("- mEndDate %lld - %s", mEndDate, STR2CHA(DatetimeUtils::date2String(mEndDate)));
 #endif //DEBUG_TRACE
     traceout;
 }
@@ -237,7 +237,7 @@ const QString &MapDbModel::uid1() const
 
 void MapDbModel::setUid1(const QString &newUid1)
 {
-    mUid1 = newUid1;
+    CHECK_MODIFIED_THEN_SET(mUid1, newUid1, KItemUid1);
 }
 
 qint64 MapDbModel::dbId1() const
@@ -257,7 +257,7 @@ const QString &MapDbModel::uid2() const
 
 void MapDbModel::setUid2(const QString &newUid2)
 {
-    mUid2 = newUid2;
+    CHECK_MODIFIED_THEN_SET(mUid2, newUid2, KItemUid2);
 }
 
 qint64 MapDbModel::dbId2() const
@@ -321,7 +321,7 @@ void MapDbModel::setParentUid(const QString &newParentUid)
 {
     if (mParentUid != newParentUid) {
         mParentUid = newParentUid;
-        markItemAsModified(KItemParentCommunity);
+        markItemAsModified(KItemParentModel);
     }
 }
 
@@ -381,6 +381,7 @@ void MapDbModel::setModelStatusName(const QString &newModelStatusName)
 QString MapDbModel::toString() const
 {
     QString str = DbModel::toString();
+    str += QString(":modeltype('%1')").arg(modelType());
     str += QString(":status('%1'-%2)")
                .arg(DbModel::modelStatus2Name((DbModelStatus)modelStatus()))
                .arg(modelStatus());

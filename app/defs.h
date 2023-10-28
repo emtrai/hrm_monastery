@@ -74,6 +74,8 @@ const char* const KFileTypeHtml = "xlsx";
 
 const char* const KItemImgPath = "img_path";
 const char* const KItemUid = "UID";
+const char* const KItemUid1 = "UID1";
+const char* const KItemUid2 = "UID2";
 const char* const KItemGender = "GIOI_TINH";
 const char* const KItemPersonCode = "MA_NU_TU";
 const char* const KItemPerson = "NU_TU";

@@ -56,76 +56,60 @@ void DbSqliteCourseTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldStartDate, INT64);
     builder->addField(KFieldEndDate, INT64);
     builder->addField(KFieldCourseType, INT64);
+    traceout;
 }
 
 ErrCode DbSqliteCourseTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
 {
     tracein;
-    DbSqliteTbl::insertTableField(builder, item); // TODO: handle error code
-    Course* course = (Course*) item;
-    builder->addValue(KFieldPeriod, course->name());
-    builder->addValue(KFieldStartDate, course->startDate());
-    builder->addValue(KFieldEndDate, course->endDate());
-    builder->addValue(KFieldCourseType, course->courseType());
+    ErrCode err = ErrNone;
+    if (!item) {
+        err = ErrInvalidArg;
+        loge("invalid argument");
+    }
+    dbg(LOG_DEBUG, "insertTableField model '%s'", MODELSTR2CHA(item));
+    if (err == ErrNone) {
+        err = DbSqliteTbl::insertTableField(builder, item); // TODO: handle error code
+    }
+    if (err == ErrNone && !IS_MODEL_NAME(item, KModelNameCourse)) {
+        loge("not supported model '%s', expect '%s'",
+             MODELSTR2CHA(item), KModelNameCourse);
+        err = ErrNotSupport;
+    }
+
+    if (err == ErrNone) {
+        Course* course = (Course*) item;
+        builder->addValue(KFieldPeriod, course->name());
+        builder->addValue(KFieldStartDate, course->startDate());
+        builder->addValue(KFieldEndDate, course->endDate());
+        builder->addValue(KFieldCourseType, course->courseType());
+    }
     traceout;
-    return ErrNone;
+    return err;
 }
 
 ErrCode DbSqliteCourseTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     tracein;
+    dbg(LOG_DEBUG, "updateDbModelDataFromQuery model '%s'", MODELSTR2CHA(item));
     ErrCode err = ErrNone;
-    DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
-    Course* course = (Course*) item;
-    course->setStartDate(qry.value(KFieldStartDate).toInt());
-    course->setEndDate(qry.value(KFieldEndDate).toInt());
-    course->setPeriod(qry.value(KFieldPeriod).toString());
-    course->setCourseType(qry.value(KFieldCourseType).toInt());
+    err = DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
+    if (err == ErrNone && !IS_MODEL_NAME(item, KModelNameCourse)) {
+        loge("not supported model '%s', expect '%s'",
+             MODELSTR2CHA(item), KModelNameCourse);
+        err = ErrNotSupport;
+    }
+
+    if (err == ErrNone) {
+        Course* course = (Course*) item;
+        course->setStartDate(qry.value(KFieldStartDate).toInt());
+        course->setEndDate(qry.value(KFieldEndDate).toInt());
+        course->setPeriod(qry.value(KFieldPeriod).toString());
+        course->setCourseType(qry.value(KFieldCourseType).toInt());
+    }
     traceout;
     return err;
 }
-
-//ErrCode DbSqliteCourseTbl::updateBuilderFromModel(DbSqliteUpdateBuilder *builder, const QList<QString> &updateField, const DbModel *item)
-//{
-//    tracein;
-//    ErrCode err = ErrNone;
-//    if (!builder || !item) {
-//        err = ErrInvalidArg;
-//        loge("invalid arg");
-//    }
-//    if (err == ErrNone) {
-//        err = DbSqliteTbl::updateBuilderFromModel(builder, updateField, item);
-//    }
-
-//    if (err == ErrNone) {
-//        if (item->modelName() == KModelNameCourse) {
-//            Course* comm = (Course*) item;
-//            foreach (QString field, updateField) {
-//                logd("Update field %s", STR2CHA(field));
-//                if (field == KItemStartDate) {
-//                    builder->addValue(KFieldStartDate, comm->startDate());
-
-//                } else if (field == KItemEndDate) {
-//                    builder->addValue(KFieldEndDate, comm->endDate());
-
-//                } else if (field == KItemPeriod) {
-//                    builder->addValue(KFieldPeriod, comm->period());
-
-//                } else if (field == KItemCourseType) {
-//                    builder->addValue(KFieldCourseType, comm->courseType());
-
-//                } else {
-//                    logw("Field '%s' not support here", STR2CHA(field));
-//                }
-//            }
-//        } else {
-//            logw("Model name '%s' is no support",
-//                 STR2CHA(item->modelName()));
-//        }
-//    }
-//    traceret(err);
-//    return err;
-//}
 
 ErrCode DbSqliteCourseTbl::updateBuilderFieldFromModel(DbSqliteUpdateBuilder *builder, const QString &field, const DbModel *item)
 {

@@ -24,7 +24,6 @@
 
 
 #include "dbsqlitedefs.h"
-#include "errcode.h"
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QHash>
@@ -37,7 +36,7 @@ DbSqliteEduTbl::DbSqliteEduTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableEdu, KTableEdu, KVersionCode,
                   KModelNameEducation)
 {
-    tracein;
+    traced;
 
     // TODO: remark field???
 }

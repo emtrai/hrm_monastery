@@ -24,10 +24,12 @@
 #include "logger.h"
 #include <QException>
 #include <QByteArray>
+#include <QThread>
 
 #define THROWEX(fmt,...) \
 do {\
     loge("EXCEPTION!! " fmt, ##__VA_ARGS__);\
+    QThread::sleep(1); \
     throw MyException(QString().asprintf("%s %s:%d" fmt, THIS_FILE, __func__, __LINE__, ##__VA_ARGS__));\
 } while(0)
 

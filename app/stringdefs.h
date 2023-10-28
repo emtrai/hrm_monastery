@@ -180,4 +180,11 @@
 
 
 #define STR_UNKNOWN             QObject::tr("Không rõ")
+
+#define STR_UNKNOWN             QObject::tr("Không rõ")
+#define STR_NOT_READY             QObject::tr("Chưa sẵn sàng")
+#define STR_INACTIVE             QObject::tr("Không hoạt động")
+#define STR_ACTIVE             QObject::tr("Đang hoạt động")
+#define STR_BUILDING             QObject::tr("Đang xây dựng")
+
 #endif // STRINGDEFS_H

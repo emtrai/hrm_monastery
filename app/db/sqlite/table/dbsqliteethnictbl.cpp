@@ -42,7 +42,7 @@ DbSqliteEthnicTbl::DbSqliteEthnicTbl(DbSqlite* db)
     :DbSqliteTbl(db, KTableEthnic, KTableEthnic, KVersionCode,
                   KModelNameEthnic)
 {
-    tracein;
+    traced;
 }
 
 void DbSqliteEthnicTbl::addTableField(DbSqliteTableBuilder *builder)
@@ -58,24 +58,38 @@ ErrCode DbSqliteEthnicTbl::insertTableField(DbSqliteInsertBuilder *builder,
                                            const DbModel *item)
 {
     tracein;
-    DbSqliteTbl::insertTableField(builder, item);
-
-    Ethnic* model = (Ethnic*) item;
-    builder->addValue(KFieldCountryUid, model->countryUid());
-    builder->addValue(KFieldCountryDbId, model->countryDbId());
+    ErrCode err = ErrNone;
+    err = DbSqliteTbl::insertTableField(builder, item);
+    if (err == ErrNone && !IS_MODEL_NAME(item, KModelNameEthnic)) {
+        loge("not supported model '%s', expect '%s'",
+             MODELSTR2CHA(item), KModelNameEthnic);
+        err = ErrNotSupport;
+    }
+    if (err == ErrNone) {
+        Ethnic* model = (Ethnic*) item;
+        builder->addValue(KFieldCountryUid, model->countryUid());
+        builder->addValue(KFieldCountryDbId, model->countryDbId());
+    }
     traceout;
-    return ErrNone;
+    return err;
 }
 
 ErrCode DbSqliteEthnicTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     tracein;
     ErrCode err = ErrNone;
-    DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
-    Ethnic* model = (Ethnic*) item;
-    model->setCountryUid(qry.value(KFieldCountryUid).toString().trimmed());
-    model->setCountryDbId(qry.value(KFieldCountryDbId).toInt());
-    model->setCountryName(qry.value(KFieldCountryName).toString().trimmed());
+    err = DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
+    if (err == ErrNone && !IS_MODEL_NAME(item, KModelNameEthnic)) {
+        loge("not supported model '%s', expect '%s'",
+             MODELSTR2CHA(item), KModelNameEthnic);
+        err = ErrNotSupport;
+    }
+    if (err == ErrNone) {
+        Ethnic* model = (Ethnic*) item;
+        model->setCountryUid(qry.value(KFieldCountryUid).toString().trimmed());
+        model->setCountryDbId(qry.value(KFieldCountryDbId).toInt());
+        model->setCountryName(qry.value(KFieldCountryName).toString().trimmed());
+    }
     traceout;
     return err;
 }
@@ -93,7 +107,7 @@ QString DbSqliteEthnicTbl::getSearchQueryString(const QString &cond)
         queryString += QString(" WHERE %1").arg(cond);
     }
     queryString += " ORDER BY name ASC";
-    logd("queryString: %s", queryString.toStdString().c_str());
+    dbg(LOG_DEBUG, "queryString: %s", STR2CHA(queryString));
     return queryString;
 }
 

@@ -72,13 +72,14 @@ DbSqliteTableBuilder* DbSqliteTableBuilder::addField(const QString& name, TableF
 QString DbSqliteTableBuilder::buildSqlStatement()
 {
     QString fields;
+    dbgtrace;
 
     foreach( TableFieldItem* item, mFields )
     {
         fields += ", " + item->name() + " " + getDateTypeString(item->datatype());
     }
 
-
+    traceout;
     /**
      * Table
      * - id (seq)

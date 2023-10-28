@@ -38,7 +38,7 @@ DbSqliteSaintPersonMapTbl::DbSqliteSaintPersonMapTbl(DbSqlite* db)
     : DbSqliteTbl(db, KTableSaintPerson, KTableSaintPerson, KVersionCode,
                   KModelNameSaintPerson)
 {
-    tracein;
+    traced;
 }
 
 void DbSqliteSaintPersonMapTbl::addTableField(DbSqliteTableBuilder *builder)
@@ -49,32 +49,40 @@ void DbSqliteSaintPersonMapTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldSaintDbId, INT64);
     builder->addField(KFieldPersonUid, TEXT);
     builder->addField(KFieldPersonDbId, INT64);
+    traceout;
 }
 
 ErrCode DbSqliteSaintPersonMapTbl::insertTableField(DbSqliteInsertBuilder *builder, const DbModel *item)
 {
     tracein;
-    DbSqliteTbl::insertTableField(builder, item);
-    SaintPerson* saint = (SaintPerson*) item;
-    builder->addValue(KFieldSaintUid, saint->saintUid());
-    builder->addValue(KFieldSaintDbId, saint->saintDbId());
-    builder->addValue(KFieldPersonUid, saint->personUid());
-    builder->addValue(KFieldPersonDbId, saint->personDbId());
+    dbgd("insert table field for model '%s'", MODELSTR2CHA(item));
+    ErrCode err = DbSqliteTbl::insertTableField(builder, item);
+    if (err == ErrNone && IS_MODEL_NAME(item, KModelNameSaintPerson)) {
+        SaintPerson* saint = (SaintPerson*) item;
+        builder->addValue(KFieldSaintUid, saint->saintUid());
+        builder->addValue(KFieldSaintDbId, saint->saintDbId());
+        builder->addValue(KFieldPersonUid, saint->personUid());
+        builder->addValue(KFieldPersonDbId, saint->personDbId());
+    }
     traceout;
-    return ErrNone;
+    return err;
 }
 
 ErrCode DbSqliteSaintPersonMapTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQuery &qry)
 {
     tracein;
     ErrCode err = ErrNone;
-    DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
-    SaintPerson* saint = (SaintPerson*) item;
-    saint->setSaintDbId(qry.value(KFieldSaintDbId).toInt());
-    saint->setSaintUid(qry.value(KFieldSaintUid).toString());
-    saint->setPersonDbId(qry.value(KFieldPersonDbId).toInt());
-    saint->setPersonUid(qry.value(KFieldPersonUid).toString());
-    traceout;
+    dbgd("updateDbModelDataFromQuery model '%s'", MODELSTR2CHA(item));
+    err = DbSqliteTbl::updateDbModelDataFromQuery(item, qry);
+
+    if (err == ErrNone && IS_MODEL_NAME(item, KModelNameSaintPerson)) {
+        SaintPerson* saint = (SaintPerson*) item;
+        saint->setSaintDbId(qry.value(KFieldSaintDbId).toInt());
+        saint->setSaintUid(qry.value(KFieldSaintUid).toString());
+        saint->setPersonDbId(qry.value(KFieldPersonDbId).toInt());
+        saint->setPersonUid(qry.value(KFieldPersonUid).toString());
+    }
+    traceret(err);
     return err;
 }
 

@@ -24,7 +24,6 @@
 
 #include "dbsqlitetbl.h"
 
-#include <QList>
 class DbSqlite;
 
 class DbSqliteEduTbl : public DbSqliteTbl
