@@ -27,28 +27,25 @@
 #include "logger.h"
 #include "mainwindow.h"
 #include "stringdefs.h"
+#include "dlgmsg.h"
 
 void DialogUtils::showMsgBox(const QString &msg, QWidget* parent)
 {
     tracein;
-//    QMessageBox msgBox;
     logd("Msg box %s", msg.toStdString().c_str());
-    // TODO: title???
-//    msgBox.setParent(parent?parent:MAINWIN);
-//    msgBox.setInformativeText(msg);
-//    msgBox.setStandardButtons(QMessageBox::Close);
-//    msgBox.exec();
-    int ret = QMessageBox::information(MAINWIN, STR_INFO, msg, QMessageBox::Close);
-    logd("return %d", ret);
+    DlgMsg::showMessage(msg, parent);
+    // cannot use QMessageBox here, as it's auto cancel, still don't understand why
+    // TODO: check why cannot use QMessageBox here
     traceout;
 }
 
-void DialogUtils::showErrorBox(const QString &msg)
+void DialogUtils::showErrorBox(const QString &msg, QWidget* parent)
 {
     tracein;
     logd("Error box %s", msg.toStdString().c_str());
-    QMessageBox::critical(MAINWIN, STR_ERROR, msg, QMessageBox::Close);
-//    MAINWIN->showMsgDlg(msg);
+    DlgMsg::showErrMessage(msg, parent);
+    // cannot use QMessageBox here, as it's auto cancel, still don't understand why
+    // TODO: check why cannot use QMessageBox here
     traceout;
 }
 

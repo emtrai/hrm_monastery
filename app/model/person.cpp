@@ -381,13 +381,22 @@ void Person::initExportFields()
         return ((Person*)model)->eduName();
     }); //"education";
     mExportCallbacks.insert(KItemEduNameId, [](const DbModel* model, const QString& item){
-        DbModel* edu = EDUCTL->getModelByUid(((Person*)model)->eduUid());
         QString nameid;
-        if (edu) {
-            nameid = edu->nameId();
-            delete edu;
+        if (model && IS_MODEL_NAME(model, KModelNamePerson)) {
+            const Person* per = static_cast<const Person*>(model);
+            if (!per->eduUid().isEmpty()) {
+                DbModel* edu = EDUCTL->getModelByUid(per->eduUid());
+                if (edu) {
+                    nameid = edu->nameId();
+                    delete edu;
+                } else {
+                    logw("Not found edu uid %s", STR2CHA(((Person*)model)->eduUid()));
+                }
+            } else {
+                logw("empty edu uid");
+            }
         } else {
-            loge("Not found edu uid %s", STR2CHA(((Person*)model)->eduUid()));
+            loge("Invalid model '%s'", MODELSTR2CHA(model));
         }
         return nameid;
 //        return ((Person*)model)->eduUid();

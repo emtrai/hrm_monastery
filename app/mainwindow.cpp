@@ -360,7 +360,7 @@ ErrCode MainWindow::exportListItems(const QList<DbModel *>* items,
 {
     tracein;
     ErrCode err = ErrNone;
-    err = getInstance()->doExportListItems(items, datatype, controller, title, exportTypeList);
+    err = getInstance()->doExportListItems(items, datatype, controller, title, exportTypeList, fpath);
     traceret(err);
     return err;
 }
@@ -1312,7 +1312,7 @@ void MainWindow::onImportPeople(ErrCode err, QList<DbModel *> *list)
 void MainWindow::onShowMsgDlg(QString msg)
 {
     tracein;
-    DialogUtils::showMsgBox(msg);
+    DialogUtils::showMsgBox(msg, this);
     traceout;
 }
 

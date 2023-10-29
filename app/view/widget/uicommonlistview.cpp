@@ -33,6 +33,7 @@
 #include "dialogutils.h"
 #include "importtype.h"
 #include "viewutils.h"
+#include <QMessageBox>
 
 UICommonListView::UICommonListView(QWidget *parent):
     UITableView(parent),
@@ -550,6 +551,7 @@ ErrCode UICommonListView::onMenuActionExport(QMenu *menu, UITableMenuAction *act
     UNUSED(act);
     tracein;
     ErrCode err = ErrNone;
+    QString fpath;
     if (!act){
         err = ErrInvalidArg;
         loge("export list failed, Empty menu action");
@@ -560,16 +562,22 @@ ErrCode UICommonListView::onMenuActionExport(QMenu *menu, UITableMenuAction *act
                                               getMainModelName(),
                                               exportController(),
                                               QString("%1: %2").arg(STR_EXPORT_TO_FILE, getTitle()),
-                                              EXPORT_XLSX);
+                                              EXPORT_XLSX, &fpath);
         } else {
             loge("nothing to export");
             err = ErrNoData;
         }
     }
-    if (err != ErrNone){
+    if (err == ErrNone) {
+//         QMessageBox::information(this, STR_INFO, QString("Xuất dữ liệu ra tập tin: %1").arg(fpath),
+//                                                     QMessageBox::Close);
+        MAINWIN->showMessageBox(QString("Xuất dữ liệu ra tập tin: %1").arg(fpath));
+//        DialogUtils::showMsgBox(QString("Xuất dữ liệu ra tập tin: %1").arg(fpath), this);
+    } else {
         loge("export list failed, error code %d",err);
         DialogUtils::showErrorBox(QString("Xuất dữ liệu lỗi, mã lỗi: %1").arg(err));
     }
+
     traceret(err);
     return err;
 }

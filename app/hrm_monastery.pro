@@ -233,6 +233,7 @@ SOURCES += \
     view/dialog/dlgimportlistresult.cpp \
     view/dialog/dlgimportlistresultfactory.cpp \
     view/dialog/dlgimportpersonlistresult.cpp \
+    view/dialog/dlgmsg.cpp \
     view/dialog/dlgperson.cpp \
     view/dialog/dlgpersoncomm.cpp \
     view/dialog/dlgprovince.cpp \
@@ -458,6 +459,7 @@ HEADERS += \
     view/dialog/dlgimportlistresult.h \
     view/dialog/dlgimportlistresultfactory.h \
     view/dialog/dlgimportpersonlistresult.h \
+    view/dialog/dlgmsg.h \
     view/dialog/dlgperson.h \
     view/dialog/dlgpersoncomm.h \
     view/dialog/dlgprovince.h \
@@ -518,6 +520,7 @@ FORMS += \
     view/dialog/dlghtmlviewer.ui \
     view/dialog/dlgimportexportselect.ui \
     view/dialog/dlgimportlistresult.ui \
+    view/dialog/dlgmsg.ui \
     view/dialog/dlgperson.ui \
     view/dialog/dlgpersoncomm.ui \
     view/dialog/dlgprovince.ui \
