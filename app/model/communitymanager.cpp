@@ -21,10 +21,8 @@
  */
 #include "communitymanager.h"
 #include "logger.h"
-#include "errcode.h"
 #include "defs.h"
 
-#include "stringdefs.h"
 #include "utils.h"
 #include "dbctl.h"
 #include "dbmodel.h"
@@ -32,8 +30,8 @@
 #include "role.h"
 #include "course.h"
 #include "community.h"
-#include "filectl.h"
 #include "prebuiltdefs.h"
+#include "stringdefs.h"
 
 CommunityManager::CommunityManager():MapDbModel(),
     mPerson(nullptr),

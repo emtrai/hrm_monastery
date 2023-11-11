@@ -145,6 +145,28 @@ do { \
     }\
 } while (0)
 
+
+#define SET_MODEL_FROM_VAL_CBOX(widget,func, ctrl, DbModelType, err) \
+    do { \
+        int index = widget->currentIndex(); \
+        QString currtxt = widget->currentText().trimmed();\
+        logd("index %d, name %s", index, STR2CHA(currtxt));\
+        if (index >= 0){ \
+            QVariant value = widget->itemData(index);\
+            if (!value.isNull()) {\
+                QString uid = value.toString();\
+                logd("uid %s", STR2CHA(uid));\
+                DbModel* model = ctrl->getModelByUid(uid); \
+                if (model) { \
+                    func((DbModelType*)model); \
+                } else { \
+                        loge("set model from cbox failed, uid '%s' not found in ctrl '%s'", \
+                             STR2CHA(uid), STR2CHA(ctrl->getName()));\
+                } \
+            }\
+        }\
+    } while (0)
+
 // TODO: should common with above macro???
 // TODO: should check if value is actually integer??? exception???
 #define SET_INT_VAL_FROM_CBOX(widget,func, functxt) \

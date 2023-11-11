@@ -51,7 +51,6 @@ public:
     MapDbModel(const MapDbModel& model);
     MapDbModel(const MapDbModel* model);
     virtual void clone(const DbModel* model);
-    virtual DbModel* clone() const;
     virtual void dump() const;
     static DbModel* buildMapModel(DbModelBuilder builder, const DbModel* item1, const DbModel* item2,
                                   int status = MODEL_STATUS_MAX,
@@ -81,6 +80,7 @@ public:
 
     qint64 endDate() const;
     void setEndDate(qint64 newEndDate);
+    ErrCode setEndDate(const QString& newEndDate);
 
     qint32 modelStatus() const;
     void setModelStatus(qint32 newStatus);
@@ -100,8 +100,8 @@ public:
 
     virtual QString toString() const;
 
-protected:
-    void copy(const MapDbModel& model);
+private:
+    void docopy(const MapDbModel& model);
 protected:
     QString mUid1;
     qint64 mDbId1;

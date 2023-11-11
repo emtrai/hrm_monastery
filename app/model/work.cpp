@@ -40,7 +40,6 @@ Work::~Work()
 
 DbModel *Work::build()
 {
-    tracein;
     Work* model = new Work();
     model->init();
     return model;

@@ -99,6 +99,16 @@ public:
      */
     ErrCode getManagersList(const QString &communityUid, QList<DbModel *> &outList,
                             qint64 modelStatus = MODEL_STATUS_MAX);
+    /**
+     * @brief getCurrentCEO
+     * @param communityUid
+     * @param ceo
+     * @param isActiveCEO
+     * @return ErrNoData if not found CEO, ErrNone if found, else other error code
+     */
+    ErrCode getCurrentCEO(const QString &communityUid,
+                          Person** ceo = nullptr,
+                          bool* isActiveCEO = nullptr);
     ErrCode getAllManagersList(QList<DbModel *> &outList,
                             qint64 modelStatus = MODEL_STATUS_MAX);
     ErrCode getManagersListInString(const QString &communityUid, const QString& sep,

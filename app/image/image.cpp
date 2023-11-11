@@ -52,6 +52,7 @@ ErrCode Image::loadImage(const QString &fullPath, const QString& tag)
     QString tmpFilePath;
     QString thumbImg;
     QString uid;
+    logi("load image fpath '%s'", STR2CHA(fullPath));
     removeTmp();
     if (fullPath.isEmpty() || !QFile::exists(fullPath)) {
         loge("full path is empty or not exist '%s'", STR2CHA(fullPath));
@@ -208,9 +209,11 @@ ErrCode Image::save()
         err = ErrInvalidData;
     }
     if (err == ErrNone) {
+        dbgv("copy file '%s' to '%s'", STR2CHA(mFullImgTmpPath), STR2CHA(mFullImgPath));
         err = FileCtl::copyFile(mFullImgTmpPath, mFullImgPath, true);
     }
     if (err == ErrNone) {
+        dbgv("copy file '%s' to '%s'", STR2CHA(mThumbImgTmpPath), STR2CHA(mThumbImgPath));
         err = FileCtl::copyFile(mThumbImgTmpPath, mThumbImgPath, true);
     }
     traceret(err);

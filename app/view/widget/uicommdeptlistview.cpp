@@ -33,6 +33,7 @@
 #include "stringdefs.h"
 #include "errreporterctl.h"
 #include "viewutils.h"
+#include "datetimeutils.h"
 
 UICommDeptListView::UICommDeptListView(QWidget *parent):
     UICommonListView(parent)

@@ -49,11 +49,6 @@ DlgDeptPerson::~DlgDeptPerson()
     delete ui;
 }
 
-void DlgDeptPerson::setupUI()
-{
-    traced;
-}
-
 ErrCode DlgDeptPerson::buildModel(DbModel *model, QString &errMsg)
 {
     tracein;
@@ -192,6 +187,11 @@ void DlgDeptPerson::on_btnSearch_clicked()
 void DlgDeptPerson::setCommDeptNameId(const QString &newCommDeptNameId)
 {
     mCommDeptNameId = newCommDeptNameId;
+}
+
+QDialogButtonBox *DlgDeptPerson::buttonBox()
+{
+    return ui->buttonBox;
 }
 
 void DlgDeptPerson::setCommDeptUid(const QString &newCommDeptUid)

@@ -41,6 +41,10 @@
 #include "importexportdefs.h"
 
 
+#define STATE_FIND_ID  (0)
+#define STATE_READ_ID  (1)
+#define STATE_READ_DATA  (2)
+
 GET_INSTANCE_IMPL(ImportXlsx)
 
 ImportXlsx::ImportXlsx():Importer()
@@ -57,6 +61,8 @@ ErrCode ImportXlsx::importFrom(const QString &importName, int importFileType,
     ErrCode ret = ErrNone;
     qint32 cnt = 0;
 
+    logi("import from file '%s' importName '%s'",
+         STR2CHA(fpath), STR2CHA(importName));
     if (importer == nullptr){
         ret = ErrInvalidArg;
         loge("import failed, importer null");
@@ -72,9 +78,6 @@ ErrCode ImportXlsx::importFrom(const QString &importName, int importFileType,
             xlsxR.workbook()->setDate1904(false);
             int headCol = 1;
             int headRow = 1;
-            #define STATE_FIND_ID  (0)
-            #define STATE_READ_ID  (1)
-            #define STATE_READ_DATA  (2)
             int state = STATE_FIND_ID;
             QList<QString> fields;
             QHash<QString, QString> fieldValues;

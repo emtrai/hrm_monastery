@@ -51,6 +51,7 @@
 #include "viewutils.h"
 #include "errreporterctl.h"
 #include "communityperson.h"
+#include "dbctl.h"
 
 UIPersonListView::UIPersonListView(QWidget *parent):
     UICommonListView(parent)
@@ -1182,6 +1183,24 @@ ErrCode UIPersonListView::updatePersonEvent(const QList<DbModel *>& perList,
         foreach(PersonEvent* perEvent, perEventList) {
             if (perEvent) {
                 logd("Save for perEvent '%s'", MODELSTR2CHA(perEvent));
+                QString nameid = perEvent->nameId();
+                QString availNameId;
+                if (!nameid.isEmpty()) {
+                    err = ErrInvalidArg;
+                    loge("Lack of nameId");
+                    break;
+                }
+                err = DB->getAvailableNameId(KModelNamePersonEvent, nameid, availNameId);
+                dbgd("availNameId '%s'", STR2CHA(availNameId));
+                if (err == ErrNone && availNameId.isEmpty()) {
+                    loge("not found suitable name id, init name id '%s'", STR2CHA(nameid));
+                    err = ErrNotFound;
+                    break;
+                }
+                if (err == ErrNone) {
+                    perEvent->setNameId(availNameId);
+                }
+
                 err = perEvent->save();
                 if (err != ErrNone) {
                     loge("Event '%s' save failed, err = %d",

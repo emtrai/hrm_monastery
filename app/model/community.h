@@ -26,15 +26,12 @@
 #include <QString>
 #include "dbmodel.h"
 #include "errcode.h"
-#include "address.h"
-#include "person.h"
-#include "department.h"
-#include "dataexporter.h"
 #include "dbmodel.h"
 
 #define MISSION_DELIM ","
 
 class Area;
+class CommunityManager;
 
 // BE WARE, ANY CHANGE TO THIS STATUS WILL IMPACT TO DB
 // THIS VALUE IS WRITTEN DIRECTLY TO DB
@@ -128,7 +125,8 @@ public:
     const QString &parentName();
     void setParentName(const QString &newParentName);
 
-    const QString &currentCEOName() ;
+    const QString &currentCEOName() const;
+    const QString &currentCEONameWithUpdate();
     void setCurrentCEOName(const QString &newCurrentCEOName);
 
     const QString &currentCEOUid() const;
@@ -140,7 +138,7 @@ public:
     const QString &parentNameId();
     void setParentNameId(const QString &newParentNameId);
 
-    const QString &currentCEONameId();
+    const QString &currentCEONameId() const;
     void setCurrentCEONameId(const QString &newCurrentCEOCode);
     virtual ErrCode exportTemplatePath(FileExporter* exporter,
                                        const QString& name,
@@ -179,6 +177,13 @@ public:
     const QString &history() const;
     void setHistory(const QString &newHistory);
 
+    bool updateCEO() const;
+    virtual QString toString() const;
+
+    CommunityManager *newCommMgr() const;
+    void setNewCommMgr(const CommunityManager *newCommMgr);
+
+
 protected:
     virtual DbModelHandler* getDbModelHandler() const;
 
@@ -188,8 +193,9 @@ protected:
      * @return true: allow to delete, false otherwise
      */
     virtual bool allowRemove(QString* msg = nullptr);
-    void copy(const Community& model);
+    virtual void copy(const Community& model);
     void resetResource();
+    virtual ErrCode loadAllData();
 private:
     QString mImgPath;
     QString mAddr;
@@ -230,6 +236,9 @@ private:
     QStringList mMissionUid;
     QStringList mMissionName;
     QStringList mMissionNameId;
+
+    CommunityManager* mNewCommMgr;
+    bool mLoadedCEO;
 };
 
 #endif // COMMUNITY_H

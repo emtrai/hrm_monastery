@@ -20,10 +20,6 @@
  * Brief:
  */
 #include "education.h"
-
-#include "crypto.h"
-
-
 #include "dbctl.h"
 #include "logger.h"
 

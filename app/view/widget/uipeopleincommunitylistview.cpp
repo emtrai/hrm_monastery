@@ -35,6 +35,7 @@
 #include "dialogutils.h"
 #include "errreporterctl.h"
 #include "stringdefs.h"
+#include "person.h"
 
 UIPeopleInCommunityListView::UIPeopleInCommunityListView(QWidget *parent):
     UICommonListView(parent),

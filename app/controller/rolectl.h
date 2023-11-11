@@ -35,6 +35,13 @@ class RoleCtl : public ModelController
 private:
     RoleCtl();
     virtual ~RoleCtl();
+public:
+    /**
+     * @brief Get default CEO role
+     *        WARNING: Caller MUST free after use.
+     * @return Role
+     */
+    Role* getCEORole();
 protected:
     // prebuilt data file name
     virtual const char* getPrebuiltFileName();

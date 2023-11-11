@@ -76,4 +76,6 @@ const char* const KModelNameIdRootCommunity = "HOI_DONG";
 
 const char* const KUidNone = "";
 const char* const KNameIdUnkown = "KHONG_XAC_DINH";
+
+const char* const KRoleCEODefaultNameId = "TONG_PHU_TRACH";
 #endif // MODELDEFS_H

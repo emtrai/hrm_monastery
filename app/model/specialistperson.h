@@ -33,8 +33,6 @@ public:
     static DbModel* build();
     virtual DbModelBuilder getBuilder() const;
 
-    virtual void clone(const DbModel* model);
-    virtual DbModel* clone() const;
 
     virtual QString modelName() const;
     const QString &experienceHistory() const;
@@ -49,6 +47,7 @@ public:
 
 protected:
     virtual DbModelHandler *getDbModelHandler() const;
+    virtual void copy(const DbModel* model);
 protected:
     QString mExperienceHistory;
     DbModel* mSpecialist;

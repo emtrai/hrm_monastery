@@ -22,7 +22,6 @@
 #include "personevent.h"
 #include "logger.h"
 #include "errcode.h"
-#include "filectl.h"
 #include "utils.h"
 #include "datetimeutils.h"
 #include "dbctl.h"
@@ -122,6 +121,7 @@ void PersonEvent::clone(const DbModel *model)
         mEventUid = event->mEventUid;
         mEventName = event->mEventName;
         mPersonUid = event->mPersonUid;
+        mPersonName = event->mPersonName;
     } else {
         logd("Model is null or not person event type, name '%s'",
              model?STR2CHA(model->name()):"null");
@@ -183,6 +183,7 @@ ErrCode PersonEvent::copyData(const DbModel *model)
             mEventName = event->mEventName;// just for display
             mPersonUid = event->mPersonUid;
             markItemAsModified(KItemPerson);
+            mPersonName = event->mPersonName;
         } else {
             loge("invalid event model '%s'", MODELSTR2CHA(model));
             err = ErrInvalidData;

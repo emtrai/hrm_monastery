@@ -22,8 +22,6 @@
 #include "specialistperson.h"
 
 #include "logger.h"
-#include "errcode.h"
-#include "defs.h"
 
 #include "utils.h"
 #include "dbctl.h"
@@ -56,12 +54,11 @@ DbModelBuilder SpecialistPerson::getBuilder() const
     return &SpecialistPerson::build;
 }
 
-void SpecialistPerson::clone(const DbModel *model)
+void SpecialistPerson::copy(const DbModel *model)
 {
     tracein;
-    if (model) {
-        MapDbModel::clone(model);
-        SpecialistPerson* item = (SpecialistPerson*)model;
+    if (IS_MODEL_NAME_STR(model, modelName())) {
+        const SpecialistPerson* item = static_cast<const SpecialistPerson*>(model);
         if (mSpecialist) {
             delete mSpecialist;
             mSpecialist = nullptr;
@@ -70,22 +67,13 @@ void SpecialistPerson::clone(const DbModel *model)
             logd("clone new specialist '%s'", STR2CHA(item->specialist()->toString()));
             mSpecialist = item->specialist()->clone();
         }
-        mExperienceHistory = item->experienceHistory();
+        setExperienceHistory(item->experienceHistory());
     } else {
         loge("clone failed, null model");
     }
     traceout;
 
 }
-
-DbModel *SpecialistPerson::clone() const
-{
-    tracein;
-    MapDbModel::clone();
-    traceout;
-
-}
-
 
 QString SpecialistPerson::modelName() const
 {

@@ -22,9 +22,9 @@
 #include "dlgsearch.h"
 #include "ui_dlgsearch.h"
 #include "logger.h"
-#include "utils.h"
 #include "dbmodel.h"
 #include "dialogutils.h"
+#include "stringdefs.h"
 
 DlgSearch::DlgSearch(QWidget *parent, bool isMulti) :
     QDialog(parent),
@@ -159,7 +159,10 @@ void DlgSearch::setupUi()
     ui->tblList->setColumnCount(mHeader.count());
     ui->tblList->setHorizontalHeaderLabels(mHeader);
     ui->lblTitle->setText(getTitle());
-
+    if (ui->buttonBox->button(QDialogButtonBox::Cancel))
+        ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(STR_CANCEL);
+    if (ui->buttonBox->button(QDialogButtonBox::Ok))
+        ui->buttonBox->button(QDialogButtonBox::Ok)->setText(STR_OK);
 
     traceout;
 }

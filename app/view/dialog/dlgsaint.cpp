@@ -23,12 +23,12 @@
 #include "ui_dlgsaint.h"
 #include "logger.h"
 #include "errcode.h"
-#include "country.h"
 #include "countryctl.h"
 #include "utils.h"
 #include "datetimeutils.h"
 #include "saint.h"
 #include "dialogutils.h"
+#include "stringdefs.h"
 
 DlgSaint::DlgSaint(QWidget *parent) :
     QDialog(parent),
@@ -47,6 +47,12 @@ DlgSaint::DlgSaint(QWidget *parent) :
     }
     // TODO: should manual clear item????
 
+    if (ui->buttonBox->button(QDialogButtonBox::Cancel))
+        ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(STR_CANCEL);
+    if (ui->buttonBox->button(QDialogButtonBox::Ok))
+        ui->buttonBox->button(QDialogButtonBox::Ok)->setText(STR_OK);
+    if (ui->buttonBox->button(QDialogButtonBox::Save))
+        ui->buttonBox->button(QDialogButtonBox::Save)->setText(STR_SAVE);
 }
 
 DlgSaint::~DlgSaint()

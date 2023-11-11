@@ -23,9 +23,7 @@
 
 #include "logger.h"
 #include "role.h"
-#include "dbctl.h"
 #include "utils.h"
-#include "defs.h"
 #include "prebuiltdefs.h"
 #include "controllerdefs.h"
 
@@ -40,6 +38,12 @@ RoleCtl::RoleCtl():
 RoleCtl::~RoleCtl()
 {
     tracein;
+}
+
+Role *RoleCtl::getCEORole()
+{
+    logd("get ceo role default role '%s'", KRoleCEODefaultNameId);
+    return static_cast<Role*>(getModelHandler()->getByNameId(KRoleCEODefaultNameId));
 }
 
 const char *RoleCtl::getPrebuiltFileName()

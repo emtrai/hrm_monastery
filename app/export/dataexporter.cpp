@@ -34,7 +34,7 @@
 
 DataExporter::DataExporter()
 {
-    tracein;
+    traced;
 }
 
 ErrCode DataExporter::exportTemplatePath(FileExporter* exporter,
@@ -42,8 +42,13 @@ ErrCode DataExporter::exportTemplatePath(FileExporter* exporter,
                                          QString& fpath,
                                          QString* ftype) const
 {
-    tracein;
-    return ErrNone;
+    traced;
+    UNUSED(exporter);
+    UNUSED(name);
+    UNUSED(fpath);
+    UNUSED(ftype);
+    logw("must be implemented by derived class");
+    return ErrNotSupport;
 }
 
 ErrCode DataExporter::getListTemplateExportKeywords(FileExporter *exporter,
@@ -55,6 +60,7 @@ ErrCode DataExporter::getListTemplateExportKeywords(FileExporter *exporter,
 
     QString fpath;
     QString ftype;
+    dbgtrace;
 
     if (exporter) {
         err = exportTemplatePath(exporter, datatype, fpath, &ftype);
@@ -67,12 +73,14 @@ ErrCode DataExporter::getListTemplateExportKeywords(FileExporter *exporter,
         err = ErrInvalidArg;
         loge("not found template file");
     }
-    logd("Load file '%s', ftype '%s'", STR2CHA(fpath), STR2CHA(ftype));
+    dbgd("Load template file '%s', ftype '%s'", STR2CHA(fpath), STR2CHA(ftype));
 
     if (err == ErrNone){
         if (ftype == KFileTypeJson) {
+            dbgd("parse json export template");
             err = parseJsonExportTemplate(fpath, outMap);
         } else if (ftype == KFileTypeCSV) {
+            dbgd("parse csv export template");
             err = parseCsvExportTemplate(fpath, outMap);
         } else {
             err = ErrNotSupport;
@@ -85,7 +93,8 @@ ErrCode DataExporter::getListTemplateExportKeywords(FileExporter *exporter,
 
 const QStringList DataExporter::getListExportKeyWord() const
 {
-    tracein;
+    traced;
+    logw("should be implemented by derived class, not here");
     return QStringList();
 }
 
@@ -94,8 +103,12 @@ ErrCode DataExporter::getExportDataString(const QString &item,
                                           const QString& datatype,
                                           QString* data) const
 {
-    tracein;
-    loge("Not support here");
+    traced;
+    UNUSED(item);
+    UNUSED(fileexporter);
+    UNUSED(datatype);
+    UNUSED(data);
+    logw("should be implemented by derived class, not here");
     return ErrNotSupport;
 }
 
@@ -104,8 +117,13 @@ ErrCode DataExporter::getExportDataString(const QString &item,
                                           const QString& datatype,
                                           const DbModel *data, QString *exportData) const
 {
-    tracein;
-    loge("Not support here");
+    traced;
+    UNUSED(item);
+    UNUSED(fileexporter);
+    UNUSED(datatype);
+    UNUSED(data);
+    UNUSED(exportData);
+    logw("should be implemented by derived class, not here");
     ASSERT(false, "CAN NOT GET EXPORT DATA HERE, MUST BE IMPLEMENTED BY DERIVED CLASS");
     return ErrNotSupport;
 }
@@ -124,6 +142,8 @@ ErrCode DataExporter::parseJsonExportTemplate(const QString& fpath, QList<QPair<
     QFile loadFile;
     QByteArray fileData;
 
+    dbgtrace;
+    dbgd("parse json export template '%s'", STR2CHA(fpath));
 
     if (fpath.isEmpty()){
         err = ErrInvalidArg;
@@ -143,10 +163,11 @@ ErrCode DataExporter::parseJsonExportTemplate(const QString& fpath, QList<QPair<
 
     if (err == ErrNone){
         // TODO: ASSUME only JSON, how about other????
+        // TODO: handle big file size
         logd("Parse json");
         fileData = loadFile.readAll();
         if (!fileData.isEmpty()) {
-            logd("fileData length %d", (int)fileData.length());
+            dbgd("fileData length %lld", fileData.length());
         } else {
             err = ErrNoData;
             loge("file '%s' is empty?", STR2CHA(fpath));
@@ -205,14 +226,13 @@ ErrCode DataExporter::parseJsonExportTemplate(const QString& fpath, QList<QPair<
     return err;
 }
 
-ErrCode DataExporter::parseCsvExportTemplate(const QString &fpath, QList<QPair<QString,QString>> &outMap) const
+ErrCode DataExporter::parseCsvExportTemplate(const QString &fpath,
+                                             QList<QPair<QString,QString>> &outMap) const
 {
     tracein;
     ErrCode ret = ErrNone;
     qint32 cnt = 0;
     QStringList items;
-    QString finalData;
-    QHash<QString, QString> keywordMap;
     logd("templatePath %s", fpath.toStdString().c_str());
 
     if (fpath.isEmpty()) {
@@ -224,7 +244,11 @@ ErrCode DataExporter::parseCsvExportTemplate(const QString &fpath, QList<QPair<Q
         logd("parse csv file %s", fpath.toStdString().c_str());
         ret = Utils::parseCSVFile(fpath,
             [](const QStringList& items, void* caller, void* param, quint32 idx){
-                tracein;
+                traced;
+                UNUSED(items);
+                UNUSED(caller);
+                UNUSED(param);
+                UNUSED(idx);
                 logd("callback from lamda when parse csv file for export csv list, idx=%d", idx);
                 return ErrCancelled; // we assume 1st line is headers, so don't need to read more
             },

@@ -163,6 +163,20 @@ qint64 DatetimeUtils::dateFromString(const QString &date, const QString &f, bool
     return ret;
 }
 
+bool DatetimeUtils::isValidDateString(const QString &date, const QString &format)
+{
+    qint64 dateVal = 0;
+    bool ok = false;
+    logd("validate date string '%s'", STR2CHA(date));
+    if (!date.isEmpty()) {
+        dateVal = dateFromString(date, format, &ok);
+        logd("dateVal 0x%llx ok %d", dateVal, ok);
+    } else {
+        logw("empty date");
+    }
+    return (ok && (dateVal > 0));
+}
+
 
 QString DatetimeUtils::date2String(qint64 date, const QString& format, bool* isOk)
 {

@@ -144,6 +144,7 @@ QString ExportFactory::getExportTemplatePath(const QString &modelName, ExportTyp
     }
 
     if (ok) *ok = (err = ErrNone);
+    logife(err, "get export template failed");
     traceout;
     return fpath;
 }

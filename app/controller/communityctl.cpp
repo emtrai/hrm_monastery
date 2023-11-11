@@ -42,6 +42,7 @@
 #include "controllerdefs.h"
 #include "communitymanager.h"
 #include "stringdefs.h"
+#include "rolectl.h"
 
 GET_INSTANCE_CONTROLLER_IMPL(CommunityCtl)
 
@@ -488,6 +489,28 @@ ErrCode CommunityCtl::getManagersList(const QString &communityUid, QList<DbModel
     traceout;
     return err;
 
+}
+
+ErrCode CommunityCtl::getCurrentCEO(const QString &communityUid, Person** ceo,
+                                    bool* isActiveCEO)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    DbCommunityModelHandler* hdl = nullptr;
+    logi("Get current CEO for comm '%s'", STR2CHA(communityUid));
+    if (err == ErrNone) {
+        hdl = dynamic_cast<DbCommunityModelHandler*>(DB->getModelHandler(KModelHdlCommunity));
+        if (!hdl) {
+            err = ErrInvalidData;
+            loge("not found handler, something was wrong");
+        }
+    }
+
+    if (err == ErrNone) {
+        err = hdl->getCurrentCEO(communityUid, ceo, isActiveCEO);
+    }
+    traceret(err);
+    return err;
 }
 
 ErrCode CommunityCtl::getAllManagersList(QList<DbModel *> &outList, qint64 modelStatus)

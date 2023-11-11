@@ -70,6 +70,8 @@ do { \
 #define SET_DATE_VAL_FROM_WIDGET(widget,func) \
         SET_DATE_FORMAT_VAL_FROM_WIDGET(widget, func, DEFAULT_FORMAT_YMD)
 
+#define VALIDATE_DATE_STRING(date, allowEmtpy, fmt) \
+((date.isEmpty() && allowEmtpy) || DatetimeUtils::isValidDateString(date.trimmed(), fmt))
 
 class DatetimeUtils
 {
@@ -82,6 +84,8 @@ public:
     static qint64 dateFromString(const QString& date,
                                  const QString& format = DEFAULT_FORMAT_YMD,
                                  bool *isOk = nullptr);
+    static bool isValidDateString(const QString& date,
+                                  const QString& format = DEFAULT_FORMAT_YMD);
     // TODO: default for const QString is ok or not??? can set it ???
     static QString date2String(qint64 date,
                                const QString& format = DEFAULT_FORMAT_YMD,

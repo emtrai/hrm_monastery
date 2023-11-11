@@ -68,7 +68,7 @@ QString FileCtl::getAppDataSubdir(const QString& dirName, const QString &subDir)
     logd("App path %s", appPath.toStdString().c_str());
 
     if (!appDirPath.exists()){
-        logi("App path not exist, create new one");
+        logi("App path '%s' not exist, create new one", STR2CHA(appPath));
         appDirPath.mkpath(appDirPath.absolutePath());
     }
     if (subDir.isEmpty()){
@@ -136,7 +136,7 @@ ErrCode FileCtl::removeFile(const QString &fpath, bool markRemove)
 {
     tracein;
     ErrCode err = ErrNone;
-    logd("remove '%s', markRemove %d", STR2CHA(fpath), markRemove);
+    logi("remove '%s', markRemove %d", STR2CHA(fpath), markRemove);
     if (!fpath.isEmpty() && QFile::exists(fpath)) {
         if (!markRemove) {
             if (!QFile::remove(fpath)) {
@@ -148,9 +148,11 @@ ErrCode FileCtl::removeFile(const QString &fpath, bool markRemove)
             QDir dir = fileInfo.absoluteDir();
             QString removeName = DELETED_IMG_NAME(fileInfo.fileName());
             QString removeFpath = dir.filePath(removeName);
-            loge("rename fpath '%s' to '%s'",
+            dbgd("rename fpath '%s' to '%s'",
                  STR2CHA(fpath), STR2CHA(removeFpath));
-            if (!QFile::rename(fpath, removeFpath)) {
+            if (QFile::rename(fpath, removeFpath)) {
+                dbgv("file is renamed to '%s'", STR2CHA(removeFpath));
+            } else {
                 err = ErrFileOp;
                 loge("rename fpath '%s' to '%s' failed",
                      STR2CHA(fpath), STR2CHA(removeFpath));
@@ -193,7 +195,6 @@ QString FileCtl::getAppImageDataDir(const QString &subDir)
 
 QString FileCtl::getAppPeopleImageDataDir()
 {
-    traced;
     return getAppImageDataDir(KPeopleImageDirName);
 }
 
@@ -224,10 +225,9 @@ QString FileCtl::getAppLocalDataDir(const QString& subDir)
         logi("App path not exist, create new one");
         appDirPath.mkpath(appDirPath.absolutePath());
     }
-    if (subDir.isEmpty()){
+    if (subDir.isEmpty()) {
         return appPath;
-    }
-    else{
+    } else{
         return appDirPath.filePath(subDir);
     }
 }
@@ -258,13 +258,11 @@ QString FileCtl::tmpDataDir(const QString &subDir)
 
 QString FileCtl::tmpDataFile(const QString &fname)
 {
-    tracein;
     return mTmpDir.filePath(fname);
 }
 
 QString FileCtl::getTmpDataDir(const QString& subDir)
 {
-    tracein;
     // TODO: implement it, this is just termprary processing
     logd("subDir '%s'", STR2CHA(subDir));
     QString tmpDirpath = getInstance()->tmpDataDir(subDir);
@@ -274,7 +272,6 @@ QString FileCtl::getTmpDataDir(const QString& subDir)
 
 QString FileCtl::getTmpDataFile(const QString &fname)
 {
-    tracein;
     // TODO: implement it, this is just termprary processing
     logd("fname '%s'", STR2CHA(fname));
     QString tmpFpath = getInstance()->tmpDataFile(fname);
@@ -313,23 +310,21 @@ ErrCode FileCtl::writeStringToFile(const QString &content, const QString &fpath)
     tracein;
     ErrCode ret = ErrNone;
     QFile file(fpath);
-    logd("Open file %s", fpath.toStdString().c_str());
+    dbgd("Open file '%s' to write '%lld' bytes", STR2CHA(fpath), content.size());
     if (file.open(QIODevice::WriteOnly | QIODevice::Text)){
-        logd("Write content '%s'", content.toStdString().c_str());
+        logd("Write content '%s'", STR2CHA(content));
         QTextStream stream(&file); // TODO: catch exception????
         stream << content;
         file.close();
         ret = ErrNone;
-    }
-    else {
+    } else {
         ret = ErrFileOpen;
-        loge("Failed to open file %s", fpath.toStdString().c_str());
+        loge("Failed to open file %s", STR2CHA(fpath));
     }
     return ret;
 }
 QString FileCtl::getUpdatePrebuiltDataFilePath(const QString name, bool lang)
 {
-    tracein;
     QString fname = Utils::getPrebuiltFileByLang(name, lang);
     QString prebuiltDir = getOrCreatePrebuiltDataDir();
     QString newFpath = QDir(prebuiltDir).filePath(fname);
@@ -340,6 +335,7 @@ ErrCode FileCtl::checkAndUpdatePrebuiltFile(const QString &name, bool backup)
     ErrCode ret = ErrNone;
     UNUSED(backup);
     tracein;
+    dbgtrace;
     // TODO: file should be from installed dir, rather than embedded inside bin??
     QString fname = Utils::getPrebuiltFileByLang(name, false);
     QString fpath = getPrebuiltDataFilePath(fname);
@@ -354,7 +350,7 @@ ErrCode FileCtl::checkAndUpdatePrebuiltFile(const QString &name, bool backup)
         logd("oldpath %s", fpath.toStdString().c_str());
         logd("newFpath %s", newFpath.toStdString().c_str());
         if (QFile::exists(newFpath)) {
-            logd("newFpath existed, remove '%s'", STR2CHA(newFpath));
+            dbgd("newFpath existed, remove '%s'", STR2CHA(newFpath));
             QFile::remove(newFpath);
         }
 
@@ -365,12 +361,12 @@ ErrCode FileCtl::checkAndUpdatePrebuiltFile(const QString &name, bool backup)
     }
 
     if (ret == ErrNone){
-        logi("Updaet file hash %s", fname.toStdString().c_str());
+        dbgd("Update file hash %s", STR2CHA(fname));
         ret = FileCtl::updatePrebuiltDataFileHash(fname);
     }
 
-    logi("Check to update prebuilt file %s: %d", name.toStdString().c_str(), ret);
-
+    logi("Check to update prebuilt file %s: %d", STR2CHA(name), ret);
+    traceout;
     return ret;
 }
 
@@ -381,23 +377,20 @@ QString FileCtl::getPrebuiltDataFile(const QString& fname)
     QString prebuiltDir = getOrCreatePrebuiltDataDir();
     QFile saintFile(QDir(prebuiltDir).filePath(fname));
     QString path;
-    logd("Resource prebuilt file %s", file.fileName().toStdString().c_str());
-    if (file.exists())
-    {
+    dbgd("Resource prebuilt file %s", STR2CHA(file.fileName()));
+    if (file.exists()) {
         if (!saintFile.exists()){
             logd("%s file not exist, do copy to %s",
                  fname.toStdString().c_str(),
                  saintFile.fileName().toStdString().c_str());
             file.copy(saintFile.fileName());
-        }
-        else{
+        } else {
             logd("%s file already exist", fname.toStdString().c_str());
             // TODO: should notifify or do update silently????
         }
         path = saintFile.fileName();
-    }
-    else{
-        loge("Prebuit %s file not exisst", fname.toStdString().c_str());
+    } else{
+        loge("Prebuit %s file not exisst", STR2CHA(fname));
     }
     return path;
 }
@@ -435,12 +428,10 @@ bool FileCtl::checkPrebuiltDataFileHash(const QString &fname)
         if (fileHash.compare(hash, Qt::CaseInsensitive) == 0){
             logi("Hash file match");
             match = true;
-        }
-        else{
+        } else{
             logi("Hash file not match");
         }
-    }
-    else {
+    } else {
         loge("Something stupid error here %d", ret);
     }
 
@@ -455,9 +446,9 @@ ErrCode FileCtl::readPrebuiltDataFileHash(const QString &fname, QString* hashOut
     QString hashFname = getPrebuiltDataFileHashPath(fname);
     QFile hashFile(hashFname);
     QString path;
-    logd("hashFile file %s", hashFile.fileName().toStdString().c_str());
-    if (hashFile.exists())
-    {
+    dbgd("read prebuilt data file hash, fname '%s' hashFile file %s",
+         STR2CHA(fname), STR2CHA(hashFile.fileName()));
+    if (hashFile.exists()) {
         if (hashFile.open(QIODevice::ReadOnly | QIODevice::Text)){
             QTextStream stream(&hashFile);
             QString hashValue = stream.readAll();
@@ -474,9 +465,9 @@ ErrCode FileCtl::readPrebuiltDataFileHash(const QString &fname, QString* hashOut
             ret = ErrFileRead;
             loge("Read file '%s' failed", hashFile.fileName().toStdString().c_str());
         }
-    }
-    else{
-        loge("Hash of %s file not exisst", fname.toStdString().c_str());
+    } else{
+        loge("Hash of %s file not exist, hastFile '%s'",
+                                STR2CHA(fname), STR2CHA(hashFile.fileName()));
         ret = ErrNotExist;
     }
     traceret(ret);
@@ -489,6 +480,8 @@ ErrCode FileCtl::readFileString(const QString &fpath, QString &out)
     ErrCode ret = ErrNone;
     QFile file(fpath);
     QString path;
+    dbgtrace;
+    dbgd("read file '%s'", STR2CHA(fpath));
     if (fpath.isEmpty()) {
         loge("invalid arg, fpath is empty");
         ret = ErrInvalidArg;
@@ -538,7 +531,7 @@ const QString &FileCtl::tmpDirPath() const
 
 void FileCtl::cleanUpData()
 {
-    tracein;
+    traced;
     // TODO: implement it, clean up all data, i.e data in temp storage
 }
 
@@ -550,10 +543,12 @@ QString FileCtl::getName() const
 ErrCode FileCtl::onLoad()
 {
     tracein;
+    dbgtrace;
     // create folder if any;
     getAppDataDir();
     getAppWorkingDataDir();
     getAppPeopleImageDataDir();
+    traceout;
     return ErrNone;
 }
 

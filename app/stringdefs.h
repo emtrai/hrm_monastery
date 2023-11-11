@@ -27,13 +27,17 @@
 #define STR_INIT_COMPONENT      QObject::tr("Khởi tạo: %1")
 #define STR_INITING             QObject::tr("Đang khởi tạo")
 #define STR_OK                  QObject::tr("Đồng ý")
+#define STR_YES                 QObject::tr("Có")
+#define STR_NO                  QObject::tr("Không")
+#define STR_EDIT                QObject::tr("Chỉnh sửa")
 #define STR_CANCEL              QObject::tr("Hủy")
 #define STR_SAVE                QObject::tr("Lưu")
 #define STR_IGNORE              QObject::tr("Bỏ qua")
 #define STR_HELP                QObject::tr("Giúp đỡ")
+#define STR_EXIT                QObject::tr("Thoát")
 
 #define STR_NO_DATA             QObject::tr("Không có dữ liệu")
-#define STR_INVALID_DATA        QObject::tr("Dữ liệu không hợp lệ")
+#define STR_INVALID_DATA        QObject::tr("Dữ liệu không hợp lệ.")
 
 #define STR_BIRTHDAY            QObject::tr("Ngày sinh")
 #define STR_BIRTHPLACE          QObject::tr("Nơi sinh")
@@ -105,6 +109,7 @@
 #define STR_DATA_EXISTED            QObject::tr("Dữ liệu đã tồn tại")
 #define STR_DATA_ERROR              QObject::tr("Dữ liệu lỗi!!!")
 #define STR_DATA_ERROR_CODE         QObject::tr("Dữ liệu lỗi!!!. Mã Lỗi %1")
+#define STR_DATA_ERROR_CHECK_AGAIN  QObject::tr("Có dữ liệu lỗi, vui lòng kiểm ra lại")
 
 
 #define STR_AREA            QObject::tr("Khu vực")
@@ -122,6 +127,10 @@
 #define STR_INFO        QObject::tr("Thông tin")
 #define STR_ERROR       QObject::tr("Lỗi!!!")
 #define STR_FAILED      QObject::tr("Thất bại!!!")
+#define STR_LACK_NAMEID      QObject::tr("Thiếu mã định danh.")
+#define STR_LACK_NAME      QObject::tr("Thiếu tên.")
+#define STR_INVALID_ENDDATE      QObject::tr("Ngày/Tháng kết thúc '%1' không hợp lệ.")
+#define STR_INVALID_STARTDATE      QObject::tr("Ngày/Tháng bắt đầu '%1' không hợp lệ.")
 
 #define STR_TYPE        QObject::tr("Loại")
 

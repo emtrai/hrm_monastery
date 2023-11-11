@@ -39,7 +39,6 @@ Mission::Mission():DbModel()
 
 DbModel *Mission::build()
 {
-    tracein;
     Mission* model = new Mission();
     model->init();
     return model;

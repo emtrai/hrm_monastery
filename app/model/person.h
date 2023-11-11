@@ -130,7 +130,6 @@ public:
     const QString &hollyName() const;
     QStringList hollyNameInList();
     void setHollyName(const QString &newHollyName, bool parseUid = false);
-//    ErrCode checkAndUpdateSaintListFromHollyName();
 
     const QString &nationalityUid() const;
     void setNationalityUid(const QString &newNationalityUid);

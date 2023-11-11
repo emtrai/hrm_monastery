@@ -32,6 +32,7 @@
 #include "dialog/dlgsearchperson.h"
 #include "area.h"
 #include "stringdefs.h"
+#include "dbctl.h"
 
 DlgAreaPerson::DlgAreaPerson(QWidget *parent) :
     DlgCommonEditModel(parent),
@@ -43,21 +44,22 @@ DlgAreaPerson::DlgAreaPerson(QWidget *parent) :
     loadCourse();
     loadRole();
     loadStatus();
+    traceout;
 }
 
 DlgAreaPerson::~DlgAreaPerson()
 {
+    tracein;
     delete ui;
-    if (mArea) {
-        delete mArea;
-        mArea = nullptr;
-    }
+    FREE_PTR(mArea);
+    traceout;
 }
 
 ErrCode DlgAreaPerson::buildModel(DbModel *model, QString &errMsg)
 {
     tracein;
     ErrCode err = ErrNone;
+    UNUSED(errMsg);
     if (!model) {
         err = ErrInvalidArg;
         loge("Invalid argument, null model");
@@ -88,18 +90,13 @@ ErrCode DlgAreaPerson::buildModel(DbModel *model, QString &errMsg)
         SET_INT_VAL_FROM_CBOX(ui->cbStatus, per->setModelStatus, per->setModelStatusName);
         SET_DATE_VAL_FROM_WIDGET(ui->txtStartDate, per->setStartDate);
         SET_DATE_VAL_FROM_WIDGET(ui->txtEndDate, per->setEndDate);
-        QString nameid = ui->txtNameId->text().trimmed();
-        if (!nameid.isEmpty()) {
-            per->setNameId(nameid);
-        } else {
-            err = ErrNoData;
-            loge("Lack of nameId");
-        }
-    } else {
+        CHECK_SET_NAMEID(err, per, ui->txtNameId->text().trimmed());
     }
+    logife(err, "build model failed");
     traceret(err);
     return err;
 }
+
 
 ErrCode DlgAreaPerson::fromModel(const DbModel *item)
 {
@@ -155,7 +152,7 @@ void DlgAreaPerson::loadCourse()
     foreach(DbModel* item, listCourse){
         ui->cbTerm->addItem(item->name(), item->uid());
     }
-
+    traceout;
 }
 
 void DlgAreaPerson::loadRole()
@@ -205,7 +202,7 @@ void DlgAreaPerson::on_btnSearch_clicked()
             logi("No person selected");
         }
     }
-    delete dlg;
+    FREE_PTR(dlg);
     traceout;
 }
 

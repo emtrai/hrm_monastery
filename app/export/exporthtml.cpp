@@ -37,23 +37,24 @@ ExportHtml::ExportHtml()
 ErrCode ExportHtml::saveTo(const DataExporter *item, const QString& datatype, const QString &fpath)
 {
     tracein;
+    dbgtrace;
     ErrCode ret = ErrNone;
     QString ftype;
     QString templatePath;
+    QString templateData;
     ret = item->exportTemplatePath(this, datatype, templatePath, &ftype);
     QStringList keywords = item->getListExportKeyWord();
-    QString templateData;
 
+    dbgd("templatePath %s", STR2CHA(templatePath));
 
-    logd("templatePath %s", templatePath.toStdString().c_str());
-
-    if (!templatePath.isEmpty()) {
-        templateData = Utils::readAll(templatePath);
-    } else {
+    if (ret == ErrNone && templatePath.isEmpty()) {
         ret = ErrInvalidData;
         loge("Export HTML failed, not template found");
     }
 
+    if (ret == ErrNone) {
+        templateData = Utils::readAll(templatePath);
+    }
     logd("number of keyword: %d", (int)keywords.length());
     logd("templateData len %d", (int)templateData.length());
 
@@ -63,7 +64,6 @@ ErrCode ExportHtml::saveTo(const DataExporter *item, const QString& datatype, co
     }
 
     if (ret == ErrNone) {
-    //    QRegularExpression re("{{(.*)}}");
         QRegularExpression re("\\{\\{([^\\}\\}\\{\\{]*)\\}\\}");
         QRegularExpressionMatchIterator i = re.globalMatch(templateData);
         QHash<QString, bool> keywordStatus;
@@ -94,7 +94,7 @@ ErrCode ExportHtml::saveTo(const DataExporter *item, const QString& datatype, co
             finadata = finadata.replace(QRegularExpression(QString("{{%1}}").arg(word)), data);
         }
 
-        logd("Write %d finadata to file %s", finadata.length(), fpath.toStdString().c_str());
+        dbgv("Write %lld finadata to file %s", finadata.length(), STR2CHA(fpath));
         ret = FileCtl::writeStringToFile(finadata, fpath);
 
     }

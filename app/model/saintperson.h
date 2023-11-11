@@ -53,6 +53,7 @@ public:
 
 protected:
     virtual DbModelHandler *getDbModelHandler() const;
+    virtual void copy(const DbModel* model);
 private:
     QString mPersonUid;
     qint64 mPersonDbId;

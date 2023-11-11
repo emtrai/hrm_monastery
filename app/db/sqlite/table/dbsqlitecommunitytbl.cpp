@@ -32,6 +32,8 @@
 #include "logger.h"
 #include "errcode.h"
 #include "dbsqlite.h"
+#include "dbcommunitymodelhandler.h"
+#include "person.h"
 
 const qint32 DbSqliteCommunityTbl::KVersionCode = VERSION_CODE(0,0,1);
 
@@ -172,6 +174,25 @@ ErrCode DbSqliteCommunityTbl::updateDbModelDataFromQuery(DbModel *item, const QS
     cmm->setEmail(qry.value(KFieldEmail).toString());
     cmm->setFeastDate(qry.value(KFieldFeastDay).toInt());
     cmm->setModelStatus((DbModelStatus)qry.value(KFieldModelStatus).toInt());
+#if 1
+    // WARNING: don't do loading CEO here, as it causes nested loop issue:
+    // community -> CEO (person) --> community --> ....
+    // keep here just to backup
+//    {
+//        Person* ceo = nullptr;
+//        DbCommunityModelHandler* commHdl = dynamic_cast<DbCommunityModelHandler*>(SQLITE->getCommunityModelHandler());
+//        dbgd("get current CEO for community '%s'", MODELSTR2CHA(cmm));
+//        ErrCode tmperr = commHdl->getCurrentCEO(cmm->uid(), &ceo);
+//        if (tmperr == ErrNone && ceo) {
+//            dbgd("current CEO for community '%s'", MODELSTR2CHA(ceo));
+//            cmm->setCurrentCEOUid(ceo->uid());
+//            cmm->setCurrentCEOName(ceo->displayName());
+//            cmm->setCurrentCEONameId(ceo->nameId());
+//        }
+//        FREE_PTR(ceo);
+//    }
+#else
+    // just for backup, that's all
     cmm->setCurrentCEOUid(qry.value(KFieldCEOUid).toString().trimmed()); // TODO: check and set name as well
     if (!cmm->currentCEOUid().isEmpty()) {
         dbg(LOG_DEBUG, "get currentCEOUid '%s'", STR2CHA(cmm->currentCEOUid()));
@@ -183,6 +204,7 @@ ErrCode DbSqliteCommunityTbl::updateDbModelDataFromQuery(DbModel *item, const QS
         logd("get current CEO by Uid");
         // SKIP THIS, CEO got from Community Managers
     }
+#endif
     cmm->setContact(qry.value(KFieldContact).toString());
     cmm->setMissionUid(qry.value(KFieldMissionUid).toString().trimmed());
     if (!cmm->missionUid().isEmpty()) {
@@ -280,6 +302,9 @@ ErrCode DbSqliteCommunityTbl::updateBuilderFieldFromModel(DbSqliteUpdateBuilder 
             } else if (field == KItemBrief) {
                 builder->addValue(KFieldBrief, comm->brief());
 
+            } else if (field == KItemCEO) {
+                builder->addValue(KFieldCEOUid, comm->currentCEOUid());
+
             } else if (field == KItemFullIntro) {
                 builder->addValue(KFieldFullInfo, comm->fullInfo());
             } else {
@@ -319,6 +344,9 @@ void DbSqliteCommunityTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldMissionUid, TEXT);
     builder->addField(KFieldTel, TEXT);
     builder->addField(KFieldEmail, TEXT);
+    // TODO: KFieldCEOUid field is just reserve only, as this may cause data is not sync
+    // with comm mgr table. Main data is still in comm mgr table.
+    // if we can sync data among tables, it's best, but for now, just put here for future usage
     builder->addField(KFieldCEOUid, TEXT);
     builder->addField(KFieldChurchAddr, TEXT);
     builder->addField(KFieldAreaUid, TEXT);

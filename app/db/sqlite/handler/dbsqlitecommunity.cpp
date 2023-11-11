@@ -57,6 +57,64 @@ DbSqliteCommunity::~DbSqliteCommunity()
     traceout;
 }
 
+ErrCode DbSqliteCommunity::add(DbModel *model, bool notify)
+{
+    tracein;
+    ErrCode_t err = ErrNone;
+    Community* comm = nullptr;
+    if (!model) {
+        loge("invalid arg");
+        err = ErrInvalidArg;
+    }
+
+    if (err == ErrNone) {
+        logi("Add community '%s' to db", MODELSTR2CHA(model));
+        err = DbSqliteModelHandler::add(model, false);
+    }
+    if (err == ErrNone) {
+        err = check2UpdateCEO(model);
+    }
+
+    if (err == ErrNone && notify) {
+        notifyDataChange(model, DBMODEL_CHANGE_ADD, err);
+    }
+    traceret(err);
+    return err;
+}
+
+ErrCode DbSqliteCommunity::update(DbModel *model, bool notify)
+{
+    tracein;
+    ErrCode_t err = ErrNone;
+    Community* comm = nullptr;
+    if (!model) {
+        loge("invalid arg");
+        err = ErrInvalidArg;
+    }
+
+    if (err == ErrNone) {
+        logi("Add community '%s' to db", MODELSTR2CHA(model));
+        err = DbSqliteModelHandler::update(model, false);
+    }
+    if (err == ErrNone) {
+        err = check2UpdateCEO(model);
+    }
+
+    if (err == ErrNone && notify) {
+        notifyDataChange(model, DBMODEL_CHANGE_UPDATE, err);
+    }
+    traceret(err);
+    return err;
+
+}
+
+ErrCode DbSqliteCommunity::update(DbModel *model, const QHash<QString, QString> &inFields,
+                                  const QString &tableName, bool notify)
+{
+    return DbSqliteModelHandler::update(model, inFields, tableName, notify);
+}
+
+
 DbSqliteTbl *DbSqliteCommunity::getMainTbl()
 {
     return (DbSqliteCommunityTbl*)DbSqlite::table(KTableCommunity);
@@ -85,6 +143,59 @@ DbSqliteTbl *DbSqliteCommunity::getTable(const QString &modelName)
 DbModelBuilder DbSqliteCommunity::getMainBuilder()
 {
     return &Community::build;
+}
+
+ErrCode DbSqliteCommunity::check2UpdateCEO(DbModel *model)
+{
+    tracein;
+    ErrCode_t err = ErrNone;
+    Community* comm = nullptr;
+    if (!model) {
+        loge("invalid arg");
+        err = ErrInvalidArg;
+    }
+
+    if (err == ErrNone && IS_MODEL_NAME(model, KModelNameCommunity)) {
+        comm = static_cast<Community*>(model);
+        if (comm->newCommMgr()) {
+            CommunityManager* newComm = comm->newCommMgr();
+            logi("Update community CEO '%s'", MODELSTR2CHA(comm->newCommMgr()));
+            QList<DbModel *> currentCEOList;
+            logi("Get current active CEO for comm '%s'", MODELSTR2CHA(comm));
+            err = getCEOList(comm->uid(), currentCEOList, MODEL_STATUS_ACTIVE);
+            logi("found '%lld' ceo", currentCEOList.size());
+            if (err == ErrNone && currentCEOList.size() > 0) {
+                foreach (DbModel* ceo, currentCEOList) {
+                    if (IS_MODEL_NAME(ceo, KModelNameCommManager)) {
+                        logi("Change current ceo '%s' to inactive", MODELSTR2CHA(ceo));
+                        CommunityManager* currMgr = static_cast<CommunityManager*>(ceo);
+                        currMgr->setMarkModified(true);
+                        currMgr->setModelStatus(MODEL_STATUS_INACTIVE);
+                        currMgr->setEndDate(DatetimeUtils::currentTimeToDatestring());
+                        err = currMgr->update(false, false);
+                        if (err != ErrNone) {
+                            break;
+                        }
+                    }
+                }
+            }
+            if (err == ErrNone) {
+                logi("save new ceo '%s'", MODELSTR2CHA(comm->newCommMgr()));
+                if (!newComm->markModified()) {
+                    newComm->setMarkModified(true);
+                }
+                newComm->setCommunityUid(comm->uid());
+                newComm->setModelStatus(MODEL_STATUS_ACTIVE);
+                err = comm->newCommMgr()->save(false);
+            }
+            RELEASE_LIST_DBMODEL(currentCEOList);
+        } else {
+            logi("Skip updating CEO for comm '%s'", MODELSTR2CHA(comm));
+        }
+    }
+
+    traceret(err);
+    return err;
 }
 
 ErrCode DbSqliteCommunity::deleteHard(DbModel *model, bool force, QString *msg)
@@ -373,6 +484,35 @@ ErrCode DbSqliteCommunity::getManagersList(const QString &communityUid,
 
 }
 
+ErrCode DbSqliteCommunity::getManagersListWithRole(const QString &communityUid,
+                                                   QList<DbModel *> &outList,
+                                                   const QString &roleUid,
+                                                   qint64 modelStatus)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    DbSqliteCommunityManagerTbl* tbl = nullptr;
+    dbgtrace;
+
+    if (err == ErrNone) {
+        tbl = (DbSqliteCommunityManagerTbl*)DbSqlite::table(KTableCommManager);
+        if (!tbl) {
+            loge("not found table %s", KTableCommManager);
+            err = ErrNotFound;
+        }
+    }
+    if (err == ErrNone) {
+        logd("Get list community mgr from communityUid '%s', roleUid '%s', status=%lld",
+             STR2CHA(communityUid), STR2CHA(roleUid), modelStatus);
+        outList = tbl->getListPerson(communityUid, roleUid, modelStatus);
+        logd("found %lld item", outList.size());
+    }
+    logife(err, "getManagersListWithRole failed");
+    traceout;
+    return err;
+
+}
+
 ErrCode DbSqliteCommunity::getAllManagersList(QList<DbModel *> &outList, qint64 modelStatus)
 {
     tracein;
@@ -395,3 +535,100 @@ ErrCode DbSqliteCommunity::getAllManagersList(QList<DbModel *> &outList, qint64 
     return err;
 }
 
+
+ErrCode DbSqliteCommunity::getCEOList(const QString &communityUid,
+                                 QList<DbModel *> &outList,
+                                 qint64 modelStatus)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    QList<DbModel *> items;
+    DbModel* role = nullptr;
+    logd("KRoleCEODefaultNameId '%s'", KRoleCEODefaultNameId);
+    role = SQLITE->getRoleModelHandler()->getByNameId(KRoleCEODefaultNameId);
+    if (role) {
+        dbgd("found ceo role '%s'", MODELSTR2CHA(role));
+    } else {
+        logw("not found role with name id '%s'", KRoleCEODefaultNameId);
+    }
+
+    if (err == ErrNone && !role) {
+        loge("not found CEO role");
+        err = ErrNotFound;
+    }
+
+
+    if (err == ErrNone) {
+        dbgi("get list of person for communityUid '%s', role '%s', status 0x%llx",
+             STR2CHA(communityUid), MODELSTR2CHA(role), modelStatus);
+        err = getManagersListWithRole(communityUid, items, role->uid(), modelStatus);
+        if (items.size() > 0) {
+            outList.append(items);
+        } else {
+            logw("not found list person of communityUid '%s', role '%s'",
+                 STR2CHA(communityUid), MODELSTR2CHA(role));
+        }
+    }
+    logife(err, "Get list of community manager '%s' failed", STR2CHA(communityUid));
+
+    FREE_PTR(role);
+    traceout;
+    return err;
+}
+
+ErrCode DbSqliteCommunity::getCurrentCEO(const QString &communityUid,
+                                         Person** ceo, bool* isActiveCEO)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    QList<DbModel *> outList;
+    logi("Get current CEO for comm '%s'", STR2CHA(communityUid));
+    err = getCEOList(communityUid, outList, MODEL_STATUS_MAX);
+    if (err == ErrNone && outList.size() == 0) {
+        err = ErrNoData;
+        loge("not found current CEO for commuid '%s'", STR2CHA(communityUid));
+    }
+    if (err == ErrNone) {
+        logi("found %lld current ceo", outList.size());
+        CommunityManager* mgr = nullptr;
+        CommunityManager* activemgr = nullptr;
+        qint64 maxStartDate = 0;
+        qint64 maxActiveStartDate = 0;
+        foreach (DbModel* iter, outList) {
+            if (IS_MODEL_NAME(iter, KModelNameCommManager)) {
+                CommunityManager* tmpMgr = static_cast<CommunityManager*>(iter);
+                if (tmpMgr->modelStatus() == MODEL_STATUS_ACTIVE) {
+                    if (tmpMgr->startDate() >= maxActiveStartDate) {
+                        maxActiveStartDate = tmpMgr->startDate();
+                        activemgr = tmpMgr;
+                    }
+                } else {
+                    if (tmpMgr->startDate() >= maxStartDate) {
+                        maxStartDate = tmpMgr->startDate();
+                        mgr = tmpMgr;
+                    }
+                }
+            }
+        }
+        dbgd("activemgr '%s'", MODELSTR2CHA(activemgr));
+        dbgd("mgr '%s'", MODELSTR2CHA(mgr));
+        if (!mgr && !activemgr) {
+            err = ErrNoData;
+            loge("not found current CEO for commuid '%s'", STR2CHA(communityUid));
+        }
+        if (err == ErrNone) {
+            // get 1st element, other is skipped
+            // if more than 1 active element, data something bad!
+            if (activemgr) {
+                if (ceo) *ceo = CLONE_MODEL(activemgr->person(), Person);
+                if (isActiveCEO) *isActiveCEO = true;
+            } else {
+                if (ceo) *ceo = CLONE_MODEL(mgr->person(), Person);
+                if (isActiveCEO) *isActiveCEO = false;
+            }
+        }
+    }
+    RELEASE_LIST_DBMODEL(outList);
+    traceret(err);
+    return err;
+}

@@ -144,14 +144,14 @@ ErrCode UICommunityListView::onEditItem(UITableCellWidgetItem *item)
 {
     tracein;
     ErrCode err = ErrNone;
-    const DbModel* comm = nullptr;
+    DbModel* comm = nullptr;
     if (!item) {
         err = ErrInvalidArg;
         loge("invalid argument");
     }
     if (err == ErrNone) {
-        comm = item->itemData();
-        if (!comm || !IS_MODEL_NAME(comm, KModelNameCommunity)) {
+        comm = const_cast<DbModel*>(item->itemData());
+        if (!IS_MODEL_NAME(comm, KModelNameCommunity)) {
             err = ErrInvalidModel;
             loge("no model info '%s'", MODELSTR2CHA(comm));
         }
@@ -159,6 +159,7 @@ ErrCode UICommunityListView::onEditItem(UITableCellWidgetItem *item)
 
     if (err == ErrNone) {
         logd("Show edit for model '%s'", MODELSTR2CHA(comm));
+        comm->check2LoadAllData();
         MainWindow::showAddEditCommunity(true, dynamic_cast<const Community*>(comm), this);
     }
     traceret(err);

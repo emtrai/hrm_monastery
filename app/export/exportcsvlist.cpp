@@ -31,18 +31,20 @@ GET_INSTANCE_IMPL(ExportCSVList)
 
 ExportCSVList::ExportCSVList()
 {
-    tracein;
+    traced;
 }
 
-ErrCode ExportCSVList::saveTo(const DataExporter* exporter, const QString& datatype, const QList<DbModel*> listData, const QString &fpath)
+ErrCode ExportCSVList::saveTo(const DataExporter* exporter, const QString& datatype,
+                              const QList<DbModel*> listData, const QString &fpath)
 {
     tracein;
     ErrCode ret = ErrNone;
-    qint32 cnt = 0;
     QStringList items;
     QString finalData;
     QList<QPair<QString,QString>> keywordMap;
 
+    dbgtrace;
+    logi("Save export to file '%s'", STR2CHA(fpath));
     ret = exporter->getListTemplateExportKeywords(this, datatype, keywordMap);
 
     if (ret == ErrNone) {
@@ -82,7 +84,8 @@ ErrCode ExportCSVList::saveTo(const DataExporter* exporter, const QString& datat
         }
     }
     if (ret == ErrNone) {
-        logd("Write %d finadata to file %s", finalData.length(), fpath.toStdString().c_str());
+        dbgv("Write %lld finadata to file %s",
+             finalData.length(), STR2CHA(fpath));
         ret = FileCtl::writeStringToFile(finalData, fpath);
     }
     traceret(ret);

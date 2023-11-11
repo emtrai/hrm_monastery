@@ -48,6 +48,7 @@ void ImageCtl::init()
 ErrCode ImageCtl::onLoad()
 {
     traced;
+    dbgtrace;
     return ErrNone;
 }
 
@@ -59,6 +60,7 @@ QString ImageCtl::getName() const
 void ImageCtl::onUnload()
 {
     traced;
+    dbgtrace;
 }
 
 QString ImageCtl::getImageDirPath(const QString &subDir)
@@ -76,6 +78,8 @@ ErrCode ImageCtl::createThumbImage(const QString &fullPath, QString &thumbPath,
     QImage img;
     QImage thumbImg;
     QFileInfo fileInfo;
+    logi("create thumb image fullpath '%s', thumbPath '%s'",
+         STR2CHA(fullPath), STR2CHA(thumbPath));
     if (fullPath.isEmpty()) {
         err = ErrInvalidArg;
         loge("invalid fullpath");
@@ -121,12 +125,15 @@ ErrCode ImageCtl::createThumbImage(const QString &fullPath, QString &thumbPath,
     return err;
 }
 
-ErrCode ImageCtl::convertImage(const QString &fullPath, const QString &finalPath, const QString &format)
+ErrCode ImageCtl::convertImage(const QString &fullPath, const QString &finalPath,
+                               const QString &format)
 {
     tracein;
     ErrCode err = ErrNone;
     QString path = finalPath;
     QImage img;
+    logi("convertImage fullPath '%s', finalPath '%s', format '%s'",
+         STR2CHA(fullPath), STR2CHA(finalPath), STR2CHA(format));
     if (fullPath.isEmpty()) {
         err = ErrInvalidArg;
         loge("invalid fullpath");

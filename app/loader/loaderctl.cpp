@@ -78,6 +78,7 @@ void LoaderCtl::add2PreLoader(Controller *ctl)
 void LoaderCtl::registerAll()
 {
     tracein;
+    dbgtrace;
     add2PreLoader(FileCtl::getInstance());
     add2Loader(BACKUP);
     add2PreLoader(DbCtl::getInstance());
@@ -103,16 +104,18 @@ void LoaderCtl::registerAll()
     add2Loader(RoleCtl::getInstance());
     add2Loader(PersonCtl::getInstance());
     add2Loader(COMMUNITYDEPTCTL);
+    traceout;
 }
 
 void LoaderCtl::runLoader(QList<Controller *> &list)
 {
     tracein;
+    dbgtrace;
     foreach(  Controller* ctl, list ) {
         if (mListener != nullptr){
             mListener->onLoadController(ctl);
         }
-        logd("load '%s'", ctl->getName().toStdString().c_str());
+        logi("onLoad '%s'", STR2CHA(ctl->getName()));
         ctl->onLoad();
     }
     // TODO: call on separate thread?
@@ -125,7 +128,7 @@ void LoaderCtl::unloadLoader(QList<Controller *> &list)
 {
     tracein;
     foreach(  Controller* ctl, list ) {
-        logd("unload '%s'", STR2CHA(ctl->getName()));
+        logi("onLoad '%s'", STR2CHA(ctl->getName()));
         ctl->onUnload();
         if (mListener != nullptr){
             logd("call listener for unload");
@@ -141,6 +144,7 @@ void LoaderCtl::unloadLoader(QList<Controller *> &list)
 void LoaderCtl::preLoad()
 {
     tracein;
+    dbgtrace;
     runLoader(mPreLoadListCtl);
     traceout;
 }
@@ -148,6 +152,7 @@ void LoaderCtl::preLoad()
 void LoaderCtl::onLoad()
 {
     tracein;
+    dbgtrace;
     runLoader(mListCtl);
     traceout;
 }
@@ -155,6 +160,7 @@ void LoaderCtl::onLoad()
 void LoaderCtl::onUnload()
 {
     tracein;
+    dbgtrace;
     logi("Unload preloader");
     unloadLoader(mPreLoadListCtl);
 

@@ -121,6 +121,7 @@ public:
      * @param err error code, if ErrNone, just show \ref msg, not show error code string
      */
     void showErrorBox(const QString& msg, ErrCode err = ErrNone);
+    void showIfErrorBox(const QString& msg, ErrCode err = ErrNone);
 protected:
     void showEvent(QShowEvent *ev);
     /**

@@ -21,8 +21,6 @@
  */
 #include "saintperson.h"
 #include "logger.h"
-#include "errcode.h"
-#include "defs.h"
 
 #include "utils.h"
 #include "dbctl.h"
@@ -45,7 +43,7 @@ DbModelBuilder SaintPerson::getBuilder() const
 
 QString SaintPerson::buildUid(const QString *seed)
 {
-    tracein;
+    traced;
     return Utils::UidFromName(personUid() + saintUid(), UidNameConvertType::HASH_NAME);
 }
 
@@ -77,6 +75,21 @@ void SaintPerson::setPersonDbId(qint64 newPersonDbId)
 DbModelHandler *SaintPerson::getDbModelHandler() const
 {
     return DB->getModelHandler(KModelHdlPerson);
+}
+
+void SaintPerson::copy(const DbModel *model)
+{
+    tracein;
+    if (IS_MODEL_NAME_STR(model, modelName())) {
+        const SaintPerson* per = static_cast<const SaintPerson*>(model);
+        setPersonUid(per->personUid());
+        setPersonDbId(per->personDbId());
+        setSaintUid(per->saintUid());
+        setSaintDbId(per->saintDbId());
+    } else {
+        loge("invalid model '%s'", MODELSTR2CHA(model));
+    }
+    traceout;
 }
 
 qint64 SaintPerson::saintDbId() const

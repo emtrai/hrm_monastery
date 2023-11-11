@@ -52,6 +52,20 @@ inline static className* build(QWidget *parent = nullptr, \
     return dlg; \
 }
 
+
+#define CHECK_SET_NAMEID(err, model, initNameId) \
+do { \
+    QString finalNameid; \
+    err = DB->getAvailableNameId(model->modelName(), initNameId, finalNameid); \
+    if ((err == ErrNone) && finalNameid.isEmpty()) { \
+        err = ErrNoData; \
+        loge("Not found nameId"); \
+    } \
+    if (err == ErrNone) { \
+        model->setNameId(finalNameid); \
+    } \
+} while (0)
+
 class DbModel;
 class DlgCommonEditModel;
 class QDialogButtonBox;
@@ -104,7 +118,7 @@ protected:
      * @return model. Caller must clone this if want to keep for later processing
      *         as returned one will be freed when dialog is closed
      */
-    virtual DbModel* model();
+    virtual DbModel* model(bool autoCreate = true);
     virtual QDialogButtonBox* buttonBox();
     /**
      * @brief Create new model object, must be implemeted by derived class
@@ -120,6 +134,7 @@ protected:
      * @return
      */
     virtual bool onValidateData(QString& msg);
+    virtual bool onConfirmSave(bool isNew, DbModel* model, QString& errMsg);
 
     virtual ErrCode loadList(QComboBox* cb, ModelController* ctrl, bool unknownItem = true);
     virtual void onChangeNameIdTxt(QLineEdit* txt, const QString &arg1, bool direct = false);

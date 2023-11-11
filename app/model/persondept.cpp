@@ -21,19 +21,12 @@
  */
 #include "persondept.h"
 #include "logger.h"
-#include "errcode.h"
 #include "dbctl.h"
 #include "stringdefs.h"
 #include "utils.h"
 #include "datetimeutils.h"
-#include "filectl.h"
-#include "dataexporter.h"
-#include "exportfactory.h"
 #include "defs.h"
 #include <QMap>
-#include "dbpersonmodelhandler.h"
-#include "person.h"
-#include "department.h"
 #include "prebuiltdefs.h"
 
 PersonDept::PersonDept():DbModel(),
@@ -238,7 +231,7 @@ void PersonDept::dump() const
     logd("- CourseName %s", courseName().toStdString().c_str());
     logd("- RoleUid %s", roleUid().toStdString().c_str());
     logd("- RoleName %s", roleName().toStdString().c_str());
-
+    traceout;
 }
 
 DbModelHandler *PersonDept::getDbModelHandler() const

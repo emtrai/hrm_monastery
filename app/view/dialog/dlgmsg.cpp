@@ -42,7 +42,7 @@ DlgMsg::~DlgMsg()
 void DlgMsg::setMsg(const QString& title, const QString &msg, QStyle::StandardPixmap style)
 {
     tracein;
-    ui->lblText->setText(msg);
+    ui->txtText->setPlainText(msg);
     QIcon icon = MAINWIN->style()->standardIcon(style); //or
     //whatever icon you choose
     QPixmap pixmap = icon.pixmap(QSize(60, 60));

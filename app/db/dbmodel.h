@@ -107,6 +107,7 @@ do { \
             }
 
 #define IS_MODEL_NAME(model, name) (model && name && (model->modelName() == name))
+#define IS_MODEL_NAME_STR(model, name) (model && (!name.isEmpty()) && (model->modelName() == name))
 
 #define EXPORT_CALLBACK_STRING_IMPL(type, modelName, func) \
 [](const DbModel* model, const QString& item){ \
@@ -241,11 +242,13 @@ public:
         }
         return outList;
     }
+private:
+    void docopy(const DbModel& model);
 protected:
     DbModel();
     DbModel(const DbModel& model);
     DbModel(const DbModel* model);
-    void copy(const DbModel& model);
+    virtual void copy(const DbModel* model);
 public:
     virtual ~DbModel();
     virtual void init();
@@ -296,7 +299,6 @@ public:
     virtual void buildUidIfNotSet();
     virtual QString buildUid(const QString* seed = nullptr);
     virtual QString buildNameId(const QString* seed = nullptr, bool* ok = nullptr);
-
     /**
      * @brief Save all info. or create new
      * All information will be stored/replaced
@@ -359,7 +361,7 @@ public:
      * @brief Check if field is modified and should be updated
      * @return
      */
-    bool isFieldUpdated(const QString& itemField);
+    bool isFieldUpdated(const QString& itemField) const;
 
     /**
      * @brief Clear list of all changes marked
@@ -400,8 +402,11 @@ public:
      * @return true: allow to delete, false otherwise
      */
     virtual bool allowRemove(QString* msg = nullptr);
-protected:
+    virtual ErrCode loadAllData();
+    virtual void check2LoadAllData();
     virtual DbModelHandler* getDbModelHandler() const = 0;
+    virtual bool isNameIdUpdated() const;
+protected:
     virtual ErrCode prepare2Save();
     virtual void markItemAsModified(const QString& itemName);
     virtual void checkModifiedThenSet(QString& cur, const QString& next, const QString& itemName);
@@ -434,6 +439,8 @@ protected:
     qint64 mDbCreatedTime; // time in ms, since epoc time (1970)
     qint64 mLastDbUpdatedTime; // time in ms, since epoc time (1970)
     QAtomicInt mRefCnt;
+
+    bool mLoadedAllData;
 };
 
 #endif // DBMODEL_H

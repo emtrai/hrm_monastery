@@ -40,13 +40,12 @@
 
 AreaPerson::AreaPerson():MapDbModel()
 {
-    tracein;
+    traced;
 }
 
 AreaPerson::~AreaPerson()
 {
-    tracein;
-    traceout;
+    traced;
 }
 
 DbModel *AreaPerson::build()
@@ -105,7 +104,6 @@ ErrCode AreaPerson::exportTemplatePath(FileExporter *exporter,
 
 QString AreaPerson::buildNameId(const QString *seed, bool *ok)
 {
-    QString name = this->name();
     QString nameid;
     tracein;
     if (!Utils::appendString(nameid, areaNameId())) {
@@ -116,6 +114,9 @@ QString AreaPerson::buildNameId(const QString *seed, bool *ok)
     }
     if (!Utils::appendString(nameid, roleNameId())) {
         logw("no role nameid to build nameid");
+    }
+    if (!Utils::appendString(nameid, courseNameId())) {
+        logw("no course nameid to build nameid");
     }
     if (seed) {
         if (!Utils::appendString(nameid, Utils::UidFromName(*seed, NO_VN_MARK_UPPER))) {
@@ -164,6 +165,9 @@ void AreaPerson::initExportFields()
     });
     mExportCallbacks.insert(KItemRemark, [](const DbModel* model, const QString& item){
         return ((AreaPerson*)model)->remark();
+    });
+    mExportCallbacks.insert(KItemStatus, [](const DbModel* model, const QString& item){
+        return ((AreaPerson*)model)->modelStatusName();
     });
     traceout;
 }
@@ -256,7 +260,7 @@ void AreaPerson::initImportFields()
     mImportCallbacks.insert(KItemTerm, [this](const QString& value){
         ErrCode err = ErrNone;
         logd("set value '%s'", STR2CHA(value));
-        if (this->courseNameId().isEmpty()) {
+        if (this->courseName().isEmpty()) {
             this->setCourseName(value);
         }
         return err;
@@ -389,6 +393,7 @@ const QString &AreaPerson::personEmail() const
 void AreaPerson::setPersonEmail(const QString &newPersonEmail)
 {
     mPersonEmail = newPersonEmail;
+    // don't mark modified, as it's info of person
 }
 
 const QString &AreaPerson::personTel() const
@@ -399,6 +404,7 @@ const QString &AreaPerson::personTel() const
 void AreaPerson::setPersonTel(const QString &newPersonTel)
 {
     mPersonTel = newPersonTel;
+    // don't mark modified, as it's info of person
 }
 
 const QString &AreaPerson::hollyName() const
@@ -409,6 +415,7 @@ const QString &AreaPerson::hollyName() const
 void AreaPerson::setHollyName(const QString &newHollyName)
 {
     mHollyName = newHollyName;
+    // don't mark modified, as it's info of person
 }
 
 const QString &AreaPerson::areaNameId() const
@@ -435,6 +442,7 @@ ErrCode AreaPerson::setArea(const Area *area)
         setAreaUid(area->uid());
     }
     traceout;
+    return err;
 }
 
 const QString &AreaPerson::areaName() const

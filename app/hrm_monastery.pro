@@ -222,7 +222,6 @@ SOURCES += \
     view/dialog/dlgconfirmupdatepeoplecomm.cpp \
     view/dialog/dlgcountry.cpp \
     view/dialog/dlgcourse.cpp \
-    view/dialog/dlgdepartment.cpp \
     view/dialog/dlgdeptperson.cpp \
     view/dialog/dlgeditmodel.cpp \
     view/dialog/dlgethnic.cpp \
@@ -448,7 +447,6 @@ HEADERS += \
     view/dialog/dlgconfirmupdatepeoplecomm.h \
     view/dialog/dlgcountry.h \
     view/dialog/dlgcourse.h \
-    view/dialog/dlgdepartment.h \
     view/dialog/dlgdeptperson.h \
     view/dialog/dlgeditmodel.h \
     view/dialog/dlgethnic.h \
@@ -513,7 +511,6 @@ FORMS += \
     view/dialog/dlgconfirmupdatepeoplecomm.ui \
     view/dialog/dlgcountry.ui \
     view/dialog/dlgcourse.ui \
-    view/dialog/dlgdepartment.ui \
     view/dialog/dlgdeptperson.ui \
     view/dialog/dlgeditmodel.ui \
     view/dialog/dlgethnic.ui \

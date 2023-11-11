@@ -21,17 +21,11 @@
  */
 #include "exportxlsx.h"
 #include "logger.h"
-#include "defs.h"
 #include "utils.h"
 #include "dataexporter.h"
 #include "importexportdefs.h"
 
 #include "xlsxdocument.h"
-#include "xlsxchartsheet.h"
-#include "xlsxcellrange.h"
-#include "xlsxchart.h"
-#include "xlsxrichstring.h"
-#include "xlsxworkbook.h"
 #include <QColor>
 using namespace QXlsx;
 
@@ -50,11 +44,12 @@ ErrCode ExportXlsx::saveTo(const DataExporter *item,
 {
     tracein;
     QXlsx::Document xlsx;
-    xlsx.write("A1", "Hello Qt!"); // write "Hello Qt!" to cell(A,1). it's shared string.
+    xlsx.write("A1", ""); // write "Hello Qt!" to cell(A,1). it's shared string.
     xlsx.saveAs(fpath); // save the document as 'Test.xlsx'
     // TODO: implement it carefully!
+    logw("Not implement here");
     traceout;
-    return ErrNone;
+    return ErrNotSupport;
 }
 
 ErrCode ExportXlsx::saveTo(const DataExporter *exporter,
@@ -62,17 +57,9 @@ ErrCode ExportXlsx::saveTo(const DataExporter *exporter,
                            const QList<DbModel *> listData,
                            const QString &fpath)
 {
-//    tracein;
-//    QXlsx::Document xlsx;
-//    xlsx.write("A1", "Hello Qt!"); // write "Hello Qt!" to cell(A,1). it's shared string.
-//    xlsx.saveAs(fpath); // save the document as 'Test.xlsx'
-//    // TODO: implement it carefully!
-//    traceout;
-//    return ErrNone;
     tracein;
     ErrCode ret = ErrNone;
     QList<QPair<QString,QString>> keywordMap;
-    qint32 cnt = 0;
     QStringList items;
     QString finalData;
     QXlsx::Document xlsx;

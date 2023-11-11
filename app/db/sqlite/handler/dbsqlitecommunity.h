@@ -43,6 +43,11 @@ public:
      * @return ErrNone on success, error code otherwise
      */
 //    virtual ErrCode add(DbModel* model, bool notifyDataChange = true);
+    virtual ErrCode add(DbModel* model, bool notifyDataChange = true);
+    virtual ErrCode update(DbModel* model, bool notifyDataChange = true);
+    virtual ErrCode update(DbModel* model,
+                           const QHash<QString, QString> &inFields,
+                           const QString& tableName, bool notifyDataChange = true);
     virtual ErrCode deleteHard(DbModel* model, bool force = false, QString* msg = nullptr);
 
     // TODO: mapping community & person stored in person tbl and community&person mapping table
@@ -110,12 +115,29 @@ public:
      */
     virtual ErrCode getManagersList(const QString &communityUid, QList<DbModel *> &outList,
                                     qint64 modelStatus = MODEL_STATUS_MAX);
+    virtual ErrCode getManagersListWithRole(const QString &communityUid,
+                                            QList<DbModel *> &outList,
+                                            const QString& roleUid,
+                                            qint64 modelStatus = MODEL_STATUS_MAX);
     virtual ErrCode getAllManagersList(QList<DbModel *> &outList,
                                qint64 modelStatus = MODEL_STATUS_MAX);
+    virtual ErrCode getCEOList(const QString &communityUid, QList<DbModel *> &outList,
+                       qint64 modelStatus = MODEL_STATUS_MAX);
+    /**
+     * @brief get current CEO
+     * @param communityUid
+     * @param ceo
+     * @param isActiveCEO
+     * @return ErrNoData if not found CEO, ErrNone if found
+     */
+    virtual ErrCode getCurrentCEO(const QString &communityUid,
+                                  Person** ceo = nullptr,
+                                  bool* isActiveCEO = nullptr);
 protected:
     virtual DbSqliteTbl* getMainTbl();
     virtual DbSqliteTbl* getTable(const QString& modelName);
     virtual DbModelBuilder getMainBuilder();
+    virtual ErrCode check2UpdateCEO(DbModel* comm);
 private:
     Community* mRootCommunity;
 };

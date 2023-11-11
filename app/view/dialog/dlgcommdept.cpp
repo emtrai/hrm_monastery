@@ -20,8 +20,8 @@
  * Brief:
  */
 #include "dlgcommdept.h"
+#include "dbctl.h"
 #include "ui_dlgcommdept.h"
-#include "communitydeptctl.h"
 #include "departctl.h"
 #include "logger.h"
 #include "errcode.h"
@@ -30,24 +30,27 @@
 #include <QDialogButtonBox>
 #include <QPushButton>
 #include "datetimeutils.h"
+#include "stringdefs.h"
 
 DlgCommDept::DlgCommDept(QWidget *parent) :
     DlgCommonEditModel(parent),
     ui(new Ui::DlgCommDept),
     mCommunity(nullptr)
 {
+    tracein;
     ui->setupUi(this);
-    ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Thoát"));
-    ui->buttonBox->button(QDialogButtonBox::Save)->setText(tr("Lưu"));
+    ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(STR_EXIT);
+    ui->buttonBox->button(QDialogButtonBox::Save)->setText(STR_SAVE);
     loadDept();
     loadStatus();
+    traceout;
 }
 
 DlgCommDept::~DlgCommDept()
 {
     tracein;
     delete ui;
-    if (mCommunity) delete mCommunity;
+    FREE_PTR(mCommunity);
     traceout;
 }
 
@@ -60,6 +63,7 @@ ErrCode DlgCommDept::buildModel(DbModel *model, QString &errMsg)
 {
     tracein;
     ErrCode err = ErrNone;
+    UNUSED(errMsg);
     CommunityDept* comm = (CommunityDept*) model;
     if (!comm){
         err = ErrInvalidArg;
@@ -75,10 +79,7 @@ ErrCode DlgCommDept::buildModel(DbModel *model, QString &errMsg)
         }
     }
     if (err == ErrNone){
-        QString name = ui->txtNameId->text().trimmed();
-        if (!name.isEmpty()) {
-            comm->setNameId(name);
-        }
+        CHECK_SET_NAMEID(err, comm, ui->txtNameId->text().trimmed());
     }
     if (err == ErrNone){
         SET_VAL_FROM_CBOX(ui->cbDept, comm->setDepartmentUid, comm->setDepartmentName, err);
@@ -182,7 +183,8 @@ void DlgCommDept::on_cbDept_currentIndexChanged(int index)
             DbModel* model = DEPART->getModelByUid(uid);
             if (model) {
                 ui->txtName->setText(model->name());
-                ui->txtNameId->setText(QString("%1_%2").arg((mCommunity?mCommunity->nameId():"")).arg(model->nameId()));
+                ui->txtNameId->setText(QString("%1_%2").arg(
+                    (mCommunity?mCommunity->nameId():""), model->nameId()));
                 delete model;
             } else {
                 loge("not found dept with uid '%s'", STR2CHA(uid));

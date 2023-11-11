@@ -42,10 +42,11 @@ ErrCode ImportCSVList::importFrom(const QString& importName, int importFileType,
                                   QList<DbModel *>* outList)
 {
     tracein;
-//    QHash<QString, QString> item;
     ErrCode ret = ErrNone;
     qint32 cnt = 0;
 
+    logi("import from file '%s' importName '%s'",
+         STR2CHA(fpath), STR2CHA(importName));
     if (importer == nullptr){
         ret = ErrInvalidArg;
         loge("import failed, importer null");
@@ -64,7 +65,6 @@ ErrCode ImportCSVList::importFrom(const QString& importName, int importFileType,
                 [importer, importFileType, importName](const QStringList& items, void* caller, void* param, quint32 idx){
                 tracein;
                 logd("called from lambda of importFrom");
-//                IDataImporter* importer = (IDataImporter)*param;
                 ErrCode ret2 = ErrNone;
                 if (importer != nullptr){
                     ret2 = importer->onImportParseDataItem(importName, importFileType, items, idx, (QList<DbModel *>*)param);

@@ -20,22 +20,18 @@
  * Brief:
  */
 #include "dlgcountry.h"
-#include "ui_dlgcountry.h"
-#include "errcode.h"
 #include "logger.h"
-#include "utils.h"
 #include "country.h"
-#include "countryctl.h"
 
 DlgCountry::DlgCountry(QWidget *parent) :
     DlgEditModel(parent)
 {
-    tracein;
+    traced;
 }
 
 DlgCountry::~DlgCountry()
 {
-    tracein;
+    traced;
 }
 
 DbModel *DlgCountry::newModel()

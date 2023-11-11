@@ -35,18 +35,18 @@ MapDbModel::MapDbModel():DbModel(),
     mEndDate(0),
     mModelStatus(0)
 {
-    tracein;
+    traced;
 }
 
 MapDbModel::~MapDbModel()
 {
-    tracein;
+    traced;
 }
 
 MapDbModel::MapDbModel(const MapDbModel &model):DbModel((DbModel*)&model)
 {
     tracein;
-    copy(model);
+    docopy(model);
     traceout;
 }
 
@@ -54,7 +54,7 @@ MapDbModel::MapDbModel(const MapDbModel *model):DbModel((DbModel*) model)
 {
     tracein;
     if (model) {
-        copy(*model);
+        docopy(*model);
     } else {
         loge("contruct failed, null pointer");
     }
@@ -66,18 +66,13 @@ void MapDbModel::clone(const DbModel *model)
     tracein;
     if (model) {
         DbModel::clone(model);
-        copy((*(MapDbModel*)model));
+        docopy((*(MapDbModel*)model));
     } else {
         loge("clone failed, null model");
     }
     traceout;
 }
 
-DbModel *MapDbModel::clone() const
-{
-    traced;
-    return DbModel::clone();
-}
 
 void MapDbModel::dump() const
 {
@@ -298,6 +293,25 @@ void MapDbModel::setEndDate(qint64 newEndDate)
     }
 }
 
+ErrCode MapDbModel::setEndDate(const QString &newEndDate)
+{
+    tracein;
+    bool isOk = false;
+    ErrCode err = ErrNone;
+    logd("end date string '%s'", STR2CHA(newEndDate));
+    qint64 dateval = DatetimeUtils::dateFromString(newEndDate, DEFAULT_FORMAT_YMD, &isOk);
+    logd("mClosedDate 0x%llx, isOk %d", dateval, isOk);
+    if (isOk) {
+        setEndDate(dateval);
+    } else {
+        err = ErrInvalidArg;
+        loge("invalid close date time '%s'", STR2CHA(newEndDate));
+    }
+
+    traceret(err);
+    return err;
+}
+
 qint32 MapDbModel::modelStatus() const
 {
     return mModelStatus;
@@ -348,7 +362,7 @@ void MapDbModel::setChangeHistory(const QString &newChangeHistory)
     }
 }
 
-void MapDbModel::copy(const MapDbModel &model)
+void MapDbModel::docopy(const MapDbModel &model)
 {
     tracein;
     mUid1 = model.mUid1;

@@ -118,6 +118,11 @@ void DlgEthnic::loadCountry()
     traceout;
 }
 
+QDialogButtonBox *DlgEthnic::buttonBox()
+{
+    return ui->buttonBox;
+}
+
 void DlgEthnic::on_txtName_textChanged(const QString &arg1)
 {
     DlgCommonEditModel::onChangeNameIdTxt(ui->txtNameId, arg1);

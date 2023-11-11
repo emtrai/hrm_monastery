@@ -77,6 +77,12 @@ bool DialogUtils::showConfirmDialog(QWidget *parent, const QString &title,
     msgBox.setInformativeText(message);
     msgBox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
     msgBox.setDefaultButton(QMessageBox::No);
+    if (msgBox.button(QMessageBox::Yes)) {
+        msgBox.button(QMessageBox::Yes)->setText(STR_YES);
+    }
+    if (msgBox.button(QMessageBox::No)) {
+        msgBox.button(QMessageBox::No)->setText(STR_NO);
+    }
 //    msgBox.setParent(parent);
     int reply = msgBox.exec();
 //    reply = QMessageBox::question(parent, title, message,

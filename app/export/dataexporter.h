@@ -33,6 +33,14 @@ class DataExporter
 public:
     DataExporter();
 
+    /**
+     * @brief Get path to export templat
+     * @param exporter
+     * @param name
+     * @param fpath
+     * @param ftype
+     * @return
+     */
     virtual ErrCode exportTemplatePath(FileExporter* exporter,
                                        const QString& name,
                                        QString& fpath,

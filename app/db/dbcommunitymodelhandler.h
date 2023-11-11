@@ -22,7 +22,6 @@
 #ifndef DBCOMMUNITYMODELHANDLER_H
 #define DBCOMMUNITYMODELHANDLER_H
 
-#include "dbmodelhandler.h"
 #include <QList>
 #include "dbmodel.h"
 
@@ -69,8 +68,24 @@ public:
      */
     virtual ErrCode getManagersList(const QString &communityUid, QList<DbModel *> &outList,
                                           qint64 modelStatus) = 0;
+    virtual ErrCode getManagersListWithRole(const QString &communityUid,
+                                            QList<DbModel *> &outList,
+                                            const QString& roleUid,
+                                            qint64 modelStatus = MODEL_STATUS_MAX) = 0;
     virtual ErrCode getAllManagersList(QList<DbModel *> &outList,
                                qint64 modelStatus = MODEL_STATUS_MAX) = 0;
+    virtual ErrCode getCEOList(const QString &communityUid, QList<DbModel *> &outList,
+                               qint64 modelStatus = MODEL_STATUS_MAX) = 0;
+    /**
+     * @brief getCurrentCEO
+     * @param communityUid
+     * @param ceo
+     * @param isActiveCEO
+     * @return  ErrNoData if not found CEO, ErrNone if found, else other error code
+     */
+    virtual ErrCode getCurrentCEO(const QString &communityUid,
+                                  Person** ceo = nullptr,
+                                  bool* isActiveCEO = nullptr) = 0;
 };
 
 #endif // DBCOMMUNITYMODELHANDLER_H

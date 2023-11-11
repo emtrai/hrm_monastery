@@ -163,21 +163,7 @@ void CommunityDept::initExportFields()
         }
         return res;
     });
-//    mExportCallbacks.insert(KItemRemark, [](const DbModel* model, const QString& item){
-//        return ((AreaPerson*)model)->remark();
-//    });
-//    mExportCallbacks.insert(KItemStartDate, [](const DbModel* model, const QString& item){
-//        return DatetimeUtils::date2String(((MapDbModel*)model)->startDate(), DEFAULT_FORMAT_YMD);
-//    });
-//    mExportCallbacks.insert(KItemEndDate, [](const DbModel* model, const QString& item){
-//        return DatetimeUtils::date2String(((MapDbModel*)model)->endDate(), DEFAULT_FORMAT_YMD);
-//    });
-//    mExportCallbacks.insert(KItemStatus, [](const DbModel* model, const QString& item){
-//        return ((MapDbModel*)model)->modelStatusName();
-//    });
-//    mExportCallbacks.insert(KItemStatusId, [](const DbModel* model, const QString& item){
-//        return QString("%1").arg(((MapDbModel*)model)->modelStatus());
-//    });
+
     traceout;
 }
 

@@ -40,7 +40,6 @@ class DlgDeptPerson : public DlgCommonEditModel
 public:
     explicit DlgDeptPerson(QWidget *parent = nullptr);
     ~DlgDeptPerson();
-    virtual void setupUI();
 
     virtual ErrCode buildModel(DbModel* model, QString& errMsg);
     virtual ErrCode fromModel(const DbModel* model);
@@ -50,6 +49,7 @@ public:
     void setCommDeptNameId(const QString &newCommDeptNameId);
 
 protected:
+    virtual QDialogButtonBox* buttonBox();
     virtual DbModel* newModel();
     virtual bool onValidateData(QString& msg);
     void loadCourse();

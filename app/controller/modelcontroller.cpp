@@ -20,8 +20,6 @@
 #include "prebuiltdefs.h"
 #include "dbmodelfactory.h"
 
-// maximum number of times to check duplicate items
-#define MAX_CHECK_DUP_TIME 1024
 
 ModelController::ModelController():
     mEnableCache(true),
@@ -703,45 +701,6 @@ void ModelController::reloadDb()
     traceout;
 }
 
-ErrCode ModelController::getAvailableNameId(const QString& modelName, const QString &initNameId, QString &availableNameId)
-{
-    tracein;
-    ErrCode err = ErrNone;
-    DbModelHandler* hdl = getModelHandler();
-    QString nameId = initNameId;
-    int i = 1;
-    if (initNameId.isEmpty() || modelName.isEmpty()) {
-        err = ErrInvalidArg;
-        loge("invalid argument, init nameid '%s' or model name '%s' is empty",
-             STR2CHA(initNameId),STR2CHA(modelName));
-    }
-    if (err == ErrNone && !hdl) {
-        err = ErrNoHandler;
-        loge("not found valid model handler");
-    }
-    if (err == ErrNone) {
-        logd("initNameId to search '%s'", STR2CHA(initNameId));
-        for (; i < MAX_CHECK_DUP_TIME; i++) {
-            if (!hdl->isNameidExist(nameId, modelName)) {
-                dbg(LOG_DEBUG, "name id '%s' not exist", STR2CHA(nameId));
-                availableNameId = nameId;
-                break;
-            } else {
-                dbg(LOG_DEBUG, "Name id '%s' existed", STR2CHA(nameId));
-                nameId = QString("%1_%2").arg(initNameId).arg(i);
-                logd("Try next nameid '%s'", STR2CHA(nameId));
-            }
-        }
-    }
-    if (i >= MAX_CHECK_DUP_TIME || nameId.isEmpty()) {
-        err = ErrNotFound;
-        loge("not found any suitable nameid for '%s', tried %d time",
-             STR2CHA(initNameId), i);
-    }
-
-    traceret(err);
-    return err;
-}
 ErrCode ModelController::check2UpdateDbFromPrebuiltFile(const QString &name, const QString &ftype)
 {
     tracein;
@@ -1152,7 +1111,6 @@ DbModel *ModelController::doImportOneItem(const QString& importName,
             }
         }
         if (err == ErrNone && model->nameId().isEmpty() && !model->name().isEmpty()) {
-//            QString nameid = Utils::UidFromName(model->name(), NO_VN_MARK_UPPER);
             bool ok = false;
             QString nameid = model->buildNameId(nullptr, &ok);
             logd("auto buid nameid '%s'", STR2CHA(nameid));

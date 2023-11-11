@@ -47,10 +47,6 @@ DlgAddCommunityHistory::DlgAddCommunityHistory(QWidget *parent) :
 
 DlgAddCommunityHistory::~DlgAddCommunityHistory()
 {
-//    foreach (Community* item, mListCommunity) {
-//        delete item;
-//    }
-//    mListCommunity.clear();
     delete ui;
 }
 
@@ -63,8 +59,7 @@ const Community *DlgAddCommunityHistory::getCommunity()
     logd("index %d", index);
     if (index >= 0){
         // TODO: index > array, index of combo box match with index of list???
-        Community* com = (Community*)mListCommunity.at(index);
-//         = item.get();
+        com = (Community*)mListCommunity.at(index);
     }
     return com;
 }

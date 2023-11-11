@@ -51,6 +51,10 @@ public:
      */
     ErrCode setCommunity(const Community *comm);
 
+    ErrCode setPerson(const Person *newPerson);
+    void setModelStatus(qint64 status);
+    void setRole(const QString& roleUid);
+
 protected:
     virtual QDialogButtonBox* buttonBox();
     virtual DbModel* newModel();
@@ -58,12 +62,15 @@ protected:
     void loadCourse();
     void loadRole();
     void loadStatus();
+
+    void updatePeson(const Person* per);
 private slots:
     void on_btnSearch_clicked();
 
 private:
     Ui::DlgCommMgr *ui;
     Community* mCommunity;
+    Person* mPerson;
 };
 
 #endif // DLGCOMMMGR_H

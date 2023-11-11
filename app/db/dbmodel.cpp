@@ -43,6 +43,7 @@ DbModel::DbModel():
     , mUpdateAllFields(false)
     , mDbCreatedTime(0)
     , mLastDbUpdatedTime(0)
+    , mLoadedAllData(false)
 
 {
     traced;
@@ -53,7 +54,7 @@ DbModel::DbModel():
 DbModel::DbModel(const DbModel &model):DbModel()
 {
     tracein;
-    copy(model);
+    docopy(model);
     // TODO: mValidateResult
     traceout;
 }
@@ -62,12 +63,12 @@ DbModel::DbModel(const DbModel *model):DbModel()
 {
     tracein;
     if (model) {
-        copy(*model);
+        docopy(*model);
     }
     traceout;
 }
 
-void DbModel::copy(const DbModel &model)
+void DbModel::docopy(const DbModel &model)
 {
     tracein;
     mDeletable = model.mDeletable;
@@ -85,7 +86,14 @@ void DbModel::copy(const DbModel &model)
     mExportCallbacks = model.mExportCallbacks;
     mImportCallbacks = model.mImportCallbacks;
     mUpdatedField = model.mUpdatedField;
+    mLoadedAllData = model.mLoadedAllData;
     traceout;
+}
+
+void DbModel::copy(const DbModel *model)
+{
+    UNUSED(model);
+    // do nothing
 }
 
 
@@ -107,7 +115,8 @@ void DbModel::clone(const DbModel *model)
     tracein;
     if (model) {
         logd("clone from model '%s'", STR2CHA(model->toString()));
-        copy(*model);
+        docopy(*model);
+        copy(model);
     } else {
         loge("clone failed, null model");
     }
@@ -149,6 +158,7 @@ ErrCode DbModel::copyData(const DbModel *model)
         mImportFieldRequired = model->mImportFieldRequired;
         mUpdatedField = model->updatedField();
         mUpdateAllFields = model->mUpdateAllFields;
+        mLoadedAllData = model->mLoadedAllData;
     } else {
         loge("copy data failed, empty model");
         err = ErrInvalidArg;
@@ -578,7 +588,7 @@ const QList<QString> &DbModel::updatedField() const
     return mUpdatedField;
 }
 
-bool DbModel::isFieldUpdated(const QString &itemField)
+bool DbModel::isFieldUpdated(const QString &itemField) const
 {
     tracein;
     bool updated = false;
@@ -686,6 +696,29 @@ ErrCode DbModel::update(bool allFields, bool notifyDataChange)
 bool DbModel::allowRemove(QString* msg)
 {
     return mDeletable;
+}
+
+ErrCode DbModel::loadAllData()
+{
+    // do nothing here, derived class will implement this
+    return ErrNone;
+}
+
+void DbModel::check2LoadAllData()
+{
+    if (!mLoadedAllData) {
+        dbgd("All data not load yet, load all");
+        ErrCode err = loadAllData();
+        dbgd("load all data ret=%d", err);
+        if (err == ErrNone) {
+            mLoadedAllData = true;
+        }
+    }
+}
+
+bool DbModel::isNameIdUpdated() const
+{
+    return isFieldUpdated(KItemNameId);
 }
 
 quint32 DbModel::refCnt() const

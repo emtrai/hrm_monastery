@@ -20,17 +20,14 @@
  * Brief:
  */
 #include "dlgarea.h"
-#include "communityctl.h"
 #include "ui_dlgarea.h"
 #include "logger.h"
 #include "errcode.h"
-#include "areactl.h"
 #include "area.h"
 #include "countryctl.h"
-#include "dialog/dlgsearchperson.h"
 #include "dbmodel.h"
 #include "datetimeutils.h"
-
+#include "stringdefs.h"
 
 DlgArea::DlgArea(QWidget *parent) :
     DlgCommonEditModel(parent),
@@ -50,6 +47,7 @@ DlgArea::~DlgArea()
 ErrCode DlgArea::buildModel(DbModel *model, QString& errMsg)
 {
     tracein;
+    UNUSED(errMsg);
     ErrCode err = ErrNone;
     Area* comm = (Area*) model;
     if (!model){
@@ -150,6 +148,44 @@ void DlgArea::loadStatus()
         ui->cbStatus->addItem(statuses->value(key), key);
     }
     traceout;
+}
+
+bool DlgArea::onValidateData(QString &msg)
+{
+    tracein;
+    bool isValid = true;
+    if (IS_MODEL_NAME(mModel, KModelNameArea)) {
+        Area* area = static_cast<Area*>(mModel);
+        if (area->name().isEmpty()) {
+            msg += STR_LACK_NAME;
+            isValid = false;
+            logw("lack name");
+        }
+        if (area->nameId().isEmpty()) {
+            msg += STR_LACK_NAMEID;
+            isValid = false;
+            logw("lack name id");
+        }
+        if (!VALIDATE_DATE_STRING(ui->txtStartDate->text(), true, DEFAULT_FORMAT_YMD)) {
+            msg += QString(STR_INVALID_STARTDATE).arg(ui->txtStartDate->text());
+            isValid = false;
+            logw("lack/invalid start date");
+        }
+        if (!VALIDATE_DATE_STRING(ui->txtEndDate->text(), true, DEFAULT_FORMAT_YMD)) {
+            msg += QString(STR_INVALID_ENDDATE).arg(ui->txtEndDate->text());
+            isValid = false;
+            logw("lack/invalid end date");
+        }
+    } else {
+        msg += STR_INVALID_DATA;
+        logw("no model or invalid model '%s' to check", MODELSTR2CHA(mModel));
+        isValid = false;
+    }
+    dbgv("is valid %d", isValid);
+    // TODO: implement this????
+    // TODO do we need this? or just implement on buildModel are enough??
+    traceout;
+    return isValid;
 }
 
 

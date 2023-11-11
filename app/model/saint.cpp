@@ -26,7 +26,6 @@
 #include <QStringLiteral>
 #include "utils.h"
 #include "datetimeutils.h"
-#include "crypto.h"
 
 #include "dbctl.h"
 
@@ -192,6 +191,7 @@ void Saint::dump() const
     logd("- Full Name %s", fullName().toStdString().c_str());
     logd("- Country dbId %s", countryUid().toStdString().c_str());
 #endif //DEBUG_TRACE
+    traceout;
 }
 
 
@@ -233,50 +233,4 @@ void Saint::setCountryUid(const QString &newCountryUid)
 {
     CHECK_MODIFIED_THEN_SET(mCountryUid, newCountryUid, KItemCountryUid);
 }
-
-//bool Saint::isValid()
-//{
-//    // TODO: add more checking for valid info
-//    return !name().isEmpty();
-//}
-
-//void Saint::dump()
-//{
-//    // TODO: dump to stdout, sdderr or file???
-//#ifdef DEBUG_TRACE
-
-//    logd("DUMP SAINT:");
-//    logd("- NameId %s", nameid().toStdString().c_str());
-//    logd("- Name %s", name().toStdString().c_str());
-//    logd("- FullName %s", fullName().toStdString().c_str());
-//    logd("- gender %d", gender());
-//    logd("- feastDay %lld (%s)", feastDay(),
-//         DatetimeUtils::date2String(feastDay(), QString()).toStdString().c_str());
-//#endif //DEBUG_TRACE
-
-//}
-
-//QString Saint::toString()
-//{
-//    return QString("%1,%2").arg(nameid(), name());
-//}
-
-//ErrCode Saint::save()
-//{
-//    tracein;
-//    ErrCode ret = ErrNone;
-//    IDbSaint* dbSaint = DbCtl::getInstance()->dbSaint();
-//    if (dbSaint != nullptr){
-//        ret = dbSaint->addSaint(this);
-//        if (ret == ErrExisted){ // alrady exist, judge as ok
-//            ret = ErrNone;
-//            logi("%s already exist", toString().toStdString().c_str());
-//        }
-//    }
-//    else{
-//        ret = ErrDbNotReady;
-//        loge("DbSaint not ready");
-//    }
-//    return ret;
-//}
 

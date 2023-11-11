@@ -55,7 +55,7 @@ DlgAbout::DlgAbout(QWidget *parent) :
     appInfo += QString(tr("- Thư mục dữ liệu ứng dụng: \n%1\n").arg(FileCtl::getAppWorkingDataDir()));
     appInfo += QString(tr("- Thư mục log: \n%1\n").arg(Logger::logDirPath()));
     appInfo += QString(tr("- Thư mục tạm: \n%1\n").arg(FileCtl::getTmpDataDir()));
-    appInfo += QString(tr("- Thư mục sao lưu: \n%1\n").arg(CONFIG->getAutoBackupDirPath()));
+    appInfo += QString(tr("- Thư mục sao lưu tự động: \n%1\n").arg(CONFIG->getAutoBackupDirPath()));
     ui->txtAppInfo->setText(appInfo);
 }
 

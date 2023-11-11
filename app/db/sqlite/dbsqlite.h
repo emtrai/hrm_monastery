@@ -81,7 +81,6 @@ class DbSqlite : public IDatabase
 {
 public:
 
-//    virtual ErrCode_t addPerson(const Person* person);
     /**
     * Load database
     */
@@ -111,6 +110,7 @@ public:
     virtual DbModelHandler* getPersonStatusModelHandler();
     virtual DbModelHandler* getCourseModelHandler();
     virtual DbModelHandler* getEthnicModelHandler();
+    virtual DbModelHandler* getRoleModelHandler();
 
     static DbSqliteTbl* table(const QString& tblName);
     static DbModelHandler* handler(const QString& name);
@@ -128,6 +128,15 @@ public:
     virtual ErrCode updateMetadataValue(const QString& key, const QString& value);
     virtual quint64 getCurrentPersonCodeNumber(bool* ok = nullptr);
     virtual quint64 getDbSeqNumber(const QString& tblName, bool* ok = nullptr);
+    /**
+     * @brief find avaible nameid which does not exist in db yet
+     * @param initNameId initial nameid to search
+     * @param availableNameId
+     * @return ErrNone to succeed or error code
+     */
+    virtual ErrCode getAvailableNameId(const QString& modelName,
+                                       const QString &initNameId, QString &availableNameId);
+
 private:
 
     DbSqlite();

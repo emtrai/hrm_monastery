@@ -36,6 +36,9 @@
 
 #define APP_VERSION_CODE VERSION_CODE(VER_MAJOR,VER_MINOR,VER_PATCH)
 
+// maximum number of times to check duplicate items
+#define MAX_CHECK_DUP_TIME 1024
+
 #define CSV_ITEM_SPLIT ','
 #define CSV_SUBITEM_SPLIT ';'
 

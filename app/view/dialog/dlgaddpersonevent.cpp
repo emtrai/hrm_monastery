@@ -43,20 +43,15 @@ DlgAddPersonEvent::DlgAddPersonEvent(QWidget *parent) :
     tracein;
     ui->setupUi(this);
     loadEvent();
+    traceout;
 }
 
 DlgAddPersonEvent::~DlgAddPersonEvent()
 {
     tracein;
     delete ui;
-    if (mPerson != nullptr) {
-        delete mPerson;
-        mPerson = nullptr;
-    }
-    if (mEvent != nullptr) {
-        delete mEvent;
-        mEvent = nullptr;
-    }
+    FREE_PTR(mPerson);
+    FREE_PTR(mEvent);
     RELEASE_LIST_DBMODEL(mEventList);
     traceout;
 }
@@ -70,10 +65,6 @@ ErrCode DlgAddPersonEvent::buildModel(DbModel *model, QString &errMsg)
         loge("Invalid argument, null model");
     }
 
-//    if (err == ErrNone && !mPerson) {
-//        err = ErrNoData;
-//        loge("No person object to be set");
-//    }
     if (err == ErrNone) {
         PersonEvent * per = (PersonEvent*) model;
         if (err == ErrNone){
@@ -188,11 +179,6 @@ void DlgAddPersonEvent::updateNameId()
             mPerson?mPerson->nameId():"KHONG",
             mEvent?mEvent->nameId():"KHONG",
             ui->txtDate->text());
-//        QString nameId = mPerson?mPerson->nameId():"KHONG";
-//        nameId += "_";
-//        nameId += mEvent?mEvent->nameId():"KHONG";
-//        nameId += "_";
-//        nameId += ui->txtDate->text();
         DlgCommonEditModel::onChangeNameIdTxt(ui->txtNameId, nameId, true);
     } else {
         logd("event info only, skip setting name id");
@@ -212,10 +198,17 @@ bool DlgAddPersonEvent::onValidateData(QString &msg)
             isValid = false;
             logw("lack name id");
         }
+        // if event only, no need to check name id as it'll be created automatically
+        // because there are many people
         if (event->date() == 0) {
-            msg += tr("Thiếu ngày/tháng");
+            msg += tr("Thiếu ngày/tháng hoặc ngày tháng không hợp lệ");
             isValid = false;
             logw("lack date");
+        }
+        if (!VALIDATE_DATE_STRING(ui->txtEndDate->text(), true, DEFAULT_FORMAT_YMD)) {
+            msg += QString(tr("Ngày/Tháng kết thúc '%1' không hợp lệ")).arg(ui->txtEndDate->text());
+            isValid = false;
+            logw("lack/invalid end date");
         }
     } else {
         logw("no model to check");
@@ -292,7 +285,7 @@ void DlgAddPersonEvent::on_btnSearch_clicked()
             logi("No person selected");
         }
     }
-    delete dlg;
+    FREE_PTR(dlg);
     traceout;
 }
 
@@ -373,7 +366,6 @@ ErrCode DlgAddPersonEvent::setPerson(const Person *newPerson)
             logd("clone new person");
             mPerson = (Person*)(((DbModel*)newPerson)->clone());
             ui->txtPersonName->setPlainText(mPerson->displayName());
-    //        ui->lblNameId->setText(mPerson->nameId());
             logd("setProperty %s", mPerson->uid().toStdString().c_str());
             ui->txtPersonName->setProperty(KItemPerson, mPerson->uid());
             ui->btnSearch->setEnabled(false); // not allow to change person info

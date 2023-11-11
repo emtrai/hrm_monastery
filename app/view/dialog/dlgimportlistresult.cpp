@@ -28,6 +28,8 @@
 #include "dialogutils.h"
 #include "stringdefs.h"
 
+#include <QPushButton>
+
 #define ITEM_CHECK (Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable)
 #define ITEM_NONE_CHECK (Qt::NoItemFlags)
 
@@ -123,6 +125,10 @@ void DlgImportListResult::setupUI()
         QString title = QString(tr("Nhập dữ liệu cho: %1")).arg(mTargetModel->name());
         setTitle(title);
     }
+    QPushButton* btn = ui->buttonBox->button(QDialogButtonBox::Cancel);
+    if (btn) btn->setText(STR_CANCEL);
+    btn = ui->buttonBox->button(QDialogButtonBox::Save);
+    if (btn) btn->setText(STR_SAVE);
     traceout;
 }
 

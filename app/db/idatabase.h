@@ -76,6 +76,15 @@ public:
     virtual ErrCode updateMetadataValue(const QString& key, const QString& value) = 0;
     virtual quint64 getCurrentPersonCodeNumber(bool* ok = nullptr) = 0;
     virtual quint64 getDbSeqNumber(const QString& tblName, bool* ok = nullptr) = 0;
+
+    /**
+     * @brief find avaible nameid which does not exist in db yet
+     * @param initNameId initial nameid to search
+     * @param availableNameId
+     * @return ErrNone to succeed or error code
+     */
+    virtual ErrCode getAvailableNameId(const QString& modelName,
+                                       const QString &initNameId, QString &availableNameId) = 0;
 };
 
 #endif // IDATABASE_H

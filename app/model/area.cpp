@@ -44,7 +44,7 @@ Area::Area():DbModel(),
 
 Area::~Area()
 {
-    tracein;
+    traced;
 }
 
 DbModel *Area::build()

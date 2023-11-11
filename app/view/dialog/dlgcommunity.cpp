@@ -21,18 +21,24 @@
  */
 #include "dlgcommunity.h"
 #include "communityctl.h"
+#include "communitymanager.h"
+#include "person.h"
 #include "ui_dlgcommunity.h"
 #include "logger.h"
 #include "errcode.h"
 #include "community.h"
 #include "areactl.h"
-#include "area.h"
 #include "countryctl.h"
 #include "communityctl.h"
 #include "dialog/dlgsearchperson.h"
 #include "dbmodel.h"
 #include "datetimeutils.h"
-
+#include "stringdefs.h"
+#include "dialogutils.h"
+#include "dlgcommmgr.h"
+#include "personctl.h"
+#include "rolectl.h"
+#include "role.h"
 
 DlgCommunity::DlgCommunity(QWidget *parent) :
     DlgCommonEditModel(parent),
@@ -54,17 +60,13 @@ DlgCommunity::~DlgCommunity()
     traceout;
 }
 
-void DlgCommunity::setupUI()
-{
-    tracein;
-    traceout;
-}
 
 ErrCode DlgCommunity::buildModel(DbModel *model, QString& errMsg)
 {
     tracein;
     ErrCode err = ErrNone;
-    Community* comm = (Community*) model;
+    UNUSED(errMsg);
+    Community* comm = static_cast<Community*>(model);
     if (!model){
         err = ErrInvalidArg;
         loge("Invalid arg");
@@ -137,6 +139,8 @@ ErrCode DlgCommunity::fromModel(const DbModel *item)
     err = DlgCommonEditModel::fromModel(item);
     Community* comm = (Community*)model();
     if (err == ErrNone) {
+        dbgd("from model '%s'", MODELSTR2CHA(comm));
+        comm->check2LoadAllData();
         ui->txtName->setText(comm->name());
         ui->txtCode->setText(comm->nameId()); // TODO: auto generate???
         Utils::setSelectItemComboxByData(ui->cbArea, comm->areaUid());
@@ -151,7 +155,7 @@ ErrCode DlgCommunity::fromModel(const DbModel *item)
         // TODO: image???
         Utils::setSelectItemComboxByData(ui->cbParentCommunity, comm->parentUid());
         SET_TEXTBOX_FROM_VALUE(ui->txtCEO, KItemUid,
-                               comm->currentCEOUid(), comm->currentCEOName());
+                               comm->currentCEOUid(), comm->currentCEONameWithUpdate());
 
 
         ui->txtIntro->setPlainText(comm->brief());
@@ -188,6 +192,168 @@ void DlgCommunity::loadStatus()
         ui->cbStatus->addItem(statuses->value(key), key);
     }
     traceout;
+}
+
+bool DlgCommunity::onValidateData(QString &msg)
+{
+    tracein;
+    bool isValid = true;
+    if (IS_MODEL_NAME(mModel, KModelNameCommunity)) {
+        Community* comm = static_cast<Community*>(mModel);
+        if (comm->name().isEmpty()) {
+            msg += STR_LACK_NAME;
+            isValid = false;
+            logw("lack name");
+        }
+        if (comm->nameId().isEmpty()) {
+            msg += STR_LACK_NAMEID;
+            isValid = false;
+            logw("lack name id");
+        }
+    } else {
+        msg += STR_INVALID_DATA;
+        logw("no model or invalid model '%s' to check", MODELSTR2CHA(mModel));
+        isValid = false;
+    }
+    dbgv("is valid %d", isValid);
+    // TODO: implement this????
+    // TODO do we need this? or just implement on buildModel are enough??
+    traceout;
+    return isValid;
+
+}
+
+bool DlgCommunity::onConfirmSave(bool isAddnew, DbModel *model, QString& errMsg)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    Person* ceo = nullptr;
+    DbModel* newCEO = nullptr;
+    bool isActiveCEO = false;
+    bool accept = false;
+    Community* comm = nullptr;
+    DlgCommMgr* dlg = nullptr;
+    const CommunityManager* mgr = nullptr;
+    if (!IS_MODEL_NAME(model, KModelNameCommunity)) {
+        err = ErrInvalidArg;
+        loge("invalid arg");
+        errMsg = STR_INVALID_DATA;
+    }
+    if (err == ErrNone) {
+        accept = DlgCommonEditModel::onConfirmSave(isAddnew, model, errMsg);
+        if (!accept) {
+            err = ErrCancelled;
+            loge("not accept in previous asking");
+        }
+    }
+    if (err == ErrNone) {
+        comm = static_cast<Community*>(model);
+        // check if need to update CEO
+        // 2 cases:
+        // - newly add
+        // - ceo info is updated
+        if ((isNew() || comm->updateCEO()) && !comm->currentCEOUid().isEmpty()) {
+            newCEO = PERSONCTL->getModelByUid(comm->currentCEOUid());
+            if (!newCEO) {
+                loge("not found person with uid '%s'", STR2CHA(comm->currentCEOUid()));
+                err = ErrNotFound;
+            }
+        } else {
+            accept = true;
+            loge("not update ceo");
+        }
+    }
+    if (err == ErrNone) {
+        // new ceo is set, ask user if we need to update CEO info or not
+        if (newCEO) {
+            ErrCode tmperr = COMMUNITYCTL->getCurrentCEO(comm->uid(), &ceo, &isActiveCEO);
+            dbgd("found ceo '%s'", MODELSTR2CHA(ceo));
+            QString question;
+            if (tmperr == ErrNone || tmperr == ErrNoData) {
+                if (ceo) {
+                    question = QString("Đổi Phụ trách hiện tại %1 sang Phụ trách %2 cho Cộng đoàn %2?")
+                                .arg(ceo->displayName(),
+                                        comm->currentCEOName(),
+                                        comm->name());
+                } else {
+                    question = QString("Thiết lập '%1' là Phụ trách cho Cộng đoàn %2?")
+                                   .arg(comm->currentCEOName(), comm->name());
+                }
+                dbgd("confirm dialog '%s'", STR2CHA(question));
+                accept = DialogUtils::showConfirmDialog(
+                    this, STR_SAVE, question, nullptr);
+
+                if (accept) {
+                    // accept to confirm, let's create dialog to add information about comm mgr
+                    if (err == ErrNone) {
+                        dlg = DlgCommMgr::build(
+                            this, false, KModelNameCommManager, nullptr, nullptr);
+                        if (!dlg) {
+                            loge("failed to build DlgCommMgr, no memory?");
+                            err = ErrNoMemory;
+                        }
+                    }
+                    if (err == ErrNone) {
+                        logd("Set comm '%s' for person", MODELSTR2CHA(comm));
+                        err = dlg->setCommunity(comm);
+                    }
+                    if (err == ErrNone) {
+                        logd("Set newCEO '%s'", MODELSTR2CHA(newCEO));
+                        err = dlg->setPerson(static_cast<const Person*>(newCEO));
+                    }
+                    if (err == ErrNone) {
+                        dlg->setModelStatus(MODEL_STATUS_ACTIVE);
+                    }
+
+                    logd("get ceo role");
+                    Role* role = ROLECTL->getCEORole();
+                    if (role) {
+                        logd("set role '%s'", MODELSTR2CHA(role));
+                        dlg->setRole(role->uid());
+                        FREE_PTR(role);
+                    }
+
+                    if (err == ErrNone) {
+                        if (dlg->exec() == QDialog::Accepted) {
+                            const DbModel* mod = dlg->getModel();
+                            if (IS_MODEL_NAME(mod, KModelNameCommManager)) {
+                                mgr = dynamic_cast<const CommunityManager*>(mod);
+                            } else {
+                                err = ErrInvalidModel;
+                                loge("invalid model '%s', expected '%s'",
+                                     MODELSTR2CHA(mod), KModelNameCommManager);
+                            }
+                        } else {
+                            err = ErrCancelled;
+                        }
+                    }
+
+                    if (err == ErrNone && mgr) {
+                        logd("set commmgr '%s'", MODELSTR2CHA(mgr));
+                        comm->setNewCommMgr(mgr);
+                    }
+
+                }
+            } else {
+                errMsg = tr("Lỗi tìm Phụ trách cộng đoàn");
+                loge("Err get current CEO %d", tmperr);
+            }
+        } else {
+            logi("not change ceo for comm '%s'", MODELSTR2CHA(comm));
+            accept = true;
+        }
+    }
+    logife(err, "on confirm failed");
+    FREE_PTR(ceo);
+    FREE_PTR(newCEO);
+    FREE_PTR(dlg);
+    traceout;
+    return accept && (err == ErrNone);
+}
+
+QDialogButtonBox *DlgCommunity::buttonBox()
+{
+    return ui->buttonBox;
 }
 
 

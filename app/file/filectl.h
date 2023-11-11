@@ -62,6 +62,13 @@ public:
     static QString getAppBackupDataDir();
 
     static ErrCode copyFile(const QString& src, const QString& dest, bool force = false);
+    /**
+     * @brief remove file
+     *        if markRemove is true, file is not removed, from FS, but change file name
+     * @param fpath
+     * @param markRemove false to remove file, true not to remove file, just change name
+     * @return
+     */
     static ErrCode removeFile(const QString& fpath, bool markRemove = false);
 
     static QString getAppImageDataRootDir();

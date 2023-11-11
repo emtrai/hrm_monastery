@@ -26,7 +26,6 @@
 #include <QPushButton>
 #include <QDialog>
 #include "logger.h"
-#include "errcode.h"
 #include "stringdefs.h"
 #include "utils.h"
 #include "person.h"
@@ -40,9 +39,14 @@ DlgConfirmUpdatePeopleComm::DlgConfirmUpdatePeopleComm(QWidget *parent) :
 {
     tracein;
     ui->setupUi(this);
-    ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(STR_CANCEL);
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setText(STR_OK);
-    ui->buttonBox->button(QDialogButtonBox::Help)->setText(STR_HELP);
+
+    if (ui->buttonBox->button(QDialogButtonBox::Cancel))
+        ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(STR_CANCEL);
+    if (ui->buttonBox->button(QDialogButtonBox::Ok))
+        ui->buttonBox->button(QDialogButtonBox::Ok)->setText(STR_OK);
+    if (ui->buttonBox->button(QDialogButtonBox::Help))
+        ui->buttonBox->button(QDialogButtonBox::Help)->setText(STR_HELP);
+
     traceout;
 }
 

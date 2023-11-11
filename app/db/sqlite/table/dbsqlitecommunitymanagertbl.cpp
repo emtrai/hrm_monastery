@@ -96,6 +96,55 @@ QList<DbModel *> DbSqliteCommunityManagerTbl::getListPerson(const QString &commu
     return list;
 }
 
+QList<DbModel *> DbSqliteCommunityManagerTbl::getListPerson(const QString &communityUid,
+                                                            const QString &roleUid,
+                                                            int status)
+{
+    tracein;
+    QString cond;
+    logi("getListPerson communityUid '%s', roleUid '%s', model status 0x%x",
+         STR2CHA(communityUid), STR2CHA(roleUid), status);
+    if (!communityUid.isEmpty()) {
+        cond = QString("%1.%2 = '%3'").arg(name(), KFieldCommunityUid, communityUid);
+    } else {
+        cond = NULL_FIELD(name(), KFieldCommunityUid);
+    }
+    if (!roleUid.isEmpty()) {
+        if (!cond.isEmpty()) {
+            cond += " AND ";
+        }
+        cond += QString("%1.%2 = '%3'").arg(name(), KFieldRoleUid, roleUid);
+    }
+    dbgd("cond '%s'", STR2CHA(cond));
+    /*
+     * SELECT * FROM "KTableCommManager"
+     *  JOIN "KTablePerson"
+     *  ON "KTableCommManager"."KFieldPersonUid" = "KTablePerson"."KFieldUid"
+     *  WHERE "KTableCommManager"."KFieldCommunityUid" = :uid
+     */
+    QList<DbModel *> list = DbSqliteMapTbl::getListItemsWithCond(name(),
+                                                                 KTablePerson,
+                                                                 KFieldPersonUid,
+                                                                 KFieldUid,
+                                                                 &CommunityManager::build,
+                                                                 cond,
+                                                                 status,
+                                                                 QString("*, %1.%2 AS %3, %1.%4 AS %5, (%6 || ' ' || %7) AS %8")
+                                                                     .arg(KTablePerson,
+                                                                          KFieldNameId,
+                                                                          KFieldPersonNameId,
+                                                                          KFieldUid,
+                                                                          KFieldPersonUid,
+                                                                          KFieldLastName,
+                                                                          KFieldFirstName,
+                                                                          KFieldFullName)
+                                                                 );
+
+    traceout;
+    return list;
+
+}
+
 QList<DbModel *> DbSqliteCommunityManagerTbl::getListPersonAll(int status)
 {
     tracein;
@@ -329,14 +378,14 @@ QString DbSqliteCommunityManagerTbl::getSearchQueryStringWithTag(const QString &
                                                cond,
                                                MODEL_STATUS_MAX, // TODO: status?
                                                QString("*, %1.%2 AS %3, %1.%4 AS %5, (%6 || ' ' || %7) AS %8")
-                                                   .arg(KTablePerson)
-                                                   .arg(KFieldNameId)
-                                                   .arg(KFieldPersonNameId)
-                                                   .arg(KFieldUid)
-                                                   .arg(KFieldPersonUid)
-                                                   .arg(KFieldLastName)
-                                                   .arg(KFieldFirstName)
-                                                   .arg(KFieldFullName)
+                                                   .arg(KTablePerson,
+                                                       KFieldNameId,
+                                                       KFieldPersonNameId,
+                                                       KFieldUid,
+                                                       KFieldPersonUid,
+                                                       KFieldLastName,
+                                                       KFieldFirstName,
+                                                       KFieldFullName)
                                                );
     traceout;
     return queryStr;

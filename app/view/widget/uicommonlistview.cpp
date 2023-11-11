@@ -402,19 +402,23 @@ ErrCode UICommonListView::onViewItem(UITableCellWidgetItem *item)
 {
     tracein;
     ErrCode err = ErrNone;
-    const DbModel* model = nullptr;
+    DbModel* model = nullptr;
 
     if (!item) {
         err = ErrInvalidArg;
         loge("invalid argument");
     }
 
-    if (err == ErrNone && ((model = item->itemData()) == nullptr)) {
-        err = ErrInvalidData;
-        loge("Invalid data");
+    if (err == ErrNone) {
+        model = const_cast<DbModel*>(item->itemData());
+        if (!model) {
+            err = ErrInvalidData;
+            loge("Invalid data or no memory?");
+        }
     }
 
     if (err == ErrNone) {
+        model->check2LoadAllData();
         err = MainWindow::showOnHtmlViewer(model, model->fullName());
     }
     if (err != ErrNone) {
@@ -444,8 +448,9 @@ ErrCode UICommonListView::onEditItem(UITableCellWidgetItem *item)
         err = ErrInvalidArg;
     }
     if (err == ErrNone) {
-        const DbModel* comm = item->itemData();
+        DbModel* comm = const_cast<DbModel*>(item->itemData());
         if (comm) {
+            comm->check2LoadAllData();
             MainWindow::showAddEditCommonModel(true, comm, this);
         } else {
             loge("Model obj is null");

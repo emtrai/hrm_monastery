@@ -45,6 +45,7 @@ protected:
     virtual DbModel* newModel();
     void loadData();
     void loadStatus();
+    virtual bool onValidateData(QString& msg);
 public:
 
 private slots:

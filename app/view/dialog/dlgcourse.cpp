@@ -26,8 +26,7 @@
 #include "logger.h"
 #include "errcode.h"
 #include "course.h"
-#include "coursectl.h"
-#include "mainwindow.h"
+#include "stringdefs.h"
 
 #include <QDialogButtonBox>
 DlgCourse::DlgCourse(QWidget *parent) :
@@ -46,8 +45,10 @@ DlgCourse::~DlgCourse()
 void DlgCourse::setupUI()
 {
     tracein;
-    ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Thoát"));
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("Lưu"));
+    if (ui->buttonBox->button(QDialogButtonBox::Cancel))
+        ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(STR_CANCEL);
+    if (ui->buttonBox->button(QDialogButtonBox::Ok))
+        ui->buttonBox->button(QDialogButtonBox::Ok)->setText(STR_OK);
     traceout;
 }
 

@@ -43,7 +43,8 @@ ErrCode ImportCSV::importFrom(const QString& importName, int importFileType,
     tracein;
     QList<QHash<QString, QString>> items;
     ErrCode ret = ErrNone;
-
+    logi("import from file '%s' importName '%s'",
+         STR2CHA(fpath), STR2CHA(importName));
     if (importer == nullptr){
         ret = ErrInvalidArg;
         loge("import failed, importer null");
@@ -59,14 +60,16 @@ ErrCode ImportCSV::importFrom(const QString& importName, int importFileType,
     }
     if (ret == ErrNone){
         int noItem = items.count();
-        logd("noItem %d", noItem);
+        dbgd("noItem %d", noItem);
         if (noItem > 0) {
+            dbgd("call import data start");
             ret = importer->onImportDataStart(importName, importFileType, fpath);
         } else {
             logd("no item");
             ret = ErrNoData;
         }
         if (ret == ErrNone) {
+            dbgd("call import data");
             foreach (QHash item, items) {
                 int cnt = item.count();
                 logd("Parsed %d key", cnt);
@@ -74,15 +77,11 @@ ErrCode ImportCSV::importFrom(const QString& importName, int importFileType,
                 if (cnt > 0) {
                     importer->onImportParseDataItem(importName, importFileType, item, idx++, outList);
 
-//                    foreach (QString key, item.keys()) {
-//                        logd("key %s", key.toStdString().c_str());
-//                        logd("val %s", item.value(key).toStdString().c_str());
-//                        importer->onImportParseDataItem(importFileType, key, item.value(key), idx++, tag);
-//                    }
                 }
             }
 
         }
+        dbgd("call import data end");
         importer->onImportDataEnd(importName, importFileType, fpath, ret);
     }
 

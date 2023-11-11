@@ -39,13 +39,15 @@ class DlgCommunity : public DlgCommonEditModel
 public:
                  explicit DlgCommunity(QWidget *parent = nullptr);
     ~DlgCommunity();
-    virtual void setupUI();
     virtual ErrCode buildModel(DbModel* model, QString& errMsg);
     virtual ErrCode fromModel(const DbModel* model);
 protected:
     virtual DbModel* newModel();
     void loadData();
     void loadStatus();
+    virtual bool onValidateData(QString& msg);
+    virtual bool onConfirmSave(bool isNew, DbModel* model, QString& errMsg);
+    virtual QDialogButtonBox* buttonBox();
 public:
 
 private slots:

@@ -21,9 +21,7 @@
  */
 #include "event.h"
 
-#include "utils.h"
 #include "dbctl.h"
-#include "defs.h"
 #include "dbmodel.h"
 Event::Event():DbModel()
 {

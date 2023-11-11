@@ -21,9 +21,6 @@
  */
 #include "ethnic.h"
 #include "logger.h"
-#include "errcode.h"
-#include "province.h"
-#include "filectl.h"
 #include "utils.h"
 #include "dbctl.h"
 #include "defs.h"
@@ -119,6 +116,5 @@ const QString &Ethnic::countryUid() const
 
 void Ethnic::setCountryUid(const QString &newCountryUid)
 {
-    mCountryUid = newCountryUid;
-    markItemAsModified(KItemCountry);
+    CHECK_MODIFIED_THEN_SET(mCountryUid, newCountryUid, KItemCountry);
 }

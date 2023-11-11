@@ -394,6 +394,15 @@ void MainWindow::showErrorBox(const QString &msg, ErrCode err)
     emit showErrorDlgSignal(err, msg);
 }
 
+void MainWindow::showIfErrorBox(const QString &msg, ErrCode err)
+{
+    if(err != ErrNone) {
+        showErrorBox(msg, err);
+    } else {
+        logd("not error, skip");
+    }
+}
+
 ErrCode MainWindow::doShowProcessingDialog(const QString& title,
                                WaitPrepare_t prepare,
                                WaitRunt_t run,
@@ -531,7 +540,7 @@ void MainWindow::doShowAddEditPerson(bool isSelfUpdate, Person *per, bool isNew)
     tracein;
     logd("isSelfUpdate %d", isSelfUpdate);
     DlgPerson* dlg = DlgPerson::buildDlg(this, per, isNew);
-    if (!dlg) {
+    if (dlg) {
         dlg->setIsSelfSave(isSelfUpdate);
         dlg->exec();
         delete dlg;
@@ -548,7 +557,7 @@ void MainWindow::doShowAddEditCommunity(bool isSelfUpdate, const Community *com,
     logd("isSelfUpdate %d", isSelfUpdate);
     DlgCommunity* dlg = DlgCommunity::build(this, isSelfUpdate, KModelNameCommunity,
                                             (DbModel*)com, listener);
-    if (!dlg) {
+    if (dlg) {
         dlg->setListener(listener);
         dlg->exec();
         delete dlg;

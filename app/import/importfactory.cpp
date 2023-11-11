@@ -119,9 +119,10 @@ void ImportFactory::doRemoveListener(ImportListener *listener)
 void ImportFactory::notifyListenerStart(const QString &importName, const QString &fpath, ImportType type)
 {
     tracein;
+    dbgtrace;
     foreach(ImportListener* listener, mImportListener) {
         if (listener != nullptr) {
-            logd("Call import listener onImportStart '%s'", STR2CHA(listener->getName()));
+            dbgd("Call import listener onImportStart '%s'", STR2CHA(listener->getName()));
             listener->onImportStart(importName, fpath, type);
         }
     }
@@ -131,9 +132,10 @@ void ImportFactory::notifyListenerStart(const QString &importName, const QString
 void ImportFactory::notifyListenerEnd(const QString &importName, ErrCode err, const QString &fpath, ImportType type)
 {
     tracein;
+    dbgtrace;
     foreach(ImportListener* listener, mImportListener) {
         if (listener != nullptr) {
-            logd("Call import listener onImportEnd '%s'", STR2CHA(listener->getName()));
+            dbgd("Call import listener onImportEnd '%s'", STR2CHA(listener->getName()));
             listener->onImportEnd(importName, err, fpath, type);
         }
     }
@@ -146,7 +148,7 @@ ErrCode ImportFactory::doImportFrom(const QString& importName, IDataImporter *it
 {
     tracein;
     ErrCode ret = ErrNone;
-    logi("Import from %d", type);
+    logi("Import from fpath '%s' type %d", STR2CHA(fpath), type);
     Importer* importer = getImporter(type);
     if (importer != nullptr) {
         notifyListenerStart(importName, fpath, type);
@@ -156,6 +158,7 @@ ErrCode ImportFactory::doImportFrom(const QString& importName, IDataImporter *it
         ret = ErrNotSupport;
         loge("Importer %d not support", type);
     }
+    traceret(ret);
     return ret;
 }
 

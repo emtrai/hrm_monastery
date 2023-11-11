@@ -77,7 +77,6 @@
 #include "defs.h"
 #include "exception.h"
 
-
 static const QString DRIVER("QSQLITE");
 
 // TODO: enhance performance of db access via refer to https://lnj.gitlab.io/post/multithreaded-databases-with-qtsql/
@@ -455,6 +454,12 @@ DbModelHandler *DbSqlite::getEthnicModelHandler()
 
 }
 
+DbModelHandler *DbSqlite::getRoleModelHandler()
+{
+    return getModelHandler(KModelHdlRole);
+
+}
+
 DbSqliteTbl *DbSqlite::table(const QString &tblName)
 {
     return DbSqlite::getInstance()->getTable(tblName);
@@ -640,6 +645,49 @@ quint64 DbSqlite::getDbSeqNumber(const QString &tblName, bool *ok)
     if (ok) *ok = (err == ErrNone);
     traceret(value);
     return value;
+}
+
+ErrCode DbSqlite::getAvailableNameId(const QString &modelName,
+                                     const QString &initNameId,
+                                     QString &availableNameId)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    DbSqliteTbl* tbl = getTableFromModelName(modelName);
+    QString nameId = initNameId;
+    int i = 1;
+    if (initNameId.isEmpty() || modelName.isEmpty()) {
+        err = ErrInvalidArg;
+        loge("invalid argument, init nameid '%s' or model name '%s' is empty",
+             STR2CHA(initNameId),STR2CHA(modelName));
+    }
+    if (err == ErrNone && !tbl) {
+        err = ErrNoHandler;
+        loge("not found valid tbl");
+    }
+    if (err == ErrNone) {
+        logd("initNameId to search '%s'", STR2CHA(initNameId));
+        for (; i < MAX_CHECK_DUP_TIME; i++) {
+            if (!tbl->isNameidExist(nameId)) {
+                dbg(LOG_DEBUG, "name id '%s' not exist", STR2CHA(nameId));
+                availableNameId = nameId;
+                break;
+            } else {
+                dbg(LOG_DEBUG, "Name id '%s' existed", STR2CHA(nameId));
+                nameId = QString("%1_%2").arg(initNameId).arg(i);
+                logd("Try next nameid '%s'", STR2CHA(nameId));
+            }
+        }
+    }
+    if (i >= MAX_CHECK_DUP_TIME || nameId.isEmpty()) {
+        err = ErrNotFound;
+        loge("not found any suitable nameid for '%s', tried %d time",
+             STR2CHA(initNameId), i);
+    }
+
+    traceret(err);
+    return err;
+
 }
 
 

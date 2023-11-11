@@ -44,6 +44,7 @@ public:
 protected:
     virtual DbModel* newModel();
     void loadCountry();
+    virtual QDialogButtonBox* buttonBox() ;
 private slots:
     void on_txtName_textChanged(const QString &arg1);
 

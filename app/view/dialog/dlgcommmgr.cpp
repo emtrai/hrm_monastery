@@ -32,12 +32,13 @@
 #include "dialog/dlgsearchperson.h"
 #include "stringdefs.h"
 #include "community.h"
-#include "communityctl.h"
+#include "dbctl.h"
 
 DlgCommMgr::DlgCommMgr(QWidget *parent) :
     DlgCommonEditModel(parent),
     ui(new Ui::DlgCommMgr),
-    mCommunity(nullptr)
+    mCommunity(nullptr),
+    mPerson(nullptr)
 {
     tracein;
     ui->setupUi(this);
@@ -52,6 +53,7 @@ DlgCommMgr::~DlgCommMgr()
     tracein;
     delete ui;
     FREE_PTR(mCommunity);
+    FREE_PTR(mPerson);
     traceout;
 }
 
@@ -59,6 +61,8 @@ ErrCode DlgCommMgr::buildModel(DbModel *model, QString &errMsg)
 {
     tracein;
     ErrCode err = ErrNone;
+    CommunityManager* comm = nullptr;
+    UNUSED(errMsg);
     if (!model) {
         err = ErrInvalidArg;
         loge("Invalid argument, null model");
@@ -77,28 +81,17 @@ ErrCode DlgCommMgr::buildModel(DbModel *model, QString &errMsg)
         loge("Invalid arg");
     }
     if (err == ErrNone) {
-        CommunityManager* comm = (CommunityManager*) model;
+        comm = (CommunityManager*) model;
         comm->setMarkModified(true); // start marking fields which are modified
         comm->setModelStatus(MODEL_STATUS_ACTIVE);
         comm->setCommunity(mCommunity);
         SET_MODEL_FROM_TEXTBOX(ui->txtSearch, KItemUid, comm->setPerson, PERSONCTL, Person, err);
-        SET_MODEL_FROM_CBOX(ui->cbRole, comm->setRole, ROLECTL, Role, err);
-        SET_MODEL_FROM_CBOX(ui->cbTerm, comm->setCourse, COURSECTL, Course, err);
+        SET_MODEL_FROM_VAL_CBOX(ui->cbRole, comm->setRole, ROLECTL, Role, err);
+        SET_MODEL_FROM_VAL_CBOX(ui->cbTerm, comm->setCourse, COURSECTL, Course, err);
         SET_INT_VAL_FROM_CBOX(ui->cbStatus, comm->setModelStatus, comm->setModelStatusName);
         SET_DATE_VAL_FROM_WIDGET(ui->txtStartDate, comm->setStartDate);
         SET_DATE_VAL_FROM_WIDGET(ui->txtEndDate, comm->setEndDate);
-        QString nameid = ui->txtNameId->text().trimmed();
-        QString availNameId;
-        if (!nameid.isEmpty()) {
-            err = ErrNoData;
-            loge("Lack of nameId");
-        }
-        err = COMMUNITYCTL->getAvailableNameId(KModelNameCommManager, nameid, availNameId);
-        if (err == ErrNone && !availNameId.isEmpty()) {
-            comm->setNameId(availNameId);
-        }
-        logife(err, "not found suitable name id '%s', input nameid",
-               STR2CHA(availNameId), STR2CHA(nameid));
+        CHECK_SET_NAMEID(err, comm, ui->txtNameId->text().trimmed());
     }
     traceret(err);
     return err;
@@ -182,6 +175,22 @@ void DlgCommMgr::loadStatus()
     traceout;
 }
 
+void DlgCommMgr::updatePeson(const Person *per)
+{
+    if (per != nullptr) {
+        ui->txtSearch->setText(per->fullName());
+        logd("setProperty %s", per->uid().toStdString().c_str());
+        ui->txtSearch->setProperty(KItemUid, per->uid());
+        QString nameid;
+        if (mCommunity) {
+            nameid = QString("%1_%2").arg(mCommunity->nameId(), per->nameId());
+        }
+        ui->txtNameId->setText(nameid);
+    } else {
+        logi("No person to set");
+    }
+}
+
 void DlgCommMgr::on_btnSearch_clicked()
 {
 
@@ -195,21 +204,38 @@ void DlgCommMgr::on_btnSearch_clicked()
 
     if (dlg->exec() == QDialog::Accepted){
         const Person* per = (const Person*)dlg->selectedItem();
-        if (per != nullptr) {
-            ui->txtSearch->setText(per->fullName());
-            logd("setProperty %s", per->uid().toStdString().c_str());
-            ui->txtSearch->setProperty(KItemUid, per->uid());
-            QString nameid;
-            if (mCommunity) {
-                nameid = QString("%1_%2").arg(mCommunity->nameId(), per->nameId());
-            }
-            ui->txtNameId->setText(nameid);
-        } else {
-            logi("No person selected");
-        }
+        updatePeson(per);
     }
     delete dlg;
     traceout;
+}
+
+ErrCode DlgCommMgr::setPerson(const Person *newPerson)
+{
+    logd("set person '%s'", MODELSTR2CHA(newPerson));
+    FREE_PTR(mPerson);
+    mPerson = CLONE_MODEL(newPerson, Person);
+    if (mPerson) {
+        updatePeson(mPerson);
+    }
+    return ErrNone;
+}
+
+void DlgCommMgr::setModelStatus(qint64 status)
+{
+    logd("set status '%lld'", status);
+    Utils::setSelectItemComboxByData(ui->cbStatus, status);
+    ui->cbStatus->setEditable(false);
+    ui->cbStatus->setDisabled(true);
+}
+
+void DlgCommMgr::setRole(const QString &roleUid)
+{
+    logd("set roleUid '%s'", STR2CHA(roleUid));
+    Utils::setSelectItemComboxByData(ui->cbRole, roleUid);
+    ui->cbRole->setEditable(false);
+    ui->cbRole->setDisabled(true);
+
 }
 
 ErrCode DlgCommMgr::setCommunity(const Community *comm)
