@@ -525,6 +525,180 @@ ErrCode DbSqliteTbl::deleteHard(const QHash<QString, QString> &condition)
     return err;
 }
 
+ErrCode DbSqliteTbl::checkMatch(const DbModel *item, int &perc)
+{
+    QSqlQuery qry(SQLITE->currentDb());
+    ErrCode err = ErrNone;
+    QString condNameId;
+    QString condUid;
+    QString cond;
+    int datatype = 0;
+    bool exist = false;
+
+    tracein;
+    dbgd("Check if item exist '%s'", MODELSTR2CHA(item));
+    QHash<QString, QString> inFields = getFieldsCheckExists(item);
+
+    bool modelStatusExist = false;
+
+    if (!item) {
+        err = ErrInvalidArg;
+        loge("invalid arg");
+    }
+
+    if (err == ErrNone && !item->nameId().isEmpty()) {
+        condNameId = QString("%1.%2 = :NAMEID").arg(name(), KFieldNameId);
+    }
+    if (err == ErrNone && !item->uid().isEmpty()) {
+        condUid = QString("%1.%2 = :UID").arg(name(), KFieldUid);
+    }
+
+    if (err == ErrNone && !inFields.empty()) {
+        foreach (QString field, inFields.keys()) {
+            if (field == KFieldModelStatus) {
+                modelStatusExist = true;
+                continue;
+            }
+
+            if ((field == KFieldNameId) || (field == KFieldUid)) {
+                logw("field '%s' will be check later", STR2CHA(field));
+                continue;
+            }
+
+            if (!cond.isEmpty()) {
+                cond += " AND ";
+            }
+            err = getDataType(field, datatype);
+            if (err != ErrNone) {
+                break;
+            }
+            logd("field '%s' data type %d", STR2CHA(field), datatype);
+            if (datatype == TEXT) {
+                if (!inFields[field].trimmed().isEmpty()) {
+                    cond += QString("lower(%1) = lower(:%1_TEXT)").arg(field);
+                } else {
+                    cond += QString("(%1 IS NULL OR %1 = '')").arg(field);
+                }
+            } else {
+                cond += QString("%1 = :%1_INT").arg(field);
+            }
+        }
+        if (modelStatusExist) {
+            bool ok = false;
+            QString modelStatusStr = inFields.value(KFieldModelStatus);
+            int status = modelStatusStr.toInt(&ok);
+            if (ok) {
+                appendModelStatusCond(cond, status);
+            } else {
+                loge("convert status value failed, value '%s'", STR2CHA(modelStatusStr));
+            }
+        }
+    }
+
+
+
+    if (err == ErrNone && !condNameId.isEmpty()) {
+        if (!cond.isEmpty()) {
+            cond = QString("(%1) OR (%2)").arg(cond, condNameId);
+        } else {
+            cond = condNameId;
+        }
+    }
+
+    if (err == ErrNone && !condUid.isEmpty()) {
+        if (!cond.isEmpty()) {
+            cond = QString("(%1) OR (%2)").arg(cond, condUid);
+        } else {
+            cond = condUid;
+        }
+    }
+
+    dbgd("Query cond '%s'", STR2CHA(cond));
+
+    if (err == ErrNone && cond.isEmpty()) {
+        loge("not condition to query");
+        err = ErrNoData;
+    }
+
+    if (err == ErrNone) {
+        QString queryString = QString("SELECT * FROM %1 WHERE %2 ORDER BY NAME ASC")
+                                  .arg(name(), cond);
+
+        qry.prepare(queryString);
+        dbgd("Query String '%s'", STR2CHA(queryString));
+
+        // TODO: check sql injection issue
+        foreach (QString field, inFields.keys()) {
+            if ((field == KFieldModelStatus) ||
+                (field == KFieldNameId) ||
+                (field == KFieldUid)) {
+                continue;
+            }
+            // TODO: if value is empty, data may not match
+            // Check if value is empty, for string, it seem '', but for integer,
+            // check again, as this process is string format, stupid
+            err = getDataType(field, datatype);
+            if (err != ErrNone) {
+                break;
+            }
+            if (datatype == TEXT) {
+                if (!inFields[field].trimmed().isEmpty()) {
+                    qry.bindValue( QString(":%1_TEXT").arg(field), inFields[field].trimmed());
+                    logd("bind txt :'%s_TEXT' to '%s'", STR2CHA(field),
+                         STR2CHA(inFields[field].trimmed()));
+                } else {
+                    logd("bind txt :'%s_TEXT' to NULL", STR2CHA(field));
+                }
+            } else {
+                bool ok = false;
+                qint64 value = inFields[field].toLong(&ok);
+                if (ok) {
+                    qry.bindValue( QString(":%1_INT").arg(field), value);
+                    logd("bind int :'%s_INT' to '%lld'", STR2CHA(field), value);
+                } else {
+                    loge("cannot convert string '%s' to int", STR2CHA(inFields[field]));
+                    err = ErrFailedConvert;
+                    break;
+                }
+            }
+        }
+        if (!condNameId.isEmpty()) {
+            qry.bindValue(":NAMEID", item->nameId());
+            logd("bind NAMEID to '%s'", STR2CHA(item->nameId()));
+        }
+
+        if (!condUid.isEmpty()) {
+            qry.bindValue(":UID", item->uid());
+            logd("bind UID to '%s'", STR2CHA(item->uid()));
+        }
+    }
+    if (err == ErrNone) {
+        dbgd("execute query for match");
+        if( qry.exec() ) {
+            int rows= 0;
+            if (qry.next()) {
+                rows = qry.value(0).toInt();
+                dbgd("found '%d' item", rows);
+                exist = rows > 0;
+            }
+            else {
+                dbgd("Not found any items, query '%s'",
+                     STR2CHA(qry.lastQuery()) );
+                exist = false;
+            }
+        } else {
+            loge( "Failed to execute %s", STR2CHA(qry.lastQuery()) );
+            err = ErrFailSqlQuery;
+        }
+    }
+
+    perc = ((err == ErrNone) && exist)?100:0;
+    logife(err, "Failed to query match");
+
+    logd("Exist %d", err);
+    return err;
+}
+
 bool DbSqliteTbl::isExist(const DbModel *item)
 {
     QSqlQuery qry(SQLITE->currentDb());

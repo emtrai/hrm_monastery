@@ -82,7 +82,7 @@ ErrCode DlgCommDept::buildModel(DbModel *model, QString &errMsg)
         CHECK_SET_NAMEID(err, comm, ui->txtNameId->text().trimmed());
     }
     if (err == ErrNone){
-        SET_VAL_FROM_CBOX(ui->cbDept, comm->setDepartmentUid, comm->setDepartmentName, err);
+        SET_VAL_FROM_VAL_CBOX(ui->cbDept, comm->setDepartmentUid, comm->setDepartmentName, err);
     }
     if ((err == ErrNone) && mCommunity) {
         comm->setCommunityUid(mCommunity->uid());

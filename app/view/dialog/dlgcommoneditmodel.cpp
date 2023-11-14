@@ -201,12 +201,12 @@ bool DlgCommonEditModel::onValidateData(QString &msg)
     bool isValid = true;
     if (mModel) {
         if (mModel->nameId().isEmpty()) {
-            msg += tr("Thiếu mã định danh.");
+            msg += STR_LACK_NAMEID;
             isValid = false;
             logw("lack name id");
         }
         if (mModel->name().isEmpty()) {
-            msg += tr("Thiếu tên.");
+            msg += STR_LACK_NAME;
             isValid = false;
             logw("lack name");
         }
@@ -398,6 +398,7 @@ ErrCode DlgCommonEditModel::fromModel(const DbModel *inModel)
         loge("Invalid model info to clone");
         return ErrInvalidData;
     }
+    dbgv("from model '%s'", MODELSTR2CHA(inModel));
     DbModel* item = model();
     if (item) {
         mCustomNameId = true;

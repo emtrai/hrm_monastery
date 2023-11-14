@@ -54,14 +54,12 @@ ErrCode DlgEditModel::buildModel(DbModel *model, QString& errMsg)
     }
     if (err == ErrNone){
         model->setMarkModified(true); // start marking fields which are modified
-    }
-    if (err == ErrNone) {
         QString name = ui->txtName->text().trimmed();
         if (!name.isEmpty()) {
             model->setName(name);
         } else {
             err = ErrInvalidData;
-            errMsg += tr("Thiếu Tên");
+            errMsg += STR_LACK_NAME;
             loge("Lack of name");
         }
     }
@@ -71,7 +69,7 @@ ErrCode DlgEditModel::buildModel(DbModel *model, QString& errMsg)
             model->setNameId(nameId);
         } else {
             err = ErrInvalidData;
-            errMsg += tr("Thiếu Tên định danh");
+            errMsg += STR_LACK_NAMEID;
             loge("Lack of nameid");
         }
     }
@@ -101,12 +99,6 @@ DbModel *DlgEditModel::newModel()
 {
     return mModel;
 }
-
-bool DlgEditModel::onValidateData(QString &msg)
-{
-    return true;
-}
-
 
 void DlgEditModel::on_txtName_textChanged(const QString &arg1)
 {

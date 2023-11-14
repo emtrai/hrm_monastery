@@ -123,6 +123,15 @@ public:
     virtual ErrCode deleteHard(DbModel* model, bool force, QString* msg, const QString& tableName);
     virtual ErrCode doDeleteHard(DbSqliteTbl* tbl, DbModel* model, bool force, QString* msg);
 
+
+    /**
+     * @brief Check match of model in table
+     * @param item
+     * @param perc percentage of maching, 0: not match, 100: complete match
+     * @return ErrNone if check ok
+     */
+    virtual ErrCode checkMatch(const DbModel* model, int& perc);
+
     /**
      * @brief Check if model exist in db
      * @param edu

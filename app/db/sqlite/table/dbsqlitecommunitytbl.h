@@ -51,6 +51,7 @@ protected:
                                                 const QString& field,
                                                 const DbModel *item);
     virtual DbModelBuilder mainModelBuilder();
+    virtual QHash<QString, QString> getFieldsCheckExists(const DbModel *item);
 private:
     static const qint32 KVersionCode;
 };

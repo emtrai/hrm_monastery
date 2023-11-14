@@ -250,6 +250,27 @@ ErrCode DbSqliteModelHandler::doDeleteHard(DbSqliteTbl *tbl, DbModel *model, boo
     return err;
 }
 
+ErrCode DbSqliteModelHandler::checkMatch(const DbModel *model, int &perc)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    if (model) {
+        dbgd("check match for model '%s'", MODELSTR2CHA(model));
+        DbSqliteTbl* tbl = getTable(model->modelName());
+        if (tbl) {
+            err = tbl->checkMatch(model, perc);
+        } else {
+            loge("not found table for model '%s'", MODELSTR2CHA(model));
+            err = ErrNoTable;
+        }
+    } else {
+        err = ErrInvalidArg;
+        loge("invalid argument");
+    }
+    traceout;
+    return err;
+}
+
 bool DbSqliteModelHandler::exist(const DbModel *model)
 {
     tracein;

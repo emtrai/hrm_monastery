@@ -98,7 +98,7 @@ void DbModelFactory::addBuilders()
     _addBuilder(KModelNameArea, &Area::build);
     _addBuilder(KModelNameAreaPerson, &AreaPerson::build);
     _addBuilder(KModelNamePerson, &Person::build);
-    _addBuilder(KModelHdlSpecialist, &Specialist::build);
+    _addBuilder(KModelNameSpecialist, &Specialist::build);
     _addBuilder(KModelNameCommunity, &Community::build);
     _addBuilder(KModelNameCommDept, &CommunityDept::build);
     _addBuilder(KModelNameCommPerson, &CommunityPerson::build);

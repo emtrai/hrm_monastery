@@ -47,6 +47,7 @@ public:
 
     const QString &countryName() const;
     void setCountryName(const QString &newCountryName);
+    virtual QString toString() const;
 
 protected:
     virtual DbModelHandler *getDbModelHandler() const;

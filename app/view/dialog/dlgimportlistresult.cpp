@@ -27,11 +27,15 @@
 #include "mainwindow.h"
 #include "dialogutils.h"
 #include "stringdefs.h"
-
+#include "imagedefs.h"
 #include <QPushButton>
+#include "viewutils.h"
 
 #define ITEM_CHECK (Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable)
 #define ITEM_NONE_CHECK (Qt::NoItemFlags)
+
+#define ALLOW_MATCH_PERCENT (80)
+#define IS_MATCH_PERCENT(perc) (perc >= ALLOW_MATCH_PERCENT)
 
 UIImportItem *UIImportItem::build(void *data)
 {
@@ -75,14 +79,16 @@ DlgImportListResult::DlgImportListResult(QWidget *parent) :
     tracein;
     ui->setupUi(this);
     traceout;
-//    DIALOG_SIZE_SHOW(this);
 }
 
 DlgImportListResult::~DlgImportListResult()
 {
+    tracein;
+    CLEAN_QTABLE_ITEM(ui->tblList);
     RELEASE_LIST_DBMODEL(mList);
     FREE_PTR(mTargetModel);
     delete ui;
+    traceout;
 }
 
 void DlgImportListResult::setHeader(const QStringList &newHeader)
@@ -99,7 +105,7 @@ ErrCode DlgImportListResult::setup(const QList<DbModel *> &newList)
     ErrCode err = ErrNone;
     tracein;
     setupUI();
-    mList = newList;
+    mList = CLONE_LIST_DBMODEL(newList);
     traceret(err);
     return err;
 }
@@ -110,7 +116,7 @@ void DlgImportListResult::setupUI()
 
     initHeader();
     QStringList hdrs = getFinalHeader();
-    logd("hdrs cnt %d", hdrs.count());
+    logd("hdrs cnt %lld", hdrs.count());
     ui->tblList->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tblList->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
 
@@ -144,8 +150,7 @@ QStringList DlgImportListResult::getFinalHeader()
 {
     tracein;
     QStringList hdrs;
-    hdrs.append(tr("Chọn"));
-//    hdrs.append(tr(""));
+    hdrs.append(STR_SELECT);
     hdrs.append(getHeader());
     traceout;
     return hdrs;
@@ -219,8 +224,7 @@ ErrCode DlgImportListResult::onLoad()
     // TODO: is it really remove all data?
     // Is there any risk of leakage memory here??
     logd("Clear all");
-    tbl->clearContents();
-    tbl->model()->removeRows(0, tbl->rowCount());
+    CLEAN_QTABLE_ITEM(tbl);
     // TODO: clear all data in UIImportItem???
     // TODO: check carefully to avoid memory leak, stupid C/C++
 
@@ -229,29 +233,37 @@ ErrCode DlgImportListResult::onLoad()
         err = ErrInvalidData;
         loge("no item data to get");
     }
+    logi("imported '%lld' items", items.size());
     if (err == ErrNone && !items.empty()) {
         int idx = tbl->rowCount();
-        QIcon icOk (QString::fromUtf8(":/icon/icon/icons8-ok-48"));
-        QIcon icNok (QString::fromUtf8(":/icon/icon/icons8-error-cloud-96"));
-        QIcon icDup (QString::fromUtf8(":/icon/icon/icons8-copy-64.png"));
+        QIcon icNok (ICON_UTF8_NOK);
+        QIcon icDup (ICON_UTF8_DUPLICATE);
         int itemIdx = 0;
+        //1st col is icon to specify if item is ok or dup
         foreach (UIImportItem* item, items){
             tbl->insertRow(idx);
             QStringList values = item->valueList();
 
             QTableWidgetItem *widgetItem = new QTableWidgetItem();
 
-//            tbl->setItem(idx, 0, widgetItem);
-
             DbModel* val = (DbModel* )item->data();
             if (val != nullptr) {
-                bool isExist = val->isExist();
-                if (isExist) {
+                int percMatch = 0;
+                err = val->checkMatch(percMatch);
+                if (err != ErrNone) {
+                    loge("check match filed, err = %d", err);
+                    break;
+                }
+                dbgd("match perc %d", percMatch);
+                if (IS_MATCH_PERCENT(percMatch)) {
+                    logi("model '%s' is existed", MODELSTR2CHA(val));
                     widgetItem->setFlags(ITEM_NONE_CHECK);
                     widgetItem->setIcon(icDup);
                     widgetItem->setToolTip(STR_DATA_EXISTED);
                 } else {
                     ErrCode valRes = val->validateAllFields();
+                    dbgd("model '%s' is not exist, valRes=%d",
+                         MODELSTR2CHA(val), valRes);
                     if (valRes == ErrNone) {
                         widgetItem->setFlags(ITEM_CHECK);
                         widgetItem->setCheckState(Qt::CheckState::Unchecked);
@@ -267,9 +279,11 @@ ErrCode DlgImportListResult::onLoad()
                 widgetItem->setIcon(icNok);
                 widgetItem->setToolTip(STR_DATA_ERROR);
             }
+            // col to indicate status of imported item
             tbl->setItem(idx, 0, widgetItem);
             widgetItem->setData(Qt::UserRole, itemIdx);
 
+            // next is data col
             for (int i = 0; i < values.count(); ++i) {
                 tbl->setItem(idx, i+1, new QTableWidgetItem(values.value(i)));
             }
@@ -297,37 +311,50 @@ ErrCode DlgImportListResult::saveItems(const QList<DbModel *> &list)
 {
     tracein;
     ErrCode ret = ErrNone;
-    logd("save %d items", list.size());
-    ret = MainWindow::showProcessingDialog(tr("Lưu dữ liệu"), nullptr,
-        [this, list](ErrCode* err, void* data, DlgWait* dlg) {
-            int total = list.size();
-            logd("saving %ld item", list.size());
-            int cnt = 0;
+    int cnt = 0;
+    int total = list.size();
+    logd("save %lld items", total);
+    ret = MainWindow::showProcessingDialog(STR_SAVE_DATA, nullptr,
+        [list, &cnt, total](ErrCode* err, void* data, DlgWait* dlg) {
+            UNUSED(data);
+            UNUSED(dlg);
+            ErrCode tmperr = ErrNone;
+            logi("saving %d item", total);
             foreach (DbModel* item, list) {
-//                logd("Save %s", item->name().toStdString().c_str());
-                item->dump();
-                *err = item->save();
-                logi("save item result %d", *err);
-                cnt++;
-                if (cnt % 3 == 0){
-                    dlg->setMessage(QString(tr("Đã lưu %1 / %2")).arg(cnt, total));
+                dbgd("Save item '%s;", MODELSTR2CHA(item));
+                tmperr = item->save();
+                dbgv("save item %d/%d result %d", cnt, total, tmperr);
+                if (tmperr == ErrNone) {
+                    cnt++;
+                    if (cnt % 3 == 0){
+                        dlg->setMessage(QString(tr("Đã lưu %1 / %2"))
+                                            .arg(QString::number(cnt), QString::number(total)));
+                    }
+                } else {
+                    loge("Save '%s' failed, err=%d", MODELSTR2CHA(item), tmperr);
+                    break;
                 }
             }
+            if (err) *err = tmperr;
             return nullptr;
         },
-        [this](ErrCode err, void* data, void* result, DlgWait* dlg) {
+        [](ErrCode err, void* data, void* result, DlgWait* dlg) {
+            UNUSED(data);
+            UNUSED(result);
+            UNUSED(dlg);
             logd("Save result %d", err);
             return err;
         });
-    // TODO: review this again
-//    foreach (DbModel* item, list) {
-//        logd("Save %s", item->name().toStdString().c_str());
-//        item->dump();
-//        ret = item->save();
-//        logi("save item result %d", ret);
-//    }
+    if (ret == ErrNone) {
+        MAINWIN->showMessageBox(QString("Đã lưu %1 mục")
+                                    .arg(total));
+    } else {
+        MAINWIN->showErrorBox(QString("Lưu dữ liệu nhập lỗi. Đã lưu %1/%2")
+                                      .arg(cnt, total),
+                              ret);
+    }
     traceout;
-    return ErrNone; // TODO: handle error case???
+    return ret;
 }
 
 void DlgImportListResult::accept()
@@ -349,11 +376,11 @@ void DlgImportListResult::accept()
         }
         if (selectedItem.size() > 0) {
             ret = saveItems(selectedItem);
-            logi("Save %ld items, ret %d", selectedItem.size(), ret);
+            logi("Save %lld items, ret %d", selectedItem.size(), ret);
             if (ret == ErrNone)
                 QDialog::accept();
             else
-                DialogUtils::showErrorBox(QString(tr("Lỗi ! Mã lỗi %1").arg(ret)));
+                QDialog::reject();
         } else {
             loge("no selected item");
             DialogUtils::showErrorBox(tr("Vui lòng chọn mục để lưu"));
@@ -392,11 +419,10 @@ void DlgImportListResult::on_chkSelect_stateChanged(int arg1)
     logd("state %d", arg1);
     bool isChecked = (arg1 == Qt::Checked);
     QTableWidget* tbl = ui->tblList;
-    QList<DbModel *> selectedItem;
     int cnt = tbl->rowCount();
     for (int idx = 0; idx < cnt; idx++){
         QTableWidgetItem *widgetItem = tbl->item(idx, 0);
-        logd("item flag %d", widgetItem->flags());
+        logd("item flag %d", static_cast<int>(widgetItem->flags()));
         if (widgetItem->flags() == ITEM_CHECK) {
             widgetItem->setCheckState(isChecked ? Qt::CheckState::Checked : Qt::CheckState::Unchecked );
         }

@@ -88,6 +88,8 @@ protected:
 
 
     virtual ErrCode updatePersonEvent(const QList<DbModel*>& perList, const PersonEvent* event = nullptr);
+
+    virtual ImportTarget getImportTarget();
 private:
     void cleanUpItem();
     ErrCode buildPersonCommunityChangeEventList(const QList<DbModel *> & perList,
@@ -100,5 +102,6 @@ private:
                                     QList<CommunityPerson*>& commPerList);
 
 };
+
 
 #endif // UIPERSONLISTVIEW_H

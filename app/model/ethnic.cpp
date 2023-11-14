@@ -109,6 +109,14 @@ void Ethnic::setCountryName(const QString &newCountryName)
     mCountryName = newCountryName;
 }
 
+QString Ethnic::toString() const
+{
+    QString str = DbModel::toString();
+    str += QString(":countryUid('%1')").arg(countryUid());
+    str += QString(":countryName('%1')").arg(countryName());
+    return str;
+}
+
 const QString &Ethnic::countryUid() const
 {
     return mCountryUid;

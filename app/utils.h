@@ -119,6 +119,24 @@ do { \
             }\
     } while (0)
 
+
+#define SET_VAL_FROM_VAL_CBOX(widget,func, functxt, err) \
+do { \
+    int index = widget->currentIndex(); \
+    QString currtxt = widget->currentText().trimmed();\
+    logd("index %d, name %s", index, STR2CHA(currtxt));\
+    if (index >= 0){ \
+        QVariant value = widget->itemData(index);\
+        if (!value.isNull()) {\
+            func(value.toString());\
+            functxt(currtxt);\
+        }\
+    } else { \
+        dbgd("item '%s' not found, try one more", STR2CHA(currtxt));\
+        SET_VAL_FROM_CBOX(widget, func, functxt, err); \
+    } \
+} while (0)
+
 #define SET_MODEL_FROM_CBOX(widget,func, ctrl, DbModelType, err) \
 do { \
     QString currtxt = widget->currentText().trimmed();\

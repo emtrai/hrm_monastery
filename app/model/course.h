@@ -61,10 +61,12 @@ public:
     void setPeriod(const QString &newPeriod);
 
     qint32 courseType() const;
-    QString courseTypeName();
+    QString courseTypeName() const;
     void setCourseType(qint32 newCourseType);
 
     void setCourseTypeName(const QString &newCourseTypeName);
+
+    virtual QString toString() const;
 
 protected:
     virtual DbModelHandler *getDbModelHandler() const;

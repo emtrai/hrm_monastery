@@ -118,6 +118,7 @@ Logger::~Logger()
     tracein;
     if (mWorker) {
         delete mWorker;
+        mWorker = nullptr;
     }
     traceout;
 }

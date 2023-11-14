@@ -73,6 +73,14 @@ public:
     virtual ErrCode deleteHard(DbModel* model, bool force = false, QString* msg = nullptr) = 0;
 
     /**
+     * @brief Check match of model in table
+     * @param item
+     * @param perc percentage of maching, 0: not match, 100: complete match
+     * @return ErrNone if check ok
+     */
+    virtual ErrCode checkMatch(const DbModel* model, int& perc) = 0;
+
+    /**
      * @brief Check if model exist in db
      * @param model
      * @return true if exists

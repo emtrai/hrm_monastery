@@ -22,20 +22,22 @@
 #include "dlgimportcommunitylistresult.h"
 #include "community.h"
 #include "dlgimportlistresult.h"
+#include "stringdefs.h"
 
-DlgImportCommunityListResult::DlgImportCommunityListResult(QWidget *parent):DlgImportListResult(parent)
+DlgImportCommunityListResult::DlgImportCommunityListResult(QWidget *parent):
+    DlgImportListResult(parent)
 {
-    tracein;
+    traced;
 }
 
 void DlgImportCommunityListResult::initHeader()
 {
     tracein;
-    mHeader.append(tr("Mã"));
-    mHeader.append(tr("Tên"));
-    mHeader.append(tr("Địa chỉ"));
-    mHeader.append(tr("Điện thoại"));
-    mHeader.append(tr("Email"));
+    mHeader.append(STR_NAMEID);
+    mHeader.append(STR_NAME);
+    mHeader.append(STR_ADDR);
+    mHeader.append(STR_TEL);
+    mHeader.append(STR_EMAIL);
     traceout;
 }
 
@@ -73,6 +75,7 @@ QList<UIImportItem *> DlgImportCommunityListResult::getItems(bool* ok)
         RELEASE_LIST(items, UIImportItem);
     }
     if (ok) *ok = (err == ErrNone);
+    logife(err, "Get item failed");
     traceout;
     return items;
 }

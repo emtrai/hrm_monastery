@@ -91,6 +91,14 @@ public:
     virtual ErrCode deleteHard(DbModel* item);
     virtual ErrCode deleteHard(const QHash<QString, QString>& condition);
 
+    /**
+     * @brief Check match of model in table
+     * @param item
+     * @param perc percentage of maching, 0: not match, 100: complete match
+     * @return ErrNone if check ok
+     */
+    virtual ErrCode checkMatch(const DbModel* model, int& perc);
+
     virtual bool isExist(const DbModel* item);
     virtual bool isNameidExist(const QString& nameId);
     virtual QHash<QString, QString> getFieldsCheckExists(const DbModel* item);

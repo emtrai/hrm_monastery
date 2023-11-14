@@ -26,7 +26,6 @@
 #include "errcode.h"
 #include "ethnic.h"
 #include "countryctl.h"
-#include "stringdefs.h"
 #include "modeldefs.h"
 
 
@@ -48,32 +47,30 @@ ErrCode DlgEthnic::buildModel(DbModel *model, QString &errMsg)
 {
     tracein;
     ErrCode err = ErrNone;
-    Ethnic* comm = (Ethnic*) model;
+    Ethnic* comm = static_cast<Ethnic*>(model);
     if (!model){
         err = ErrInvalidArg;
         loge("Invalid arg");
     }
     if (err == ErrNone){
         comm->setMarkModified(true); // start marking fields which are modified
-    }
-    if (err == ErrNone) {
+
         QString name = ui->txtName->text().trimmed();
         if (!name.isEmpty()) {
             comm->setName(name);
         }
-    }
-    if (err == ErrNone){
-        QString name = ui->txtNameId->text().trimmed();
+
+        name = ui->txtNameId->text().trimmed();
         if (!name.isEmpty()) {
             comm->setNameId(name);
         }
-    }
-    if (err == ErrNone){
-        SET_VAL_FROM_CBOX(ui->cbCountry, comm->setCountryUid, comm->setCountryName, err);
-    }
-    if (err == ErrNone){
+
+        SET_VAL_FROM_VAL_CBOX(ui->cbCountry,
+                              comm->setCountryUid, comm->setCountryName, err);
+
         comm->setRemark(ui->txtRemark->toPlainText().trimmed());
     }
+    dbgv("build model '%s' err %d", MODELSTR2CHA(comm), err);
     traceret(err);
     return err;
 
@@ -83,6 +80,7 @@ ErrCode DlgEthnic::fromModel(const DbModel *item)
 {
     tracein;
     ErrCode err = ErrNone;
+    dbgv("from model '%s'", MODELSTR2CHA(item));
     if (item && item->modelName() == KModelNameEthnic) {
         err = DlgCommonEditModel::fromModel(item);
         Ethnic* comm = (Ethnic*)model();

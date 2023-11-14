@@ -387,8 +387,9 @@ UITableView::UITableView(QWidget *parent) :
     connect(ui->tblList, SIGNAL(customContextMenuRequested(QPoint)),
             SLOT(customMenuRequested(QPoint)));
     if (!connect(this,
-                 SIGNAL(signalDeleteDone(ErrCode,QString)),
-                 SLOT(onHandleSignalDeleteDone(ErrCode,QString)))) {
+                 &UITableView::signalDeleteDone,
+                 this, &UITableView::onHandleSignalDeleteDone,
+                 Qt::QueuedConnection)) {
         loge("Failed to connect signalDeleteDone to onHandleSignalDeleteDone");
     }
 
@@ -618,7 +619,8 @@ ErrCode UITableView::onDeleteItem(const QList<UITableItem *>& selectedItems)
                                     break;
                                 }
                                 if (cnt % 4 == 0) {
-                                    dlg->setMessage(QString(tr("Đã xóa %1 / %2")).arg(cnt, total));
+                                    dlg->setMessage(QString(tr("Đã xóa %1 / %2"))
+                                                        .arg(QString::number(cnt), QString::number(total)));
                                 }
                                 FREE_PTR(model);
                             } else {
@@ -641,6 +643,8 @@ ErrCode UITableView::onDeleteItem(const QList<UITableItem *>& selectedItems)
                         logi("Deleted %d item", cnt);
                         errMsg = QString(tr("Đã xóa '%1' mục")).arg(cnt);
                     }
+
+                    mSuspendReloadOnDbUpdate = false;
                     emit this->signalDeleteDone(err, errMsg);
                     return err;
                 });
@@ -1058,14 +1062,15 @@ void UITableView::cleanupMenuActions()
 
 void UITableView::onHandleSignalDeleteDone(ErrCode err, QString msg)
 {
+    tracein;
     if (err != ErrNone) {
         loge("failed to delete item, err=%d", err);
         DialogUtils::showErrorBox(QString(tr("Lỗi, mã lỗi: %1")).arg(err));
     } else {
         DialogUtils::showMsgBox(msg);
-        mSuspendReloadOnDbUpdate = false;
         reload();
     }
+    traceout;
 }
 
 ErrCode UITableView::addFilter(const QString &filterItem, const QString &keyword, const QVariant &value)

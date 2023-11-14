@@ -67,6 +67,13 @@ private:
 protected:
     virtual QStringList getHeader();
     virtual void initHeader();
+
+    /**
+     * @brief get List of import item
+     *        NOTICE: Caller must free returned items after use
+     * @param ok
+     * @return List of import item. Caller must FREE after use
+     */
     virtual QList<UIImportItem*> getItems(bool* ok = nullptr);
     virtual ErrCode setWidgetItem(UIImportItem* wgitem, DbModel* item);
     virtual ErrCode onLoad();

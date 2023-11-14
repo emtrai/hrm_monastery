@@ -26,6 +26,7 @@
 #include <QFileDialog>
 #include "filectl.h"
 #include "dialogutils.h"
+#include "stringdefs.h"
 
 DlgImportExportSelect::DlgImportExportSelect(QWidget *parent) :
     QDialog(parent),
@@ -50,7 +51,7 @@ ErrCode DlgImportExportSelect::setExportTypes(quint64 exportTypes)
     tracein;
     QHash<int, QString> exportTypeName;
     ErrCode err = ErrNone;
-    logd("Export Type 0x%x", exportTypes);
+    logi("Set export type 0x%llx", exportTypes);
     if (!exportTypes) {
         err = ErrInvalidArg;
         loge("invalid arguments");
@@ -80,7 +81,7 @@ void DlgImportExportSelect::setImportExport(bool isExport, const QString &title)
     tracein;
     logd("isExport %d", isExport);
     mIsExport = isExport;
-    mTitle = isExport?"Xuất dữ liệu":"Nhập dữ liệu";
+    mTitle = isExport?STR_EXPORT:STR_IMPORT;
     if (!title.isEmpty()) {
         mTitle += ": " + title;
     }

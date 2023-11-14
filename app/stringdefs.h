@@ -50,6 +50,7 @@
 #define STR_CHURCH      QObject::tr("Giáo xứ")
 
 #define STR_STT         QObject::tr("STT")
+#define STR_SELECT         QObject::tr("Chọn")
 
 #define STR_NAMEID          QObject::tr("Tên định danh")
 #define STR_PERSON_NAMEID   QObject::tr("Tên định danh Nữ tu")
@@ -104,7 +105,9 @@
 #define STR_IMPORT_DATA_ERR_CODE    QObject::tr("Nhập dữ liệu lỗi, mã lỗi %1")
 #define STR_SELECT_TO_IMPORT        QObject::tr("Chọn tập tin để nhập dữ liệu")
 #define STR_IMPORT_FROM_FILE        QObject::tr("Nhập từ tập tin")
+#define STR_IMPORT                  QObject::tr("Nhập dữ liệu")
 #define STR_EXPORT_TO_FILE          QObject::tr("Xuất ra tập tin")
+#define STR_EXPORT                  QObject::tr("Xuất dữ liệu")
 
 #define STR_DATA_EXISTED            QObject::tr("Dữ liệu đã tồn tại")
 #define STR_DATA_ERROR              QObject::tr("Dữ liệu lỗi!!!")
@@ -182,6 +185,8 @@
 #define STR_GENERAL_STAT_ERR                QObject::tr("Thống kê lỗi")
 #define STR_ERR_QUERY_COMMUNITY_MANAGER     QObject::tr("Lỗi truy vấn thông tin quản lý cộng đoàn")
 
+
+#define STR_SAVE_DATA              QObject::tr("Lưu dữ liệu")
 
 #define STR_BACKUP              QObject::tr("Sao lưu dữ liệu")
 #define STR_BACKUP_TO           QObject::tr("Sao lưu file vào: %1")

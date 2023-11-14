@@ -51,5 +51,11 @@
 #define ICON_ADD_PERSON_EVENT ICON_PATH("icons8-add-64")
 #define ICON_ADD            ICON_PATH("icons8-add-64")
 #define ICON_PERSON         ICON_PATH("icons8-nun-64")
+#define ICON_OK             ICON_PATH("icons8-ok-48")
+#define ICON_UTF8_OK        QString::fromUtf8(ICON_OK)
+#define ICON_NOK            ICON_PATH("icons8-error-cloud-96")
+#define ICON_UTF8_NOK       QString::fromUtf8(ICON_NOK)
+#define ICON_DUPLICATE      ICON_PATH("icons8-copy-64")
+#define ICON_UTF8_DUPLICATE QString::fromUtf8(ICON_DUPLICATE)
 
 #endif // IMAGEDEFS_H

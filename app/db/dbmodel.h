@@ -340,6 +340,13 @@ public:
      */
     virtual ErrCode validateAllFields(bool checkExist = false);
     virtual bool isExist();
+    /**
+     * @brief Check match of model in table
+     * @param item
+     * @param perc percentage of maching, 0: not match, 100: complete match
+     * @return ErrNone if check ok
+     */
+    virtual ErrCode checkMatch(int& perc);
 
     QHash<QString, ErrCode> *validateResult() const;
 

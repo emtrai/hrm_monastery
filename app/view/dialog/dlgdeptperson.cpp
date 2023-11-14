@@ -42,6 +42,7 @@ DlgDeptPerson::DlgDeptPerson(QWidget *parent) :
     loadCourse();
     loadRole();
     loadStatus();
+    traceout;
 }
 
 DlgDeptPerson::~DlgDeptPerson()
@@ -54,27 +55,28 @@ ErrCode DlgDeptPerson::buildModel(DbModel *model, QString &errMsg)
     tracein;
     ErrCode err = ErrNone;
     PersonDept* perdep = (PersonDept*) model;
-    if (!model){
+    if (!perdep){
         err = ErrInvalidArg;
         loge("Invalid arg");
     }
     if (err == ErrNone){
         perdep->setMarkModified(true); // start marking fields which are modified
+        perdep->setModelStatus(MODEL_STATUS_ACTIVE);
+        SET_VAL_FROM_TEXTBOX(ui->txtSearch, KItemUid, perdep->setPersonUid, perdep->setPersonName);
+        SET_VAL_FROM_VAL_CBOX(ui->cbRole, perdep->setRoleUid, perdep->setRoleName, err);
+        SET_VAL_FROM_VAL_CBOX(ui->cbTerm, perdep->setCourseUid, perdep->setCourseName, err);
+        SET_INT_VAL_FROM_CBOX(ui->cbStatus, perdep->setModelStatus, perdep->setModelStatusName);
+        SET_DATE_VAL_FROM_WIDGET(ui->txtStartDate, perdep->setStartDate);
+        SET_DATE_VAL_FROM_WIDGET(ui->txtEndDate, perdep->setEndDate);
+        QString nameid = ui->txtNameId->text().trimmed();
+        if (!nameid.isEmpty()) {
+            perdep->setNameId(nameid);
+        }
+        if (!mCommDeptUid.isEmpty()) {
+            perdep->setCommDeptUid(mCommDeptUid);
+        }
     }
-    perdep->setModelStatus(MODEL_STATUS_ACTIVE);
-    SET_VAL_FROM_TEXTBOX(ui->txtSearch, KItemUid, perdep->setPersonUid, perdep->setPersonName);
-    SET_VAL_FROM_CBOX(ui->cbRole, perdep->setRoleUid, perdep->setRoleName, err);
-    SET_VAL_FROM_CBOX(ui->cbTerm, perdep->setCourseUid, perdep->setCourseName, err);
-    SET_INT_VAL_FROM_CBOX(ui->cbStatus, perdep->setModelStatus, perdep->setModelStatusName);
-    SET_DATE_VAL_FROM_WIDGET(ui->txtStartDate, perdep->setStartDate);
-    SET_DATE_VAL_FROM_WIDGET(ui->txtEndDate, perdep->setEndDate);
-    QString nameid = ui->txtNameId->text().trimmed();
-    if (!nameid.isEmpty()) {
-        perdep->setNameId(nameid);
-    }
-    if (!mCommDeptUid.isEmpty()) {
-        perdep->setCommDeptUid(mCommDeptUid);
-    }
+    dbgv("build model '%s' err %d", MODELSTR2CHA(perdep), err);
     traceret(err);
     return err;
 }
@@ -83,42 +85,48 @@ ErrCode DlgDeptPerson::fromModel(const DbModel *item)
 {
     tracein;
     ErrCode err = ErrNone;
-    if (item && item->modelName() == KModelNamePersonDept) {
-        err = DlgCommonEditModel::fromModel(item);
-        PersonDept* comm = (PersonDept*)model();
-        if (err == ErrNone) {
-            Utils::setSelectItemComboxByData(ui->cbTerm, comm->courseUid());
-            Utils::setSelectItemComboxByData(ui->cbRole, comm->roleUid());
-            Utils::setSelectItemComboxByData(ui->cbStatus, comm->modelStatus());
-            ui->txtStartDate->setText(DatetimeUtils::date2String(comm->startDate(), DEFAULT_FORMAT_YMD));
-            ui->txtEndDate->setText(DatetimeUtils::date2String(comm->endDate(), DEFAULT_FORMAT_YMD));
-            ui->txtRemark->setPlainText(comm->remark());
-            ui->btnSearch->setEnabled(false); // not allow to change person
-            QString nameid = comm->nameId();
-            if (!comm->personUid().isEmpty()) {
-                logd("Search person uid '%s'", STR2CHA(comm->personUid()));
-                Person* per = (Person*)PERSONCTL->getModelByUid(comm->personUid());
-                if (per) {
-                    SET_TEXTBOX_FROM_VALUE(ui->txtSearch, KItemUid,
-                                           per->uid(), per->fullName());
-                    logd("found person '%s'", STR2CHA(per->toString()));
-                    if (nameid.isEmpty()) {
-                        nameid = QString("%1_%2").arg(comm->commDeptNameId(), per->nameId());
-                        comm->setNameId(nameid);
-                    }
-
-                    delete per;
-                } else {
-                    loge("Not found person uid '%s'", STR2CHA(comm->personUid()));
-                }
-            } else {
-                loge("No person uid");
-            }
-            ui->txtNameId->setText(comm->nameId());
-        }
-    } else {
+    PersonDept* comm = nullptr;
+    err = DlgCommonEditModel::fromModel(item);
+    if (err == ErrNone && !IS_MODEL_NAME(item, KModelNamePersonDept)) {
         err = ErrInvalidArg;
-        loge("null item or invalid type");
+        loge("null item or invalid type '%s'", MODELSTR2CHA(item));
+    }
+    if (err == ErrNone) {
+        comm = static_cast<PersonDept*>(model());
+        if (!comm) {
+            err = ErrInvalidModel;
+            loge("not found suitable model");
+        }
+    }
+    if (err == ErrNone) {
+        Utils::setSelectItemComboxByData(ui->cbTerm, comm->courseUid());
+        Utils::setSelectItemComboxByData(ui->cbRole, comm->roleUid());
+        Utils::setSelectItemComboxByData(ui->cbStatus, comm->modelStatus());
+        ui->txtStartDate->setText(DatetimeUtils::date2String(comm->startDate(), DEFAULT_FORMAT_YMD));
+        ui->txtEndDate->setText(DatetimeUtils::date2String(comm->endDate(), DEFAULT_FORMAT_YMD));
+        ui->txtRemark->setPlainText(comm->remark());
+        ui->btnSearch->setEnabled(false); // not allow to change person
+        QString nameid = comm->nameId();
+        if (!comm->personUid().isEmpty()) {
+            logd("Search person uid '%s'", STR2CHA(comm->personUid()));
+            Person* per = (Person*)PERSONCTL->getModelByUid(comm->personUid());
+            if (per) {
+                SET_TEXTBOX_FROM_VALUE(ui->txtSearch, KItemUid,
+                                       per->uid(), per->fullName());
+                logd("found person '%s'", STR2CHA(per->toString()));
+                if (nameid.isEmpty()) {
+                    nameid = QString("%1_%2").arg(comm->commDeptNameId(), per->nameId());
+                    comm->setNameId(nameid);
+                }
+
+                delete per;
+            } else {
+                loge("Not found person uid '%s'", STR2CHA(comm->personUid()));
+            }
+        } else {
+            loge("No person uid");
+        }
+        ui->txtNameId->setText(comm->nameId());
     }
     traceret(err);
     return err;
@@ -139,7 +147,8 @@ void DlgDeptPerson::loadCourse()
 void DlgDeptPerson::loadRole()
 {
     ui->cbRole->clear();
-    QList<DbModel*> list = INSTANCE(RoleCtl)->getAllItemsFromDb(); // TODO: getAllItem???
+    QList<DbModel*> list = INSTANCE(RoleCtl)->getAllItems();
+    // not allow none/empty one
     foreach(DbModel* item, list){
         ui->cbRole->addItem(item->name(), item->uid());
     }
@@ -172,7 +181,7 @@ void DlgDeptPerson::on_btnSearch_clicked()
         const Person* per = (const Person*)dlg->selectedItem();
         if (per != nullptr) {
             ui->txtSearch->setText(per->fullName());
-            logd("setProperty %s", per->uid().toStdString().c_str());
+            logd("setProperty %s", STR2CHA(per->uid()));
             ui->txtSearch->setProperty(KItemUid, per->uid());
             QString nameid = QString("%1_%2").arg(mCommDeptNameId, per->nameId());
             ui->txtNameId->setText(nameid);
@@ -210,7 +219,7 @@ bool DlgDeptPerson::onValidateData(QString &msg)
     bool isValid = true;
     if (mModel) {
         if (mModel->nameId().isEmpty()) {
-            msg += tr("Thiếu mã định danh.");
+            msg += STR_LACK_NAMEID;
             isValid = false;
             logw("lack name id");
         }
@@ -218,7 +227,7 @@ bool DlgDeptPerson::onValidateData(QString &msg)
         logw("no model to check");
         isValid = false;
     }
-    logd("is valid %d", isValid);
+    logi("is valid %d", isValid);
     // TODO: implement this????
     // TODO do we need this? or just implement on buildModel are enough??
     traceout;

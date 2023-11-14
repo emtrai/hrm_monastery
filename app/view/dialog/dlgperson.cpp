@@ -278,11 +278,11 @@ ErrCode DlgPerson::buildPerson(Person* per)
 
     // nationality
     logd("set nationality");
-    if (err == ErrNone) SET_VAL_FROM_CBOX(ui->cbNationality, per->setNationalityUid, per->setNationalityName, err);
+    if (err == ErrNone) SET_VAL_FROM_VAL_CBOX(ui->cbNationality, per->setNationalityUid, per->setNationalityName, err);
 
     // ethnic name
     logd("set Ethnic");
-    if (err == ErrNone) SET_VAL_FROM_CBOX(ui->cbEthic, per->setEthnicUid, per->setEthnicName, err);
+    if (err == ErrNone) SET_VAL_FROM_VAL_CBOX(ui->cbEthic, per->setEthnicUid, per->setEthnicName, err);
 
     // id card
     per->setIdCard(ui->txtIDCard->text().trimmed());
@@ -294,7 +294,7 @@ ErrCode DlgPerson::buildPerson(Person* per)
 
 
     // edu name
-    if (err == ErrNone) SET_VAL_FROM_CBOX(ui->cbEdu, per->setEduUid, per->setEduName, err);
+    if (err == ErrNone) SET_VAL_FROM_VAL_CBOX(ui->cbEdu, per->setEduUid, per->setEduName, err);
     per->setEduDetail(ui->txtEduDetail->toPlainText().trimmed());
 
     //specialist
@@ -305,10 +305,10 @@ ErrCode DlgPerson::buildPerson(Person* per)
     }
     per->setSpecialistInfo(ui->txtSpecialistInfo->toPlainText().trimmed());
 
-    if (err == ErrNone) SET_VAL_FROM_CBOX(ui->cbCourse, per->setCourseUid, per->setCourseName, err);
-    if (err == ErrNone) SET_VAL_FROM_CBOX(ui->cbCountry, per->setCountryUid, per->setCountryName, err);
+    if (err == ErrNone) SET_VAL_FROM_VAL_CBOX(ui->cbCourse, per->setCourseUid, per->setCourseName, err);
+    if (err == ErrNone) SET_VAL_FROM_VAL_CBOX(ui->cbCountry, per->setCountryUid, per->setCountryName, err);
 #ifndef SKIP_PERSON_PROVINE
-    if (err == ErrNone) SET_VAL_FROM_CBOX(ui->cbProvince, per->setProvinceUid, per->setProvinceName, err);
+    if (err == ErrNone) SET_VAL_FROM_VAL_CBOX(ui->cbProvince, per->setProvinceUid, per->setProvinceName, err);
 #endif
     per->setAddr(ui->txtAddr->toPlainText().trimmed());
     per->setChurchAddr(ui->txtChurch->toPlainText().trimmed());
@@ -316,7 +316,7 @@ ErrCode DlgPerson::buildPerson(Person* per)
     per->setTel(ui->txtPhone->text().split(SPLIT_EMAIL_PHONE));
     per->setOtherContact(ui->txtOtherContact->toPlainText().trimmed());
 
-    if (err == ErrNone) SET_VAL_FROM_CBOX(ui->cbCommunity, per->setCommunityUid, per->setCommunityName, err);
+    if (err == ErrNone) SET_VAL_FROM_VAL_CBOX(ui->cbCommunity, per->setCommunityUid, per->setCommunityName, err);
 
 
     per->setDadName(ui->txtDad->text().trimmed());
@@ -370,7 +370,7 @@ ErrCode DlgPerson::buildPerson(Person* per)
     SET_DATE_VAL_FROM_WIDGET(ui->txtEternalDate, per->setEternalDate);
     per->setEternalPlace(ui->txtEternalPlace->text().trimmed());
 
-    if (err == ErrNone) SET_VAL_FROM_CBOX(ui->cbStatus, per->setPersonStatusUid, per->setPersonStatusName, err);
+    if (err == ErrNone) SET_VAL_FROM_VAL_CBOX(ui->cbStatus, per->setPersonStatusUid, per->setPersonStatusName, err);
 
     SET_DATE_VAL_FROM_WIDGET(ui->txtRetireDate, per->setRetireDate);
     per->setRetirePlace(ui->txtRetirePlace->text().trimmed());
@@ -380,7 +380,7 @@ ErrCode DlgPerson::buildPerson(Person* per)
 
     // work
     logd("set work");
-    SET_VAL_FROM_CBOX(ui->cbWork, per->setCurrentWorkUid, per->setCurrentWorkName, err);
+    SET_VAL_FROM_VAL_CBOX(ui->cbWork, per->setCurrentWorkUid, per->setCurrentWorkName, err);
     per->setWorkHistory(ui->txtWorkHistory->toPlainText().trimmed());
 
     //event

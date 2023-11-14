@@ -182,27 +182,27 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     dbg(LOG_DEBUG, "setup signal/slot connect");
-    if (!QObject::connect(this, SIGNAL(load()), this, SLOT(onLoad()))) {
+    if (!QObject::connect(this, SIGNAL(load()), this, SLOT(onLoad()), Qt::QueuedConnection)) {
         loge("Failed to connect load to onLoad");
     }
-    if (!QObject::connect(this, SIGNAL(unload()), this, SLOT(onUnload()))){
+    if (!QObject::connect(this, SIGNAL(unload()), this, SLOT(onUnload()), Qt::QueuedConnection)){
         loge("Failed to connect unload to onUnload");
     }
     if (!QObject::connect(this,
                           SIGNAL(showMsgDlgSignal(QString)),
                           this,
-                          SLOT(onShowMsgDlg(QString)))) {
+                          SLOT(onShowMsgDlg(QString)), Qt::QueuedConnection)) {
         loge("Failed to connect showMsgDlgSignal to onShowMsgDlg");
     }
     if (!QObject::connect(this,
                           SIGNAL(showErrorDlgSignal(ErrCode,QString)),
                           this,
-                          SLOT(onShowErrorMsgDlg(ErrCode,QString)))) {
+                          SLOT(onShowErrorMsgDlg(ErrCode,QString)), Qt::QueuedConnection)) {
         loge("Failed to connect showErrorDlgSignal to onShowErrorMsgDlg");
     }
 
     if (!QObject::connect(this, &MainWindow::importPeople,
-                          this, &MainWindow::onImportPeople)){
+                          this, &MainWindow::onImportPeople, Qt::QueuedConnection)){
         loge("Failed to connect importPeople to onImportPeople");
     }
     setAppState(APP_STATE_INITED);
@@ -577,7 +577,7 @@ ErrCode MainWindow::doShowImportPerson()
                                         this,
                                         STR_SELECT_TO_IMPORT,
                                         FileCtl::getAppDataDir(),
-                                        tr("Excel (*.xlsx))"));
+                                        tr("Excel (*.xlsx)"));
     // TODO: this is duplicate code, make it common please
     if (!fname.isEmpty()){
         notifyMainWindownImportListenerStart(IMPORT_TARGET_PERSON);
@@ -595,7 +595,7 @@ ErrCode MainWindow::doShowImportPerson()
                 if (tmperr == ErrNone) {
                     ImportType type = ImportFactory::importTypeFromExt(fname, true);
                     if (type == IMPORT_XLSX || type == IMPORT_CSV_LIST || type == IMPORT_CSV) {
-                        tmperr = PERSONCTL->importFromFile(KModelHdlPerson, type, fname, list);
+                        tmperr = PERSONCTL->importFromFile(KModelNamePerson, type, fname, list);
                     } else {
                         tmperr = ErrNotSupport;
                         loge("Import type %d not support (fname = '%s'", type, STR2CHA(fname));
@@ -612,12 +612,14 @@ ErrCode MainWindow::doShowImportPerson()
             [this, fname](ErrCode err, void* data, void* result, DlgWait* dlg) {
                 UNUSED(data);
                 UNUSED(dlg);
+                tracein;
                 logd("Import result %d", err);
                 if (err == ErrNone && result) {
                     QList<DbModel*>* list = static_cast<QList<DbModel*>*>(result);
                     logd("No of import item %lld", list->count());
                     emit this->importPeople(err, list);
                 }
+                traceout;
                 return err;
             });
         if (ret != ErrNone) {
@@ -646,7 +648,7 @@ ErrCode MainWindow::doShowImportCommunity()
     if (!fname.isEmpty()){
         QList<DbModel*> list;
         dbg(LOG_VERBOSE, "Import community from file %s", STR2CHA(fname));
-        ErrCode ret = COMMUNITYCTL->importFromFile(KModelHdlCommunity,
+        ErrCode ret = COMMUNITYCTL->importFromFile(KModelNameCommunity,
                                                    ImportType::IMPORT_XLSX,
                                                    fname, &list);
         dbg(LOG_DEBUG, "Import result %d, number item '%lld'",
@@ -1306,7 +1308,7 @@ void MainWindow::onImportPeople(ErrCode err, QList<DbModel *> *list)
         notifyMainWindownImportListenerEnd(IMPORT_TARGET_PERSON, err, list);
         FREE_PTR(dlg);
         if (list) {
-            // no clean list element, as dlg will take over it and release it when it's deleted
+            RELEASE_LIST_DBMODEL(*list);
             delete list;
         }
     }
@@ -1343,6 +1345,7 @@ void MainWindow::on_action_ImportPersonList_triggered()
 {
     tracein;
     ErrCode ret = ErrNone;
+    QList<DbModel*> list;
     // TODO: show dialog to select which type of file to be imported???
     QString fname = QFileDialog::getOpenFileName(
                                     this,
@@ -1351,11 +1354,10 @@ void MainWindow::on_action_ImportPersonList_triggered()
                                     tr("CSV Files (*.csv);;Excel (*.xls *.xlsx)"));
     // TODO: this is duplicate code, make it common please
     if (!fname.isEmpty()){
-        QList<DbModel*> list;
         dbg(LOG_INFO, "Import from file %s", STR2CHA(fname));
         ImportType type = ImportFactory::importTypeFromExt(fname, true);
         if (type == IMPORT_XLSX || type == IMPORT_CSV_LIST || type == IMPORT_CSV) {
-            ret = INSTANCE(PersonCtl)->importFromFile(KModelHdlPerson, type, fname, &list);
+            ret = INSTANCE(PersonCtl)->importFromFile(KModelNamePerson, type, fname, &list);
         } else {
             ret = ErrNotSupport;
             loge("Import type %d not support, fname = '%s'", type, STR2CHA(fname));
@@ -1377,6 +1379,7 @@ void MainWindow::on_action_ImportPersonList_triggered()
         logw("no file selected to import");
     }
     logife(ret, "import person list failed");
+    RELEASE_LIST_DBMODEL(list);
     traceout;
 }
 

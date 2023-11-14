@@ -1051,15 +1051,19 @@ int DbSqlitePersonTbl::getTotalItemsByPersonStatus(const QString &statusUid,
 QHash<QString, QString> DbSqlitePersonTbl::getFieldsCheckExists(const DbModel *item)
 {
     tracein;
-    const Person* per = (Person*)item;
     // TODO: make as class member?
     QHash<QString, QString> list;
-    list[KFieldLastName] = per->lastName();
-    list[KFieldFirstName] = per->firstName();
-    list[KFieldBirthDay] = QString("%1").arg(per->birthday());
-    list[KFieldBirthPlace] = per->birthPlace();
-    list[KFieldIDCard] = per->idCard();
-    list[KFieldHollyName] = per->hollyName();
+    if (IS_MODEL_NAME(item, KModelNamePerson)) {
+        const Person* per = (Person*)item;
+        list[KFieldLastName] = per->lastName();
+        list[KFieldFirstName] = per->firstName();
+        list[KFieldBirthDay] = QString("%1").arg(per->birthday());
+        list[KFieldBirthPlace] = per->birthPlace();
+        list[KFieldIDCard] = per->idCard();
+        list[KFieldHollyName] = per->hollyName();
+    } else {
+        loge("invalid model '%s', expect model '%s'", MODELSTR2CHA(item), KModelNamePerson);
+    }
     traceout;
     return list;
 }

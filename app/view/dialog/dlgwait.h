@@ -52,7 +52,7 @@ public:
                   void* data = nullptr);
 
     void setRunFunc(const WaitRunt_t &newRunFunc);
-
+    virtual ~DlgWaitWorker();
 public slots:
     void run() override;
 

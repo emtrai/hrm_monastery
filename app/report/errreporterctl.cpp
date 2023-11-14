@@ -46,6 +46,6 @@ void ErrReporterCtl::reportErr(const QString &errMsg, ErrCode err,
     logd("showErrDlg %d", showErrDlg);
     logd("delay %d", delay);
     if (showErrDlg) {
-        DialogUtils::showErrorBox(msg);
+        MAINWIN->showErrorBox(msg, err);
     }
 }

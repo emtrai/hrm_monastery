@@ -22,9 +22,9 @@
 #include "dlghtmlviewer.h"
 #include "ui_dlghtmlviewer.h"
 #include "utils.h"
-#include "filectl.h"
 #include <QPushButton>
 #include "dialogutils.h"
+#include "stringdefs.h"
 
 dlgHtmlViewer::dlgHtmlViewer(QWidget *parent) :
     QDialog(parent),
@@ -33,7 +33,8 @@ dlgHtmlViewer::dlgHtmlViewer(QWidget *parent) :
     ui->setupUi(this);
     DIALOG_SIZE_SHOW(this);
 
-    ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Thoát"));
+    if (ui->buttonBox->button(QDialogButtonBox::Cancel))
+        ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(STR_EXIT);
 }
 
 dlgHtmlViewer::~dlgHtmlViewer()
@@ -52,10 +53,14 @@ void dlgHtmlViewer::setHtmlPath(const QString &fpath)
     ui->txtContent->clearHistory();
     ui->txtContent->clear();
 
-    ui->txtContent->setHtml(Utils::readAll(fpath));
-    mHtmlPath = fpath;
+    logi("html path '%s'", STR2CHA(fpath));
+    if (QFile::exists(fpath)) {
+        ui->txtContent->setHtml(Utils::readAll(fpath));
+        mHtmlPath = fpath;
+    } else {
+        loge("file '%s' not exist", STR2CHA(fpath));
+    }
 
-    logd("html path '%s'", STR2CHA(mHtmlPath));
     traceout;
 }
 
@@ -63,10 +68,19 @@ void dlgHtmlViewer::on_btnExport_clicked()
 {
     // Export information to file
     tracein;
-    ErrCode err = Utils::saveHtmlToPdf(mHtmlPath,
-                                       Utils::UidFromName(this->windowTitle(),
-                                            UidNameConvertType::NO_VN_MARK_UPPER),
-                                       this);
+    ErrCode err = ErrNone;
+
+    if (mHtmlPath.isEmpty() || !QFile::exists(mHtmlPath)) {
+        err = ErrNotFound;
+        loge("'%s' is empty or not found", STR2CHA(mHtmlPath));
+    }
+
+    if (err == ErrNone) {
+        err = Utils::saveHtmlToPdf(mHtmlPath,
+                                   Utils::UidFromName(this->windowTitle(),
+                                        UidNameConvertType::NO_VN_MARK_UPPER),
+                                   this);
+    }
     if (err == ErrNone) {
         logi("Saved html path '%s' to pdf succeed", STR2CHA(mHtmlPath));
     } else {

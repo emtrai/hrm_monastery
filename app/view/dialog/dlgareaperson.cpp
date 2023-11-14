@@ -85,8 +85,8 @@ ErrCode DlgAreaPerson::buildModel(DbModel *model, QString &errMsg)
         per->setModelStatus(MODEL_STATUS_ACTIVE);
         per->setAreaUid(mArea->uid());
         SET_VAL_FROM_TEXTBOX(ui->txtSearch, KItemUid, per->setPersonUid, per->setPersonName);
-        SET_VAL_FROM_CBOX(ui->cbRole, per->setRoleUid, per->setRoleName, err);
-        SET_VAL_FROM_CBOX(ui->cbTerm, per->setCourseUid, per->setCourseName, err);
+        SET_VAL_FROM_VAL_CBOX(ui->cbRole, per->setRoleUid, per->setRoleName, err);
+        SET_VAL_FROM_VAL_CBOX(ui->cbTerm, per->setCourseUid, per->setCourseName, err);
         SET_INT_VAL_FROM_CBOX(ui->cbStatus, per->setModelStatus, per->setModelStatusName);
         SET_DATE_VAL_FROM_WIDGET(ui->txtStartDate, per->setStartDate);
         SET_DATE_VAL_FROM_WIDGET(ui->txtEndDate, per->setEndDate);

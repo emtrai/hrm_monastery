@@ -885,6 +885,21 @@ bool DbModel::isExist()
     return isExist;
 }
 
+ErrCode DbModel::checkMatch(int &perc)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    DbModelHandler* hdlr = this->getDbModelHandler();
+    if (hdlr) {
+        err = hdlr->checkMatch(this, perc);
+    } else {
+        err = ErrNoHandler;
+        loge("not found handler");
+    }
+    traceret(err);
+    return err;
+}
+
 QHash<QString, ErrCode> *DbModel::validateResult() const
 {
     return mValidateResult;

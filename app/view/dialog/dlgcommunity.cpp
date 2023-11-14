@@ -87,7 +87,7 @@ ErrCode DlgCommunity::buildModel(DbModel *model, QString& errMsg)
         }
     }
     if (err == ErrNone){
-        SET_VAL_FROM_CBOX(ui->cbArea, comm->setAreaUid, comm->setAreaName, err);
+        SET_VAL_FROM_VAL_CBOX(ui->cbArea, comm->setAreaUid, comm->setAreaName, err);
     }
     if (err == ErrNone){
         SET_DATE_FORMAT_VAL_FROM_WIDGET(ui->txtFeaseDay, comm->setFeastDate, DATE_FORMAT_DM);
@@ -102,7 +102,7 @@ ErrCode DlgCommunity::buildModel(DbModel *model, QString& errMsg)
         comm->setEmail(ui->txtEmail->toPlainText().trimmed());
     }
     if (err == ErrNone){
-        SET_VAL_FROM_CBOX(ui->cbCountry, comm->setCountryUid, comm->setCountryName, err);
+        SET_VAL_FROM_VAL_CBOX(ui->cbCountry, comm->setCountryUid, comm->setCountryName, err);
     }
     if (err == ErrNone){
         comm->setChurch(ui->txtChurch->toPlainText().trimmed());
@@ -114,7 +114,7 @@ ErrCode DlgCommunity::buildModel(DbModel *model, QString& errMsg)
         SET_DATE_FORMAT_VAL_FROM_WIDGET(ui->txtEstablishDate, comm->setCreateDate, DEFAULT_FORMAT_YMD);
     }
     if (err == ErrNone){
-        SET_VAL_FROM_CBOX(ui->cbParentCommunity, comm->setParentUid, comm->setParentName, err);
+        SET_VAL_FROM_VAL_CBOX(ui->cbParentCommunity, comm->setParentUid, comm->setParentName, err);
     }
     if (err == ErrNone){
         SET_VAL_FROM_TEXTBOX(ui->txtCEO, KItemUid, comm->setCurrentCEOUid, comm->setCurrentCEOName);
@@ -128,6 +128,7 @@ ErrCode DlgCommunity::buildModel(DbModel *model, QString& errMsg)
     if (err == ErrNone){
         comm->setRemark(ui->txtNote->toPlainText().trimmed());
     }
+    dbgv("build model '%s' err %d", MODELSTR2CHA(model), err);
     traceret(err);
     return err;
 }

@@ -1222,3 +1222,8 @@ ErrCode UIPersonListView::updatePersonEvent(const QList<DbModel *>& perList,
     return err;
 }
 
+ImportTarget UIPersonListView::getImportTarget()
+{
+    return IMPORT_TARGET_PERSON;
+}
+

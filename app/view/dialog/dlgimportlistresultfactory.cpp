@@ -25,6 +25,7 @@
 #include "dlgimportlistresult.h"
 #include "dlgimportcommunitylistresult.h"
 #include "dlgimportareapersonlistresult.h"
+#include "dlgimportpersonlistresult.h"
 #include <QWidget>
 
 ErrCode DlgImportListResultFactory::getImportListResult(int target,
@@ -40,6 +41,9 @@ ErrCode DlgImportListResultFactory::getImportListResult(int target,
     }
     if (err == ErrNone) {
         switch (target) {
+        case IMPORT_TARGET_PERSON:
+            dlg = new DlgImportPersonListResult(parent);
+            break;
         case IMPORT_TARGET_COMMUNITY:
             dlg = new DlgImportCommunityListResult(parent);
             break;

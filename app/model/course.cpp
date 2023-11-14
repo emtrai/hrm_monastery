@@ -165,12 +165,23 @@ void Course::setCourseTypeName(const QString &newCourseTypeName)
     mCourseTypeName = newCourseTypeName;
 }
 
+QString Course::toString() const
+{
+    QString str = DbModel::toString();
+    str += QString(":courseType('%1')").arg(courseType());
+    str += QString(":courseTypeName('%1')").arg(courseTypeName());
+    str += QString(":endDate('%1')").arg(endDate());
+    str += QString(":startDate('%1')").arg(startDate());
+    str += QString(":period('%1')").arg(period());
+    return str;
+}
+
 qint32 Course::courseType() const
 {
     return mCourseType;
 }
 
-QString Course::courseTypeName()
+QString Course::courseTypeName() const
 {
     if (mCourseTypeName.isEmpty()) {
         return courseType2Name((CourseType)mCourseType);

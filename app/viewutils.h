@@ -31,4 +31,12 @@ UITableMenuAction::build(title, this, item) \
 
 #define BUILD_MENU_SEPARATE UITableMenuAction::buildSeparateAction()
 
+#define CLEAN_QTABLE_ITEM(tbl) ViewUtils::cleanupTableItems(tbl)
+
+class QTableWidget;
+class ViewUtils
+{
+public:
+    static void cleanupTableItems(QTableWidget* tbl);
+};
 #endif // VIEWUTILS_H

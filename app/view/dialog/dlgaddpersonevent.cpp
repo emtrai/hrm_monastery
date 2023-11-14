@@ -71,7 +71,7 @@ ErrCode DlgAddPersonEvent::buildModel(DbModel *model, QString &errMsg)
             per->setMarkModified(true); // start marking fields which are modified
         }
         per->setName(ui->txtTitle->text().trimmed());
-        SET_VAL_FROM_CBOX(ui->cbEvent, per->setEventUid, per->setEventName, err);
+        SET_VAL_FROM_VAL_CBOX(ui->cbEvent, per->setEventUid, per->setEventName, err);
         SET_DATE_VAL_FROM_WIDGET(ui->txtDate, per->setDate);
         SET_DATE_VAL_FROM_WIDGET(ui->txtEndDate, per->setEndDate);
         if (!mEvenInfoOnly) {

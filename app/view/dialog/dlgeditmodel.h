@@ -51,12 +51,6 @@ public:
     virtual ErrCode fromModel(const DbModel* model);
 protected:
     virtual DbModel *newModel();
-    /**
-     * @brief Validate data of dialog
-     * @param msg: output message if validate is not ok
-     * @return
-     */
-    virtual bool onValidateData(QString& msg);
 
 private slots:
 

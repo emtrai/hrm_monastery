@@ -325,6 +325,24 @@ DbModelBuilder DbSqliteCommunityTbl::mainModelBuilder()
     return &Community::build;
 }
 
+QHash<QString, QString> DbSqliteCommunityTbl::getFieldsCheckExists(const DbModel *item)
+{
+    tracein;
+    // TODO: make as class member?
+    QHash<QString, QString> list;
+    if (IS_MODEL_NAME(item, KModelNameCommunity)) {
+        const Community* comm = static_cast<const Community*>(item);
+        list[KFieldName] = comm->name();
+        list[KFieldAreaUid] = comm->areaUid();
+        list[KFieldCountryUid] = comm->countryUid();
+        list[KFieldAddr] = comm->addr();
+    } else {
+        loge("invalid model '%s', expect model '%s'", MODELSTR2CHA(item), KModelNameCommunity);
+    }
+    traceout;
+    return list;
+}
+
 void DbSqliteCommunityTbl::addTableField(DbSqliteTableBuilder *builder)
 {
     tracein;

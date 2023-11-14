@@ -27,7 +27,8 @@
 #include "utils.h"
 #include "datetimeutils.h"
 #include "stringdefs.h"
-DlgImportAreaPersonListResult::DlgImportAreaPersonListResult(QWidget *parent):DlgImportListResult(parent)
+DlgImportAreaPersonListResult::DlgImportAreaPersonListResult(QWidget *parent):
+    DlgImportListResult(parent)
 {
     traced;
 }

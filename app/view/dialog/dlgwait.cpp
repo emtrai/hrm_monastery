@@ -22,6 +22,8 @@
 #include "dlgwait.h"
 #include "ui_dlgwait.h"
 #include "logger.h"
+#include "utils.h"
+#define WAIT_TIMEOUT (10 * 1000)
 
 DlgWait::DlgWait(QWidget *parent) :
     QDialog(parent),
@@ -36,7 +38,19 @@ DlgWait::DlgWait(QWidget *parent) :
 
 DlgWait::~DlgWait()
 {
+    tracein;
+    if (mWorker && mWorker->isRunning()) {
+        logw("thread is still running, waiting for a while");
+        if (!mWorker->wait(WAIT_TIMEOUT)) {
+            logw("thread wait timeout! (%d ms), terminate it", WAIT_TIMEOUT);
+            mWorker->terminate();
+            mWorker->wait(WAIT_TIMEOUT);
+        }
+    }
+    FREE_PTR(mWorker);
+
     delete ui;
+    traceout;
 }
 
 ErrCode DlgWait::show(void* data, WaitPrepare_t prepare,
@@ -50,7 +64,6 @@ ErrCode DlgWait::show(void* data, WaitPrepare_t prepare,
     mWorker = new DlgWaitWorker(this, this, data);
     mWorker->setRunFunc(run);
     connect(mWorker, &DlgWaitWorker::done, this, &DlgWait::handleResult);
-    connect(mWorker, &DlgWaitWorker::finished, mWorker, &QObject::deleteLater);
     if (prepare) {
         logd("Call prepare");
         err = prepare(data, this);
@@ -118,7 +131,8 @@ void DlgWait::setProgress(int cur, int total)
 {
     tracein;
     logd("cur %d total %d", cur, total);
-    ui->lblProgress->setText(QString("%1 / %2").arg(cur, total));
+    ui->lblProgress->setText(QString("%1 / %2")
+                                 .arg(QString::number(cur), QString::number(total)));
 
 }
 
@@ -193,7 +207,7 @@ void DlgWait::setErrResult(ErrCode newResult)
 DlgWaitWorker::DlgWaitWorker(QObject *parent, DlgWait* dlg, void* data):
     QThread(parent), mDlg(dlg), mRunFunc(nullptr), mData(data)
 {
-    tracein;
+    traced;
 }
 
 void DlgWaitWorker::setRunFunc(const WaitRunt_t &newRunFunc)
@@ -202,10 +216,16 @@ void DlgWaitWorker::setRunFunc(const WaitRunt_t &newRunFunc)
     mRunFunc = newRunFunc;
 }
 
+DlgWaitWorker::~DlgWaitWorker()
+{
+    traced;
+}
+
 void DlgWaitWorker::run()
 {
     tracein;
     ErrCode ret = ErrNone;
+    QThread::setTerminationEnabled(true);
     void* result = nullptr;
     if (mRunFunc) {
         logd("call run func");
