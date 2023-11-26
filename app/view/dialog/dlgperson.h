@@ -67,7 +67,7 @@ private:
 
 private:
     void setupUI();
-    Person *getPerson();
+    Person *getPerson(Person* per = nullptr);
     ErrCode buildPerson(Person* person);
     ErrCode fromPerson(const Person* person);
     void multiComboxItemUpdate(UIMultiComboxView *cb, QLineEdit* txt = nullptr);
@@ -156,11 +156,13 @@ private slots:
 
 private:
     Person* mPerson;
+    Person* mPersonOrgin;
     UIMultiComboxView *cbSaints;
     UIMultiComboxView *cbSpecialist;
     DlgPerson::Mode mEditMode;
 
     QList<DbModel*> mListPersonEvent;
+    QList<DbModel*> mListPersonEventOrigin;
     bool mIsNew; // true: add new, false: edit/update
     bool mIsSelfSave; //true: auto save on accept, false: not save
     bool mInitDone;

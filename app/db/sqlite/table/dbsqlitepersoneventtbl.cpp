@@ -174,7 +174,7 @@ ErrCode DbSqlitePersonEventTbl::getListEvents(const QString &personUid,
         if (!condString.isEmpty())
             queryString += " WHERE " + condString;
 
-        queryString += " ORDER BY name ASC";
+        appendOrderQueryString(queryString);
         qry.prepare(queryString);
         dbgd("Query String '%s'", queryString.toStdString().c_str());
 

@@ -39,14 +39,10 @@ protected:
     virtual QString getTitle();
     virtual void initHeader();
 
-    virtual int onSearch(const QString& keyword);
-    virtual void clearAll();
-    virtual int onGetAll();
-    virtual int onGetManagers();
-    virtual DbModel* getItemAtIdx(int idx);
-    virtual QString getValueOfItemAt(int idx, int col, QString header, DbModel* item);
-private:
-    QList<DbModel*> mListItems;
+    virtual ErrCode doSearch(const QString& keyword, QList<DbModel*>& items);
+    virtual ErrCode doGetAll(QList<DbModel*>& items);
+    virtual ErrCode doGetManager(QList<DbModel*>& items);
+    virtual QString getValueOfItemCol(int col, const DbModel* item);
 
 };
 

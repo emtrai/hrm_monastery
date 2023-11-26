@@ -242,7 +242,6 @@ QString DbSqliteCommunityTbl::getSearchQueryString(const QString &cond)
     if (!cond.isEmpty()) {
         queryString += QString(" WHERE %1").arg(cond);
     }
-    queryString += " ORDER BY name ASC";
     dbg(LOG_DEBUG, "queryString: %s", queryString.toStdString().c_str());
     return queryString;
 }
@@ -304,6 +303,9 @@ ErrCode DbSqliteCommunityTbl::updateBuilderFieldFromModel(DbSqliteUpdateBuilder 
 
             } else if (field == KItemCEO) {
                 builder->addValue(KFieldCEOUid, comm->currentCEOUid());
+
+            } else if (field == KItemMission) {
+                builder->addValue(KFieldMissionUid, comm->missionUidString());
 
             } else if (field == KItemFullIntro) {
                 builder->addValue(KFieldFullInfo, comm->fullInfo());

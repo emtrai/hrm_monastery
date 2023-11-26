@@ -149,6 +149,7 @@ public:
 
     const QStringList &missionUid() const;
     QString missionUidString() const;
+    QString mainMissionUid() const;
     void setMissionUid(const QStringList &newMissionUid);
     void setMissionUid(const QString &newMissionUid);
     void addMissionUid(const QString &newMissionUid);
@@ -156,6 +157,7 @@ public:
     const QStringList &missionName() const;
     QString missionNameString() const;
     void setMissionName(const QStringList &newMissionName);
+    void setMissionName(const QString &newMissionName);
     void addMissionName(const QString &newMissionName);
 
     const QString &countryName();

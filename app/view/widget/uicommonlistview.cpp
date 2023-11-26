@@ -34,6 +34,7 @@
 #include "importtype.h"
 #include "viewutils.h"
 #include <QMessageBox>
+#include "errreporterctl.h"
 
 UICommonListView::UICommonListView(QWidget *parent):
     UITableView(parent),
@@ -136,9 +137,16 @@ ErrCode UICommonListView::getListTableRowItems(
     UNUSED(page);
     UNUSED(perPage);
     UNUSED(totalPages);
-    foreach (DbModel* item, mModelList) {
+    qint64 startIdx = (page-1)*perPage;
+    qint64 endIdx = startIdx + perPage;
+    if (endIdx >= mModelList.size()) {
+        endIdx = mModelList.size();
+    }
+    for (; startIdx < endIdx; startIdx++) {
+        DbModel* item = mModelList.at(startIdx);
         UITableItem* tblItem = UITableItem::build(item);
         if (tblItem) {
+            logd("add table item '%s'", MODELSTR2CHA(item));
             err = fillValueTableRowItem(item, tblItem, ++idx);
             if (err == ErrNone) {
                 items.append(tblItem);
@@ -153,7 +161,6 @@ ErrCode UICommonListView::getListTableRowItems(
     }
     if (err != ErrNone) {
         loge("build table row item failed, err %d", err);
-        RELEASE_LIST(items, UITableItem);
     }
     traceret(err);
     return err;
@@ -229,7 +236,7 @@ ErrCode UICommonListView::onLoad()
     if (ready2FetchData()) {
         RELEASE_LIST_DBMODEL(mModelList);
         if (mFilterList.size() > 0) {
-            logd("Do filter");
+            dbgv("Do filter");
             foreach (FilterItem* item, this->mFilterList) {
                 logd("filter item %s", STR2CHA(item->item()));
                 if (item->item() == KItemStatus) {
@@ -241,11 +248,35 @@ ErrCode UICommonListView::onLoad()
             }
             RELEASE_LIST(mFilterList, FilterItem);
         } else {
-            logd("load all data");
-            mModelList = getListDbModels();
-            clearFilter();
+            dbgv("load all data");
+
+            // async loading, to show progress dialog
+            err = MainWindow::showProcessingDialog(STR_QUERYING,
+                nullptr, // prepare callback
+                // run callback
+                [this](ErrCode* err, void* data, DlgWait* dlg) {
+                    UNUSED(data);
+                    UNUSED(dlg);
+                    UNUSED(err);
+                    this->mModelList = getListDbModels();
+                    return nullptr;//nothing to return
+                },
+                // finish callback
+                [this](ErrCode err, void* data, void* result, DlgWait* dlg) {
+                    UNUSED(data);
+                    UNUSED(result);
+                    UNUSED(dlg);
+                    logd("Save result %d", err);
+                    if (err != ErrNone) {
+                        loge("load data failed, err=%d",err);
+                        REPORTERRCTL->reportErr(STR_QUERY_ERROR, err, true);
+                    }
+
+                    clearFilter();
+                    return err;
+                });
         }
-        err = ErrNone;
+
     } else {
         loge("not show, so not load data");
         err = ErrNotReady;
@@ -368,12 +399,26 @@ int UICommonListView::onFilter(int catetoryid, const QString &catetory,
             logd("searchKeyWork %s", STR2CHA(searchKeyWork));
             logd("modelName %s", STR2CHA(modelName));
             logd("ctrl %s", STR2CHA(ctrl->getName()));
-            err = _onFilter(ctrl,
-                            catetoryid,
-                            opFlags, searchKeyWork,
-                            modelName.toStdString().c_str(),
-                            mParentModel,
-                            &mModelList);
+            err = MainWindow::showProcessingDialog(STR_QUERYING,
+                nullptr, // prepare callback
+                // run callback
+                [this, value, ctrl, catetoryid, opFlags, searchKeyWork, modelName]
+                (ErrCode* err, void* data, DlgWait* dlg) {
+                    UNUSED(data);
+                    UNUSED(dlg);
+                    UNUSED(err);
+                    ErrCode ret = _onFilter(ctrl,
+                                    getCategoryId(catetoryid, searchKeyWork, value),
+                                    opFlags, searchKeyWork,
+                                    modelName.toStdString().c_str(),
+                                    this->mParentModel,
+                                    &(this->mModelList));
+                    if (err) *err = ret;
+                    return nullptr;//nothing to return
+                },
+                // finish callback
+                nullptr);
+
         }
         logd("filter err %d", err);
         logd("mItemList cnt %lld", mModelList.count());
@@ -395,6 +440,14 @@ ErrCode UICommonListView::_onFilter(ModelController* ctrl,
                        outList);
     traceret(err);
     return err;
+}
+
+int UICommonListView::getCategoryId(int currCategoryId,
+                                    const QString &keywords, const QVariant *value)
+{
+    UNUSED(keywords);
+    UNUSED(value);
+    return currCategoryId;
 }
 
 

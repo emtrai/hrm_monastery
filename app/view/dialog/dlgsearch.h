@@ -23,6 +23,7 @@
 #define DLGSEARCH_H
 
 #include <QDialog>
+#include "errcode.h"
 
 class Person;
 namespace Ui {
@@ -45,9 +46,7 @@ public:
 
     virtual void setupUi();
 
-    virtual void clearAll();
-    virtual void clearSelectedItem();
-
+    void clearAll();
     virtual const QList<DbModel *> &selectedItems() const;
     virtual const DbModel* selectedItem() const;
 
@@ -58,14 +57,36 @@ protected:
     virtual QString getTitle();
     virtual void initHeader();
 
-//    virtual void reload();
+    virtual ErrCode onSearch(const QString& keyword);
+    virtual ErrCode doSearch(const QString& keyword, QList<DbModel*>& items) = 0;
+    virtual ErrCode onGetAll();
+    virtual ErrCode doGetAll(QList<DbModel*>& items) = 0;
+    virtual ErrCode onGetManagers();
+    virtual ErrCode doGetManager(QList<DbModel*>& items);
+    virtual DbModel* getItemAtIdx(int idx);
+    virtual QString getValueOfItemAt(int idx, int col, DbModel* item);
+    virtual QString getValueOfItemCol(int idx, const DbModel* item);
 
-    virtual int onSearch(const QString& keyword) = 0;
-    virtual int onGetAll();
-    virtual int onGetManagers();
-    virtual DbModel* getItemAtIdx(int idx) = 0;
-    virtual QString getValueOfItemAt(int idx, int col, QString header, DbModel* item);
-    virtual int query(std::function<int()> queryfunc);
+    virtual void updatePage(qint32 page, bool updatePageInfo = true);
+    /**
+     * @brief update page info, 0 to clear
+     * @param page
+     * @param totalItems
+     */
+    virtual void updatePageInfo(qint32 page, qint32 totalItems = 0);
+    virtual void cleanupTableItems();
+    /**
+     * @brief get item index from row index
+     * @param rowIdx
+     * @return >=0 item index, < 0 error
+     */
+    virtual qint32 getItemIdxFromRowIdx(qint32 rowIdx);
+    /**
+     * @brief get current selected page
+     * @param index if set >= 0, use this index to get page number
+     * @return page number (>0), 0 if invalid page
+     */
+    qint32 getCurrentSelectedPage(qint32 index = -1);
 private slots:
     void on_btnSearch_clicked();
 
@@ -73,10 +94,13 @@ private slots:
 
     void on_btnManagers_clicked();
 
+    void on_cbPage_currentIndexChanged(int index);
+
 protected:
     Ui::DlgSearch *ui;
     QStringList mHeader;
     QList<DbModel*> mSelectedItems;
+    QList<DbModel*> mListItems;
     bool mIsMultiSelection;
 };
 

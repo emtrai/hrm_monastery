@@ -83,7 +83,6 @@ QString DbSqliteCommDeptPersonTbl::getSearchQueryStringWithTag(const QString &co
     if (!cond.isEmpty()) {
         queryString += QString(" WHERE %1").arg(cond);
     }
-    queryString += " ORDER BY name ASC";
     dbg(LOG_DEBUG, "queryString: %s", STR2CHA(queryString));
     return queryString;
 }

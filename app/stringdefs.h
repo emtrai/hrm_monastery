@@ -35,6 +35,7 @@
 #define STR_IGNORE              QObject::tr("Bỏ qua")
 #define STR_HELP                QObject::tr("Giúp đỡ")
 #define STR_EXIT                QObject::tr("Thoát")
+#define STR_LIST                QObject::tr("Danh sách")
 
 #define STR_NO_DATA             QObject::tr("Không có dữ liệu")
 #define STR_INVALID_DATA        QObject::tr("Dữ liệu không hợp lệ.")
@@ -63,6 +64,7 @@
 #define STR_NOTE            QObject::tr("Ghi chú")
 
 #define STR_COMMUNITY           QObject::tr("Cộng đoàn")
+#define STR_SEARCH_COMMUNITY    QObject::tr("Tìm kiếm Cộng đoàn")
 #define STR_COMMUNITY_LIST      QObject::tr("Danh sách Cộng đoàn")
 #define STR_CURRENT_COMMUNITY   QObject::tr("Cộng đoàn hiện tại")
 #define STR_PARENT_COMMUNITY    QObject::tr("Cộng đoàn quản lý")
@@ -146,6 +148,7 @@
 #define STR_ETHNIC              QObject::tr("Dân tộc")
 #define STR_NATIONALITY         QObject::tr("Quốc tịch")
 #define STR_ADD_PERSON_EVENT    QObject::tr("Thêm Sự kiện cho Nữ tu")
+#define STR_SEARCH_PERSON    QObject::tr("Tìm kiếm Nữ tu")
 
 #define STR_NONE            QObject::tr("Không")
 #define STR_MEMBER          QObject::tr("Thành viên")
@@ -158,6 +161,7 @@
 #define STR_NGAY_AN_NGHI    QObject::tr("Ngày an nghỉ")
 
 #define STR_QUERYING        QObject::tr("Đang truy vấn dữ liệu")
+#define STR_UPDATING_DATA   QObject::tr("Đang cập nhật dữ liệu")
 #define STR_QUERY_ERROR     QObject::tr("Lỗi truy vấn dữ liệu")
 
 #define STR_ADD_EVENT           QObject::tr("Thêm thông tin sự kiện")

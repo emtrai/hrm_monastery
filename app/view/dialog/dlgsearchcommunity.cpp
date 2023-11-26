@@ -21,14 +21,9 @@
  */
 #include "dlgsearchcommunity.h"
 #include "logger.h"
-#include "community.h"
 #include "communityctl.h"
+#include "stringdefs.h"
 
-
-DlgSearchCommunity::~DlgSearchCommunity()
-{
-    tracein;
-}
 
 DlgSearchCommunity *DlgSearchCommunity::build(QWidget *parent, bool isMulti)
 {
@@ -43,57 +38,38 @@ DlgSearchCommunity *DlgSearchCommunity::build(QWidget *parent, bool isMulti)
 DlgSearchCommunity::DlgSearchCommunity(QWidget *parent, bool isMulti):
     DlgSearch(parent, isMulti)
 {
-    tracein;
+    traced;
+}
+
+DlgSearchCommunity::~DlgSearchCommunity()
+{
+    traced;
 }
 
 QString DlgSearchCommunity::getTitle()
 {
-    return tr("Tìm kiếm Cộng đoàn");
+    return STR_SEARCH_COMMUNITY;
 }
 
 
-int DlgSearchCommunity::onSearch(const QString &keyword)
+ErrCode DlgSearchCommunity::doSearch(const QString &keyword, QList<DbModel*>& items)
 {
     tracein;
     clearAll();
-    logd("Start search community %s", keyword.toStdString().c_str());
-    ErrCode err = COMMUNITYCTL->search(keyword, &mListItems);
-    logd("search err=%d", err);
+    logi("Start search community keyword '%s'", STR2CHA(keyword));
+    ErrCode err = COMMUNITYCTL->search(keyword, &items);
+    logd("search err=%d, cnt=%lld", err, items.count());
     traceout;
-    return mListItems.count();
+    return err;
 }
 
-int DlgSearchCommunity::onGetAll()
+ErrCode DlgSearchCommunity::doGetAll(QList<DbModel*>& items)
 {
     tracein;
-    clearAll();
-    mListItems = COMMUNITYCTL->getAllItemsFromDb();
-    logd("get all cnt=%d", mListItems.count());
+    ErrCode err = ErrNone;
+    items = COMMUNITYCTL->getAllItemsFromDb();
+    logd("get all cnt=%lld", items.count());
     traceout;
-    return mListItems.count();
+    return err;
 
-}
-
-void DlgSearchCommunity::clearAll()
-{
-    tracein;
-
-    DlgSearch::clearAll();
-    // TODO: clear each element of list????
-    mListItems.clear();
-    traceout;
-}
-
-DbModel *DlgSearchCommunity::getItemAtIdx(int idx)
-{
-    tracein;
-    DbModel* ret = nullptr;
-    logd("get item at idx=%d", idx);
-    if (idx >= 0 && idx < mListItems.count()) {
-        ret = (DbModel*)mListItems[idx];
-    } else {
-        loge("invalid idx %d", idx);
-    }
-    traceout;
-    return ret;
 }

@@ -272,6 +272,7 @@ QString Person::toString() const
     str += QString(":name('%1')").arg(displayName());
     str += QString(":imageid('%1')").arg(imgId());
     str += QString(":imagepath('%1')").arg(imgPath());
+    str += QString(":event('%1')").arg(mPersonEventList.size());
     return str;
 }
 
@@ -386,6 +387,9 @@ void Person::initExportFields()
     mExportCallbacks.insert(KItemEdu, [](const DbModel* model, const QString& item){
         return ((Person*)model)->eduName();
     }); //"education";
+    mExportCallbacks.insert(KItemEduDetail, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->eduDetail();
+    }); //"education detail";
     mExportCallbacks.insert(KItemEduNameId, [](const DbModel* model, const QString& item){
         QString nameid;
         if (model && IS_MODEL_NAME(model, KModelNamePerson)) {
@@ -423,6 +427,9 @@ void Person::initExportFields()
         // TODO: free memory????
         return specialist;
     }); //"specialist";
+    mExportCallbacks.insert(KItemSpecialistInfo, [](const DbModel* model, const QString& item){
+        return ((Person*)model)->specialistInfo();
+    }); //"specialist detail";
     mExportCallbacks.insert(KItemSpecialistUid, [](const DbModel* model, const QString& item){
         QStringList list = ((Person*)model)->specialistUidList();
         if (list.count() > 0)
@@ -1166,6 +1173,7 @@ void Person::setPersonEventList(const QList<DbModel *> &newPersonEventList)
 {
     tracein;
     RELEASE_HASH(mPersonEventList, QString, DbModel);
+    logd("set %lld events", newPersonEventList.size());
     foreach (DbModel* model, newPersonEventList) {
         addPersonEvent(model);
     }
@@ -1712,7 +1720,7 @@ const QString &Person::bankPlace() const
 
 void Person::setBankPlace(const QString &newBankPlace)
 {
-    CHECK_MODIFIED_THEN_SET(mBankPlace, newBankPlace, KItemGoldenDate);
+    CHECK_MODIFIED_THEN_SET(mBankPlace, newBankPlace, KItemBankPlace);
 }
 
 qint64 Person::bankDate() const

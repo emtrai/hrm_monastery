@@ -29,13 +29,8 @@
 #include "dialogutils.h"
 #include "communityctl.h"
 #include "communitymanager.h"
-
-DlgSearchPerson::~DlgSearchPerson()
-{
-    tracein;
-    clearAll();
-    traceout;
-}
+#include "stringdefs.h"
+#include "person.h"
 
 DlgSearchPerson *DlgSearchPerson::build(QWidget *parent, bool isMulti)
 {
@@ -52,118 +47,65 @@ DlgSearchPerson *DlgSearchPerson::build(QWidget *parent, bool isMulti)
 DlgSearchPerson::DlgSearchPerson(QWidget *parent, bool isMulti):
     DlgSearch(parent, isMulti)
 {
-    tracein;
+    traced;
+}
+
+DlgSearchPerson::~DlgSearchPerson()
+{
+    traced;
 }
 
 QString DlgSearchPerson::getTitle()
 {
-    return tr("Tìm kiếm Nữ tu");
+    return STR_SEARCH_PERSON;
 }
 
 
-int DlgSearchPerson::onSearch(const QString &keyword)
+ErrCode DlgSearchPerson::doSearch(const QString& keyword, QList<DbModel*>& items)
 {
     tracein;
     ErrCode err = ErrNone;
-    clearAll();
+    err = INSTANCE(PersonCtl)->search(keyword, &items);
+    traceout;
+    return err;
+}
 
-    err = INSTANCE(PersonCtl)->search(keyword, &mListItems);
-    if (err != ErrNone) {
-        loge("Search person err=%d", err);
-        DialogUtils::showErrorBox(QString(tr("Tìm kiếm lỗi, mã lỗi %1")).arg(err));
+ErrCode DlgSearchPerson::doGetAll(QList<DbModel*>& items)
+{
+    tracein;
+    items = PERSONCTL->getAllItemsFromDb();
+    logd("get all people cnt=%lld", items.count());
+    traceout;
+    return ErrNone;
+}
+
+ErrCode DlgSearchPerson::doGetManager(QList<DbModel*>& items)
+{
+    tracein;
+    QList<DbModel*> managerList;
+    ErrCode err = ErrNone;
+    err = COMMUNITYCTL->getAllManagersList(managerList);
+    logd("get manager err = %d cnt=%lld", err, managerList.size());
+    if (err == ErrNone && managerList.size() > 0) {
+        foreach (DbModel* item, managerList) {
+            if (IS_MODEL_NAME(item, KModelNameCommManager)) {
+                CommunityManager* mgr = static_cast<CommunityManager*>(item);
+                Person* per = CLONE_MODEL(mgr->person(), Person);
+                if (per) {
+                    items.append(per);
+                }
+            } else {
+                loge("invalid model '%s'", MODELSTR2CHA(item));
+            }
+        }
     }
+    RELEASE_LIST_DBMODEL(managerList);
     traceout;
-    return mListItems.count();
-}
-
-void DlgSearchPerson::clearAll()
-{
-    tracein;
-    DlgSearch::clearAll();
-    RELEASE_LIST_DBMODEL(mListItems);
-    traceout;
-}
-
-int DlgSearchPerson::onGetAll()
-{
-    tracein;
-    clearAll();
-    int cnt = 0;
-    ErrCode err = MainWindow::showProcessingDialog(tr("Đang truy vấn dữ liệu"), nullptr,
-         [this, &cnt](ErrCode* err, void* data, DlgWait* dlg) {
-            RELEASE_LIST_DBMODEL(this->mListItems);
-            this->mListItems = PERSONCTL->getAllItemsFromDb();
-            logd("get all cnt=%d", this->mListItems.count());
-            cnt = this->mListItems.count();
-            return nullptr;//nothing to return
-         },
-        [this](ErrCode err, void* data, void* result, DlgWait* dlg) {
-            logd("Search result %d", err);
-
-            return err;
-        });
-
-//    mListItems = PERSONCTL->getAllItemsFromDb();
-//    logd("get all cnt=%d", mListItems.count());
-    logd("found %d", cnt);
-    traceout;
-    return cnt;
-}
-
-int DlgSearchPerson::onGetManagers()
-{
-    tracein;
-    clearAll();
-    int cnt = 0;
-    ErrCode err = MainWindow::showProcessingDialog(tr("Đang truy vấn dữ liệu"), nullptr,
-                         [this, &cnt](ErrCode* err, void* data, DlgWait* dlg) {
-                             RELEASE_LIST_DBMODEL(this->mListItems);
-                             QList<DbModel*> managerList;
-                             ErrCode tmperr = COMMUNITYCTL->getAllManagersList(managerList);
-                             logd("get all cnt=%d", this->mListItems.count());
-                             if (tmperr == ErrNone && managerList.size() > 0) {
-                                 foreach (DbModel* item, managerList) {
-                                     if (IS_MODEL_NAME(item, KModelNameCommManager)) {
-                                         CommunityManager* mgr = static_cast<CommunityManager*>(item);
-                                         Person* per = CLONE_MODEL(mgr->person(), Person);
-                                         if (per) {
-                                             this->mListItems.append(per);
-                                         }
-                                     }
-                                 }
-                             }
-                             RELEASE_LIST_DBMODEL(managerList);
-                             if (err) *err = tmperr;
-                             cnt = this->mListItems.count();
-                             return nullptr;//nothing to return
-                         },
-        [this](ErrCode err, void* data, void* result, DlgWait* dlg) {
-            logd("Search result %d", err);
-
-            return err;
-        });
-
-    //    mListItems = PERSONCTL->getAllItemsFromDb();
-    //    logd("get all cnt=%d", mListItems.count());
-    logd("found %d", cnt);
-    traceout;
-    return cnt;
+    return err;
 
 }
 
-DbModel *DlgSearchPerson::getItemAtIdx(int idx)
-{
-    tracein;
-    DbModel* ret = nullptr;
-    logd("get item at idx=%d", idx);
-    if (idx >= 0 && idx < mListItems.count()) {
-        ret = (DbModel*)mListItems[idx];
-    } else {
-        loge("invalid idx %d", idx);
-    }
-    traceout;
-    return ret;
-}
+
 void DlgSearchPerson::initHeader()
 {
     // TODO: translation
@@ -176,19 +118,12 @@ void DlgSearchPerson::initHeader()
     // WARNING: any change on this, must update to getValueOfItemAt
 }
 
-QString DlgSearchPerson::getValueOfItemAt(int idx, int col, QString header, DbModel* item)
+QString DlgSearchPerson::getValueOfItemCol(int col, const DbModel* item)
 {
     tracein;
     QString val;
-    logd("idx = %d, col = %d", idx, col);
-    if (item != nullptr) {
-        logd("item is nullptr, get from index");
-        item = getItemAtIdx(idx);
-    }
-    if (item != nullptr){
-        Person* per = (Person*)item;
-
-        // TODO: improve this, i.e. app callback to mHeader?
+    if (IS_MODEL_NAME(item, KModelNamePerson)) {
+        const Person* per = static_cast<const Person*>(item);
         switch (col) {
         case 0:
             val = per->nameId();
@@ -208,8 +143,14 @@ QString DlgSearchPerson::getValueOfItemAt(int idx, int col, QString header, DbMo
         case 5:
             val = per->communityName();
             break;
+        default:
+            loge("invalid col %d", col);
+            break;
         }
+    } else {
+        loge("invalid item '%s'", MODELSTR2CHA(item));
     }
+    logd("value of col %d is '%s'", col, STR2CHA(val));
     traceout;
     return val;
 }

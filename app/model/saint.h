@@ -46,7 +46,6 @@ class Saint: public DbModel
         virtual DbModelBuilder getBuilder() const;
         virtual void clone(const DbModel* model);
 
-        void init();
         void initImportFields();
         Saint();
         virtual ErrCode onImportParseDataItem(const QString& importName, int importFileType,

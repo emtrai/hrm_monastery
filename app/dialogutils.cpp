@@ -54,7 +54,7 @@ void DialogUtils::showErrorBox(int ret, const QString& msg)
     tracein;
     QString errMsg;
     if (ret != ErrNone) {
-        errMsg.append(QString("Lỗi ! Mã lỗi %1\n").arg(ret)); // TODO: translation
+        errMsg.append(QString("Lỗi ! Mã lỗi %1 (%2)\n").arg(ret).arg(ERRSTR((ErrCode)ret))); // TODO: translation
     }
     if (!msg.isEmpty()) {
         errMsg.append(msg);

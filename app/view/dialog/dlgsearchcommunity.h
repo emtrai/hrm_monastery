@@ -38,12 +38,8 @@ protected:
 
     virtual QString getTitle();
 
-    virtual int onSearch(const QString& keyword);
-    virtual int onGetAll();
-    virtual void clearAll();
-    virtual DbModel* getItemAtIdx(int idx);
-private:
-    QList<DbModel*> mListItems;
+    virtual ErrCode doSearch(const QString& keyword, QList<DbModel*>& items);
+    virtual ErrCode doGetAll(QList<DbModel*>& items);
 };
 
 #endif // DLGSEARCHCOMMUNITY_H

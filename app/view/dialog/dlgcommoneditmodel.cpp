@@ -191,7 +191,7 @@ void DlgCommonEditModel::accept()
     if (ret == ErrNone) {
         QDialog::accept();
     } else {
-        QDialog::reject();
+        loge("failed to save, error %d", ret);
     }
     traceout;
 }

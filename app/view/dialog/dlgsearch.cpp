@@ -25,11 +25,15 @@
 #include "dbmodel.h"
 #include "dialogutils.h"
 #include "stringdefs.h"
+#include "mainwindow.h"
+#include "stringdefs.h"
+#include "viewutils.h"
+
+#define ITEMS_PER_PAGE (10)
 
 DlgSearch::DlgSearch(QWidget *parent, bool isMulti) :
     QDialog(parent),
     ui(new Ui::DlgSearch),
-//    mPerson(nullptr),
     mIsMultiSelection(isMulti)
 {
     tracein;
@@ -63,44 +67,12 @@ DlgSearch::~DlgSearch()
 
 void DlgSearch::on_btnSearch_clicked()
 {
-//    tracein;
-//    QTableWidget* tbl = ui->tblList;
     QString keyword = ui->txtName->text().trimmed();
-////    mPerson = nullptr;
-//    clearAll();
-//    tbl->clearContents();
-//    tbl->model()->removeRows(0, tbl->rowCount());
-
-//    if (!keyword.isEmpty()) {
-//        int cnt = onSearch(keyword);
-//        logd("Found %d item", cnt);
-//        if (cnt > 0) {
-
-//            qint32 idx = tbl->rowCount();
-
-//            for(int i = 0; i < cnt; i++){
-//                DbModel* item = getItemAtIdx(i);
-//                logd("idx=%d", idx);
-//                item->dump();
-//                tbl->insertRow(idx);
-//                for (int col = 0; col < mHeader.count(); col++) {
-//                    tbl->setItem(idx, col, new QTableWidgetItem(getValueOfItemAt(i, col, mHeader[col], item)));
-//                }
-//                idx++;
-//            }
-//        } else {
-//            logi("No person");
-//        }
-//    } else {
-//        loge("Nothing to search");
-//        DialogUtils::showErrorBox(tr("Nhập tên để tìm")); // TODO: translation
-//    }
     tracein;
     if (!keyword.isEmpty()) {
         logd("search with keyword '%s'", keyword.toStdString().c_str());
-        query([this, keyword](){
-            return this->onSearch(keyword);
-        });
+        onSearch(keyword);
+        updatePage(1);
     } else {
         loge("Nothing to search");
         DialogUtils::showErrorBox(tr("Nhập tên để tìm")); // TODO: translation
@@ -117,7 +89,7 @@ const DbModel *DlgSearch::selectedItem() const
 {
     DbModel* ret = nullptr;
     tracein;
-    logd("no. selected item %d", mSelectedItems.count());
+    logd("no. selected item %lld", mSelectedItems.count());
     if (mSelectedItems.count() > 0) {
         ret = mSelectedItems[0];
     }
@@ -170,16 +142,8 @@ void DlgSearch::setupUi()
 void DlgSearch::clearAll()
 {
     tracein;
-    // TODO: free up data of each item? i.e. delete DbModel*
-    clearSelectedItem();
-    traceout;
-}
-
-void DlgSearch::clearSelectedItem()
-{
-    tracein;
-    mSelectedItems.clear();
-    // TODO: free up data of each item? i.e. delete DbModel*
+    RELEASE_LIST_DBMODEL(mListItems);
+    mSelectedItems.clear(); // item in selected item is just pointer to mListItems
     traceout;
 }
 
@@ -198,8 +162,18 @@ void DlgSearch::accept()
         {
             QModelIndex index = selection.at(i);
             // TODO: validate value
-            DbModel* item = getItemAtIdx(index.row());
-            mSelectedItems.append(item);
+            qint32 idx = getItemIdxFromRowIdx(index.row());
+            if (idx >= 0) {
+                DbModel* item = getItemAtIdx(idx);
+                if (item) {
+                    mSelectedItems.append(item);
+                } else {
+                    loge("Null item at index %d row %d", idx, index.row());
+                }
+            } else {
+                loge("invalid idx");
+                break;
+            }
         }
     } else {
         loge("Nothing to select");
@@ -211,34 +185,102 @@ void DlgSearch::accept()
 
 QString DlgSearch::getTitle()
 {
-    return tr("Danh sách");
+    return STR_LIST;
 }
 
 void DlgSearch::initHeader()
 {
-    tracein;
-    mHeader.append(tr("Mã"));
-    mHeader.append(tr("Tên"));
+    traced;
+    mHeader.append(STR_NAMEID);
+    mHeader.append(STR_NAME);
 }
 
-int DlgSearch::onGetAll()
+ErrCode DlgSearch::onSearch(const QString &keyword)
 {
     tracein;
-    loge("MUST BE CALLED BY DERIVED CLASS, NOT CALL HERE");
+    clearAll();
+    ErrCode err = MainWindow::showProcessingDialog(
+        STR_QUERYING, nullptr,
+        [this, keyword](ErrCode* err, void* data, DlgWait* dlg) {
+            UNUSED(data);
+            UNUSED(dlg);
+            ErrCode ret = this->doSearch(keyword, this->mListItems);
+            if (err) *err = ret;
+            return nullptr;//nothing to return
+        },
+        [keyword](ErrCode err, void* data, void* result, DlgWait* dlg) {
+            UNUSED(data);
+            UNUSED(dlg);
+            UNUSED(result);
+            dbgd("Search result %d", err);
+            MAINWIN->showIfErrorBox(QString(tr("Tìm kiếm '%1' lỗi")).arg(keyword), err);
+            return err;
+        });
     traceout;
-    return 0;
+    return err;
 }
 
-int DlgSearch::onGetManagers()
+ErrCode DlgSearch::onGetAll()
 {
     tracein;
-    loge("MUST BE CALLED BY DERIVED CLASS, NOT CALL HERE");
+    clearAll();
+    ErrCode err = MainWindow::showProcessingDialog(
+        STR_QUERYING, nullptr,
+        [this](ErrCode* err, void* data, DlgWait* dlg) {
+            UNUSED(data);
+            UNUSED(dlg);
+            ErrCode ret = this->doGetAll(this->mListItems);
+            if (err) *err = ret;
+            return nullptr;//nothing to return
+        },
+        [](ErrCode err, void* data, void* result, DlgWait* dlg) {
+            UNUSED(data);
+            UNUSED(dlg);
+            UNUSED(result);
+            dbgd("Get all result %d", err);
+            MAINWIN->showIfErrorBox(QString(tr("Truy vấn thông tin lỗi")), err);
+            return err;
+        });
     traceout;
-    return 0;
-
+    return err;
 }
 
-QString DlgSearch::getValueOfItemAt(int idx, int col, QString header, DbModel *item)
+ErrCode DlgSearch::onGetManagers()
+{
+    tracein;
+    clearAll();
+    ErrCode err = MainWindow::showProcessingDialog(
+        STR_QUERYING, nullptr,
+        [this](ErrCode* err, void* data, DlgWait* dlg) {
+            UNUSED(data);
+            UNUSED(dlg);
+            ErrCode ret = this->doGetManager(this->mListItems);
+            if (err) *err = ret;
+            return nullptr;//nothing to return
+        },
+        [](ErrCode err, void* data, void* result, DlgWait* dlg) {
+            UNUSED(data);
+            UNUSED(dlg);
+            UNUSED(result);
+            dbgd("Get manager result %d", err);
+
+            MAINWIN->showIfErrorBox(QString(tr("Truy vấn người quản lý lỗi")), err);
+            return err;
+        });
+    traceout;
+    return err;
+}
+
+ErrCode DlgSearch::doGetManager(QList<DbModel*>& items)
+{
+    tracein;
+    UNUSED(items);
+    loge("MUST BE CALLED BY DERIVED CLASS, NOT CALL HERE");
+    traceout;
+    return ErrNotImpl;
+}
+
+QString DlgSearch::getValueOfItemAt(int idx, int col, DbModel *item)
 {
     tracein;
     QString val;
@@ -248,54 +290,140 @@ QString DlgSearch::getValueOfItemAt(int idx, int col, QString header, DbModel *i
         item = getItemAtIdx(idx);
     }
     if (item != nullptr){
-
-        // TODO: improve this, i.e. app callback to mHeader?
-        switch (col) {
-        case 0:
-            val = item->uid();
-            break;
-        case 1:
-            val = item->name();
-            break;
-        }
+        val = getValueOfItemCol(col, item);
     }
     traceout;
     return val;
 }
 
-int DlgSearch::query(std::function<int ()> queryfunc)
+QString DlgSearch::getValueOfItemCol(int col, const DbModel *item)
+{
+    tracein;
+    QString val;
+    switch (col) {
+    case 0:
+        val = item->nameId();
+        break;
+    case 1:
+        val = item->name();
+        break;
+    default:
+        loge("invalid col %d", col);
+        break;
+    }
+    logd("value of col %d is '%s'", col, STR2CHA(val));
+    traceout;
+    return val;
+}
+
+void DlgSearch::updatePage(qint32 page, bool updatePage)
 {
     tracein;
     QTableWidget* tbl = ui->tblList;
-    clearAll();
-    tbl->clearContents();
-    tbl->model()->removeRows(0, tbl->rowCount());
-    int cnt = queryfunc();
+    cleanupTableItems();
+    quint32 cnt = mListItems.size();
 
     logd("Found %d item", cnt);
-    if (cnt > 0) {
+    if (cnt > 0 && page > 0) {
 
         qint32 idx = tbl->rowCount();
-
-        for(int i = 0; i < cnt; i++){
-            DbModel* item = getItemAtIdx(i);
+        qint64 startIdx = (page-1)*ITEMS_PER_PAGE;
+        qint64 endIdx = startIdx + ITEMS_PER_PAGE;
+        if (endIdx >= mListItems.size()) {
+            endIdx = mListItems.size();
+        }
+        for(; startIdx < endIdx; startIdx++){
+            DbModel* item = getItemAtIdx(startIdx);
             logd("idx=%d", idx);
             if (item) {
-                item->dump();
                 tbl->insertRow(idx);
                 for (int col = 0; col < mHeader.count(); col++) {
-                    tbl->setItem(idx, col, new QTableWidgetItem(getValueOfItemAt(i, col, mHeader[col], item)));
+                    tbl->setItem(idx, col,
+                                 new QTableWidgetItem(getValueOfItemAt(startIdx, col, item)));
                 }
                 idx++;
             } else {
-                logw("item at idex %d is null", i);
+                logw("item at idex %lld is null", startIdx);
             }
         }
+        if (updatePage) {
+            updatePageInfo(page, cnt);
+        }
     } else {
-        logi("no data");
+        logi("no data cnt %d page %d", cnt, page);
+        updatePageInfo(0);
     }
     traceout;
-    return cnt;
+}
+
+void DlgSearch::updatePageInfo(qint32 page, qint32 totalItems)
+{
+    tracein;
+    ViewUtils::updatePageInfo(ui->cbPage, ui->lblPage,
+                              page, totalItems, ITEMS_PER_PAGE);
+    traceout;
+}
+
+void DlgSearch::cleanupTableItems()
+{
+    tracein;
+
+    QTableWidget* tbl = ui->tblList;
+    int rowCnt = tbl->rowCount();
+    int colCnt = tbl->columnCount();
+    logd("rowCnt %d colCnt %d", rowCnt, colCnt);
+    for (int i = 0; i < rowCnt; i++) {
+        for (int j = 0; j < colCnt; j++) {
+            QTableWidgetItem* item = tbl->takeItem(i, j);
+            if (item) {
+                delete item;
+            }
+        }
+    }
+    tbl->clearContents();
+    tbl->model()->removeRows(0, tbl->rowCount());
+    traceout;
+}
+
+qint32 DlgSearch::getItemIdxFromRowIdx(qint32 rowIdx)
+{
+    tracein;
+    qint32 idx = -1;
+    logd("rowIdx=%d", rowIdx);
+    qint32 page = getCurrentSelectedPage();
+    if (page > 0) {
+        idx = (page-1)*ITEMS_PER_PAGE + rowIdx;
+        logd("idx = %d", idx);
+    } else {
+        loge("invalid page");
+    }
+    traceret(idx);
+    return idx;
+}
+
+qint32 DlgSearch::getCurrentSelectedPage(qint32 index)
+{
+    tracein;
+    int page = 0;
+    logd("index = %d", index);
+    if (index < 0)
+        index = ui->cbPage->currentIndex();
+    logd("idx %d", index);
+    if (index >= 0) {
+        QVariant value = ui->cbPage->itemData(index);
+        if (value.isValid()) {
+            bool ok = false;
+            page = value.toInt(&ok);
+            if (!ok) {
+                loge("invalid value");
+                page = 0;
+            }
+        } else {
+            loge("valid is invalid");
+        }
+    }
+    traceret(page);
+    return page;
 }
 
 
@@ -303,9 +431,8 @@ int DlgSearch::query(std::function<int ()> queryfunc)
 void DlgSearch::on_btnAll_clicked()
 {
     tracein;
-    query([this](){
-        return this->onGetAll();
-    });
+    onGetAll();
+    updatePage(1);
     traceout;
 }
 
@@ -313,10 +440,35 @@ void DlgSearch::on_btnAll_clicked()
 void DlgSearch::on_btnManagers_clicked()
 {
     tracein;
-    query([this](){
-        return this->onGetManagers();
-    });
+    onGetManagers();
+    updatePage(1);
     traceout;
 
+}
+
+
+DbModel *DlgSearch::getItemAtIdx(int idx)
+{
+    tracein;
+    DbModel* ret = nullptr;
+    logd("get item at idx=%d", idx);
+    if (idx >= 0 && idx < mListItems.count()) {
+        ret = (DbModel*)mListItems[idx];
+    } else {
+        loge("invalid idx %d", idx);
+    }
+    traceout;
+    return ret;
+}
+
+void DlgSearch::on_cbPage_currentIndexChanged(int index)
+{
+    tracein;
+    int page = getCurrentSelectedPage(index);
+    if (page > 0) {
+        logd("update page %d", page);
+        updatePage(page);
+    }
+    traceout;
 }
 

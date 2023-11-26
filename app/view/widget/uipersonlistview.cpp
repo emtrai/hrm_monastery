@@ -764,23 +764,6 @@ void UIPersonListView::initFilterFields()
     traceout;
 }
 
-int UIPersonListView::onFilter(int catetoryid,
-                                const QString &catetory,
-                                qint64 opFlags,
-                                const QString &keywords,
-                               const QVariant *value)
-{
-    tracein;
-    UNUSED(catetory);
-    UNUSED(value);
-    RELEASE_LIST_DBMODEL(mModelList);
-    ErrCode ret = PERSONCTL->filter(catetoryid, opFlags, keywords, KModelNamePerson, nullptr, &mModelList);
-    logd("filter ret %d", ret);
-    logd("mItemList cnt %lld", mModelList.count());
-    traceout;
-    return mModelList.count();
-}
-
 DbModel *UIPersonListView::onCreateDbModelObj(const QString& modelName)
 {
     UNUSED(modelName);
@@ -1185,7 +1168,7 @@ ErrCode UIPersonListView::updatePersonEvent(const QList<DbModel *>& perList,
                 logd("Save for perEvent '%s'", MODELSTR2CHA(perEvent));
                 QString nameid = perEvent->nameId();
                 QString availNameId;
-                if (!nameid.isEmpty()) {
+                if (nameid.isEmpty()) {
                     err = ErrInvalidArg;
                     loge("Lack of nameId");
                     break;
@@ -1225,5 +1208,36 @@ ErrCode UIPersonListView::updatePersonEvent(const QList<DbModel *>& perList,
 ImportTarget UIPersonListView::getImportTarget()
 {
     return IMPORT_TARGET_PERSON;
+}
+
+int UIPersonListView::getCategoryId(int currCategoryId, const QString &keywords,
+                                    const QVariant *value)
+{
+    int nextCategory = currCategoryId;
+    UNUSED(keywords);
+    traceout;
+    logd("currCategoryId %d", currCategoryId);
+    if (value != nullptr && value->isValid()) {
+        switch (currCategoryId) {
+        case FILTER_FIELD_COMMUNITY:
+            nextCategory = FILTER_FIELD_COMMUNITY_UID;
+            break;
+        case FILTER_FIELD_EDUCATION:
+            nextCategory = FILTER_FIELD_EDUCATION_UID;
+            break;
+        case FILTER_FIELD_SPECIALIST:
+            nextCategory = FILTER_FIELD_SPECIALIST_UID;
+            break;
+        case FILTER_FIELD_WORK:
+            nextCategory = FILTER_FIELD_WORK_UID;
+            break;
+        case FILTER_FIELD_COURSE:
+            nextCategory = FILTER_FIELD_COURSE_UID;
+            break;
+        }
+    }
+    logd("nextCategory %d", nextCategory);
+    traceret(nextCategory);
+    return nextCategory;
 }
 

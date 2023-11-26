@@ -42,7 +42,7 @@ protected:
     virtual ErrCode fillValueTableRowItem(DbModel* item, UITableItem* tblItem, int idx);
     virtual void initHeader();
 
-    virtual int onFilter(int catetoryid, const QString& catetory, qint64 opFlags, const QString& keywords, const QVariant *value);
+//    virtual int onFilter(int catetoryid, const QString& catetory, qint64 opFlags, const QString& keywords, const QVariant *value);
 
     virtual QList<DbModel*> getListDbModels();
 

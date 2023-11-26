@@ -86,7 +86,6 @@ ErrCode DbSqliteCommunity::update(DbModel *model, bool notify)
 {
     tracein;
     ErrCode_t err = ErrNone;
-    Community* comm = nullptr;
     if (!model) {
         loge("invalid arg");
         err = ErrInvalidArg;

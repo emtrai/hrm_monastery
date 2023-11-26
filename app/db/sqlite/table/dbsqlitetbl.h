@@ -315,6 +315,9 @@ protected:
 
     virtual QString getCountTotalQueryString(const QString& cond = nullptr,
                                         const QString& req = nullptr);
+
+    virtual QString getOrderField();
+    virtual void appendOrderQueryString(QString& sql, const QString& field = nullptr);
 public:
 
     virtual DbSqlite *db() const;

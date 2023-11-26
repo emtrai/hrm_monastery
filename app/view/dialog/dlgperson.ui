@@ -38,7 +38,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-1907</y>
+        <y>-3507</y>
         <width>679</width>
         <height>4123</height>
        </rect>
@@ -1291,7 +1291,7 @@
             </size>
            </property>
            <property name="text">
-            <string>Mã số</string>
+            <string>Mã/Tên định danh</string>
            </property>
           </widget>
          </item>
@@ -1714,7 +1714,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Reset|QDialogButtonBox::Save</set>
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
      </property>
      <property name="centerButtons">
       <bool>false</bool>

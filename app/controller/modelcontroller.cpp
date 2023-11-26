@@ -22,7 +22,7 @@
 
 
 ModelController::ModelController():
-    mEnableCache(true),
+    mEnableCache(false), // TODO: when enable cache, data is not sort, so temporary disable now
     mReloadDb(false)
 {
     tracein;
@@ -51,8 +51,9 @@ void ModelController::init()
     tracein;
     logd("Init controller '%s'", STR2CHA(getName()));
     logd("Register signal/slots");
-    QObject::connect(this, SIGNAL(dataUpdate(DbModel*)),
-                     this, SLOT(onModelControllerDataUpdated(DbModel*)));
+    QObject::connect(this, &ModelController::dataUpdate,
+                     this, &ModelController::onModelControllerDataUpdated,
+                     Qt::QueuedConnection);
 
     DbModelHandler* hdl = getModelHandler();
     if (hdl) {

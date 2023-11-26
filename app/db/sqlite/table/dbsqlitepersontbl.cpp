@@ -404,6 +404,7 @@ ErrCode DbSqlitePersonTbl::updateDbModelDataFromQuery(DbModel *item, const QSqlQ
             }
             RELEASE_LIST_DBMODEL(listspecialist);
         }
+        cmm->setSpecialistInfo(qry.value(KFieldSpecialistInfo).toString());
 
         cmm->setCountryUid(qry.value(KFieldCountryUid).toString());
         if (!cmm->countryUid().isEmpty()) {
@@ -877,7 +878,6 @@ QString DbSqlitePersonTbl::getSearchQueryString(const QString &cond)
     if (!cond.isEmpty()) {
         queryString += QString(" WHERE %1").arg(cond);
     }
-    queryString += " ORDER BY name ASC ";
     dbgd("queryString: %s", STR2CHA(queryString));
     traceout;
     return queryString;
@@ -894,6 +894,7 @@ QString DbSqlitePersonTbl::getFilterQueryString(int fieldId, const QString &cond
          fieldId, STR2CHA(cond));
     switch (fieldId) {
     case FILTER_FIELD_EDUCATION:
+    case FILTER_FIELD_EDUCATION_UID:
         selectQuery = QString("%1.%2 AS %3, %1.%4 AS %5, %1.%6 AS %7")
                         .arg(KTableEdu, KFieldName, KFieldEduName)
                         .arg(KFieldUid, KFieldEduUid)
@@ -917,6 +918,7 @@ QString DbSqlitePersonTbl::getFilterQueryString(int fieldId, const QString &cond
             ;
         break;
     case FILTER_FIELD_COMMUNITY:
+    case FILTER_FIELD_COMMUNITY_UID:
         selectQuery = QString("%1.%2 AS %7, %1.%4 AS %5, %1.%3 AS %6")
                           .arg(KTableCommunity) // 1
                           .arg(KFieldUid, KFieldNameId) // 2 3
@@ -929,6 +931,7 @@ QString DbSqlitePersonTbl::getFilterQueryString(int fieldId, const QString &cond
             ;
         break;
     case FILTER_FIELD_COURSE:
+    case FILTER_FIELD_COURSE_UID:
         selectQuery = QString("%1.%2 AS %7, %1.%4 AS %5, %1.%3 AS %6")
                           .arg(KTableCourse) // 1
                           .arg(KFieldUid, KFieldNameId) // 2 3
@@ -941,6 +944,7 @@ QString DbSqlitePersonTbl::getFilterQueryString(int fieldId, const QString &cond
             ;
         break;
     case FILTER_FIELD_WORK:
+    case FILTER_FIELD_WORK_UID:
         selectQuery = QString("%1.%2 AS %7, %1.%4 AS %5, %1.%3 AS %6")
                           .arg(KTableWork) // 1
                           .arg(KFieldUid, KFieldNameId) // 2 3
@@ -968,10 +972,14 @@ QString DbSqlitePersonTbl::getFilterQueryString(int fieldId, const QString &cond
     if (!cond.isEmpty()) {
         queryString += QString(" WHERE %1").arg(cond);
     }
-    queryString += " ORDER BY name ASC ";
     dbgd("queryString: %s", STR2CHA(queryString));
     traceout;
     return queryString;
+}
+
+QString DbSqlitePersonTbl::getOrderField()
+{
+    return KFieldFirstName;
 }
 
 ErrCode DbSqlitePersonTbl::updateCommunity(const QString &uid, const QString &communityUid)

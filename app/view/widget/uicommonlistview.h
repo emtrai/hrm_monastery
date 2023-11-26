@@ -104,6 +104,15 @@ protected:
                           const DbModel* parentModel = nullptr,
                           QList<DbModel*>* outList = nullptr);
 
+    /**
+     * @brief get correct category to be used
+     * @param currCategoryId
+     * @param keywords
+     * @param value
+     * @return
+     */
+    virtual int getCategoryId(int currCategoryId, const QString& keywords,
+                              const QVariant *value = nullptr);
     virtual ErrCode onMenuActionImport(QMenu* menu, UITableMenuAction* act);
     virtual ErrCode onMenuActionExport(QMenu *menu, UITableMenuAction *act);
     virtual ErrCode onViewItem(UITableCellWidgetItem *item);

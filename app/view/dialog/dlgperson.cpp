@@ -93,6 +93,7 @@ DlgPerson::DlgPerson(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DlgPerson),
     mPerson(nullptr),
+    mPersonOrgin(nullptr),
     cbSaints(nullptr),
     cbSpecialist(nullptr),
     mEditMode(Mode::NEW),
@@ -106,14 +107,14 @@ DlgPerson::DlgPerson(QWidget *parent) :
 
 DlgPerson::~DlgPerson()
 {
-    if (mPerson)
-        delete mPerson;
-    if (cbSaints)
-        delete cbSaints;
-    if (cbSpecialist)
-        delete cbSpecialist;
+    tracein;
+    FREE_PTR(mPerson);
+    FREE_PTR(mPersonOrgin);
+    FREE_PTR(cbSaints);
+    FREE_PTR(cbSpecialist);
     RELEASE_LIST_DBMODEL(mListPersonEvent);
     delete ui;
+    traceout;
 }
 
 void DlgPerson::on_btnImport_clicked()
@@ -229,10 +230,15 @@ void DlgPerson::setupUI()
     mInitDone = true;
 }
 
-Person *DlgPerson::getPerson()
+Person *DlgPerson::getPerson(Person* inper)
 {
     tracein;
-    Person* per = person();
+    Person* per = inper;
+    if (!per) {
+        per = person();
+    } else {
+        logd("use existing inper");
+    }
     buildPerson(per);
     traceout;
     return per;
@@ -244,6 +250,11 @@ ErrCode DlgPerson::buildPerson(Person* per)
     // TODO: backup data to restore later??
     ErrCode err = ErrNone;
     QString imgPath = ui->lblImgPath->text().trimmed();
+
+    if (mPersonOrgin) {
+        dbgd("clone origin person info");
+        per->clone(mPersonOrgin);
+    }
     per->setMarkModified(true); // start marking fields which are modified
     // Image
     if (imgPath.isEmpty()) {
@@ -311,6 +322,7 @@ ErrCode DlgPerson::buildPerson(Person* per)
     if (err == ErrNone) SET_VAL_FROM_VAL_CBOX(ui->cbProvince, per->setProvinceUid, per->setProvinceName, err);
 #endif
     per->setAddr(ui->txtAddr->toPlainText().trimmed());
+
     per->setChurchAddr(ui->txtChurch->toPlainText().trimmed());
     per->setEmail(ui->txtEmail->text().split(SPLIT_EMAIL_PHONE));
     per->setTel(ui->txtPhone->text().split(SPLIT_EMAIL_PHONE));
@@ -325,7 +337,7 @@ ErrCode DlgPerson::buildPerson(Person* per)
 
     per->setMomName(ui->txtMom->text().trimmed());
     SET_DATE_VAL_FROM_WIDGET(ui->txtMonBirth, per->setMomBirthday);
-    per->setDadAddr(ui->txtMonAddr->text().trimmed());
+    per->setMomAddr(ui->txtMonAddr->text().trimmed());
 
     per->setFamilyHistory(ui->txtFamilyHistory->toPlainText().trimmed());
     per->setFamilyContact(ui->txtFamilyContact->toPlainText().trimmed() );
@@ -384,15 +396,11 @@ ErrCode DlgPerson::buildPerson(Person* per)
     per->setWorkHistory(ui->txtWorkHistory->toPlainText().trimmed());
 
     //event
-//    QList<QVariant> specialist = ui->tblEvents->item
-//    per->clearSpecialistUid();
-//    foreach (QVariant id, specialist){
-//        per->addSpecialistUid(id.toString());
-//    }
     if (mListPersonEvent.size() > 0) {
+        logd("set %lld event", mListPersonEvent.size());
         per->setPersonEventList(mListPersonEvent);
     }
-    logd("build person '%s'", STR2CHA(per->toString()));
+    logd("build person '%s'", MODELSTR2CHA(per));
     per->dump();
     traceout;
     return err;
@@ -406,6 +414,7 @@ ErrCode DlgPerson::fromPerson(const Person *model)
     QList<DbModel*> events;
     QList<DbModel*> specialistList;
     Person* per = person();
+    FREE_PTR(mPersonOrgin);
 
     mInitDone = false;
     if (model == nullptr) {
@@ -414,9 +423,19 @@ ErrCode DlgPerson::fromPerson(const Person *model)
         goto out;
     }
     if (per == nullptr){
+        loge("Invalid argument");
         ret = ErrInvalidArg; // TODO: should raise assert instead???
         goto out;
     }
+
+    mPersonOrgin = static_cast<Person*>(Person::build());
+    if (mPersonOrgin == nullptr){
+        ret = ErrNoMemory; // TODO: should raise assert instead???
+        loge("No memory to allocate mPersonOrgin");
+        goto out;
+    }
+
+    mPersonOrgin->clone(model);
     per->clone(model);
     logd("fromPerson '%s'", MODELSTR2CHA(per));
     per->validateAllFields(); // TODO: should call validate here???
@@ -455,6 +474,7 @@ ErrCode DlgPerson::fromPerson(const Person *model)
     ui->txtIdCardPlace->setText(per->idCardIssuePlace());
     // cbEdu
     Utils::setSelectItemComboxByData(ui->cbEdu, per->eduUid());
+    ui->txtEduDetail->setPlainText(per->eduDetail());
 
     // cbSpecialist
     specialistList = per->getSpecialistList();
@@ -462,6 +482,7 @@ ErrCode DlgPerson::fromPerson(const Person *model)
     foreach (DbModel* item, specialistList) {
         cbSpecialist->addSelectedItemByData(item->uid());
     }
+    ui->txtSpecialistInfo->setPlainText(per->specialistInfo());
 
     // cbCourse
     Utils::setSelectItemComboxByData(ui->cbCourse, per->courseUid());
@@ -1112,10 +1133,10 @@ void DlgPerson::on_btnPreview_clicked()
 Person *DlgPerson::person(bool newone)
 {
     if (mPerson == nullptr) {
-        mPerson = (Person*) Person::build();
+        mPerson = static_cast<Person*>(Person::build());
     } else if (newone) {
         delete mPerson;
-        mPerson = (Person*) Person::build();
+        mPerson = static_cast<Person*>(Person::build());
     }
 
     return mPerson;
@@ -1369,8 +1390,8 @@ void DlgPerson::on_btnAddEvent_clicked()
         loge("Open dlg DlgAddPersonEvent fail, No memory");
         return;
     }
-
-    dlg->setPerson(getPerson());
+    Person* per = static_cast<Person*>(Person::build());
+    dlg->setPerson(getPerson(per));
     if (dlg->exec() == QDialog::Accepted){
         const DbModel* event = dlg->getModel();
         if (event != nullptr) {
@@ -1379,7 +1400,8 @@ void DlgPerson::on_btnAddEvent_clicked()
         }
         loadEvent();
     }
-    delete dlg;
+    FREE_PTR(dlg);
+    FREE_PTR(per);
     traceout;
 }
 
@@ -1403,6 +1425,8 @@ void DlgPerson::on_btnDelEvent_clicked()
         }
         mListPersonEvent.removeAt(index.row());
     }
+    logd("deleted %lld event, remain %lld event",
+         toDel.size(), mListPersonEvent.size());
     RELEASE_LIST_DBMODEL(toDel);
     loadEvent();
 }
@@ -1502,6 +1526,7 @@ void DlgPerson::on_btnModifyEvent_clicked()
     QModelIndexList selection = selectionModel->selectedRows();
     // Multiple rows can be selected
     DbModel* model = nullptr;
+    Person* per = static_cast<Person*>(Person::build());
     for(int i=0; i< selection.count(); i++)
     {
         QModelIndex index = selection.at(i);
@@ -1518,7 +1543,7 @@ void DlgPerson::on_btnModifyEvent_clicked()
             return;
         }
 
-        dlg->setPerson(getPerson());
+        dlg->setPerson(getPerson(per));
         if (dlg->exec() == QDialog::Accepted){
             const DbModel* event = dlg->getModel();
             if (event != nullptr) {
@@ -1534,6 +1559,7 @@ void DlgPerson::on_btnModifyEvent_clicked()
     } else {
         loge("no person event model to modify");
     }
+    FREE_PTR(per);
     traceout;
 }
 

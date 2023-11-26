@@ -234,7 +234,7 @@ ErrCode PersonCtl::filter(int catetoryid, qint64 opFlags,
      */
     if (err == ErrNone) {
         switch (catetoryid) {
-        case FILTER_FIELD_SPECIALIST:
+        case FILTER_FIELD_SPECIALIST_UID:
             controller = SPECIALISTCTL;
             modelHdl = DB->getModelHandler(KModelHdlSpecialist);
             break;
@@ -244,9 +244,13 @@ ErrCode PersonCtl::filter(int catetoryid, qint64 opFlags,
         case FILTER_FIELD_ADDRESS:
         case FILTER_FIELD_BIRTHDAY:
         case FILTER_FIELD_COMMUNITY:
+        case FILTER_FIELD_COMMUNITY_UID:
         case FILTER_FIELD_EDUCATION:
+        case FILTER_FIELD_EDUCATION_UID:
         case FILTER_FIELD_COURSE:
+        case FILTER_FIELD_COURSE_UID:
         case FILTER_FIELD_WORK:
+        case FILTER_FIELD_WORK_UID:
             directFilter = true;
             err = ModelController::filter(catetoryid,
                                           opFlags,
@@ -267,7 +271,7 @@ ErrCode PersonCtl::filter(int catetoryid, qint64 opFlags,
     logd("directFilter=%d", directFilter);
     if (!directFilter) {
         if (err == ErrNone) {
-            if (catetoryid == FILTER_FIELD_SPECIALIST) {
+            if (catetoryid == FILTER_FIELD_SPECIALIST_UID) {
                 QList<DbModel *> models = controller->getAllItems(true);
                 DbSpecialistModelHandler* perspechdl = dynamic_cast<DbSpecialistModelHandler*>(modelHdl);
                 foreach (DbModel* item, models) {

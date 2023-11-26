@@ -59,6 +59,7 @@ protected:
 
     virtual QString getFilterQueryString(int fieldId, const QString& cond = nullptr);
 
+    virtual QString getOrderField();
 //    ErrCode_t addPerson(const Person* person);
 
 //protected:

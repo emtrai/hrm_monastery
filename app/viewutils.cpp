@@ -45,3 +45,36 @@ void ViewUtils::cleanupTableItems(QTableWidget *tbl)
     }
     traceout;
 }
+
+void ViewUtils::updatePageInfo(QComboBox *cbPage, QLabel *lblPage,
+                               qint32 page, qint32 total, qint32 itemPerPage)
+{
+    tracein;
+    if (page > 0 && total > 0) {
+        qint32 perPage = ((itemPerPage != 0) && (itemPerPage < total))?itemPerPage:total;
+        qint32 totalPages = total/perPage + ((total%perPage == 0)?0:1);
+        dbgd("page %d, total %d, total page %d, perPage = %d",
+             page, total, totalPages, perPage);
+
+        cbPage->blockSignals(true); // TODO: store old state then restore?
+        cbPage->clear();
+        lblPage->setText("");
+        for (int pageidx = 0; pageidx < totalPages; pageidx++) {
+            cbPage->addItem(QString::number(pageidx+1), pageidx+1);
+        }
+        qint32 startIdx = (page-1)*perPage;
+        qint32 endIdx = (startIdx + perPage);
+        if (endIdx > total) endIdx = total;
+        logd("startIdx %d, endIdx = %d", startIdx, endIdx);
+        lblPage->setText(QString("%1-%2/%3").arg(startIdx+1).arg(endIdx).arg(total));
+        cbPage->setCurrentIndex(page-1);
+        cbPage->blockSignals(false);
+    } else {
+        loge("invalid page %d or total %d", page, total);
+        cbPage->blockSignals(true); // TODO: store old state and restore?
+        cbPage->clear();
+        lblPage->setText("");
+        cbPage->blockSignals(false);
+    }
+    traceout;
+}

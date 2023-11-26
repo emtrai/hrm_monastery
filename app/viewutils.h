@@ -22,6 +22,8 @@
 #ifndef VIEWUTILS_H
 #define VIEWUTILS_H
 
+#include <QComboBox>
+#include <QLabel>
 
 #define BUILD_MENU_ACTION_IMPL(title, item, func) \
 UITableMenuAction::build(title, this, item) \
@@ -38,5 +40,12 @@ class ViewUtils
 {
 public:
     static void cleanupTableItems(QTableWidget* tbl);
+    /**
+     * @brief update page info, 0 to clear
+     * @param page
+     * @param totalItems
+     */
+    static void updatePageInfo(QComboBox* cbPage, QLabel* lblPage,
+                               qint32 page, qint32 total, qint32 itemPerPage);
 };
 #endif // VIEWUTILS_H

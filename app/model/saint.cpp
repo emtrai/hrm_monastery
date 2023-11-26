@@ -56,12 +56,6 @@ void Saint::clone(const DbModel *model)
     traceout;
 }
 
-void Saint::init()
-{
-    tracein;
-    initImportFields();
-}
-
 
 void Saint::initImportFields()
 {

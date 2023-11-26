@@ -216,7 +216,7 @@ protected:
     virtual QString getTitle();
     virtual QStringList getHeader();
     virtual void showEvent(QShowEvent *ev);
-    virtual ErrCode onUpdatePage(qint32 page);
+    virtual ErrCode onUpdatePage(qint32 page, bool updatePage = true);
     virtual void onUpdatePageDone(ErrCode err, qint32 page, qint32 totalpages, qint32 totalItems);
     virtual ErrCode getListTableRowItems(qint32 page, qint32 perPage, qint32 totalPages,
                                                       QList<UITableItem*>& items) = 0;
@@ -298,6 +298,13 @@ protected:
      */
     virtual QHash<QString, QString> getFilterKeywords(int fieldId, const QString& fieldText);
 
+    /**
+     * @brief update page info, 0 to clear
+     * @param page
+     * @param totalItems
+     */
+    void updatePageInfo(qint32 page, qint32 totalItems = 0);
+
 signals:
     void signalDeleteDone(ErrCode err, QString msg);
     void signalRequestReload();
@@ -313,6 +320,8 @@ private slots:
 
     void on_cbCategory_currentIndexChanged(int index);
     void onRequestReload();
+
+    void on_cbPage_currentIndexChanged(int index);
 
 protected:
     QStringList mHeader;

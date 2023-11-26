@@ -76,10 +76,6 @@ protected:
 
     virtual void initFilterFields();
 
-    virtual int onFilter(int catetoryid,
-                          const QString& catetory,
-                          qint64 opFlags,
-                          const QString& keywords, const QVariant *value);
     virtual void onImportStart(const QString& importName, const QString& fpath, ImportType type);
     virtual void onImportEnd(const QString& importName, ErrCode err, const QString& fpath, ImportType type);
 
@@ -90,6 +86,8 @@ protected:
     virtual ErrCode updatePersonEvent(const QList<DbModel*>& perList, const PersonEvent* event = nullptr);
 
     virtual ImportTarget getImportTarget();
+    virtual int getCategoryId(int currCategoryId, const QString& keywords,
+                              const QVariant *value = nullptr);
 private:
     void cleanUpItem();
     ErrCode buildPersonCommunityChangeEventList(const QList<DbModel *> & perList,

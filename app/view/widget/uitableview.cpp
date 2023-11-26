@@ -34,6 +34,7 @@
 #include "viewutils.h"
 #include "stringdefs.h"
 
+#define ITEMS_PER_PAGE (50)
 
 /****************************************************************************
  * UITableItem
@@ -348,7 +349,7 @@ UITableMenuAction *UITableMenuAction::addItemList(UITableItem *newItemList)
 {
     tracein;
     if (newItemList != nullptr) {
-        mItemList.append(newItemList->clone());
+        mItemList.insert(mItemList.size(), newItemList->clone());
     }
     traceout;
     return this;
@@ -373,7 +374,7 @@ UITableView::UITableView(QWidget *parent) :
     QFrame(parent),
     BaseView(),
     ui(new Ui::UITableView),
-    mItemPerPage(0),
+    mItemPerPage(ITEMS_PER_PAGE),
     mMenu(nullptr),
     mSuspendReloadOnDbUpdate(false)
 {
@@ -487,7 +488,7 @@ void UITableView::showEvent(QShowEvent *ev)
     traceout;
 }
 
-ErrCode UITableView::onUpdatePage(qint32 page)
+ErrCode UITableView::onUpdatePage(qint32 page, bool updatePage)
 {
     QTableWidget* tbl = ui->tblList;
     qint32 totalPages = 0;
@@ -500,11 +501,12 @@ ErrCode UITableView::onUpdatePage(qint32 page)
     cleanupTableItems();
 
     qint32 total = getTotalModelItems();
+    dbgd("update page %d, total item %d", page, total);
     if (total > 0){
         // TODO: remove paging, as it not need????
         qint32 perPage = ((mItemPerPage != 0) && (mItemPerPage < total))?mItemPerPage:total;
-        totalPages = total/perPage;
-        logd("total %d perpage %d totaPage %d", total, perPage, totalPages);
+        totalPages = total/perPage + ((total%perPage == 0)?0:1);
+        logi("total %d perpage %d totaPage %d", total, perPage, totalPages);
         err = getListTableRowItems(page, perPage, totalPages, mItemList);
         if (err == ErrNone) {
             int idx = tbl->rowCount();
@@ -512,6 +514,7 @@ ErrCode UITableView::onUpdatePage(qint32 page)
                 if (!item) continue;
                 tbl->insertRow(idx);
                 QStringList values = item->valueList();
+                logd("add item '%s'", MODELSTR2CHA(item->data()));
                 for (int i = 0; i < values.count(); ++i) {
                     UITableCellWidgetItem* cell =
                         UITableCellWidgetItem::build(values.value(i), i, idx, item);
@@ -529,7 +532,14 @@ ErrCode UITableView::onUpdatePage(qint32 page)
             }
         } else {
             loge("failed to get list of table row items, err %d", err);
+            RELEASE_LIST(mItemList, UITableItem);
         }
+
+        if (err == ErrNone && updatePage) {
+            updatePageInfo(page, total);
+        }
+    } else {
+        updatePageInfo(0);
     }
     onUpdatePageDone(err, total, totalPages, total);
     traceout;
@@ -1005,6 +1015,13 @@ QHash<QString, QString> UITableView::getFilterKeywords(int fieldId, const QStrin
     return QHash<QString, QString>();
 }
 
+void UITableView::updatePageInfo(qint32 page, qint32 total)
+{
+    tracein;
+    ViewUtils::updatePageInfo(ui->cbPage, ui->lblPage, page, total, mItemPerPage);
+    traceout;
+}
+
 
 ErrCode UITableView::doFilter(int field, int op, const QVariant& keyword)
 {
@@ -1284,6 +1301,28 @@ void UITableView::onRequestReload()
 {
     tracein;
     reload();
+    traceout;
+}
+
+
+void UITableView::on_cbPage_currentIndexChanged(int index)
+{
+    tracein;
+    int page = 0;
+    logd("idx %d", index);
+    QVariant value = ui->cbPage->itemData(index);
+    if (value.isValid()) {
+        bool ok = false;
+        page = value.toInt(&ok);
+        if (!ok) {
+            loge("invalid value");
+            page = 0;
+        }
+    }
+    if (page > 0) {
+        logd("update page %d", page);
+        onUpdatePage(page);
+    }
     traceout;
 }
 

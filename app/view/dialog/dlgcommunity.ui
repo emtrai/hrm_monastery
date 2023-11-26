@@ -23,9 +23,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>-335</y>
         <width>462</width>
-        <height>1025</height>
+        <height>1061</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -291,6 +291,16 @@
             </widget>
            </item>
           </layout>
+         </item>
+         <item row="11" column="0">
+          <widget class="QLabel" name="label_20">
+           <property name="text">
+            <string>Sứ vụ</string>
+           </property>
+          </widget>
+         </item>
+         <item row="11" column="1">
+          <widget class="QComboBox" name="cbMission"/>
          </item>
         </layout>
        </item>

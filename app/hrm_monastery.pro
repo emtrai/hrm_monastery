@@ -19,6 +19,7 @@ CONFIG += console
 DEFINES += DEBUG_TRACE
 DEFINES += DEBUG_LOG
 DEFINES += LOG_LEVEL=4
+DEFINES += AUTO_BACKUP_TIME_SEC=60
 
 DEFINES += VER_MAJOR=0
 DEFINES += VER_MINOR=1
@@ -124,6 +125,7 @@ SOURCES += \
     db/sqlite/table/dbsqlsequencetbl.cpp \
     dbmodelutils.cpp \
     dialogutils.cpp \
+    errcode.cpp \
     exception/exception.cpp \
     image/image.cpp \
     image/imagectl.cpp \

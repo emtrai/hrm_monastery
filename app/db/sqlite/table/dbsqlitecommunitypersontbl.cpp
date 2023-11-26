@@ -83,7 +83,7 @@ QList<Person *> DbSqliteCommunityPersonTbl::getListPerson(const QString &communi
     if (!cond.isEmpty()) {
         queryString += " WHERE " + cond;
     }
-    queryString += " ORDER BY name ASC";
+    appendOrderQueryString(queryString, QString("%1.%2").arg(KTablePerson, KFieldFirstName));
     qry.prepare(queryString);
     dbg(LOG_DEBUG, "Query String '%s'", STR2CHA(queryString));
 
@@ -151,6 +151,7 @@ QList<DbModel *> DbSqliteCommunityPersonTbl::getListCommunityPerson(
                               .arg(name(), cond) // 1, 2
         ;
 
+    appendOrderQueryString(queryString);
     qry.prepare(queryString);
     logd("Query String '%s'", queryString.toStdString().c_str());
 

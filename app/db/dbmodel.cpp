@@ -100,6 +100,7 @@ void DbModel::copy(const DbModel *model)
 DbModel::~DbModel()
 {
     traced;
+    logd("free model '%s'", MODELSTR2CHA(this));
 }
 
 void DbModel::init()

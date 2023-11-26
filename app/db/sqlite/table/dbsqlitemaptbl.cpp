@@ -141,6 +141,7 @@ QList<DbModel *> DbSqliteMapTbl::getListItemsWithCond(const QString &mapTblName,
                                                   fieldUid2Join, fieldModelUid,
                                                   cond, status, selectedField);
     dbg(LOG_DEBUG, "Query String '%s'", STR2CHA(queryString));
+    appendOrderQueryString(queryString);
     qry.prepare(queryString);
 
     // TODO: status check???
@@ -178,10 +179,11 @@ QList<DbModel *> DbSqliteMapTbl::getListItemsUids(const QString &uid1, const QSt
     cond = QString("(%1) AND (%2)").arg(uid1Cond, uid2Cond);
     appendModelStatusCond(cond, modelStatus);
     logd("cond='%s'", STR2CHA(cond));
-    QString queryString = QString("SELECT * FROM %1 WHERE %2 ORDER BY NAME ASC")
+    QString queryString = QString("SELECT * FROM %1 WHERE %2")
                               .arg(name(), cond)
         ;
 
+    appendOrderQueryString(queryString);
     qry.prepare(queryString);
     dbg(LOG_DEBUG, "Query String '%s'", queryString.toStdString().c_str());
 

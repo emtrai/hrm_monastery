@@ -29,6 +29,7 @@
 #include "saint.h"
 #include "dialogutils.h"
 #include "stringdefs.h"
+#include "mainwindow.h"
 
 DlgSaint::DlgSaint(QWidget *parent) :
     QDialog(parent),
@@ -40,9 +41,9 @@ DlgSaint::DlgSaint(QWidget *parent) :
 
     logd("Load country");
     QList<DbModel*> listCountry = COUNTRYCTL->getAllItemsFromDb();
-    logd("Found %d country", listCountry.length());
+    logd("Found %lld country", listCountry.length());
+    ui->cbCountry->addItem(STR_UNKNOWN, KUidNone);
     foreach(DbModel* item, listCountry){
-        item->dump();
         ui->cbCountry->addItem(item->name(), item->uid());
     }
     // TODO: should manual clear item????
@@ -57,10 +58,8 @@ DlgSaint::DlgSaint(QWidget *parent) :
 
 DlgSaint::~DlgSaint()
 {
-    if (mSaint) {
-        delete mSaint;
-        mSaint = nullptr;
-    }
+    traced;
+    FREE_PTR(mSaint);
     delete ui;
 }
 
@@ -88,10 +87,10 @@ void DlgSaint::accept()
             ret = ErrFailed;
         }
     } else {
-        logd("No feastday");
+        dbgd("No feastday");
     }
 
-    if (warning.isEmpty()){
+    if (ret == ErrNone){
         if (mSaint == nullptr)
             mSaint = new Saint();
         mSaint->setName(name);
@@ -113,19 +112,13 @@ void DlgSaint::accept()
         logi("Save Saint to db, name %s", mSaint->name().toStdString().c_str());
         ret = mSaint->save();
         logd("save saint ret=%d", ret);
-        if (ret == ErrNone){
-            logd("all well, accept");
-            QDialog::accept();
-        }
-    } else {
-        DialogUtils::showErrorBox(warning);
     }
-
-}
-
-
-void DlgSaint::on_btnImport_clicked()
-{
+    if (ret == ErrNone){
+        logd("all well, accept");
+        QDialog::accept();
+    } else {
+        MAINWIN->showErrorBox(warning, ret);
+    }
 
 }
 
@@ -157,12 +150,14 @@ void DlgSaint::on_txtName_textChanged(const QString &arg1)
 void DlgSaint::on_btnChangeNameId_clicked()
 {
     tracein;
-    QString txt = ui->txtName->text().trimmed();
+    QString txt = ui->txtNameId->text().trimmed();
     bool ok = false;
-    QString nameId = DialogUtils::showInputDialog(this, tr("Định danh"), tr("Nhập mã định danh"), txt, &ok);
+    QString nameId = DialogUtils::showInputDialog(this,
+                                                  tr("Định danh"),
+                                                  tr("Nhập mã định danh"), txt, &ok);
     if (ok && !nameId.isEmpty()) {
         mCustomNameId = true;
-        ui->txtName->setText(nameId);
+        ui->txtNameId->setText(nameId);
         logd("custom name id '%s'", STR2CHA(nameId));
     } else {
         logd("no name id (ok=%d) or name id is empty", ok);

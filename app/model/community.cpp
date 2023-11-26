@@ -188,6 +188,10 @@ void Community::initExportFields()
         UNUSED(item);
         return ((Community*)model)->statusName();
     });
+    mExportCallbacks.insert(KItemStatusId, [](const DbModel* model, const QString& item){
+        UNUSED(item);
+        return QString::number(((Community*)model)->getStatus());
+    });
     mExportCallbacks.insert(KItemMission, [](const DbModel* model, const QString& item){
         UNUSED(item);
         return ((Community*)model)->missionNameString();
@@ -220,7 +224,7 @@ void Community::initImportFields()
 {
     tracein;
     DbModel::initImportFields();
-    mImportCallbacks.insert(KItemStatus, [this](const QString& value){
+    mImportCallbacks.insert(KItemStatusId, [this](const QString& value){
         this->setModelStatus(value.toInt()); // TODO: handle error case when convert to Int
         return ErrNone;
     });
@@ -625,6 +629,15 @@ void Community::setMissionName(const QStringList &newMissionName)
     mMissionName = newMissionName;
 }
 
+void Community::setMissionName(const QString &newMissionName)
+{
+    QStringList list;
+    if (!newMissionName.isEmpty()) {
+        list = newMissionName.split(MISSION_DELIM);
+    }
+    setMissionName(list);
+}
+
 void Community::addMissionName(const QString &newMissionName)
 {
     mMissionName.push_back(newMissionName);
@@ -638,6 +651,16 @@ const QStringList &Community::missionUid() const
 QString Community::missionUidString() const
 {
     return mMissionUid.isEmpty()?"":mMissionUid.join(MISSION_DELIM);
+}
+
+QString Community::mainMissionUid() const
+{
+    QString mainUid;
+    // TODO: ugly hack for single mission by using 1st element of mission uid
+    if (mMissionUid.size() > 0) {
+        mainUid = mMissionUid[0];
+    }
+    return mainUid;
 }
 
 void Community::setMissionUid(const QStringList &newMissionUid)

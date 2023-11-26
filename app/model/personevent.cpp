@@ -208,8 +208,8 @@ void PersonEvent::buildUidIfNotSet()
 
 DbModelHandler *PersonEvent::getDbModelHandler() const
 {
-//    return DB->getModelHandler(KModelHdlPersonEvent);
-    return DB->getModelHandler(KModelHdlPerson);
+    return DB->getModelHandler(KModelHdlPersonEvent);
+//    return DB->getModelHandler(KModelHdlPerson);
 }
 
 QString PersonEvent::personName() const

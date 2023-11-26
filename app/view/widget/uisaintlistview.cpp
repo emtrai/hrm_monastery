@@ -97,28 +97,6 @@ QString UISaintListView::getTitle()
     return STR_HOLLYNAME;
 }
 
-int UISaintListView::onFilter(int catetoryid, const QString &catetory, qint64 opFlags, const QString &keywords, const QVariant *value)
-{
-    tracein;
-    QList<DbModel*> list;
-    logd("Search %s", keywords.toStdString().c_str());
-    ErrCode ret = SAINTCTL->search(keywords, &list);
-    logd("Search ret %d", ret);
-    RELEASE_LIST_DBMODEL(mModelList);
-    // TODO: loop to much, redundant, do something better?
-    if (ret == ErrNone) {
-        foreach (DbModel* item, list) {
-            mModelList.append(static_cast<DbModel*>(item));
-            // TODO: should it be shared pointer or not???
-//            mItemList.append(std::shared_ptr<DbModel>(item));
-        }
-    } else {
-        logi("Nothing to add");
-    }
-    reload();
-    return mModelList.size();
-}
-
 DbModel *UISaintListView::onCreateDbModelObj(const QString& modelName)
 {
     return Saint::build();

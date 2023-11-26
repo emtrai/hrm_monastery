@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QString>
 #include <QList>
+#include <QMap>
 #include "errcode.h"
 
 #include "importfactory.h"
@@ -333,7 +334,7 @@ protected:
     bool mEnableCache;
     // cached item list, must clone data from cache, not get from it directly!!!!
     // data will also not sorted.
-    QHash<QString, DbModel*> mCacheItemList;
+    QMap<QString, DbModel*> mCacheItemList;
     bool mReloadDb;
     QList<OnModelControllerListener*> mListeners;
 public:

@@ -24,6 +24,8 @@
 
 #include <QString>
 
+#define ERRSTR(err) ErrMsg::errString(err)
+
 typedef enum ErrCode {
     ErrNone = 0,
     ErrFailed,
@@ -108,7 +110,7 @@ public:
         mMsg = newMsg;
     }
 
-
+    static const char* errString(ErrCode err);
 private:
     ErrCode mCode;
     QString mMsg;

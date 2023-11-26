@@ -45,12 +45,17 @@ static void initFieldMap()
         s_fieldMap[FILTER_FIELD_ADDRESS] = KFieldAddr;
         s_fieldMap[FILTER_FIELD_AREA] = KFieldAreaName;
         s_fieldMap[FILTER_FIELD_COMMUNITY] = KFieldCommunityName;
+        s_fieldMap[FILTER_FIELD_COMMUNITY_UID] = KFieldCommunityUid;
         s_fieldMap[FILTER_FIELD_DEPARTMENT] = KFieldDepartmentName;
         s_fieldMap[FILTER_FIELD_WORK] = KFieldWorkName;
+        s_fieldMap[FILTER_FIELD_WORK_UID] = KFieldWorkUid;
         s_fieldMap[FILTER_FIELD_EDUCATION] = KFieldEduName;
+        s_fieldMap[FILTER_FIELD_EDUCATION_UID] = KFieldEduUid;
         s_fieldMap[FILTER_FIELD_SPECIALIST] = KFieldSpecialistName;
+        s_fieldMap[FILTER_FIELD_SPECIALIST_UID] = KFieldSpecialistUid;
         s_fieldMap[FILTER_FIELD_MISSON] = KFieldMissionName;
         s_fieldMap[FILTER_FIELD_COURSE] = KFieldCourseName;
+        s_fieldMap[FILTER_FIELD_COURSE_UID] = KFieldCourseUid;
         s_fieldMap[FILTER_FIELD_MODEL_STATUS] = KFieldModelStatus;
         s_fieldMapInit = true;
     }

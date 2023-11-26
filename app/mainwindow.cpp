@@ -182,22 +182,22 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     dbg(LOG_DEBUG, "setup signal/slot connect");
-    if (!QObject::connect(this, SIGNAL(load()), this, SLOT(onLoad()), Qt::QueuedConnection)) {
+    if (!QObject::connect(this, &MainWindow::load, this, &MainWindow::onLoad, Qt::QueuedConnection)) {
         loge("Failed to connect load to onLoad");
     }
-    if (!QObject::connect(this, SIGNAL(unload()), this, SLOT(onUnload()), Qt::QueuedConnection)){
+    if (!QObject::connect(this, &MainWindow::unload, this, &MainWindow::onUnload, Qt::QueuedConnection)){
         loge("Failed to connect unload to onUnload");
     }
     if (!QObject::connect(this,
-                          SIGNAL(showMsgDlgSignal(QString)),
+                          &MainWindow::showMsgDlgSignal,
                           this,
-                          SLOT(onShowMsgDlg(QString)), Qt::QueuedConnection)) {
+                          &MainWindow::onShowMsgDlg, Qt::QueuedConnection)) {
         loge("Failed to connect showMsgDlgSignal to onShowMsgDlg");
     }
     if (!QObject::connect(this,
-                          SIGNAL(showErrorDlgSignal(ErrCode,QString)),
+                          &MainWindow::showErrorDlgSignal,
                           this,
-                          SLOT(onShowErrorMsgDlg(ErrCode,QString)), Qt::QueuedConnection)) {
+                          &MainWindow::onShowErrorMsgDlg, Qt::QueuedConnection)) {
         loge("Failed to connect showErrorDlgSignal to onShowErrorMsgDlg");
     }
 
@@ -391,16 +391,19 @@ void MainWindow::showMessageBox(const QString &msg)
 
 void MainWindow::showErrorBox(const QString &msg, ErrCode err)
 {
+    logd("emit error dlg with err=%d", err);
     emit showErrorDlgSignal(err, msg);
 }
 
 void MainWindow::showIfErrorBox(const QString &msg, ErrCode err)
 {
+    tracein;
     if(err != ErrNone) {
         showErrorBox(msg, err);
     } else {
         logd("not error, skip");
     }
+    traceout;
 }
 
 ErrCode MainWindow::doShowProcessingDialog(const QString& title,
@@ -1403,7 +1406,7 @@ void MainWindow::on_action_New_triggered()
     tracein;
     dbg(LOG_VERBOSE, "new community click");
     DlgPerson *dlg = DlgPerson::buildDlg(this);
-    if (!dlg) {
+    if (dlg) {
         dlg->exec();
         delete dlg;
     } else {

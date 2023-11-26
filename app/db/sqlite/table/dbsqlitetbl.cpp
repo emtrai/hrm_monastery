@@ -621,9 +621,10 @@ ErrCode DbSqliteTbl::checkMatch(const DbModel *item, int &perc)
     }
 
     if (err == ErrNone) {
-        QString queryString = QString("SELECT * FROM %1 WHERE %2 ORDER BY NAME ASC")
+        QString queryString = QString("SELECT * FROM %1 WHERE %2")
                                   .arg(name(), cond);
 
+        appendOrderQueryString(queryString);
         qry.prepare(queryString);
         dbgd("Query String '%s'", STR2CHA(queryString));
 
@@ -764,9 +765,10 @@ bool DbSqliteTbl::isExist(const DbModel *item)
             }
 
             if (err == ErrNone) {
-                QString queryString = QString("SELECT * FROM %1 WHERE %2 ORDER BY NAME ASC")
+                QString queryString = QString("SELECT * FROM %1 WHERE %2")
                                           .arg(name(), cond);
 
+                appendOrderQueryString(queryString);
                 qry.prepare(queryString);
                 dbgd("Query String '%s'", STR2CHA(queryString));
 
@@ -950,23 +952,33 @@ ErrCode DbSqliteTbl::filterFieldCond(int fieldId,
     }
 
     if (err == ErrNone) {
+
+        switch (fieldId) {
+            // special case, field full name is combination, not belong to any table?
+            // TODO: make it generic
+            case FILTER_FIELD_FULL_NAME:
+                dataType = TEXT;
+                break;
+            default:
+                err = getDataType(fieldName, dataType);
+                break;
+        }
+
+    }
+    if (err == ErrNone) {
         switch (fieldId) {
         case FILTER_FIELD_NAME:
             field = QString("%1.%2").arg(name(), fieldName);
-            dataType = TEXT;
             break;
         case FILTER_FIELD_MODEL_STATUS:
-            field = fieldName;
-            dataType = INT64;
+            field = QString("%1.%2").arg(name(), fieldName);
             break;
         case FILTER_FIELD_FULL_NAME:
             field = fieldName;
-            dataType = TEXT;
             break;
             // TODO: support more filter???
         default:
             field = fieldName;
-            dataType = TEXT;
             break;
         }
     }
@@ -980,6 +992,9 @@ ErrCode DbSqliteTbl::filterFieldCond(int fieldId,
         case FILTER_OP_NOT_EQUAL:
             cond = QString("lower(%1) != ").arg(field);
             isExact = true;
+            if (dataType == TEXT) {
+                cond = QString("%1 IS NULL OR ").arg(field) + cond;
+            }
             break;
 
         case FILTER_OP_CONTAIN:
@@ -989,6 +1004,9 @@ ErrCode DbSqliteTbl::filterFieldCond(int fieldId,
 
         case FILTER_OP_NOT_CONTAIN:
             cond = QString("lower(%1) not like ").arg(field);
+            if (dataType == TEXT) {
+                cond = QString("%1 IS NULL OR ").arg(field) + cond;
+            }
             isExact = false;
             break;
         case FILTER_OP_LESS:
@@ -1056,7 +1074,7 @@ ErrCode DbSqliteTbl::filter(int fieldId,
     if (err == ErrNone) {
         logd("Query cond '%s'", STR2CHA(cond));
         QString queryString = getFilterQueryString(fieldId, cond);
-
+        appendOrderQueryString(queryString);
         qry.prepare(queryString);
         dbgd("Query String '%s'", STR2CHA(queryString));
 
@@ -1072,7 +1090,7 @@ ErrCode DbSqliteTbl::filter(int fieldId,
         logi("Found %d for keyword '%s'", cnt, STR2CHA(keyword));
     }
 
-    logife(err, "filter failed err %d");
+    logife(err, "filter failed");
 
     traceret(err);
     return err;
@@ -1146,6 +1164,7 @@ ErrCode DbSqliteTbl::filter(const QList<FilterKeyworkItem *> &filters,
     if (err == ErrNone) {
         logd("Query cond '%s'", STR2CHA(cond));
         queryString = getFilterQueryString(filters, cond);
+        appendOrderQueryString(queryString);
         if (queryString.isEmpty()) {
             err = ErrInvalidQuery;
             loge("Invalid query string");
@@ -1365,8 +1384,8 @@ int DbSqliteTbl::runQuery(QSqlQuery &qry, const DbModelBuilder& builder,
                 logd("Updae model from query");
                 err = updateDbModelDataFromQuery(item, qry);
                 if (err == ErrNone) {
-                    logd("add model '%s' to outlist", STR2CHA(item->toString()));
-                    outList->append(item); // TODO: when it cleaned up?????
+                    logd("add model '%s' to outlist", MODELSTR2CHA(item));
+                    outList->insert(outList->size(), item); // TODO: when it cleaned up?????
                 } else {
                     logw("Update model from query err=%d", err);
                 }
@@ -1390,6 +1409,7 @@ QSqlQuery *DbSqliteTbl::getAllQuery(qint64 dbstatus)
     tracein;
     // TODO: check record status????
     QString queryString = getAllQueryString(dbstatus);
+    appendOrderQueryString(queryString);
     qry->prepare(queryString);
     dbgd("Query String '%s'", queryString.toStdString().c_str());
     traceout;
@@ -1432,6 +1452,34 @@ QString DbSqliteTbl::getCountTotalQueryString(const QString &cond, const QString
     return ret;
 }
 
+QString DbSqliteTbl::getOrderField()
+{
+    return KFieldName;
+}
+
+void DbSqliteTbl::appendOrderQueryString(QString &sql, const QString& orderfield)
+{
+    tracein;
+    QString field;
+    if (orderfield.isEmpty()) {
+        field = getOrderField();
+    } else {
+        field = orderfield;
+    }
+    logd("order field '%s'", STR2CHA(field));
+    logd("sql'%s'", STR2CHA(sql));
+    if (!field.isEmpty() && !sql.isEmpty()) {
+        if (!sql.contains("ORDER BY")) {
+            sql += QString(" ORDER BY %1 ASC").arg(field);
+        } else {
+            logw("ORDER By existed in '%s'", STR2CHA(sql));
+        }
+    } else {
+        logd("no order field or sql is empty");
+    }
+    traceout;
+}
+
 
 QList<DbModel *> DbSqliteTbl::getAll(const DbModelBuilder& builder, qint64 status,
                                      int from, int noItems, int* total)
@@ -1465,8 +1513,8 @@ QList<DbModel *> DbSqliteTbl::getAll(const DbModelBuilder& builder, qint64 statu
                 // TODO: validate value before, i.e. toInt return ok
                 err = updateDbModelDataFromQuery(item, *qry);
                 if (err == ErrNone) {
-                    logd("add model '%s' to outlist", STR2CHA(item->toString()));
-                    list.append(item); // TODO: when it cleaned up?????
+                    logd("add model '%s' to outlist", MODELSTR2CHA(item));
+                    list.insert(list.size(), item); // TODO: when it cleaned up?????
                 } else {
                     logw("Update model from query err=%d", err);
                 }
@@ -1493,9 +1541,10 @@ DbModel *DbSqliteTbl::getModel(qint64 dbId, const DbModelBuilder& builder)
     ErrCode err = ErrNone;
     DbModel* item = nullptr;
     // TODO: check record status????
-    QString queryString = QString("SELECT * FROM %1 where id=:id ORDER BY NAME ASC").arg(name());
+    QString queryString = QString("SELECT * FROM %1 where id=:id").arg(name());
     qry.prepare(queryString);
     dbgd("Query String '%s'", STR2CHA(queryString));
+    appendOrderQueryString(queryString);
 
     qry.bindValue(":id", dbId);
     if(!qry.exec() ){
@@ -1782,7 +1831,7 @@ ErrCode DbSqliteTbl::search(const QString &keyword, const DbModelBuilder &builde
     logi("Search '%s', status=%lld", keyword.toStdString().c_str(), dbStatus);
     logd("from %d noItems %d", from, noItems);
     ErrCode err = ErrNone;
-    err = search(keyword, inFields, builder, outList, dbStatus, from, noItems);
+    err = search(keyword, inFields, builder, outList, false, dbStatus, from, noItems);
     if (err == ErrNone && outList) {
         logd("found %lld item, total %d", outList->size(), total?*total:0);
     }
@@ -1877,7 +1926,8 @@ QString DbSqliteTbl::getSearchQueryStringWithTag(const QString &cond, const QStr
     if (!cond.isEmpty()) {
         queryString += QString(" WHERE %1").arg(cond);
     }
-    queryString += " ORDER BY name ASC ";
+
+    appendOrderQueryString(queryString);
     dbgd("queryString: %s", STR2CHA(queryString));
     traceout;
     return queryString;
@@ -1940,6 +1990,7 @@ ErrCode DbSqliteTbl::search(const QString& keyword, const QHash<QString, int>& i
 
     logd("Query cond '%s'", cond.toStdString().c_str());
     QString queryString = getSearchQueryString(cond);
+    appendOrderQueryString(queryString);
 
     qry.prepare(queryString);
     logi("Query String '%s'", STR2CHA(queryString));
@@ -2019,7 +2070,7 @@ ErrCode DbSqliteTbl::search(const QHash<QString, FieldValue> &searchCond,
 
     logd("Query cond '%s'", cond.toStdString().c_str());
     QString queryString = getSearchQueryStringWithTag(cond, condTag);
-
+    appendOrderQueryString(queryString);
     qry.prepare(queryString);
     logi("Query String '%s'", STR2CHA(queryString));
 

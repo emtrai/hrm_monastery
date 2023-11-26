@@ -39,6 +39,8 @@
 #include "personctl.h"
 #include "rolectl.h"
 #include "role.h"
+#include "mission.h"
+#include "missionctl.h"
 
 DlgCommunity::DlgCommunity(QWidget *parent) :
     DlgCommonEditModel(parent),
@@ -88,6 +90,11 @@ ErrCode DlgCommunity::buildModel(DbModel *model, QString& errMsg)
     }
     if (err == ErrNone){
         SET_VAL_FROM_VAL_CBOX(ui->cbArea, comm->setAreaUid, comm->setAreaName, err);
+    }
+    // TODO: we should support multiple missions
+    // currently, only one mission uid is supported
+    if (err == ErrNone){
+        SET_VAL_FROM_VAL_CBOX(ui->cbMission, comm->setMissionUid, comm->setMissionName, err);
     }
     if (err == ErrNone){
         SET_DATE_FORMAT_VAL_FROM_WIDGET(ui->txtFeaseDay, comm->setFeastDate, DATE_FORMAT_DM);
@@ -149,6 +156,9 @@ ErrCode DlgCommunity::fromModel(const DbModel *item)
         ui->txtFeaseDay->setText(DatetimeUtils::date2String(comm->feastDate(), DEFAULT_FORMAT_MD));
         ui->txtAddr->setPlainText(comm->addr());
         Utils::setSelectItemComboxByData(ui->cbCountry, comm->countryUid());
+        // TODO: ugly hack for single mission by using 1st element of mission uid
+        // we should support multiple missions
+        Utils::setSelectItemComboxByData(ui->cbMission, comm->mainMissionUid());
         ui->txtTel->setText(comm->tel());
         ui->txtEmail->setPlainText(comm->email());
         ui->txtChurch->setPlainText(comm->church());
@@ -179,6 +189,7 @@ void DlgCommunity::loadData()
     loadList(ui->cbArea, AREACTL, true);
     loadList(ui->cbCountry, COUNTRYCTL, true);
     loadList(ui->cbParentCommunity, COMMUNITYCTL, true);
+    loadList(ui->cbMission, MISSIONCTL, true);
     loadStatus();
     traceout;
 }
