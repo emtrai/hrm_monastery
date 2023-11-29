@@ -81,6 +81,42 @@ ErrCode AreaCtl::getContactPeopleList(const QString &areaUid, QList<DbModel *> &
     return err;
 }
 
+ErrCode AreaCtl::getCommunityList(const QString &areaUid, QList<DbModel *> &outList,
+                                      qint64 modelStatus)
+{
+    tracein;
+    ErrCode err = ErrNone;
+    DbAreaModelHandler* hdl = nullptr;
+    QList<DbModel *> items;
+    logd("get list of communites for areaUid '%s', status 0x%llx", STR2CHA(areaUid), modelStatus);
+    if (areaUid.isEmpty()) {
+        err = ErrInvalidArg;
+        loge("Get communites failed invalid args");
+    }
+
+    if (err == ErrNone) {
+        hdl = dynamic_cast<DbAreaModelHandler*>(DB->getModelHandler(KModelHdlArea));
+        if (!hdl) {
+            err = ErrInvalidData;
+            loge("not found handler, something was wrong");
+        }
+    }
+
+    if (err == ErrNone) {
+        items = hdl->getListCommunities(areaUid, modelStatus);
+        if (items.size() > 0) {
+            outList.append(items);
+        } else {
+            logw("not found list communites of areaUid '%s'", STR2CHA(areaUid));
+        }
+    }
+    logife(err, "Get list of communites failed");
+
+    traceout;
+    return err;
+
+}
+
 // Format: Country name id, name id, Name, remark
 DbModel* AreaCtl::buildModel(void *items, const QString &fmt)
 {

@@ -237,7 +237,39 @@ void Area::initExportFields()
         if (contactListStr.isEmpty()) {
             contactListStr = STR_NO_DATA;
         }
+        RELEASE_LIST_DBMODEL(contactList);
         return contactListStr;
+    });
+    mExportCallbacks.insert(KItemCommunityList, [](const DbModel* model, const QString& item){
+        QString communityListStr;
+        QList<DbModel *> communityListList;
+        ErrCode err = ErrNone;
+        if (!model) {
+            err = ErrInvalidModel;
+        }
+        dbg(LOG_VERBOSE, "get community list for model '%s'", MODELSTR2CHA(model));
+        if (err == ErrNone) {
+            err = AREACTL->getCommunityList(model->uid(), communityListList, MODEL_STATUS_ACTIVE);
+            logife(err, "failed to get community list for ''%s'", MODELSTR2CHA(model));
+        }
+
+        if (err == ErrNone) {
+            foreach (DbModel* item, communityListList) {
+                if (IS_MODEL_NAME(item, KModelNameCommunity)) {
+                    communityListStr += item->name() + "\n";
+                } else {
+                    loge("invalid model '%s', expected %s", MODELSTR2CHA(item), KModelNameAreaPerson);
+                }
+            }
+        }
+        if (err != ErrNone) {
+            communityListStr = QString(STR_DATA_ERROR_CODE).arg(err);
+        }
+        if (communityListStr.isEmpty()) {
+            communityListStr = STR_NO_DATA;
+        }
+        RELEASE_LIST_DBMODEL(communityListList);
+        return communityListStr;
     });
     // TODO: implement more
     traceout;

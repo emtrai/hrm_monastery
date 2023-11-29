@@ -37,15 +37,12 @@ public:
 
     QList<DbModel *> getListCommunitiesInArea(const QString &areaUid, int status = 0);
 protected:
-//    virtual QString getSqlCmdCreateTable();
-//    virtual ErrCode_t add(const DbModel* item);
+
     virtual void addTableField(DbSqliteTableBuilder* builder);
     virtual ErrCode insertTableField(DbSqliteInsertBuilder* builder, const DbModel *item);
     virtual ErrCode updateDbModelDataFromQuery(DbModel* item, const QSqlQuery& qry);
     virtual QString getSearchQueryString(const QString& cond = nullptr);
-//    virtual ErrCode updateBuilderFromModel(DbSqliteUpdateBuilder* builder,
-//                                     const QList<QString>& updateField,
-//                                     const DbModel *item);
+
 
     virtual ErrCode updateBuilderFieldFromModel(DbSqliteUpdateBuilder* builder,
                                                 const QString& field,

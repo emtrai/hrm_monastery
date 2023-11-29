@@ -65,12 +65,14 @@ QString UIAreaListView::getTitle()
 void UIAreaListView::initHeader()
 {
     tracein;
-    UICommonListView::initHeader();
+    mHeader.append(STR_NAMEID);
+    mHeader.append(STR_NAME);
     mHeader.append(STR_MODELSTATUS);
     mHeader.append(STR_COUNTRY);
     mHeader.append(STR_TEL);
     mHeader.append(STR_EMAIL);
     mHeader.append(STR_ADDR);
+    mHeader.append(STR_NOTE);
 
     traceout;
 }
@@ -85,13 +87,15 @@ ErrCode UIAreaListView::fillValueTableRowItem(DbModel *item, UITableItem *tblIte
     }
     if (err == ErrNone) {
         if (IS_MODEL_NAME(item, KModelNameArea)) {
-            UICommonListView::fillValueTableRowItem(item, tblItem, idx);
             Area* model = (Area*) item;
+            tblItem->addValue(item->nameId());
+            tblItem->addValue(item->name());
             tblItem->addValue(model->modelStatusName());
             tblItem->addValue(model->countryName());
             tblItem->addValue(model->tel());
             tblItem->addValue(model->email());
             tblItem->addValue(model->addr());
+            tblItem->addValue(item->remark());
         } else {
             loge("Not area model name, it's '%s'", STR2CHA(item->modelName()));
             err = ErrInvalidModel;

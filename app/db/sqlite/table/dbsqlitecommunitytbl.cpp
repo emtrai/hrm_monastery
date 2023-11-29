@@ -45,6 +45,7 @@ DbSqliteCommunityTbl::DbSqliteCommunityTbl(DbSqlite* db)
 QList<DbModel *> DbSqliteCommunityTbl::getListCommunitiesInArea(const QString &areaUid, int status)
 {
     tracein;
+    UNUSED(status);
     QList<DbModel *> olist;
     ErrCode ret = ErrNone;
     QHash<QString, int> fields;

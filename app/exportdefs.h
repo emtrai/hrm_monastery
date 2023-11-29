@@ -32,5 +32,6 @@ const char* const KItemTotalActivePeople = "TONG_NU_TU_HIEN_TAI";
 const char* const KItemTotalPeopleStatus = "TONG_NU_TU_TRANG_THAI";
 
 const char* const KItemContactPeopleList = "DANH_SACH_LIEN_LAC";
+const char* const KItemCommunityList = "DANH_SACH_CONG_DOAN";
 
 #endif // EXPORTDEFS_H

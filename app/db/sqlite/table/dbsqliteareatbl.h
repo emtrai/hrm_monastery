@@ -39,10 +39,6 @@ protected:
     virtual QString getSearchQueryString(const QString& cond = nullptr);
     virtual ErrCode onTblMigration(qint64 oldVer);
 
-//    virtual ErrCode updateBuilderFromModel(DbSqliteUpdateBuilder* builder,
-//                                     const QList<QString>& updateField,
-//                                     const DbModel *item);
-
     virtual ErrCode updateBuilderFieldFromModel(DbSqliteUpdateBuilder* builder,
                                                 const QString& field,
                                                 const DbModel *item);
