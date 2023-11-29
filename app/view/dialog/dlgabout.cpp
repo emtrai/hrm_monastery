@@ -47,7 +47,10 @@ DlgAbout::DlgAbout(QWidget *parent) :
     QString appInfo;
     // TODO: read somewhere????
     appInfo += QString(tr("\n------ Thông tin phiên bản ------\n"));
-    appInfo += QString(tr("- Phiên bản: %1 (0x%2)\n").arg(APP_VERSION).arg(APP_VERSION_CODE, 16));
+    appInfo += QString(tr("- Phiên bản: %1_%2 (0x%3)\n")
+                           .arg(APP_VERSION)
+                           .arg(STRINGIFY(BUILD_MODE))
+                           .arg((long)APP_VERSION_CODE, 0, 16));
     appInfo += QString(tr("- Ngày tạo: %1\n").arg(__DATE__));
     appInfo += QString(tr("Phiên bản dùng thử\n")); // TODO: load release info from file???
     appInfo += QString(tr("\n\n------ Thư mục dữ liệu ------\n"));

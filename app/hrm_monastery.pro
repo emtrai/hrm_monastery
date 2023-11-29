@@ -12,8 +12,8 @@ QT += printsupport
 
 DEFINES += FEATURE_system_sqlite=OFF
 
-#BUILD_MODE = RELEASE
-BUILD_MODE = DEBUG
+BUILD_MODE = RELEASE
+#BUILD_MODE = DEBUG
 
 
 #DEFINES += TEST_ENABLE
@@ -30,7 +30,8 @@ equals(BUILD_MODE, RELEASE): DEFINES += LOG_LEVEL=2
 
 DEFINES += VER_MAJOR=0
 DEFINES += VER_MINOR=1
-DEFINES += VER_PATCH=3
+DEFINES += VER_PATCH=4
+DEFINES += BUILD_MODE=$${BUILD_MODE}
 
 # Supporting provine for person is quite complicated
 # as it need to sync up with country
