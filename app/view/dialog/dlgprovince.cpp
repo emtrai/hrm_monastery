@@ -111,7 +111,7 @@ void DlgProvince::accept()
     if (ret == ErrNone)
         QDialog::accept();
     else
-        DialogUtils::showErrorBox(QString(tr("Lỗi ! Mã lỗi %1").arg(ret)));
+        DialogUtils::showErrorBox(ret, QString(tr("Lỗi lưu dữ liệu")));
 }
 
 void DlgProvince::on_btnAddCountry_clicked()

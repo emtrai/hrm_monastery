@@ -92,7 +92,11 @@ QString FileCtl::getAppWorkingDataDir()
 
 QString FileCtl::getAppBackupDataDir(const QString &subDir)
 {
-    return getAppDataSubdir(KBackupDirName, subDir);
+    QString bkdir = getSystemAppDataDir(KBackupDirName);
+    if (!subDir.isEmpty()) {
+        bkdir = QDir(bkdir).filePath(subDir);
+    }
+    return bkdir;
 }
 
 QString FileCtl::getAppBackupDataDir()
@@ -236,6 +240,28 @@ QString FileCtl::getAppLocalDataDir(const QString& subDir)
 QString FileCtl::getAppDataDir()
 {
     return getAppDataDir(QString());
+}
+
+QString FileCtl::getSystemAppDataDir(const QString& subDir)
+{
+    QStringList locations =
+        QStandardPaths::standardLocations(QStandardPaths::AppDataLocation);
+    QString rootDir;
+    QString finalDir;
+
+    if (locations.size() > 0) {
+        rootDir = locations[0];
+    } else {
+        rootDir = getAppDataDir();
+    }
+    logd("Root dir '%s'", STR2CHA(rootDir));
+    if (subDir.isEmpty()) {
+        finalDir = rootDir;
+    } else {
+        finalDir = QDir(rootDir).filePath(subDir);
+    }
+    logd("finalDir '%s'", STR2CHA(finalDir));
+    return finalDir;
 }
 
 QString FileCtl::tmpDataDir(const QString &subDir)
@@ -426,10 +452,11 @@ bool FileCtl::checkPrebuiltDataFileHash(const QString &fname)
     if (ret == ErrNone){
         QString hash = Crypto::hashFile(getPrebuiltDataFilePath(fname));
         if (fileHash.compare(hash, Qt::CaseInsensitive) == 0){
-            logi("Hash file match");
+            dbgd("Hash file match");
             match = true;
         } else{
-            logi("Hash file not match");
+            logw("Hash file '%s' not match to hash '%s'",
+                 STR2CHA(fname), STR2CHA(hash));
         }
     } else {
         loge("Something stupid error here %d", ret);

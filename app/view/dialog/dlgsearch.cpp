@@ -213,9 +213,9 @@ ErrCode DlgSearch::onSearch(const QString &keyword)
             UNUSED(dlg);
             UNUSED(result);
             dbgd("Search result %d", err);
-            MAINWIN->showIfErrorBox(QString(tr("Tìm kiếm '%1' lỗi")).arg(keyword), err);
             return err;
         });
+    MAINWIN->showIfErrorBox(QString(tr("Tìm kiếm '%1' lỗi")).arg(keyword), err);
     traceout;
     return err;
 }
@@ -238,9 +238,9 @@ ErrCode DlgSearch::onGetAll()
             UNUSED(dlg);
             UNUSED(result);
             dbgd("Get all result %d", err);
-            MAINWIN->showIfErrorBox(QString(tr("Truy vấn thông tin lỗi")), err);
             return err;
         });
+    MAINWIN->showIfErrorBox(QString(tr("Truy vấn thông tin lỗi")), err);
     traceout;
     return err;
 }
@@ -263,10 +263,9 @@ ErrCode DlgSearch::onGetManagers()
             UNUSED(dlg);
             UNUSED(result);
             dbgd("Get manager result %d", err);
-
-            MAINWIN->showIfErrorBox(QString(tr("Truy vấn người quản lý lỗi")), err);
             return err;
         });
+    MAINWIN->showIfErrorBox(QString(tr("Truy vấn người quản lý lỗi")), err);
     traceout;
     return err;
 }

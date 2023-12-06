@@ -32,6 +32,7 @@
 #include "filectl.h"
 
 #include "configdefs.h"
+#include "controllerdefs.h"
 
 /*
  * log level:
@@ -52,7 +53,7 @@ Config *Config::getInstance()
     return gInstance;
 }
 
-ErrCode Config::init()
+ErrCode Config::initConfig()
 {
     traced;
     return getInstance()->doInit();
@@ -71,8 +72,32 @@ int Config::getLogLevel()
 #ifdef DEBUG_LOG
     return LOG_DEBUG;
 #else //!DEBUG_LOG
-    return CONFIG->getValue(CONFIG_LOG_LEVEL, DEFAULT_LOGLEVEL);
+    return CONFIG->getValueInt(CONFIG_LOG_LEVEL, DEFAULT_LOGLEVEL);
 #endif //DEBUG_LOG
+}
+
+quint64 Config::getMaxPersonCodeValue()
+{
+    return getInstance()->doGetMaxPersonCodeValue();
+}
+
+ErrCode Config::onLoad()
+{
+    // do nothing
+    return ErrNone;
+}
+
+QString Config::getName() const
+{
+    return KControllerConfig;
+}
+
+void Config::onUnload()
+{
+    if (mConfigUpdated) {
+        logi("Config is updated, store it");
+        saveConfig();
+    }
 }
 
 ErrCode Config::initDefaultConfig()
@@ -82,6 +107,7 @@ ErrCode Config::initDefaultConfig()
     mConfigKeyValue[CONFIG_PREFIX] = DEFAULT_PREFIX_PERSON;
     mConfigKeyValue[CONFIG_CODE_LENGTH] = QString::number(DEFAULT_CODE_LENGTH);
     mConfigKeyValue[CONFIG_LOG_LEVEL] = QString::number(DEFAULT_LOGLEVEL);
+    mConfigKeyValue[CONFIG_PERSON_CODE_VAL_MAX] = QString::number(0);
     traceret(err);
     return err;
 }
@@ -91,7 +117,7 @@ QString Config::doGetNextPersonalCode(qint64* code, ErrCode *outErr)
     tracein;
     ulong seq = 0;
     ErrCode err = ErrNone;
-    int maxSeqChar = getValue(CONFIG_CODE_LENGTH, DEFAULT_CODE_LENGTH);
+    int maxSeqChar = getValueInt(CONFIG_CODE_LENGTH, DEFAULT_CODE_LENGTH);
     QString prefix = mConfigKeyValue.value(CONFIG_PREFIX);
     if (!code) {
         logd("get from db");
@@ -142,7 +168,7 @@ QString Config::getValue(QString key, QString* defaultValue, bool *ok)
     return value;
 }
 
-quint64 Config::getValue(QString key, quint64 defaultValue, bool *ok)
+quint64 Config::getValueInt(QString key, quint64 defaultValue, bool *ok)
 {
     QString value;
     quint64 valueInt = defaultValue;
@@ -166,6 +192,18 @@ quint64 Config::getValue(QString key, quint64 defaultValue, bool *ok)
     return valueInt;
 }
 
+ErrCode Config::setValueInt(QString key, quint64 value)
+{
+    dbgd("set config value key '%s' = %lld", STR2CHA(key), value);
+    mConfigKeyValue[key] = QString::number(value);
+    mConfigUpdated = true;
+    return ErrNone;
+}
+
+quint64 Config::doGetMaxPersonCodeValue()
+{
+    return getValueInt(CONFIG_PERSON_CODE_VAL_MAX, 0);
+}
 
 
 ErrCode Config::loadConfig()
@@ -173,18 +211,18 @@ ErrCode Config::loadConfig()
     tracein;
     ErrCode err = ErrNone;
     QDir dataDir(FileCtl::getAppWorkingDataDir());
-    QString fpath = dataDir.absoluteFilePath(CONFIG_FNAME);
+    mConfigPath = dataDir.absoluteFilePath(CONFIG_FNAME);
     QMap<QString, QString> config;
-    logd("Parse config file '%s'", STR2CHA(fpath));
-    err = parseConfig(fpath, config);
+    logi("Parse config file '%s'", STR2CHA(mConfigPath));
+    err = parseConfig(mConfigPath, config);
     if (err == ErrNone && config.size() > 0) {
         logd("Assign to %lld item to main config", config.size());
         foreach(QString key, config.keys()) {
             mConfigKeyValue[key] = config[key];
         }
     } else if (err == ErrNotExist) {
-        loge("config file '%s' not exist, store default one", STR2CHA(fpath));
-        err = saveConfig(fpath);
+        logi("config file '%s' not exist, store default one", STR2CHA(mConfigPath));
+        err = saveConfig(mConfigPath);
     }
     Logger::setLogLevel(getLogLevel());
     dumpConfig();
@@ -257,12 +295,12 @@ ErrCode Config::saveConfig(const QString &fpath, const QMap<QString, QString> &c
     }
     if (err == ErrNone) {
         QFile file(fpath);
-        logi("Write %lld item to file '%s'", config.size(), STR2CHA(fpath));
+        logi("Write %lld item to config file '%s'", config.size(), STR2CHA(fpath));
         if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
             QTextStream stream(&file); // TODO: catch exception????
             foreach (QString key, config.keys()) {
                 QString item = QString("%1%2%3\n").arg(key).arg(SPLIT).arg(config[key]);
-                logd("Write to config file '%s'", STR2CHA(item));
+                dbgd("Write to config file '%s'", STR2CHA(item));
                 stream << item;
             }
             file.close();
@@ -277,6 +315,19 @@ ErrCode Config::saveConfig(const QString &fpath)
 {
     traced;
     return saveConfig(fpath, mConfigKeyValue);
+}
+
+ErrCode Config::saveConfig()
+{
+    ErrCode err = ErrNone;
+    traceout;
+    if (!mConfigPath.isEmpty()) {
+        err = saveConfig(mConfigPath);
+    } else {
+        logd("no config path to save");
+    }
+    traceret(err);
+    return err;
 }
 
 void Config::dumpConfig()
@@ -299,8 +350,48 @@ QString Config::getAutoBackupDirPath()
     return FileCtl::getAppBackupDataDir();
 }
 
+ErrCode Config::updatePersonCode(const QString &personCode)
+{
+    ErrCode err = ErrNone;
+    tracein;
+    if (personCode.isEmpty()) {
+        err = ErrInvalidArg;
+        loge("invald value, empty person code");
+    }
+    if (err == ErrNone) {
+        logd("Update person code '%s'", STR2CHA(personCode));
+        QString prefix = getPersonCodePrefix();
+        bool ok = false;
+        quint64 currMaxCode = doGetMaxPersonCodeValue();
+        logd("perfix '%s', currMaxCode %lld", STR2CHA(prefix), currMaxCode);
+        quint64 code = personCode.mid(prefix.length()).toULong(&ok);
+        logd("code %lld", code);
+        if (ok) {
+            if (code > currMaxCode) {
+                dbgi("Update max person code %lld", code);
+                err = setValueInt(CONFIG_PERSON_CODE_VAL_MAX, code);
+            } else {
+                logd("new code %lld is less than max %lld", code, currMaxCode);
+            }
+        } else {
+            err = ErrInvalidArg;
+            loge("failed to parse person code '%s'", STR2CHA(personCode));
+        }
+    }
+    traceret(err);
+    return err;
+}
 
-Config::Config()
+QString Config::getPersonCodePrefix()
+{
+    QString prefix;
+    bool ok = false;
+    prefix = getValue(CONFIG_PREFIX, NULL, &ok);
+    return prefix;
+}
+
+
+Config::Config():mConfigUpdated(false)
 {
     traced;
 }

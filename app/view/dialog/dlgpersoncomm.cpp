@@ -212,6 +212,7 @@ void DlgPersonCommunity::accept()
     QString remark = ui->txtRemark->toPlainText();
     int startDate = DatetimeUtils::dateFromString(ui->txtStartDate->text());
     int endDate = DatetimeUtils::dateFromString(ui->txtEndDate->text());
+    bool callListener = false;
     logd("model status = 0x%x", modelStatus);
     logd("community '%s'", MODELSTR2CHA(mCommunity));
     logd("startDate = 0x%x", startDate);
@@ -315,15 +316,11 @@ void DlgPersonCommunity::accept()
                 logi("Save/update ok , close dialog");
                 DialogUtils::showMsgBox(tr("Lưu thành công"));
             } else {
-                DialogUtils::showErrorBox(QString(tr("Lỗi, không thể lưu thông tin, mã lỗi %1 ('%2')"))
-                                        .arg(err).arg(errMsg));
+                DialogUtils::showErrorBox(err,
+                                          QString(tr("Lỗi, không thể lưu thông tin. %1"))
+                                        .arg(errMsg));
             }
-            if (mListener) {
-                logd("Call listener");
-                mListener->onDbModelReady(err, nullptr, this);// TODO: nullptr is ok?
-            } else {
-                logd("no listener to call");
-            }
+            callListener = true;
         }
     } else {
         logd("not mIsSelfSave, just call accept");
@@ -333,6 +330,14 @@ void DlgPersonCommunity::accept()
     mAcceptResult = err;
     if (err == ErrNone) {
         QDialog::accept();
+    }
+    if (callListener) {
+        if (mListener) {
+            logd("Call listener");
+            mListener->onDbModelReady(err, nullptr, this);// TODO: nullptr is ok?
+        } else {
+            logd("no listener to call");
+        }
     }
     traceout;
 }

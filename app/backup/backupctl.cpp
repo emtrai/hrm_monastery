@@ -24,7 +24,7 @@
 #include <QFileInfoList>
 #include <QTemporaryDir>
 #include <QDir>
-#include "QtGui/6.5.0/QtGui/private/qzipwriter_p.h"
+#include "QtGui/6.4.0/QtGui/private/qzipwriter_p.h"
 #include "filectl.h"
 #include "backupmetainfo.h"
 #include "controllerdefs.h"

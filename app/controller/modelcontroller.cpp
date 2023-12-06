@@ -707,7 +707,7 @@ ErrCode ModelController::check2UpdateDbFromPrebuiltFile(const QString &name, con
     tracein;
     ErrCode ret = ErrNone;
     QString fpath;
-    logd("check update for '%s', ftype '%s'", STR2CHA(name), STR2CHA(ftype));
+    dbgd("check update for '%s', ftype '%s'", STR2CHA(name), STR2CHA(ftype));
     if (name.isEmpty() || ftype.isEmpty()) {
         ret = ErrInvalidArg;
         loge("invalid argument");
@@ -723,16 +723,16 @@ ErrCode ModelController::check2UpdateDbFromPrebuiltFile(const QString &name, con
     }
     if (ret == ErrNone) {
         if (!FileCtl::checkPrebuiltDataFileHash(fpath)){
+            logi("Update data from prebuilt file '%s'", STR2CHA(fpath));
             ret = parsePrebuiltFile(FileCtl::getPrebuiltDataFilePath(fpath), ftype);
             if (ret == ErrNone){
                 FileCtl::updatePrebuiltDataFileHash(fpath);
-            }
-            else{
-                logi("Check to update db from file failed %d", ret);
+            } else{
+                loge("Check to update db from file failed %d", ret);
             }
         }
         else {
-            logi("Prebuilt saint file up-to-date");
+            dbgd("Prebuilt saint file up-to-date");
         }
     }
     traceret(ret);
@@ -742,15 +742,16 @@ ErrCode ModelController::check2UpdateDbFromPrebuiltFile(const QString &name, con
 ErrCode ModelController::check2UpdateDbFromPrebuiltFile()
 {
     tracein;
-    logd("check 2 update for controller %s", mName.toStdString().c_str());
+    dbgd("check 2 update for controller %s", STR2CHA(getName()));
     ErrCode ret = ErrNone;
     QString fname = getPrebuiltFileName();
     if (!fname.isEmpty()) {
-        logi("Check & load from prebuilt file");
+        logd("Check & load from prebuilt file");
         ret = check2UpdateDbFromPrebuiltFile(fname, getPrebuiltFileType());
         logd("check2UpdateDbFromPrebuiltFile ret=%d", ret);
     } else {
-        logi("Not load from prebuilt file, no prebuilt filename");
+        logi("Not load from prebuilt file, no prebuilt filename for controller '%s'",
+             STR2CHA(getName()));
     }
     traceret(ret);
     return ret;
@@ -764,7 +765,7 @@ ErrCode ModelController::doCsvParseOneItem(const QStringList &items, void *param
     if (!items.empty()) {
         DbModel* model = buildModel((void*)&items, KDataFormatStringList);
         if ((model != nullptr) && model->isValid()) {
-            logi("Save model '%s'", STR2CHA(model->toString()));
+            dbgd("Save model '%s'", STR2CHA(model->toString()));
             ret = model->save();
             logd("save ret = %d", ret);
             if (ret == ErrExisted) {

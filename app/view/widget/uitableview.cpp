@@ -395,8 +395,9 @@ UITableView::UITableView(QWidget *parent) :
     }
 
     if (!connect(this,
-                 SIGNAL(signalRequestReload()),
-                 SLOT(onRequestReload()))) {
+                 &UITableView::signalRequestReload,
+                 this,
+                 &UITableView::onRequestReload, Qt::QueuedConnection)) {
         loge("Failed to connect signalRequestReload to onRequestReload");
     }
 }
@@ -654,7 +655,6 @@ ErrCode UITableView::onDeleteItem(const QList<UITableItem *>& selectedItems)
                         errMsg = QString(tr("Đã xóa '%1' mục")).arg(cnt);
                     }
 
-                    mSuspendReloadOnDbUpdate = false;
                     emit this->signalDeleteDone(err, errMsg);
                     return err;
                 });
@@ -676,9 +676,9 @@ ErrCode UITableView::addMenuActionCallback(QList<UITableMenuAction *> &actionLis
 {
     logd("Add callback for menu action, no. item %lld", actionList.size());
     foreach (UITableMenuAction* act, actionList) {
-        if (act->menuType() != MENU_ACTION_SEPARATE) {
+        if (act && act->menuType() != MENU_ACTION_SEPARATE) {
             logd("connect for act '%s'", STR2CHA(act->text()));
-            disconnect(SIGNAL(QAction::triggered(bool)), this);
+//            disconnect(SIGNAL(QAction::triggered(bool)), this);
             connect(act, &QAction::triggered, this, [this, act](){
                 QAction *sentAct = qobject_cast<QAction *>(sender());
                 logd("lambda trigger call for menu sentAct '%s'", STR2CHA(sentAct->text()));
@@ -690,6 +690,7 @@ ErrCode UITableView::addMenuActionCallback(QList<UITableMenuAction *> &actionLis
             logd("action menuType separation, skip it");
         }
     }
+    return ErrNone;
 }
 
 
@@ -896,7 +897,7 @@ ErrCode UITableView::onMenuActionView(QMenu *menu, UITableMenuAction *act)
 ErrCode UITableView::onMenuActionReload(QMenu *menu, UITableMenuAction *act)
 {
     tracein;
-    reload();
+    requestReload();
     traceout;
     return ErrNone;
 }
@@ -1080,12 +1081,13 @@ void UITableView::cleanupMenuActions()
 void UITableView::onHandleSignalDeleteDone(ErrCode err, QString msg)
 {
     tracein;
+    mSuspendReloadOnDbUpdate = false;
     if (err != ErrNone) {
         loge("failed to delete item, err=%d", err);
-        DialogUtils::showErrorBox(QString(tr("Lỗi, mã lỗi: %1")).arg(err));
+        DialogUtils::showErrorBox(err, QString(tr("Lỗi xóa dữ liệu. %1")).arg(msg));
     } else {
         DialogUtils::showMsgBox(msg);
-        reload();
+        requestReload();
     }
     traceout;
 }
@@ -1215,7 +1217,7 @@ void UITableView::customMenuRequested(QPoint pos)
     QTableWidget *tbl = ui->tblList;
     QItemSelectionModel *select = tbl->selectionModel();
     QList<UITableItem*> selectedItem;
-    if (select->hasSelection()) {
+    if (select && select->hasSelection()) {
         QModelIndexList selected = select->selectedRows();
         logd("Selected %d rows", selected.count());
         QList<UITableItem*> items = getListAllTableRowItems();
@@ -1239,7 +1241,9 @@ void UITableView::customMenuRequested(QPoint pos)
 //    cell = ui->tblList->item(row, col);
     UITableCellWidgetItem *item = (UITableCellWidgetItem*)tbl->itemAt(pos);
     QMenu* menu = buildPopupMenu(item, selectedItem);
-    menu->popup(tbl->viewport()->mapToGlobal(pos));
+    if (menu) {
+        menu->popup(tbl->viewport()->mapToGlobal(pos));
+    }
 }
 
 

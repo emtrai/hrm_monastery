@@ -50,6 +50,7 @@ public:
      * @return
      */
     virtual QString getName() const = 0;
+    virtual QString getDisplayName() const;
 
     virtual void onUnload() = 0;
 };

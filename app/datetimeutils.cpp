@@ -56,7 +56,8 @@ QString DatetimeUtils::currentTimeToDatestring(const QString &format)
 }
 
 
-qint64 DatetimeUtils::dateFromString(const QString &date, const QString &f, bool* isOk)
+qint64 DatetimeUtils::dateFromString(const QString &date, const QString &f,
+                                     bool* isOk)
 {
     QStringList listFormat;
     QStringList listDate;
@@ -151,7 +152,8 @@ qint64 DatetimeUtils::dateFromString(const QString &date, const QString &f, bool
             ret = YMD_TO_INT(year, month, day);
         } else{
             ret = 0;
-            loge("Invalid data/format: parse faile");
+            loge("Invalid data/format: parse failed '%s' '%s'",
+                 STR2CHA(date), STR2CHA(f));
 
         }
     } else{

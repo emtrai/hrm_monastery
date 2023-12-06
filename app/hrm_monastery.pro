@@ -1,3 +1,10 @@
+APP_VER_MAJOR=1
+APP_VER_MINOR=0
+APP_VER_PATCH=0
+
+BUILD_MODE = RELEASE
+#BUILD_MODE = DEBUG
+
 QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -12,8 +19,6 @@ QT += printsupport
 
 DEFINES += FEATURE_system_sqlite=OFF
 
-BUILD_MODE = RELEASE
-#BUILD_MODE = DEBUG
 
 
 #DEFINES += TEST_ENABLE
@@ -28,9 +33,9 @@ DEFINES += AUTO_BACKUP_TIME_SEC=60
 
 equals(BUILD_MODE, RELEASE): DEFINES += LOG_LEVEL=2
 
-DEFINES += VER_MAJOR=0
-DEFINES += VER_MINOR=1
-DEFINES += VER_PATCH=4
+DEFINES += VER_MAJOR=$${APP_VER_MAJOR}
+DEFINES += VER_MINOR=$${APP_VER_MINOR}
+DEFINES += VER_PATCH=$${APP_VER_PATCH}
 DEFINES += BUILD_MODE=$${BUILD_MODE}
 
 # Supporting provine for person is quite complicated
@@ -567,6 +572,7 @@ DISTFILES += \
     res/communities_of_person_info_template.html \
     res/community_dept_export_template_vi.json \
     res/community_export_template_vi.json \
+    res/country_vi_full.csv \
     res/course_template.html \
     res/course_vi.csv \
     res/default_export_template_vi.json \
@@ -584,6 +590,7 @@ DISTFILES += \
     res/person_list_export_template.csv \
     res/person_list_export_template_vi.json \
     res/role_vi.csv \
+    res/saints_vi_full.csv \
     res/status_vi.csv \
     res/work_vi.csv
 

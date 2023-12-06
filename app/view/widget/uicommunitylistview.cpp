@@ -202,7 +202,7 @@ void UICommunityListView::onMainWindownImportEnd(ImportTarget target, ErrCode er
         mSuspendReloadOnDbUpdate = false;
         if (err == ErrNone && ready2FetchData()) {
             logi("reload data after import for target %d", target);
-            reload();
+            requestReload();
         } else {
             loge("Error %d so no update data, or not ready to fetch data", err);
         }

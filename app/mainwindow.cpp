@@ -60,7 +60,7 @@
 #include "stringdefs.h"
 #include "imagedefs.h"
 #include "statistic/statistic.h"
-
+#include "dbctl.h"
 
 #define ADD_MENU_ITEM(menu, func, name, iconPath) \
 do { \
@@ -97,11 +97,17 @@ MainWindow::MainWindow(QWidget *parent)
     , mCurrentView(nullptr)
     , mWaitDlg(nullptr)
     , mAppState(APP_STATE_NOT_READY)
+    , isFirstInit(false)
 {
     tracein;
-
-    QCoreApplication::setApplicationName(STR_APP_TITLE);
-    setWindowTitle( QCoreApplication::applicationName() );
+    // currently, judge app is first inited or not by checking if db file is existed.
+    // this is not really good solution, as app may be stopped while initializing, but
+    // still be marked as initialized later on.
+    // TODO: any more other checking method to judge if app first inited?
+    // i.e. create file like firstinit to mark initalization stage (store init stage)?
+    isFirstInit = !DB->isDbExist();
+    QCoreApplication::setApplicationName(STR_APP_NAME);
+    setWindowTitle(STR_APP_TITLE);
 
     // init order is important, take care of this
 
@@ -111,9 +117,11 @@ MainWindow::MainWindow(QWidget *parent)
     setAppState(APP_STATE_INITING);
     gInstance = this;
     ui->setupUi(this);
-
+    if (isFirstInit) {
+        logi("First init time");
+    }
     dbg(LOG_VERBOSE, "init config");
-    Config::init();
+    Config::initConfig();
 
     LOADERCTL->setOnFinishLoadListener(this, this);
     LOADERCTL->preLoad();
@@ -520,9 +528,9 @@ void MainWindow::onLoadController (Controller* ctl)
 {
     tracein;
     if (ctl) {
-        logi("on load ctrl %s", STR2CHA(ctl->getName()));
+        dbgd("on load ctrl %s", STR2CHA(ctl->getName()));
         if (mWaitDlg != nullptr) {
-            mWaitDlg->setMessage(QString(STR_INIT_COMPONENT).arg(ctl->getName()));
+            mWaitDlg->setMessage(QString(STR_INIT_COMPONENT).arg(ctl->getDisplayName()));
         }
     } else {
         loge("invalid controller");
@@ -583,14 +591,14 @@ ErrCode MainWindow::doShowImportPerson()
                                         tr("Excel (*.xlsx)"));
     // TODO: this is duplicate code, make it common please
     if (!fname.isEmpty()){
-        notifyMainWindownImportListenerStart(IMPORT_TARGET_PERSON);
         ret = showProcessingDialog(STR_IMPORT_DATA, nullptr,
-            [fname](ErrCode* err, void* data, DlgWait* dlg) {
+            [this, fname](ErrCode* err, void* data, DlgWait* dlg) {
                 UNUSED(data);
                 UNUSED(dlg);
                 ErrCode tmperr = ErrNone;
                 QList<DbModel*> *list = new QList<DbModel*>();
                 dbg(LOG_INFO, "Import from file %s", STR2CHA(fname));
+                this->notifyMainWindownImportListenerStart(IMPORT_TARGET_PERSON);
                 if (!list) {
                     loge("no memory to allocat list mode");
                     tmperr = ErrNoMemory;
@@ -625,10 +633,6 @@ ErrCode MainWindow::doShowImportPerson()
                 traceout;
                 return err;
             });
-        if (ret != ErrNone) {
-            loge("Failed to import, notify listener err = %d", ret);
-            notifyMainWindownImportListenerEnd(IMPORT_TARGET_PERSON, ret, nullptr);
-        }
     } else {
         loge("no file selected to import person?");
     }
@@ -651,6 +655,7 @@ ErrCode MainWindow::doShowImportCommunity()
     if (!fname.isEmpty()){
         QList<DbModel*> list;
         dbg(LOG_VERBOSE, "Import community from file %s", STR2CHA(fname));
+        notifyMainWindownImportListenerStart(IMPORT_TARGET_COMMUNITY);
         ErrCode ret = COMMUNITYCTL->importFromFile(KModelNameCommunity,
                                                    ImportType::IMPORT_XLSX,
                                                    fname, &list);
@@ -667,6 +672,7 @@ ErrCode MainWindow::doShowImportCommunity()
             err = ErrNoMemory;
             loge("no memory to craete result dialog");
         }
+        notifyMainWindownImportListenerEnd(IMPORT_TARGET_COMMUNITY, err, nullptr);
         RELEASE_LIST_DBMODEL(list);
     } else {
         logw("no file selected to import community?");
@@ -1257,7 +1263,11 @@ void MainWindow::onLoad()
         mWaitDlg = new DlgWait(this);
     }
     if (mWaitDlg) {
-        mWaitDlg->setMessage(STR_INITING);
+        if (isFirstInit) {
+            mWaitDlg->setTitle(STR_INITING_FIRST);
+        } else {
+            mWaitDlg->setTitle(STR_INITING_LONG);
+        }
         mWaitDlg->setAllowCancel(false);
         mWaitDlg->show(nullptr,
               nullptr,

@@ -44,6 +44,8 @@
 #include "controllerdefs.h"
 GET_INSTANCE_CONTROLLER_IMPL(PersonCtl)
 
+#define LOOP_NAME_ID_MAX_TIME (1000)
+
 ErrCode PersonCtl::getListPersonInCommunity(const QString &communityUid, QList<DbModel *>& list, qint32 status)
 {
     tracein;
@@ -173,14 +175,14 @@ DbModel *PersonCtl::doImportOneItem(const QString& importName, int importFileTyp
     logd("idx = %d", idx);
     person = (Person*)Person::build();
     if (person) {
-        bool ok = false;
-        qint64 code = 0;
-        qint64 seq = DB->getCurrentPersonCodeNumber(&ok);
-        if (!ok) {
-            loge("Get sequence number failed, restart from 1");
-            seq = 0;
-        }
-        code = idx + seq + 1;
+//        bool ok = false;
+//        qint64 code = 0;
+//        qint64 seq = DB->getCurrentPersonCodeNumber(&ok);
+//        if (!ok) {
+//            loge("Get sequence number failed, restart from 1");
+//            seq = 0;
+//        }
+//        code = idx + seq + 1;
         foreach (QString field, items.keys()) {
             QString value = items.value(field);
             logd("Import field %s", field.toStdString().c_str());
@@ -189,7 +191,13 @@ DbModel *PersonCtl::doImportOneItem(const QString& importName, int importFileTyp
         }
         if (ret == ErrNone && person->nameId().isEmpty()) {
             // TODO: should make temp code??? to distingue with official one
-            person->setNameId(CONFIG->getNextPersonalCode(&code));
+//            person->setNameId(CONFIG->getNextPersonalCode(&code));
+            QString codeStr;
+            qint64 code = 0;
+            ret = PERSONCTL->try2GetAvailableNameId(0, idx, codeStr, code);
+            if (ret == ErrNone) {
+                person->setNameId(codeStr);
+            }
             // TODO: numer is increased, but not save --> may cause much dummy code?
         }
     } else {
@@ -477,5 +485,102 @@ int PersonCtl::getTotalItemsByPersonStatus(const QString &statusUid)
 {
     dbg(LOG_DEBUG, "get total item by person status uid '%s'", STR2CHA(statusUid));
     return personModelHdl()->getTotalItemsByPersonStatus(statusUid);
+}
+
+ErrCode PersonCtl::try2GetAvailableNameId(qint64 initCode, qint64 offset,
+                                          QString &personCode, qint64& codeInt)
+{
+    ErrCode err = ErrNotFound;
+    quint64 seq = initCode;
+    bool ok = false;
+    tracein;
+
+    // try to get name id from:
+    // - init code
+    // - if not ok, get from config file
+    // - if not ok, get from seq number in db
+    // - if still not ok, last change is from 1
+    // There is still an issue with import, as there may be some "hole" in name id
+    // for example: if 10 people is imported, but only item 5-10 are valid, 1-4
+    // are invalid, but name is still assigned for item 1-4
+    // --> if saved, 5-10 are saved, name id assigned for 1-4 are not assigned to any people
+    // --> there is a waste in name id here
+    // TODO: solution to avoid "hole" in nameid when import
+
+    if (initCode > 0) {
+        dbgd("try to get person code from initCode %lld", initCode);
+        err = getAvailableNameId(initCode + offset, personCode, codeInt);
+    }
+    if (err == ErrNotFound) {
+        dbgd("try to get person code from max person code from config");
+        seq = CONFIG->getMaxPersonCodeValue();
+        if (seq > 0) {
+            err = getAvailableNameId(seq + 1 + offset, personCode, codeInt);
+        } else {
+            logi("no max current person code is set");
+        }
+    }
+    if (err == ErrNotFound) {
+        seq = DB->getCurrentPersonCodeNumber(&ok);
+        dbgd("try to get code from db sequence %lld", seq);
+        if (ok) {
+            err = getAvailableNameId(seq + 1 + offset, personCode, codeInt);
+        } else {
+            logw("Get sequence number failed");
+        }
+    }
+    if (err == ErrNotFound) {
+        logi("last chance, try to get person code from 1");
+        err = getAvailableNameId(1 + offset, personCode, codeInt);
+    }
+
+    traceret(err);
+    return err;
+}
+
+ErrCode PersonCtl::getAvailableNameId(qint64 initCode, QString &personCode, qint64& codeInt)
+{
+    ErrCode err = ErrNone;
+    qint64 code = 0;
+    QString codeStr;
+    int i = 0;
+    tracein;
+
+    dbgi("Get available name id with init code %lld", initCode);
+    for (i = 0; i < LOOP_NAME_ID_MAX_TIME; i++) {
+        code = initCode + i;
+        codeStr = CONFIG->getNextPersonalCode(&code);
+        logd("code to check '%s'", STR2CHA(codeStr));
+        if (!DB->getPersonModelHandler()->isNameidExist(codeStr, KModelNamePerson)) {
+            codeInt = code;
+            dbgi("found person code with code %lld", codeInt);
+            break;
+        }
+    }
+    if (i < LOOP_NAME_ID_MAX_TIME) {
+        personCode = codeStr;
+        dbgi("Found person code '%s'", STR2CHA(personCode));
+    } else {
+        loge("reach max %d, but not found valid name id to use", i);
+        err = ErrNotFound;
+    }
+
+    traceret(err);
+    return err;
+}
+
+void PersonCtl::onDbModelHandlerDataUpdate(DbModel *model, int type, ErrCode err)
+{
+    tracein;
+    ModelController::onDbModelHandlerDataUpdate(model, type, err);
+
+    logd("on db update for model '%s', type %d, err %d",
+         MODELSTR2CHA(model), type, err);
+    if (IS_MODEL_NAME(model, KModelNamePerson) && (err == ErrNone) &&
+        ((type == DBMODEL_CHANGE_ADD) || (type == DBMODEL_CHANGE_UPDATE))) {
+        logd("check to update person code in config");
+        CONFIG->updatePersonCode(model->nameId());
+    }
+    traceout;
 }
 

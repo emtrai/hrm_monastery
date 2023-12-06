@@ -39,18 +39,17 @@ class IDatabase
 public:
     IDatabase();
 
-
-    /**
-    * Add person to datablase
-    *
-    */
-//    virtual ErrCode_t addPerson(const Person* person) = 0;
-
     /**
     * Load database
     */
     virtual ErrCode_t loadDb(const DbInfo* dbInfo) = 0;
     virtual ErrCode validateDbInfo(const DbInfo* dbInfo) = 0;
+
+    /**
+     * @brief check if db exist
+     * @return
+     */
+    virtual bool isDbExist() = 0;
 
 
     virtual DbModelHandler* getEduModelHandler() = 0;

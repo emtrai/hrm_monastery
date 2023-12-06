@@ -21,7 +21,7 @@
  */
 #ifndef DATETIMEUTILS_H
 #define DATETIMEUTILS_H
-#include "QtCore/qtypes.h"
+
 #include <QString>
 
 #define DATE_FORMAT_MD "M/D"

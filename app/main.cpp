@@ -24,7 +24,7 @@
 #include <QApplication>
 #include <QLocale>
 #include <QTranslator>
-#include "logger.h"
+#include "stringdefs.h"
 
 int main(int argc, char *argv[])
 {
@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     // this is to avoid confliction when updating data
     MainWindow w;
     w.setWindowState(Qt::WindowState::WindowMaximized);
-    w.setWindowTitle("Quản lý hội dòng");
+    w.setWindowTitle(STR_APP_TITLE);
     w.show();
     return a.exec();
 }

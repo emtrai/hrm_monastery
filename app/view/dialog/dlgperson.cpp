@@ -1015,7 +1015,7 @@ void DlgPerson::on_buttonBox_clicked( QAbstractButton * button )
                 logd("Save/update ok, close dialog");
                 QDialog::accept();
             } else {
-                DialogUtils::showErrorBox(QString("Lỗi, không thể lưu thông tin, Mã lỗi %1").arg(ret));
+                DialogUtils::showErrorBox(ret, QString("Lỗi, không thể lưu thông tin"));
             }
         }
 
@@ -1125,7 +1125,7 @@ void DlgPerson::on_btnPreview_clicked()
         }
     } else {
         loge("Bild person failed, err=%d", ret);
-        DialogUtils::showErrorBox(QString("Có lỗi xảy ra, mã lỗi %1").arg(ret));
+        DialogUtils::showErrorBox(ret, QString("Có lỗi xảy ra khi 'xem trước' (preview)"));
     }
     traceout;
 }
@@ -1445,8 +1445,14 @@ void DlgPerson::setIsSelfSave(bool newIsSelfSave)
 void DlgPerson::loadPersonCode()
 {
     tracein;
-
-    ui->txtCode->setText(Config::getNextPersonalCode());
+    QString codeStr;
+    qint64 code = 0;
+    ErrCode err = PERSONCTL->try2GetAvailableNameId(0, 0, codeStr, code);
+    if (err == ErrNone) {
+        ui->txtCode->setText(codeStr);
+    } else {
+        loge("not found suitable name id");
+    }
 
     traceout;
 }

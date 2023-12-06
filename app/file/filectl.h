@@ -78,6 +78,7 @@ public:
     static QString getAppLocalDataDir(const QString& subDir);
     static QString getAppDataDir(const QString& subDir);
     static QString getAppDataDir();
+    static QString getSystemAppDataDir(const QString& subDir);
 
     QString tmpDataDir(const QString& subDir);
     QString tmpDataFile(const QString& fname);

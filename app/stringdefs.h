@@ -23,9 +23,12 @@
 #define STRINGDEFS_H
 #include <QObject>
 
+#define STR_APP_NAME            QObject::tr("QuanLyHoiDong")
 #define STR_APP_TITLE           QObject::tr("Quản lý Hội dòng")
 #define STR_INIT_COMPONENT      QObject::tr("Khởi tạo: %1")
 #define STR_INITING             QObject::tr("Đang khởi tạo")
+#define STR_INITING_LONG        QObject::tr("Đang khởi tạo. Có thể tốn nhiều thời gian để khởi tạo dữ liệu.")
+#define STR_INITING_FIRST       QObject::tr("Đang khởi tạo lần đầu. Khởi tạo dữ liệu ban đầu sẽ tốn thời gian. Vui lòng chờ 3-5 phút, không tắt ứng dụng trong thời gian này")
 #define STR_OK                  QObject::tr("Đồng ý")
 #define STR_YES                 QObject::tr("Có")
 #define STR_NO                  QObject::tr("Không")
@@ -36,6 +39,7 @@
 #define STR_HELP                QObject::tr("Giúp đỡ")
 #define STR_EXIT                QObject::tr("Thoát")
 #define STR_LIST                QObject::tr("Danh sách")
+#define STR_CONTROLER           QObject::tr("Trình Quản lý")
 
 #define STR_NO_DATA             QObject::tr("Không có dữ liệu")
 #define STR_INVALID_DATA        QObject::tr("Dữ liệu không hợp lệ.")

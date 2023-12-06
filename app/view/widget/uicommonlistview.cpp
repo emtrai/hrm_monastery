@@ -258,6 +258,7 @@ ErrCode UICommonListView::onLoad()
                     UNUSED(data);
                     UNUSED(dlg);
                     UNUSED(err);
+                    logd("get all data");
                     this->mModelList = getListDbModels();
                     return nullptr;//nothing to return
                 },
@@ -267,14 +268,13 @@ ErrCode UICommonListView::onLoad()
                     UNUSED(result);
                     UNUSED(dlg);
                     logd("Save result %d", err);
-                    if (err != ErrNone) {
-                        loge("load data failed, err=%d",err);
-                        REPORTERRCTL->reportErr(STR_QUERY_ERROR, err, true);
-                    }
-
                     clearFilter();
                     return err;
                 });
+            if (err != ErrNone) {
+                loge("load data failed, err=%d",err);
+                REPORTERRCTL->reportErr(STR_QUERY_ERROR, err, true);
+            }
         }
 
     } else {
@@ -351,8 +351,12 @@ QHash<QString, QString> UICommonListView::getFilterKeywords(int fieldId,
             }
         }
         break;
+    case FILTER_FIELD_NAME:
+        // do nothing, just to avoid below log is printed out too much,
+        // as field name is common one
+        break;
     default:
-        loge("Field %d not supported", fieldId);
+        logw("Field %d not supported", fieldId);
     };
     if (modelList.count() > 0) {
         foreach (DbModel* item, modelList) {
@@ -417,7 +421,13 @@ int UICommonListView::onFilter(int catetoryid, const QString &catetory,
                     return nullptr;//nothing to return
                 },
                 // finish callback
-                nullptr);
+                [](ErrCode err, void* data, void* result, DlgWait* dlg) {
+                    UNUSED(data);
+                    UNUSED(result);
+                    UNUSED(dlg);
+                    logd("Save result %d", err);
+                    return err;
+                });
 
         }
         logd("filter err %d", err);
@@ -519,17 +529,7 @@ void UICommonListView::onDbModelReady(ErrCode ret, DbModel *model, DlgCommonEdit
 {
     tracein;
     UNUSED(dlg);
-    if (ret == ErrNone) {
-#ifdef DEBUG_LOG
-        if (model){
-            model->dump();
-        }
-#endif
-        onReload();
-    } else {
-        loge("db model err = %d", ret);
-    }
-
+    // do nothing, data is update by callback onModelControllerDataUpdated
     traceout;
 }
 
@@ -560,7 +560,7 @@ void UICommonListView::onModelControllerDataUpdated(const DbModel *model)
         logd("main model name '%s'", STR2CHA(mainModelName));
         if (mainModelName.isEmpty() || (model && mainModelName == model->modelName())) {
             logd("reload");
-            reload();
+            requestReload();
         }
     } else {
         logw("Suspend reload on data update");
@@ -627,13 +627,10 @@ ErrCode UICommonListView::onMenuActionExport(QMenu *menu, UITableMenuAction *act
         }
     }
     if (err == ErrNone) {
-//         QMessageBox::information(this, STR_INFO, QString("Xuất dữ liệu ra tập tin: %1").arg(fpath),
-//                                                     QMessageBox::Close);
         MAINWIN->showMessageBox(QString("Xuất dữ liệu ra tập tin: %1").arg(fpath));
-//        DialogUtils::showMsgBox(QString("Xuất dữ liệu ra tập tin: %1").arg(fpath), this);
     } else {
         loge("export list failed, error code %d",err);
-        DialogUtils::showErrorBox(QString("Xuất dữ liệu lỗi, mã lỗi: %1").arg(err));
+        MAINWIN->showErrorBox(QString("Xuất dữ liệu lỗi"), err);
     }
 
     traceret(err);

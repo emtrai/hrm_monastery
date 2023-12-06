@@ -128,6 +128,7 @@ void DlgCommonEditModel::accept()
     QString errMsg;
     ErrCode ret = ErrNone;
     bool ok2Save = false;
+    bool callListener = false;
 
     logd("build model to save/return");
     DbModel* item = model();
@@ -165,12 +166,7 @@ void DlgCommonEditModel::accept()
             }
             logi("Save/Update result %d", ret);
 
-            if (mListener) {
-                logd("Call listener");
-                mListener->onDbModelReady(ret, item, this);
-            } else {
-                logd("no listener to call");
-            }
+            callListener = true;
         } else {
             logw("not mIsSelfSave, just call accept");
         }
@@ -192,6 +188,14 @@ void DlgCommonEditModel::accept()
         QDialog::accept();
     } else {
         loge("failed to save, error %d", ret);
+    }
+    if (callListener) {
+        if (mListener) {
+            logd("Call listener");
+            mListener->onDbModelReady(ret, item, this);
+        } else {
+            logd("no listener to call");
+        }
     }
     traceout;
 }

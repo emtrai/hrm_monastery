@@ -135,6 +135,18 @@ public:
      * @return > 0: the number of item, < 0: error code
      */
     int getTotalItemsByPersonStatus(const QString& statusUid);
+
+    /**
+     * @brief Try to search available name id to use, i.e. init from config file, db sequence number, etc.
+     * @param initCode init code to get name id, if 0, system will try other method to get it
+     * @param offset offset from init code (id = initCode + offset)
+     * @param[out] personCode output person code string
+     * @param[out] codeInt output code in integer
+     * @return ErrNone if ok, error code if failed (i.e. ErrNotFound)
+     */
+    ErrCode try2GetAvailableNameId(qint64 initCode, qint64 offset, QString& personCode, qint64& codeInt);
+    ErrCode getAvailableNameId(qint64 initCode, QString& personCode, qint64& codeInt);
+    virtual void onDbModelHandlerDataUpdate(DbModel* model, int type, ErrCode err);
 private:
     QList<QString> mImportFields;
 };

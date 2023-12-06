@@ -132,6 +132,7 @@ ErrCode UIPersonListView::onLoad()
                 items = PERSONCTL->getAllItems(true);
                 logd("found %lld item", items.size());
             }
+
             if (err) *err = ret;
             return nullptr;//nothing to return
        },
@@ -523,13 +524,13 @@ ErrCode UIPersonListView::onMenuActionChangeCommunity(QMenu *menu, UITableMenuAc
             nullptr, nullptr);
     }
     if (ret == ErrNone) {
-        MAINWIN->showMessageBox(QString(STR_CHANGE_COMMUNITY_FOR_PERSON)
+        DialogUtils::showMsgBox(QString(STR_CHANGE_COMMUNITY_FOR_PERSON)
                                     .arg(comm->name())
                                     .arg(peopleList.size())
                                 );
     } else {
         loge("Change community failed, err=%d", ret);
-        MAINWIN->showErrorBox(STR_FAILED_CHANGE_COMMUNITY, ret);
+        DialogUtils::showErrorBox(ret, STR_FAILED_CHANGE_COMMUNITY);
     }
 
     logd("reload list");
@@ -1061,7 +1062,7 @@ void UIPersonListView::onImportEnd(const QString &importName, ErrCode err,
     UNUSED(type);
     mSuspendReloadOnDbUpdate = false;
     logd("resume reload on db update");
-    reload();
+    requestReload();
     traceout;
 }
 
@@ -1077,7 +1078,7 @@ void UIPersonListView::onMainWindownImportEnd(ImportTarget target, ErrCode err, 
     UNUSED(err);
     UNUSED(importData);
     mSuspendReloadOnDbUpdate = false;
-    reload();
+    requestReload();
 }
 
 QString UIPersonListView::getMainModelName()

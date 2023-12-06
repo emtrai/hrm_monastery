@@ -310,5 +310,6 @@ public:
  private:
      static MainWindow* gInstance;
      QList<MainWindownImportListener*> mMainWindowImportListener;
+     bool isFirstInit;
 };
 #endif // MAINWINDOW_H

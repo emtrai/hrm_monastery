@@ -88,6 +88,12 @@ public:
     virtual ErrCode_t loadDb(const DbInfo* dbInfo);
     virtual ErrCode validateDbInfo(const DbInfo* dbInfo);
 
+    /**
+     * @brief check if db exist
+     * @return
+     */
+    virtual bool isDbExist();
+
     virtual ErrCode_t execQuery(const QString& sql);
     virtual ErrCode_t execQuery(QSqlQuery* qry);
     virtual ErrCode_t execQueryNoTrans(QSqlQuery* qry);

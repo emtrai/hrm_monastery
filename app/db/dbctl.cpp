@@ -62,6 +62,11 @@ QString DbCtl::getName() const
     return KControllerDb;
 }
 
+bool DbCtl::isDbExist()
+{
+    return mDatabase->isDbExist();
+}
+
 
 DbCtl* DbCtl::getInstance(){
     if (gInstance == nullptr){

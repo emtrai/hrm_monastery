@@ -260,6 +260,7 @@ ErrCode DlgImportListResult::onLoad()
                     widgetItem->setFlags(ITEM_NONE_CHECK);
                     widgetItem->setIcon(icDup);
                     widgetItem->setToolTip(STR_DATA_EXISTED);
+                    widgetItem->setText(STR_DATA_EXISTED);
                 } else {
                     ErrCode valRes = val->validateAllFields();
                     dbgd("model '%s' is not exist, valRes=%d",
@@ -271,6 +272,7 @@ ErrCode DlgImportListResult::onLoad()
                         widgetItem->setFlags(ITEM_NONE_CHECK);
                         widgetItem->setIcon(icNok);
                         widgetItem->setToolTip(STR_DATA_ERROR);
+                        widgetItem->setText(STR_DATA_ERROR);
                     }
                 }
 
@@ -278,6 +280,7 @@ ErrCode DlgImportListResult::onLoad()
                 widgetItem->setFlags(ITEM_NONE_CHECK);
                 widgetItem->setIcon(icNok);
                 widgetItem->setToolTip(STR_DATA_ERROR);
+                widgetItem->setText(STR_DATA_ERROR);
             }
             // col to indicate status of imported item
             tbl->setItem(idx, 0, widgetItem);
@@ -313,7 +316,7 @@ ErrCode DlgImportListResult::saveItems(const QList<DbModel *> &list)
     ErrCode ret = ErrNone;
     int cnt = 0;
     int total = list.size();
-    logd("save %lld items", total);
+    logd("save %d items", total);
     ret = MainWindow::showProcessingDialog(STR_SAVE_DATA, nullptr,
         [list, &cnt, total](ErrCode* err, void* data, DlgWait* dlg) {
             UNUSED(data);

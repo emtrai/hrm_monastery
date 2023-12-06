@@ -38,6 +38,7 @@ public:
     static IDatabase* getDb();
     IDatabase *database() const;
     virtual QString getName() const;
+    bool isDbExist();
 
 private:
     DbCtl();

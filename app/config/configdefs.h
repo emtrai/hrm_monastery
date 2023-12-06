@@ -28,5 +28,6 @@ const char* const DEFAULT_PREFIX_PERSON = "NUTU_";
 const char* const CONFIG_PREFIX = "codeprefix";
 const char* const CONFIG_CODE_LENGTH = "codelength";
 const char* const CONFIG_LOG_LEVEL = "loglevel";
+const char* const CONFIG_PERSON_CODE_VAL_MAX = "person_code_max";
 
 #endif // CONFIGDEFS_H

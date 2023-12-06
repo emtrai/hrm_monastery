@@ -44,6 +44,7 @@
 #include "communitydeptctl.h"
 #include "filectl.h"
 #include "backup/backupctl.h"
+#include "config.h"
 
 LoaderCtl* LoaderCtl::gInstance = nullptr;
 
@@ -80,6 +81,7 @@ void LoaderCtl::registerAll()
     tracein;
     dbgtrace;
     add2PreLoader(FileCtl::getInstance());
+    add2PreLoader(CONFIG);
     add2Loader(BACKUP);
     add2PreLoader(DbCtl::getInstance());
     /* Beware, order is important*/
@@ -128,7 +130,7 @@ void LoaderCtl::unloadLoader(QList<Controller *> &list)
 {
     tracein;
     foreach(  Controller* ctl, list ) {
-        logi("onLoad '%s'", STR2CHA(ctl->getName()));
+        dbgd("onUnLoad '%s'", STR2CHA(ctl->getName()));
         ctl->onUnload();
         if (mListener != nullptr){
             logd("call listener for unload");

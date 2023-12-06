@@ -120,7 +120,8 @@ DbModel *SaintCtl::buildModel(void *params, const QString &fmt)
         if (gender != Gender::GENDER_UNKNOWN){
             saint->setGender(gender);
         } else{
-            loge("Invalid gender");
+//            loge("Invalid gender");
+
         }
 
     }

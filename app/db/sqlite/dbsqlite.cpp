@@ -800,6 +800,21 @@ ErrCode DbSqlite::validateDbInfo(const DbInfo *dbInfo)
     return err;
 }
 
+bool DbSqlite::isDbExist()
+{
+    bool exist = false;
+    tracein;
+    logd("mDbUri '%s'", STR2CHA(mDbUri));
+    if (!mDbUri.isEmpty() && QFile::exists(mDbUri)) {
+        exist = true;
+    } else {
+        dbgd("db '%s' not exist", STR2CHA(mDbUri));
+        exist = false;
+    }
+    traceret(exist);
+    return exist;
+}
+
 ErrCode_t DbSqlite::execQuery(const QString &sql)
 {
     ErrCode_t err = ErrNone;

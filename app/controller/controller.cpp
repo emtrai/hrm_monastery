@@ -26,3 +26,8 @@ void Controller::init()
 {
     logi("Controller::init .. do nothing");
 }
+
+QString Controller::getDisplayName() const
+{
+    return QString(QObject::tr("Trình quản lý '%1'")).arg(getName());
+}

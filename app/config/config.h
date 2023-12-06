@@ -27,38 +27,60 @@
 #include "errcode.h"
 #include <QString>
 #include <QMap>
+#include "controller.h"
 
 #define CONFIG Config::getInstance()
 
-class Config
+class Config: public Controller
 {
 public:
     static Config* getInstance();
-    static ErrCode init();
+    static ErrCode initConfig();
 
 
     static QString getNextPersonalCode(qint64* code = nullptr, ErrCode *outErr = nullptr);
     static int getLogLevel();
+    static quint64 getMaxPersonCodeValue();
+public:
+    /**
+     * @brief on load controller
+     * @return
+     */
+    virtual ErrCode onLoad();
 
-    ErrCode initDefaultConfig();
-    ErrCode loadConfig();
-    ErrCode parseConfig(const QString& fpath, QMap<QString, QString>& config);
-    ErrCode saveConfig(const QString& fpath, const QMap<QString, QString>& config);
-    ErrCode saveConfig(const QString& fpath);
-    void dumpConfig();
+    /**
+     * @brief Name of controller
+     * @return
+     */
+    virtual QString getName() const;
+
+    virtual void onUnload();
 
     bool autoBackupEnable();
     QString getAutoBackupDirPath();
 
+    ErrCode updatePersonCode(const QString& personCode);
+    QString getPersonCodePrefix();
 private:
     Config();
     ErrCode doInit();
     QString doGetNextPersonalCode(qint64* code = nullptr, ErrCode *outErr = nullptr);
     QString getValue(QString key, QString* defaultValue = nullptr, bool* ok = nullptr);
-    quint64 getValue(QString key, quint64 defaultValue, bool* ok = nullptr);
+    quint64 getValueInt(QString key, quint64 defaultValue, bool* ok = nullptr);
+    ErrCode setValueInt(QString key, quint64 value);
+    quint64 doGetMaxPersonCodeValue();
+    ErrCode initDefaultConfig();
+    ErrCode loadConfig();
+    ErrCode parseConfig(const QString& fpath, QMap<QString, QString>& config);
+    ErrCode saveConfig(const QString& fpath, const QMap<QString, QString>& config);
+    ErrCode saveConfig(const QString& fpath);
+    ErrCode saveConfig();
+    void dumpConfig();
 private:
     static Config* gInstance;
     QMap<QString, QString> mConfigKeyValue;
+    QString mConfigPath;
+    bool mConfigUpdated;
 };
 
 #endif // CONFIG_H

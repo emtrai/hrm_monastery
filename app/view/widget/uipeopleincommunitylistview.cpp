@@ -96,7 +96,7 @@ ErrCode UIPeopleInCommunityListView::onEditItem(UITableCellWidgetItem *item)
         err = DlgPersonCommunity::updateCommunityPerson(this, commPer);
     }
     if (err == ErrNone) {
-        reload();
+        requestReload();
     } else if (err != ErrCancelled) {
         DialogUtils::showErrorBox(err, tr("Lỗi cập nhật Cộng đoàn - Nữ tu"));
     } // cancel, do nothing
@@ -143,7 +143,7 @@ ErrCode UIPeopleInCommunityListView::onAddItem(UITableCellWidgetItem *item)
     }
 
     if (err == ErrNone) {
-        reload();
+        requestReload();
     } else if (err != ErrCancelled) {
         loge("failed to add item %d", err);
         DialogUtils::showErrorBox(err, tr("Lỗi thêm mục Cộng đoàn - Nữ tu"));

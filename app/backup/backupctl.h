@@ -22,7 +22,7 @@
 #ifndef BACKUPCTL_H
 #define BACKUPCTL_H
 
-#include <controller.h>
+#include "controller.h"
 #include "utils.h"
 #include "errcode.h"
 #include <QObject>

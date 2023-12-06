@@ -36,7 +36,7 @@ QString Crypto::hashFile(const QString &filename, QCryptographicHash::Algorithm 
     if (!filename.isEmpty()){ // TODO: check valid enum
         QFile file(filename);
         if (file.exists()) {
-            logi("Hash file %s, algo %d",
+            dbgd("Hash file %s, algo %d",
                  file.fileName().toStdString().c_str(), algo);
             if (file.open(QFile::ReadOnly)) {
                 QCryptographicHash hash(algo);

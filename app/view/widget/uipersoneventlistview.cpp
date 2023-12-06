@@ -147,7 +147,7 @@ ErrCode UIPersonEventListView::onAddItem(UITableCellWidgetItem *item)
 
         if (dlg->exec() == QDialog::Accepted){
             logd("reload data");
-            reload();
+            requestReload();
         }
     }
     FREE_PTR(dlg);
@@ -181,7 +181,7 @@ ErrCode UIPersonEventListView::onEditItem(UITableCellWidgetItem *item)
 
         if (dlg->exec() == QDialog::Accepted){
             logd("reload data");
-            reload();
+            requestReload();
         }
         delete dlg;
     }

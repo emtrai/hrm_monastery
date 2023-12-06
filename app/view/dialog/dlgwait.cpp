@@ -47,7 +47,10 @@ DlgWait::~DlgWait()
             mWorker->wait(WAIT_TIMEOUT);
         }
     }
-    FREE_PTR(mWorker);
+    if (mWorker) {
+        mWorker->deleteLater();
+    }
+    mWorker = nullptr;
 
     delete ui;
     traceout;
@@ -61,9 +64,12 @@ ErrCode DlgWait::show(void* data, WaitPrepare_t prepare,
     // to avoid flicking when wait dialog show multiple time for multiple purpose
     ErrCode err = ErrNone;
     mForceCancel = false;
+    if (mWorker) {
+        mWorker->deleteLater();
+    }
     mWorker = new DlgWaitWorker(this, this, data);
     mWorker->setRunFunc(run);
-    connect(mWorker, &DlgWaitWorker::done, this, &DlgWait::handleResult);
+    connect(mWorker, &DlgWaitWorker::runFinish, this, &DlgWait::handleResult, Qt::QueuedConnection);
     if (prepare) {
         logd("Call prepare");
         err = prepare(data, this);
@@ -76,6 +82,9 @@ ErrCode DlgWait::show(void* data, WaitPrepare_t prepare,
         logd("start worker thread");
         mWorker->start();
         this->exec();
+        // don't try below one, it takes no affect, no waiting
+        // this->setModal(true);
+        // this->show();
         err = mResult;
         logd("thread completed, err %d", err);
     }
@@ -142,10 +151,15 @@ void DlgWait::clearProgress()
     ui->lblProgress->setText("");
 }
 
-void DlgWait::forceClose()
+void DlgWait::forceClose(DlgWait* dlg)
 {
     tracein;
     mForceCancel = true;
+    if (dlg) {
+        logd("accept dialog");
+//        dlg->accept();
+        emit accepted();
+    }
     QDialog::close();
     traceout;
 }
@@ -174,17 +188,17 @@ void DlgWait::reject()
     traceout;
 }
 
-void DlgWait::handleResult(ErrCode err, void *data, void *result)
+void DlgWait::handleResult(ErrCode err, void *data, void *result, DlgWait* dlg)
 {
     tracein;
     // TODO: should terminate thread???
     // TODO: callback is called when app is already closed???
     logd("err=%d", err);
     if (mFinishCallback) {
-        err = mFinishCallback(err, data, result, this);
+        err = mFinishCallback(err, data, result, dlg);
     }
     setErrResult(err);
-    forceClose();
+    forceClose(dlg);
     traceout;
 }
 
@@ -205,7 +219,7 @@ void DlgWait::setErrResult(ErrCode newResult)
 }
 
 DlgWaitWorker::DlgWaitWorker(QObject *parent, DlgWait* dlg, void* data):
-    QThread(parent), mDlg(dlg), mRunFunc(nullptr), mData(data)
+    QThread(parent), mRunFunc(nullptr), mData(data), mDlg(dlg)
 {
     traced;
 }
@@ -234,6 +248,6 @@ void DlgWaitWorker::run()
         logw("no run function to execute");
     }
     logd("signal done, ret %d", ret);
-    emit done(ret, mData, result, mDlg);
+    emit runFinish(ret, mData, result, mDlg);
     traceout;
 }

@@ -57,7 +57,7 @@ public slots:
     void run() override;
 
 signals:
-    void done(ErrCode err, void* data, void* result, DlgWait* dlg);
+    void runFinish(ErrCode err, void* data, void* result, DlgWait* dlg);
 private:
     WaitRunt_t mRunFunc;
     void* mData;
@@ -89,7 +89,7 @@ public:
     void setProgress(int newProgress);
     void setProgress(int cur, int total);
     void clearProgress();
-    void forceClose();
+    void forceClose(DlgWait* dlg);
     ErrCode errResult() const;
     void setErrResult(ErrCode newResult);
 
@@ -100,7 +100,7 @@ protected:
 signals:
     void closeDlg(ErrCode err);
 public slots:
-    void handleResult(ErrCode err, void* data, void* result);
+    void handleResult(ErrCode err, void* data, void* result, DlgWait* dlg);
     void handleCloseDlg(ErrCode err);
 private:
     Ui::DlgWait *ui;
