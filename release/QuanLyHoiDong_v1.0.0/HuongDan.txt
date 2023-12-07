@@ -1,0 +1,13 @@
+Thư mục QuanLyHoiDong: Ứng dụng Quản lý Hội dòng
+- Click đúp vào QuanLyHoiDong\QuanLyHoiDong.exe để mở ứng dụng.
+Lưu ý: Ở lần mở đầu tiên sẽ tốn nhiều thời gian để khởi tạo ban đầu cho ứng dụng.
+Vui lòng chờ 3-5 phút, và không tắt ứng dụng trong thời gian này
+
+Thư mục tai_lieu: Tài liệu của Ứng dụng, vd: Hướng dẫn sử dụng
+- Xem hướng dẫn sử dụng tại: tai_lieu\HuongDanSuDung_V0.2.pdf
+Lưu ý: Máy cần cài sẵn ứng dụng đọc tập tin pdf, vd: Adobe Acrobat Reader, Foxit reader
+
+Thư mục du_lieu_mau: Dữ liệu mẫu để nhập thông tin:
+- du_lieu_mau\danhsachnutu.xlsx: Nhập danh sách nữ tu
+- du_lieu_mau\danhsachcongdoan.xlsx: Nhập danh sách cộng đoàn
+Lưu ý: Máy cần cài sẵn ứng dụng Microsoft Office (Word, Excel, ...)
