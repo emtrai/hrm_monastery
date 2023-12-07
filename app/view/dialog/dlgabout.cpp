@@ -51,7 +51,7 @@ DlgAbout::DlgAbout(QWidget *parent) :
                            .arg(APP_VERSION)
                            .arg(STRINGIFY(BUILD_MODE))
                            .arg((long)APP_VERSION_CODE, 0, 16));
-    appInfo += QString(tr("- Ngày tạo: %1\n").arg(__DATE__));
+    appInfo += QString(tr("- Ngày tạo: %1 @ %2\n").arg(__DATE__, __TIME__ ));
     appInfo += QString(tr("Phiên bản dùng thử\n")); // TODO: load release info from file???
     appInfo += QString(tr("\n\n------ Thư mục dữ liệu ------\n"));
     appInfo += QString(tr("- Thư mục dữ liệu cài đặt ứng dụng: \n%1\n").arg(FileCtl::getAppInstallDir()));

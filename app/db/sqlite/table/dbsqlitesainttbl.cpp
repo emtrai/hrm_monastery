@@ -55,6 +55,8 @@ void DbSqliteSaintTbl::addTableField(DbSqliteTableBuilder *builder)
     builder->addField(KFieldGender, INT32);
     builder->addField(KFieldFeastDay, INT64);
     builder->addField(KFieldCountry, TEXT);
+    // From version 0.0.2
+    builder->addField(KFieldCountryUid, TEXT);
     traceout;
 }
 
