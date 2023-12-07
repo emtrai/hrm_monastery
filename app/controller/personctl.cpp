@@ -36,7 +36,7 @@
 #include "exportfactory.h"
 
 #include "communityctl.h"
-#include "eductl.h""
+#include "eductl.h"
 #include "coursectl.h"
 #include "workctl.h"
 #include "config.h"

@@ -735,7 +735,7 @@ ErrCode_t DbSqlite::loadDb(const DbInfo* dbInfo){
         bool ok = false;
         quint64 dbVersion = getDbVersion();
         quint64 versionInDb = getDbVersionInMetadata(&ok);
-        logi("dbversion = 0x%08llx, versionInDb = 0x%08x", dbVersion, versionInDb);
+        logi("dbversion = 0x%08llx, versionInDb = 0x%08llx", dbVersion, versionInDb);
         bool updateversionindb = false;
         if (ok) {
             if (dbVersion == versionInDb) {

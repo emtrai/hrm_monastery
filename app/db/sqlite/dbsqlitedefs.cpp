@@ -104,7 +104,3 @@ QString getFieldNameFromId(int fieldId, bool* isOk)
     }
 }
 
-QString getFieldNameFromItemName(const QString &itemName, bool *isOk)
-{
-
-}

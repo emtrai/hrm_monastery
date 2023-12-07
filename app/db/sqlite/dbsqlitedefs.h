@@ -239,6 +239,5 @@ const char* const KMetadataKeyPersonCode = "person_code";
 // TODO: move to class???
 QString getDateTypeString(TableFieldDatatype_t dataType);
 QString getFieldNameFromId(int fieldId, bool* isOk = nullptr);
-QString getFieldNameFromItemName(const QString& itemName, bool* isOk = nullptr);
 
 #endif // DBSQLITEDEFS_H

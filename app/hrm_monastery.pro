@@ -45,6 +45,7 @@ DEFINES += BUILD_MODE=$${BUILD_MODE}
 # TODO: check to support person province info
 SUPPORT_PROVINE = OFF
 
+QMAKE_CXXFLAGS += -Werror=return-type -Wno-unused-parameter -Wextra
 
 # QXlsx code for Application Qt project
 QXLSX_PARENTPATH=QXlsx/QXlsx/         # current QXlsx path is . (. means curret directory)

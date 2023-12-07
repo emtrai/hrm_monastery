@@ -69,9 +69,15 @@ void DlgSaint::accept()
     ErrCode ret = ErrNone;
     QString warning;
     QString name = ui->txtName->text().trimmed();
+    QString nameid = ui->txtNameId->text().trimmed();
     if (name.isEmpty()) {
         loge("Empty String!");
         warning += tr("Thiếu tên");
+        ret = ErrFailed;
+    }
+    if (nameid.isEmpty()) {
+        loge("Empty nameid String!");
+        warning += tr("Thiếu tên định danh");
         ret = ErrFailed;
     }
 
@@ -94,6 +100,7 @@ void DlgSaint::accept()
         if (mSaint == nullptr)
             mSaint = new Saint();
         mSaint->setName(name);
+        mSaint->setNameId(nameid);
         mSaint->setFeastDay( feastday);
         mSaint->setFullName(ui->txtFullName->text().trimmed());
         Gender gender = GENDER_UNKNOWN;
@@ -109,7 +116,7 @@ void DlgSaint::accept()
             mSaint->setCountryUid(countryuid);
         }
         mSaint->dump();
-        logi("Save Saint to db, name %s", mSaint->name().toStdString().c_str());
+        logi("Save Saint to db: '%s'", MODELSTR2CHA(mSaint));
         ret = mSaint->save();
         logd("save saint ret=%d", ret);
     }

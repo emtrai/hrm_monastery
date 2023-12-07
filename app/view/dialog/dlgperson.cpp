@@ -858,7 +858,7 @@ void DlgPerson::loadEvent(bool reloadAll)
                     mListPersonEvent.append(item);
                 }
             } else {
-                loge("Get list event of person uid '%s' failed, err", STR2CHA(per->uid()), err);
+                loge("Get list event of person uid '%s' failed, err=%d", STR2CHA(per->uid()), err);
                 // TODO: show error dialog???
             }
         }
