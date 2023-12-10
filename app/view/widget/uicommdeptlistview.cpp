@@ -34,6 +34,7 @@
 #include "errreporterctl.h"
 #include "viewutils.h"
 #include "datetimeutils.h"
+#include "modeldefs.h"
 
 UICommDeptListView::UICommDeptListView(QWidget *parent):
     UICommonListView(parent)

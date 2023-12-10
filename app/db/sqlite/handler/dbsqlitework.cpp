@@ -27,6 +27,7 @@
 #include "dbsqlite.h"
 #include "work.h"
 #include "person.h"
+#include "modeldefs.h"
 
 GET_INSTANCE_IMPL(DbSqliteWork)
 

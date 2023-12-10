@@ -42,7 +42,7 @@
 #include "controllerdefs.h"
 #include "communitymanager.h"
 #include "stringdefs.h"
-#include "rolectl.h"
+#include "modeldefs.h"
 
 GET_INSTANCE_CONTROLLER_IMPL(CommunityCtl)
 

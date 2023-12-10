@@ -45,6 +45,7 @@
 #include "dbcommunitymodelhandler.h"
 #include "communitymanager.h"
 #include "persondept.h"
+#include "modeldefs.h"
 
 GET_INSTANCE_IMPL(DbSqlitePerson)
 
@@ -118,7 +119,7 @@ ErrCode DbSqlitePerson::add(DbModel *model, bool notify)
             logd("Check to add person - specialist ");
             QStringList list = per->specialistUidList();
             if (!list.empty()) {
-                logd("set specialist for person, no. specialist %d", list.count());
+                logd("set specialist for person, no. specialist %lld", list.count());
 
                 foreach (QString item, list) {
                     SpecialistPerson* spelistPerson = (SpecialistPerson*)SpecialistPerson::build();
@@ -455,7 +456,7 @@ QList<DbModel *> DbSqlitePerson::getSpecialistList(const QString &personUid)
         if (IS_MODEL_NAME(model, KModelNameSpecialistPerson)) {
             SpecialistPerson* specialist = (SpecialistPerson*) model;
             if (specialist->specialist()) {
-                outList.push_back(specialist->specialist()->clone());
+                outList.push_back(CLONE_DBMODEL(specialist->specialist()));
             } else {
                 loge("no specialist info for model '%s'", MODELSTR2CHA(model));
             }
@@ -660,13 +661,8 @@ ErrCode DbSqlitePerson::update(DbModel *model, bool notify)
                                     logd("copy data from update event '%s' to current event '%s'",
                                          MODELSTR2CHA(updateEvent), MODELSTR2CHA(currentEvent));
                                     currentEvent->setMarkModified(true);
-                                    err = currentEvent->copyData(updateEvent);
-                                    if (err == ErrNone) {
-                                        err = currentEvent->update(true, false);
-                                    } else {
-                                        loge("failed to copy update data, out");
-                                        break;
-                                    }
+                                    currentEvent->clone(updateEvent, false);
+                                    err = currentEvent->update(true, false);
                                 }
                             } else {
                                 logd("current event not exist in updated one, delete it '%s'",
@@ -755,7 +751,7 @@ ErrCode DbSqlitePerson::check2UpdateCommunity(Person* per)
         } else { // empty, use root community
             if (rootComm) {
                 logi("No community uid was found, use root comm one");
-                comm = CLONE_MODEL(rootComm, Community);
+                comm = CLONE_MODEL_CONST1(rootComm, Community);
                 if (!comm) {
                     loge("cannot clone root comm, no memory?");
                     err = ErrNoMemory;

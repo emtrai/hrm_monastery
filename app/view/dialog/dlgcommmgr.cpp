@@ -33,6 +33,7 @@
 #include "stringdefs.h"
 #include "community.h"
 #include "dbctl.h"
+#include "modeldefs.h"
 
 DlgCommMgr::DlgCommMgr(QWidget *parent) :
     DlgCommonEditModel(parent),
@@ -214,7 +215,7 @@ ErrCode DlgCommMgr::setPerson(const Person *newPerson)
 {
     logd("set person '%s'", MODELSTR2CHA(newPerson));
     FREE_PTR(mPerson);
-    mPerson = CLONE_MODEL(newPerson, Person);
+    mPerson = CLONE_MODEL_CONST1(newPerson, Person);
     if (mPerson) {
         updatePeson(mPerson);
     }
@@ -245,7 +246,7 @@ ErrCode DlgCommMgr::setCommunity(const Community *comm)
     FREE_PTR(mCommunity);
     if (comm) {
         logd("clone new comm");
-        mCommunity = CLONE_MODEL(comm, Community);
+        mCommunity = CLONE_MODEL_CONST1(comm, Community);
         if (!mCommunity) {
             err = ErrNoMemory;
             loge("Clone new comm fail, no memory?");

@@ -37,7 +37,6 @@ public:
     static DbModel* build();
     virtual DbModelBuilder getBuilder() const;
     virtual QString modelName() const;
-    virtual void clone(const DbModel* model);
     virtual QString exportHtmlTemplateFile(const QString& name) const;
     virtual void initExportFields();
 
@@ -72,6 +71,7 @@ public:
 
 
 protected:
+    virtual void _copyData(const DbModel& model);
     virtual DbModelHandler *getDbModelHandler() const;
 protected:
     Person* mPerson;

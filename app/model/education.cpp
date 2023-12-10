@@ -22,6 +22,7 @@
 #include "education.h"
 #include "dbctl.h"
 #include "logger.h"
+#include "modeldefs.h"
 
 
 Education::Education():DbModel()

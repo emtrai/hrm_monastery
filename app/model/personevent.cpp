@@ -30,6 +30,7 @@
 #include "eventctl.h"
 #include "prebuiltdefs.h"
 #include "stringdefs.h"
+#include "modeldefs.h"
 
 PersonEvent::PersonEvent():DbModel(),
     mDate(0),
@@ -110,25 +111,6 @@ QString PersonEvent::modelName() const
     return KModelNamePersonEvent;
 }
 
-void PersonEvent::clone(const DbModel *model)
-{
-    tracein;
-    if (model && model->modelName() == KModelNamePersonEvent) {
-        DbModel::clone(model);
-        PersonEvent* event = (PersonEvent*)model;
-        mDate = event->mDate;
-        mEndDate = event->mEndDate;
-        mEventUid = event->mEventUid;
-        mEventName = event->mEventName;
-        mPersonUid = event->mPersonUid;
-        mPersonName = event->mPersonName;
-    } else {
-        logd("Model is null or not person event type, name '%s'",
-             model?STR2CHA(model->name()):"null");
-    }
-    traceout;
-}
-
 QString PersonEvent::exportHtmlTemplateFile(const QString &name) const
 {
     UNUSED(name);
@@ -167,30 +149,17 @@ void PersonEvent::initExportFields()
     traceout;
 }
 
-ErrCode PersonEvent::copyData(const DbModel *model)
+void PersonEvent::_copyData(const DbModel& model)
 {
     tracein;
-    ErrCode err = DbModel::copyData(model);
-    if (err == ErrNone) {
-        if (model && model->modelName() == KModelNamePersonEvent) {
-            PersonEvent* event = (PersonEvent*) model;
-            mDate = event->mDate;
-            markItemAsModified(KItemDate);
-            mEndDate = event->mEndDate;
-            markItemAsModified(KItemEndDate);
-            mEventUid = event->mEventUid;
-            markItemAsModified(KItemEvent);
-            mEventName = event->mEventName;// just for display
-            mPersonUid = event->mPersonUid;
-            markItemAsModified(KItemPerson);
-            mPersonName = event->mPersonName;
-        } else {
-            loge("invalid event model '%s'", MODELSTR2CHA(model));
-            err = ErrInvalidData;
-        }
-    }
-    traceret(err);
-    return err;
+    const PersonEvent* event = static_cast<const PersonEvent*>(&model);
+    setDate(event->mDate);
+    setEndDate(event->mEndDate);
+    setEventUid(event->mEventUid);
+    setEventName(event->mEventName);// just for display
+    setPersonUid(event->mPersonUid);
+    setPersonName(event->mPersonName);
+    traceout;
 }
 void PersonEvent::buildUidIfNotSet()
 {

@@ -37,6 +37,7 @@
 #include "communitydeptctl.h"
 #include "communitydept.h"
 #include "persondept.h"
+#include "modeldefs.h"
 
 GET_INSTANCE_IMPL(Statistic)
 

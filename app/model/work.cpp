@@ -27,6 +27,7 @@
 #include "dbctl.h"
 #include "defs.h"
 #include "dbmodel.h"
+#include "modeldefs.h"
 
 Work::Work():DbModel()
 {

@@ -122,7 +122,7 @@ void DlgConfirmUpdatePeopleComm::setCommunity(const Community *newCommunity)
     tracein;
     FREE_PTR(mCommunity);
     if (newCommunity) {
-        mCommunity = CLONE_MODEL(newCommunity, Community);
+        mCommunity = CLONE_MODEL_CONST1(newCommunity, Community);
         if (mCommunity) {
             ui->lblTitle->setText(
                 QString(tr("Bạn có muốn đổi thành cộng đoàn '%1' cho các Nữ tu?"))

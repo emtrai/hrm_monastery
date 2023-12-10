@@ -24,12 +24,12 @@
 #include "logger.h"
 #include "errcode.h"
 #include "utils.h"
-#include "filectl.h"
 #include "specialist.h"
 #include "dbctl.h"
 #include "dbspecialistmodelhandler.h"
 #include "prebuiltdefs.h"
 #include "controllerdefs.h"
+#include "modeldefs.h"
 
 #define SPLIT ','
 

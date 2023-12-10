@@ -412,7 +412,7 @@ bool Utils::isSameList(const QList<T>& l1, const QList<T>& l2)
 {
     tracein;
     bool ret = false;
-    logd("compare l1 cnt=%d l2 cnt=%d", l1.count(), l2.count());
+    logd("compare l1 cnt=%lld l2 cnt=%lld", l1.count(), l2.count());
     if (l1.count() != l2.count()) {
         ret = false;
     } else {

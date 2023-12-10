@@ -52,6 +52,7 @@
 #include "errreporterctl.h"
 #include "communityperson.h"
 #include "dbctl.h"
+#include "modeldefs.h"
 
 UIPersonListView::UIPersonListView(QWidget *parent):
     UICommonListView(parent)
@@ -357,7 +358,7 @@ ErrCode UIPersonListView::onMenuActionChangeCommunity(QMenu *menu, UITableMenuAc
     if (ret == ErrNone) {
         const DbModel* item = dlg->selectedItem();
         if (item != nullptr && IS_MODEL_NAME(item, KModelNameCommunity)) {
-            comm = (Community*)item->clone();
+            comm = CLONE_MODEL_CONST1(item, Community);
             if (!comm) {
                 loge("cannot clone community '%s', no memory?", MODELSTR2CHA(item));
                 ret = ErrNoMemory;
@@ -823,7 +824,7 @@ ErrCode UIPersonListView::buildPersonCommunityChangeEventList(const QList<DbMode
             if (perEvent && event) {
                 foreach (DbModel* per, perList) {
                     if (IS_MODEL_NAME(per, KModelNamePerson)) {
-                        PersonEvent* tmp = (PersonEvent* )(((DbModel*)perEvent)->clone());
+                        PersonEvent* tmp = CLONE_MODEL(perEvent, PersonEvent);
                         if (tmp) {
                             tmp->setPersonUid(per->uid());
                             tmp->buildNameIdFromOthersNameId(per->nameId(), event->nameId());
@@ -1113,7 +1114,7 @@ ErrCode UIPersonListView::updatePersonEvent(const QList<DbModel *>& perList,
             if (perEvent && event) {
                 foreach (DbModel* per, perList) {
                     if (per) {
-                        PersonEvent* tmp = (PersonEvent* )(((DbModel*)perEvent)->clone());
+                        PersonEvent* tmp = CLONE_MODEL(perEvent, PersonEvent);
                         if (tmp) {
                             tmp->setPersonUid(per->uid());
                             tmp->buildNameIdFromOthersNameId(per->nameId(), event->nameId());

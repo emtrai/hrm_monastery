@@ -30,7 +30,6 @@ public:
     virtual ~AreaPerson();
     static DbModel* build();
 
-    virtual void clone(const DbModel* model);
     virtual DbModelBuilder getBuilder() const;
     virtual QString modelName() const;
     virtual ErrCode exportTemplatePath(FileExporter* exporter,
@@ -94,7 +93,7 @@ public:
 protected:
     AreaPerson();
     virtual DbModelHandler *getDbModelHandler() const;
-    void copy(const AreaPerson& model);
+    virtual void _copyData(const DbModel& model);
 protected:
     QString mPersonUid;
     QString mHollyName; // just for display

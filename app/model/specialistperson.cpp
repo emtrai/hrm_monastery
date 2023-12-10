@@ -26,6 +26,7 @@
 #include "utils.h"
 #include "dbctl.h"
 #include "dbmodel.h"
+#include "modeldefs.h"
 
 SpecialistPerson::SpecialistPerson():MapDbModel()
 {
@@ -37,10 +38,7 @@ SpecialistPerson::SpecialistPerson():MapDbModel()
 SpecialistPerson::~SpecialistPerson()
 {
     tracein;
-    if (mSpecialist) {
-        delete mSpecialist;
-        mSpecialist = nullptr;
-    }
+    FREE_PTR(mSpecialist);
     traceout;
 }
 
@@ -54,23 +52,14 @@ DbModelBuilder SpecialistPerson::getBuilder() const
     return &SpecialistPerson::build;
 }
 
-void SpecialistPerson::copy(const DbModel *model)
+void SpecialistPerson::_copyData(const DbModel& model)
 {
     tracein;
-    if (IS_MODEL_NAME_STR(model, modelName())) {
-        const SpecialistPerson* item = static_cast<const SpecialistPerson*>(model);
-        if (mSpecialist) {
-            delete mSpecialist;
-            mSpecialist = nullptr;
-        }
-        if (item->specialist()) {
-            logd("clone new specialist '%s'", STR2CHA(item->specialist()->toString()));
-            mSpecialist = item->specialist()->clone();
-        }
-        setExperienceHistory(item->experienceHistory());
-    } else {
-        loge("clone failed, null model");
-    }
+    const SpecialistPerson* item = static_cast<const SpecialistPerson*>(&model);
+    setSpecialist(item->specialist());
+
+    setExperienceHistory(item->experienceHistory());
+
     traceout;
 
 }
@@ -94,14 +83,8 @@ const DbModel *SpecialistPerson::specialist() const
 void SpecialistPerson::setSpecialist(const DbModel *newSpecialist)
 {
     tracein;
-    if (mSpecialist) {
-        delete mSpecialist;
-        mSpecialist = nullptr;
-    }
-    if (newSpecialist) {
-        logd("clone new specialist '%s'", STR2CHA(newSpecialist->toString()));
-        mSpecialist = newSpecialist->clone();
-    }
+    FREE_PTR(mSpecialist);
+    mSpecialist = CLONE_DBMODEL(newSpecialist);
     traceout;
 }
 
@@ -126,7 +109,7 @@ const QString &SpecialistPerson::experienceHistory() const
 
 void SpecialistPerson::setExperienceHistory(const QString &newExperienceHistory)
 {
-    mExperienceHistory = newExperienceHistory;
+    CHECK_MODIFIED_THEN_SET(mExperienceHistory, newExperienceHistory, KItemExperience);
 }
 
 void SpecialistPerson::setPersonUid(const QString &uid)

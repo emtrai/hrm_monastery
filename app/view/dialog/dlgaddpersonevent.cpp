@@ -32,6 +32,7 @@
 #include "event.h"
 #include "person.h"
 #include "dlgsearchperson.h"
+#include "modeldefs.h"
 
 DlgAddPersonEvent::DlgAddPersonEvent(QWidget *parent) :
     DlgCommonEditModel(parent),
@@ -154,8 +155,8 @@ void DlgAddPersonEvent::setSelectedEvent(int index)
             DbModel* event = mEventList.at(index);
             if (event != nullptr) {
                 if (event->uid() == value.toString()) {
-                    if (mEvent) delete mEvent;
-                    mEvent = (Event*)event->clone();
+                    FREE_PTR(mEvent);
+                    mEvent = static_cast<Event*>(CLONE_DBMODEL(event));
                     updateNameId();
                 } else {
                     loge("something went wrong, list uid '%s' not match with cb uid '%s'",
@@ -358,13 +359,12 @@ ErrCode DlgAddPersonEvent::setPerson(const Person *newPerson)
     tracein;
     ErrCode err = ErrNone;
     if (!mEvenInfoOnly) {
-        if (mPerson) {
-            delete mPerson;
-            mPerson = nullptr;
-        }
+        FREE_PTR(mPerson);
         if (newPerson) {
             logd("clone new person");
-            mPerson = (Person*)(((DbModel*)newPerson)->clone());
+            mPerson = CLONE_MODEL_CONST1(newPerson, Person);
+        }
+        if (mPerson) {
             ui->txtPersonName->setPlainText(mPerson->displayName());
             logd("setProperty %s", mPerson->uid().toStdString().c_str());
             ui->txtPersonName->setProperty(KItemPerson, mPerson->uid());

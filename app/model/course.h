@@ -42,7 +42,6 @@ protected:
 public:
     virtual ~Course();
     static DbModel *build();
-    virtual void clone(const DbModel* model);
     virtual QString modelName() const;
     virtual void initExportFields();
     virtual ErrCode exportTemplatePath(FileExporter* exporter,
@@ -69,6 +68,7 @@ public:
     virtual QString toString() const;
 
 protected:
+    virtual void _copyData(const DbModel& model);
     virtual DbModelHandler *getDbModelHandler() const;
 private:
     qint64 mStartDate;

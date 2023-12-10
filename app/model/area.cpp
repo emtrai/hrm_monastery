@@ -32,6 +32,7 @@
 #include "areactl.h"
 #include "areaperson.h"
 #include "stringdefs.h"
+#include "modeldefs.h"
 
 Area::Area():DbModel(),
       mCountryDbId(0),
@@ -52,18 +53,6 @@ DbModel *Area::build()
     Area* item = new Area();
     item->init();
     return item;
-}
-
-void Area::clone(const DbModel *model)
-{
-    tracein;
-    if (model) {
-        DbModel::clone(model);
-        copy(*(Area*)model);
-    } else {
-        loge("clone failed, null model");
-    }
-    traceout;
 }
 
 QString Area::modelName() const
@@ -123,21 +112,22 @@ DbModelBuilder Area::getBuilder() const
     return &Area::build;
 }
 
-void Area::copy(const Area &model)
+void Area::_copyData(const DbModel &model)
 {
     tracein;
-    mCountryName = model.mCountryName;
-    mCountryDbId = model.mCountryDbId;
-    mCountryUid = model.mCountryUid;
-    mCountryNameId = model.mCountryNameId;
-    mAddr = model.mAddr;
-    mTel = model.mTel;
-    mEmail = model.mEmail;
-    mStartDate = model.mStartDate;
-    mEndDate = model.mEndDate;
-    mModelStatus = model.mModelStatus;
-    mModelStatusName = model.mModelStatusName;
-    mChangeHistory = model.mChangeHistory;
+    const Area* area = static_cast<const Area*>(&model);
+    setCountryName(area->mCountryName);
+    setCountryDbId(area->mCountryDbId);
+    setCountryUid(area->mCountryUid);
+    setCountryNameId(area->mCountryNameId);
+    setAddr(area->mAddr);
+    setTel(area->mTel);
+    setEmail(area->mEmail);
+    setStartDate(area->mStartDate);
+    setEndDate(area->mEndDate);
+    setModelStatus(area->mModelStatus);
+    setModelStatusName(area->mModelStatusName);
+    setChangeHistory(area->mChangeHistory);
     traceout;
 }
 

@@ -30,6 +30,7 @@
 #include "community.h"
 #include "ethnic.h"
 #include "saint.h"
+#include "modeldefs.h"
 
 
 GET_INSTANCE_IMPL(DbSqliteCountry);

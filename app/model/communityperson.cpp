@@ -32,6 +32,7 @@
 #include "community.h"
 #include "filectl.h"
 #include "prebuiltdefs.h"
+#include "modeldefs.h"
 
 CommunityPerson::CommunityPerson():MapDbModel(),
     mPerson(nullptr),
@@ -66,18 +67,13 @@ QString CommunityPerson::modelName() const
     return KModelNameCommPerson;
 }
 
-void CommunityPerson::clone(const DbModel *model)
+void CommunityPerson::_copyData(const DbModel& model)
 {
     tracein;
-    if (model) {
-        MapDbModel::clone(model);
-        if (model->modelName() == modelName()) {
-            logd("clone person & community");
-            CommunityPerson* commper = (CommunityPerson*) model;
-            CLEAR_THEN_SET(mPerson, commper->person(), Person);
-            CLEAR_THEN_SET(mCommunity, commper->community(), Community);
-        }
-    }
+    logd("clone person & community");
+    const CommunityPerson* commper = static_cast<const CommunityPerson*>(&model);
+    setPerson(commper->person());
+    setCommunity(commper->community());
     traceout;
 }
 
@@ -160,6 +156,7 @@ void CommunityPerson::setCommunity(const Community *newCommunity)
 {
     tracein;
     CLEAR_THEN_SET(mCommunity, newCommunity, Community);
+    setCommunityUid(KUidNone);
     if (mCommunity && communityUid().isEmpty()) {
         setCommunityUid(mCommunity->uid());
     }
@@ -189,6 +186,7 @@ void CommunityPerson::setPerson(const Person *newPerson)
 {
     tracein;
     CLEAR_THEN_SET(mPerson, newPerson, Person);
+    setPersonUid(KUidNone);
     if (mPerson && personUid().isEmpty()) {
         setPersonUid(mPerson->uid());
     }

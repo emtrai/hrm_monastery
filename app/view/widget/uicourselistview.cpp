@@ -32,6 +32,7 @@
 #include "mainwindow.h"
 #include "coursectl.h"
 #include "stringdefs.h"
+#include "modeldefs.h"
 
 
 UICourseListView::UICourseListView(QWidget *parent):

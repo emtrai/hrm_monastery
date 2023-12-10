@@ -69,7 +69,7 @@ private:
 public:
     Person(const Person& person) = delete;
     virtual ~Person();
-    virtual void clone(const DbModel* per);
+    virtual void _copyData(const DbModel& per);
     virtual void buildUidIfNotSet();
     virtual QString buildUid(const QString* seed = nullptr);
     virtual QString modelName() const;
@@ -448,6 +448,8 @@ public:
     virtual ErrCode delPersonEvent(const DbModel* event);
 
     bool personEventListUpdated() const;
+
+    void setPersonEventListUpdated(bool newPersonEventListUpdated);
 
 protected:
     virtual void check2ReloadPersonEventList(bool reload = false);

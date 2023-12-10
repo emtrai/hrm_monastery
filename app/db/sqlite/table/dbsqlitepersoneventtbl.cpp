@@ -35,6 +35,7 @@
 #include "personevent.h"
 #include "dbctl.h"
 #include "dbsqlite.h"
+#include "modeldefs.h"
 
 /**
  * VERSION 0.0.1:

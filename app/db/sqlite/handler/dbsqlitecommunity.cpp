@@ -33,6 +33,7 @@
 #include "dbpersonmodelhandler.h"
 #include "communitydept.h"
 #include "exception.h"
+#include "modeldefs.h"
 
 // if defined, only one mapping community-person allow
 // else, can exist multiple same mapping community-person

@@ -32,6 +32,7 @@
 #include "dialog/dlgdeptperson.h"
 #include "persondept.h"
 #include "stringdefs.h"
+#include "modeldefs.h"
 
 UIDepartmentPersonListView::UIDepartmentPersonListView(QWidget *parent):
     UICommonListView(parent)

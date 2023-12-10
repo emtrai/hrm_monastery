@@ -203,9 +203,9 @@ DbModel *DlgCommDept::community() const
 
 void DlgCommDept::setCommunity(const DbModel *newCommunity)
 {
-    if (mCommunity) delete mCommunity;
+    FREE_PTR(mCommunity);
     if (newCommunity) {
-        mCommunity = newCommunity->clone();
+        mCommunity = CLONE_DBMODEL(newCommunity);
         on_cbDept_currentIndexChanged(ui->cbDept->currentIndex());
     } else {
         loge("Set communityf failed, null input");

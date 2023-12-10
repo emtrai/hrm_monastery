@@ -43,7 +43,7 @@ qint64 DatetimeUtils::currentTimeMs()
 QString DatetimeUtils::timeMsToDatestring(qint64 timeMs, const QString &format)
 {
     tracein;
-    logd("conver time ms %ld", timeMs);
+    logd("conver time ms %lld", timeMs);
     QString time = QDateTime::fromMSecsSinceEpoch(timeMs).toString(format);
     logd("time in string %s", time.toStdString().c_str());
     traceout;

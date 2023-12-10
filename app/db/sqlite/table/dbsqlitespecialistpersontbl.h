@@ -36,6 +36,9 @@ protected:
 
     virtual ErrCode updateDbModelDataFromQuery(DbModel* item, const QSqlQuery& qry);
 
+    virtual ErrCode updateBuilderFieldFromModel(DbSqliteUpdateBuilder *builder,
+                                                const QString &field,
+                                                const DbModel *item);
 private:
     static const qint32 KVersionCode;
 };

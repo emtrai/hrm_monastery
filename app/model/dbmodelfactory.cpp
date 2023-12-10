@@ -91,6 +91,7 @@ DbModelBuilder DbModelFactory::getBuilder(const QString &modelName)
 #include "specialistperson.h"
 #include "work.h"
 #include "communitymanager.h"
+#include "modeldefs.h"
 
 void DbModelFactory::addBuilders()
 {

@@ -52,11 +52,8 @@ public:
     static DbModel *build();
 protected:
     Community();
-    Community(const Community& obj);
 public:
     virtual ~Community();
-    virtual void clone(const DbModel* model);
-
     virtual DbModelBuilder getBuilder() const;
     virtual void initExportFields();
     virtual void initImportFields();
@@ -195,7 +192,7 @@ protected:
      * @return true: allow to delete, false otherwise
      */
     virtual bool allowRemove(QString* msg = nullptr);
-    virtual void copy(const Community& model);
+    virtual void _copyData(const DbModel& model);
     void resetResource();
     virtual ErrCode loadAllData();
 private:

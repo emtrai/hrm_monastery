@@ -27,6 +27,7 @@
 #include <QHash>
 #include "defs.h"
 #include "logger.h"
+#include "modeldefs.h"
 
 
 const qint32 DbSqlitePersonStatusTbl::KVersionCode = VERSION_CODE(0,0,1);

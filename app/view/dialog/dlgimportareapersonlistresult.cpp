@@ -27,6 +27,8 @@
 #include "utils.h"
 #include "datetimeutils.h"
 #include "stringdefs.h"
+#include "modeldefs.h"
+
 DlgImportAreaPersonListResult::DlgImportAreaPersonListResult(QWidget *parent):
     DlgImportListResult(parent)
 {

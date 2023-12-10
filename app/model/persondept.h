@@ -36,7 +36,6 @@ public:
     PersonDept();
     static DbModel* build();
     virtual DbModelBuilder getBuilder() const;
-    virtual void clone(const DbModel* model);
 
     virtual QString toString() const;
     virtual QString exportHtmlTemplateFile(const QString& name) const;
@@ -113,7 +112,7 @@ public:
 
 protected:
     virtual DbModelHandler *getDbModelHandler() const;
-    void copy(const PersonDept& model);
+    virtual void _copyData(const DbModel& model);
 protected:
     QString mRoleUid;
     QString mRoleName; // not store to db

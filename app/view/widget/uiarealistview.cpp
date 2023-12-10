@@ -32,6 +32,7 @@
 #include "stringdefs.h"
 #include "errreporterctl.h"
 #include "dialogutils.h"
+#include "modeldefs.h"
 
 UIAreaListView::UIAreaListView(QWidget *parent):
     UICommonListView(parent)

@@ -20,11 +20,15 @@
  * Brief:
  */
 #include "backupctl.h"
+#include "defs.h"
 #include <QFile>
 #include <QFileInfoList>
 #include <QTemporaryDir>
 #include <QDir>
-#include "QtGui/6.4.0/QtGui/private/qzipwriter_p.h"
+#define QTGUI QtGui
+#define WRITER QtGui/private/qzipwriter_p.h
+// ~~ #include "QtGui/6.4.0/QtGui/private/qzipwriter_p.h"
+#include STRINGIFY(QTGUI/QTSDK_VER/WRITER)
 #include "filectl.h"
 #include "backupmetainfo.h"
 #include "controllerdefs.h"

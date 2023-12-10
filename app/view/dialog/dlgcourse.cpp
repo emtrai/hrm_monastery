@@ -27,6 +27,7 @@
 #include "errcode.h"
 #include "course.h"
 #include "stringdefs.h"
+#include "modeldefs.h"
 
 #include <QDialogButtonBox>
 DlgCourse::DlgCourse(QWidget *parent) :

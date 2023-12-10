@@ -36,6 +36,7 @@
 #include "stringdefs.h"
 #include "communitymanager.h"
 #include "person.h"
+#include "modeldefs.h"
 
 DbModel *Community::build()
 {
@@ -52,32 +53,12 @@ Community::Community():DbModel()
     traceout;
 }
 
-Community::Community(const Community &obj):DbModel(obj)
-{
-    tracein;
-    resetResource();
-    copy(obj);
-    traceout;
-}
-
 Community::~Community()
 {
     tracein;
     FREE_PTR(mNewCommMgr);
     resetResource();
     tracein;
-}
-
-void Community::clone(const DbModel *model)
-{
-    tracein;
-    if (model && model->modelName() == KModelNameCommunity) {
-        DbModel::clone(model);
-        copy(*(Community*)model);
-    } else {
-        loge("clone invalid model '%s'", MODELSTR2CHA(model));
-    }
-    traceout;
 }
 
 DbModelBuilder Community::getBuilder() const
@@ -389,7 +370,7 @@ ErrCode Community::setCloseDateFromString(const QString &date, const QString &fo
     bool ok = false;
     logd("close date string '%s'", date.toStdString().c_str());
     qint64 dateVal = DatetimeUtils::dateFromString(date, format, &ok);
-    logd("dateVal %ll", dateVal);
+    logd("dateVal %lld", dateVal);
     if (!ok) {
         setCloseDate(dateVal);
     } else {
@@ -423,55 +404,51 @@ bool Community::allowRemove(QString *msg)
     return allow; // not allow to deleve root community, only update is allowed
 }
 
-void Community::copy(const Community &model)
+void Community::_copyData(const DbModel& model)
 {
     tracein;
-    mImgPath = model.mImgPath;
-    mAddr = model.mAddr;
+    const Community* comm = static_cast<const Community*>(&model);
+    setImgPath(comm->mImgPath);
+    setAddr(comm->mAddr);
+    setProvince(comm->mProvince);
 
-    mProvince = model.mProvince;
+    setCountryUid(comm->mCountryUid);
+    setCountryName(comm->mCountryName);
+    setCountryNameId(comm->mCountryNameId);
+    setChurch(comm->mChurch);
+    setTel(comm->mTel);
+    setEmail(comm->mEmail);
+    setLevel(comm->mLevel);
 
-    mCountryUid = model.mCountryUid;
-    mCountryName = model.mCountryName;
-    mCountryNameId = model.mCountryNameId;
+    setParentName(comm->mParentName);
+    setParentUid(comm->mParentUid);
+    setParentNameId(comm->mParentNameId);
 
-    mChurch = model.mChurch;
+    setCreateDate(comm->mCreateDate);
+    setCloseDate(comm->mCloseDate);
+    setFeastDate(comm->mFeastDate);
 
-    mTel = model.mTel;
-    mEmail = model.mEmail;
+    setModelStatus(comm->mStatus);
+    setModelStatusName(comm->mStatusName);
 
-    mLevel = model.mLevel;
+    setBrief(comm->mBrief);
+    setFullInfo(comm->mFullInfo);
+    setHistory(comm->mHistory);
 
-    mParentName = model.mParentName;
-    mParentUid = model.mParentUid;
-    mParentNameId = model.mParentNameId;
+    setAreaUid(comm->mAreaUid);
+    setAreaDbId(comm->mAreaDbId);
+    setAreaName(comm->mAreaName);
+    setAreaNameId(comm->mAreaNameId);
 
-    mCreateDate = model.mCreateDate;
-    mCloseDate = model.mCloseDate;
-    mFeastDate = model.mFeastDate;
+    setCurrentCEOName(comm->mCurrentCEOName);
+    setCurrentCEOUid(comm->mCurrentCEOUid);
+    setCurrentCEONameId(comm->mCurrentCEONameId);
+    setContact(comm->mContact);
 
-    mStatus = model.mStatus;
-    mStatusName = model.mStatusName;
-
-    mBrief = model.mBrief;
-    mFullInfo = model.mFullInfo;
-    mHistory = model.mHistory;
-
-    mAreaUid = model.mAreaUid;
-    mAreaDbId = model.mAreaDbId;
-    mAreaName = model.mAreaName;
-    mAreaNameId = model.mAreaNameId;
-
-    mCurrentCEOName = model.mCurrentCEOName;
-    mCurrentCEOUid = model.mCurrentCEOUid;
-    mCurrentCEONameId = model.mCurrentCEONameId;
-    mContact = model.mContact;
-
-    mMissionUid = model.mMissionUid;
-    mMissionName = model.mMissionName;
-    FREE_PTR(mNewCommMgr);
-    mNewCommMgr = CLONE_MODEL(model.newCommMgr(), CommunityManager);
-    mLoadedCEO = model.mLoadedCEO;
+    setMissionUid(comm->mMissionUid);
+    setMissionName(comm->mMissionName);
+    setNewCommMgr(comm->newCommMgr());
+    mLoadedCEO = comm->mLoadedCEO;
     traceout;
 }
 
@@ -517,7 +494,7 @@ CommunityManager *Community::newCommMgr() const
 void Community::setNewCommMgr(const CommunityManager *newCommMgr)
 {
     FREE_PTR(mNewCommMgr);
-    mNewCommMgr = CLONE_MODEL(newCommMgr, CommunityManager);
+    mNewCommMgr = CLONE_MODEL_CONST1(newCommMgr, CommunityManager);
 }
 
 bool Community::updateCEO() const
@@ -869,7 +846,7 @@ ErrCode Community::setFeastDateFromString(const QString &date, const QString &fo
     bool ok = false;
     logd("mFeastDate date string '%s'", date.toStdString().c_str());
     mFeastDate = DatetimeUtils::dateFromString(date, format, &ok);
-    logd("mFeastDate %ll", mFeastDate);
+    logd("mFeastDate %lld", mFeastDate);
     if (!ok) {
         loge("Invalid date '%s', format '%s'", STR2CHA(date), STR2CHA(format));
     }

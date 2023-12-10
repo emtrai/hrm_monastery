@@ -23,6 +23,7 @@
 
 #include "dbctl.h"
 #include "dbmodel.h"
+#include "modeldefs.h"
 Event::Event():DbModel()
 {
     traced;

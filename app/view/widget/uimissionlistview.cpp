@@ -29,6 +29,7 @@
 #include "mission.h"
 #include "utils.h"
 #include "stringdefs.h"
+#include "modeldefs.h"
 
 UIMissionListView::UIMissionListView(QWidget *parent):
     UICommonListView(parent)

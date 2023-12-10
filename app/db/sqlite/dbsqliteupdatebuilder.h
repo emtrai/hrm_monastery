@@ -29,7 +29,7 @@
 #include <QSqlQuery>
 #include "dbsqlitedefs.h"
 
-class FieldValue;
+struct FieldValue;
 
 class DbSqliteUpdateBuilder
 {

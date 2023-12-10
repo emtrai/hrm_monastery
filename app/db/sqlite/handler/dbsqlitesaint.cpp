@@ -27,6 +27,7 @@
 #include "saint.h"
 #include "person.h"
 #include "saintperson.h"
+#include "modeldefs.h"
 
 GET_INSTANCE_IMPL(DbSqliteSaint)
 

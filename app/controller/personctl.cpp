@@ -42,6 +42,8 @@
 #include "config.h"
 #include "prebuiltdefs.h"
 #include "controllerdefs.h"
+#include "modeldefs.h"
+
 GET_INSTANCE_CONTROLLER_IMPL(PersonCtl)
 
 #define LOOP_NAME_ID_MAX_TIME (1000)

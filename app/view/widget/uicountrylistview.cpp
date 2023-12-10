@@ -28,6 +28,7 @@
 #include "utils.h"
 #include "stringdefs.h"
 #include "filter.h"
+#include "modeldefs.h"
 
 UICountryListView::UICountryListView(QWidget *parent):
     UICommonListView(parent)

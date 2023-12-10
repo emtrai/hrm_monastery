@@ -33,6 +33,7 @@
 #include "stringdefs.h"
 #include "dialogutils.h"
 #include "datetimeutils.h"
+#include "modeldefs.h"
 
 UIAreaContactPeopleListView::UIAreaContactPeopleListView(QWidget *parent):
     UICommonListView(parent)

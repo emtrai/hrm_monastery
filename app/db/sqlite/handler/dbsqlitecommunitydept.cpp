@@ -28,6 +28,7 @@
 #include "table/dbsqlitecommdeptpersontbl.h"
 #include "table/dbsqlitecommunitydepttbl.h"
 #include "persondept.h"
+#include "modeldefs.h"
 
 GET_INSTANCE_IMPL(DbSqliteCommunityDept);
 

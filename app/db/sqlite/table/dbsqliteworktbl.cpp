@@ -29,6 +29,7 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QHash>
+#include "modeldefs.h"
 
 const qint32 DbSqliteWorkTbl::KVersionCode = VERSION_CODE(0,0,1);
 

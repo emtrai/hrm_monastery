@@ -38,6 +38,7 @@
 #include "role.h"
 #include "course.h"
 #include "dbsqlite.h"
+#include "modeldefs.h"
 
 const qint32 DbSqliteCommDeptPersonTbl::KVersionCode = VERSION_CODE(0,0,1);
 

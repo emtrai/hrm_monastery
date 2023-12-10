@@ -33,6 +33,7 @@
 #include "dbctl.h"
 #include "prebuiltdefs.h"
 #include "controllerdefs.h"
+#include "modeldefs.h"
 
 SaintCtl *SaintCtl::gInstance = nullptr;
 

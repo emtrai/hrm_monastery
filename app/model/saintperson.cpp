@@ -25,6 +25,7 @@
 #include "utils.h"
 #include "dbctl.h"
 #include "dbmodel.h"
+#include "modeldefs.h"
 
 SaintPerson::SaintPerson():DbModel()
 {
@@ -77,18 +78,14 @@ DbModelHandler *SaintPerson::getDbModelHandler() const
     return DB->getModelHandler(KModelHdlPerson);
 }
 
-void SaintPerson::copy(const DbModel *model)
+void SaintPerson::_copyData(const DbModel& model)
 {
     tracein;
-    if (IS_MODEL_NAME_STR(model, modelName())) {
-        const SaintPerson* per = static_cast<const SaintPerson*>(model);
-        setPersonUid(per->personUid());
-        setPersonDbId(per->personDbId());
-        setSaintUid(per->saintUid());
-        setSaintDbId(per->saintDbId());
-    } else {
-        loge("invalid model '%s'", MODELSTR2CHA(model));
-    }
+    const SaintPerson* per = static_cast<const SaintPerson*>(&model);
+    setPersonUid(per->personUid());
+    setPersonDbId(per->personDbId());
+    setSaintUid(per->saintUid());
+    setSaintDbId(per->saintDbId());
     traceout;
 }
 

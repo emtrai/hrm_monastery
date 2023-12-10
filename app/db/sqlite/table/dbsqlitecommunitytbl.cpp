@@ -34,6 +34,7 @@
 #include "dbsqlite.h"
 #include "dbcommunitymodelhandler.h"
 #include "person.h"
+#include "modeldefs.h"
 
 const qint32 DbSqliteCommunityTbl::KVersionCode = VERSION_CODE(0,0,1);
 

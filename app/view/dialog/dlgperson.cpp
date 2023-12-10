@@ -592,7 +592,7 @@ ErrCode DlgPerson::fromPerson(const Person *model)
         RELEASE_LIST_DBMODEL(mListPersonEvent);
         foreach (DbModel* item, events) {
             if (item) {
-                DbModel* event = item->clone();
+                DbModel* event = CLONE_DBMODEL(item);
                 if (event) {
                     mListPersonEvent.append(event);
                 } else {
@@ -1396,7 +1396,13 @@ void DlgPerson::on_btnAddEvent_clicked()
         const DbModel* event = dlg->getModel();
         if (event != nullptr) {
             logd("Add event to list '%s'", STR2CHA(event->toString()));
-            mListPersonEvent.append(event->clone());
+            DbModel* tmp = CLONE_DBMODEL(event);
+            if (tmp) {
+                mListPersonEvent.append(tmp);
+            } else {
+                loge("failed to clone event '%s' look like no memory?",
+                     MODELSTR2CHA(event));
+            }
         }
         loadEvent();
     }
@@ -1555,7 +1561,7 @@ void DlgPerson::on_btnModifyEvent_clicked()
             if (event != nullptr) {
                 logd("copy data from '%s'", STR2CHA(event->toString()));
                 model->setMarkModified(true);
-                model->copyData(event);
+                model->clone(event, false);
             } else {
                 logw("something was wrong, invalid data");
             }

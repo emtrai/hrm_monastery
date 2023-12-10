@@ -19,10 +19,8 @@
  * Created date:12/22/2022
  * Brief:
  */
-#include "DbSqliteDeleteBuilder.h"
+#include "dbsqlitedeletebuilder.h"
 #include "logger.h"
-#include "errcode.h"
-#include "dbctl.h"
 #include "dbsqlite.h"
 
 DbSqliteDeleteBuilder *DbSqliteDeleteBuilder::build(const QString &tblName)
@@ -84,5 +82,5 @@ QSqlQuery *DbSqliteDeleteBuilder::buildSqlQuery(const QString *cond)
 DbSqliteDeleteBuilder::DbSqliteDeleteBuilder(const QString& name):
     mName(name)
 {
-    tracein;
+    traced;
 }

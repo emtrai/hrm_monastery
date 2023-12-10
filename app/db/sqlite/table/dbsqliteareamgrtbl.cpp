@@ -41,6 +41,7 @@
 #include "coursectl.h"
 #include "utils.h"
 #include "dbmodelutils.h"
+#include "modeldefs.h"
 /**
  * VERSION 0.0.1:
  * + KFieldAreaUid

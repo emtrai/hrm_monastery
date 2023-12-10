@@ -37,6 +37,7 @@
 #include "personctl.h"
 #include "dialogutils.h"
 #include "viewutils.h"
+#include "modeldefs.h"
 
 UICommunityListView::UICommunityListView(QWidget *parent):
     UICommonListView(parent)
@@ -100,7 +101,8 @@ ErrCode UICommunityListView::fillValueTableRowItem(DbModel *item, UITableItem *t
         loge("invalid model, not community model");
     }
     if (err == ErrNone) {
-        Community* model = (Community*) item;
+        Community* model = static_cast<Community*>(item);
+        model->check2LoadAllData();
         tblItem->addValue(model->nameId());
         tblItem->addValue(model->name());
         tblItem->addValue(model->remark());

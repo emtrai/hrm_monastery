@@ -29,6 +29,7 @@
 #include "specialist.h"
 
 #include "specialistperson.h"
+#include "modeldefs.h"
 
 GET_INSTANCE_IMPL(DbSqliteSpecialist)
 

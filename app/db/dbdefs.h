@@ -22,10 +22,5 @@
 #ifndef DBDEFS_H
 #define DBDEFS_H
 
-typedef enum DbModelType {
-    MODEL_UNKNOWN = 0,
-    MODEL_MAP = 1 << 0,
-    MODEL_TYPE_MAX
-};
 
 #endif // DBDEFS_H

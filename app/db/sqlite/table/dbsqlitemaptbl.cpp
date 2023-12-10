@@ -35,6 +35,7 @@
 #include "dbdefs.h"
 #include "dbsqlite.h"
 #include "exception.h"
+#include "modeldefs.h"
 
 /* Map table:
  * UID1 | UID2 | xxx | yyy

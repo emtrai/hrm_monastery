@@ -25,6 +25,7 @@
 #include "dbctl.h"
 #include "defs.h"
 #include "dbmodel.h"
+#include "modeldefs.h"
 
 
 Department::Department():DbModel()

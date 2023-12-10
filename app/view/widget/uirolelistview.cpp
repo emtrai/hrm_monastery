@@ -31,6 +31,7 @@
 #include "mainwindow.h"
 #include "uitableviewfactory.h"
 #include "stringdefs.h"
+#include "modeldefs.h"
 
 UIRoleListView::UIRoleListView(QWidget *parent):
     UICommonListView(parent)

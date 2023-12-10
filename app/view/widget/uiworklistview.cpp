@@ -26,9 +26,8 @@
 #include "dbmodel.h"
 #include "work.h"
 #include "utils.h"
-#include "mainwindow.h"
-#include "uitableviewfactory.h"
 #include "stringdefs.h"
+#include "modeldefs.h"
 
 UIWorkListView::UIWorkListView(QWidget *parent):
     UICommonListView(parent)

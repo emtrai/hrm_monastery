@@ -366,13 +366,10 @@ void DlgCommonEditModel::setModelName(const QString &newModelName)
 void DlgCommonEditModel::setModel(DbModel *newModel)
 {
     tracein;
+    FREE_PTR(mModel);
     if (newModel) {
-        if (mModel) {
-            logd("delete old model");
-            delete mModel;
-        }
         logd("clone new model");
-        mModel = newModel->clone();
+        mModel = CLONE_DBMODEL(newModel);
     } else {
         loge("invalid new model");
     }

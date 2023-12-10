@@ -30,6 +30,7 @@
 #include "dbsqlitetablebuilder.h"
 #include "dbsqliteinsertbuilder.h"
 #include "event.h"
+#include "modeldefs.h"
 
 const qint32 DbSqliteEventTbl::KVersionCode = VERSION_CODE(0,0,1);
 

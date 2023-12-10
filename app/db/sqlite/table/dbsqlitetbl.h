@@ -36,7 +36,7 @@ class DbSqliteInsertBuilder;
 class DbSqliteUpdateBuilder;
 class DbSqliteDeleteBuilder;
 class QSqlQuery;
-class FieldValue;
+struct FieldValue;
 class FilterKeyworkItem;
 
 class DbSqliteTbl

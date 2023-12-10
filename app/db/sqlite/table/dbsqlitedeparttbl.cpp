@@ -28,6 +28,7 @@
 #include "defs.h"
 #include "logger.h"
 #include "dbsqlite.h"
+#include "modeldefs.h"
 
 
 const qint32 DbSqliteDepartTbl::KVersionCode = VERSION_CODE(0,0,1);

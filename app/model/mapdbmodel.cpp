@@ -26,7 +26,8 @@
 #include "datetimeutils.h"
 #include "defs.h"
 #include "dbmodel.h"
-#include "dbdefs.h"
+#include "modeldefs.h"
+#include "importtype.h"
 
 MapDbModel::MapDbModel():DbModel(),
     mDbId1(0),
@@ -43,36 +44,21 @@ MapDbModel::~MapDbModel()
     traced;
 }
 
-MapDbModel::MapDbModel(const MapDbModel &model):DbModel((DbModel*)&model)
-{
-    tracein;
-    docopy(model);
-    traceout;
-}
+MapDbModel::MapDbModel(const MapDbModel &model):MapDbModel(&model)
+{}
 
 MapDbModel::MapDbModel(const MapDbModel *model):DbModel((DbModel*) model)
 {
     tracein;
     if (model) {
+        // because docopy is not virtual, we need to call it here to make sure
+        // it's called correctly
         docopy(*model);
     } else {
         loge("contruct failed, null pointer");
     }
     traceout;
 }
-
-void MapDbModel::clone(const DbModel *model)
-{
-    tracein;
-    if (model) {
-        DbModel::clone(model);
-        docopy((*(MapDbModel*)model));
-    } else {
-        loge("clone failed, null model");
-    }
-    traceout;
-}
-
 
 void MapDbModel::dump() const
 {
@@ -362,19 +348,30 @@ void MapDbModel::setChangeHistory(const QString &newChangeHistory)
     }
 }
 
-void MapDbModel::docopy(const MapDbModel &model)
+void MapDbModel::docopy(const DbModel &model)
 {
     tracein;
-    mUid1 = model.mUid1;
-    mDbId1 = model.mDbId1;
-    mUid2 = model.mUid2;
-    mDbId2 = model.mDbId2;
-    mStartDate = model.mStartDate;
-    mEndDate = model.mEndDate;
-    mModelStatus = model.mModelStatus;
-    mModelStatusName = model.mModelStatusName;
-    mParentUid = model.mParentUid;
-    mChangeHistory = model.mChangeHistory;
+    const MapDbModel* mapModel = static_cast<const MapDbModel*>(&model);
+    setUid1(mapModel->mUid1);
+    setDbId1(mapModel->mDbId1);
+    setUid2(mapModel->mUid2);
+    setDbId2(mapModel->mDbId2);
+    setStartDate(mapModel->mStartDate);
+    setEndDate(mapModel->mEndDate);
+    setModelStatus(mapModel->mModelStatus);
+    setModelStatusName(mapModel->mModelStatusName);
+    setParentUid(mapModel->mParentUid);
+    setChangeHistory(mapModel->mChangeHistory);
+    traceout;
+}
+
+void MapDbModel::copyData(const DbModel *model)
+{
+    tracein;
+    if (model && model->modelType() == MODEL_MAP) {
+        docopy(*model);
+    }
+    DbModel::copyData(model);
     traceout;
 }
 

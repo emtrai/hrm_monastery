@@ -298,7 +298,12 @@ int UITableMenuAction::itemListData(QList<DbModel *>&outList)
         logd("selected %lld items", mItemList.count());
         foreach (UITableItem* item, mItemList) {
             if (item->data() != nullptr) {
-                outList.append(item->data()->clone());
+                DbModel* model = CLONE_DBMODEL(item->data());
+                if (model) {
+                    outList.append(model);
+                } else {
+                    logw("failed to clone data, no memory??");
+                }
             }
         }
     } else {
@@ -626,7 +631,7 @@ ErrCode UITableView::onDeleteItem(const QList<UITableItem *>& selectedItems)
                                 if (*err == ErrNone) {
                                     cnt++;
                                 } else {
-                                    loge("Delete '%s' err = %d", STR2CHA(model->toString()), err);
+                                    loge("Delete '%s' err = %d", STR2CHA(model->toString()), *err);
                                     break;
                                 }
                                 if (cnt % 4 == 0) {

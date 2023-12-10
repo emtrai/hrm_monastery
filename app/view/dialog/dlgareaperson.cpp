@@ -33,6 +33,7 @@
 #include "area.h"
 #include "stringdefs.h"
 #include "dbctl.h"
+#include "modeldefs.h"
 
 DlgAreaPerson::DlgAreaPerson(QWidget *parent) :
     DlgCommonEditModel(parent),
@@ -213,7 +214,7 @@ ErrCode DlgAreaPerson::setArea(const Area *newArea)
     FREE_PTR(mArea);
     if (newArea) {
         logd("clone new area");
-        mArea = CLONE_MODEL(newArea, Area);
+        mArea = CLONE_MODEL_CONST1(newArea, Area);
         if (!mArea) {
             err = ErrNoMemory;
             loge("Clone new area fail, no memory?");

@@ -28,6 +28,7 @@
 #include "dbmodel.h"
 #include "datetimeutils.h"
 #include "stringdefs.h"
+#include "modeldefs.h"
 
 DlgArea::DlgArea(QWidget *parent) :
     DlgCommonEditModel(parent),

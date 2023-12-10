@@ -26,16 +26,25 @@
 #include <QStringLiteral>
 #include "utils.h"
 #include "datetimeutils.h"
-
 #include "dbctl.h"
-
 #include "defs.h"
+#include "modeldefs.h"
+
+
+Saint::Saint(): DbModel(),
+    mFeastDay(0),
+    mGender(GENDER_UNKNOWN)
+{}
 
 
 DbModel *Saint::build()
 {
     Saint* model = new Saint();
-    model->init();
+    if (model) {
+        model->init();
+    } else {
+        loge("failed to allocate saint, no memory?");
+    }
     return model;
 }
 
@@ -44,33 +53,12 @@ DbModelBuilder Saint::getBuilder() const
     return &Saint::build;
 }
 
-void Saint::clone(const DbModel *model)
-{
-    tracein;
-    if (model) {
-        DbModel::clone(model);
-        copy(*(Saint*)model);
-    } else {
-        loge("clone failed, null model");
-    }
-    traceout;
-}
-
 
 void Saint::initImportFields()
 {
     tracein;
     // TODO: check fields like holly name, country, etc. and mark invalid field???
-
-    mImportCallbacks.insert(KItemUid, [this](const QString& value){
-        this->setUid(value);
-        return ErrNone;
-    });
-
-    mImportCallbacks.insert(KItemName, [this](const QString& value){
-        this->setName(value);
-        return ErrNone;
-    });
+    DbModel::initImportFields();
 
     mImportCallbacks.insert(KItemFullName, [this](const QString& value){
         this->setFullName(value);
@@ -88,16 +76,6 @@ void Saint::initImportFields()
         this->setFeastDay(value);
         return ErrNone;
     });
-    mImportCallbacks.insert(KItemRemark, [this](const QString& value){
-        this->setRemark(value);
-        return ErrNone;
-    });
-}
-
-Saint::Saint(): DbModel()
-
-{
-    mFeastDay = 0;
 }
 
 ErrCode Saint::onImportParseDataItem(const QString& importName, int importFileType,
@@ -194,16 +172,16 @@ DbModelHandler *Saint::getDbModelHandler() const
     return DbCtl::getInstance()->getDb()->getSaintModelHandler();
 }
 
-void Saint::copy(const Saint &model)
+void Saint::_copyData(const DbModel& model)
 {
     tracein;
-    mImportCallbacks = model.mImportCallbacks;
-    mFullName = model.mFullName;
-    mOriginName = model.mOriginName;
-    mGender = model.mGender;
-    mFeastDay = model.mFeastDay;
-    mCountry = model.mCountry;
-    mCountryUid = model.mCountryUid;
+    const Saint* saint = static_cast<const Saint*>(&model);
+    setFullName(saint->mFullName);
+    setOriginName(saint->mOriginName);
+    setGender(saint->mGender);
+    setFeastDay(saint->mFeastDay);
+    setCountry(saint->mCountry);
+    setCountryUid(saint->mCountryUid);
     traceout;
 }
 

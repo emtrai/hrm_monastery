@@ -31,6 +31,7 @@
 #include "stringdefs.h"
 #include "prebuiltdefs.h"
 #include "communitydeptctl.h"
+#include "modeldefs.h"
 
 CommunityDept::CommunityDept():DbModel()
 {
@@ -65,41 +66,35 @@ QString CommunityDept::modelName() const
     return KModelNameCommDept;
 }
 
-void CommunityDept::clone(const DbModel *model)
+void CommunityDept::_copyData(const DbModel& model)
 {
     tracein;
-    DbModel::clone(model);
-    if (model && model->modelName() == KModelNameCommDept) {
-        CommunityDept* comm = (CommunityDept*)model;
-        mDepartmentUid = comm->mDepartmentUid;
-        mDepartmentDbId = comm->mDepartmentDbId;
-        mDepartmentNameId = comm->mDepartmentNameId;
-        mDepartmentName = comm->mDepartmentName;
-        mCommunityUid = comm->mCommunityUid;
-        mCommunityNameId = comm->mCommunityNameId;
-        mCommunityDbId = comm->mCommunityDbId;
-        mCommunityName = comm->mCommunityName;
-        mEstablishDate = comm->mEstablishDate;
-        mClosedDate = comm->mClosedDate;
-        mEmail = comm->mEmail;
-        mAddr = comm->mAddr;
-        mTel = comm->mTel;
-        mBrief = comm->mBrief;
-        mStatus = comm->mStatus;
-        mModelStatusName = comm->mModelStatusName;
-        FREE_PTR(mCurrentDirector);
-        if (comm->currentDirector()) {
-            mCurrentDirector = CLONE_MODEL(comm->currentDirector(), Person);
-        }
-    }
+    const CommunityDept* comm = static_cast<const CommunityDept*>(&model);
+    setDepartmentUid(comm->mDepartmentUid);
+    setDepartmentDbId(comm->mDepartmentDbId);
+    setDepartmentNameId(comm->mDepartmentNameId);
+    setDepartmentName(comm->mDepartmentName);
+
+    setCommunityUid(comm->mCommunityUid);
+    setCommunityNameId(comm->mCommunityNameId);
+    setCommunityDbId(comm->mCommunityDbId);
+    setCommunityName(comm->mCommunityName);
+
+    setEstablishDate(comm->mEstablishDate);
+    setClosedDate(comm->mClosedDate);
+
+    setEmail(comm->mEmail);
+    setAddr(comm->mAddr);
+    setTel(comm->mTel);
+    setBrief(comm->mBrief);
+
+    setModelStatus(comm->mStatus);
+    setModelStatusName(comm->mModelStatusName);
+
+    setCurrentDirector(comm->currentDirector());
     traceout;
 }
 
-DbModel *CommunityDept::clone() const
-{
-    traced;
-    return DbModel::clone();
-}
 void CommunityDept::initExportFields()
 {
     tracein;
@@ -288,7 +283,7 @@ void CommunityDept::setCurrentDirector(const Person *newCurrentDirector)
     FREE_PTR(mCurrentDirector);
     if (newCurrentDirector) {
         logd("clone for new director '%s'", MODELSTR2CHA(newCurrentDirector));
-        mCurrentDirector = CLONE_MODEL(newCurrentDirector, Person);
+        mCurrentDirector = CLONE_MODEL_CONST1(newCurrentDirector, Person);
     }
     traceout;
 }

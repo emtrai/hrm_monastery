@@ -29,6 +29,7 @@
 #include "areaperson.h"
 #include "persondept.h"
 #include "communitymanager.h"
+#include "modeldefs.h"
 
 GET_INSTANCE_IMPL(DbSqliteRole)
 

@@ -23,14 +23,13 @@
 #include "logger.h"
 #include "person.h"
 #include "personctl.h"
-#include "mainwindow.h"
 #include "utils.h"
 #include "datetimeutils.h"
-#include "dialogutils.h"
 #include "communityctl.h"
 #include "communitymanager.h"
 #include "stringdefs.h"
 #include "person.h"
+#include "modeldefs.h"
 
 DlgSearchPerson *DlgSearchPerson::build(QWidget *parent, bool isMulti)
 {

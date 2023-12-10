@@ -32,6 +32,7 @@
 #include "dbsqlitetablebuilder.h"
 #include "dbsqliteinsertbuilder.h"
 #include "dbsqliteupdatebuilder.h"
+#include "modeldefs.h"
 
 const qint32 DbSqliteEthnicTbl::KVersionCode = VERSION_CODE(0,0,1);
 

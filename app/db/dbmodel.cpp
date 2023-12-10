@@ -24,23 +24,23 @@
 #include "dbmodelhandler.h"
 #include "utils.h"
 #include "dataexporter.h"
-#include "dbdefs.h"
 #include "filectl.h"
 
 #include "prebuiltdefs.h"
 #include "stringdefs.h"
 #include "datetimeutils.h"
 #include <QUuid>
+#include "modeldefs.h"
 
 #define MAX_HISTORY_LENGTH 500
 
 DbModel::DbModel():
     mDeletable(true)
     , mValidateResult(nullptr)
-    , mDbId(0)
     , mMarkModified(false)
-    , mDbStatus(0)
     , mUpdateAllFields(false)
+    , mDbId(0)
+    , mDbStatus(0)
     , mDbCreatedTime(0)
     , mLastDbUpdatedTime(0)
     , mLoadedAllData(false)
@@ -48,16 +48,10 @@ DbModel::DbModel():
 {
     traced;
     mRefCnt.storeRelease(0);
-//    init(); // TODO: should call init here?
 }
 
-DbModel::DbModel(const DbModel &model):DbModel()
-{
-    tracein;
-    docopy(model);
-    // TODO: mValidateResult
-    traceout;
-}
+DbModel::DbModel(const DbModel &model):DbModel(&model)
+{}
 
 DbModel::DbModel(const DbModel *model):DbModel()
 {
@@ -68,32 +62,22 @@ DbModel::DbModel(const DbModel *model):DbModel()
     traceout;
 }
 
-void DbModel::docopy(const DbModel &model)
+
+void DbModel::copyData(const DbModel *model)
 {
     tracein;
-    mDeletable = model.mDeletable;
-    mDbId = model.dbId();
-    mUid = model.uid();
-    mName = model.name();
-    mRemark = model.remark();
-    mNameId = model.nameId();
-    mDbStatus = model.dbStatus();
-    mDbHistory = model.dbHistory();
-    mDbCreatedTime = model.dbCreatedTime();
-    mLastDbUpdatedTime = model.lastDbUpdatedTime();
-    mMarkModified = model.markModified();
-    mUpdateAllFields = model.updateAllFields();
-    mExportCallbacks = model.mExportCallbacks;
-    mImportCallbacks = model.mImportCallbacks;
-    mUpdatedField = model.mUpdatedField;
-    mLoadedAllData = model.mLoadedAllData;
+    if (IS_MODEL_NAME_STR(model, modelName())) {
+        _copyData(*model);
+    } else {
+        loge("clone failed, invalid model '%s'", MODELSTR2CHA(model));
+    }
     traceout;
 }
 
-void DbModel::copy(const DbModel *model)
+void DbModel::_copyData(const DbModel &model)
 {
     UNUSED(model);
-    // do nothing
+    // do nothing, overrided by derived class
 }
 
 
@@ -111,13 +95,13 @@ void DbModel::init()
     traceout;
 }
 
-void DbModel::clone(const DbModel *model)
+void DbModel::clone(const DbModel *model, bool all)
 {
     tracein;
     if (model) {
         logd("clone from model '%s'", STR2CHA(model->toString()));
-        docopy(*model);
-        copy(model);
+        docopy(*model, all);
+        copyData(model);
     } else {
         loge("clone failed, null model");
     }
@@ -135,37 +119,34 @@ DbModel *DbModel::clone() const
     return model;
 }
 
-ErrCode DbModel::copyData(const DbModel *model)
+void DbModel::docopy(const DbModel &model, bool all)
 {
     tracein;
-    ErrCode err = ErrNone;
-    if (model) {
-
-        mUpdateAllFields = model->updateAllFields();
-        setName(model->name());
-        setRemark(model->remark());
-        setNameId(model->nameId());
-        setUid(model->uid());
-        setDbId(model->dbId());
-        setDbStatus(model->dbStatus());
-        setDbHistory(model->dbHistory());
-        setDbCreatedTime(model->dbCreatedTime());
-        setLastDbUpdatedTime(model->lastDbUpdatedTime());
-        mDeletable = model->mDeletable;
-
-        mExportCallbacks = model->mExportCallbacks;
-        mImportCallbacks = model->mImportCallbacks;
-        mImportItemsType = model->mImportItemsType;
-        mImportFieldRequired = model->mImportFieldRequired;
-        mUpdatedField = model->updatedField();
-        mUpdateAllFields = model->mUpdateAllFields;
-        mLoadedAllData = model->mLoadedAllData;
+    logd("clone all %d", all);
+    if (all) {
+        mMarkModified = model.markModified();
+        mUpdateAllFields = model.updateAllFields();
     } else {
-        loge("copy data failed, empty model");
-        err = ErrInvalidArg;
+        dbgd("not clone all");
     }
-    traceret(err);
-    return err;
+    mDeletable = model.mDeletable;
+    setDbId(model.dbId());
+    setUid(model.uid());
+    setName(model.name());
+    setRemark(model.remark());
+    setNameId(model.nameId());
+    setDbStatus(model.dbStatus());
+    setDbHistory(model.dbHistory());
+    setDbCreatedTime(model.dbCreatedTime());
+    setLastDbUpdatedTime(model.lastDbUpdatedTime());
+
+    mExportCallbacks = model.mExportCallbacks;
+    mImportCallbacks = model.mImportCallbacks;
+    mUpdatedField = model.mUpdatedField;
+    mLoadedAllData = model.mLoadedAllData;
+    mImportItemsType = model.mImportItemsType;
+    mImportFieldRequired = model.mImportFieldRequired;
+    traceout;
 }
 
 void DbModel::incRef()

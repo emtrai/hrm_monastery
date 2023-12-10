@@ -29,6 +29,7 @@
 #include <QList>
 #include "prebuiltdefs.h"
 #include "controllerdefs.h"
+#include "modeldefs.h"
 
 #define SPLIT ','
 

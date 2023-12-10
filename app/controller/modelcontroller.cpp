@@ -177,7 +177,7 @@ QList<DbModel *> ModelController::getAllItems(bool readFromDb, int from, int noI
         // Cache is hash map, so data is not sorted, take care
         foreach (DbModel* item, mCacheItemList.values()) {
             if (item) {
-                DbModel* cloneItem = item->clone();
+                DbModel* cloneItem = CLONE_DBMODEL(item);
                 if (cloneItem) {
                     list.append(cloneItem);
                 } else {
@@ -255,7 +255,7 @@ DbModel *ModelController::getModelByUid(const QString &uid)
                 if (cacheModel) {
                     logd("Found '%s' from cache", STR2CHA(cacheModel->toString()));
                     // clone it, not get directly from cache
-                    model = cacheModel->clone();
+                    model = CLONE_DBMODEL(cacheModel);
                 } else {
                     loge("Cach contain null value!!!");
                 }
@@ -336,7 +336,7 @@ DbModel *ModelController::getModelByNameId(const QString &nameId)
                     logd("Check name id '%s'", STR2CHA(item->nameId()));
                     if (item->nameId() == nameId) {
                         logd("Found name id '%s'", STR2CHA(nameId));
-                        model = item->clone();
+                        model = CLONE_DBMODEL(item);
                         break;
                     }
                 } else {
@@ -872,7 +872,7 @@ ErrCode ModelController::insertModelToCache(DbModel* model, bool clone)
         // so save back to cache
         DbModel* saveModel = nullptr;
         if (clone) {
-            saveModel = model->clone();
+            saveModel = CLONE_DBMODEL(model);
         } else {
             saveModel = model;
         }

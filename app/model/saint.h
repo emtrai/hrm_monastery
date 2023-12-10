@@ -41,55 +41,54 @@
 
 class Saint: public DbModel
 {
-    public:
-        static DbModel* build();
-        virtual DbModelBuilder getBuilder() const;
-        virtual void clone(const DbModel* model);
+public:
+    static DbModel* build();
+public:
+    Saint();
+    virtual DbModelBuilder getBuilder() const;
 
-        void initImportFields();
-        Saint();
-        virtual ErrCode onImportParseDataItem(const QString& importName, int importFileType,
-                                     const QString& keyword, const QString& value,
-                                     quint32 idx = 0, QList<DbModel *>* outList = nullptr);
+    void initImportFields();
+    virtual ErrCode onImportParseDataItem(const QString& importName, int importFileType,
+                                 const QString& keyword, const QString& value,
+                                 quint32 idx = 0, QList<DbModel *>* outList = nullptr);
 
-        virtual QString modelName() const;
+    virtual QString modelName() const;
 
-        qint64 feastDay() const;
-        void setFeastDay(qint64 newFeastDay);
-        void setFeastDay(const QString& newFeastDay, const QString& f = "D-M");
+    qint64 feastDay() const;
+    void setFeastDay(qint64 newFeastDay);
+    void setFeastDay(const QString& newFeastDay, const QString& f = "D-M");
 
-        Gender gender() const;
-        void setGender(Gender newGender);
-        void setGender(const QString& gender);
+    Gender gender() const;
+    void setGender(Gender newGender);
+    void setGender(const QString& gender);
 
-        const QString &country() const;
-        void setCountry(const QString &newCountry);
+    const QString &country() const;
+    void setCountry(const QString &newCountry);
 
-        virtual QString fullName() const;
-        void setFullName(const QString &newFullName);
+    virtual QString fullName() const;
+    void setFullName(const QString &newFullName);
 
-        virtual void dump() const;
+    virtual void dump() const;
 
-    public:
-        const QString &countryUid() const;
-        void setCountryUid(const QString &newCountryUid);
+public:
+    const QString &countryUid() const;
+    void setCountryUid(const QString &newCountryUid);
 
-        const QString &originName() const;
-        void setOriginName(const QString &newOriginName);
+    const QString &originName() const;
+    void setOriginName(const QString &newOriginName);
 
 
-    protected:
-        virtual DbModelHandler *getDbModelHandler() const;
-        void copy(const Saint& model);
+protected:
+    virtual DbModelHandler *getDbModelHandler() const;
+    virtual void _copyData(const DbModel& model);
 
-    private:
-        QHash<QString, ImportCallbackFunc> mImportCallbacks;
-        QString mFullName;
-        QString mOriginName;
-        Gender mGender;
-        qint64 mFeastDay; // ngay bon mang
-        QString mCountry;
-        QString mCountryUid;
+private:
+    QString mFullName;
+    QString mOriginName;
+    Gender mGender;
+    qint64 mFeastDay; // ngay bon mang
+    QString mCountry;
+    QString mCountryUid;
 };
 
 

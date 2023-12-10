@@ -35,7 +35,6 @@ protected:
 public:
     virtual ~Area();
     static DbModel *build();
-    virtual void clone(const DbModel* model);
 
     virtual QString modelName() const;
 
@@ -84,7 +83,7 @@ public:
 protected:
     virtual DbModelHandler* getDbModelHandler() const;
     virtual DbModelBuilder getBuilder() const;
-    void copy(const Area& model);
+    virtual void _copyData(const DbModel& model);
 private:
     QString mCountryName; // just for display, not store to db
     qint64 mCountryDbId;

@@ -36,6 +36,7 @@
 #include "utils.h"
 #include "dbsqlitespecialistpersontbl.h"
 #include "specialistperson.h"
+#include "modeldefs.h"
 
 const qint32 DbSqlitePersonTbl::KVersionCode = VERSION_CODE(0,0,1);
 

@@ -34,6 +34,7 @@
 #include "dialog/dlgpersoncomm.h"
 #include "stringdefs.h"
 #include "dialogutils.h"
+#include "modeldefs.h"
 
 UICommunitiesOfPersonListView::UICommunitiesOfPersonListView(QWidget *parent):
     UICommonListView(parent)

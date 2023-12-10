@@ -28,6 +28,7 @@
 #include "personstatus.h"
 #include "utils.h"
 #include "stringdefs.h"
+#include "modeldefs.h"
 
 UIPersonStatusListView::UIPersonStatusListView(QWidget *parent):
     UICommonListView(parent)

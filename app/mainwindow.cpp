@@ -61,6 +61,7 @@
 #include "imagedefs.h"
 #include "statistic/statistic.h"
 #include "dbctl.h"
+#include "modeldefs.h"
 
 #define ADD_MENU_ITEM(menu, func, name, iconPath) \
 do { \

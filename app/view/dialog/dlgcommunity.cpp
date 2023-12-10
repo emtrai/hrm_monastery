@@ -41,6 +41,7 @@
 #include "role.h"
 #include "mission.h"
 #include "missionctl.h"
+#include "modeldefs.h"
 
 DlgCommunity::DlgCommunity(QWidget *parent) :
     DlgCommonEditModel(parent),

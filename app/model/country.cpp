@@ -29,6 +29,7 @@
 #include "defs.h"
 #include "dbmodel.h"
 #include "provincectl.h"
+#include "modeldefs.h"
 
 
 Country::Country():DbModel()

@@ -34,6 +34,7 @@
 #include "communityperson.h"
 #include "filter.h"
 #include "person.h"
+#include "modeldefs.h"
 
 const qint32 DbSqliteCommunityPersonTbl::KVersionCode = VERSION_CODE(0,0,1);
 

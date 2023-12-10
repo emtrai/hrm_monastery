@@ -29,6 +29,7 @@
 #include "table/dbsqliteareamgrtbl.h"
 #include "table/dbsqlitecommunitytbl.h"
 #include "model/areaperson.h"
+#include "modeldefs.h"
 
 
 GET_INSTANCE_IMPL(DbSqliteArea)

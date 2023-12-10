@@ -27,6 +27,7 @@
 #include "defs.h"
 #include "mission.h"
 #include "community.h"
+#include "modeldefs.h"
 
 GET_INSTANCE_IMPL(DbSqliteMission)
 

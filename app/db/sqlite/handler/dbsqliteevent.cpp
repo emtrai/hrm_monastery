@@ -26,6 +26,7 @@
 #include "dbsqlitedefs.h"
 #include "dbsqlite.h"
 #include "personevent.h"
+#include "modeldefs.h"
 
 GET_INSTANCE_IMPL(DbSqliteEvent)
 

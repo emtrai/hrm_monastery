@@ -21,8 +21,8 @@
  */
 #include "specialist.h"
 #include "logger.h"
-
 #include "dbctl.h"
+#include "modeldefs.h"
 
 Specialist::Specialist():DbModel()
 {

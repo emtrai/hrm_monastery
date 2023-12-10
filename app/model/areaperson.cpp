@@ -37,6 +37,7 @@
 #include "person.h"
 #include "utils.h"
 #include "area.h"
+#include "modeldefs.h"
 
 AreaPerson::AreaPerson():MapDbModel()
 {
@@ -53,18 +54,6 @@ DbModel *AreaPerson::build()
     AreaPerson* item = new AreaPerson();
     item->init();
     return item;
-}
-
-void AreaPerson::clone(const DbModel *model)
-{
-    tracein;
-    if (model) {
-        MapDbModel::clone(model);
-        copy(*(AreaPerson*)model);
-    } else {
-        loge("clone failed, null model");
-    }
-    traceout;
 }
 
 DbModelBuilder AreaPerson::getBuilder() const
@@ -329,28 +318,29 @@ DbModelHandler *AreaPerson::getDbModelHandler() const
     return DB->getModelHandler(KModelHdlArea);
 }
 
-void AreaPerson::copy(const AreaPerson &model)
+void AreaPerson::_copyData(const DbModel &model)
 {
     tracein;
-    mRoleUid = model.mRoleUid;
-    mRoleName = model.mRoleName;
-    mRoleNameId = model.mRoleNameId;
+    const AreaPerson* area = static_cast<const AreaPerson*>(&model);
+    setRoleUid(area->mRoleUid);
+    setRoleName(area->mRoleName);
+    setRoleNameId(area->mRoleNameId);
 
-    mCourseUid = model.mCourseUid;
-    mCourseName = model.mCourseName;
-    mCourseNameId = model.mCourseNameId;
+    setCourseUid(area->mCourseUid);
+    setCourseName(area->mCourseName);
+    setCourseNameId(area->mCourseNameId);
 
-    mPersonUid = model.mPersonUid;
-    mPersonName = model.mPersonName;
-    mPersonNameId = model.mPersonNameId;
+    setPersonUid(area->mPersonUid);
+    setPersonName(area->mPersonName);
+    setPersonNameId(area->mPersonNameId);
 
-    mHollyName = model.mHollyName;
-    mPersonTel = model.mPersonTel;
-    mPersonEmail = model.mPersonEmail;
+    setHollyName(area->mHollyName);
+    setPersonTel(area->mPersonTel);
+    setPersonEmail(area->mPersonEmail);
 
-    mAreaUid = model.mAreaUid;
-    mAreaName = model.mAreaName;
-    mAreaNameId = model.mAreaNameId;
+    setAreaUid(area->mAreaUid);
+    setAreaName(area->mAreaName);
+    setAreaNameId(area->mAreaNameId);
 
     traceout;
 }

@@ -50,6 +50,7 @@
 
 #include "stringdefs.h"
 #include <QUuid>
+#include "modeldefs.h"
 
 #define SPLIT_EMAIL_TEL ";"
 // TODO: show person code instead of uid?? uid should use for debug only?
@@ -99,138 +100,140 @@ Person::~Person()
     RELEASE_HASH(mPersonEventList, QString, DbModel);
 }
 
-void Person::clone(const DbModel *model)
+void Person::_copyData(const DbModel& model)
 {
     tracein;
-    if (model) {
-        DbModel::clone(model);
-        Person* per = (Person*) model;
-        mFirstName = per->firstName();
-        mLastName = per->lastName();
+    const Person* per = static_cast<const Person*>(&model);
 
-        mBirthday = per->birthday();
-        mBirthPlace = per->birthPlace();
+    setFirstName(per->firstName());
+    setLastName(per->lastName());
 
-        mHollyName = per->hollyName();
-        mSaintUidList = per->saintUidList();
-        mSaintUidNameMap.insert(per->saintUidNameMap());
-        mFeastDay = per->feastDay();
+    setBirthday(per->birthday());
+    setBirthPlace(per->birthPlace());
 
-        mImgId = per->mImgId;
-        mImage.copy(per->mImage);
-        mIsDeleteImg = per->mIsDeleteImg;
+    setHollyName(per->hollyName());
+    setSaintUidList(per->saintUidList());
+    setSaintUidNameMap(per->saintUidNameMap());
 
-        mNationalityUid = per->nationalityUid();
-        mNationalityName = per->nationalityName();
+    setFeastDay(per->feastDay());
 
-        mEthnicUid = per->ethnicUid();
-        mEthnicName = per->ethnicName();
+    setImgId(per->mImgId);
+    mImage.copy(per->mImage);
+    mIsDeleteImg = per->mIsDeleteImg;
 
-        mIdCard = per->idCard();
-        mIdCardIssuePlace = per->idCardIssuePlace();
-        mIdCardIssueDate = per->idCardIssueDate();
+    setNationalityUid(per->nationalityUid());
+    setNationalityName(per->nationalityName());
 
-        mEduUid = per->eduUid();
-        mEduName = per->eduName();
-        mEduDetail = per->eduDetail();
+    setEthnicUid(per->ethnicUid());
+    setEthnicName(per->ethnicName());
 
-        mSpecialistUidList = per->specialistUidList();
-        mSpecialistInfo = per->specialistInfo();
+    setIdCard(per->idCard());
+    setIdCardIssuePlace(per->idCardIssuePlace());
+    setIdCardIssueDate(per->idCardIssueDate());
 
-        mCourseUid = per->courseUid();
-        mCourse = per->courseName();
+    setEduUid(per->eduUid());
+    setEduName(per->eduName());
+    setEduDetail(per->eduDetail());
 
-        mCountryUid = per->countryUid();
-        mCountryName = per->countryName();
-        mProvinceUid = per->provinceUid();
-        mProvinceName = per->provinceName();
-        mAddr = per->addr();
-        mChurchAddr = per->churchAddr();
-        mEmail = per->email();
-        mTel = per->tel();
-        mOtherContact = per->otherContact();
+    setSpecialistUidList(per->specialistUidList());
+    setSpecialistNameList(per->specialistNameList());
+    setSpecialistInfo(per->specialistInfo());
 
-        mDadName = per->dadName();
-        mDadBirthday = per->dadBirthday();
-        mDadAddr = per->dadAddr();
+    setCourseUid(per->courseUid());
+    setCourseName(per->courseName());
 
-        mMomName = per->momName();
-        mMomBirthday = per->momBirthday();
-        mMomAddr = per->momAddr();
+    setCountryUid(per->countryUid());
+    setCountryName(per->countryName());
 
-        mFamilyHistory = per->familyHistory();
-        mFamilyContact = per->familyContact();
+    setProvinceUid(per->provinceUid());
+    setProvinceName(per->provinceName());
 
-        mChristenDate = per->christenDate();
-        mChristenPlace = per->christenPlace();
+    setAddr(per->addr());
+    setChurchAddr(per->churchAddr());
+    setEmail(per->email());
+    setTel(per->tel());
+    setOtherContact(per->otherContact());
 
-        mEucharistPlace = per->eucharistPlace();
-        mEucharistDate = per->eucharistDate();
+    setDadName(per->dadName());
+    setDadBirthday(per->dadBirthday());
+    setDadAddr(per->dadAddr());
 
-        mHollyPlace = per->hollyPlace();
-        mHollyDate = per->hollyDate();
+    setMomName(per->momName());
+    setMomBirthday(per->momBirthday());
+    setMomAddr(per->momAddr());
 
-        mJoinDate = per->joinDate();
-        mJoinPICUid = per->joinPICUid();
-        mJoinPICName = per->joinPICName();
-        mJoinPICNameId = per->joinPICNameId();
+    setFamilyHistory(per->familyHistory());
+    setFamilyContact(per->familyContact());
 
-        mPreTrainJoinDate = per->preTrainJoinDate();
-        mPreTrainPICUid = per->preTrainPICUid();
-        mPreTrainPICName = per->preTrainPICName();
-        mPreTrainPICNameId = per->preTrainPICNameId();
-        mTrainJoinDate = per->trainJoinDate();
+    setChristenDate(per->christenDate());
+    setChristenPlace(per->christenPlace());
 
-        mTrainPICUid = per->trainPICUid();
-        mTrainPICName = per->trainPICName();
-        mTrainPICNameId = per->trainPICNameId();
+    setEucharistPlace(per->eucharistPlace());
+    setEucharistDate(per->eucharistDate());
 
-        mVowsDate = per->vowsDate();
-        mVowsCEOUid = per->vowsCEOUid();
-        mVowsCEOName = per->vowsCEOName();
-        mVowsCEONameId = per->vowsCEONameId();
+    setHollyPlace(per->hollyPlace());
+    setHollyDate(per->hollyDate());
 
-        mEternalVowsDate = per->eternalVowsDate();
-        mEternalVowsCEOUid = per->eternalVowsCEOUid();
-        mEternalVowsCEOName = per->eternalVowsCEOName();
-        mEternalVowsCEONameId = per->eternalVowsCEONameId();
-        mEternalVowsPICUid = per->eternalVowsPICUid();
-        mEternalVowsPICName = per->eternalVowsPICName();
-        mEternalVowsPICNameId = per->eternalVowsPICNameId();
+    setJoinDate(per->joinDate());
+    setJoinPICUid(per->joinPICUid());
+    setJoinPICName(per->joinPICName());
+    setJoinPICNameId(per->joinPICNameId());
 
-        mBankDate = per->bankDate();
-        mBankPlace = per->bankPlace();
+    setPreTrainJoinDate(per->preTrainJoinDate());
+    setPreTrainPICUid(per->preTrainPICUid());
+    setPreTrainPICName(per->preTrainPICName());
+    setPreTrainPICNameId(per->preTrainPICNameId());
 
-        mGoldenDate = per->goldenDate();
-        mGoldenPlace = per->goldenPlace();
+    setTrainJoinDate(per->trainJoinDate());
+    setTrainPICUid(per->trainPICUid());
+    setTrainPICName(per->trainPICName());
+    setTrainPICNameId(per->trainPICNameId());
 
-        mEternalDate = per->eternalDate();
-        mEternalPlace = per->eternalPlace();
+    setVowsDate(per->vowsDate());
+    setVowsCEOUid(per->vowsCEOUid());
+    setVowsCEOName(per->vowsCEOName());
+    setVowsCEONameId(per->vowsCEONameId());
 
-        mPersonStatusUid = per->personStatusUid();
-        mPersonStatusName = per->personStatusName();
+    setEternalVowsDate(per->eternalVowsDate());
+    setEternalVowsCEOUid(per->eternalVowsCEOUid());
+    setEternalVowsCEOName(per->eternalVowsCEOName());
+    setEternalVowsCEONameId(per->eternalVowsCEONameId());
+    setEternalVowsPICUid(per->eternalVowsPICUid());
+    setEternalVowsPICName(per->eternalVowsPICName());
+    setEternalVowsPICNameId(per->eternalVowsPICNameId());
 
-        mRetireDate = per->retireDate();
-        mRetirePlace = per->retirePlace();
+    setBankDate(per->bankDate());
+    setBankPlace(per->bankPlace());
 
-        mDeadDate = per->deadDate();
-        mDeadPlace = per->deadPlace();
+    setGoldenDate(per->goldenDate());
+    setGoldenPlace(per->goldenPlace());
 
-        mEventUidList = per->eventUidList();
+    setEternalDate(per->eternalDate());
+    setEternalPlace(per->eternalPlace());
 
-        mCommunityUid = per->communityUid();
-        mCommunityName = per->communityName();
-        mCommunityNameId = per->communityNameId();
-        mCurrentWorkUid = per->currentWorkUid();
-        mCurrentWorkName = per->currentWorkName();
-        mWorkHistory = per->workHistory();
+    setPersonStatusUid(per->personStatusUid());
+    setPersonStatusName(per->personStatusName());
 
-        mEventUidList = per->eventUidList();
-        setPersonEventList(per->personEventList());
-        mPersonEventListUpdated = per->mPersonEventListUpdated;
-    } else {
-        loge("no model to clone");
-    }
+    setRetireDate(per->retireDate());
+    setRetirePlace(per->retirePlace());
+
+    setDeadDate(per->deadDate());
+    setDeadPlace(per->deadPlace());
+
+    setEventUidList(per->eventUidList());
+
+    setCommunityUid(per->communityUid());
+    setCommunityName(per->communityName());
+    setCommunityNameId(per->communityNameId());
+
+    setCurrentWorkUid(per->currentWorkUid());
+    setCurrentWorkName(per->currentWorkName());
+    setWorkHistory(per->workHistory());
+
+    setPersonEventList(const_cast<Person*>(per)->personEventList());
+
+    setPersonEventListUpdated(per->mPersonEventListUpdated);
+
     traceout;
 }
 
@@ -1130,6 +1133,11 @@ ErrCode Person::prepare2Save()
     return ret;
 }
 
+void Person::setPersonEventListUpdated(bool newPersonEventListUpdated)
+{
+    mPersonEventListUpdated = newPersonEventListUpdated;
+}
+
 bool Person::personEventListUpdated() const
 {
     return mPersonEventListUpdated;
@@ -1186,7 +1194,7 @@ ErrCode Person::addPersonEvent(const DbModel *event)
     ErrCode err = ErrNone;
     if (event) {
         logd("clone event '%s'", STR2CHA(event->toString()));
-        DbModel* newEvent = event->clone();
+        DbModel* newEvent = CLONE_DBMODEL(event);
         if (newEvent) {
             mPersonEventList.insert(newEvent->nameId(), newEvent);
             markItemAsModified(KItemPersonEvent);

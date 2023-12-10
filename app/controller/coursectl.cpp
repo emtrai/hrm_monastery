@@ -29,6 +29,7 @@
 #include "defs.h"
 #include "prebuiltdefs.h"
 #include "controllerdefs.h"
+#include "modeldefs.h"
 
 GET_INSTANCE_CONTROLLER_IMPL(CourseCtl)
 

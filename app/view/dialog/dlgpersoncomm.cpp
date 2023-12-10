@@ -33,6 +33,7 @@
 #include "exception.h"
 #include "datetimeutils.h"
 #include "dialogutils.h"
+#include "modeldefs.h"
 
 
 DlgPersonCommunity::DlgPersonCommunity(QWidget *parent) :
@@ -178,7 +179,7 @@ ErrCode DlgPersonCommunity::appendPerson(const Person *person)
         loge("item '%s' is not person model", MODELSTR2CHA(person));
     }
     if (err == ErrNone) {
-        clone = CLONE_MODEL(person, Person);
+        clone = CLONE_MODEL_CONST1(person, Person);
         if (!clone) {
             err = ErrNoMemory;
             loge("No memory, cloned failed");
@@ -463,7 +464,7 @@ void DlgPersonCommunity::setCommunity(const Community *newCommunity)
     if (newCommunity) {
         int index = -1;
         FREE_PTR(mCommunity);
-        mCommunity = CLONE_MODEL(newCommunity, Community);
+        mCommunity = CLONE_MODEL_CONST1(newCommunity, Community);
         logd("newCommunity '%s'", MODELSTR2CHA(newCommunity));
         Utils::setSelectItemComboxByData(ui->cbCommunity, mCommunity->uid(), &index);
         logd("index = %d", index);
@@ -495,7 +496,7 @@ ErrCode DlgPersonCommunity::appendCommunityPerson(const CommunityPerson *commPer
         err = ErrInvalidArg;
     }
     if (err == ErrNone) {
-        newCommPer = CLONE_MODEL(commPer, CommunityPerson);
+        newCommPer = CLONE_MODEL_CONST1(commPer, CommunityPerson);
         if (newCommPer) {
             mCommunityPersonList.append(newCommPer);
         } else {

@@ -76,6 +76,7 @@
 
 #include "defs.h"
 #include "exception.h"
+#include "modeldefs.h"
 
 static const QString DRIVER("QSQLITE");
 
@@ -294,7 +295,7 @@ ErrCode_t DbSqlite::checkOrCreateAllTables()
 #ifdef DEBUG_TRACE
         qint64 seq = 0;
         seq = getDbSeqNumber(key, &ok);
-        logd("Get seq number of tbl '%s', seq = %d, ok = %d", STR2CHA(key), seq, ok);
+        logd("Get seq number of tbl '%s', seq = %lld, ok = %d", STR2CHA(key), seq, ok);
 #endif
         qint64 tblVer = mMetaDbInfo.tableVersion(key, &ok);
         if (ok) {

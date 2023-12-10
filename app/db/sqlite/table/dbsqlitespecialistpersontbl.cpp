@@ -29,6 +29,7 @@
 #include "dbsqlitetablebuilder.h"
 #include "model/specialistperson.h"
 #include "dbsqliteinsertbuilder.h"
+#include "dbsqliteupdatebuilder.h"
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QHash>
@@ -37,6 +38,7 @@
 #include "specialist.h"
 #include "dbsqlite.h"
 #include "person.h"
+#include "modeldefs.h"
 
 const qint32 DbSqliteSpecialistPersonTbl::KVersionCode = VERSION_CODE(0,0,1);
 
@@ -181,5 +183,34 @@ ErrCode DbSqliteSpecialistPersonTbl::updateDbModelDataFromQuery(DbModel *item, c
         loge("Invalid mapp model '%s', do nothing", modelName.toStdString().c_str());
     }
     traceout;
+    return err;
+}
+
+ErrCode DbSqliteSpecialistPersonTbl::updateBuilderFieldFromModel(DbSqliteUpdateBuilder *builder,
+                                                                 const QString &field, const DbModel *item)
+{
+
+    tracein;
+    ErrCode err = ErrNone;
+    logd("update table field '%s' for model '%s'", STR2CHA(field), MODELSTR2CHA(item));
+    if (!builder || !item || field.isEmpty()) {
+        err = ErrInvalidArg;
+        loge("invalid arg");
+    }
+    if (err == ErrNone) {
+        if (IS_MODEL_NAME(item, KModelNameSpecialistPerson)) {
+            const SpecialistPerson* per = static_cast<const SpecialistPerson*>(item);
+            if (field == KItemExperience) {
+                builder->addValue(KFieldExperienceHistory, per->experienceHistory());
+
+            } else {
+                err = DbSqliteMapTbl::updateBuilderFieldFromModel(builder, field, item);
+            }
+        } else {
+            loge("Model '%s' is no support", MODELSTR2CHA(item));
+            err = ErrNotSupport;
+        }
+    }
+    traceret(err);
     return err;
 }

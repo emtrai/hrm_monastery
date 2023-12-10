@@ -33,6 +33,7 @@
 #include "dialogutils.h"
 #include "datetimeutils.h"
 #include "communitymanager.h"
+#include "modeldefs.h"
 
 UICommunityMgrListView::UICommunityMgrListView(QWidget *parent):
     UICommonListView(parent)

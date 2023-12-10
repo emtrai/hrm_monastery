@@ -26,6 +26,7 @@
 #include "defs.h"
 #include "dbmodel.h"
 #include "prebuiltdefs.h"
+#include "modeldefs.h"
 #include "stringdefs.h"
 
 Ethnic::Ethnic():DbModel()
@@ -51,18 +52,13 @@ QString Ethnic::modelName() const
     return KModelNameEthnic;
 }
 
-void Ethnic::clone(const DbModel *model)
+void Ethnic::_copyData(const DbModel& model)
 {
     tracein;
-    DbModel::clone(model);
-    if (model && model->modelName() == KModelNameEthnic) {
-        Ethnic* ethnic = (Ethnic*)model;
-        mCountryUid = ethnic->mCountryUid;
-        mCountryDbId = ethnic->mCountryDbId;
-        mCountryName = ethnic->mCountryName;
-    } else {
-        loge("null or invald model name '%s'", model?STR2CHA(model->modelName()):"null");
-    }
+    const Ethnic* ethnic = static_cast<const Ethnic*>(&model);
+    setCountryUid(ethnic->mCountryUid);
+    setCountryDbId(ethnic->mCountryDbId);
+    setCountryName(ethnic->mCountryName);
     traceout;
 }
 

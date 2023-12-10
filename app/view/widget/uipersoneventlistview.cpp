@@ -32,6 +32,7 @@
 #include "dialog/dlgaddpersonevent.h"
 #include "stringdefs.h"
 #include "dialogutils.h"
+#include "modeldefs.h"
 
 UIPersonEventListView::UIPersonEventListView(QWidget *parent):
     UICommonListView(parent)

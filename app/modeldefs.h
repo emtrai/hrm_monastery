@@ -23,6 +23,12 @@
 #ifndef MODELDEFS_H
 #define MODELDEFS_H
 
+enum DbModelType {
+    MODEL_UNKNOWN = 0,
+    MODEL_MAP = 1 << 0,
+    MODEL_TYPE_MAX
+};
+
 const char* const KModelHdlCountry = "modelhdl@country";
 const char* const KModelHdlEdu = "modelhdl@education";
 const char* const KModelHdlCommunity = "modelhdl@community";

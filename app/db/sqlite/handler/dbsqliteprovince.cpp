@@ -25,6 +25,7 @@
 #include "province.h"
 #include "dbsqlitedefs.h"
 #include "dbsqlite.h"
+#include "modeldefs.h"
 
 DbSqliteProvince::DbSqliteProvince()
 {

@@ -33,6 +33,7 @@
 #include <QSqlRecord>
 #include <QHash>
 #include "utils.h"
+#include "modeldefs.h"
 
 const qint32 DbSqliteCourseTbl::KVersionCode = VERSION_CODE(0,0,1);
 

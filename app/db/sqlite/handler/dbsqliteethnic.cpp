@@ -27,6 +27,7 @@
 #include "dbsqlitedefs.h"
 #include "dbsqlite.h"
 #include "person.h"
+#include "modeldefs.h"
 
 GET_INSTANCE_IMPL(DbSqliteEthnic)
 

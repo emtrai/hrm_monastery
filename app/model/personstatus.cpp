@@ -23,6 +23,7 @@
 #include "logger.h"
 #include "dbctl.h"
 #include "dbmodel.h"
+#include "modeldefs.h"
 
 PersonStatus::PersonStatus():DbModel()
 {

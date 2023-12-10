@@ -2,8 +2,8 @@ APP_VER_MAJOR=1
 APP_VER_MINOR=0
 APP_VER_PATCH=0
 
-BUILD_MODE = RELEASE
-#BUILD_MODE = DEBUG
+#BUILD_MODE = RELEASE
+BUILD_MODE = DEBUG
 
 QT       += core gui
 
@@ -19,6 +19,11 @@ QT += printsupport
 
 DEFINES += FEATURE_system_sqlite=OFF
 
+win32 {
+    QTSDK_VER = 6.4.0
+} macx {
+    QTSDK_VER = 6.5.0
+}
 
 
 #DEFINES += TEST_ENABLE
@@ -37,6 +42,7 @@ DEFINES += VER_MAJOR=$${APP_VER_MAJOR}
 DEFINES += VER_MINOR=$${APP_VER_MINOR}
 DEFINES += VER_PATCH=$${APP_VER_PATCH}
 DEFINES += BUILD_MODE=$${BUILD_MODE}
+DEFINES += QTSDK_VER=$${QTSDK_VER}
 
 # Supporting provine for person is quite complicated
 # as it need to sync up with country
@@ -45,7 +51,8 @@ DEFINES += BUILD_MODE=$${BUILD_MODE}
 # TODO: check to support person province info
 SUPPORT_PROVINE = OFF
 
-QMAKE_CXXFLAGS += -Werror=return-type -Wno-unused-parameter -Wextra
+QMAKE_CXXFLAGS += -Werror=return-type
+QMAKE_CXXFLAGS += -Wno-unused-parameter
 
 # QXlsx code for Application Qt project
 QXLSX_PARENTPATH=QXlsx/QXlsx/         # current QXlsx path is . (. means curret directory)

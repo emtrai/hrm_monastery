@@ -32,6 +32,7 @@
 #include "dbsqliteinsertbuilder.h"
 #include "dbsqliteupdatebuilder.h"
 #include "dbmodel.h"
+#include "modeldefs.h"
 
 /**
  * VERSION 0.0.1:

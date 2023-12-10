@@ -28,6 +28,7 @@
 #include "utils.h"
 #include "departctl.h"
 #include "stringdefs.h"
+#include "modeldefs.h"
 
 UIDepartmentListView::UIDepartmentListView(QWidget *parent):
     UICommonListView(parent)

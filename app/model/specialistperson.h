@@ -47,7 +47,7 @@ public:
 
 protected:
     virtual DbModelHandler *getDbModelHandler() const;
-    virtual void copy(const DbModel* model);
+    virtual void _copyData(const DbModel& model);
 protected:
     QString mExperienceHistory;
     DbModel* mSpecialist;

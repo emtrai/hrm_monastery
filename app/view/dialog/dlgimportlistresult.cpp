@@ -401,7 +401,7 @@ void DlgImportListResult::setTargetModel(const DbModel *newTargetModel)
     FREE_PTR(mTargetModel);
     if (newTargetModel) {
         logd("clone model '%s'", MODELSTR2CHA(newTargetModel));
-        mTargetModel = CLONE_MODEL(newTargetModel, DbModel);
+        mTargetModel = CLONE_DBMODEL(newTargetModel);
     } else {
         logw("null input value");
     }

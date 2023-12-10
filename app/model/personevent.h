@@ -37,14 +37,8 @@ public:
     virtual ErrCode buildNameIdFromOthersNameId(const QString& perNameId, const QString& eventNameId, const QString& date = nullptr);
     virtual DbModelBuilder getBuilder() const;
     virtual QString modelName() const;
-    virtual void clone(const DbModel* model);
     virtual QString exportHtmlTemplateFile(const QString& name) const;
     virtual void initExportFields();
-    /**
-     * @brief Copy data only, except identity such as uid, nameid, dbid
-     * @param model
-     */
-    virtual ErrCode copyData(const DbModel* model);
     virtual void buildUidIfNotSet();
 
     qint64 date() const;
@@ -73,6 +67,11 @@ public:
     QString toEventString() const;
 protected:
     virtual DbModelHandler *getDbModelHandler() const;
+    /**
+     * @brief Copy data only, except identity such as uid, nameid, dbid
+     * @param model
+     */
+    virtual void _copyData(const DbModel& model);
 private:
     qint64 mDate;
     qint64 mEndDate;

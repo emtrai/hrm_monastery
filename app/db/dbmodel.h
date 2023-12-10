@@ -29,11 +29,17 @@
 #include "utils.h"
 #include "idataimporter.h"
 #include "dataexporter.h"
-#include "modeldefs.h"
 #include <QAtomicInt>
-#include "importtype.h"
 
-#define CLONE_MODEL(model, type) (model?((type*)((DbModel*)model)->clone()):nullptr)
+#define CLONE_MODEL(model, type) \
+        (model?(static_cast<type*>(static_cast<DbModel*>(model)->clone())):nullptr)
+
+#define CLONE_MODEL_CONST1(model, type) \
+    (model?(static_cast<type*>(static_cast<const DbModel*>(model)->clone())):nullptr)
+
+#define CLONE_MODEL_CONST2(model, type) \
+    (model?(static_cast<const type*>(static_cast<const DbModel*>(model)->clone())):nullptr)
+
 #define CLONE_DBMODEL(model) (model?(model->clone()):nullptr)
 #define CLONE_LIST(list, type) DbModel::cloneListModel<type>(list)
 #define CLONE_LIST_DBMODEL(list) CLONE_LIST(list, DbModel)
@@ -242,27 +248,34 @@ public:
         }
         return outList;
     }
-private:
-    void docopy(const DbModel& model);
 protected:
     DbModel();
     DbModel(const DbModel& model);
     DbModel(const DbModel* model);
-    virtual void copy(const DbModel* model);
+    /**
+     * @brief copy data, derived class should implemen this to copy its data
+     * @param model
+     */
+    virtual void copyData(const DbModel* model);
+    virtual void _copyData(const DbModel& model);
+private:
+    /**
+     * @brief internal function to do copy data of this class
+     *        can be overloaded, but not virtual, because this funciton is called
+     *        in constructor.
+     *        WARNING: this function is non-virtual, so derived class need to take care of this!!!!
+     * @param model
+     */
+    void docopy(const DbModel& model, bool all = true);
 public:
     virtual ~DbModel();
     virtual void init();
     virtual DbModelBuilder getBuilder() const = 0;
     // TODO: override operation ==?
 
-    virtual void clone(const DbModel* model);
+    virtual void clone(const DbModel* model, bool all = true);
     virtual DbModel* clone() const;
 
-    /**
-     * @brief Copy data only, except identity such as uid, nameid, dbid
-     * @param model
-     */
-    virtual ErrCode copyData(const DbModel* model);
     virtual void incRef(); // TODO: change to use reference counter to avoid overhead when clone
     virtual void decRef();
     virtual QString modelName() const;

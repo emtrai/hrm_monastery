@@ -32,6 +32,7 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QHash>
+#include "modeldefs.h"
 
 #define VERSION_CODE_1 VERSION_CODE(0,0,1)
 #define VERSION_CODE_2 VERSION_CODE(0,0,2)

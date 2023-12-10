@@ -28,6 +28,7 @@
 #include "dbctl.h"
 #include "defs.h"
 #include "dbmodel.h"
+#include "modeldefs.h"
 
 
 Mission::Mission():DbModel()

@@ -28,6 +28,7 @@
 #include "defs.h"
 #include <QMap>
 #include "prebuiltdefs.h"
+#include "modeldefs.h"
 
 PersonDept::PersonDept():DbModel(),
     mModelStatus(0)
@@ -45,18 +46,6 @@ DbModel *PersonDept::build()
 DbModelBuilder PersonDept::getBuilder() const
 {
     return &PersonDept::build;
-}
-
-void PersonDept::clone(const DbModel *model)
-{
-    tracein;
-    DbModel::clone(model);
-    if (model && model->modelName() == KModelNamePersonDept) {
-        copy(*((PersonDept*)model));
-    } else {
-        loge("cloned failed, model is null or invalid name '%s'", model?STR2CHA(model->toString()):"null");
-    }
-    traceout;
 }
 
 QString PersonDept::toString() const
@@ -239,28 +228,29 @@ DbModelHandler *PersonDept::getDbModelHandler() const
     return DB->getModelHandler(KModelHdlCommDept); // TODO: suitable???
 }
 
-void PersonDept::copy(const PersonDept &model)
+void PersonDept::_copyData(const DbModel& model)
 {
     tracein;
-    mRoleUid = model.mRoleUid;
-    mRoleName = model.mRoleName;
-    mRoleNameId = model.mRoleNameId;
-    mCourseUid = model.mCourseUid;
-    mCourseName = model.mCourseName;
-    mCourseNameId = model.mCourseNameId;
-    mStartDate = model.mStartDate;
-    mEndDate = model.mEndDate;
-    mModelStatusName = model.mModelStatusName;
-    mModelStatus = model.mModelStatus;
-    mCommDeptUid = model.mCommDeptUid;
-    mCommDeptNameId = model.mCommDeptNameId;
-    mCommDeptName = model.mCommDeptName;
-    mPersonUid = model.mPersonUid;
-    mPersonName = model.mPersonName;
-    mPersonNameId = model.mPersonNameId;
-    mPersonEmail = model.mPersonEmail;
-    mPersonTel = model.mPersonTel;
-    mChangeHistory = model.mChangeHistory;
+    const PersonDept* per = static_cast<const PersonDept*>(&model);
+    setRoleUid(per->mRoleUid);
+    setRoleName(per->mRoleName);
+    setRoleNameId(per->mRoleNameId);
+    setCourseUid(per->mCourseUid);
+    setCourseName(per->mCourseName);
+    setCourseNameId(per->mCourseNameId);
+    setStartDate(per->mStartDate);
+    setEndDate(per->mEndDate);
+    setModelStatusName(per->mModelStatusName);
+    setModelStatus(per->mModelStatus);
+    setCommDeptUid(per->mCommDeptUid);
+    setCommDeptNameId(per->mCommDeptNameId);
+    setCommDeptName(per->mCommDeptName);
+    setPersonUid(per->mPersonUid);
+    setPersonName(per->mPersonName);
+    setPersonNameId(per->mPersonNameId);
+    setPersonEmail(per->mPersonEmail);
+    setPersonTel(per->mPersonTel);
+    setChangeHistory(per->mChangeHistory);
     traceout;
 }
 

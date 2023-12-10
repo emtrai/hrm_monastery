@@ -30,6 +30,7 @@
 #include "defs.h"
 #include "dbmodel.h"
 #include "prebuiltdefs.h"
+#include "modeldefs.h"
 
 const QHash<int, QString> *Course::getCourseTypeNameMap()
 {
@@ -84,19 +85,15 @@ DbModel *Course::build()
 
 }
 
-void Course::clone(const DbModel *model)
+void Course::_copyData(const DbModel& model)
 {
     tracein;
-    if (model && model->modelName() == KModelNameCourse) {
-        DbModel::clone(model);
-        Course* course = (Course*)model;
-        setCourseType(course->courseType());
-        setStartDate(course->startDate());
-        setEndDate(course->endDate());
-        setPeriod(course->period());
-    } else {
-        logd("Model is null or not course type, name '%s'", model?STR2CHA(model->name()):"null");
-    }
+    const Course* course = static_cast<const Course*>(&model);
+    setCourseType(course->courseType());
+    setStartDate(course->startDate());
+    setEndDate(course->endDate());
+    setPeriod(course->period());
+
     traceout;
 }
 
@@ -192,7 +189,6 @@ QString Course::courseTypeName() const
 
 void Course::setCourseType(qint32 newCourseType)
 {
-    mCourseType = newCourseType;
     CHECK_MODIFIED_THEN_SET(mCourseType, newCourseType, KItemCourseType);
 }
 

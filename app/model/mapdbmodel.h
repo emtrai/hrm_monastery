@@ -50,7 +50,6 @@ public:
     virtual ~MapDbModel();
     MapDbModel(const MapDbModel& model);
     MapDbModel(const MapDbModel* model);
-    virtual void clone(const DbModel* model);
     virtual void dump() const;
     static DbModel* buildMapModel(DbModelBuilder builder, const DbModel* item1, const DbModel* item2,
                                   int status = MODEL_STATUS_MAX,
@@ -99,9 +98,10 @@ public:
 
 
     virtual QString toString() const;
-
+protected:
+    virtual void copyData(const DbModel* model);
 private:
-    void docopy(const MapDbModel& model);
+    void docopy(const DbModel& model);
 protected:
     QString mUid1;
     qint64 mDbId1;

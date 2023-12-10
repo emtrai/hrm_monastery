@@ -27,6 +27,7 @@
 #include "persondept.h"
 #include "areaperson.h"
 #include "communitymanager.h"
+#include "modeldefs.h"
 
 GET_INSTANCE_IMPL(DbSqliteCourse)
 

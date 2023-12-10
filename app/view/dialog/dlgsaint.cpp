@@ -30,6 +30,7 @@
 #include "dialogutils.h"
 #include "stringdefs.h"
 #include "mainwindow.h"
+#include "modeldefs.h"
 
 DlgSaint::DlgSaint(QWidget *parent) :
     QDialog(parent),

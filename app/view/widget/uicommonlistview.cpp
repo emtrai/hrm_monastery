@@ -648,7 +648,7 @@ ErrCode UICommonListView::setParentModel(const DbModel *newParentModel)
     ErrCode err = ErrNone;
     FREE_PTR(mParentModel);
     if (newParentModel) {
-        mParentModel = CLONE_MODEL(newParentModel, DbModel);
+        mParentModel = CLONE_DBMODEL(newParentModel);
     } else {
         logw("null value is set");
     }

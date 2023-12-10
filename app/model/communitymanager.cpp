@@ -32,6 +32,7 @@
 #include "community.h"
 #include "prebuiltdefs.h"
 #include "stringdefs.h"
+#include "modeldefs.h"
 
 CommunityManager::CommunityManager():MapDbModel(),
     mPerson(nullptr),
@@ -70,20 +71,15 @@ QString CommunityManager::modelName() const
     return KModelNameCommManager;
 }
 
-void CommunityManager::clone(const DbModel *model)
+void CommunityManager::_copyData(const DbModel& model)
 {
     tracein;
-    if (model) {
-        MapDbModel::clone(model);
-        if (model->modelName() == modelName()) {
-            logd("clone person & community");
-            CommunityManager* commper = (CommunityManager*) model;
-            CLEAR_THEN_SET(mPerson, commper->person(), Person);
-            CLEAR_THEN_SET(mCommunity, commper->community(), Community);
-            CLEAR_THEN_SET(mRole, commper->role(), Role);
-            CLEAR_THEN_SET(mCourse, commper->course(), Course);
-        }
-    }
+    logd("clone person & community");
+    const CommunityManager* commper = static_cast<const CommunityManager*>(&model);
+    setPerson(commper->person());
+    setCommunity(commper->community());
+    setRole(commper->role());
+    setCourse(commper->course());
     traceout;
 }
 
@@ -219,6 +215,7 @@ void CommunityManager::setCommunity(const Community *newCommunity)
 {
     tracein;
     CLEAR_THEN_SET(mCommunity, newCommunity, Community);
+    setCommunityUid(KUidNone);
     if (mCommunity && communityUid().isEmpty()) {
         setCommunityUid(mCommunity->uid());
     }
@@ -257,6 +254,7 @@ void CommunityManager::setPerson(const Person *newPerson)
 {
     tracein;
     CLEAR_THEN_SET(mPerson, newPerson, Person);
+    setPersonUid(KUidNone);
     if (mPerson && personUid().isEmpty()) {
         setPersonUid(mPerson->uid());
     }
